@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр Умножения - Математика в Minecraft</title>
+    <link rel="stylesheet" href="../style.css"> </head>
+<body class="trainer-page"> <a href="../index.html" class="back-button">&#x2190;</a> 
+    <h1 class="trainer-title">Тренажёр Умножения</h1>
+
+    <div class="problem-container">
+        <span id="num1" class="number-display">?</span>
+        <span class="operator-display"> &#x00D7; </span> <span id="num2" class="number-display">?</span>
+        <span class="operator-display"> = </span>
+        <input type="number" id="trainer-answer-input" placeholder="Ответ">
+    </div>
+
+    <div class="trainer-controls">
+        <button id="trainer-check-button" class="minecraft-button-variant-two">Проверить</button>
+    </div>
+
+    <div id="trainer-feedback" class="feedback">
+        </div>
+
+    <div class="decoration">
+        <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon"> </div>
+
+    <script src="../js/multiplication_trainer.js"></script> </body>
+</html>

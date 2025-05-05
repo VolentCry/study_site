@@ -65,6 +65,20 @@ body {
     /* ... другие стили кнопок ... */
 }
 
+.minecraft-button-variant-two {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: rgb(70, 190, 68); /* Зеленый цвет */
+    color: white;
+    text-decoration: none;
+    border: 3px solid rgb(41, 167, 39); /* Темная рамка */
+    box-shadow: 3px 3px 0px rgb(36, 146, 34); /* Тень для 3D эффекта */
+    font-size: 1.5em;
+    cursor: pointer;
+    image-rendering: pixelated; /* Для сохранения пиксельности при масштабировании */
+    /* ... другие стили кнопок ... */
+}
+
 .pulsating-button {
     animation: pulse 1.5s infinite;
 }
@@ -137,6 +151,16 @@ body {
     white-space: nowrap;
     width: auto;
     min-width: 120px;
+}
+
+.mode-button {
+    /* Можно сделать их пошире или другого цвета */
+    background-color: #DAA520; /* Золотистый, как золото в Minecraft */
+    border-color: #b8860b;
+    box-shadow: 3px 3px 0px #b8860b;
+    grid-column: span 2; /* Пример: занять 2 колонки в сетке, если нужно */
+    /* Или просто оставить как есть, если не нужно отличие */
+    animation: pulse 1.5s infinite;
 }
 
 .task-button:hover {
@@ -270,4 +294,228 @@ body {
 .nav-button {
     padding: 10px 15px;
     font-size: 1.2em;
+}
+
+/* Стили для страницы теста */
+.test-page {
+    /* Можно задать фон */
+    background: url('../assets/images/dirt_background.png'); /* Текстура земли */
+    padding: 80px 20px 40px 20px;
+    box-sizing: border-box;
+    position: relative;
+    min-height: 100vh;
+    font-family: 'MinecraftFont', sans-serif;
+    color: #FFF; /* Белый текст на темном фоне */
+}
+
+.test-title {
+    text-align: center;
+    font-size: 2.5em;
+    text-shadow: 2px 2px #333;
+    margin-bottom: 10px;
+}
+
+.test-instructions {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px #333;
+}
+
+/* Сетка для примеров */
+.problems-grid {
+    display: grid;
+    /* Адаптивная сетка: 1 или 2 колонки в зависимости от ширины */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px; /* Промежутки между примерами */
+    max-width: 800px; /* Ограничение ширины */
+    margin: 0 auto 30px auto; /* Центрирование */
+    background-color: rgba(0, 0, 0, 0.2); /* Легкий фон для области примеров */
+    padding: 20px;
+    border: 3px solid #6b4423; /* Темно-коричневая рамка */
+}
+
+.problem-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Распределение элементов */
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.1); /* Фон для каждого примера */
+    border-radius: 3px;
+}
+
+.problem-item span {
+    font-size: 1.5em;
+    margin: 0 5px;
+}
+
+.problem-item input[type="number"] {
+    width: 60px; /* Узкое поле для ответа */
+    padding: 5px;
+    font-size: 1.3em;
+    text-align: center;
+    border: 2px solid #505050;
+    background-color: #c6c6c6;
+    font-family: 'MinecraftFont', sans-serif;
+    /* Убираем стрелочки у number input */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.problem-item input[type="number"]::-webkit-outer-spin-button,
+.problem-item input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+/* Стили для иконки результата */
+.result-icon {
+    font-size: 1.5em;
+    min-width: 25px; /* Резервируем место */
+    text-align: center;
+    font-weight: bold;
+}
+.result-icon.correct {
+    color: #32CD32; /* Lime Green */
+}
+.result-icon.incorrect {
+    color: #FF4500; /* Orange Red */
+}
+
+/* Стили для инпутов после проверки */
+.problem-item input.correct {
+    background-color: #7FFF7F;
+    border-color: #008000;
+    color: #004d00;
+}
+.problem-item input.incorrect {
+    background-color: #FF7F7F;
+    border-color: #8B0000;
+    color: #5b0000;
+}
+
+
+/* Стили для блока результатов */
+.results-display {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border: 3px solid #4a2a0f;
+    box-shadow: 3px 3px 0px #4a2a0f;
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: center;
+}
+.results-display h2 {
+    margin-top: 0;
+    font-size: 1.8em;
+    color: #FFD700; /* Золотой */
+}
+#results-summary {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Контейнер для кнопок */
+.test-controls {
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Стили для страницы тренажера (если нужны отличия от task-page) */
+.trainer-page {
+    /* Например, другой фон */
+    background: url('../assets/images/stone_background.png'); /* Текстура камня */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Центрируем контент */
+    min-height: 100vh;
+    padding: 80px 20px 20px 20px; /* Отступ сверху для кнопки "Назад" */
+    box-sizing: border-box;
+    position: relative; /* Для позиционирования кнопки "Назад" и декораций */
+    font-family: 'MinecraftFont', sans-serif; /* Убедимся, что шрифт применен */
+}
+
+.trainer-title {
+    font-size: 2.5em;
+    color: #e4e4e4; /* Белый текст на каменном фоне */
+    text-shadow: 2px 2px #333; /* Тень для читаемости */
+    margin-bottom: 40px;
+}
+
+.problem-container {
+    background-color: rgba(0, 0, 0, 0.3); /* Полупрозрачный фон для блока с примером */
+    padding: 20px 30px;
+    border: 3px solid #505050;
+    box-shadow: 3px 3px 0px #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.number-display, .operator-display {
+    font-size: 3em; /* Крупные цифры и знаки */
+    color: #FFF;
+    text-shadow: 2px 2px #333;
+    margin: 0 10px;
+}
+
+#trainer-answer-input {
+    /* Стилизуем похоже на input из задач */
+    padding: 10px;
+    border: 3px solid #505050;
+    background-color: #c6c6c6;
+    font-family: 'MinecraftFont', sans-serif;
+    font-size: 2em; /* Крупный шрифт для ввода */
+    width: 100px; /* Ширина поля ввода */
+    text-align: center;
+    margin-left: 10px; /* Небольшой отступ от знака '=' */
+}
+
+/* Стили для .correct и .incorrect можно использовать те же, что и для #answer-input */
+#trainer-answer-input.correct {
+    background-color: #7FFF7F;
+    border-color: #008000;
+    color: #004d00;
+}
+
+#trainer-answer-input.incorrect {
+    background-color: #FF7F7F;
+    border-color: #8B0000;
+    color: #5b0000;
+}
+
+
+.trainer-controls {
+    margin-bottom: 20px;
+}
+
+/* Стили для feedback можно использовать те же */
+#trainer-feedback {
+    min-height: 1.2em;
+    font-size: 1.3em;
+    margin-top: 5px;
+    font-weight: bold;
+    color: #FFF; /* Белый текст для сообщения */
+    text-shadow: 1px 1px #333;
+}
+
+/* Декоративный элемент (пример) */
+.decoration {
+   position: absolute;
+   bottom: 20px;
+   right: 20px;
+}
+
+.spinning-icon {
+   width: 50px;
+   height: 50px;
+   image-rendering: pixelated;
+   animation: spin 5s linear infinite; /* Анимация вращения */
+}
+
+@keyframes spin {
+   from { transform: rotate(0deg); }
+   to { transform: rotate(360deg); }
 }
