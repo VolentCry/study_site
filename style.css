@@ -1,0 +1,273 @@
+/* Подключение шрифта (пример) */
+@font-face {
+    font-family: 'MinecraftFont';
+    src: url('../assets/fonts/minecraftia.ttf') format('truetype'); /* Укажи путь к файлу шрифта */
+}
+
+body {
+    font-family: 'MinecraftFont', sans-serif; /* Применяем шрифт */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.welcome-page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    max-width: 800px;
+    padding: 40px;
+    text-align: center;
+}
+
+.welcome-title {
+    font-size: 2.5em;
+    color: #333;
+    margin: 0;
+}
+
+.welcome-text {
+    font-size: 1.5em;
+    color: #555;
+    margin: 0;
+}
+
+.welcome-button {
+    margin-top: 20px;
+}
+
+.minecraft-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: #8B4513; /* Коричневый цвет дерева */
+    color: white;
+    text-decoration: none;
+    border: 3px solid #4a2a0f; /* Темная рамка */
+    box-shadow: 3px 3px 0px #4a2a0f; /* Тень для 3D эффекта */
+    font-size: 1.5em;
+    cursor: pointer;
+    image-rendering: pixelated; /* Для сохранения пиксельности при масштабировании */
+    /* ... другие стили кнопок ... */
+}
+
+.pulsating-button {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Стили для .welcome-page, .welcome-container и т.д. */
+
+.tasks-page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.tasks-title {
+    font-size: 2.5em;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+@media (max-width: 900px) {
+    .tasks-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .tasks-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.task-button {
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 1em;
+    background-color: #7f7f7f;
+    border-color: #505050;
+    box-shadow: 3px 3px 0px #505050;
+    transition: transform 0.2s ease;
+    white-space: nowrap;
+    width: auto;
+    min-width: 120px;
+}
+
+.task-button:hover {
+    transform: translateY(-2px);
+}
+
+.answer-section {
+    margin-top: 20px;
+    text-align: center;
+}
+#answer-input {
+    padding: 10px;
+    border: 3px solid #505050; /* Серая рамка */
+    background-color: #c6c6c6; /* Светло-серый фон */
+    font-family: 'MinecraftFont', sans-serif;
+    font-size: 1.2em;
+    width: 150px;
+    text-align: center;
+    margin-bottom: 10px;
+    display: block; /* Чтобы margin auto работал */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Стили для правильного/неправильного ответа */
+#answer-input.correct {
+    background-color: #7FFF7F; /* Светло-зеленый */
+    border-color: #008000; /* Зеленый */
+    color: #004d00; /* Темно-зеленый текст */
+}
+
+#answer-input.incorrect {
+    background-color: #FF7F7F; /* Светло-красный */
+    border-color: #8B0000; /* Темно-красный */
+    color: #5b0000; /* Очень темно-красный текст */
+}
+
+.feedback {
+    min-height: 1.2em; /* Резервируем место под сообщение */
+    font-size: 1.1em;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+
+/* Стили для неактивных кнопок */
+.nav-button.disabled {
+    background-color: #a0a0a0; /* Серый */
+    color: #606060;
+    border-color: #606060;
+    box-shadow: none;
+    cursor: default;
+    pointer-events: none; /* Отключаем события мыши */
+}
+
+
+/* Стили для .task-page, .back-button, .task-title, .task-content, #animation-container, .task-text, .navigation-buttons, .nav-button */
+.task-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative; /* Для позиционирования кнопок */
+    padding: 50px 20px 80px 20px; /* Отступы сверху/снизу/по бокам */
+    box-sizing: border-box; /* Чтобы padding не увеличивал размер */
+}
+
+.back-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 2em;
+    color: #333;
+    text-decoration: none;
+    background: #ddd;
+    border: 2px solid #888;
+    padding: 0px 8px;
+    border-radius: 4px; /* Небольшое скругление или оставить острым */
+}
+.back-button:hover {
+    background: #ccc;
+}
+
+
+.task-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+}
+
+.task-content {
+    display: flex;
+    flex-direction: column; /* Или row, если анимация сбоку от текста */
+    align-items: center;
+    margin-bottom: 20px;
+    flex-grow: 1; /* Занимает доступное пространство */
+}
+
+#animation-container {
+    width: 200px; /* Примерный размер */
+    height: 200px; /* Примерный размер */
+    margin-bottom: 20px;
+    /* Стили для фона или рамки контейнера анимации */
+    background-color: rgba(0,0,0,0.1); /* Легкий фон для обозначения */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#animation-container img {
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+}
+
+
+.task-text {
+    font-size: 1.3em;
+    text-align: center;
+    max-width: 600px; /* Ограничение ширины текста */
+    line-height: 1.5;
+}
+
+.navigation-buttons {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-button {
+    padding: 10px 15px;
+    font-size: 1.2em;
+}
