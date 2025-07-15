@@ -7,9 +7,14 @@
     <link rel="stylesheet" href="../../../style.css">
 </head>
 <body class="tasks-page">
-    <a href="../index.html" class="back-button">&#x2190;</a> 
+    <a href="../index.html" class="back-button" style="position: fixed; top: 18px; left: 18px; z-index: 300;">&#x2190;</a>
+    <div class="sidebar-nav">
+        <button class="minecraft-button nav-theme-button" onclick="document.getElementById('multiplication-section').scrollIntoView({behavior: 'smooth'});">Умножение</button>
+        <button class="minecraft-button nav-theme-button" onclick="document.getElementById('way-section').scrollIntoView({behavior: 'smooth'});">Путь</button>
+        <button class="minecraft-button nav-theme-button" onclick="document.getElementById('cost-section').scrollIntoView({behavior: 'smooth'});">Стоимость</button>
+    </div>
     <div class="tasks-container">
-        <h1 class="tasks-title">Задачи на умножение</h1>
+        <h1 id="multiplication-section" class="tasks-title">Задачи на умножение</h1>
         <h2 class="tasks-title" style="font-size: 25px;">Лёгкий уровень:</h2>
         <div class="tasks-grid">
             <a href="multiplication_tasks/easy_tasks/task1.html" class="minecraft-button task-button">Задача 1</a>
@@ -70,7 +75,7 @@
             <a href="multiplication_tasks/medium_tasks/task16.html" class="minecraft-button task-button">Задача 16</a>
             <a href="multiplication_tasks/medium_tasks/task17.html" class="minecraft-button task-button">Задача 17</a> 
         </div>
-        <h1 class="tasks-title">Задачи на формулу пути</h1>
+        <h1 id="way-section" class="tasks-title">Задачи на формулу пути</h1>
         <a href="way_tasks/theory.html" class="minecraft-button task-button">Теория</a>
         <h2 class="tasks-title" style="font-size: 25px;">Лёгкий уровень:</h2>
         <div class="tasks-grid">
@@ -86,7 +91,7 @@
             <a href="way_tasks/easy_tasks/task10.html" class="minecraft-button task-button">Задача 10</a>
         </div>
         <h2 class="tasks-title" style="font-size: 25px;">Средний уровень:</h2>
-        <h1 class="tasks-title">Задачи на формулу стоимости</h1>
+        <h1 id="cost-section" class="tasks-title">Задачи на формулу стоимости</h1>
         <a href="cost_tasks/theory.html" class="minecraft-button task-button">Теория</a>
         <h2 class="tasks-title" style="font-size: 25px;">Лёгкий уровень:</h2>
         <div class="tasks-grid">
