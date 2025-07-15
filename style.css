@@ -508,6 +508,14 @@ body {
    right: 20px;
 }
 
+body.welcome-page {
+    background-image: url('assets/bg/start_bg.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    min-height: 100vh !important;
+}
+
 .spinning-icon {
    width: 50px;
    height: 50px;
@@ -518,4 +526,75 @@ body {
 @keyframes spin {
    from { transform: rotate(0deg); }
    to { transform: rotate(360deg); }
+}
+
+body.profile-page {
+    background-image: url('assets/bg/profile_bg.png'); /* Пример фонового изображения для профиля */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #FFF;
+    text-shadow: 2px 2px #333;
+}
+
+.profile-button {
+    padding: 8px 18px;
+    font-size: 1em;
+    background-color: #8B4513;
+    border: 2px solid #4a2a0f;
+    box-shadow: 2px 2px 0px #4a2a0f;
+    border-radius: 8px;
+    opacity: 0.95;
+    transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+.profile-button:hover {
+    background-color: #a0522d;
+    box-shadow: 3px 3px 0px #4a2a0f;
+    opacity: 1;
+}
+
+.sidebar-nav {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 10px 20px 10px;
+    background: rgba(240, 240, 240, 0.95);
+    border-radius: 0 16px 16px 0;
+    z-index: 200;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
+}
+
+.nav-theme-button {
+    font-family: 'MinecraftFont', 'Minecraft', 'Minecraft 3', sans-serif !important;
+    padding: 10px 18px;
+    font-size: 1em;
+    min-width: 120px;
+    margin: 0;
+    border-radius: 8px;
+    opacity: 0.97;
+    transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.nav-theme-button:hover {
+    background-color: #a0522d;
+    box-shadow: 3px 3px 0px #4a2a0f;
+    opacity: 1;
+}
+
+@media (max-width: 900px) {
+    .sidebar-nav {
+        top: 10px;
+        padding: 10px 5px 10px 5px;
+    }
+    .nav-theme-button {
+        font-size: 0.95em;
+        padding: 8px 10px;
+    }
 }
