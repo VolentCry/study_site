@@ -8,26 +8,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Получаем номер задачи и правильный ответ из data-атрибутов body
     const taskId = parseInt(taskBody.dataset.taskId, 10);
-    const correctAnswer = parseInt(taskBody.dataset.correctAnswer, 10);
+    // Теперь получаем correctAnswer как строку, так как ожидаем текстовый ответ
+    const correctAnswer = taskBody.dataset.correctAnswer; 
 
     // --- Логика проверки ответа ---
     if (checkButton && answerInput) {
         checkButton.addEventListener('click', () => {
-            const userAnswer = parseInt(answerInput.value, 10);
+            // Получаем ответ пользователя как строку
+            const userAnswer = answerInput.value.trim(); // Удаляем пробелы по краям
 
             // Сбрасываем предыдущие классы и сообщение
             answerInput.classList.remove('correct', 'incorrect');
             feedbackMessage.textContent = '';
-            answerInput.placeholder = "Введи ответ"; // Восстанавливаем плейсхолдер
+            answerInput.placeholder = "Введи ответ текстом"; // Восстанавливаем плейсхолдер
 
-            if (isNaN(userAnswer)) {
-                 feedbackMessage.textContent = "Введи число!";
+            if (userAnswer === '') { // Проверяем, если поле пустое
+                 feedbackMessage.textContent = "Пожалуйста, введи ответ!";
                  answerInput.classList.add('incorrect'); // Подсвечиваем как ошибку
                  // Можно добавить звук ошибки
                  return;
             }
 
-            if (userAnswer === correctAnswer) {
+            // Сравниваем текстовые ответы
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) { // Сравниваем без учета регистра
                 answerInput.classList.add('correct');
                 feedbackMessage.textContent = 'Всё правильно! Ты молодец!';
                 feedbackMessage.style.color = 'green';
@@ -57,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (nextButton) {
-        if (taskId === 37) {
+        if (taskId === 37) { // Предполагается, что 37 - это последняя задача
             nextButton.classList.add('disabled');
             nextButton.removeAttribute('href'); // Убираем ссылку
         } else {

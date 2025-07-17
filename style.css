@@ -227,23 +227,6 @@ body {
     box-sizing: border-box; /* Чтобы padding не увеличивал размер */
 }
 
-.back-button {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    font-size: 2em;
-    color: #333;
-    text-decoration: none;
-    background: #ddd;
-    border: 2px solid #888;
-    padding: 0px 8px;
-    border-radius: 4px; /* Небольшое скругление или оставить острым */
-}
-.back-button:hover {
-    background: #ccc;
-}
-
-
 .task-title {
     text-align: center;
     margin-bottom: 20px;
@@ -597,4 +580,32 @@ body.profile-page {
         font-size: 0.95em;
         padding: 8px 10px;
     }
+}
+
+#selector {
+    width:100%;
+    height:100%;
+}
+
+.back-button {
+    display: inline-block;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    padding: 10px 18px;
+    background: #222;
+    color: #fff;
+    border: 3px solid #bfa14a;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-family: 'Minecraft', 'Minecraft 3', sans-serif;
+    text-decoration: none;
+    box-shadow: 2px 2px 0 #bfa14a, 4px 4px 0 #000;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    z-index: 10;
+}
+.back-button:hover {
+    background: #bfa14a;
+    color: #222;
+    box-shadow: 2px 2px 0 #222, 4px 4px 0 #bfa14a;
 }

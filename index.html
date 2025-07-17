@@ -12,15 +12,29 @@
         * {
             font-family: 'Minecraft', 'Minecraft 3', sans-serif !important;
         }
+        .welcome-card {
+            background: rgba(34, 34, 34, 0.85);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+            padding: 40px 32px 32px 32px;
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
     </style>
 </head>
 <body class="welcome-page">
     <a href="profile.html" class="minecraft-button profile-button" style="position: absolute; top: 20px; left: 20px; z-index: 100;">Профиль</a>
     <div class="welcome-container">
+        <div class="welcome-card">
         <h1 class="welcome-title">Рады тебя видеть, юный строитель!</h1>
         <p class="welcome-text">Давай решим несколько интересных математических задач из мира Minecraft!</p>
         <a href="tasks/tasks.html" class="minecraft-button pulsating-button welcome-button">Задачки</a>
         <a href="math_moduls/multiplication_trainer.html" class="minecraft-button mode-button">Тренажёр по умножению</a>
+        </div>
     </div>
 </body>
 </html>
