@@ -55,6 +55,7 @@ body {
     display: inline-block;
     padding: 15px 30px;
     background-color: #8B4513; /* Коричневый цвет дерева */
+    font-family: 'MinecraftFont', sans-serif;
     color: white;
     text-decoration: none;
     border: 3px solid #4a2a0f; /* Темная рамка */
@@ -119,6 +120,25 @@ body {
     text-align: center;
 }
 
+.separator {
+    width: 860px; 
+    height: 90px;
+    margin: 10px 0px -65px;
+}
+
+.easy-level-png {
+    width: 35px; 
+    height: 35px;
+    margin: 0px 10px 0px 10px;
+    transform: translateY(9px); /* вниз на 50px */
+}
+.sub-tasks-title {
+    font-size: 2.5em;
+    color: #333;
+    margin: -25px -25px;
+    text-align: center;
+}
+
 .tasks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -171,6 +191,24 @@ body {
     margin-top: 20px;
     text-align: center;
 }
+/* Горизонтальное выравнивание дроби и кнопки */
+.answer-row {
+    display: inline-flex;
+    align-items: center; /* по центру по вертикали */
+    gap: 20px; /* расстояние между дробью и кнопкой */
+}
+/* Дробный ввод: контейнер и полоска */
+.fraction-input {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-right: 16px;
+}
+.fraction-bar {
+    height: 2px;
+    background: #333;
+}
 #answer-input {
     padding: 10px;
     border: 3px solid #505050; /* Серая рамка */
@@ -183,6 +221,32 @@ body {
     display: block; /* Чтобы margin auto работал */
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Стили для числителя и знаменателя как у #answer-input */
+#numerator-input,
+#denominator-input {
+    padding: 10px;
+    border: 3px solid #505050;
+    background-color: #c6c6c6;
+    font-family: 'MinecraftFont', sans-serif;
+    font-size: 1.2em;
+    width: 180px;
+    text-align: center;
+}
+
+#numerator-input.correct,
+#denominator-input.correct {
+    background-color: #7FFF7F;
+    border-color: #008000;
+    color: #004d00;
+}
+
+#numerator-input.incorrect,
+#denominator-input.incorrect {
+    background-color: #FF7F7F;
+    border-color: #8B0000;
+    color: #5b0000;
 }
 
 /* Стили для правильного/неправильного ответа */
@@ -244,9 +308,9 @@ body {
 #animation-container {
     width: 200px; /* Примерный размер */
     height: 200px; /* Примерный размер */
-    margin-bottom: 20px;
+    margin-bottom: -10px;
     /* Стили для фона или рамки контейнера анимации */
-    background-color: rgba(0,0,0,0.1); /* Легкий фон для обозначения */
+    /* background-color: rgba(0,0,0,0.1); */
     display: flex;
     justify-content: center;
     align-items: center;
