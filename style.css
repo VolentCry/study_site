@@ -673,3 +673,19 @@ body.profile-page {
     color: #222;
     box-shadow: 2px 2px 0 #222, 4px 4px 0 #bfa14a;
 }
+
+.fraction {
+  display: inline-block;
+  text-align: center;
+}
+
+.numerator {
+  display: block;
+  border-bottom: 5px solid black;
+}
+
+.denominator {
+  display: block;
+  position: relative; 
+  top: 2px;
+}
