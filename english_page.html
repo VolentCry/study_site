@@ -117,7 +117,7 @@
         .radar-btn.wrong-choice { background: #ff5555 !important; }
         .score-board { margin-top: 15px; font-size: 0.8rem; color: var(--color-sand); }
 
-        .result-text { font-size: 1.2rem; color: var(--color-sand); margin: 20px 0; display: none; text-shadow: 2px 2px 0 #000; }
+        .result-text { font-size: 1.2rem; color: var(--color-sand); margin: 20px 0; display: none; text-shadow: 2px 2px 0 #000; text-align: center; line-height: 1.5; }
 
         @media (max-width: 900px) { .grid-6-col { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 600px) {
@@ -134,9 +134,8 @@
 
         .task-image {
             width: 375px;
-            height: 275px; /* Увеличили высоту */
-            object-fit: cover; /* Картинка заполнит рамку (обрежет лишнее по краям, но будет крупной) */
-            /* Если важные детали обрезаются, верните object-fit: contain; */
+            height: 275px; 
+            object-fit: cover; 
             background-color: rgba(0,0,0,0.3);
             border: 2px solid var(--color-sand);
             margin-bottom: 10px;
@@ -147,8 +146,7 @@
         .task-3-image {
             width: 100px;
             height: 80px;
-            object-fit: cover; /* Картинка заполнит рамку (обрежет лишнее по краям, но будет крупной) */
-            /* Если важные детали обрезаются, верните object-fit: contain; */
+            object-fit: cover; 
             background-color: rgba(0,0,0,0.3);
             border: 2px solid var(--color-sand);
             margin-bottom: 10px;
@@ -159,7 +157,7 @@
         /* --- ЗАДАНИЕ 6 (ТАБЛИЦА МЕСТОИМЕНИЙ) --- */
         .pronoun-table {
             display: grid;
-            grid-template-columns: 80px 1fr 1fr; /* Узкий столбец для лиц, два широких для ответов */
+            grid-template-columns: 80px 1fr 1fr; 
             gap: 10px;
             max-width: 800px;
             width: 100%;
@@ -190,9 +188,8 @@
             border: 2px solid var(--color-dark);
         }
 
-        /* Адаптация ячеек для таблицы */
         .pronoun-table .drop-slot {
-            width: 100%; /* Растягиваем на всю ячейку */
+            width: 100%; 
             height: 70px;
             border: 2px dashed rgba(255,255,255,0.3);
         }
@@ -211,15 +208,12 @@
         </nav>
     </div>
 
-    <!-- 1.1. ГЛАВНАЯ АНГЛИЙСКИЙ -->
-
-    <!-- 1.2. ГЛАВНАЯ АНГЛИЙСКИЙ -->
+    <!-- 1. ГЛАВНАЯ АНГЛИЙСКИЙ -->
     <div id="page-english" class="page active">
         <h1>Английский язык / English</h1>
         <button class="mc-button" onclick="startTest()">Контрольный тест №1</button>
     </div>
 
-    <!-- 2. ЗАДАНИЕ 1 -->
     <!-- 2. ЗАДАНИЕ 1 -->
     <div id="page-task-1" class="page">
         <h1>Задание №1</h1>
@@ -227,39 +221,29 @@
         <p class="instruction">Посмотрите на картинки. Определите, какой предлог места изображен, и впишите его английское название в поле под картинкой.</p>
         
         <div class="task-container grid-3-col">
-            <!-- Карточка 1 -->
+            <!-- Временно оставил плейсхолдеры, так как реальных картинок на сервере может не быть -->
             <div class="task-item">
-                <img src="assets/images/english/among.png" class="task-image" alt="among">
+                <div class="image-placeholder">among.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="among">
             </div>
-
-            <!-- Карточка 2 -->
             <div class="task-item">
-                <img src="assets/images/english/under.png" class="task-image" alt="under">
+                <div class="image-placeholder">under.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="under">
             </div>
-
-            <!-- Карточка 3 -->
             <div class="task-item">
-                <img src="assets/images/english/in.png" class="task-image" alt="in">
+                <div class="image-placeholder">in.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="in">
             </div>
-
-            <!-- Карточка 4 -->
             <div class="task-item">
-                <img src="assets/images/english/through.png" class="task-image" alt="through">
+                <div class="image-placeholder">through.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="through">
             </div>
-
-            <!-- Карточка 5 -->
             <div class="task-item">
-                <img src="assets/images/english/behind.png" class="task-image" alt="behind">
+                <div class="image-placeholder">behind.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="behind">
             </div>
-
-            <!-- Карточка 6 -->
             <div class="task-item">
-                <img src="assets/images/english/between.png" class="task-image" alt="between">
+                <div class="image-placeholder">between.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="between">
             </div>
         </div>
@@ -291,18 +275,18 @@
         <p class="instruction">Вспомните названия овощей и фруктов. Введите английский перевод названия продукта под каждой картинкой.</p>
         
         <div class="task-container grid-6-col">
-            <div class="task-item"><img src="assets/images/english/task_3/currant.png" class="task-3-image" alt="Смородина"><input type="text" class="mc-input task3-input" data-ans="currant"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/gooseberry.png" class="task-3-image" alt="Крыжовник"><input type="text" class="mc-input task3-input" data-ans="gooseberry"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/garlic.png" class="task-3-image" alt="Чеснок"><input type="text" class="mc-input task3-input" data-ans="garlic"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/watermelon.png" class="task-3-image" alt="Арбуз"><input type="text" class="mc-input task3-input" data-ans="watermelon"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/pumpkin.png" class="task-3-image" alt="Тыква"><input type="text" class="mc-input task3-input" data-ans="pumpkin"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/eggplant.png" class="task-3-image" alt="Баклажан"><input type="text" class="mc-input task3-input" data-ans="eggplant"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/raspberry.png" class="task-3-image" alt="Малина"><input type="text" class="mc-input task3-input" data-ans="raspberry"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/blueberry.png" class="task-3-image" alt="Голубика"><input type="text" class="mc-input task3-input" data-ans="blueberry"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/pear.png" class="task-3-image" alt="Груша"><input type="text" class="mc-input task3-input" data-ans="pear"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/peach.png" class="task-3-image" alt="Персик"><input type="text" class="mc-input task3-input" data-ans="peach"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/pineapple.png" class="task-3-image" alt="Ананас"><input type="text" class="mc-input task3-input" data-ans="pineapple"></div>
-            <div class="task-item"><img src="assets/images/english/task_3/flour.png" class="task-3-image" alt="Мука"><input type="text" class="mc-input task3-input" data-ans="flour"></div>
+            <div class="task-item"><div class="image-placeholder">Смородина</div><input type="text" class="mc-input task3-input" data-ans="currant"></div>
+            <div class="task-item"><div class="image-placeholder">Крыжовник</div><input type="text" class="mc-input task3-input" data-ans="gooseberry"></div>
+            <div class="task-item"><div class="image-placeholder">Чеснок</div><input type="text" class="mc-input task3-input" data-ans="garlic"></div>
+            <div class="task-item"><div class="image-placeholder">Арбуз</div><input type="text" class="mc-input task3-input" data-ans="watermelon"></div>
+            <div class="task-item"><div class="image-placeholder">Тыква</div><input type="text" class="mc-input task3-input" data-ans="pumpkin"></div>
+            <div class="task-item"><div class="image-placeholder">Баклажан</div><input type="text" class="mc-input task3-input" data-ans="eggplant"></div>
+            <div class="task-item"><div class="image-placeholder">Малина</div><input type="text" class="mc-input task3-input" data-ans="raspberry"></div>
+            <div class="task-item"><div class="image-placeholder">Голубика</div><input type="text" class="mc-input task3-input" data-ans="blueberry"></div>
+            <div class="task-item"><div class="image-placeholder">Груша</div><input type="text" class="mc-input task3-input" data-ans="pear"></div>
+            <div class="task-item"><div class="image-placeholder">Персик</div><input type="text" class="mc-input task3-input" data-ans="peach"></div>
+            <div class="task-item"><div class="image-placeholder">Ананас</div><input type="text" class="mc-input task3-input" data-ans="pineapple"></div>
+            <div class="task-item"><div class="image-placeholder">Мука</div><input type="text" class="mc-input task3-input" data-ans="flour"></div>
         </div>
         <div class="result-text" id="result-task-3"></div>
         <button class="mc-button" onclick="checkTask3()">Проверить</button>
@@ -315,7 +299,6 @@
         <p class="instruction">Перетащите блоки из сундука в пустые ячейки, чтобы составить верную схему предложения для каждого времени.</p>
         
         <div class="dnd-area">
-            <!-- 1. Present Simple Row -->
             <div class="scheme-row">
                 <div class="scheme-title">Present Simple:</div>
                 <div class="drop-zone-container">
@@ -326,7 +309,6 @@
                 </div>
             </div>
 
-            <!-- 2. Present Continuous Row -->
             <div class="scheme-row">
                 <div class="scheme-title">Present Continuous:</div>
                 <div class="drop-zone-container">
@@ -337,7 +319,6 @@
                 </div>
             </div>
 
-            <!-- 3. Past Simple Row (НОВОЕ) -->
             <div class="scheme-row">
                 <div class="scheme-title">Past Simple:</div>
                 <div class="drop-zone-container">
@@ -347,13 +328,12 @@
                 </div>
             </div>
 
-            <!-- 4. Future Simple Row (НОВОЕ) -->
             <div class="scheme-row">
                 <div class="scheme-title">Future Simple:</div>
                 <div class="drop-zone-container">
                     <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="subject"></div>
                     <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="will"></div>
-                    <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="verb_base"></div>
+                    <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="verb"></div>
                     <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="other"></div>
                 </div>
             </div>
@@ -398,22 +378,18 @@
         <p class="instruction">Расставьте местоимения из сундука по своим местам в таблице.</p>
 
         <div class="pronoun-table">
-            <!-- 1 строка: Заголовки -->
-            <div></div> <!-- Пустой угол -->
+            <div></div> 
             <div class="table-header">Ед. ч.</div>
             <div class="table-header">Мн. ч.</div>
 
-            <!-- 2 строка: 1 лицо -->
             <div class="row-label">1 л.</div>
             <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="i"></div>
             <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="we"></div>
 
-            <!-- 3 строка: 2 лицо -->
             <div class="row-label">2 л.</div>
             <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="you"></div>
             <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="you"></div>
 
-            <!-- 4 строка: 3 лицо -->
             <div class="row-label">3 л.</div>
             <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="hesheit"></div>
             <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="they"></div>
@@ -428,12 +404,25 @@
         <button class="mc-button" onclick="checkTask6()">Завершить тест</button>
     </div>
 
-    <!-- ФИНИШ -->
+    <!-- ФИНИШ (С ОБНОВЛЕННЫМ СЧЕТЧИКОМ) -->
     <div id="page-finish" class="page">
         <h1>Тест завершен!</h1>
         <h2>Вы прошли все уровни!</h2>
-        <div style="font-size: 4rem; margin: 30px;">💎</div>
-        <p>Your underwater journey is complete.</p>
+        
+        <!-- БЛОК ИТОГОВОГО СЧЕТА -->
+        <div style="background: var(--frame-bg); border: 4px solid var(--color-sand); padding: 20px; margin: 30px 0; text-align: center; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); min-width: 300px;">
+            <h3 style="color: var(--color-sand); margin-bottom: 20px; font-size: 1rem; text-shadow: 2px 2px 0 #000;">Ваши результаты:</h3>
+            <div style="font-size: 0.8rem; line-height: 2; color: white;">
+                <p>Правильных ответов: <span id="final-correct" style="color: var(--correct); font-size: 1.2rem;">0</span></p>
+                <p>Ошибок: <span id="final-wrong" style="color: var(--wrong); font-size: 1.2rem;">0</span></p>
+                <p style="margin-top: 15px; border-top: 2px dashed var(--color-med); padding-top: 15px;">
+                    Общий балл: <span id="final-total" style="color: var(--color-sand); font-size: 1.5rem;">0</span> / <span id="final-max">57</span>
+                </p>
+            </div>
+        </div>
+
+        <div style="font-size: 4rem; margin-bottom: 20px;">💎</div>
+        <p style="font-size: 0.8rem; color: var(--color-light);">Your underwater journey is complete.</p>
         <button class="mc-button" onclick="switchPage('english')">Главное меню</button>
     </div>
 
@@ -456,6 +445,17 @@
             {en: "sleet", ru: "дождь со снегом"}, {en: "thunderstorm", ru: "гроза"}
         ];
 
+        // --- GLOBAL SCORE VARIABLES ---
+        let globalCorrect = 0;
+        let globalWrong = 0;
+        
+        // Флаги, чтобы не накручивать баллы при повторном клике на "Проверить"
+        let t1Scored = false;
+        let t2Scored = false;
+        let t3Scored = false;
+        let t4Scored = false;
+        let t6Scored = false;
+
         // --- NAVIGATION ---
         function switchPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -467,7 +467,11 @@
         }
 
         function startTest() {
-            // Сброс всего
+            // Сброс всего (в том числе баллов)
+            globalCorrect = 0;
+            globalWrong = 0;
+            t1Scored = false; t2Scored = false; t3Scored = false; t4Scored = false; t6Scored = false;
+            
             document.querySelectorAll('.mc-input').forEach(inp => {inp.value=''; inp.classList.remove('correct','wrong');});
             document.querySelectorAll('.result-text').forEach(d => d.style.display='none');
             switchPage('task-1');
@@ -478,20 +482,28 @@
                 if(nextId === 'task-4') initTask4();
                 if(nextId === 'task-5') initTask5();
                 switchPage(nextId);
-            }, 3000); // 3 секунды пауза
+            }, 3000); 
         }
 
         // --- TASKS 1-3 LOGIC (STANDARD) ---
         function checkInputs(taskNum) {
             const inputs = document.querySelectorAll(`.task${taskNum}-input`);
             let score = 0;
+            let wrong = 0;
+            
             inputs.forEach(inp => {
                 if(inp.value.trim().toLowerCase() === inp.dataset.ans.toLowerCase()) {
                     score++; inp.classList.add('correct'); inp.classList.remove('wrong');
                 } else {
-                    inp.classList.add('wrong'); inp.classList.remove('correct');
+                    wrong++; inp.classList.add('wrong'); inp.classList.remove('correct');
                 }
             });
+
+            // Добавляем баллы в глобальный счётчик ТОЛЬКО ОДИН РАЗ
+            if (taskNum === 1 && !t1Scored) { globalCorrect += score; globalWrong += wrong; t1Scored = true; }
+            if (taskNum === 2 && !t2Scored) { globalCorrect += score; globalWrong += wrong; t2Scored = true; }
+            if (taskNum === 3 && !t3Scored) { globalCorrect += score; globalWrong += wrong; t3Scored = true; }
+
             const res = document.getElementById(`result-task-${taskNum}`);
             res.innerText = `Result: ${score}/${inputs.length}`;
             res.style.display = 'block';
@@ -502,55 +514,40 @@
         function checkTask2() { checkInputs(2); nextTask('task-1', 'task-3'); }
         function checkTask3() { checkInputs(3); nextTask('task-3', 'task-4'); }
 
-        // --- TASK 4: DRAG & DROP (UPDATED) ---
+        // --- TASK 4: DRAG & DROP ---
         let draggedEl = null;
 
         function initTask4() {
-            // Очищаем все слоты
             document.querySelectorAll('.drop-slot').forEach(slot => slot.innerHTML = '');
             const bank = document.getElementById('drag-bank');
             bank.innerHTML = '';
             
-            // Список всех необходимых блоков для 4-х схем
             const blocks = [
-                // Present Simple parts
                 { id: 'b_neg', text: 'don\'t / doesn\'t', type: 'neg' }, 
-                { id: 'b_vs', text: 'Глагол', type: 'verb_s' },
-                
-                // Present Continuous parts
+                { id: 'b_v1', text: 'Глагол', type: 'verb' },
                 { id: 'b_be', text: 'am / is / are', type: 'to_be' }, 
                 { id: 'b_ving', text: 'Глагол + ing', type: 'verb_ing' },
-
-                // Past Simple parts
                 { id: 'b_vpast', text: 'Глагол (ed) / V2', type: 'verb_past' },
-
-                // Future Simple parts
                 { id: 'b_will', text: 'will', type: 'will' },
-                { id: 'b_vbase', text: 'Глагол', type: 'verb_base' },
-
-                // Общие части (Subject - нужно 4 штуки)
+                { id: 'b_vbase', text: 'Глагол', type: 'verb' },
                 { id: 'sub1', text: 'Подлежащее', type: 'subject' },
                 { id: 'sub2', text: 'Подлежащее', type: 'subject' },
                 { id: 'sub3', text: 'Подлежащее', type: 'subject' },
                 { id: 'sub4', text: 'Подлежащее', type: 'subject' },
-
-                // Общие части (Other - нужно 4 штуки)
                 { id: 'oth1', text: 'Прочее', type: 'other' },
                 { id: 'oth2', text: 'Прочее', type: 'other' },
                 { id: 'oth3', text: 'Прочее', type: 'other' },
                 { id: 'oth4', text: 'Прочее', type: 'other' }
             ];
             
-            // Перемешиваем блоки случайным образом
             blocks.sort(() => Math.random() - 0.5);
 
-            // Создаем элементы
             blocks.forEach(b => {
                 const el = document.createElement('div');
                 el.classList.add('draggable-item');
                 el.setAttribute('draggable', 'true');
                 el.innerText = b.text;
-                el.dataset.type = b.type; // Храним тип блока для проверки
+                el.dataset.type = b.type;
                 el.id = b.id;
                 el.ondragstart = drag;
                 bank.appendChild(el);
@@ -564,11 +561,9 @@
         function drop(ev) {
             ev.preventDefault();
             let target = ev.target;
-            // Если кидаем поверх другого блока, ищем родителя-слот
             if(target.classList.contains('draggable-item')) target = target.parentNode;
             
             if(target.classList.contains('drop-slot') || target.id === 'drag-bank') {
-                // Если слот занят, возвращаем старый блок в банк
                 if(target.classList.contains('drop-slot') && target.children.length > 0) {
                     document.getElementById('drag-bank').appendChild(target.children[0]);
                 }
@@ -580,12 +575,11 @@
             let correct = 0;
             const slots = document.querySelectorAll('#page-task-4 .drop-slot');
             let filled = 0;
-            const totalSlots = slots.length; // Теперь он посчитает ровно 15
+            const totalSlots = slots.length; 
 
             slots.forEach(slot => {
                 if(slot.children.length > 0) {
                     filled++;
-                    // Проверяем: тип блока совпадает с ожиданием слота?
                     if(slot.children[0].dataset.type === slot.dataset.expect) correct++;
                 }
             });
@@ -597,12 +591,21 @@
                 res.innerText = "Заполните все ячейки!";
                 res.style.color = "#ff5555";
             } else {
+                // Записываем результат только при первой ПОЛНОЙ попытке
+                if (!t4Scored) {
+                    globalCorrect += correct;
+                    globalWrong += (totalSlots - correct);
+                    t4Scored = true;
+                }
+
                 res.innerText = `Правильно: ${correct}/${totalSlots}`;
-                res.style.color = "#55ff55";
                 
-                // Если всё верно, переходим дальше
                 if (correct === totalSlots) {
+                     res.style.color = "#55ff55";
                      setTimeout(() => { switchPage('task-5'); initTask5(); }, 3000);
+                } else {
+                     res.style.color = "#ffaa00";
+                     res.innerText += " - Найдите ошибки и исправьте!";
                 }
             }
         }
@@ -611,12 +614,11 @@
         let weatherScore = 0;
         let weatherRounds = 0;
         const maxRounds = 14;
-        let weatherDeck = []; // Колода для уникальных вопросов
+        let weatherDeck = [];
 
         function initTask5() {
             weatherScore = 0;
             weatherRounds = 0;
-            // Создаем копию массива слов и перемешиваем, чтобы вопросы не повторялись
             weatherDeck = [...weatherData];
             weatherDeck.sort(() => Math.random() - 0.5);
 
@@ -627,18 +629,22 @@
 
         function nextWeatherQuestion() {
             if(weatherRounds >= maxRounds) {
+                // Радар завершен, добавляем в глобальный счетчик
+                globalCorrect += weatherScore;
+                globalWrong += (maxRounds - weatherScore);
+
                 const res = document.getElementById('result-task-5');
-                res.innerText = `Тест завершен: ${weatherScore}/${maxRounds}`;
+                res.innerText = "Сканирование завершено!";
                 res.style.display = 'block';
+                res.style.color = "#55ff55";
+                
                 setTimeout(() => { switchPage('task-6'); initTask6(); }, 3000);
                 return;
             }
 
-            // Берем уникальное слово из перемешанной колоды
-            if(weatherDeck.length === 0) weatherDeck = [...weatherData]; // На всякий случай, если слов не хватит (хотя у нас их 23 > 14)
+            if(weatherDeck.length === 0) weatherDeck = [...weatherData];
             const correctObj = weatherDeck.pop();
             
-            // Дистракторы
             let options = [correctObj];
             while(options.length < 4) {
                 let r = weatherData[Math.floor(Math.random() * weatherData.length)];
@@ -679,7 +685,6 @@
 
         // --- TASK 6: PRONOUNS ---
         function initTask6() {
-            // Очищаем слоты таблицы
             document.querySelectorAll('#page-task-6 .drop-slot').forEach(s => s.innerHTML = '');
             const bank = document.getElementById('bank-task-6');
             bank.innerHTML = '';
@@ -688,7 +693,7 @@
                 { id: 'p_i', text: 'I', type: 'i' },
                 { id: 'p_we', text: 'We', type: 'we' },
                 { id: 'p_you1', text: 'You', type: 'you' },
-                { id: 'p_you2', text: 'You', type: 'you' }, // Второе You для мн.ч.
+                { id: 'p_you2', text: 'You', type: 'you' },
                 { id: 'p_he', text: 'He / She / It', type: 'hesheit' },
                 { id: 'p_they', text: 'They', type: 'they' }
             ];
@@ -702,7 +707,7 @@
                 el.innerText = p.text;
                 el.dataset.type = p.type;
                 el.id = p.id;
-                el.ondragstart = drag; // Используем ту же функцию drag, что и в задании 4
+                el.ondragstart = drag; 
                 bank.appendChild(el);
             });
             document.getElementById('result-task-6').style.display='none';
@@ -710,7 +715,6 @@
 
         function checkTask6() {
             let correct = 0;
-            // Ищем слоты ТОЛЬКО внутри 6-го задания
             const slots = document.querySelectorAll('#page-task-6 .drop-slot');
             let filled = 0;
 
@@ -728,14 +732,37 @@
                 res.innerText = "Заполните всю таблицу!";
                 res.style.color = "#ff5555";
             } else {
+                // Фиксируем результат первой полной попытки
+                if (!t6Scored) {
+                    globalCorrect += correct;
+                    globalWrong += (6 - correct);
+                    t6Scored = true;
+                }
+
                 res.innerText = `Результат: ${correct}/6`;
-                res.style.color = "#55ff55";
                 
-                // Если всё верно, идем к финишу
                 if(correct === 6) {
-                    setTimeout(() => { switchPage('finish'); }, 3000);
+                    res.style.color = "#55ff55";
+                    setTimeout(() => { 
+                        showFinalScore(); // Обновляем табло финального экрана
+                        switchPage('finish'); 
+                    }, 3000);
+                } else {
+                    res.style.color = "#ffaa00";
+                    res.innerText += " - Есть ошибки!";
                 }
             }
+        }
+
+        // --- ВЫВОД ИТОГОВОГО СЧЕТА ---
+        function showFinalScore() {
+            document.getElementById('final-correct').innerText = globalCorrect;
+            document.getElementById('final-wrong').innerText = globalWrong;
+            document.getElementById('final-total').innerText = globalCorrect;
+            
+            // Считаем максимально возможный балл: 
+            // 6(зад.1) + 4(зад.2) + 12(зад.3) + 15(зад.4) + 14(зад.5) + 6(зад.6) = 57
+            document.getElementById('final-max').innerText = "57"; 
         }
 
         // --- BUBBLES ---
