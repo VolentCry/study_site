@@ -94,6 +94,7 @@
         .mc-input { width: 100%; padding: 8px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; background-color: var(--input-bg); border: 2px solid white; color: white; text-align: center; outline: none; }
         .mc-input.correct { border-color: var(--correct); background-color: rgba(85, 255, 85, 0.2); }
         .mc-input.wrong { border-color: var(--wrong); background-color: rgba(255, 85, 85, 0.2); }
+        .mc-input:disabled { opacity: 0.7; cursor: not-allowed; }
 
         /* --- ЗАДАНИЕ 4 (DRAG & DROP) --- */
         .dnd-area { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 30px; margin-bottom: 30px; }
@@ -131,28 +132,6 @@
         .bubble { position: absolute; background-color: rgba(255, 255, 255, 0.4); display: block; pointer-events: none; z-index: 1; }
         .bubble-square { width: 20px; height: 20px; animation: rise 8s infinite linear; }
         @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(90deg); opacity: 0; } }
-
-        .task-image {
-            width: 375px;
-            height: 275px; 
-            object-fit: cover; 
-            background-color: rgba(0,0,0,0.3);
-            border: 2px solid var(--color-sand);
-            margin-bottom: 10px;
-            display: block;
-            border-radius: 4px;
-        }
-
-        .task-3-image {
-            width: 100px;
-            height: 80px;
-            object-fit: cover; 
-            background-color: rgba(0,0,0,0.3);
-            border: 2px solid var(--color-sand);
-            margin-bottom: 10px;
-            display: block;
-            border-radius: 4px;
-        }
 
         /* --- ЗАДАНИЕ 6 (ТАБЛИЦА МЕСТОИМЕНИЙ) --- */
         .pronoun-table {
@@ -193,6 +172,14 @@
             height: 70px;
             border: 2px dashed rgba(255,255,255,0.3);
         }
+
+        /* --- ДИКТАНТ СТИЛИ --- */
+        .dictation-wrapper {
+            display: flex; flex-direction: column; align-items: center;
+            background: rgba(0,0,0,0.3); padding: 30px; border: 4px solid var(--color-sand);
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.5); width: 100%; max-width: 600px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -211,8 +198,45 @@
     <!-- 1. ГЛАВНАЯ АНГЛИЙСКИЙ -->
     <div id="page-english" class="page active">
         <h1>Английский язык / English</h1>
-        <button class="mc-button" onclick="startTest()">Контрольный тест №1</button>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+            <button class="mc-button" onclick="startTest()">Контрольный тест №1</button>
+            <button class="mc-button" style="background-color: var(--color-dark);" onclick="startDictation()">Режим диктанта</button>
+        </div>
     </div>
+
+    <!-- ==================== ДИКТАНТ (НОВЫЙ БЛОК) ==================== -->
+    <div id="page-dictation" class="page">
+        <h1>Режим диктанта</h1>
+        <h2 id="dictation-progress">Слово 1 / 15</h2>
+        
+        <div class="dictation-wrapper">
+            <p class="instruction" id="dictation-instruction" style="font-size: 0.9rem; margin-bottom: 20px;">Переведите слово:</p>
+            
+            <div class="text-frame" id="dictation-word" style="font-size: 1.5rem; color: var(--correct); min-height: 80px;">...</div>
+            
+            <input type="text" id="dictation-input" class="mc-input" placeholder="Введите перевод и нажмите Enter..." autocomplete="off" style="font-size: 0.8rem; padding: 15px; margin-bottom: 20px;">
+            
+            <div class="result-text" id="dictation-feedback" style="display: none; margin-bottom: 15px; font-size: 1rem;"></div>
+            
+            <button class="mc-button" id="dictation-submit" onclick="submitDictationAnswer()">Ответить</button>
+        </div>
+    </div>
+
+    <div id="page-dictation-finish" class="page">
+        <h1>Диктант завершен!</h1>
+        <div style="background: var(--frame-bg); border: 4px solid var(--color-sand); padding: 30px; margin: 30px 0; text-align: center; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); min-width: 350px;">
+            <h3 style="color: var(--color-sand); margin-bottom: 20px; font-size: 1rem; text-shadow: 2px 2px 0 #000;">Ваши результаты:</h3>
+            <div style="font-size: 1rem; line-height: 2.5; color: white;">
+                <p>Правильных ответов: <span id="dict-final-correct" style="color: var(--correct); font-size: 1.5rem;">0</span> <span style="font-size: 1rem;">/ 15</span></p>
+                <p style="margin-top: 15px; border-top: 2px dashed var(--color-med); padding-top: 15px;">
+                    Точность: <span id="dict-final-percent" style="color: var(--color-sand); font-size: 2rem;">0%</span>
+                </p>
+            </div>
+        </div>
+
+        <button class="mc-button" onclick="switchPage('english')">Главное меню</button>
+    </div>
+    <!-- ============================================================= -->
 
     <!-- 2. ЗАДАНИЕ 1 -->
     <div id="page-task-1" class="page">
@@ -221,7 +245,6 @@
         <p class="instruction">Посмотрите на картинки. Определите, какой предлог места изображен, и впишите его английское название в поле под картинкой.</p>
         
         <div class="task-container grid-3-col">
-            <!-- Временно оставил плейсхолдеры, так как реальных картинок на сервере может не быть -->
             <div class="task-item">
                 <div class="image-placeholder">among.png</div>
                 <input type="text" class="mc-input task1-input" data-ans="among">
@@ -433,7 +456,51 @@
 
     <!-- JS -->
     <script>
-        // --- DATA ---
+        // --- ДАННЫЕ СЛОВАРЯ ДЛЯ ДИКТАНТА ---
+        // Теперь вы можете использовать как обычный текст ("класс, год"), так и массивы (["класс", "год"])
+        const fullVocabulary = {
+            "circle": "круг", "triangle": "треугольник", "square": "квадрат", "red": "красный", "age": "лет", 
+            "phone": "телефон", "surname": "фамилия", "year": "класс, год", "Wednesday": "среда", "Monday": "понедельник", 
+            "juice": "сок", "September": "сентябрь", "pen": "ручка", "pencil": "карандаш", "bed": "кровать", "lamp": "лампа", 
+            "uncle": "дядя", "aunt": "тётя", "cousin": "двоюродный брат или сестра", "tall": "высокий", "short": "короткий", 
+            "fair hair": "светлые волосы", "dark hair": "тёмные волосы", "slim": "стройный", "kind": "добрый", "friendly": "дружелюбный", 
+            "funny": "весёлый", "helmet": "шлем", "CDs": "диск", "hairbrush": "расчёска", "watch": "ручные часы", "gloves": "перчатки", 
+            "keys": "ключи", "roller blades": "ролики", "camera": "камера", "guitar": "гитара", "mobile phone": "мобильный телефон", 
+            "armchair": "кресло", "complete": "завершить", "tree": "дерево", "sun": "солнце", "ten": "десять", "six": "шесть", 
+            "five": "пять", "gymnasium": "гимназия", "October": "октябрь", "bag": "сумка", "sheets": "листов", "hi": "привет", 
+            "and": "и", "or": "или", "umbrella": "зонт", "mask": "маска", "hat": "шляпа", "Canada": "Канада", 
+            "Australia": "Австралия", "the United Kingdom": "Великобритания", "New Zealand": "Новая Зеландия", 
+            "the United States America": "США", "London": "Лондон", "Washington": "Вашингтон", "flower": "цветок", 
+            "bird": "птица", "brown": "коричневый", "doctor": "доктор", "home": "дом", "cold": "холодно", "rainbow": "радужный", 
+            "school": "школа", "New York": "Нью-Йорк", "know": "знать", "city": "город", "other": "другой", "in them": "в них", 
+            "millionaire city": "город-миллионник", "some": "немного, несколько", "famous": "известный", "sights": "достопримечательность", 
+            "monuments": "памятники/монументы", "theatre": "театр", "church": "церковь", "street": "улица", "order": "порядок", 
+            "always": "всегда", "usually": "часто (обычно)", "often": "часто", "sometimes": "иногда", "never": "никогда", 
+            "golden": "золотой", "with": "с", "serves": "подавать", "shirt": "рубашка", "nurse": "медсестра", "turn": "ход", 
+            "curtain": "занавеска", "want": "хочу", "sick": "болеть, болезнь, больной", "work": "работа, работать, работают", 
+            "dream": "мечта, сон", "to be": "быть", "think": "думать", "job": "работа, профессия", "space": "космос", 
+            "spaceship": "космический корабль", "ship": "корабль", "different": "разные, другие", "so cute": "милые", 
+            "so": "очень", "study": "учиться, учёба", "a lot of": "очень много", "lessons": "урок", "now": "сейчас", 
+            "at the moment": "в данный момент", "mechanic": "механик", "baker": "пекарь", "waiter": "официант", 
+            "injection": "инъекция (в тетради написано инфекция)", "rain": "дождь", "wind": "ветер", "snow": "снег", 
+            "sleet": "снег и дождь", "sunny": "солнечно", "rainy": "дождливая", "cloudy": "облачная", "snowy": "снежная", 
+            "warm": "тепло", "tornado": "торнадо", "blizzard": "метель", "lightning": "молния", "thunderstorm": "гроза", 
+            "weather": "погода", "freeze": "морозная", "fog": "туман", "ice": "лёд", "foggy": "туманный", "hail": "град", 
+            "moon": "луна", "yesterday": "вчера", "tomorrow": "завтра", "live": "жить, жизнь", "person": "человек (конкрет.)", 
+            "people": "люди (мн.ч)", "young": "молодой", "bean": "боб", "dinner": "ужин", "onion": "лук", "pea": "горох", 
+            "pear": "груша", "pineapple": "ананас", "supper": "ужин", "apartment": "квартира", "flat": "квартира", 
+            "bookcase": "книжный шкаф", "cupboard": "буфет", "dining-room": "обеденная комната", "muddy": "грязная", 
+            "puddles": "лужи", "must": "должен", "can": "уметь / мочь", "wear": "надевать", "boots": "обувь / ботинки", 
+            "fun": "веселье", "imagine": "воображать", "month": "месяц", "birthday": "день рождения", "night": "ночь", 
+            "morning": "утро", "evening": "вечер", "afternoon": "день", "noon": "полдень", "hour": "час (h не читается!!!)", 
+            "minute": "минута", "second": "секунда", "millisecond": "миллисекунда", "o'clock": "час (обозначение времени на циферблате)", 
+            "half-past": "половина", "quarter past / quarter to": "пятнадцатом", "quarter past": "пятнадцать минут... (час)", 
+            "quarter to": "без пятнадцати минут... (час)", "excited": "воодушевлённый, взволнованный", "wrap up": "одеться (закутываться)", 
+            "forget": "забывать (в тетради ошибочно: помнить)", "scarf": "шарф", "scarves": "шарфы", "footprints": "отпечатки от ног", 
+            "dear": "боже", "maybe": "возможно", "rough": "грубый, жёсткий", "first time": "сначала, в первую очередь", 
+            "needs": "нужен", "arms": "руки", "mouth": "рот", "found / find": "искать", "clothes": "одежда", "to keep": "сохранить"
+        };
+
         const weatherData = [
             {en: "weather", ru: "погода"}, {en: "Sun", ru: "Солнце"}, {en: "Moon", ru: "Луна"},
             {en: "rain", ru: "дождь"}, {en: "cloud", ru: "облако"}, {en: "wind", ru: "ветер"},
@@ -449,12 +516,7 @@
         let globalCorrect = 0;
         let globalWrong = 0;
         
-        // Флаги, чтобы не накручивать баллы при повторном клике на "Проверить"
-        let t1Scored = false;
-        let t2Scored = false;
-        let t3Scored = false;
-        let t4Scored = false;
-        let t6Scored = false;
+        let t1Scored = false; let t2Scored = false; let t3Scored = false; let t4Scored = false; let t6Scored = false;
 
         // --- NAVIGATION ---
         function switchPage(pageId) {
@@ -466,8 +528,148 @@
             }
         }
 
+        // ==================== ЛОГИКА ДИКТАНТА ====================
+        let dictationQueue = [];
+        let currentDictWordIndex = 0;
+        let dictationScoreCount = 0;
+        let dictationState = "waiting";
+
+        function startDictation() {
+            const vocabEntries = Object.entries(fullVocabulary);
+            vocabEntries.sort(() => Math.random() - 0.5);
+            const selected = vocabEntries.slice(0, 15);
+            
+            dictationQueue = selected.map(entry => {
+                const en = entry[0];
+                const ru = entry[1];
+                const isEnToRu = Math.random() > 0.5; // 50% с англ на русс, 50% наоборот
+                return { en, ru, direction: isEnToRu ? 'en-ru' : 'ru-en' };
+            });
+
+            currentDictWordIndex = 0;
+            dictationScoreCount = 0;
+            dictationState = "waiting";
+            
+            switchPage('dictation');
+            showNextDictationWord();
+            
+            // Нажатие Enter для ответа
+            document.getElementById('dictation-input').onkeydown = function(e) {
+                if (e.key === 'Enter') submitDictationAnswer();
+            };
+        }
+
+        function showNextDictationWord() {
+            if (currentDictWordIndex >= 15) {
+                finishDictation();
+                return;
+            }
+            
+            dictationState = "waiting";
+            const currentObj = dictationQueue[currentDictWordIndex];
+            
+            document.getElementById('dictation-progress').innerText = `Слово ${currentDictWordIndex + 1} / 15`;
+            
+            const inputEl = document.getElementById('dictation-input');
+            inputEl.value = '';
+            inputEl.classList.remove('correct', 'wrong');
+            inputEl.disabled = false;
+            
+            const feedbackEl = document.getElementById('dictation-feedback');
+            feedbackEl.style.display = 'none';
+            document.getElementById('dictation-submit').style.display = 'block';
+
+            if (currentObj.direction === 'en-ru') {
+                document.getElementById('dictation-instruction').innerText = "Переведите на РУССКИЙ:";
+                document.getElementById('dictation-word').innerText = currentObj.en;
+            } else {
+                document.getElementById('dictation-instruction').innerText = "Переведите на АНГЛИЙСКИЙ:";
+                // Если в словаре используется массив, соединяем его для отображения
+                let displayRu = Array.isArray(currentObj.ru) ? currentObj.ru.join(', ') : currentObj.ru;
+                document.getElementById('dictation-word').innerText = displayRu.replace(/\(.*?\)/g, '').trim();
+            }
+            
+            // Ставим фокус в поле ввода (с задержкой для мобильных)
+            setTimeout(() => inputEl.focus(), 100);
+        }
+
+        // Универсальная функция для разбора правильных ответов (работает и со строками и с массивами)
+        function parseAnswers(rawStr) {
+            if (Array.isArray(rawStr)) {
+                // Если это массив, обрабатываем каждый элемент
+                return rawStr.flatMap(s => s.replace(/\(.*?\)/g, '').split(/[,/]|или/))
+                             .map(s => s.trim().toLowerCase())
+                             .filter(s => s.length > 0);
+            }
+            // Если это строка (стандартно)
+            let cleanedStr = rawStr.replace(/\(.*?\)/g, '');
+            return cleanedStr.split(/[,/]|или/)
+                             .map(s => s.trim().toLowerCase())
+                             .filter(s => s.length > 0);
+        }
+
+        function submitDictationAnswer() {
+            if (dictationState !== "waiting") return;
+            
+            const inputEl = document.getElementById('dictation-input');
+            const userInput = inputEl.value.trim().toLowerCase();
+            const currentObj = dictationQueue[currentDictWordIndex];
+            const feedbackEl = document.getElementById('dictation-feedback');
+            
+            let isCorrect = false;
+            let expectedAnswerStrs = [];
+            
+            if (currentObj.direction === 'en-ru') {
+                // Ищем все возможные русские значения для этого английского слова
+                expectedAnswerStrs = parseAnswers(currentObj.ru);
+                isCorrect = expectedAnswerStrs.includes(userInput);
+            } else {
+                // Ищем ВСЕ английские слова, у которых русский перевод совпадает с тем, что на экране
+                let promptRuList = parseAnswers(currentObj.ru);
+                
+                for (let [enKey, ruVal] of Object.entries(fullVocabulary)) {
+                    let ruValList = parseAnswers(ruVal);
+                    // Если есть пересечение значений (например "ужин" есть и у supper и у dinner)
+                    let hasIntersection = promptRuList.some(r => ruValList.includes(r));
+                    if (hasIntersection) {
+                        expectedAnswerStrs.push(enKey.trim().toLowerCase());
+                    }
+                }
+                isCorrect = expectedAnswerStrs.includes(userInput);
+            }
+            
+            dictationState = "showing_result";
+            inputEl.disabled = true;
+            document.getElementById('dictation-submit').style.display = 'none';
+            
+            if (isCorrect) {
+                dictationScoreCount++;
+                inputEl.classList.add('correct');
+                feedbackEl.innerText = "Правильно! ✓";
+                feedbackEl.style.color = "var(--correct)";
+            } else {
+                inputEl.classList.add('wrong');
+                feedbackEl.innerText = `Ошибка! Правильно: ${expectedAnswerStrs.join(' или ')}`;
+                feedbackEl.style.color = "var(--wrong)";
+            }
+            feedbackEl.style.display = 'block';
+            
+            currentDictWordIndex++;
+            setTimeout(() => {
+                showNextDictationWord();
+            }, 2000); // Показываем результат 2 секунды, затем следующее слово
+        }
+
+        function finishDictation() {
+            const percent = Math.round((dictationScoreCount / 15) * 100);
+            document.getElementById('dict-final-correct').innerText = dictationScoreCount;
+            document.getElementById('dict-final-percent').innerText = `${percent}%`;
+            
+            switchPage('dictation-finish');
+        }
+        // =========================================================
+
         function startTest() {
-            // Сброс всего (в том числе баллов)
             globalCorrect = 0;
             globalWrong = 0;
             t1Scored = false; t2Scored = false; t3Scored = false; t4Scored = false; t6Scored = false;
@@ -485,7 +687,7 @@
             }, 3000); 
         }
 
-        // --- TASKS 1-3 LOGIC (STANDARD) ---
+        // --- TASKS 1-3 LOGIC ---
         function checkInputs(taskNum) {
             const inputs = document.querySelectorAll(`.task${taskNum}-input`);
             let score = 0;
@@ -499,7 +701,6 @@
                 }
             });
 
-            // Добавляем баллы в глобальный счётчик ТОЛЬКО ОДИН РАЗ
             if (taskNum === 1 && !t1Scored) { globalCorrect += score; globalWrong += wrong; t1Scored = true; }
             if (taskNum === 2 && !t2Scored) { globalCorrect += score; globalWrong += wrong; t2Scored = true; }
             if (taskNum === 3 && !t3Scored) { globalCorrect += score; globalWrong += wrong; t3Scored = true; }
@@ -591,7 +792,6 @@
                 res.innerText = "Заполните все ячейки!";
                 res.style.color = "#ff5555";
             } else {
-                // Записываем результат только при первой ПОЛНОЙ попытке
                 if (!t4Scored) {
                     globalCorrect += correct;
                     globalWrong += (totalSlots - correct);
@@ -629,7 +829,6 @@
 
         function nextWeatherQuestion() {
             if(weatherRounds >= maxRounds) {
-                // Радар завершен, добавляем в глобальный счетчик
                 globalCorrect += weatherScore;
                 globalWrong += (maxRounds - weatherScore);
 
@@ -732,7 +931,6 @@
                 res.innerText = "Заполните всю таблицу!";
                 res.style.color = "#ff5555";
             } else {
-                // Фиксируем результат первой полной попытки
                 if (!t6Scored) {
                     globalCorrect += correct;
                     globalWrong += (6 - correct);
@@ -744,7 +942,7 @@
                 if(correct === 6) {
                     res.style.color = "#55ff55";
                     setTimeout(() => { 
-                        showFinalScore(); // Обновляем табло финального экрана
+                        showFinalScore();
                         switchPage('finish'); 
                     }, 3000);
                 } else {
@@ -759,9 +957,6 @@
             document.getElementById('final-correct').innerText = globalCorrect;
             document.getElementById('final-wrong').innerText = globalWrong;
             document.getElementById('final-total').innerText = globalCorrect;
-            
-            // Считаем максимально возможный балл: 
-            // 6(зад.1) + 4(зад.2) + 12(зад.3) + 15(зад.4) + 14(зад.5) + 6(зад.6) = 57
             document.getElementById('final-max').innerText = "57"; 
         }
 
