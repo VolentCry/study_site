@@ -120,19 +120,6 @@
 
         .result-text { font-size: 1.2rem; color: var(--color-sand); margin: 20px 0; display: none; text-shadow: 2px 2px 0 #000; text-align: center; line-height: 1.5; }
 
-        @media (max-width: 900px) { .grid-6-col { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 600px) {
-            h1 { font-size: 1rem; }
-            .grid-3-col, .grid-6-col { grid-template-columns: repeat(2, 1fr); }
-            .grid-2-col { grid-template-columns: 1fr; }
-            .drop-zone-container { flex-direction: column; align-items: center; }
-            .radar-controls { grid-template-columns: 1fr; }
-        }
-
-        .bubble { position: absolute; background-color: rgba(255, 255, 255, 0.4); display: block; pointer-events: none; z-index: 1; }
-        .bubble-square { width: 20px; height: 20px; animation: rise 8s infinite linear; }
-        @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(90deg); opacity: 0; } }
-
         /* --- ЗАДАНИЕ 6 (ТАБЛИЦА МЕСТОИМЕНИЙ) --- */
         .pronoun-table {
             display: grid;
@@ -145,33 +132,9 @@
             padding: 10px;
             border: 4px solid var(--color-med);
         }
-
-        .table-header {
-            color: var(--color-sand);
-            font-size: 0.7rem;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            text-transform: uppercase;
-        }
-
-        .row-label {
-            color: white;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--color-dark);
-        }
-
-        .pronoun-table .drop-slot {
-            width: 100%; 
-            height: 70px;
-            border: 2px dashed rgba(255,255,255,0.3);
-        }
+        .table-header { color: var(--color-sand); font-size: 0.7rem; text-align: center; display: flex; align-items: center; justify-content: center; padding: 10px; text-transform: uppercase; }
+        .row-label { color: white; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); border: 2px solid var(--color-dark); }
+        .pronoun-table .drop-slot { width: 100%; height: 70px; border: 2px dashed rgba(255,255,255,0.3); }
 
         /* --- ДИКТАНТ СТИЛИ --- */
         .dictation-wrapper {
@@ -180,6 +143,26 @@
             box-shadow: 6px 6px 0 rgba(0,0,0,0.5); width: 100%; max-width: 600px;
             margin-top: 20px;
         }
+
+        /* --- УРОКИ СТИЛИ --- */
+        .lessons-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 15px; margin-top: 20px; margin-bottom: 30px; }
+        .lesson-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 15px 20px; border: 4px solid var(--color-med); box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
+        .lesson-title { font-size: 1rem; color: white; text-shadow: 2px 2px 0 #000; }
+        .lesson-btn { margin: 0; padding: 10px 15px; font-size: 0.6rem; }
+
+        @media (max-width: 900px) { .grid-6-col { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) {
+            h1 { font-size: 1rem; }
+            .grid-3-col, .grid-6-col { grid-template-columns: repeat(2, 1fr); }
+            .grid-2-col { grid-template-columns: 1fr; }
+            .drop-zone-container { flex-direction: column; align-items: center; }
+            .radar-controls { grid-template-columns: 1fr; }
+            .lesson-row { flex-direction: column; gap: 15px; text-align: center; }
+        }
+
+        .bubble { position: absolute; background-color: rgba(255, 255, 255, 0.4); display: block; pointer-events: none; z-index: 1; }
+        .bubble-square { width: 20px; height: 20px; animation: rise 8s infinite linear; }
+        @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(90deg); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -199,12 +182,26 @@
     <div id="page-english" class="page active">
         <h1>Английский язык / English</h1>
         <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+            <button class="mc-button" onclick="switchPage('lessons')">Уроки</button>
             <button class="mc-button" onclick="startTest()">Контрольный тест №1</button>
             <button class="mc-button" style="background-color: var(--color-dark);" onclick="startDictation()">Режим диктанта</button>
         </div>
     </div>
 
-    <!-- ==================== ДИКТАНТ (НОВЫЙ БЛОК) ==================== -->
+    <!-- ==================== УРОКИ (НОВЫЙ БЛОК) ==================== -->
+    <div id="page-lessons" class="page">
+        <h1>Уроки / Lessons</h1>
+        <p class="instruction">Выберите нужный урок для выполнения заданий.</p>
+        
+        <div class="lessons-container" id="lessons-list">
+            <!-- Список уроков генерируется через JavaScript -->
+        </div>
+
+        <button class="mc-button" onclick="switchPage('english')">Назад</button>
+    </div>
+    <!-- ============================================================= -->
+
+    <!-- ==================== ДИКТАНТ ==================== -->
     <div id="page-dictation" class="page">
         <h1>Режим диктанта</h1>
         <h2 id="dictation-progress">Слово 1 / 15</h2>
@@ -457,48 +454,196 @@
     <!-- JS -->
     <script>
         // --- ДАННЫЕ СЛОВАРЯ ДЛЯ ДИКТАНТА ---
-        // Теперь вы можете использовать как обычный текст ("класс, год"), так и массивы (["класс", "год"])
         const fullVocabulary = {
-            "circle": "круг", "triangle": "треугольник", "square": "квадрат", "red": "красный", "age": "лет", 
-            "phone": "телефон", "surname": "фамилия", "year": "класс, год", "Wednesday": "среда", "Monday": "понедельник", 
-            "juice": "сок", "September": "сентябрь", "pen": "ручка", "pencil": "карандаш", "bed": "кровать", "lamp": "лампа", 
-            "uncle": "дядя", "aunt": "тётя", "cousin": "двоюродный брат или сестра", "tall": "высокий", "short": "короткий", 
-            "fair hair": "светлые волосы", "dark hair": "тёмные волосы", "slim": "стройный", "kind": "добрый", "friendly": "дружелюбный", 
-            "funny": "весёлый", "helmet": "шлем", "CDs": "диск", "hairbrush": "расчёска", "watch": "ручные часы", "gloves": "перчатки", 
-            "keys": "ключи", "roller blades": "ролики", "camera": "камера", "guitar": "гитара", "mobile phone": "мобильный телефон", 
-            "armchair": "кресло", "complete": "завершить", "tree": "дерево", "sun": "солнце", "ten": "десять", "six": "шесть", 
-            "five": "пять", "gymnasium": "гимназия", "October": "октябрь", "bag": "сумка", "sheets": "листов", "hi": "привет", 
-            "and": "и", "or": "или", "umbrella": "зонт", "mask": "маска", "hat": "шляпа", "Canada": "Канада", 
-            "Australia": "Австралия", "the United Kingdom": "Великобритания", "New Zealand": "Новая Зеландия", 
-            "the United States America": "США", "London": "Лондон", "Washington": "Вашингтон", "flower": "цветок", 
-            "bird": "птица", "brown": "коричневый", "doctor": "доктор", "home": "дом", "cold": "холодно", "rainbow": "радужный", 
-            "school": "школа", "New York": "Нью-Йорк", "know": "знать", "city": "город", "other": "другой", "in them": "в них", 
-            "millionaire city": "город-миллионник", "some": "немного, несколько", "famous": "известный", "sights": "достопримечательность", 
-            "monuments": "памятники/монументы", "theatre": "театр", "church": "церковь", "street": "улица", "order": "порядок", 
-            "always": "всегда", "usually": "часто (обычно)", "often": "часто", "sometimes": "иногда", "never": "никогда", 
-            "golden": "золотой", "with": "с", "serves": "подавать", "shirt": "рубашка", "nurse": "медсестра", "turn": "ход", 
-            "curtain": "занавеска", "want": "хочу", "sick": "болеть, болезнь, больной", "work": "работа, работать, работают", 
-            "dream": "мечта, сон", "to be": "быть", "think": "думать", "job": "работа, профессия", "space": "космос", 
-            "spaceship": "космический корабль", "ship": "корабль", "different": "разные, другие", "so cute": "милые", 
-            "so": "очень", "study": "учиться, учёба", "a lot of": "очень много", "lessons": "урок", "now": "сейчас", 
-            "at the moment": "в данный момент", "mechanic": "механик", "baker": "пекарь", "waiter": "официант", 
-            "injection": "инъекция (в тетради написано инфекция)", "rain": "дождь", "wind": "ветер", "snow": "снег", 
-            "sleet": "снег и дождь", "sunny": "солнечно", "rainy": "дождливая", "cloudy": "облачная", "snowy": "снежная", 
-            "warm": "тепло", "tornado": "торнадо", "blizzard": "метель", "lightning": "молния", "thunderstorm": "гроза", 
-            "weather": "погода", "freeze": "морозная", "fog": "туман", "ice": "лёд", "foggy": "туманный", "hail": "град", 
-            "moon": "луна", "yesterday": "вчера", "tomorrow": "завтра", "live": "жить, жизнь", "person": "человек (конкрет.)", 
-            "people": "люди (мн.ч)", "young": "молодой", "bean": "боб", "dinner": "ужин", "onion": "лук", "pea": "горох", 
-            "pear": "груша", "pineapple": "ананас", "supper": "ужин", "apartment": "квартира", "flat": "квартира", 
-            "bookcase": "книжный шкаф", "cupboard": "буфет", "dining-room": "обеденная комната", "muddy": "грязная", 
-            "puddles": "лужи", "must": "должен", "can": "уметь / мочь", "wear": "надевать", "boots": "обувь / ботинки", 
-            "fun": "веселье", "imagine": "воображать", "month": "месяц", "birthday": "день рождения", "night": "ночь", 
-            "morning": "утро", "evening": "вечер", "afternoon": "день", "noon": "полдень", "hour": "час (h не читается!!!)", 
-            "minute": "минута", "second": "секунда", "millisecond": "миллисекунда", "o'clock": "час (обозначение времени на циферблате)", 
-            "half-past": "половина", "quarter past / quarter to": "пятнадцатом", "quarter past": "пятнадцать минут... (час)", 
-            "quarter to": "без пятнадцати минут... (час)", "excited": "воодушевлённый, взволнованный", "wrap up": "одеться (закутываться)", 
-            "forget": "забывать (в тетради ошибочно: помнить)", "scarf": "шарф", "scarves": "шарфы", "footprints": "отпечатки от ног", 
-            "dear": "боже", "maybe": "возможно", "rough": "грубый, жёсткий", "first time": "сначала, в первую очередь", 
-            "needs": "нужен", "arms": "руки", "mouth": "рот", "found / find": "искать", "clothes": "одежда", "to keep": "сохранить"
+            "circle": "круг", 
+            "triangle": "треугольник", 
+            "square": "квадрат", 
+            "red": "красный", 
+            "age": "возраст", 
+            "phone": "телефон", 
+            "surname": "фамилия", 
+            "year": "год", 
+            "Wednesday": "среда", 
+            "Monday": "понедельник", 
+            "juice": "сок", 
+            "September": "сентябрь", 
+            "pen": "ручка", 
+            "pencil": "карандаш", 
+            "bed": "кровать", 
+            "lamp": ("лампа", "светильник"), 
+            "uncle": "дядя", 
+            "aunt": "тётя", 
+            "cousin": ("двоюродный брат", "двоюродная сестра"), 
+            "tall": "высокий", 
+            "short": "короткий", 
+            "fair hair": "светлые волосы", 
+            "dark hair": "тёмные волосы", 
+            "slim": "стройный", 
+            "kind": "добрый", 
+            "friendly": "дружелюбный", 
+            "funny": "весёлый", 
+            "helmet": "шлем", 
+            "hairbrush": "расчёска", 
+            "watch": ("часы", "смотреть"), 
+            "gloves": "перчатки", 
+            "keys": "ключи", 
+            "roller blades": "ролики", 
+            "camera": "камера", 
+            "guitar": "гитара", 
+            "mobile phone": "мобильный телефон", 
+            "armchair": "кресло", 
+            "complete": ("завершить", "завершение", "полный"), 
+            "tree": "дерево", 
+            "The Sun": "солнце", 
+            "ten": "десять", 
+            "six": "шесть", 
+            "five": "пять", 
+            "gymnasium": "гимназия", 
+            "October": "октябрь", 
+            "bag": "сумка", 
+            "hi": "привет", 
+            "and": "и", 
+            "or": "или", 
+            "umbrella": "зонт", 
+            "mask": "маска", 
+            "hat": "шляпа", 
+            "Canada": "Канада", 
+            "Australia": "Австралия", 
+            "the United Kingdom": "Великобритания", 
+            "New Zealand": "Новая Зеландия", 
+            "the United States America": "США", 
+            "London": "Лондон", 
+            "Washington": "Вашингтон", 
+            "flower": "цветок", 
+            "bird": "птица", 
+            "brown": "коричневый", 
+            "doctor": "доктор", 
+            "home": "дом", 
+            "cold": ("холодный", "холодно"), 
+            "rainbow": ("радужный", "радуга"), 
+            "school": "школа", 
+            "New York": "Нью-Йорк", 
+            "know": "знать", 
+            "city": "город", 
+            "other": "другой", 
+            "in them": "в них", 
+            "millionaire city": 
+            "город-миллионник", 
+            "some": ("немного", "несколько"), 
+            "famous": "известный", 
+            "sight": "достопримечательность", 
+            "monuments": "памятники", 
+            "theatre": "театр", 
+            "church": "церковь", 
+            "street": "улица", 
+            "order": "порядок", 
+            "always": "всегда", 
+            "usually": "обычно", 
+            "often": "часто", 
+            "sometimes": "иногда", 
+            "never": "никогда", 
+            "golden": "золотой", 
+            "with": "с", 
+            "serves": "подавать", 
+            "shirt": "рубашка", 
+            "nurse": "медсестра", 
+            "turn": "ход", 
+            "curtain": "занавеска", 
+            "want": "хочу", 
+            "sick": ("болеть", "болезнь", "больной"), 
+            "work": ("работа", "работать", "работают"), 
+            "dream": ("мечта", "сон"), 
+            "to be": "быть", 
+            "think": "думать", 
+            // "job": "работа, профессия", 
+            "space": "космос", 
+            "spaceship": "космический корабль", 
+            "ship": "корабль", 
+            // "different": "разные, другие", 
+            "cute": "милый", 
+            "so": "очень", 
+            // "study": "учиться, учёба", 
+            "a lot of": "очень много", 
+            "lesson": "урок", 
+            "now": "сейчас", 
+            "at the moment": "в данный момент", 
+            "mechanic": "механик", 
+            "baker": "пекарь", 
+            "waiter": "официант", 
+            "injection": "инъекция", 
+            "rain": "дождь", 
+            "wind": "ветер", 
+            "snow": "снег", 
+            "sleet": "снег с дождём", 
+            "sunny": "солнечно", 
+            "rainy": "дождливо", 
+            "cloudy": "облачно", 
+            "snowy": "снежная", 
+            "warm": "тепло", 
+            "tornado": "торнадо", 
+            "blizzard": "метель", 
+            "lightning": "молния", 
+            "thunderstorm": "гроза", 
+            "weather": "погода", 
+            "freeze": "морозная", 
+            "fog": "туман", 
+            "ice": "лёд", 
+            "foggy": "туманный", 
+            "hail": "град", 
+            "moon": "луна", 
+            "yesterday": "вчера", 
+            "tomorrow": "завтра", 
+            // "live": "жить, жизнь", 
+            "person": "человек", 
+            "people": "люди", 
+            "young": "молодой", 
+            "bean": "боб", 
+            "dinner": "ужин", 
+            "onion": "лук", 
+            "pea": "горох", 
+            "pear": "груша", 
+            "pineapple": "ананас", 
+            "supper": "ужин", 
+            "apartment": "квартира", 
+            "flat": "квартира", 
+            "bookcase": "книжный шкаф", 
+            "cupboard": "буфет", 
+            "dining-room": "обеденная комната", 
+            "muddy": "грязная", 
+            "puddles": "лужи", 
+            "must": "должен", 
+            // "can": "уметь / мочь", 
+            "wear": "надевать", 
+            "boots": "обувь", 
+            "fun": "веселье", 
+            "imagine": "воображать", 
+            "month": "месяц", 
+            "birthday": "день рождения", 
+            "night": "ночь", 
+            "morning": "утро", 
+            "evening": "вечер", 
+            "afternoon": "день", 
+            "noon": "полдень", 
+            "hour": "час", 
+            "minute": "минута", 
+            "second": "секунда", 
+            "millisecond": "миллисекунда", 
+            // "excited": "воодушевлённый, взволнованный", 
+            // "wrap up": "одеться (закутываться)", 
+            "forget": "забывать", 
+            "scarf": "шарф", 
+            "scarves": "шарфы", 
+            "footprints": "отпечатки от ног", 
+            "dear": "боже",
+            "maybe": "возможно", 
+            // "rough": "грубый, жёсткий", 
+            // "first time": "сначала, в первую очередь", 
+            "needs": "нужен", 
+            "arms": "руки", 
+            "mouth": "рот", 
+            // "found / find": "искать", 
+            "clothes": "одежда", 
+            "to keep": "сохранить"
         };
 
         const weatherData = [
@@ -526,6 +671,53 @@
                 target.classList.add('active');
                 target.scrollTop = 0;
             }
+        }
+
+        // ==================== ЛОГИКА УРОКОВ ====================
+        function initLessons() {
+            const container = document.getElementById('lessons-list');
+            container.innerHTML = ''; // Очищаем контейнер перед добавлением
+            
+            for(let i = 1; i <= 15; i++) {
+                const row = document.createElement('div');
+                row.className = 'lesson-row';
+                
+                const title = document.createElement('div');
+                title.className = 'lesson-title';
+                
+                const btn = document.createElement('button');
+                btn.className = 'mc-button lesson-btn';
+                btn.innerText = 'Задание к уроку';
+                
+                // Делаем первый урок особенным
+                if (i === 1) {
+                    title.innerText = 'Урок 1. Времена';
+                    btn.onclick = () => window.location.href = 'english_lessons/lesson_1.html';
+                } else {
+                    title.innerText = `Урок ${i}`;
+                    btn.onclick = () => showDevMessage(btn);
+                }
+                
+                row.appendChild(title);
+                row.appendChild(btn);
+                container.appendChild(row);
+            }
+        }
+
+        // Временная заглушка вместо alert(), чтобы не портить дизайн
+        function showDevMessage(btn) {
+            const originalText = btn.innerText;
+            const originalColor = btn.style.backgroundColor;
+            
+            btn.innerText = "В разработке!";
+            btn.style.backgroundColor = "var(--wrong)";
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = originalColor || "var(--color-sand)";
+                btn.disabled = false;
+            }, 2000);
         }
 
         // ==================== ЛОГИКА ДИКТАНТА ====================
@@ -974,7 +1166,12 @@
                 body.appendChild(bubble);
             }
         }
-        window.onload = createBubbles;
+        
+        // Запускаем инициализации при загрузке страницы
+        window.onload = () => {
+            createBubbles();
+            initLessons();
+        };
     </script>
 </body>
 </html>

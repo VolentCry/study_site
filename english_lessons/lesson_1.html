@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок 1. Времена</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- ПЕРЕМЕННЫЕ ЦВЕТОВ --- */
+        :root {
+            --color-light: #c5d0e6;
+            --color-med: #a1b3d7;
+            --color-dark: #7e96c7;
+            --color-sand: #c7ba7e;
+            --text-color: #ffffff;
+            --frame-bg: rgba(62, 78, 110, 0.85);
+            --input-bg: rgba(0, 0, 0, 0.4);
+            --correct: #55ff55;
+            --wrong: #ff5555;
+            --card-back: #4f688e;
+            --card-front: #c7ba7e;
+        }
+
+        /* --- ОСНОВНЫЕ СТИЛИ --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            position: relative;
+            background: linear-gradient(180deg, var(--color-light) 0%, var(--color-med) 40%, var(--color-dark) 80%, var(--color-sand) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        h1 { font-size: 1.5rem; margin-top: 30px; text-align: center; text-transform: uppercase; text-shadow: 3px 3px 0px #3f3f3f; line-height: 1.4; position: relative; z-index: 10; }
+        h2 { font-size: 1rem; color: var(--color-sand); text-shadow: 2px 2px 0 #000; margin-bottom: 15px; text-align: center; line-height: 1.5;}
+        
+        .instruction {
+            font-size: 0.8rem; color: #e0e0e0; text-align: center; margin: 20px 0 40px 0;
+            max-width: 800px; line-height: 1.8; background: rgba(0,0,0,0.3); padding: 20px; border: 4px dashed var(--color-sand);
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.5); position: relative; z-index: 10;
+        }
+
+        /* --- БЛОКИ ЗАДАНИЙ --- */
+        .task-section {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 4px solid var(--color-med);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- ИНПУТЫ --- */
+        .inline-input {
+            width: 150px;
+            padding: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            background-color: var(--input-bg);
+            border: 2px solid white;
+            color: white;
+            text-align: center;
+            outline: none;
+            margin: 5px;
+            transition: 0.3s;
+        }
+        .inline-input:focus { border-color: var(--color-sand); }
+        .inline-input.correct { border-color: var(--correct); background-color: rgba(85, 255, 85, 0.2); }
+        .inline-input.wrong { border-color: var(--wrong); background-color: rgba(255, 85, 85, 0.2); }
+        .inline-input:disabled { opacity: 0.9; cursor: not-allowed; }
+
+        /* --- ЗАДАНИЕ 1, 7, 9, 10: СЕТКИ --- */
+        .dict-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; font-size: 0.7rem; line-height: 2; }
+        .list-grid { display: grid; grid-template-columns: 1fr; gap: 15px; font-size: 0.7rem; line-height: 2; }
+        .dict-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px; border: 2px solid var(--color-dark); }
+
+        /* --- ЗАДАНИЕ 2: ТЕКСТ --- */
+        .story-text { font-size: 0.8rem; line-height: 2.5; color: white; background: rgba(255, 255, 255, 0.05); padding: 20px; border: 2px dashed var(--color-light); }
+
+        /* --- ЗАДАНИЕ 3: MEMORY CARDS --- */
+        .memory-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; perspective: 1000px; }
+        .memory-card { width: 100%; height: 80px; background-color: var(--card-back); border: 4px solid white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: transparent; cursor: pointer; box-shadow: 4px 4px 0 rgba(0,0,0,0.5); transition: 0.3s; user-select: none; }
+        .memory-card:active { transform: scale(0.95); }
+        .memory-card.flipped { background-color: var(--card-front); color: #333; border-color: #333; cursor: default; }
+        .memory-card.matched { background-color: var(--correct); color: #111; border-color: #fff; cursor: default; animation: matchAnim 0.5s ease; }
+        @keyframes matchAnim { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+
+        /* --- ЗАДАНИЕ 4, 5, 8: КНОПКИ ВЫБОРА --- */
+        .quiz-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.1); padding: 10px; border: 2px solid var(--color-dark); margin-bottom: 10px; font-size: 0.7rem; line-height: 1.5; }
+        .quiz-btns { display: flex; gap: 10px; }
+        .opt-btn { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; padding: 8px 10px; cursor: pointer; border: 2px solid white; background: var(--color-dark); color: white; transition: 0.2s; }
+        .opt-btn:hover { background: var(--color-med); }
+        .opt-btn.selected { background: var(--color-sand); color: black; border-color: black; }
+        .opt-btn.correct-ans { background: var(--correct) !important; color: black; border-color: black; }
+        .opt-btn.wrong-ans { background: var(--wrong) !important; color: white; border-color: black; }
+
+        /* --- ЗАДАНИЕ 6: ПОРЯДОК СЛОВ --- */
+        .wo-container { background: rgba(0,0,0,0.2); padding: 15px; border: 2px dashed var(--color-sand); margin-bottom: 20px; }
+        .wo-target { min-height: 50px; border-bottom: 2px solid white; margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; align-items: center; }
+        .wo-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .wo-word { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; padding: 10px; background: var(--frame-bg); border: 2px solid var(--color-sand); cursor: pointer; user-select: none; box-shadow: 2px 2px 0 #000; }
+        .wo-word:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+
+        /* --- КНОПКИ --- */
+        .mc-button {
+            position: relative; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: white;
+            padding: 15px 25px; cursor: pointer; border: none; outline: none; background-color: var(--color-sand);
+            overflow: hidden; box-shadow: inset 3px 3px 0px rgba(255,255,255,0.5), inset -3px -3px 0px rgba(0,0,0,0.4), 3px 3px 0px #000;
+            display: inline-block; margin-top: 20px; text-align: center;
+        }
+        .mc-button::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background-color: var(--color-dark); transition: height 0.4s ease-out; z-index: -1; }
+        .mc-button:hover::before { height: 100%; }
+        .mc-button:hover { transform: translateY(-2px); text-shadow: 2px 2px 0px #000; }
+        .mc-button:active { transform: translateY(2px); box-shadow: inset 3px 3px 0px rgba(0,0,0,0.4), 2px 2px 0px #000; }
+
+        .result-box { display: none; font-size: 1rem; margin-top: 15px; color: var(--color-sand); text-shadow: 2px 2px 0 #000; }
+
+        /* --- АДАПТИВНОСТЬ --- */
+        @media (max-width: 800px) {
+            .dict-grid { grid-template-columns: 1fr; }
+            .memory-board { grid-template-columns: repeat(3, 1fr); }
+            .dict-item, .quiz-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .quiz-btns { width: 100%; justify-content: space-between; }
+            .inline-input { width: 100%; }
+        }
+        @media (max-width: 500px) {
+            .memory-board { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 1.2rem; }
+            .opt-btn { padding: 6px; font-size: 0.5rem; }
+        }
+
+        /* --- ПУЗЫРЬКИ АНИМАЦИИ --- */
+        .bubble { position: fixed; background-color: rgba(255, 255, 255, 0.4); display: block; pointer-events: none; z-index: 1; }
+        .bubble-square { width: 20px; height: 20px; animation: rise 8s infinite linear; }
+        @keyframes rise { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-10vh) rotate(90deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <!-- Навигация -->
+    <button class="mc-button" style="position: absolute; top: 20px; left: 20px; margin: 0; z-index: 100; font-size: 0.6rem; padding: 10px;" onclick="window.location.href='english_page.html'">◄ Назад</button>
+
+    <h1>Урок 1.<br>Повторение времён</h1>
+    
+    <div class="instruction">
+        Добро пожаловать на тренировочный полигон!<br>Сегодня мы повторяем времена глаголов (Present, Past, Future) и неправильные глаголы. Выполни все 10 заданий ниже. Удачи!
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 1 ================= -->
+    <div class="task-section">
+        <h2>Задание 1: Диктант (V2)</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Напиши форму <strong>Past Simple (вторую форму)</strong> для этих 10 неправильных глаголов.</p>
+        
+        <div class="dict-grid" id="dict-container">
+            <div class="dict-item"><span>1. Идти (go)</span> <input type="text" class="inline-input dict-input" data-ans="went" autocomplete="off"></div>
+            <div class="dict-item"><span>2. Видеть (see)</span> <input type="text" class="inline-input dict-input" data-ans="saw" autocomplete="off"></div>
+            <div class="dict-item"><span>3. Делать (make)</span> <input type="text" class="inline-input dict-input" data-ans="made" autocomplete="off"></div>
+            <div class="dict-item"><span>4. Иметь (have)</span> <input type="text" class="inline-input dict-input" data-ans="had" autocomplete="off"></div>
+            <div class="dict-item"><span>5. Брать (take)</span> <input type="text" class="inline-input dict-input" data-ans="took" autocomplete="off"></div>
+            <div class="dict-item"><span>6. Давать (give)</span> <input type="text" class="inline-input dict-input" data-ans="gave" autocomplete="off"></div>
+            <div class="dict-item"><span>7. Находить (find)</span> <input type="text" class="inline-input dict-input" data-ans="found" autocomplete="off"></div>
+            <div class="dict-item"><span>8. Строить (build)</span> <input type="text" class="inline-input dict-input" data-ans="built" autocomplete="off"></div>
+            <div class="dict-item"><span>9. Думать (think)</span> <input type="text" class="inline-input dict-input" data-ans="thought" autocomplete="off"></div>
+            <div class="dict-item"><span>10. Ловить (catch)</span> <input type="text" class="inline-input dict-input" data-ans="caught" autocomplete="off"></div>
+        </div>
+
+        <button class="mc-button" onclick="checkTask('dict', 10)" id="btn-dict">Проверить</button>
+        <div class="result-box" id="res-dict"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 2 ================= -->
+    <div class="task-section">
+        <h2>Задание 2: История Стива</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Прочитай текст и вставь глаголы из скобок в правильном времени.</p>
+        
+        <div class="story-text" id="story-container">
+            Usually, Steve <input type="text" class="inline-input story-input" data-ans="mines" placeholder="(mine)" autocomplete="off"> for diamonds in the morning. 
+            But yesterday, he <input type="text" class="inline-input story-input" data-ans="heard" placeholder="(hear)" autocomplete="off"> a strange noise in the cave. 
+            A green creeper <input type="text" class="inline-input story-input" data-ans="stood" placeholder="(stand)" autocomplete="off"> right behind him! 
+            Steve <input type="text" class="inline-input story-input" data-ans="ran" placeholder="(run)" autocomplete="off"> away very fast. 
+            He thinks that tomorrow he <input type="text" class="inline-input story-input" data-ans="will make|'ll make" placeholder="(make)" autocomplete="off"> a stronger sword.
+        </div>
+
+        <button class="mc-button" onclick="checkTask('story', 5)" id="btn-story">Проверить</button>
+        <div class="result-box" id="res-story"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 3 ================= -->
+    <div class="task-section">
+        <h2>Задание 3: Memory Cards</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 10px; color: #ddd; line-height: 1.5;">Найди пары! Соедини глагол в настоящем времени с его формой в прошедшем.</p>
+        
+        <div class="memory-board" id="memory-board">
+            <!-- Карточки генерируются скриптом -->
+        </div>
+
+        <div class="result-box" id="res-memory" style="font-size: 1.2rem; text-align: center; color: var(--correct);"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 4 ================= -->
+    <div class="task-section">
+        <h2>Задание 4: Маркеры времени</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Выбери правильное слово-подсказку для каждого предложения.</p>
+        
+        <div class="quiz-row" data-ans="now">
+            <span>1. I am building a house in Minecraft ___.</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 4)">yesterday</button>
+                <button class="opt-btn" onclick="selectOption(this, 4)">often</button>
+                <button class="opt-btn" onclick="selectOption(this, 4)">now</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="tomorrow">
+            <span>2. We will defeat the Ender Dragon ___.</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 4)">tomorrow</button>
+                <button class="opt-btn" onclick="selectOption(this, 4)">usually</button>
+                <button class="opt-btn" onclick="selectOption(this, 4)">now</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="usually">
+            <span>3. Creepers ___ explode near players.</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 4)">yesterday</button>
+                <button class="opt-btn" onclick="selectOption(this, 4)">usually</button>
+                <button class="opt-btn" onclick="selectOption(this, 4)">tomorrow</button>
+            </div>
+        </div>
+
+        <button class="mc-button" onclick="checkQuiz(4, 3)" id="btn-quiz4">Проверить</button>
+        <div class="result-box" id="res-quiz4"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 5 ================= -->
+    <div class="task-section">
+        <h2>Задание 5: Детектив (True/False)</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Правильно ли написано предложение грамматически?</p>
+        
+        <div class="quiz-row" data-ans="False">
+            <span>1. He didn't went to the mine.</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 5)">True</button>
+                <button class="opt-btn" onclick="selectOption(this, 5)">False</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="True">
+            <span>2. Will you play with me tomorrow?</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 5)">True</button>
+                <button class="opt-btn" onclick="selectOption(this, 5)">False</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="False">
+            <span>3. I am swiming in the ocean right now.</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 5)">True</button>
+                <button class="opt-btn" onclick="selectOption(this, 5)">False</button>
+            </div>
+        </div>
+
+        <button class="mc-button" onclick="checkQuiz(5, 3)" id="btn-quiz5">Проверить</button>
+        <div class="result-box" id="res-quiz5"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 6 ================= -->
+    <div class="task-section">
+        <h2>Задание 6: Магия порядка</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Кликай по словам, чтобы собрать правильное предложение!</p>
+        
+        <div class="wo-container" id="wo-block-1" data-ans="Did you see him ?">
+            <div class="wo-target" onclick="returnWord(event, 1)"></div>
+            <div class="wo-bank">
+                <span class="wo-word" onclick="moveWord(this, 1)">you</span>
+                <span class="wo-word" onclick="moveWord(this, 1)">?</span>
+                <span class="wo-word" onclick="moveWord(this, 1)">see</span>
+                <span class="wo-word" onclick="moveWord(this, 1)">Did</span>
+                <span class="wo-word" onclick="moveWord(this, 1)">him</span>
+            </div>
+        </div>
+
+        <div class="wo-container" id="wo-block-2" data-ans="I am crafting a sword .">
+            <div class="wo-target" onclick="returnWord(event, 2)"></div>
+            <div class="wo-bank">
+                <span class="wo-word" onclick="moveWord(this, 2)">a</span>
+                <span class="wo-word" onclick="moveWord(this, 2)">crafting</span>
+                <span class="wo-word" onclick="moveWord(this, 2)">.</span>
+                <span class="wo-word" onclick="moveWord(this, 2)">am</span>
+                <span class="wo-word" onclick="moveWord(this, 2)">sword</span>
+                <span class="wo-word" onclick="moveWord(this, 2)">I</span>
+            </div>
+        </div>
+
+        <button class="mc-button" onclick="checkWordOrder()" id="btn-wo">Проверить</button>
+        <div class="result-box" id="res-wo"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 7 ================= -->
+    <div class="task-section">
+        <h2>Задание 7: Трудности перевода</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Переведи фразы на английский язык.</p>
+        
+        <div class="list-grid">
+            <div class="dict-item"><span>1. Я играю каждый день.</span> <input type="text" class="inline-input trans-input" data-ans="I play every day|I play everyday" autocomplete="off" style="width: 200px;"></div>
+            <div class="dict-item"><span>2. Мы построим дом.</span> <input type="text" class="inline-input trans-input" data-ans="We will build a house|We'll build a house" autocomplete="off" style="width: 200px;"></div>
+            <div class="dict-item"><span>3. Он не пошел в шахту.</span> <input type="text" class="inline-input trans-input" data-ans="He didn't go to the mine|He did not go to the mine" autocomplete="off" style="width: 200px;"></div>
+        </div>
+
+        <button class="mc-button" onclick="checkTask('trans', 3)" id="btn-trans">Проверить</button>
+        <div class="result-box" id="res-trans"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 8 ================= -->
+    <div class="task-section">
+        <h2>Задание 8: Сортировка лута</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Укажи, какой это глагол: Правильный (Regular) или Неправильный (Irregular).</p>
+        
+        <div class="quiz-row" data-ans="Regular">
+            <span>1. Play</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 8)">Regular</button>
+                <button class="opt-btn" onclick="selectOption(this, 8)">Irregular</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="Irregular">
+            <span>2. Go</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 8)">Regular</button>
+                <button class="opt-btn" onclick="selectOption(this, 8)">Irregular</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="Regular">
+            <span>3. Jump</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 8)">Regular</button>
+                <button class="opt-btn" onclick="selectOption(this, 8)">Irregular</button>
+            </div>
+        </div>
+        <div class="quiz-row" data-ans="Irregular">
+            <span>4. Swim</span>
+            <div class="quiz-btns">
+                <button class="opt-btn" onclick="selectOption(this, 8)">Regular</button>
+                <button class="opt-btn" onclick="selectOption(this, 8)">Irregular</button>
+            </div>
+        </div>
+
+        <button class="mc-button" onclick="checkQuiz(8, 4)" id="btn-quiz8">Проверить</button>
+        <div class="result-box" id="res-quiz8"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 9 ================= -->
+    <div class="task-section">
+        <h2>Задание 9: Починка</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Найди грамматическую ошибку в предложении и впиши <strong>только правильный глагол</strong>.</p>
+        
+        <div class="list-grid">
+            <div class="dict-item"><span>1. She <i>goed</i> to the village.</span> <input type="text" class="inline-input fix-input" data-ans="went" autocomplete="off"></div>
+            <div class="dict-item"><span>2. They <i>will to win</i> the game.</span> <input type="text" class="inline-input fix-input" data-ans="will win" autocomplete="off"></div>
+            <div class="dict-item"><span>3. I <i>am play</i> Minecraft right now.</span> <input type="text" class="inline-input fix-input" data-ans="am playing|'m playing" autocomplete="off"></div>
+        </div>
+
+        <button class="mc-button" onclick="checkTask('fix', 3)" id="btn-fix">Проверить</button>
+        <div class="result-box" id="res-fix"></div>
+    </div>
+
+    <!-- ================= ЗАДАНИЕ 10 ================= -->
+    <div class="task-section" style="border-color: var(--wrong);">
+        <h2 style="color: var(--wrong);">Задание 10: Битва с Боссом</h2>
+        <p style="font-size: 0.7rem; margin-bottom: 20px; color: #ddd; line-height: 1.5;">Финальный тест на все времена! Раскрой скобки.</p>
+        
+        <div class="list-grid">
+            <div class="dict-item"><span>1. I <input type="text" class="inline-input boss-input" data-ans="do not see|don't see" autocomplete="off"> (not/see) any diamonds here.</span></div>
+            <div class="dict-item"><span>2. Look! He <input type="text" class="inline-input boss-input" data-ans="is running|'s running" autocomplete="off"> (run) from a skeleton!</span></div>
+            <div class="dict-item"><span>3. We <input type="text" class="inline-input boss-input" data-ans="built" autocomplete="off"> (build) this castle last week.</span></div>
+            <div class="dict-item"><span>4. <input type="text" class="inline-input boss-input" data-ans="did you sleep" autocomplete="off"> (you/sleep) in the bed yesterday?</span></div>
+            <div class="dict-item"><span>5. I think it <input type="text" class="inline-input boss-input" data-ans="will rain|'ll rain" autocomplete="off"> (rain) tomorrow.</span></div>
+        </div>
+
+        <button class="mc-button" onclick="checkTask('boss', 5)" id="btn-boss" style="background-color: var(--wrong);">Победить босса</button>
+        <div class="result-box" id="res-boss"></div>
+    </div>
+
+    <script>
+        // --- ПУЗЫРЬКИ ---
+        function createBubbles() {
+            const body = document.body;
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble', 'bubble-square');
+                const size = Math.random() * 30 + 10 + 'px';
+                bubble.style.width = size; bubble.style.height = size;
+                bubble.style.left = Math.random() * 100 + 'vw';
+                bubble.style.animationDelay = Math.random() * 5 + 's';
+                bubble.style.animationDuration = Math.random() * 5 + 5 + 's';
+                body.appendChild(bubble);
+            }
+        }
+        window.onload = () => {
+            createBubbles();
+            initMemoryGame();
+        };
+
+        // --- УНИВЕРСАЛЬНАЯ ПРОВЕРКА ДЛЯ ИНПУТОВ (Задания 1, 2, 7, 9, 10) ---
+        function checkTask(taskPrefix, totalCount) {
+            let correctCount = 0;
+            const inputs = document.querySelectorAll(`.${taskPrefix}-input`);
+            
+            inputs.forEach(inp => {
+                const userAns = inp.value.trim().toLowerCase();
+                const correctAnswers = inp.dataset.ans.split('|').map(s => s.trim().toLowerCase());
+                
+                inp.disabled = true; 
+                
+                if (correctAnswers.includes(userAns)) {
+                    inp.classList.add('correct');
+                    inp.classList.remove('wrong');
+                    correctCount++;
+                } else {
+                    inp.classList.add('wrong');
+                    inp.classList.remove('correct');
+                    if(userAns === "") {
+                        inp.value = correctAnswers[0];
+                    } else {
+                        inp.value = userAns + " (" + correctAnswers[0] + ")";
+                    }
+                }
+            });
+
+            const btn = document.getElementById(`btn-${taskPrefix}`);
+            const res = document.getElementById(`res-${taskPrefix}`);
+            
+            btn.style.display = 'none';
+            res.style.display = 'block';
+            
+            if(correctCount === totalCount) {
+                res.innerHTML = `Идеально! <span style="color:var(--correct);">${correctCount}/${totalCount}</span>`;
+            } else if (correctCount >= totalCount / 2) {
+                res.innerHTML = `Хорошо! <span style="color:var(--color-sand);">${correctCount}/${totalCount}</span>. Изучи свои ошибки.`;
+            } else {
+                res.innerHTML = `Слабовато... <span style="color:var(--wrong);">${correctCount}/${totalCount}</span>. Повтори правила!`;
+            }
+        }
+
+        // --- ЛОГИКА МИНИ-ИГРЫ MEMORY (Задание 3) ---
+        const memoryPairs = [
+            { id: 1, text1: "fly", text2: "flew" },
+            { id: 2, text1: "eat", text2: "ate" },
+            { id: 3, text1: "drink", text2: "drank" },
+            { id: 4, text1: "sleep", text2: "slept" },
+            { id: 5, text1: "swim", text2: "swam" },
+            { id: 6, text1: "buy", text2: "bought" }
+        ];
+
+        let cardsArray = [];
+        let flippedCards = [];
+        let matchedPairsCount = 0;
+        let isBoardLocked = false;
+
+        function initMemoryGame() {
+            const board = document.getElementById('memory-board');
+            board.innerHTML = '';
+            cardsArray = [];
+            flippedCards = [];
+            matchedPairsCount = 0;
+            isBoardLocked = false;
+            document.getElementById('res-memory').style.display = 'none';
+
+            memoryPairs.forEach(pair => {
+                cardsArray.push({ pairId: pair.id, text: pair.text1 });
+                cardsArray.push({ pairId: pair.id, text: pair.text2 });
+            });
+
+            cardsArray.sort(() => Math.random() - 0.5);
+
+            cardsArray.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.classList.add('memory-card');
+                cardEl.dataset.pairId = card.pairId;
+                cardEl.innerText = card.text;
+                cardEl.onclick = () => flipCard(cardEl);
+                board.appendChild(cardEl);
+            });
+        }
+
+        function flipCard(cardEl) {
+            if (isBoardLocked) return;
+            if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+
+            cardEl.classList.add('flipped');
+            flippedCards.push(cardEl);
+
+            if (flippedCards.length === 2) {
+                checkForMatch();
+            }
+        }
+
+        function checkForMatch() {
+            isBoardLocked = true;
+            const card1 = flippedCards[0];
+            const card2 = flippedCards[1];
+
+            if (card1.dataset.pairId === card2.dataset.pairId) {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    matchedPairsCount++;
+                    
+                    if(matchedPairsCount === memoryPairs.length) {
+                        const res = document.getElementById('res-memory');
+                        res.innerText = "Ура! Ты нашел все пары!";
+                        res.style.display = 'block';
+                    }
+                    resetBoard();
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    resetBoard();
+                }, 1000);
+            }
+        }
+
+        function resetBoard() { flippedCards = []; isBoardLocked = false; }
+
+        // --- ЛОГИКА КНОПОК ВЫБОРА (Задания 4, 5, 8) ---
+        function selectOption(btn, quizNum) {
+            // Убираем выделение с соседних кнопок в этом же ряду
+            const parentRow = btn.closest('.quiz-row');
+            parentRow.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function checkQuiz(quizNum, totalCount) {
+            let correctCount = 0;
+            // Ищем все ряды, относящиеся к этому заданию
+            const rows = document.querySelectorAll(`#btn-quiz${quizNum}`).parentNode.querySelectorAll('.quiz-row');
+            
+            rows.forEach(row => {
+                const correctAns = row.dataset.ans;
+                const selectedBtn = row.querySelector('.opt-btn.selected');
+                const allBtns = row.querySelectorAll('.opt-btn');
+                
+                allBtns.forEach(b => b.disabled = true); // блокируем
+                
+                if (selectedBtn) {
+                    if (selectedBtn.innerText.trim() === correctAns) {
+                        selectedBtn.classList.add('correct-ans');
+                        correctCount++;
+                    } else {
+                        selectedBtn.classList.add('wrong-ans');
+                        // Подсвечиваем правильный
+                        allBtns.forEach(b => {
+                            if(b.innerText.trim() === correctAns) b.classList.add('correct-ans');
+                        });
+                    }
+                } else {
+                    // Если ничего не выбрано, просто подсвечиваем правильный
+                    allBtns.forEach(b => {
+                        if(b.innerText.trim() === correctAns) b.classList.add('correct-ans');
+                    });
+                }
+            });
+
+            const btn = document.getElementById(`btn-quiz${quizNum}`);
+            const res = document.getElementById(`res-quiz${quizNum}`);
+            btn.style.display = 'none';
+            res.style.display = 'block';
+            
+            if(correctCount === totalCount) res.innerHTML = `Отлично! <span style="color:var(--correct);">${correctCount}/${totalCount}</span>`;
+            else res.innerHTML = `Результат: <span style="color:var(--color-sand);">${correctCount}/${totalCount}</span>`;
+        }
+
+        // --- ЛОГИКА ПОРЯДКА СЛОВ (Задание 6) ---
+        function moveWord(wordEl, blockNum) {
+            const targetDiv = document.querySelector(`#wo-block-${blockNum} .wo-target`);
+            targetDiv.appendChild(wordEl);
+        }
+
+        function returnWord(event, blockNum) {
+            if(event.target.classList.contains('wo-word')) {
+                const bankDiv = document.querySelector(`#wo-block-${blockNum} .wo-bank`);
+                bankDiv.appendChild(event.target);
+            }
+        }
+
+        function checkWordOrder() {
+            let correctCount = 0;
+            const blocks = [1, 2];
+            
+            blocks.forEach(num => {
+                const container = document.getElementById(`wo-block-${num}`);
+                const targetDiv = container.querySelector('.wo-target');
+                const expectedAns = container.dataset.ans;
+                
+                // Собираем текст из слов, лежащих в таргете
+                let userAnsArray = [];
+                targetDiv.querySelectorAll('.wo-word').forEach(w => userAnsArray.push(w.innerText.trim()));
+                const userAns = userAnsArray.join(' ');
+                
+                // Блокируем слова
+                container.querySelectorAll('.wo-word').forEach(w => {
+                    w.onclick = null;
+                    w.style.cursor = 'default';
+                });
+                targetDiv.onclick = null;
+                
+                if(userAns === expectedAns) {
+                    targetDiv.style.borderColor = "var(--correct)";
+                    correctCount++;
+                } else {
+                    targetDiv.style.borderColor = "var(--wrong)";
+                    // Показываем правильный ответ в bank
+                    const bank = container.querySelector('.wo-bank');
+                    bank.innerHTML = `<span style="color:var(--wrong); font-size:0.7rem;">Правильно: ${expectedAns}</span>`;
+                }
+            });
+
+            const btn = document.getElementById('btn-wo');
+            const res = document.getElementById('res-wo');
+            btn.style.display = 'none';
+            res.style.display = 'block';
+            res.innerHTML = `Собрано: <span style="color:var(--correct);">${correctCount}/2</span> предложений.`;
+        }
+    </script>
+</body>
+</html>
