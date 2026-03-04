@@ -3,6 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль — Minecraft Underwater School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-light: #c5d0e6;
+            --color-med: #a1b3d7;
+            --color-dark: #7e96c7;
+            --color-sand: #c7ba7e;
+            --text-color: #ffffff;
+            --frame-bg: rgba(62, 78, 110, 0.9);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, var(--color-light) 0%, var(--color-med) 40%, var(--color-dark) 80%, var(--color-sand) 100%);
+        }
+
+        .profile-card {
+            background: var(--frame-bg);
+            border: 4px solid var(--color-light);
+            padding: 30px 25px 25px;
+            text-align: center;
+            min-width: 320px;
+            max-width: 420px;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.6);
+        }
+
+        .nickname {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        .avatar-wrapper {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            border: 5px solid var(--color-sand);
+            overflow: hidden;
+            background: radial-gradient(circle at 30% 30%, #ffffff55, #3e4e6e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-placeholder-text {
+            font-size: 0.55rem;
+            line-height: 1.5;
+            color: #eaeaea;
+            text-shadow: 1px 1px 0px #000;
+            padding: 10px;
+        }
+
+        .stats-label {
+            font-size: 0.7rem;
+            color: var(--color-sand);
+            margin-bottom: 10px;
+        }
+
+        .stats-value {
+            font-size: 1.4rem;
+            color: #55ff55;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            font-size: 0.6rem;
+            padding: 10px 18px;
+            background: var(--color-sand);
+            color: #000;
+            text-decoration: none;
+            box-shadow: inset 3px 3px 0px rgba(255,255,255,0.5),
+                        inset -3px -3px 0px rgba(0,0,0,0.4),
+                        3px 3px 0px #000;
+        }
+
+        .back-link:hover {
+            background: var(--color-dark);
+            color: #fff;
+        }
+
+        @media (max-width: 480px) {
+            .profile-card {
+                width: 90%;
+                padding: 20px 15px 18px;
+            }
+            .avatar-wrapper {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="nickname" id="nickname">Никнейм игрока</div>
+
+        <div class="avatar-wrapper">
+            <div class="avatar-placeholder-text">
+                Здесь будет ваша фотография<br>
+                (круглая рамка)
+            </div>
+        </div>
+
+        <div class="stats-label">Всего решённых задач на сайте</div>
+        <div class="stats-value" id="total-tasks">0</div>
+
+        <a href="english_page.html" class="back-link">Назад на сайт</a>
+    </div>
+
+    <script>
+        // Чтение прогресса с сайта (если сохранён)
+        (function() {
+            try {
+                const total = localStorage.getItem('totalSolvedTasks');
+                if (total !== null) {
+                    document.getElementById('total-tasks').innerText = total;
+                }
+            } catch (e) {
+                // локальное хранилище может быть недоступно — в этом случае просто оставляем 0
+            }
+        })();
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль пользователя</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="assets/fonts/minecraft-font.css">
