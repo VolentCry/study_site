@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Minecraft Underwater School</title>
+        
+        <link rel="stylesheet" href="../style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+        <style>
+            /* --- ПЕРЕМЕННЫЕ ЦВЕТОВ --- */
+            :root {
+                --color-light: #c5d0e6;
+                --color-med: #a1b3d7;
+                --color-dark: #7e96c7;
+                --color-sand: #c7ba7e;
+                --text-color: #ffffff;
+                --input-bg: rgba(0, 0, 0, 0.4);
+                --frame-bg: rgba(62, 78, 110, 0.85);
+                --correct: #55ff55;
+                --wrong: #ff5555;
+            }
+
+            /* --- ОСНОВНЫЕ СТИЛИ --- */
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                font-family: 'Press Start 2P', cursive;
+                color: var(--text-color);
+                height: 100vh;
+                overflow: hidden; 
+                position: relative;
+                background: linear-gradient(180deg, var(--color-light) 0%, var(--color-med) 40%, var(--color-dark) 80%, var(--color-sand) 100%);
+                user-select: none;
+            }
+
+            /* --- СТРАНИЦЫ --- */
+            .page {
+                width: 100%;
+                height: 100vh;
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                position: absolute;
+                top: 0; left: 0;
+                overflow-y: auto; 
+                padding: 20px;
+                padding-bottom: 100px;
+            }
+            
+            .page.active { display: flex; animation: fadeIn 0.5s; }
+            @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+            /* ТИПОГРАФИКА */
+            h1 { font-size: 1.5rem; margin-top: 50px; text-align: center; text-transform: uppercase; text-shadow: 3px 3px 0px #3f3f3f; line-height: 1.4; }
+            h2 { font-size: 1rem; color: var(--color-sand); margin-top: 10px; text-align: center; text-shadow: 2px 2px 0 #000; }
+            
+            .instruction {
+                font-size: 0.7rem; color: #e0e0e0; text-align: center; margin: 15px 0 30px 0;
+                max-width: 800px; line-height: 1.5; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;
+            }
+
+            /* --- КНОПКИ --- */
+            .mc-button {
+                position: relative; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; color: white;
+                padding: 15px 25px; cursor: pointer; border: none; outline: none; background-color: var(--color-sand);
+                overflow: hidden; z-index: 10; margin-top: 20px; margin-bottom: 20px;
+                box-shadow: inset 3px 3px 0px rgba(255,255,255,0.5), inset -3px -3px 0px rgba(0,0,0,0.4), 3px 3px 0px #000;
+            }
+            .mc-button::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background-color: var(--color-dark); transition: height 0.4s ease-out; z-index: -1; }
+            .mc-button:hover::before { height: 100%; }
+            .mc-button:hover { transform: translateY(-2px); text-shadow: 2px 2px 0px #000; }
+            .mc-button:active { transform: translateY(2px); box-shadow: inset 3px 3px 0px rgba(0,0,0,0.4), 2px 2px 0px #000; }
+
+            /* --- СЕТКИ ЗАДАНИЙ --- */
+            .task-container { width: 100%; max-width: 1000px; display: grid; gap: 15px; margin-bottom: 20px; }
+            .grid-3-col { grid-template-columns: repeat(3, 1fr); }
+            .grid-2-col { grid-template-columns: repeat(2, 1fr); max-width: 800px; }
+            .grid-6-col { grid-template-columns: repeat(6, 1fr); }
+            
+            .task-item { display: flex; flex-direction: column; align-items: center; background: rgba(0, 0, 0, 0.2); padding: 10px; border: 2px solid var(--color-med); box-shadow: 4px 4px 0px rgba(0,0,0,0.3); }
+            .image-placeholder { width: 100%; height: 80px; background-color: #566c86; border: 2px dashed var(--color-sand); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 0.5rem; text-align: center; color: #ddd; padding: 5px; }
+            .text-frame { width: 100%; min-height: 100px; background-color: var(--frame-bg); border: 4px solid var(--color-light); padding: 10px; margin-bottom: 10px; color: white; font-size: 0.6rem; line-height: 1.6; display: flex; align-items: center; justify-content: center; text-align: center; }
+            .mc-input { width: 100%; padding: 8px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; background-color: var(--input-bg); border: 2px solid white; color: white; text-align: center; outline: none; }
+            .mc-input.correct { border-color: var(--correct); background-color: rgba(85, 255, 85, 0.2); }
+            .mc-input.wrong { border-color: var(--wrong); background-color: rgba(255, 85, 85, 0.2); }
+            .mc-input:disabled { opacity: 0.7; cursor: not-allowed; }
+
+            /* --- ЗАДАНИЕ 4 (DRAG & DROP) --- */
+            .dnd-area { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 30px; margin-bottom: 30px; }
+            .scheme-row { background: rgba(0,0,0,0.2); padding: 15px; border: 2px solid var(--color-med); }
+            .scheme-title { color: var(--color-sand); margin-bottom: 15px; font-size: 0.8rem; text-align: left; }
+            .drop-zone-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+            .drop-slot { width: 160px; height: 60px; border: 2px dashed #fff; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
+            .draggable-item { padding: 10px 15px; background-color: var(--color-dark); border: 2px solid white; font-size: 0.6rem; cursor: grab; box-shadow: 2px 2px 0 #000; text-align: center; margin: 5px; }
+            .draggable-item:active { cursor: grabbing; }
+            .items-bank { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px; border: 4px solid var(--color-sand); background: rgba(0,0,0,0.3); min-height: 100px; }
+
+            /* --- ЗАДАНИЕ 5 (WEATHER) --- */
+            .weather-radar { width: 100%; max-width: 600px; background: var(--frame-bg); border: 4px solid var(--color-med); padding: 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 6px 6px 0 rgba(0,0,0,0.5); }
+            .radar-screen { width: 100%; height: 120px; background-color: #001a33; border: 4px inset var(--color-dark); margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #00ff00; text-shadow: 0 0 5px #00ff00; text-align: center; }
+            .radar-label { font-size: 0.6rem; margin-bottom: 10px; opacity: 0.7; }
+            .radar-value { font-size: 1.2rem; text-transform: uppercase; }
+            .radar-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+            .radar-btn { background: var(--color-light); color: #333; padding: 15px; font-family: inherit; font-size: 0.7rem; border: 2px solid #fff; cursor: pointer; box-shadow: 2px 2px 0 #000; transition: 0.2s; }
+            .radar-btn:hover { background: #fff; transform: translateY(-2px); }
+            .radar-btn.correct-choice { background: #55ff55 !important; }
+            .radar-btn.wrong-choice { background: #ff5555 !important; }
+            .score-board { margin-top: 15px; font-size: 0.8rem; color: var(--color-sand); }
+
+            .result-text { font-size: 1.2rem; color: var(--color-sand); margin: 20px 0; display: none; text-shadow: 2px 2px 0 #000; text-align: center; line-height: 1.5; }
+
+            /* --- ЗАДАНИЕ 6 (ТАБЛИЦА МЕСТОИМЕНИЙ) --- */
+            .pronoun-table {
+                display: grid;
+                grid-template-columns: 80px 1fr 1fr; 
+                gap: 10px;
+                max-width: 800px;
+                width: 100%;
+                margin-bottom: 30px;
+                background: rgba(0,0,0,0.2);
+                padding: 10px;
+                border: 4px solid var(--color-med);
+            }
+            .table-header { color: var(--color-sand); font-size: 0.7rem; text-align: center; display: flex; align-items: center; justify-content: center; padding: 10px; text-transform: uppercase; }
+            .row-label { color: white; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); border: 2px solid var(--color-dark); }
+            .pronoun-table .drop-slot { width: 100%; height: 70px; border: 2px dashed rgba(255,255,255,0.3); }
+
+            /* --- ДИКТАНТ СТИЛИ --- */
+            .dictation-wrapper {
+                display: flex; flex-direction: column; align-items: center;
+                background: rgba(0,0,0,0.3); padding: 30px; border: 4px solid var(--color-sand);
+                box-shadow: 6px 6px 0 rgba(0,0,0,0.5); width: 100%; max-width: 600px;
+                margin-top: 20px;
+            }
+
+            /* --- УРОКИ СТИЛИ --- */
+            .lessons-container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 15px; margin-top: 20px; margin-bottom: 30px; }
+            .lesson-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 15px 20px; border: 4px solid var(--color-med); box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
+            .lesson-title { font-size: 1rem; color: white; text-shadow: 2px 2px 0 #000; }
+            .lesson-btn { margin: 0; padding: 10px 15px; font-size: 0.6rem; }
+
+            @media (max-width: 900px) { .grid-6-col { grid-template-columns: repeat(3, 1fr); } }
+            @media (max-width: 600px) {
+                h1 { font-size: 1rem; }
+                .grid-3-col, .grid-6-col { grid-template-columns: repeat(2, 1fr); }
+                .grid-2-col { grid-template-columns: 1fr; }
+                .drop-zone-container { flex-direction: column; align-items: center; }
+                .radar-controls { grid-template-columns: 1fr; }
+                .lesson-row { flex-direction: column; gap: 15px; text-align: center; }
+            }
+
+            .bubble { position: absolute; background-color: rgba(255, 255, 255, 0.4); display: block; pointer-events: none; z-index: 1; }
+            .bubble-square { width: 20px; height: 20px; animation: rise 8s infinite linear; }
+            @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(90deg); opacity: 0; } }
+
+        </style>
+    </head>
+    <body>
+        <!-- МЕНЮ -->
+        <div class="menu-container">
+            <div class="hamburger-icon">
+                <div class="line"></div><div class="line"></div><div class="line"></div>
+            </div>
+
+            <div class="sidebar" id="sidebar">
+                <div class="menu-item">
+                    <span class="menu-title"><a href="../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title">Английский язык</span>
+                    <div class="submenu">
+                        <a href="english_4.html">4 класс</a>
+                        <a href="#">5 класс</a>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <span class="menu-title">Математика</span>
+                    <div class="submenu">
+                        <a href="math_4.html">4 класс</a>
+                        <a href="#">5 класс</a>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title">Физика</span>
+                    <div class="submenu">
+                        <a href="#">4 класс</a>
+                        <a href="#">5 класс</a>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+                </div>
+                
+                <a href="../profile.html" class="menu-profile-btn">Профиль</a>
+            </div>
+        </div>
+
+        <!-- 1. ГЛАВНАЯ АНГЛИЙСКИЙ -->
+        <div id="page-english" class="page active">
+            <h1>Английский язык / English</h1>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+                <button class="mc-button" onclick="switchPage('lessons')">Уроки</button>
+                <button class="mc-button" onclick="switchPage('tests')">Контрольные тестирования</button>
+                <button class="mc-button" style="background-color: var(--color-dark);" onclick="startDictation()">Режим диктанта</button>
+            </div>
+        </div>
+
+        <!-- ==================== УРОКИ ==================== -->
+        <div id="page-lessons" class="page">
+            <h1>Уроки / Lessons</h1>
+            <p class="instruction">Выберите нужный урок для выполнения заданий.</p>
+            
+            <div class="lessons-container" id="lessons-list">
+                <!-- Список уроков генерируется через JavaScript -->
+            </div>
+
+            <button class="mc-button" onclick="switchPage('english')">Назад</button>
+        </div>
+        <!-- ============================================================= -->
+
+        <!-- ==================== КОНТРОЛЬНЫЕ ==================== -->
+        <div id="page-tests" class="page">
+            <h1>Контрольные работы / Tests</h1>
+            <p class="instruction">Выберите нужный тест для проверки ваших знаний.</p>
+            
+            <div class="tests-container">
+                <button class="mc-button" onclick="startTest()">Контрольный тест №1</button>
+                <button class="mc-button">Контрольный тест №2</button>
+            </div>
+
+            <button class="mc-button" onclick="switchPage('english')">Назад</button>
+        </div>
+        <!-- ============================================================= -->
+
+        <!-- ==================== ДИКТАНТ ==================== -->
+        <div id="page-dictation" class="page">
+            <h1>Режим диктанта</h1>
+            <h2 id="dictation-progress">Слово 1 / 15</h2>
+            
+            <div class="dictation-wrapper">
+                <p class="instruction" id="dictation-instruction" style="font-size: 0.9rem; margin-bottom: 20px;">Переведите слово:</p>
+                
+                <div class="text-frame" id="dictation-word" style="font-size: 1.5rem; color: var(--correct); min-height: 80px;">...</div>
+                
+                <input type="text" id="dictation-input" class="mc-input" placeholder="Введите перевод и нажмите Enter..." autocomplete="off" style="font-size: 0.8rem; padding: 15px; margin-bottom: 20px;">
+                
+                <div class="result-text" id="dictation-feedback" style="display: none; margin-bottom: 15px; font-size: 1rem;"></div>
+                
+                <button class="mc-button" id="dictation-submit" onclick="submitDictationAnswer()">Ответить</button>
+            </div>
+        </div>
+
+        <div id="page-dictation-finish" class="page">
+            <h1>Диктант завершен!</h1>
+            <div style="background: var(--frame-bg); border: 4px solid var(--color-sand); padding: 30px; margin: 30px 0; text-align: center; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); min-width: 350px;">
+                <h3 style="color: var(--color-sand); margin-bottom: 20px; font-size: 1rem; text-shadow: 2px 2px 0 #000;">Ваши результаты:</h3>
+                <div style="font-size: 1rem; line-height: 2.5; color: white;">
+                    <p>Правильных ответов: <span id="dict-final-correct" style="color: var(--correct); font-size: 1.5rem;">0</span> <span style="font-size: 1rem;">/ 15</span></p>
+                    <p style="margin-top: 15px; border-top: 2px dashed var(--color-med); padding-top: 15px;">
+                        Точность: <span id="dict-final-percent" style="color: var(--color-sand); font-size: 2rem;">0%</span>
+                    </p>
+                </div>
+            </div>
+
+            <button class="mc-button" onclick="switchPage('english')">Главное меню</button>
+        </div>
+        <!-- ============================================================= -->
+
+        <!-- 2. ЗАДАНИЕ 1 -->
+        <div id="page-task-1" class="page">
+            <h1>Задание №1</h1>
+            <h2>"Найди предателя"</h2>
+            <p class="instruction">Посмотрите на картинки. Определите, какой предлог места изображен, и впишите его английское название в поле под картинкой.</p>
+            
+            <div class="task-container grid-3-col">
+                <div class="task-item">
+                    <div class="image-placeholder">among.png</div>
+                    <input type="text" class="mc-input task1-input" data-ans="among">
+                </div>
+                <div class="task-item">
+                    <div class="image-placeholder">under.png</div>
+                    <input type="text" class="mc-input task1-input" data-ans="under">
+                </div>
+                <div class="task-item">
+                    <div class="image-placeholder">in.png</div>
+                    <input type="text" class="mc-input task1-input" data-ans="in">
+                </div>
+                <div class="task-item">
+                    <div class="image-placeholder">through.png</div>
+                    <input type="text" class="mc-input task1-input" data-ans="through">
+                </div>
+                <div class="task-item">
+                    <div class="image-placeholder">behind.png</div>
+                    <input type="text" class="mc-input task1-input" data-ans="behind">
+                </div>
+                <div class="task-item">
+                    <div class="image-placeholder">between.png</div>
+                    <input type="text" class="mc-input task1-input" data-ans="between">
+                </div>
+            </div>
+            
+            <div class="result-text" id="result-task-1"></div>
+            <button class="mc-button" onclick="checkTask1()">Проверить</button>
+        </div>
+
+        <!-- 3. ЗАДАНИЕ 2 -->
+        <div id="page-task-2" class="page">
+            <h1>Задание №2</h1>
+            <h2>"Подбери эмоцию"</h2>
+            <p class="instruction">Прочитайте описание ситуации на табличке. Напишите эмоцию (на английском), которую испытывает персонаж.</p>
+            
+            <div class="task-container grid-2-col">
+                <div class="task-item"><div class="text-frame">Horror movie... very scary... not fun at all.</div><input type="text" class="mc-input task2-input" data-ans="scared"></div>
+                <div class="task-item"><div class="text-frame">Brother broke my toy... shouted loudly!</div><input type="text" class="mc-input task2-input" data-ans="angry"></div>
+                <div class="task-item"><div class="text-frame">Studied all night... eyes closing... want to sleep.</div><input type="text" class="mc-input task2-input" data-ans="tired"></div>
+                <div class="task-item"><div class="text-frame">Came home... huge cake... didn't expect a party!</div><input type="text" class="mc-input task2-input" data-ans="surprised"></div>
+            </div>
+            <div class="result-text" id="result-task-2"></div>
+            <button class="mc-button" onclick="checkTask2()">Проверить</button>
+        </div>
+
+        <!-- 4. ЗАДАНИЕ 3 -->
+        <div id="page-task-3" class="page">
+            <h1>Задание №3</h1>
+            <h2>"Перекус"</h2>
+            <p class="instruction">Вспомните названия овощей и фруктов. Введите английский перевод названия продукта под каждой картинкой.</p>
+            
+            <div class="task-container grid-6-col">
+                <div class="task-item"><div class="image-placeholder">Смородина</div><input type="text" class="mc-input task3-input" data-ans="currant"></div>
+                <div class="task-item"><div class="image-placeholder">Крыжовник</div><input type="text" class="mc-input task3-input" data-ans="gooseberry"></div>
+                <div class="task-item"><div class="image-placeholder">Чеснок</div><input type="text" class="mc-input task3-input" data-ans="garlic"></div>
+                <div class="task-item"><div class="image-placeholder">Арбуз</div><input type="text" class="mc-input task3-input" data-ans="watermelon"></div>
+                <div class="task-item"><div class="image-placeholder">Тыква</div><input type="text" class="mc-input task3-input" data-ans="pumpkin"></div>
+                <div class="task-item"><div class="image-placeholder">Баклажан</div><input type="text" class="mc-input task3-input" data-ans="eggplant"></div>
+                <div class="task-item"><div class="image-placeholder">Малина</div><input type="text" class="mc-input task3-input" data-ans="raspberry"></div>
+                <div class="task-item"><div class="image-placeholder">Голубика</div><input type="text" class="mc-input task3-input" data-ans="blueberry"></div>
+                <div class="task-item"><div class="image-placeholder">Груша</div><input type="text" class="mc-input task3-input" data-ans="pear"></div>
+                <div class="task-item"><div class="image-placeholder">Персик</div><input type="text" class="mc-input task3-input" data-ans="peach"></div>
+                <div class="task-item"><div class="image-placeholder">Ананас</div><input type="text" class="mc-input task3-input" data-ans="pineapple"></div>
+                <div class="task-item"><div class="image-placeholder">Мука</div><input type="text" class="mc-input task3-input" data-ans="flour"></div>
+            </div>
+            <div class="result-text" id="result-task-3"></div>
+            <button class="mc-button" onclick="checkTask3()">Проверить</button>
+        </div>
+
+        <!-- 5. ЗАДАНИЕ 4 (DRAG & DROP) -->
+        <div id="page-task-4" class="page">
+            <h1>Задание №4</h1>
+            <h2>"Восстанови время"</h2>
+            <p class="instruction">Перетащите блоки из сундука в пустые ячейки, чтобы составить верную схему предложения для каждого времени.</p>
+            
+            <div class="dnd-area">
+                <div class="scheme-row">
+                    <div class="scheme-title">Present Simple:</div>
+                    <div class="drop-zone-container">
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="subject"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="neg"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="verb"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="other"></div>
+                    </div>
+                </div>
+
+                <div class="scheme-row">
+                    <div class="scheme-title">Present Continuous:</div>
+                    <div class="drop-zone-container">
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="subject"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="to_be"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="verb_ing"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="other"></div>
+                    </div>
+                </div>
+
+                <div class="scheme-row">
+                    <div class="scheme-title">Past Simple:</div>
+                    <div class="drop-zone-container">
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="subject"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="verb_past"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="other"></div>
+                    </div>
+                </div>
+
+                <div class="scheme-row">
+                    <div class="scheme-title">Future Simple:</div>
+                    <div class="drop-zone-container">
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="subject"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="will"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="verb"></div>
+                        <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="other"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scheme-title">Сундук блоков (Drag items):</div>
+            <div class="items-bank" id="drag-bank" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <!-- Генерируются через JS -->
+            </div>
+
+            <div class="result-text" id="result-task-4"></div>
+            <button class="mc-button" onclick="checkTask4()">Проверить</button>
+        </div>
+
+        <!-- 6. ЗАДАНИЕ 5 (WEATHER) -->
+        <div id="page-task-5" class="page">
+            <h1>Задание №5</h1>
+            <h2>"Собирайся по погоде"</h2>
+            <p class="instruction">Погодный радар обнаружил изменение атмосферы! Переведите слово на радаре с русского на английский, выбрав правильную кнопку.</p>
+
+            <div class="weather-radar">
+                <div class="radar-screen">
+                    <div class="radar-label">RADAR DETECTED:</div>
+                    <div class="radar-value" id="weather-question">...</div>
+                </div>
+                
+                <div class="radar-controls" id="weather-options">
+                    <!-- Buttons injected by JS -->
+                </div>
+                
+                <div class="score-board">
+                    Score: <span id="weather-score">0</span> / 14
+                </div>
+            </div>
+            <div class="result-text" id="result-task-5"></div>
+        </div>
+
+        <!-- 7. ЗАДАНИЕ 6 (PRONOUNS) -->
+        <div id="page-task-6" class="page">
+            <h1>Задание №6</h1>
+            <h2>"Личные местоимения"</h2>
+            <p class="instruction">Расставьте местоимения из сундука по своим местам в таблице.</p>
+
+            <div class="pronoun-table">
+                <div></div> 
+                <div class="table-header">Ед. ч.</div>
+                <div class="table-header">Мн. ч.</div>
+
+                <div class="row-label">1 л.</div>
+                <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="i"></div>
+                <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="we"></div>
+
+                <div class="row-label">2 л.</div>
+                <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="you"></div>
+                <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="you"></div>
+
+                <div class="row-label">3 л.</div>
+                <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="hesheit"></div>
+                <div class="drop-slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="they"></div>
+            </div>
+
+            <div class="scheme-title">Сундук:</div>
+            <div class="items-bank" id="bank-task-6" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <!-- Генерируется JS -->
+            </div>
+
+            <div class="result-text" id="result-task-6"></div>
+            <button class="mc-button" onclick="checkTask6()">Завершить тест</button>
+        </div>
+
+        <!-- ФИНИШ (С ОБНОВЛЕННЫМ СЧЕТЧИКОМ) -->
+        <div id="page-finish" class="page">
+            <h1>Тест завершен!</h1>
+            <h2>Вы прошли все уровни!</h2>
+            
+            <!-- БЛОК ИТОГОВОГО СЧЕТА -->
+            <div style="background: var(--frame-bg); border: 4px solid var(--color-sand); padding: 20px; margin: 30px 0; text-align: center; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); min-width: 300px;">
+                <h3 style="color: var(--color-sand); margin-bottom: 20px; font-size: 1rem; text-shadow: 2px 2px 0 #000;">Ваши результаты:</h3>
+                <div style="font-size: 0.8rem; line-height: 2; color: white;">
+                    <p>Правильных ответов: <span id="final-correct" style="color: var(--correct); font-size: 1.2rem;">0</span></p>
+                    <p>Ошибок: <span id="final-wrong" style="color: var(--wrong); font-size: 1.2rem;">0</span></p>
+                    <p style="margin-top: 15px; border-top: 2px dashed var(--color-med); padding-top: 15px;">
+                        Общий балл: <span id="final-total" style="color: var(--color-sand); font-size: 1.5rem;">0</span> / <span id="final-max">57</span>
+                    </p>
+                </div>
+            </div>
+
+            <div style="font-size: 4rem; margin-bottom: 20px;">💎</div>
+            <p style="font-size: 0.8rem; color: var(--color-light);">Your underwater journey is complete.</p>
+            <button class="mc-button" onclick="switchPage('english')">Главное меню</button>
+        </div>
+
+        <div id="page-math" class="page">
+            <h1>Математика</h1> 
+            <a href="index.html"><button class="mc-button" style="background-color: #a1b3d7;">Скоро...</button></a>
+        </div>
+
+        <!-- JS -->
+        <script>
+            // --- ДАННЫЕ СЛОВАРЯ ДЛЯ ДИКТАНТА ---
+            const fullVocabulary = {
+                "circle": "круг", 
+                "triangle": "треугольник", 
+                "square": "квадрат", 
+                "red": "красный", 
+                "age": "возраст", 
+                "phone": "телефон", 
+                "surname": "фамилия", 
+                "year": "год", 
+                "Wednesday": "среда", 
+                "Monday": "понедельник", 
+                "juice": "сок", 
+                "September": "сентябрь", 
+                "pen": "ручка", 
+                "pencil": "карандаш", 
+                "bed": "кровать", 
+                "lamp": ("лампа", "светильник"), 
+                "uncle": "дядя", 
+                "aunt": "тётя", 
+                "cousin": ("двоюродный брат", "двоюродная сестра"), 
+                "tall": "высокий", 
+                "short": "короткий", 
+                "fair hair": "светлые волосы", 
+                "dark hair": "тёмные волосы", 
+                "slim": "стройный", 
+                "kind": "добрый", 
+                "friendly": "дружелюбный", 
+                "funny": "весёлый", 
+                "helmet": "шлем", 
+                "hairbrush": "расчёска", 
+                "watch": ("часы", "смотреть"), 
+                "gloves": "перчатки", 
+                "keys": "ключи", 
+                "roller blades": "ролики", 
+                "camera": "камера", 
+                "guitar": "гитара", 
+                "mobile phone": "мобильный телефон", 
+                "armchair": "кресло", 
+                "complete": ("завершить", "завершение", "полный"), 
+                "tree": "дерево", 
+                "The Sun": "солнце", 
+                "ten": "десять", 
+                "six": "шесть", 
+                "five": "пять", 
+                "gymnasium": "гимназия", 
+                "October": "октябрь", 
+                "bag": "сумка", 
+                "hi": "привет", 
+                "and": "и", 
+                "or": "или", 
+                "umbrella": "зонт", 
+                "mask": "маска", 
+                "hat": "шляпа", 
+                "Canada": "Канада", 
+                "Australia": "Австралия", 
+                "the United Kingdom": "Великобритания", 
+                "New Zealand": "Новая Зеландия", 
+                "the United States America": "США", 
+                "London": "Лондон", 
+                "Washington": "Вашингтон", 
+                "flower": "цветок", 
+                "bird": "птица", 
+                "brown": "коричневый", 
+                "doctor": "доктор", 
+                "home": "дом", 
+                "cold": ("холодный", "холодно"), 
+                "rainbow": ("радужный", "радуга"), 
+                "school": "школа", 
+                "New York": "Нью-Йорк", 
+                "know": "знать", 
+                "city": "город", 
+                "other": "другой", 
+                "in them": "в них", 
+                "millionaire city": 
+                "город-миллионник", 
+                "some": ("немного", "несколько"), 
+                "famous": "известный", 
+                "sight": "достопримечательность", 
+                "monuments": "памятники", 
+                "theatre": "театр", 
+                "church": "церковь", 
+                "street": "улица", 
+                "order": "порядок", 
+                "always": "всегда", 
+                "usually": "обычно", 
+                "often": "часто", 
+                "sometimes": "иногда", 
+                "never": "никогда", 
+                "golden": "золотой", 
+                "with": "с", 
+                "serves": "подавать", 
+                "shirt": "рубашка", 
+                "nurse": "медсестра", 
+                "turn": "ход", 
+                "curtain": "занавеска", 
+                "want": "хочу", 
+                "sick": ("болеть", "болезнь", "больной"), 
+                "work": ("работа", "работать", "работают"), 
+                "dream": ("мечта", "сон"), 
+                "to be": "быть", 
+                "think": "думать", 
+                "job": ("работа", "профессия"), 
+                "space": "космос", 
+                "spaceship": "космический корабль", 
+                "ship": "корабль", 
+                "different": ("разные", "другие"), 
+                "cute": "милый", 
+                "so": "очень", 
+                "study": ("учиться", "учёба"), 
+                "a lot of": "очень много", 
+                "lesson": "урок", 
+                "now": "сейчас", 
+                "at the moment": "в данный момент", 
+                "mechanic": "механик", 
+                "baker": "пекарь", 
+                "waiter": "официант", 
+                "injection": "инъекция", 
+                "rain": "дождь", 
+                "wind": "ветер", 
+                "snow": "снег", 
+                "sleet": "снег с дождём", 
+                "sunny": "солнечно", 
+                "rainy": "дождливо", 
+                "cloudy": "облачно", 
+                "snowy": "снежная", 
+                "warm": "тепло", 
+                "tornado": "торнадо", 
+                "blizzard": "метель", 
+                "lightning": "молния", 
+                "thunderstorm": "гроза", 
+                "weather": "погода", 
+                "freeze": "морозная", 
+                "fog": "туман", 
+                "ice": "лёд", 
+                "foggy": "туманный", 
+                "hail": "град", 
+                "moon": "луна", 
+                "yesterday": "вчера", 
+                "tomorrow": "завтра", 
+                // "live": "жить, жизнь", 
+                "person": "человек", 
+                "people": "люди", 
+                "young": "молодой", 
+                "bean": "боб", 
+                "dinner": "ужин", 
+                "onion": "лук", 
+                "pea": "горох", 
+                "pear": "груша", 
+                "pineapple": "ананас", 
+                "supper": "ужин", 
+                "apartment": "квартира", 
+                "flat": "квартира", 
+                "bookcase": "книжный шкаф", 
+                "cupboard": "буфет", 
+                "dining-room": "обеденная комната", 
+                "muddy": "грязная", 
+                "puddles": "лужи", 
+                "must": "должен", 
+                "can": ("уметь", "мочь"), 
+                "wear": "надевать", 
+                "boots": "обувь", 
+                "fun": "веселье", 
+                "imagine": "воображать", 
+                "month": "месяц", 
+                "birthday": "день рождения", 
+                "night": "ночь", 
+                "morning": "утро", 
+                "evening": "вечер", 
+                "afternoon": "день", 
+                "noon": "полдень", 
+                "hour": "час", 
+                "minute": "минута", 
+                "second": "секунда", 
+                "millisecond": "миллисекунда", 
+                "excited": ("воодушевлённый", "взволнованный"), 
+                "wrap up": ("одеться", "укутаться", "завершить", "закончить"), 
+                "forget": "забывать", 
+                "scarf": "шарф", 
+                "scarves": "шарфы", 
+                "footprints": "отпечатки от ног", 
+                "dear": "боже",
+                "maybe": "возможно", 
+                "rough": ("грубый", "жёсткий", "тяжёлый"), 
+                "first time": ("сначала", "в первую очередь"), 
+                "needs": "нужен", 
+                "arms": "руки", 
+                "mouth": "рот", 
+                "find": "искать", 
+                "clothes": "одежда", 
+                "to keep": "сохранить"
+            };
+
+            const weatherData = [
+                {en: "weather", ru: "погода"}, {en: "Sun", ru: "Солнце"}, {en: "Moon", ru: "Луна"},
+                {en: "rain", ru: "дождь"}, {en: "cloud", ru: "облако"}, {en: "wind", ru: "ветер"},
+                {en: "snow", ru: "снег"}, {en: "ice", ru: "лёд"}, {en: "fog", ru: "туман"},
+                {en: "temperature", ru: "температура"}, {en: "sunny", ru: "солнечно"}, {en: "rainy", ru: "дождливо"},
+                {en: "cloudy", ru: "облачно"}, {en: "windy", ru: "ветрено"}, {en: "snowy", ru: "снежно"},
+                {en: "cold", ru: "холодно"}, {en: "warm", ru: "тепло"}, {en: "hot", ru: "горячо"},
+                {en: "tornado", ru: "торнадо"}, {en: "blizzard", ru: "метель"}, {en: "lightning", ru: "молния"},
+                {en: "sleet", ru: "дождь со снегом"}, {en: "thunderstorm", ru: "гроза"}
+            ];
+
+            // --- GLOBAL SCORE VARIABLES ---
+            let globalCorrect = 0;
+            let globalWrong = 0;
+            
+            let t1Scored = false; let t2Scored = false; let t3Scored = false; let t4Scored = false; let t6Scored = false;
+
+            // --- NAVIGATION ---
+            function switchPage(pageId) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById('page-' + pageId);
+                if(target) {
+                    target.classList.add('active');
+                    target.scrollTop = 0;
+                }
+            }
+
+            // ==================== ЛОГИКА УРОКОВ ====================
+            function initLessons() {
+                const container = document.getElementById('lessons-list');
+                container.innerHTML = ''; // Очищаем контейнер перед добавлением
+                
+                for(let i = 1; i <= 15; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'lesson-row';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'lesson-title';
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'mc-button lesson-btn';
+                    btn.innerText = 'Задание к уроку';
+                    
+                    // Делаем первый урок особенным
+                    if (i === 1) {
+                        title.innerText = 'Урок 1. Времена';
+                        btn.onclick = () => window.location.href = 'english_lessons/lesson_1.html';
+                    } else {
+                        title.innerText = `Урок ${i}`;
+                        btn.onclick = () => showDevMessage(btn);
+                    }
+                    
+                    row.appendChild(title);
+                    row.appendChild(btn);
+                    container.appendChild(row);
+                }
+            }
+
+            // Временная заглушка вместо alert(), чтобы не портить дизайн
+            function showDevMessage(btn) {
+                const originalText = btn.innerText;
+                const originalColor = btn.style.backgroundColor;
+                
+                btn.innerText = "В разработке!";
+                btn.style.backgroundColor = "var(--wrong)";
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = originalColor || "var(--color-sand)";
+                    btn.disabled = false;
+                }, 2000);
+            }
+
+            // ==================== ЛОГИКА ДИКТАНТА ====================
+            let dictationQueue = [];
+            let currentDictWordIndex = 0;
+            let dictationScoreCount = 0;
+            let dictationState = "waiting";
+
+            function startDictation() {
+                const vocabEntries = Object.entries(fullVocabulary);
+                vocabEntries.sort(() => Math.random() - 0.5);
+                const selected = vocabEntries.slice(0, 15);
+                
+                dictationQueue = selected.map(entry => {
+                    const en = entry[0];
+                    const ru = entry[1];
+                    const isEnToRu = Math.random() > 0.5; // 50% с англ на русс, 50% наоборот
+                    return { en, ru, direction: isEnToRu ? 'en-ru' : 'ru-en' };
+                });
+
+                currentDictWordIndex = 0;
+                dictationScoreCount = 0;
+                dictationState = "waiting";
+                
+                switchPage('dictation');
+                showNextDictationWord();
+                
+                // Нажатие Enter для ответа
+                document.getElementById('dictation-input').onkeydown = function(e) {
+                    if (e.key === 'Enter') submitDictationAnswer();
+                };
+            }
+
+            function showNextDictationWord() {
+                if (currentDictWordIndex >= 15) {
+                    finishDictation();
+                    return;
+                }
+                
+                dictationState = "waiting";
+                const currentObj = dictationQueue[currentDictWordIndex];
+                
+                document.getElementById('dictation-progress').innerText = `Слово ${currentDictWordIndex + 1} / 15`;
+                
+                const inputEl = document.getElementById('dictation-input');
+                inputEl.value = '';
+                inputEl.classList.remove('correct', 'wrong');
+                inputEl.disabled = false;
+                
+                const feedbackEl = document.getElementById('dictation-feedback');
+                feedbackEl.style.display = 'none';
+                document.getElementById('dictation-submit').style.display = 'block';
+
+                if (currentObj.direction === 'en-ru') {
+                    document.getElementById('dictation-instruction').innerText = "Переведите на РУССКИЙ:";
+                    document.getElementById('dictation-word').innerText = currentObj.en;
+                } else {
+                    document.getElementById('dictation-instruction').innerText = "Переведите на АНГЛИЙСКИЙ:";
+                    // Если в словаре используется массив, соединяем его для отображения
+                    let displayRu = Array.isArray(currentObj.ru) ? currentObj.ru.join(', ') : currentObj.ru;
+                    document.getElementById('dictation-word').innerText = displayRu.replace(/\(.*?\)/g, '').trim();
+                }
+                
+                // Ставим фокус в поле ввода (с задержкой для мобильных)
+                setTimeout(() => inputEl.focus(), 100);
+            }
+
+            // Универсальная функция для разбора правильных ответов (работает и со строками и с массивами)
+            function parseAnswers(rawStr) {
+                if (Array.isArray(rawStr)) {
+                    // Если это массив, обрабатываем каждый элемент
+                    return rawStr.flatMap(s => s.replace(/\(.*?\)/g, '').split(/[,/]|или/))
+                                .map(s => s.trim().toLowerCase())
+                                .filter(s => s.length > 0);
+                }
+                // Если это строка (стандартно)
+                let cleanedStr = rawStr.replace(/\(.*?\)/g, '');
+                return cleanedStr.split(/[,/]|или/)
+                                .map(s => s.trim().toLowerCase())
+                                .filter(s => s.length > 0);
+            }
+
+            function submitDictationAnswer() {
+                if (dictationState !== "waiting") return;
+                
+                const inputEl = document.getElementById('dictation-input');
+                const userInput = inputEl.value.trim().toLowerCase();
+                const currentObj = dictationQueue[currentDictWordIndex];
+                const feedbackEl = document.getElementById('dictation-feedback');
+                
+                let isCorrect = false;
+                let expectedAnswerStrs = [];
+                
+                if (currentObj.direction === 'en-ru') {
+                    // Ищем все возможные русские значения для этого английского слова
+                    expectedAnswerStrs = parseAnswers(currentObj.ru);
+                    isCorrect = expectedAnswerStrs.includes(userInput);
+                } else {
+                    // Ищем ВСЕ английские слова, у которых русский перевод совпадает с тем, что на экране
+                    let promptRuList = parseAnswers(currentObj.ru);
+                    
+                    for (let [enKey, ruVal] of Object.entries(fullVocabulary)) {
+                        let ruValList = parseAnswers(ruVal);
+                        // Если есть пересечение значений (например "ужин" есть и у supper и у dinner)
+                        let hasIntersection = promptRuList.some(r => ruValList.includes(r));
+                        if (hasIntersection) {
+                            expectedAnswerStrs.push(enKey.trim().toLowerCase());
+                        }
+                    }
+                    isCorrect = expectedAnswerStrs.includes(userInput);
+                }
+                
+                dictationState = "showing_result";
+                inputEl.disabled = true;
+                document.getElementById('dictation-submit').style.display = 'none';
+                
+                if (isCorrect) {
+                    dictationScoreCount++;
+                    inputEl.classList.add('correct');
+                    feedbackEl.innerText = "Правильно! ✓";
+                    feedbackEl.style.color = "var(--correct)";
+                } else {
+                    inputEl.classList.add('wrong');
+                    feedbackEl.innerText = `Ошибка! Правильно: ${expectedAnswerStrs.join(' или ')}`;
+                    feedbackEl.style.color = "var(--wrong)";
+                }
+                feedbackEl.style.display = 'block';
+                
+                currentDictWordIndex++;
+                setTimeout(() => {
+                    showNextDictationWord();
+                }, 2000); // Показываем результат 2 секунды, затем следующее слово
+            }
+
+            function finishDictation() {
+                const percent = Math.round((dictationScoreCount / 15) * 100);
+                document.getElementById('dict-final-correct').innerText = dictationScoreCount;
+                document.getElementById('dict-final-percent').innerText = `${percent}%`;
+                
+                switchPage('dictation-finish');
+            }
+            // =========================================================
+
+            function startTest() {
+                globalCorrect = 0;
+                globalWrong = 0;
+                t1Scored = false; t2Scored = false; t3Scored = false; t4Scored = false; t6Scored = false;
+                
+                document.querySelectorAll('.mc-input').forEach(inp => {inp.value=''; inp.classList.remove('correct','wrong');});
+                document.querySelectorAll('.result-text').forEach(d => d.style.display='none');
+                switchPage('task-1');
+            }
+
+            function nextTask(currentId, nextId) {
+                setTimeout(() => {
+                    if(nextId === 'task-4') initTask4();
+                    if(nextId === 'task-5') initTask5();
+                    switchPage(nextId);
+                }, 3000); 
+            }
+
+            // --- TASKS 1-3 LOGIC ---
+            function checkInputs(taskNum) {
+                const inputs = document.querySelectorAll(`.task${taskNum}-input`);
+                let score = 0;
+                let wrong = 0;
+                
+                inputs.forEach(inp => {
+                    if(inp.value.trim().toLowerCase() === inp.dataset.ans.toLowerCase()) {
+                        score++; inp.classList.add('correct'); inp.classList.remove('wrong');
+                    } else {
+                        wrong++; inp.classList.add('wrong'); inp.classList.remove('correct');
+                    }
+                });
+
+                if (taskNum === 1 && !t1Scored) { globalCorrect += score; globalWrong += wrong; t1Scored = true; }
+                if (taskNum === 2 && !t2Scored) { globalCorrect += score; globalWrong += wrong; t2Scored = true; }
+                if (taskNum === 3 && !t3Scored) { globalCorrect += score; globalWrong += wrong; t3Scored = true; }
+
+                const res = document.getElementById(`result-task-${taskNum}`);
+                res.innerText = `Result: ${score}/${inputs.length}`;
+                res.style.display = 'block';
+                return score;
+            }
+
+            function checkTask1() { checkInputs(1); nextTask('task-1', 'task-2'); }
+            function checkTask2() { checkInputs(2); nextTask('task-1', 'task-3'); }
+            function checkTask3() { checkInputs(3); nextTask('task-3', 'task-4'); }
+
+            // --- TASK 4: DRAG & DROP ---
+            let draggedEl = null;
+
+            function initTask4() {
+                document.querySelectorAll('.drop-slot').forEach(slot => slot.innerHTML = '');
+                const bank = document.getElementById('drag-bank');
+                bank.innerHTML = '';
+                
+                const blocks = [
+                    { id: 'b_neg', text: 'don\'t / doesn\'t', type: 'neg' }, 
+                    { id: 'b_v1', text: 'Глагол', type: 'verb' },
+                    { id: 'b_be', text: 'am / is / are', type: 'to_be' }, 
+                    { id: 'b_ving', text: 'Глагол + ing', type: 'verb_ing' },
+                    { id: 'b_vpast', text: 'Глагол (ed) / V2', type: 'verb_past' },
+                    { id: 'b_will', text: 'will', type: 'will' },
+                    { id: 'b_vbase', text: 'Глагол', type: 'verb' },
+                    { id: 'sub1', text: 'Подлежащее', type: 'subject' },
+                    { id: 'sub2', text: 'Подлежащее', type: 'subject' },
+                    { id: 'sub3', text: 'Подлежащее', type: 'subject' },
+                    { id: 'sub4', text: 'Подлежащее', type: 'subject' },
+                    { id: 'oth1', text: 'Прочее', type: 'other' },
+                    { id: 'oth2', text: 'Прочее', type: 'other' },
+                    { id: 'oth3', text: 'Прочее', type: 'other' },
+                    { id: 'oth4', text: 'Прочее', type: 'other' }
+                ];
+                
+                blocks.sort(() => Math.random() - 0.5);
+
+                blocks.forEach(b => {
+                    const el = document.createElement('div');
+                    el.classList.add('draggable-item');
+                    el.setAttribute('draggable', 'true');
+                    el.innerText = b.text;
+                    el.dataset.type = b.type;
+                    el.id = b.id;
+                    el.ondragstart = drag;
+                    bank.appendChild(el);
+                });
+                
+                document.getElementById('result-task-4').style.display='none';
+            }
+
+            function allowDrop(ev) { ev.preventDefault(); }
+            function drag(ev) { draggedEl = ev.target; ev.dataTransfer.setData("text", ev.target.id); }
+            function drop(ev) {
+                ev.preventDefault();
+                let target = ev.target;
+                if(target.classList.contains('draggable-item')) target = target.parentNode;
+                
+                if(target.classList.contains('drop-slot') || target.id === 'drag-bank') {
+                    if(target.classList.contains('drop-slot') && target.children.length > 0) {
+                        document.getElementById('drag-bank').appendChild(target.children[0]);
+                    }
+                    target.appendChild(draggedEl);
+                }
+            }
+
+            function checkTask4() {
+                let correct = 0;
+                const slots = document.querySelectorAll('#page-task-4 .drop-slot');
+                let filled = 0;
+                const totalSlots = slots.length; 
+
+                slots.forEach(slot => {
+                    if(slot.children.length > 0) {
+                        filled++;
+                        if(slot.children[0].dataset.type === slot.dataset.expect) correct++;
+                    }
+                });
+
+                const res = document.getElementById('result-task-4');
+                res.style.display = 'block';
+                
+                if(filled < totalSlots) {
+                    res.innerText = "Заполните все ячейки!";
+                    res.style.color = "#ff5555";
+                } else {
+                    if (!t4Scored) {
+                        globalCorrect += correct;
+                        globalWrong += (totalSlots - correct);
+                        t4Scored = true;
+                    }
+
+                    res.innerText = `Правильно: ${correct}/${totalSlots}`;
+                    
+                    if (correct === totalSlots) {
+                        res.style.color = "#55ff55";
+                        setTimeout(() => { switchPage('task-5'); initTask5(); }, 3000);
+                    } else {
+                        res.style.color = "#ffaa00";
+                        res.innerText += " - Найдите ошибки и исправьте!";
+                    }
+                }
+            }
+
+            // --- TASK 5: WEATHER GAME ---
+            let weatherScore = 0;
+            let weatherRounds = 0;
+            const maxRounds = 14;
+            let weatherDeck = [];
+
+            function initTask5() {
+                weatherScore = 0;
+                weatherRounds = 0;
+                weatherDeck = [...weatherData];
+                weatherDeck.sort(() => Math.random() - 0.5);
+
+                document.getElementById('weather-score').innerText = '0';
+                document.getElementById('result-task-5').style.display = 'none';
+                nextWeatherQuestion();
+            }
+
+            function nextWeatherQuestion() {
+                if(weatherRounds >= maxRounds) {
+                    globalCorrect += weatherScore;
+                    globalWrong += (maxRounds - weatherScore);
+
+                    const res = document.getElementById('result-task-5');
+                    res.innerText = "Сканирование завершено!";
+                    res.style.display = 'block';
+                    res.style.color = "#55ff55";
+                    
+                    setTimeout(() => { switchPage('task-6'); initTask6(); }, 3000);
+                    return;
+                }
+
+                if(weatherDeck.length === 0) weatherDeck = [...weatherData];
+                const correctObj = weatherDeck.pop();
+                
+                let options = [correctObj];
+                while(options.length < 4) {
+                    let r = weatherData[Math.floor(Math.random() * weatherData.length)];
+                    if(!options.includes(r)) options.push(r);
+                }
+                options.sort(() => Math.random() - 0.5);
+
+                document.getElementById('weather-question').innerText = correctObj.ru;
+                const container = document.getElementById('weather-options');
+                container.innerHTML = '';
+                
+                options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'radar-btn';
+                    btn.innerText = opt.en;
+                    btn.onclick = () => checkWeatherAnswer(btn, opt.en, correctObj.en);
+                    container.appendChild(btn);
+                });
+            }
+
+            function checkWeatherAnswer(btn, selected, correct) {
+                const btns = document.querySelectorAll('.radar-btn');
+                btns.forEach(b => b.onclick = null);
+
+                if(selected === correct) {
+                    btn.classList.add('correct-choice');
+                    weatherScore++;
+                } else {
+                    btn.classList.add('wrong-choice');
+                    btns.forEach(b => { if(b.innerText === correct) b.classList.add('correct-choice'); });
+                }
+                
+                weatherRounds++;
+                document.getElementById('weather-score').innerText = weatherScore;
+                
+                setTimeout(nextWeatherQuestion, 1500);
+            }
+
+            // --- TASK 6: PRONOUNS ---
+            function initTask6() {
+                document.querySelectorAll('#page-task-6 .drop-slot').forEach(s => s.innerHTML = '');
+                const bank = document.getElementById('bank-task-6');
+                bank.innerHTML = '';
+
+                const pronouns = [
+                    { id: 'p_i', text: 'I', type: 'i' },
+                    { id: 'p_we', text: 'We', type: 'we' },
+                    { id: 'p_you1', text: 'You', type: 'you' },
+                    { id: 'p_you2', text: 'You', type: 'you' },
+                    { id: 'p_he', text: 'He / She / It', type: 'hesheit' },
+                    { id: 'p_they', text: 'They', type: 'they' }
+                ];
+
+                pronouns.sort(() => Math.random() - 0.5);
+
+                pronouns.forEach(p => {
+                    const el = document.createElement('div');
+                    el.classList.add('draggable-item');
+                    el.setAttribute('draggable', 'true');
+                    el.innerText = p.text;
+                    el.dataset.type = p.type;
+                    el.id = p.id;
+                    el.ondragstart = drag; 
+                    bank.appendChild(el);
+                });
+                document.getElementById('result-task-6').style.display='none';
+            }
+
+            function checkTask6() {
+                let correct = 0;
+                const slots = document.querySelectorAll('#page-task-6 .drop-slot');
+                let filled = 0;
+
+                slots.forEach(slot => {
+                    if(slot.children.length > 0) {
+                        filled++;
+                        if(slot.children[0].dataset.type === slot.dataset.expect) correct++;
+                    }
+                });
+
+                const res = document.getElementById('result-task-6');
+                res.style.display = 'block';
+
+                if(filled < 6) {
+                    res.innerText = "Заполните всю таблицу!";
+                    res.style.color = "#ff5555";
+                } else {
+                    if (!t6Scored) {
+                        globalCorrect += correct;
+                        globalWrong += (6 - correct);
+                        t6Scored = true;
+                    }
+
+                    res.innerText = `Результат: ${correct}/6`;
+                    
+                    if(correct === 6) {
+                        res.style.color = "#55ff55";
+                        setTimeout(() => { 
+                            showFinalScore();
+                            switchPage('finish'); 
+                        }, 3000);
+                    } else {
+                        res.style.color = "#ffaa00";
+                        res.innerText += " - Есть ошибки!";
+                    }
+                }
+            }
+
+            // --- ВЫВОД ИТОГОВОГО СЧЕТА ---
+            function showFinalScore() {
+                document.getElementById('final-correct').innerText = globalCorrect;
+                document.getElementById('final-wrong').innerText = globalWrong;
+                document.getElementById('final-total').innerText = globalCorrect;
+                document.getElementById('final-max').innerText = "57";
+
+                // Сохраняем общий прогресс для страницы профиля
+                try {
+                    localStorage.setItem('totalSolvedTasks', String(globalCorrect));
+                } catch(e) {
+                    // если localStorage недоступен, просто пропускаем
+                }
+            }
+
+            // --- BUBBLES ---
+            function createBubbles() {
+                const body = document.body;
+                for (let i = 0; i < 15; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.classList.add('bubble', 'bubble-square');
+                    const size = Math.random() * 30 + 10 + 'px';
+                    bubble.style.width = size; bubble.style.height = size;
+                    bubble.style.left = Math.random() * 100 + 'vw';
+                    bubble.style.animationDelay = Math.random() * 5 + 's';
+                    bubble.style.animationDuration = Math.random() * 5 + 5 + 's';
+                    body.appendChild(bubble);
+                }
+            }
+            
+            // Запускаем инициализации при загрузке страницы
+            window.onload = () => {
+                createBubbles();
+                initLessons();
+            };
+        </script>
+    </body>
+</html>

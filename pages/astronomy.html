@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>
+            Solar System
+        </title>
+
+        <link rel="stylesheet" href="../style.css">
+
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@300;400;600&display=swap');
+
+            *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+            :root {
+                --bg: #03050d;
+                --text: #e8e4da;
+                --accent: #c8a96e;
+                --muted: #4a4f6a;
+                --panel-bg: rgba(6, 10, 24, 0.92);
+                --border: rgba(200, 169, 110, 0.2);
+            }
+
+            html, body {
+                width: 100%; height: 100%;
+                background: var(--bg);
+                color: var(--text);
+                font-family: 'Space Mono', monospace;
+                overflow: hidden;
+                cursor: default;
+            }
+
+            canvas {
+                display: block;
+                position: fixed;
+                top: 0; left: 0;
+            }
+
+            /* Header */
+            #header {
+                position: fixed;
+                top: 32px; left: 40px;
+                z-index: 10;
+                pointer-events: none;
+            }
+            #header h1 {
+                font-family: 'Cormorant Garamond', serif;
+                font-weight: 300;
+                font-size: 13px;
+                letter-spacing: 0.35em;
+                text-transform: uppercase;
+                color: var(--accent);
+                opacity: 0.8;
+                text-align: center;
+            }
+            #header p {
+                font-size: 9px;
+                letter-spacing: 0.2em;
+                color: var(--muted);
+                margin-top: 4px;
+            }
+
+            /* Hint */
+            #hint {
+                position: fixed;
+                bottom: 32px; left: 50%;
+                transform: translateX(-50%);
+                z-index: 10;
+                font-size: 9px;
+                letter-spacing: 0.25em;
+                color: var(--muted);
+                text-transform: uppercase;
+                pointer-events: none;
+                transition: opacity 0.6s;
+            }
+
+            /* Planet panel */
+            #panel {
+                position: fixed;
+                right: -420px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 360px;
+                z-index: 20;
+                background: var(--panel-bg);
+                border: 1px solid var(--border);
+                backdrop-filter: blur(20px);
+                padding: 40px 36px;
+                transition: right 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            #panel.open { right: 32px; }
+
+            #panel-close {
+                position: absolute;
+                top: 16px; right: 20px;
+                background: none;
+                border: none;
+                color: var(--muted);
+                font-family: 'Space Mono', monospace;
+                font-size: 11px;
+                cursor: pointer;
+                letter-spacing: 0.15em;
+                transition: color 0.2s;
+            }
+            #panel-close:hover { color: var(--accent); }
+
+            #panel-number {
+                font-size: 9px;
+                letter-spacing: 0.3em;
+                color: var(--muted);
+                text-transform: uppercase;
+                margin-bottom: 8px;
+            }
+
+            #panel-name {
+                font-family: 'Cormorant Garamond', serif;
+                font-weight: 300;
+                font-size: 42px;
+                line-height: 1;
+                letter-spacing: 0.04em;
+                color: var(--text);
+                margin-bottom: 6px;
+            }
+
+            #panel-type {
+                font-size: 9px;
+                letter-spacing: 0.25em;
+                color: var(--accent);
+                text-transform: uppercase;
+                margin-bottom: 28px;
+            }
+
+            #panel-desc {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 15px;
+                line-height: 1.75;
+                color: rgba(232, 228, 218, 0.7);
+                margin-bottom: 32px;
+            }
+
+            #panel-stats {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin-bottom: 28px;
+            }
+
+            .stat {
+                border-top: 1px solid var(--border);
+                padding-top: 12px;
+            }
+            .stat-label {
+                font-size: 8px;
+                letter-spacing: 0.25em;
+                color: var(--muted);
+                text-transform: uppercase;
+                margin-bottom: 4px;
+            }
+            .stat-value {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 16px;
+                color: var(--text);
+                font-weight: 400;
+            }
+
+            #panel-facts {
+                border-top: 1px solid var(--border);
+                padding-top: 20px;
+            }
+            #panel-facts h3 {
+                font-size: 8px;
+                letter-spacing: 0.3em;
+                color: var(--muted);
+                text-transform: uppercase;
+                margin-bottom: 14px;
+            }
+            .fact {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            .fact::before {
+                content: '—';
+                color: var(--accent);
+                font-size: 11px;
+                flex-shrink: 0;
+                margin-top: 1px;
+            }
+            .fact span {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 13px;
+                line-height: 1.6;
+                color: rgba(232, 228, 218, 0.65);
+            }
+
+            /* Planet label tooltips */
+            .planet-label {
+                position: fixed;
+                pointer-events: none;
+                font-size: 9px;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                color: rgba(232, 228, 218, 0.5);
+                transform: translate(-50%, -50%);
+                transition: opacity 0.3s;
+                z-index: 5;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- МЕНЮ -->
+        <div class="menu-container">
+            <div class="hamburger-icon">
+                <div class="line"></div><div class="line"></div><div class="line"></div>
+            </div>
+
+            <div class="sidebar" id="sidebar">
+                <div class="menu-item">
+                    <span class="menu-title"><a href="../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title">Английский язык</span>
+                    <div class="submenu">
+                        <a href="english_4.html">4 класс</a>
+                        <a href="#">5 класс</a>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <span class="menu-title">Математика</span>
+                    <div class="submenu">
+                        <a href="math_4.html">4 класс</a>
+                        <a href="#">5 класс</a>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title">Физика</span>
+                    <div class="submenu">
+                        <a href="#">4 класс</a>
+                        <a href="#">5 класс</a>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+                </div>
+                
+                <a href="../profile.html" class="menu-profile-btn">Профиль</a>
+            </div>
+        </div>
+
+        <canvas id="c"></canvas>
+
+        <div id="header">
+            <h1>Солнечная система</h1>
+            <p>Интерактивная 3D симуляция</p>
+        </div>
+
+        <div id="hint">
+            Click on a planet to explore
+        </div>
+
+        <div id="panel">
+            <button id="panel-close">[ Назад ]</button>
+            <div id="panel-number"></div>
+            <div id="panel-name"></div>
+            <div id="panel-type"></div>
+            <div id="panel-desc"></div>
+            <div id="panel-stats"></div>
+            <div id="panel-facts"></div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script>
+            const PLANETS = [
+            {
+                name: 'Меркурий', number: '01', type: 'Terrestrial Planet',
+                color: '#8a8a8a', emissive: '#2a2a2a', size: 0.38,
+                orbit: 3.8, speed: 4.15, tilt: 0.03,
+                desc: 'Самая маленькая планета в нашей Солнечной системе и ближайшая к Солнцу. Меркурий совершает гонку вокруг Солнца каждые 88 дней и имеет экстремальные колебания температуры.',
+                stats: [
+                    { label: 'Диаметр', value: '4,879 км' },
+                    { label: 'Отдолённость', value: '57.9 млн. км' },
+                    { label: 'Длительсноть суток', value: '1,408 ч' },
+                    { label: 'Кол-во спутников', value: '0' },
+                ],
+                facts: [
+                    'Колебания температуры от 180°C до 430°C',
+                    'Имеет большое железное ядро, которое составляет 85% от его радиуса',
+                    'Covered in craters like our Moon',
+                ]
+            },
+            {
+                name: 'Венера', number: '02', type: 'Terrestrial Planet',
+                color: '#c9a96e', emissive: '#3d2a10', size: 0.95,
+                orbit: 5.5, speed: 1.62, tilt: 177.4,
+                desc: 'The hottest planet in our solar system despite not being the closest to the Sun. Venus rotates backwards and its thick atmosphere creates a runaway greenhouse effect.',
+                stats: [
+                    { label: 'Диаметр', value: '12,104 км' },
+                    { label: 'Отдолённость', value: '108.2 млн. км' },
+                    { label: 'Длительсноть суток', value: '5,832 ч' },
+                    { label: 'Кол-во спутников', value: '0' },
+                ],
+                facts: [
+                    'Surface temperature reaches 465°C — hot enough to melt lead',
+                    'A day on Venus is longer than its year',
+                    'Rotates in the opposite direction to most planets',
+                ]
+            },
+            {
+                name: 'Земля', number: '03', type: 'Terrestrial Planet',
+                color: '#3a6b8a', emissive: '#0d2535', size: 1.0,
+                orbit: 7.5, speed: 1.0, tilt: 23.5,
+                desc: 'Our home world. The only known planet to harbor life, with liquid water on the surface, a protective magnetic field, and an atmosphere fine-tuned for life.',
+                stats: [
+                    { label: 'Диаметр', value: '12,742 км' },
+                    { label: 'Отдолённость', value: '149.6 млн. км' },
+                    { label: 'Длительсноть суток', value: '24 ч' },
+                    { label: 'Кол-во спутников', value: '1' },
+                ],
+                facts: [
+                    '71% of the surface is covered by water',
+                    'The only planet not named after a god',
+                    'Earth\'s magnetic field protects life from solar radiation',
+                ]
+            },
+            {
+                name: 'Марс', number: '04', type: 'Terrestrial Planet',
+                color: '#c1440e', emissive: '#3d1205', size: 0.53,
+                orbit: 10.0, speed: 0.53, tilt: 25.2,
+                desc: 'The Red Planet, named for its iron-rich dust. Mars has the tallest volcano and longest canyon in the solar system, and is the most likely candidate for future human colonization.',
+                stats: [
+                    { label: 'Диаметр', value: '6,779 км' },
+                    { label: 'Отдолённость', value: '227.9 млн. км' },
+                    { label: 'Длительсноть суток', value: '24.6 ч' },
+                    { label: 'Кол-во спутников', value: '2' },
+                ],
+                facts: [
+                    'Olympus Mons is 3× taller than Everest at 21.9 км',
+                    'Has the longest canyon: Valles Marineris, 4,000 км wide',
+                    'A Martian year lasts 687 Earth days',
+                ]
+            },
+            {
+                name: 'Юпитер', number: '05', type: 'Газовый гигант',
+                color: '#c8a97a', emissive: '#3a2510', size: 2.6,
+                orbit: 15.0, speed: 0.084, tilt: 3.1,
+                desc: 'The largest planet in the solar system — so massive that all other planets could fit inside it. The Great Red Spot is a storm that has raged for centuries.',
+                stats: [
+                    { label: 'Диаметр', value: '139,820 км' },
+                    { label: 'Отдолённость', value: '778.5 млн. км' },
+                    { label: 'Длительсноть суток', value: '9.9 ч' },
+                    { label: 'Кол-во спутников', value: '95' },
+                ],
+                facts: [
+                    'The Great Red Spot is a 350-year-old storm larger than Earth',
+                    'Has a faint ring system discovered in 1979',
+                    'Its moon Europa may have a subsurface ocean with life',
+                ]
+            },
+            {
+                name: 'Стаурн', number: '06', type: 'Газовый гигант',
+                color: '#e8d5a3', emissive: '#3a3010', size: 2.2,
+                orbit: 20.5, speed: 0.034, tilt: 26.7,
+                hasRings: true,
+                desc: 'The jewel of the solar system, famous for its spectacular ring system made of ice and rock. Saturn is so light it could theoretically float on water.',
+                stats: [
+                    { label: 'Диаметр', value: '116,460 км' },
+                    { label: 'Отдолённость', value: '1.43 млрд. км' },
+                    { label: 'Длительсноть суток', value: '10.7 ч' },
+                    { label: 'Кол-во спутников', value: '146' },
+                ],
+                facts: [
+                    'Its rings span 282,000 км but are less than 1 км thick',
+                    'Less dense than water — it would float if placed in a vast ocean',
+                    'Titan, its largest moon, has rain of liquid methane',
+                ]
+            },
+            {
+                name: 'Уран', number: '07', type: 'Ледяной гигант',
+                color: '#7de8e8', emissive: '#0d3d3d', size: 1.6,
+                orbit: 26.5, speed: 0.012, tilt: 97.8,
+                desc: 'The tilted planet — Uranus orbits the Sun on its side, likely due to a massive ancient collision. It is the coldest planetary atmosphere in our solar system.',
+                stats: [
+                    { label: 'Диаметр', value: '50,724 км' },
+                    { label: 'Отдолённость', value: '2.87 млрд. км' },
+                    { label: 'Длительсноть суток', value: '17.2 ч' },
+                    { label: 'Кол-во спутников', value: '27' },
+                ],
+                facts: [
+                    'Axial tilt of 97.8° means it rolls around the Sun on its side',
+                    'Coldest planetary atmosphere: −224°C',
+                    'Has 13 known rings and 27 moons, all named after Shakespeare characters',
+                ]
+            },
+            {
+                name: 'Нептун', number: '08', type: 'Ледяной Гигант',
+                color: '#3b5fc0', emissive: '#0a1540', size: 1.5,
+                orbit: 32.5, speed: 0.006, tilt: 28.3,
+                desc: 'The windiest planet in the solar system, with storms reaching 2,100 км/h. Neptune was predicted mathematically before it was ever observed through a telescope.',
+                stats: [
+                    { label: 'Диаметр', value: '49,244 км' },
+                    { label: 'Отдолённость', value: '4.50 млрд. км' },
+                    { label: 'Длительсноть суток', value: '16.1 ч' },
+                    { label: 'Кол-во спутников', value: '16' },
+                ],
+                facts: [
+                    'Скорость ветра может достигать 2100 км/ч - самая быстрая в солнечной системе.',
+                    'Один год Нептуна равняется 165 земным годам',
+                    'Тритон, его луна, вращается назад и медленно движется вперёд',
+                ]
+            },
+            ];
+
+            // ── Three.js setup ──────────────────────────────────────────────
+            const canvas = document.getElementById('c');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x03050d, 1);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 22, 50);
+            camera.lookAt(0, 0, 0);
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0x111122, 0.6);
+            scene.add(ambient);
+            const sunLight = new THREE.PointLight(0xfff5e0, 3.5, 200);
+            sunLight.position.set(0, 0, 0);
+            scene.add(sunLight);
+
+            // Stars background
+            (function createStars() {
+            const geo = new THREE.BufferGeometry();
+            const count = 3000;
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count * 3; i++) {
+                pos[i] = (Math.random() - 0.5) * 800;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.18, sizeAttenuation: true, transparent: true, opacity: 0.6 });
+            scene.add(new THREE.Points(geo, mat));
+            })();
+
+            // Sun
+            const sunGeo = new THREE.SphereGeometry(2.2, 32, 32);
+            const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff0a0 });
+            const sun = new THREE.Mesh(sunGeo, sunMat);
+            scene.add(sun);
+
+            // Sun glow
+            const glowGeo = new THREE.SphereGeometry(2.8, 32, 32);
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.08, side: THREE.BackSide });
+            scene.add(new THREE.Mesh(glowGeo, glowMat));
+
+            // Planet meshes
+            const planetMeshes = [];
+            const orbitLines = [];
+
+            PLANETS.forEach((p, i) => {
+            // Orbit ring
+            const orbitGeo = new THREE.RingGeometry(p.orbit - 0.02, p.orbit + 0.02, 128);
+            const orbitMat = new THREE.MeshBasicMaterial({ color: 0x2a2f4a, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+            const orbitMesh = new THREE.Mesh(orbitGeo, orbitMat);
+            orbitMesh.rotation.x = Math.PI / 2;
+            scene.add(orbitMesh);
+            orbitLines.push(orbitMesh);
+
+            // Planet
+            const geo = new THREE.SphereGeometry(p.size * 0.55, 32, 32);
+            const mat = new THREE.MeshStandardMaterial({
+                color: p.color,
+                emissive: p.emissive,
+                roughness: 0.85,
+                metalness: 0.05,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.userData = { planet: p, index: i, angle: (i / PLANETS.length) * Math.PI * 2 };
+            scene.add(mesh);
+
+            // Saturn rings
+            if (p.hasRings) {
+                const rGeo = new THREE.RingGeometry(p.size * 0.7, p.size * 1.2, 64);
+                const rMat = new THREE.MeshBasicMaterial({ color: 0xd4c49a, transparent: true, opacity: 0.45, side: THREE.DoubleSide });
+                const ring = new THREE.Mesh(rGeo, rMat);
+                ring.rotation.x = Math.PI / 2.4;
+                mesh.add(ring);
+            }
+
+            planetMeshes.push(mesh);
+            });
+
+            // ── State ───────────────────────────────────────────────────────
+            let selectedPlanet = null;
+            let systemAngle = 0;
+            const SYSTEM_SPEED = 0.0008;
+
+            // Camera tracking
+            let camTarget = new THREE.Vector3(0, 22, 50);
+            let camLookAt = new THREE.Vector3(0, 0, 0);
+            let isTracking = false;
+            let trackOffset = new THREE.Vector3(0, 2.5, 7);
+
+            // ── Raycasting ──────────────────────────────────────────────────
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            canvas.addEventListener('click', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const hits = raycaster.intersectObjects(planetMeshes, false);
+            if (hits.length > 0) {
+                openPanel(hits[0].object);
+            }
+            });
+
+            canvas.style.cursor = 'crosshair';
+            canvas.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const hits = raycaster.intersectObjects(planetMeshes, false);
+            canvas.style.cursor = hits.length > 0 ? 'pointer' : 'crosshair';
+            });
+
+            // ── Panel ───────────────────────────────────────────────────────
+            const panel = document.getElementById('panel');
+            const hint = document.getElementById('hint');
+
+            function openPanel(mesh) {
+            const p = mesh.userData.planet;
+            selectedPlanet = mesh;
+            isTracking = true;
+
+            document.getElementById('panel-number').textContent = p.number + ' / 08';
+            document.getElementById('panel-name').textContent = p.name;
+            document.getElementById('panel-type').textContent = p.type;
+            document.getElementById('panel-desc').textContent = p.desc;
+
+            const statsEl = document.getElementById('panel-stats');
+            statsEl.innerHTML = p.stats.map(s => `
+                <div class="stat">
+                <div class="stat-label">${s.label}</div>
+                <div class="stat-value">${s.value}</div>
+                </div>
+            `).join('');
+
+            const factsEl = document.getElementById('panel-facts');
+            factsEl.innerHTML = `<h3>Notable facts</h3>` + p.facts.map(f => `
+                <div class="fact"><span>${f}</span></div>
+            `).join('');
+
+            panel.classList.add('open');
+            hint.style.opacity = '0';
+
+            // Highlight selected orbit
+            orbitLines.forEach((o, i) => {
+                o.material.opacity = i === mesh.userData.index ? 0.9 : 0.2;
+                o.material.color.setHex(i === mesh.userData.index ? 0xc8a96e : 0x2a2f4a);
+            });
+            }
+
+            document.getElementById('panel-close').addEventListener('click', closePanel);
+
+            function closePanel() {
+            panel.classList.remove('open');
+            selectedPlanet = null;
+            isTracking = false;
+            hint.style.opacity = '1';
+            // Reset camera
+            camTarget.set(0, 22, 50);
+            camLookAt.set(0, 0, 0);
+            // Reset orbit lines
+            orbitLines.forEach(o => {
+                o.material.opacity = 0.5;
+                o.material.color.setHex(0x2a2f4a);
+            });
+            }
+
+            // ── Animation loop ──────────────────────────────────────────────
+            const clock = new THREE.Clock();
+            const tempVec = new THREE.Vector3();
+
+            function animate() {
+            requestAnimationFrame(animate);
+            const dt = clock.getDelta();
+
+            systemAngle += SYSTEM_SPEED;
+
+            // Update planet positions
+            planetMeshes.forEach((mesh) => {
+                const p = mesh.userData.planet;
+                const angle = systemAngle * p.speed + mesh.userData.angle;
+                mesh.position.x = Math.cos(angle) * p.orbit;
+                mesh.position.z = Math.sin(angle) * p.orbit;
+                mesh.position.y = Math.sin(angle * 0.5) * 0.3;
+                mesh.rotation.y += 0.005 * p.speed;
+            });
+
+            // Sun slow rotation
+            sun.rotation.y += 0.001;
+
+            // Camera follow
+            if (isTracking && selectedPlanet) {
+                const pp = selectedPlanet.userData.planet;
+                const target = selectedPlanet.position.clone();
+                const dist = pp.size * 0.55 * 6 + 4;
+                const desired = target.clone().add(new THREE.Vector3(0, dist * 0.4, dist));
+                camTarget.lerp(desired, 0.04);
+                camLookAt.lerp(target, 0.06);
+            } else if (!isTracking) {
+                camTarget.lerp(new THREE.Vector3(0, 22, 50), 0.03);
+                camLookAt.lerp(new THREE.Vector3(0, 0, 0), 0.03);
+            }
+
+            camera.position.copy(camTarget);
+            camera.lookAt(camLookAt);
+
+            renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // ── Resize ──────────────────────────────────────────────────────
+            window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        </script>
+    </body>
+</html>

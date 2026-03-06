@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Квантовая физика
+    </title>
+
+    <!-- <link rel="stylesheet" href="../style.css"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+        --void: #000000;
+        --deep: #050508;
+        --nebula: #0a0a14;
+        --glow: #c8a96e;
+        --glow-soft: rgba(200, 169, 110, 0.15);
+        --glow-ring: rgba(200, 169, 110, 0.6);
+        --text: #e8e0d0;
+        --text-dim: rgba(232, 224, 208, 0.45);
+        --accent: #f0e4c8;
+        }
+
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+        }
+
+        html { 
+            scroll-behavior: smooth; 
+        }
+
+        body {
+            background: var(--void);
+            color: var(--text);
+            font-family: 'Jost', sans-serif;
+            font-weight: 200;
+            overflow-x: hidden;
+        }
+
+        /* ─── HERO SECTION ─── */
+        .hero {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #08080f 0%, #000000 70%);
+        }
+
+        /* Star field */
+        .stars {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+            opacity: var(--op, 0.6);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--op, 0.6); transform: scale(1); }
+            50% { opacity: 0.1; transform: scale(0.6); }
+        }
+
+        /* Black hole SVG container */
+        .blackhole-wrap {
+            position: absolute;
+            width: 80vmin;
+            height: 80vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .blackhole-svg {
+            width: 160%;
+            height: 160%;
+            overflow: visible;
+        }
+
+        /* Accretion disk glow animation */
+        @keyframes diskPulse {
+            0%, 100% { opacity: 0.85; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes diskRotate {
+            from { transform: rotate(0deg) scaleY(0.28); }
+            to { transform: rotate(360deg) scaleY(0.28); }
+        }
+
+        @keyframes innerGlow {
+            0%, 100% { opacity: 0.4; r: 34; }
+            50% { opacity: 0.6; r: 36; }
+        }
+
+        @keyframes lensWarp {
+            0%, 100% { opacity: 0.18; }
+            50% { opacity: 0.28; }
+        }
+
+        .disk-outer {
+            animation: diskPulse 4s ease-in-out infinite;
+            transform-origin: center;
+        }
+        .disk-mid {
+            animation: diskPulse 4s ease-in-out infinite 0.5s;
+        }
+        .lens-ring {
+            animation: lensWarp 5s ease-in-out infinite;
+        }
+
+        /* Corner facts */
+        .fact {
+            position: absolute;
+            max-width: 220px;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            line-height: 1.7;
+            color: var(--text-dim);
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 300;
+            transition: color 0.4s;
+        }
+
+        .fact:hover { 
+            color: var(--glow); 
+        }
+        
+        .fact .label {
+            display: block;
+            font-family: 'Jost', sans-serif;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 1rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--glow);
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+
+        .fact-tl { top: 5.5rem; left: 3rem; }
+        .fact-tr { top: 2.5rem; right: 10.5rem; text-align: right; }
+        .fact-bl { bottom: 6.5rem; left: 4.5rem; }
+        .fact-br { bottom: 8.5rem; right: 7.5rem; text-align: right; }
+
+        /* Center title */
+        .hero-title {
+        position: absolute;
+        text-align: center;
+        pointer-events: none;
+        z-index: 10;
+        }
+        .hero-title h1 {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 300;
+        font-size: clamp(1.1rem, 2.8vw, 2rem);
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        text-shadow:
+            0 0 40px rgba(200, 169, 110, 0.5),
+            0 0 80px rgba(200, 169, 110, 0.2);
+        line-height: 1.4;
+        }
+        .hero-title .sub {
+        display: block;
+        font-family: 'Jost', sans-serif;
+        font-weight: 200;
+        font-size: clamp(0.5rem, 1vw, 0.75rem);
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-top: 0.6rem;
+        }
+
+        /* Scroll hint */
+        .scroll-hint {
+        position: absolute;
+        bottom: 1.8rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        opacity: 0.4;
+        animation: fadeFloat 2.5s ease-in-out infinite;
+        }
+        .scroll-hint span {
+        font-size: 0.55rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--glow);
+        }
+        .scroll-hint svg { width: 16px; opacity: 0.6; }
+        @keyframes fadeFloat {
+        0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+        50% { transform: translateX(-50%) translateY(6px); opacity: 0.7; }
+        }
+
+        /* ─── TOPICS SECTION ─── */
+        .topics {
+            background: var(--deep);
+            padding: 6rem 4rem;
+            position: relative;
+        }
+
+        .topics::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glow-ring), transparent);
+            opacity: 0.4;
+        }
+
+        .topics-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .topics-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(1.4rem, 3vw, 2.4rem);
+            letter-spacing: 0.1em;
+            color: var(--accent);
+        }
+
+        .topics-header p {
+            margin-top: 0.7rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .topic-card {
+            position: relative;
+            aspect-ratio: 4/3;
+            background: var(--nebula);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            cursor: pointer;
+            overflow: hidden;
+            transition: background 0.5s;
+        }
+
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+            z-index: 1;
+        }
+
+        .topic-card:hover { background: #0e0e1a; }
+        .topic-card:hover .card-border { opacity: 1; }
+        .topic-card:hover .card-num { color: var(--glow); }
+
+        .card-border {
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(200, 169, 110, 0.2);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .card-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0.04;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7rem;
+            user-select: none;
+        }
+
+        .card-content { 
+            position: relative; z-index: 2; 
+        }
+
+        .card-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 1.8vw, 1.5rem);
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        .card-placeholder {
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 0.55rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(200, 169, 110, 0.3);
+            border: 1px solid rgba(200, 169, 110, 0.15);
+            padding: 0.3rem 0.7rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--void);
+            text-align: center;
+            padding: 2.5rem;
+            font-size: 0.55rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(200, 169, 110, 0.2);
+            border-top: 1px solid rgba(200, 169, 110, 0.06);
+        }
+
+        @media (max-width: 768px) {
+            .fact-tr, .fact-br { display: none; }
+            .fact-tl, .fact-bl { max-width: 160px; font-size: 0.65rem; }
+            .topics-grid { grid-template-columns: 1fr 1fr; }
+            .topics { padding: 4rem 1.5rem; }
+        }
+        @media (max-width: 480px) {
+            .topics-grid { grid-template-columns: 1fr; }
+            .fact-tl, .fact-bl { max-width: 130px; font-size: 0.6rem; }
+        }
+
+        /* --- БОКОВОЕ МЕНЮ ДЛЯ КАЖДОЙ СТРАНИЦЫ --- */
+        .menu-container { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            z-index: 200;
+            height: 100vh;
+        }
+
+        .hamburger-icon { 
+            width: 40px; 
+            height: 35px; 
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding-bottom: 10px; 
+        }
+
+        .line { 
+            width: 100%; 
+            height: 6px; 
+            background-color: white; 
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.5); 
+            transition: 0.3s; }
+
+        .sidebar {
+            position: fixed; 
+            top: 0; 
+            left: -280px;
+            width: 280px; 
+            height: 100vh; /* На весь экран */
+            background: var(--frame-bg); 
+            border-right: 4px solid var(--color-light);
+            transition: 0.4s ease; 
+            padding-top: 100px; 
+            z-index: 1000;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-container:hover .sidebar { 
+            left: 0; 
+        }
+
+        .menu-container:hover .line {
+            background-color: var(--color-sand); 
+        }
+
+        .menu-item {
+            position: relative;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .menu-title {
+            padding: 15px 25px; font-size: 11px;
+            color: var(--text-color); display: block;
+            cursor: pointer; transition: 0.2s;
+            line-height: 1.4;
+        }
+
+        .menu-item:hover .menu-title {
+            background: rgba(0,0,0,0.3); color: var(--color-sand);
+        }
+
+        /* Выпадающее подменю */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .menu-item:hover .submenu {
+            max-height: 200px;
+        }
+
+        .submenu a {
+            padding: 12px 25px 12px 40px; 
+            text-decoration: none; 
+            font-size: 10px;
+            color: var(--color-light); 
+            display: block; 
+            transition: 0.2s;
+        }
+
+        .submenu a:hover {
+            color: var(--correct); 
+            background: rgba(255,255,255,0.05);
+        }
+
+        .menu-profile-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: inline-block;
+            text-decoration: none;
+            color: var(--text-color);
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--color-sand);
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .menu-profile-btn:hover {
+            background: var(--color-sand);
+            color: #000;
+        }
+        /* ------------------------------ */
+    </style>
+  </head>
+
+  <body>
+    <!-- МЕНЮ -->
+    <div class="menu-container">
+        <div class="hamburger-icon">
+            <div class="line"></div><div class="line"></div><div class="line"></div>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="menu-item">
+                <span class="menu-title"><a href="../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title">Английский язык</span>
+                <div class="submenu">
+                    <a href="english_4.html">4 класс</a>
+                    <a href="#">5 класс</a>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <span class="menu-title">Математика</span>
+                <div class="submenu">
+                    <a href="math_4.html">4 класс</a>
+                    <a href="#">5 класс</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title">Физика</span>
+                <div class="submenu">
+                    <a href="#">4 класс</a>
+                    <a href="#">5 класс</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+            </div>
+            
+            <a href="../profile.html" class="menu-profile-btn">Профиль</a>
+        </div>
+    </div>
+
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <section class="hero">
+
+      <!-- Stars -->
+      <div class="stars" id="stars"></div>
+
+      <!-- Black Hole SVG -->
+      <div class="blackhole-wrap">
+        <svg class="blackhole-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            
+            <!-- Outer glow gradient for accretion disk -->
+            <radialGradient id="diskGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c8a96e" stop-opacity="0"/>
+              <stop offset="60%" stop-color="#c8a96e" stop-opacity="0.05"/>
+              <stop offset="80%" stop-color="#e8c07a" stop-opacity="0.3"/>
+              <stop offset="90%" stop-color="#f0d090" stop-opacity="0.5"/>
+              <stop offset="95%" stop-color="#c8a96e" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+            </radialGradient>
+
+            <!-- Thin bright ring -->
+            <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff8e8" stop-opacity="0"/>
+              <stop offset="75%" stop-color="#fff8e8" stop-opacity="0"/>
+              <stop offset="87%" stop-color="#ffe8a0" stop-opacity="0.9"/>
+              <stop offset="92%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="96%" stop-color="#ffe090" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+            </radialGradient>
+
+            <!-- Ghost ring above (gravitational lensing arc) -->
+            <radialGradient id="lensGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c8a96e" stop-opacity="0"/>
+              <stop offset="82%" stop-color="#c8a96e" stop-opacity="0"/>
+              <stop offset="88%" stop-color="#e0c07a" stop-opacity="0.5"/>
+              <stop offset="92%" stop-color="#fff0c0" stop-opacity="0.8"/>
+              <stop offset="96%" stop-color="#c8a96e" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+            </radialGradient>
+
+            <!-- Ambient halo -->
+            <radialGradient id="haloGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c8a96e" stop-opacity="0"/>
+              <stop offset="60%" stop-color="#c8a96e" stop-opacity="0.03"/>
+              <stop offset="85%" stop-color="#c8a96e" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+            </radialGradient>
+
+            <!-- Event horizon mask -->
+            <radialGradient id="horizonGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#000000" stop-opacity="1"/>
+              <stop offset="85%" stop-color="#000000" stop-opacity="1"/>
+              <stop offset="95%" stop-color="#03020a" stop-opacity="0.95"/>
+              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+            </radialGradient>
+
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="8" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="haloBlur">
+              <feGaussianBlur stdDeviation="18"/>
+            </filter>
+            <filter id="diskBlur">
+              <feGaussianBlur stdDeviation="4"/>
+            </filter>
+          </defs>
+
+          <!-- Ambient halo -->
+          <ellipse cx="200" cy="200" rx="190" ry="80" fill="url(#haloGrad)" filter="url(#haloBlur)" opacity="0.6"/>
+
+          <!-- Wide accretion glow -->
+          <ellipse cx="200" cy="200" rx="175" ry="49" fill="url(#diskGrad)" filter="url(#diskBlur)" class="disk-outer"/>
+
+          <!-- Disk bands - bottom (visible below black hole) -->
+          <g transform="translate(200,200)">
+            <!-- Outer warm band -->
+            <ellipse rx="158" ry="44" fill="none" stroke="#c8904a" stroke-width="8" opacity="0.18" class="disk-mid"/>
+            <ellipse rx="148" ry="41" fill="none" stroke="#d4a055" stroke-width="5" opacity="0.25"/>
+            <ellipse rx="140" ry="39" fill="none" stroke="#e8c07a" stroke-width="3" opacity="0.35"/>
+            <ellipse rx="133" ry="37" fill="none" stroke="#f5d890" stroke-width="2" opacity="0.5"/>
+
+            <!-- Photon ring / bright thin ring -->
+            <ellipse rx="127" ry="35.5" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.85" filter="url(#glow)"/>
+            <ellipse rx="127" ry="35.5" fill="none" stroke="#ffe8a0" stroke-width="3" opacity="0.45"/>
+
+            <!-- Inner shadow ring -->
+            <ellipse rx="120" ry="33.5" fill="none" stroke="#c8904a" stroke-width="2" opacity="0.2"/>
+          </g>
+
+          <!-- Gravitational lensing ghost arc (top) -->
+          <g transform="translate(200,200)" class="lens-ring">
+            <!-- The light bending over the top - a thinner, dimmer arc -->
+            <path d="M -110 -28 Q 0 -58 110 -28" fill="none" stroke="#ffe8b0" stroke-width="1.8" opacity="0.7" filter="url(#glow)"/>
+            <path d="M -120 -30 Q 0 -62 120 -30" fill="none" stroke="#c8a96e" stroke-width="3" opacity="0.3"/>
+            <path d="M -100 -26 Q 0 -52 100 -26" fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.5"/>
+          </g>
+
+          <!-- Event horizon — pure black circle -->
+          <circle cx="200" cy="200" r="110" fill="#000000"/>
+
+          <!-- Thin inner glow at event horizon edge -->
+          <circle cx="200" cy="200" r="110" fill="none" stroke="#c8702a" stroke-width="2.5" opacity="0.15" filter="url(#glow)"/>
+
+          <!-- Innermost shadow gradient -->
+          <circle cx="200" cy="200" r="115" fill="url(#horizonGrad)" opacity="0.5"/>
+
+        </svg>
+      </div>
+
+      <!-- Corner Facts -->
+      <div class="fact fact-tl">
+        <span class="label">Принцип неопределённости</span>
+        Гейзенберг показал: чем точнее мы знаем положение частицы, тем меньше знаем о её импульсе — и наоборот. Природа запрещает полную точность.
+      </div>
+
+      <div class="fact fact-tr">
+        <span class="label">Квантовая запутанность</span>
+        Эйнштейн называл это «жутким действием на расстоянии». Две частицы остаются связанными мгновенно, вне зависимости от расстояния между ними.
+      </div>
+
+      <div class="fact fact-bl">
+        <span class="label">Двойственность природы</span>
+        Электрон — волна или частица? Всё зависит от того, смотрите ли вы на него. Наблюдение само по себе меняет реальность.
+      </div>
+
+      <div class="fact fact-br">
+        <span class="label">Излучение Хокинга</span>
+        Даже чёрные дыры медленно испаряются — квантовые флуктуации у горизонта событий порождают реальные частицы из вакуума.
+      </div>
+
+      <!-- Title -->
+      <div class="hero-title">
+        <h1>Добро пожаловать в мир<br>квантовой физики</h1>
+        <span class="sub">Где реальность перестаёт быть очевидной</span>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="scroll-hint">
+        <span>Далее</span>
+        <svg viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 0v20M1 13l7 7 7-7" stroke="#c8a96e" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════ TOPICS ═══════════════ -->
+    <section class="topics">
+      <div class="topics-header">
+        <h2>Разделы</h2>
+        <p>Выберите направление для изучения</p>
+      </div>
+
+      <div class="topics-grid">
+
+        <!-- Card 1 -->
+        <a href="atom_structure.html" class="topic-card" style="text-decoration: none;">
+          <div class="card-border"></div>
+          <div class="card-bg">⚛</div>
+          <div class="card-content">
+            <div class="card-num">01</div>
+            <div class="card-title">Атом и его строение</div>
+            <div class="card-desc">Погрузитесь в невероятный мир атомов и их струтур. Изучите тайны скрытые в самых крошечных частицах нашей Вселенной!</div>
+            <span class="card-placeholder">Скоро</span>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="superposition.html" class="topic-card" style="text-decoration: none;">
+          <div class="card-border"></div>
+          <div class="card-bg">🔭</div>
+          <div class="card-content">
+            <div class="card-num">02</div>
+            <div class="card-title">Суперпозиция</div>
+            <div class="card-desc">Кот Шрёдингера и реальность</div>
+            <span class="card-placeholder">Скоро</span>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a href="entanglement.html" class="topic-card" style="text-decoration: none;">
+          <div class="card-border"></div>
+          <div class="card-bg">🌀</div>
+          <div class="card-content">
+            <div class="card-num">03</div>
+            <div class="card-title">Запутанность</div>
+            <div class="card-desc">Нелокальные корреляции</div>
+            <span class="card-placeholder">Скоро</span>
+          </div>
+        </a>
+
+        <!-- Card 4 -->
+        <a href="quantum_field.html" class="topic-card" style="text-decoration: none;">
+          <div class="card-border"></div>
+          <div class="card-bg">💡</div>
+          <div class="card-content">
+            <div class="card-num">04</div>
+            <div class="card-title">Квантовое поле</div>
+            <div class="card-desc">Теория всего сущего</div>
+            <span class="card-placeholder">Скоро</span>
+          </div>
+        </a>
+
+        <!-- Card 5 -->
+        <a href="black_holes.html" class="topic-card" style="text-decoration: none;">
+          <div class="card-border"></div>
+          <div class="card-bg">🕳</div>
+          <div class="card-content">
+            <div class="card-num">05</div>
+            <div class="card-title">Чёрные дыры</div>
+            <div class="card-desc">Горизонты и информация</div>
+            <span class="card-placeholder">Скоро</span>
+          </div>
+        </a>
+
+        <!-- Card 6 -->
+        <a href="multiverse.html" class="topic-card" style="text-decoration: none;">
+          <div class="card-border"></div>
+          <div class="card-bg">∞</div>
+          <div class="card-content">
+            <div class="card-num">06</div>
+            <div class="card-title">Многомировая</div>
+            <div class="card-desc">Параллельные вселенные</div>
+            <span class="card-placeholder">Скоро</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+    <!-- ════════════════════════════════════════════ -->
+
+    <footer>
+      Квантовая физика &nbsp;·&nbsp; Исследуй бесконечное &nbsp;·&nbsp; 2026
+    </footer>
+
+    <script>
+      // Generate stars
+      const starsEl = document.getElementById('stars');
+      const count = 180;
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random() < 0.85 ? Math.random() * 1.5 + 0.5 : Math.random() * 2.5 + 1.5;
+        s.style.cssText = `
+          width:${size}px; height:${size}px;
+          top:${Math.random()*100}%; left:${Math.random()*100}%;
+          --d:${(Math.random()*4+2).toFixed(1)}s;
+          --delay:-${(Math.random()*5).toFixed(1)}s;
+          --op:${(Math.random()*0.5+0.2).toFixed(2)};
+        `;
+        starsEl.appendChild(s);
+      }
+    </script>
+  </body>
+</html>

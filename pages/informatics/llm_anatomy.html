@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Анатомия LLM: Нейроны, Модели, Токены</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&family=Vollkorn:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a25;
+      --border: #2a2a3a;
+      --accent: #7c6aff;
+      --accent2: #ff6a9e;
+      --accent3: #00e5b0;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --mono: 'IBM Plex Mono', monospace;
+      --display: 'Syne', sans-serif;
+      --body: 'Vollkorn', serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(124,106,255,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .header h1 {
+      font-family: var(--display);
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.05;
+      background: linear-gradient(135deg, #e8e8f0 30%, var(--accent) 70%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+    .header p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* NAV TABS */
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1.5rem 2rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      font-family: var(--display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 0.6rem 1.4rem;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+    .tab-btn:hover { border-color: var(--accent); color: var(--text); }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* MAIN CONTENT */
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 6rem;
+    }
+
+    /* SECTION CARD */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .section-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--accent);
+      border-radius: 4px 0 0 4px;
+    }
+    .section-card.green::before { background: var(--accent3); }
+    .section-card.pink::before { background: var(--accent2); }
+
+    .section-tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .section-tag.green { color: var(--accent3); }
+    .section-tag.pink { color: var(--accent2); }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.8rem;
+    }
+    .section-body {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: #b8b8cc;
+    }
+    .section-body strong { color: var(--text); }
+
+    /* FORMULA BOX */
+    .formula-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1rem 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--accent3);
+      margin: 1.2rem 0;
+      overflow-x: auto;
+    }
+
+    /* CANVAS wrapper */
+    .canvas-wrap {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      margin: 1.2rem 0;
+      text-align: center;
+    }
+    canvas { max-width: 100%; }
+
+    /* NEURON DEMO */
+    .neuron-interactive {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media(max-width:600px) { .neuron-interactive { grid-template-columns: 1fr; } }
+
+    .neuron-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.2rem;
+    }
+    .neuron-box h4 {
+      font-family: var(--display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* SLIDER ROW */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+    .slider-label {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      width: 80px;
+      flex-shrink: 0;
+    }
+    input[type=range] {
+      flex: 1;
+      accent-color: var(--accent);
+      height: 3px;
+    }
+    .slider-val {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent3);
+      width: 38px;
+      text-align: right;
+    }
+
+    /* OUTPUT BAR */
+    .output-bar-wrap {
+      margin-top: 1rem;
+    }
+    .output-bar-label {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .output-bar {
+      height: 28px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .output-bar-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      padding-left: 0.5rem;
+    }
+    .output-bar-fill span {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: white;
+      white-space: nowrap;
+    }
+
+    /* TOKENIZER */
+    .token-input-area {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0.8rem 1rem;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      resize: none;
+      transition: border-color 0.2s;
+      margin-bottom: 0.8rem;
+    }
+    .token-input-area:focus { border-color: var(--accent); }
+
+    .token-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      min-height: 48px;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .token-chip {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+      cursor: default;
+      transition: transform 0.15s;
+      animation: chipIn 0.2s ease;
+    }
+    .token-chip:hover { transform: translateY(-2px); }
+    @keyframes chipIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .token-stats {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-val {
+      font-family: var(--display);
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* LANG COMPARE */
+    .lang-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    @media(max-width:600px) { .lang-compare { grid-template-columns: 1fr; } }
+    .lang-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+    }
+    .lang-block h4 {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .lang-tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    /* MODEL CARDS */
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .model-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.3rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .model-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--color, var(--accent));
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+    .model-card:hover { border-color: var(--color, var(--accent)); transform: translateY(-2px); }
+    .model-card:hover::after { transform: scaleX(1); }
+    .model-card.active { border-color: var(--color, var(--accent)); }
+    .model-card.active::after { transform: scaleX(1); }
+
+    .model-icon {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+    }
+    .model-name {
+      font-family: var(--display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .model-short {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .model-detail {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      animation: fadeSlide 0.25s ease;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .model-detail h3 {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .model-detail p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #b8b8cc;
+      margin-bottom: 0.8rem;
+    }
+    .model-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+    .example-tag {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 2px;
+      border: 1px solid;
+    }
+
+    /* ATTENTION VIZ */
+    .attention-grid {
+      display: grid;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .attention-row { display: flex; gap: 4px; align-items: center; }
+    .attention-cell {
+      width: 48px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 2px;
+      font-size: 0.65rem;
+      transition: all 0.3s;
+    }
+    .attention-word {
+      width: 72px;
+      color: var(--muted);
+      text-align: right;
+      padding-right: 6px;
+      flex-shrink: 0;
+    }
+
+    /* BTN */
+    .btn {
+      font-family: var(--display);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.4rem;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background: #9580ff; transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+
+    /* PROGRESS */
+    .step-progress {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .step-dot {
+      height: 3px;
+      flex: 1;
+      border-radius: 2px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .step-dot.done { background: var(--accent); }
+    .step-dot.active { background: var(--accent2); }
+
+    /* TOOLTIP */
+    .tooltip-wrap { position: relative; display: inline; }
+    .tooltip-trigger {
+      border-bottom: 1px dashed var(--accent);
+      cursor: help;
+      color: inherit;
+    }
+    .tooltip-box {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.6rem 0.9rem;
+      font-family: var(--body);
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+      white-space: normal;
+      min-width: 200px;
+      max-width: 260px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .tooltip-wrap:hover .tooltip-box { display: block; }
+
+    /* FACTS */
+    .fact-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+      align-items: flex-start;
+    }
+    .fact-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .fact-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #b8b8cc;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─────────────── TOKENIZER LOGIC ───────────────
+// Simplified BPE-like tokenizer for demo purposes
+const tokenColors = [
+  { bg: 'rgba(124,106,255,0.25)', border: 'rgba(124,106,255,0.6)', text: '#c5bcff' },
+  { bg: 'rgba(255,106,158,0.25)', border: 'rgba(255,106,158,0.6)', text: '#ffb3d1' },
+  { bg: 'rgba(0,229,176,0.25)',   border: 'rgba(0,229,176,0.6)',   text: '#7fffd4' },
+  { bg: 'rgba(255,180,0,0.2)',    border: 'rgba(255,180,0,0.5)',   text: '#ffd580' },
+  { bg: 'rgba(100,200,255,0.2)',  border: 'rgba(100,200,255,0.5)', text: '#a0dcff' },
+];
+
+function naiveTokenize(text) {
+  if (!text.trim()) return [];
+  // Rough simulation: split cyrillic differently from latin
+  const tokens = [];
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    if (/[а-яёА-ЯЁ]/.test(ch)) {
+      // Cyrillic: shorter chunks (simulate less efficient tokenization)
+      const len = Math.random() < 0.5 ? 2 : 3;
+      const chunk = text.slice(i, i + len);
+      if (chunk.trim()) tokens.push({ text: chunk, lang: 'ru' });
+      i += len;
+    } else if (/[a-zA-Z]/.test(ch)) {
+      // Latin: larger chunks
+      const len = Math.floor(Math.random() * 3) + 3;
+      const chunk = text.slice(i, i + len);
+      if (chunk.trim()) tokens.push({ text: chunk, lang: 'en' });
+      i += len;
+    } else if (ch === ' ') {
+      i++;
+    } else {
+      tokens.push({ text: ch, lang: 'sym' });
+      i++;
+    }
+  }
+  return tokens;
+}
+
+// Deterministic tokenize by word boundaries for comparison panel
+function tokenizeEN(text) {
+  return text.split(/(\s+)/).filter(t => t.trim()).map(w => {
+    if (w.length > 5) return [w.slice(0, Math.ceil(w.length/2)), w.slice(Math.ceil(w.length/2))];
+    return [w];
+  }).flat().map(t => ({ text: t }));
+}
+function tokenizeRU(text) {
+  return text.split(/(\s+)/).filter(t => t.trim()).map(w => {
+    // Cyrillic words tokenize into smaller pieces (avg 2-3 chars per token)
+    const chunks = [];
+    let i = 0;
+    while(i < w.length) {
+      const sz = w.length - i <= 2 ? w.length - i : (Math.random() < 0.4 ? 2 : 3);
+      chunks.push(w.slice(i, i+sz));
+      i += sz;
+    }
+    return chunks;
+  }).flat().map(t => ({ text: t }));
+}
+
+// ─────────────── NEURON CANVAS ───────────────
+function NeuronCanvas({ inputs, bias, activation }) {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = 420;
+    const H = canvas.height = 240;
+
+    const inputNodes = inputs.map((inp, i) => ({
+      x: 60, y: 50 + i * 46, val: inp
+    }));
+    const neuron = { x: 220, y: H/2 };
+    const output = { x: 370, y: H/2 };
+
+    let frame = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+
+      // Weighted sum
+      const weightedSum = inputs.reduce((s, v) => s + v, 0) + bias;
+      let out = 0;
+      if (activation === 'relu') out = Math.max(0, weightedSum / inputs.length);
+      else if (activation === 'sigmoid') out = 1 / (1 + Math.exp(-weightedSum / inputs.length));
+      else out = Math.tanh(weightedSum / inputs.length);
+      out = Math.max(0, Math.min(1, out));
+
+      // Draw connections
+      inputNodes.forEach((node, i) => {
+        const w = inputs[i] / 100;
+        const alpha = 0.2 + Math.abs(w) * 0.7;
+        const pulse = Math.sin(frame * 0.08 - i * 0.8) * 0.5 + 0.5;
+        ctx.strokeStyle = w > 0
+          ? `rgba(124,106,255,${alpha * pulse})`
+          : `rgba(255,106,158,${alpha * pulse})`;
+        ctx.lineWidth = 1 + Math.abs(w) * 3;
+        ctx.beginPath();
+        ctx.moveTo(node.x + 18, node.y);
+        ctx.lineTo(neuron.x - 22, neuron.y);
+        ctx.stroke();
+      });
+
+      // Output line
+      ctx.strokeStyle = `rgba(0,229,176,${0.3 + out * 0.6})`;
+      ctx.lineWidth = 1 + out * 4;
+      ctx.beginPath();
+      ctx.moveTo(neuron.x + 22, neuron.y);
+      ctx.lineTo(output.x - 18, output.y);
+      ctx.stroke();
+
+      // Input nodes
+      inputNodes.forEach((node, i) => {
+        const v = inputs[i] / 100;
+        const g = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, 18);
+        g.addColorStop(0, v > 0 ? 'rgba(124,106,255,0.8)' : 'rgba(255,106,158,0.6)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(node.x, node.y, 18, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = v > 0 ? 'rgba(124,106,255,0.9)' : 'rgba(255,106,158,0.7)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(node.x, node.y, 16, 0, Math.PI*2); ctx.stroke();
+        ctx.fillStyle = '#e8e8f0'; ctx.font = 'bold 11px IBM Plex Mono';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(`x${i+1}`, node.x, node.y);
+        ctx.fillStyle = '#888899'; ctx.font = '9px IBM Plex Mono';
+        ctx.fillText(`${inputs[i]}%`, node.x, node.y + 24);
+      });
+
+      // Neuron body
+      const pulse2 = Math.sin(frame * 0.06) * 3;
+      const ng = ctx.createRadialGradient(neuron.x, neuron.y, 0, neuron.x, neuron.y, 24 + pulse2);
+      ng.addColorStop(0, `rgba(255,180,0,${0.4 + out * 0.4})`);
+      ng.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ng;
+      ctx.beginPath(); ctx.arc(neuron.x, neuron.y, 24 + pulse2, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = `rgba(255,180,0,${0.6 + out * 0.3})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(neuron.x, neuron.y, 22, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#e8e8f0'; ctx.font = 'bold 10px IBM Plex Mono';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('Σ + f', neuron.x, neuron.y);
+
+      // Output node
+      const og = ctx.createRadialGradient(output.x, output.y, 0, output.x, output.y, 18);
+      og.addColorStop(0, `rgba(0,229,176,${0.3 + out * 0.6})`);
+      og.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = og;
+      ctx.beginPath(); ctx.arc(output.x, output.y, 18, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = `rgba(0,229,176,${0.5 + out * 0.4})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(output.x, output.y, 16, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#e8e8f0'; ctx.font = 'bold 11px IBM Plex Mono';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(out.toFixed(2), output.x, output.y);
+
+      // Labels
+      ctx.fillStyle = '#555566'; ctx.font = '10px IBM Plex Mono'; ctx.textAlign = 'center';
+      ctx.fillText('входы', 60, H - 16);
+      ctx.fillText('нейрон', 220, H - 16);
+      ctx.fillText('выход', 370, H - 16);
+
+      frame++;
+      animRef.current = requestAnimationFrame(draw);
+    };
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [inputs, bias, activation]);
+
+  return <canvas ref={canvasRef} style={{ width: '100%', borderRadius: 4 }} />;
+}
+
+// ─────────────── ATTENTION VIZ ───────────────
+function AttentionViz({ tokens, weights }) {
+  const maxW = Math.max(...weights.flat());
+  return (
+    <div className="attention-grid">
+      <div className="attention-row">
+        <div className="attention-word" />
+        {tokens.map((t, i) => (
+          <div key={i} className="attention-cell" style={{ color: '#888899', fontWeight: 700 }}>{t}</div>
+        ))}
+      </div>
+      {tokens.map((t, i) => (
+        <div key={i} className="attention-row">
+          <div className="attention-word">{t}</div>
+          {tokens.map((_, j) => {
+            const w = weights[i][j];
+            const intensity = w / maxW;
+            return (
+              <div key={j} className="attention-cell" style={{
+                background: `rgba(124,106,255,${intensity * 0.85})`,
+                color: intensity > 0.5 ? '#ffffff' : '#888899',
+                border: `1px solid rgba(124,106,255,${intensity * 0.4})`
+              }}>{w.toFixed(1)}</div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─────────────── MODEL DATA ───────────────
+const modelTypes = [
+  {
+    id: 'decoder',
+    icon: '🔮',
+    name: 'Decoder-only',
+    short: 'Генерация текста слева направо',
+    color: '#7c6aff',
+    detail: `Архитектура «только декодер» — основа большинства современных чат-ботов. Модель предсказывает следующий токен, опираясь только на предыдущие. Это позволяет генерировать тексты произвольной длины.`,
+    howItWorks: `Каждый токен видит только токены до него (маскированное внимание). Нет «понимания» — только вероятностное предсказание следующего слова, основанное на паттернах из обучающих данных.`,
+    examples: ['GPT-4', 'Claude', 'LLaMA', 'Gemini', 'Mistral'],
+    pros: ['Отлично генерирует', 'Масштабируется хорошо', 'Универсальный'],
+    cons: ['Нет «понимания» двунаправленного контекста', 'Галлюцинации'],
+  },
+  {
+    id: 'encoder',
+    icon: '🔬',
+    name: 'Encoder-only',
+    short: 'Понимание и классификация текста',
+    color: '#00e5b0',
+    detail: `Encoder-only модели читают весь текст целиком и строят его «понимание» в виде векторов. Они не генерируют — они понимают. Идеальны для задач классификации, поиска похожих текстов, анализа тональности.`,
+    howItWorks: `Двунаправленное внимание: каждый токен видит все остальные. Выход — числовой вектор для каждого токена или для всего текста, который можно использовать в классификаторе.`,
+    examples: ['BERT', 'RoBERTa', 'ELECTRA', 'ruBERT'],
+    pros: ['Глубокое понимание контекста', 'Точность в классификации', 'Компактные'],
+    cons: ['Не генерирует текст', 'Нужен fine-tuning под задачу'],
+  },
+  {
+    id: 'seq2seq',
+    icon: '🔄',
+    name: 'Encoder-Decoder',
+    short: 'Перевод, суммаризация, вопросы-ответы',
+    color: '#ff6a9e',
+    detail: `Классическая трансформерная архитектура: энкодер «читает» входной текст и создаёт его представление, декодер «пишет» выходной текст, используя это представление. Хороши для задач преобразования одного текста в другой.`,
+    howItWorks: `Энкодер обрабатывает всю входную последовательность. Декодер генерирует выход и через механизм cross-attention обращается к кодированию энкодера — это позволяет «помнить» исходный текст при генерации.`,
+    examples: ['T5', 'BART', 'mT5', 'MarianMT'],
+    pros: ['Отличный перевод', 'Суммаризация', 'Структурированный выход'],
+    cons: ['Сложнее масштабировать', 'Decoder-only догнал по качеству'],
+  },
+  {
+    id: 'moe',
+    icon: '🧩',
+    name: 'Mixture of Experts',
+    short: 'Огромные модели с умным распределением нагрузки',
+    color: '#ffd580',
+    detail: `MoE — способ сделать модель в 10x больше, не увеличивая вычисления в 10x. Вместо одного большого FFN-слоя — много «экспертов», из которых для каждого токена активируются лишь несколько.`,
+    howItWorks: `Router (маршрутизатор) для каждого токена выбирает Top-K экспертов из N. Каждый эксперт — это обычная FFN-сеть. Итоговый выход — взвешенная сумма выходов выбранных экспертов. Это даёт разреженные вычисления.`,
+    examples: ['Mixtral 8x7B', 'GPT-4 (предположительно)', 'Switch Transformer', 'DeepSeek'],
+    pros: ['Огромная ёмкость', 'Меньше FLOPs', 'Специализация экспертов'],
+    cons: ['Сложная балансировка нагрузки', 'Труднее обучать', 'Много памяти'],
+  },
+  {
+    id: 'multimodal',
+    icon: '👁',
+    name: 'Мультимодальные',
+    short: 'Текст + изображения + аудио',
+    color: '#a0dcff',
+    detail: `Модели, работающие с несколькими типами данных одновременно. Изображения кодируются Vision Encoder'ом в токены, которые смешиваются с текстовыми токенами. Модель «видит» и «читает» одновременно.`,
+    howItWorks: `Vision Encoder (например CLIP или ViT) разбивает изображение на патчи и кодирует их в векторы — «визуальные токены». Они конкатенируются с текстовыми и обрабатываются стандартным трансформером.`,
+    examples: ['GPT-4o', 'Claude Sonnet', 'Gemini', 'LLaVA', 'Qwen-VL'],
+    pros: ['Работает с изображениями', 'Мощные возможности', 'Один интерфейс'],
+    cons: ['Дорого обучать', 'Много данных нужно', 'Выровнять модальности сложно'],
+  },
+];
+
+// ─────────────── TABS ───────────────
+const tabs = [
+  { id: 'neuron',    label: '🧠 Нейрон' },
+  { id: 'attention', label: '👁 Внимание' },
+  { id: 'models',    label: '🗂 Виды LLM' },
+  { id: 'tokenizer', label: '✂️ Токенизация' },
+];
+
+// ─────────────── APP ───────────────
+function App() {
+  const [activeTab, setActiveTab] = useState('neuron');
+  const [inputs, setInputs] = useState([75, 40, 60]);
+  const [bias, setBias] = useState(10);
+  const [activation, setActivation] = useState('relu');
+  const [tokenizerText, setTokenizerText] = useState('Нейронная сеть — это мощный инструмент');
+  const [activeModel, setActiveModel] = useState(null);
+  const [attTokens] = useState(['кот', 'сидит', 'на', 'крыше']);
+  const [attWeights] = useState([
+    [8.2, 3.1, 1.4, 2.8],
+    [2.9, 7.4, 2.1, 5.6],
+    [1.1, 1.8, 4.3, 6.2],
+    [3.5, 5.9, 5.1, 8.7],
+  ]);
+
+  const tokens = React.useMemo(() => naiveTokenize(tokenizerText), [tokenizerText]);
+
+  const ruTokens = React.useMemo(() => tokenizeRU('Нейронная сеть'), []);
+  const enTokens = React.useMemo(() => tokenizeEN('Neural network'), []);
+  const ruCode   = React.useMemo(() => tokenizeRU('передвижение'), []);
+  const enCode   = React.useMemo(() => tokenizeEN('movement'), []);
+
+  const colorFor = (i) => tokenColors[i % tokenColors.length];
+
+  const weightedSum = inputs.reduce((s,v) => s+v, 0) + bias;
+  const norm = weightedSum / (inputs.length * 100 + 100);
+  let outVal = 0;
+  if (activation === 'relu')    outVal = Math.max(0, norm);
+  else if (activation === 'sigmoid') outVal = 1/(1+Math.exp(-weightedSum/inputs.length/10));
+  else outVal = Math.tanh(weightedSum/inputs.length/10);
+  outVal = Math.max(0, Math.min(1, outVal));
+
+  return (
+    <div>
+      <header className="header">
+        <div className="header-eyebrow">Интерактивный учебник</div>
+        <h1>Анатомия LLM</h1>
+        <p>Разберём «нейроны», механизм внимания, виды языковых моделей и токенизацию — на живых интерактивных примерах.</p>
+      </header>
+
+      <nav className="nav">
+        {tabs.map(t => (
+          <button key={t.id} className={`tab-btn ${activeTab===t.id?'active':''}`} onClick={() => setActiveTab(t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </nav>
+
+      <main className="content">
+
+        {/* ── NEURON TAB ── */}
+        {activeTab === 'neuron' && (
+          <div>
+            <div className="section-card">
+              <div className="section-tag">01 / Основы</div>
+              <div className="section-title">Что такое «нейрон» в LLM?</div>
+              <div className="section-body">
+                В биологии нейрон получает сигналы через дендриты, суммирует их и, если сумма превышает порог, «стреляет» по аксону. В LLM каждый нейрон — это просто <strong>математическая функция</strong>: берём входы x₁…xₙ, умножаем каждый на вес w, складываем, прибавляем смещение b и пропускаем через нелинейную функцию активации f.
+              </div>
+              <div className="formula-box">
+                output = f( w₁·x₁ + w₂·x₂ + ... + wₙ·xₙ + b )
+              </div>
+              <div className="section-body">
+                В GPT-4 (~1.8 трлн параметров) таких нейронов — сотни миллиардов. Магия возникает не в одном нейроне, а в их совокупном взаимодействии через <strong>миллиарды обучаемых весов</strong>.
+              </div>
+            </div>
+
+            <div className="section-card green">
+              <div className="section-tag green">Интерактив</div>
+              <div className="section-title">Поиграй с нейроном</div>
+              <div className="section-body" style={{marginBottom:'1rem'}}>
+                Измени входные сигналы, смещение и функцию активации — наблюдай, как меняется выход нейрона на анимации.
+              </div>
+
+              <div className="neuron-interactive">
+                <div className="neuron-box">
+                  <h4>Входные сигналы (x₁, x₂, x₃)</h4>
+                  {inputs.map((val, i) => (
+                    <div key={i} className="slider-row">
+                      <span className="slider-label">x{i+1}</span>
+                      <input type="range" min={-100} max={100} value={val}
+                        onChange={e => setInputs(prev => prev.map((v,j) => j===i ? +e.target.value : v))} />
+                      <span className="slider-val">{val}</span>
+                    </div>
+                  ))}
+
+                  <h4 style={{marginTop:'1rem'}}>Смещение (b)</h4>
+                  <div className="slider-row">
+                    <span className="slider-label">bias</span>
+                    <input type="range" min={-100} max={100} value={bias}
+                      onChange={e => setBias(+e.target.value)} />
+                    <span className="slider-val">{bias}</span>
+                  </div>
+
+                  <h4 style={{marginTop:'1rem'}}>Функция активации</h4>
+                  {['relu','sigmoid','tanh'].map(a => (
+                    <label key={a} style={{display:'block',marginBottom:'0.3rem',cursor:'pointer',fontFamily:'IBM Plex Mono',fontSize:'0.82rem',color: activation===a ? 'var(--accent3)' : 'var(--muted)'}}>
+                      <input type="radio" checked={activation===a} onChange={() => setActivation(a)} style={{marginRight:'0.4rem'}} />
+                      {a === 'relu' ? 'ReLU — обнуляет отрицательное' : a === 'sigmoid' ? 'Sigmoid — сжимает в [0, 1]' : 'Tanh — сжимает в [-1, 1]'}
+                    </label>
+                  ))}
+
+                  <div className="output-bar-wrap">
+                    <div className="output-bar-label">Выход нейрона</div>
+                    <div className="output-bar">
+                      <div className="output-bar-fill" style={{
+                        width: `${outVal * 100}%`,
+                        background: `linear-gradient(90deg, rgba(0,229,176,0.7), rgba(0,229,176,1))`
+                      }}>
+                        <span>{outVal.toFixed(3)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="neuron-box" style={{padding:0, overflow:'hidden'}}>
+                  <div className="canvas-wrap" style={{margin:0,border:'none',background:'var(--surface2)'}}>
+                    <NeuronCanvas inputs={inputs} bias={bias} activation={activation} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="section-card pink">
+              <div className="section-tag pink">Важно понять</div>
+              <div className="section-title">Функции активации — почему они нужны?</div>
+              <div className="section-body">
+                Без нелинейных функций активации стек из 100 слоёв линейных нейронов был бы эквивалентен <strong>одному слою</strong> — вся сеть схлопнулась бы в линейное преобразование. Активации добавляют нелинейность, позволяя модели учить сложные зависимости.
+              </div>
+              <div style={{marginTop:'1rem'}}>
+                {[
+                  { fn: 'ReLU(x)', desc: 'max(0, x). Быстро, экономно. Стандарт для FFN слоёв в трансформерах.', color: 'var(--accent)' },
+                  { fn: 'GELU(x)', desc: 'Плавная версия ReLU. Используется в BERT, GPT и большинстве современных LLM.', color: 'var(--accent3)' },
+                  { fn: 'SwiGLU', desc: 'Gated variant. Применяется в LLaMA, Mistral — улучшает качество генерации.', color: 'var(--accent2)' },
+                ].map(item => (
+                  <div key={item.fn} className="fact-row">
+                    <span className="fact-icon" style={{color: item.color, fontFamily:'IBM Plex Mono', fontSize:'0.8rem', minWidth:'70px'}}>{item.fn}</span>
+                    <span className="fact-text">{item.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── ATTENTION TAB ── */}
+        {activeTab === 'attention' && (
+          <div>
+            <div className="section-card">
+              <div className="section-tag">02 / Архитектура</div>
+              <div className="section-title">Self-Attention: нейроны «смотрят» друг на друга</div>
+              <div className="section-body">
+                Механизм внимания (Attention) — ключевая инновация трансформеров. Каждый токен формирует три вектора: <strong>Query (Q)</strong> — «что ищу», <strong>Key (K)</strong> — «что предлагаю», <strong>Value (V)</strong> — «что даю». Скалярное произведение Q·K определяет, насколько токены «смотрят» друг на друга.
+              </div>
+              <div className="formula-box">
+                Attention(Q,K,V) = softmax( Q·Kᵀ / √dₖ ) · V
+              </div>
+              <div className="section-body">
+                Деление на √dₖ стабилизирует градиенты. Softmax нормализует веса в сумму 1. Итог — каждый токен получает взвешенную смесь значений V всех остальных токенов.
+              </div>
+            </div>
+
+            <div className="section-card green">
+              <div className="section-tag green">Визуализация</div>
+              <div className="section-title">Матрица внимания: «кот сидит на крыше»</div>
+              <div className="section-body" style={{marginBottom:'1rem'}}>
+                Каждая ячейка — вес внимания от токена (строка) к токену (столбец). Чем ярче — тем сильнее связь. Обратите внимание: «сидит» сильно смотрит на «крыше» (5.6) — глагол связан с местом действия. «Кот» и «сидит» — субъект и предикат.
+              </div>
+              <AttentionViz tokens={attTokens} weights={attWeights} />
+            </div>
+
+            <div className="section-card pink">
+              <div className="section-tag pink">Multi-Head</div>
+              <div className="section-title">Многоголовое внимание</div>
+              <div className="section-body">
+                Один механизм внимания — один «взгляд» на текст. В реальных LLM используют <strong>h голов параллельно</strong> (в GPT-3: 96 голов). Каждая голова обучается замечать разные типы связей:
+              </div>
+              <div style={{marginTop:'1rem'}}>
+                {[
+                  { icon: '📌', text: 'Голова №1 — синтаксические зависимости (подлежащее → сказуемое)' },
+                  { icon: '📌', text: 'Голова №2 — кореференции (местоимение → существительное)' },
+                  { icon: '📌', text: 'Голова №3 — позиционные паттерны (токены рядом)' },
+                  { icon: '📌', text: 'Голова №N — что-то ещё, что сеть обнаружила полезным' },
+                ].map((f, i) => (
+                  <div key={i} className="fact-row">
+                    <span className="fact-icon">{f.icon}</span>
+                    <span className="fact-text">{f.text}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="section-body" style={{marginTop:'0.8rem'}}>
+                Выходы всех голов конкатенируются и проецируются обратно — модель получает богатое многоаспектное представление каждого токена.
+              </div>
+            </div>
+
+            <div className="section-card">
+              <div className="section-tag">KV-Cache</div>
+              <div className="section-title">Кэширование ключей и значений</div>
+              <div className="section-body">
+                При генерации каждого нового токена нет смысла пересчитывать K и V для уже обработанных токенов. <strong>KV-Cache</strong> хранит их в памяти. Это ускоряет генерацию в сотни раз, но требует много GPU-памяти — именно поэтому длинный контекст дороже короткого.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── MODELS TAB ── */}
+        {activeTab === 'models' && (
+          <div>
+            <div className="section-card">
+              <div className="section-tag">03 / Зоопарк</div>
+              <div className="section-title">Виды архитектур LLM</div>
+              <div className="section-body">
+                «LLM» — зонтичный термин. За ним скрываются очень разные архитектуры, оптимизированные под разные задачи. Нажми на карточку, чтобы узнать подробности.
+              </div>
+            </div>
+
+            <div className="model-grid">
+              {modelTypes.map(m => (
+                <div key={m.id}
+                  className={`model-card ${activeModel===m.id?'active':''}`}
+                  style={{'--color': m.color}}
+                  onClick={() => setActiveModel(activeModel===m.id ? null : m.id)}>
+                  <div className="model-icon">{m.icon}</div>
+                  <div className="model-name">{m.name}</div>
+                  <div className="model-short">{m.short}</div>
+                </div>
+              ))}
+            </div>
+
+            {activeModel && (() => {
+              const m = modelTypes.find(x => x.id === activeModel);
+              return (
+                <div className="model-detail" style={{ borderColor: m.color + '55' }}>
+                  <h3 style={{ color: m.color }}>{m.icon} {m.name}</h3>
+                  <p>{m.detail}</p>
+                  <p><strong style={{color:'var(--text)'}}>Как работает:</strong> {m.howItWorks}</p>
+                  <div style={{marginTop:'1rem'}}>
+                    <div style={{fontFamily:'IBM Plex Mono',fontSize:'0.72rem',color:'var(--muted)',marginBottom:'0.5rem',textTransform:'uppercase',letterSpacing:'0.1em'}}>Примеры моделей</div>
+                    <div className="model-examples">
+                      {m.examples.map(e => (
+                        <span key={e} className="example-tag" style={{ borderColor: m.color + '77', color: m.color, background: m.color + '15' }}>{e}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginTop:'1.2rem'}}>
+                    <div>
+                      <div style={{fontFamily:'IBM Plex Mono',fontSize:'0.7rem',color:'var(--accent3)',marginBottom:'0.4rem',textTransform:'uppercase'}}>✅ Плюсы</div>
+                      {m.pros.map(p => <div key={p} className="fact-row"><span className="fact-icon">+</span><span className="fact-text">{p}</span></div>)}
+                    </div>
+                    <div>
+                      <div style={{fontFamily:'IBM Plex Mono',fontSize:'0.7rem',color:'var(--accent2)',marginBottom:'0.4rem',textTransform:'uppercase'}}>❌ Минусы</div>
+                      {m.cons.map(c => <div key={c} className="fact-row"><span className="fact-icon">−</span><span className="fact-text">{c}</span></div>)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* ── TOKENIZER TAB ── */}
+        {activeTab === 'tokenizer' && (
+          <div>
+            <div className="section-card">
+              <div className="section-tag">04 / Токенизация</div>
+              <div className="section-title">Как LLM «видит» текст</div>
+              <div className="section-body">
+                LLM не читают символы и не читают слова — они читают <strong>токены</strong>. Токен — это кусочек текста, определённый алгоритмом BPE (Byte-Pair Encoding). Один токен ≈ 4 символа на латинице, но <strong>2–3 символа на кириллице</strong> — и это важно!
+              </div>
+            </div>
+
+            <div className="section-card green">
+              <div className="section-tag green">Интерактив</div>
+              <div className="section-title">Введи любой текст — увидишь токены</div>
+              <div className="section-body" style={{marginBottom:'0.8rem'}}>
+                Это упрощённая симуляция. Настоящий BPE использует словарь из 100k+ пар — здесь показан принцип.
+              </div>
+              <textarea
+                className="token-input-area"
+                rows={3}
+                value={tokenizerText}
+                onChange={e => setTokenizerText(e.target.value)}
+                placeholder="Введи текст на русском или английском..."
+              />
+              <div className="token-display">
+                {tokens.length === 0 && <span style={{color:'var(--muted)',fontFamily:'IBM Plex Mono',fontSize:'0.8rem'}}>токены появятся здесь...</span>}
+                {tokens.map((t, i) => {
+                  const c = colorFor(i);
+                  return (
+                    <span key={i} className="token-chip" style={{
+                      background: c.bg, border: `1px solid ${c.border}`, color: c.text
+                    }}>
+                      {t.text === ' ' ? '·' : t.text}
+                    </span>
+                  );
+                })}
+              </div>
+              <div className="token-stats">
+                <div className="stat-item">
+                  <div className="stat-val">{tokens.length}</div>
+                  <div className="stat-label">Токенов</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-val" style={{color:'var(--accent2)'}}>{tokenizerText.length}</div>
+                  <div className="stat-label">Символов</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-val" style={{color:'var(--accent3)'}}>
+                    {tokens.length > 0 ? (tokenizerText.length / tokens.length).toFixed(1) : '—'}
+                  </div>
+                  <div className="stat-label">Симв / токен</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="section-card pink">
+              <div className="section-tag pink">Русский vs Английский</div>
+              <div className="section-title">Почему кириллица «дороже»?</div>
+              <div className="section-body">
+                Большинство LLM обучены на данных, где <strong>80–95% — английский</strong>. BPE словарь содержит больше длинных английских токенов. Для кириллицы приходится использовать более короткие — одно и то же слово занимает в 1.5–3× больше токенов.
+              </div>
+              <div className="lang-compare">
+                {[
+                  { title: '🇷🇺 Русский', word: 'Нейронная сеть', tokens: ruTokens, color: 'var(--accent2)' },
+                  { title: '🇬🇧 English', word: 'Neural network', tokens: enTokens, color: 'var(--accent3)' },
+                  { title: '🇷🇺 передвижение (9 симв.)', word: '', tokens: ruCode, color: 'var(--accent2)' },
+                  { title: '🇬🇧 movement (8 chars)', word: '', tokens: enCode, color: 'var(--accent3)' },
+                ].map((row, ri) => (
+                  <div key={ri} className="lang-block">
+                    <h4 style={{color: row.color}}>{row.title}</h4>
+                    {row.word && <div style={{fontFamily:'IBM Plex Mono',fontSize:'0.8rem',color:'var(--muted)',marginBottom:'0.5rem'}}>«{row.word}»</div>}
+                    <div className="lang-tokens">
+                      {row.tokens.map((t, i) => {
+                        const c = colorFor(i);
+                        return (
+                          <span key={i} className="token-chip" style={{
+                            background: c.bg, border: `1px solid ${c.border}`, color: c.text
+                          }}>{t.text}</span>
+                        );
+                      })}
+                    </div>
+                    <div style={{fontFamily:'IBM Plex Mono',fontSize:'0.75rem',color:'var(--muted)',marginTop:'0.5rem'}}>
+                      {row.tokens.length} токен{row.tokens.length===1?'':'ов'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="section-body" style={{marginTop:'1rem'}}>
+                Это означает, что <strong>запрос на русском дороже</strong> (больше токенов → дороже API), а длинный контекст «заполняется» быстрее. Именно поэтому создают специализированные русскоязычные модели с расширенными словарями.
+              </div>
+            </div>
+
+            <div className="section-card">
+              <div className="section-tag">BPE алгоритм</div>
+              <div className="section-title">Как строится словарь токенов?</div>
+              <div className="section-body">
+                Byte-Pair Encoding начинает с отдельных байт/символов и итеративно объединяет <strong>самые частые пары</strong> в новый токен. После ~50 000 итераций получается словарь, оптимальный для обучающего корпуса.
+              </div>
+              <div className="formula-box">
+{`Шаг 0: [н][е][й][р][о][н][н][а][я]
+Шаг 1: [не][й][р][он][н][а][я]   ← "не" — частая пара
+Шаг 2: [не][й][р][он][на][я]     ← "на" объединяется
+Шаг 3: [ней][р][он][на][я]       ← продолжаем...
+...
+Итог:  [нейрон][ная]              ← финальные токены`}
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
