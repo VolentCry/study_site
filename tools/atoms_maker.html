@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Конструктор Атома</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #030810;
+    --panel: #070f1e;
+    --border: #1a3a5c;
+    --accent: #00d4ff;
+    --accent2: #7b2fff;
+    --proton: #ff4e4e;
+    --neutron: #4e9eff;
+    --electron: #00ffcc;
+    --text: #c8e0f4;
+    --dim: #4a6a8a;
+    --glow: rgba(0,212,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px var(--accent);
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.4);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .view-btn {
+    padding: 6px 18px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+  }
+
+  .view-btn.active {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    box-shadow: 0 0 15px rgba(0,212,255,0.4);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--dim);
+    margin-bottom: 4px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .control-label {
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .control-label .symbol {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .styled-select {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .styled-select:focus { border-color: var(--accent); }
+
+  .styled-input {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .styled-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(0,212,255,0.2);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    opacity: 0.5;
+  }
+
+  /* Element Info Card */
+  .element-card {
+    background: rgba(0,212,255,0.05);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .element-symbol {
+    font-family: 'Orbitron', monospace;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 20px var(--accent);
+    line-height: 1;
+  }
+
+  .element-name {
+    font-size: 12px;
+    color: var(--dim);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  .element-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    margin-top: 4px;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--dim);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* CANVAS AREA */
+  .canvas-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #0a1628 0%, #030810 70%);
+  }
+
+  canvas { display: block; width: 100% !important; height: 100% !important; }
+
+  .canvas-overlay {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+
+  .hint-tag {
+    background: rgba(7,15,30,0.85);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .info-overlay {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(7,15,30,0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    line-height: 1.8;
+    min-width: 160px;
+  }
+
+  .info-overlay .row { display: flex; justify-content: space-between; gap: 14px; }
+  .info-overlay .val { color: var(--accent); }
+
+  .model-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: linear-gradient(135deg, rgba(123,47,255,0.3), rgba(0,212,255,0.2));
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  /* Input row with +/- */
+  .num-input-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .num-btn {
+    width: 26px;
+    height: 26px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+    line-height: 1;
+  }
+
+  .num-btn:hover { background: rgba(0,212,255,0.18); }
+
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(26,58,92,0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,58,92,0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">АТОМ<span>LAB</span></div>
+  <div style="display:flex; align-items:center; gap:10px">
+    <span style="font-size:12px; color:var(--dim); font-family:'Space Mono',monospace; letter-spacing:1px">РЕЖИМ:</span>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnBohr" onclick="setModel('bohr')">Модель Бора</button>
+      <button class="view-btn" id="btnSchro" onclick="setModel('schrodinger')">Модель Шрёдингера</button>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+
+    <div class="element-card" id="elementCard">
+      <div class="element-symbol" id="elSymbol">H</div>
+      <div class="element-name" id="elName">Водород</div>
+      <div class="element-number" id="elNum">Z = 1 · A = 1</div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-label">Тип атома</div>
+      <select class="styled-select" id="atomSelect" onchange="onElementSelect()"></select>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="control-group">
+      <div class="section-label">Квантовые числа</div>
+      <div class="control-label">Главное <span class="symbol">n</span></div>
+      <input class="styled-input" id="qn" type="number" min="1" max="7" value="1" onchange="onQuantumChange()">
+
+      <div class="control-label" style="margin-top:6px">Орбитальное <span class="symbol">l</span></div>
+      <input class="styled-input" id="ql" type="number" min="0" max="6" value="0" onchange="onQuantumChange()">
+
+      <div class="control-label" style="margin-top:6px">Магнитное <span class="symbol">m</span></div>
+      <input class="styled-input" id="qm" type="number" min="-6" max="6" value="0" onchange="onQuantumChange()">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="control-group">
+      <div class="section-label">Состав ядра</div>
+
+      <div class="control-label">Протоны <span class="symbol" style="background:rgba(255,78,78,0.15);color:#ff4e4e">p⁺</span></div>
+      <div class="num-input-row">
+        <button class="num-btn" onclick="adj('protons',-1)">−</button>
+        <input class="styled-input" id="protons" type="number" min="1" max="118" value="1" onchange="onNucleusChange()">
+        <button class="num-btn" onclick="adj('protons',1)">+</button>
+      </div>
+
+      <div class="control-label" style="margin-top:6px">Нейтроны <span class="symbol" style="background:rgba(78,158,255,0.15);color:#4e9eff">n⁰</span></div>
+      <div class="num-input-row">
+        <button class="num-btn" onclick="adj('neutrons',-1)">−</button>
+        <input class="styled-input" id="neutrons" type="number" min="0" max="177" value="0" onchange="onNucleusChange()">
+        <button class="num-btn" onclick="adj('neutrons',1)">+</button>
+      </div>
+
+      <div class="control-label" style="margin-top:6px">Электроны <span class="symbol" style="background:rgba(0,255,204,0.1);color:#00ffcc">e⁻</span></div>
+      <div class="num-input-row">
+        <button class="num-btn" onclick="adj('electrons',-1)">−</button>
+        <input class="styled-input" id="electrons" type="number" min="0" max="118" value="1" onchange="onNucleusChange()">
+        <button class="num-btn" onclick="adj('electrons',1)">+</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="legend">
+      <div class="section-label">Легенда</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff4e4e;box-shadow:0 0 6px #ff4e4e"></div>Протон</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4e9eff;box-shadow:0 0 6px #4e9eff"></div>Нейтрон</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#00ffcc;box-shadow:0 0 6px #00ffcc"></div>Электрон</div>
+    </div>
+
+  </div>
+
+  <div class="canvas-area">
+    <div class="grid-bg"></div>
+    <canvas id="c"></canvas>
+    <div class="model-badge" id="modelBadge">МОДЕЛЬ БОРА</div>
+    <div class="info-overlay" id="infoOverlay">
+      <div class="row"><span>Протонов</span><span class="val" id="iP">1</span></div>
+      <div class="row"><span>Нейтронов</span><span class="val" id="iN">0</span></div>
+      <div class="row"><span>Электронов</span><span class="val" id="iE">1</span></div>
+      <div class="row"><span>Масса (а.е.м.)</span><span class="val" id="iA">1</span></div>
+      <div class="row"><span>Заряд ядра</span><span class="val" id="iZ">+1</span></div>
+    </div>
+    <div class="canvas-overlay">
+      <div class="hint-tag">ЛКМ — вращение</div>
+      <div class="hint-tag">SCROLL — масштаб</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ELEMENT DATA
+// ============================================================
+const ELEMENTS = [
+  {z:1,  sym:'H',  name:'Водород',     neutrons:0,  shells:[1]},
+  {z:2,  sym:'He', name:'Гелий',       neutrons:2,  shells:[2]},
+  {z:3,  sym:'Li', name:'Литий',       neutrons:4,  shells:[2,1]},
+  {z:4,  sym:'Be', name:'Бериллий',    neutrons:5,  shells:[2,2]},
+  {z:5,  sym:'B',  name:'Бор',         neutrons:6,  shells:[2,3]},
+  {z:6,  sym:'C',  name:'Углерод',     neutrons:6,  shells:[2,4]},
+  {z:7,  sym:'N',  name:'Азот',        neutrons:7,  shells:[2,5]},
+  {z:8,  sym:'O',  name:'Кислород',    neutrons:8,  shells:[2,6]},
+  {z:9,  sym:'F',  name:'Фтор',        neutrons:10, shells:[2,7]},
+  {z:10, sym:'Ne', name:'Неон',        neutrons:10, shells:[2,8]},
+  {z:11, sym:'Na', name:'Натрий',      neutrons:12, shells:[2,8,1]},
+  {z:12, sym:'Mg', name:'Магний',      neutrons:12, shells:[2,8,2]},
+  {z:13, sym:'Al', name:'Алюминий',    neutrons:14, shells:[2,8,3]},
+  {z:14, sym:'Si', name:'Кремний',     neutrons:14, shells:[2,8,4]},
+  {z:15, sym:'P',  name:'Фосфор',      neutrons:16, shells:[2,8,5]},
+  {z:16, sym:'S',  name:'Сера',        neutrons:16, shells:[2,8,6]},
+  {z:17, sym:'Cl', name:'Хлор',        neutrons:18, shells:[2,8,7]},
+  {z:18, sym:'Ar', name:'Аргон',       neutrons:22, shells:[2,8,8]},
+  {z:19, sym:'K',  name:'Калий',       neutrons:20, shells:[2,8,8,1]},
+  {z:20, sym:'Ca', name:'Кальций',     neutrons:20, shells:[2,8,8,2]},
+  {z:26, sym:'Fe', name:'Железо',      neutrons:30, shells:[2,8,14,2]},
+  {z:29, sym:'Cu', name:'Медь',        neutrons:34, shells:[2,8,18,1]},
+  {z:30, sym:'Zn', name:'Цинк',        neutrons:35, shells:[2,8,18,2]},
+  {z:47, sym:'Ag', name:'Серебро',     neutrons:61, shells:[2,8,18,18,1]},
+  {z:50, sym:'Sn', name:'Олово',       neutrons:69, shells:[2,8,18,18,4]},
+  {z:79, sym:'Au', name:'Золото',      neutrons:118,shells:[2,8,18,32,18,1]},
+  {z:82, sym:'Pb', name:'Свинец',      neutrons:125,shells:[2,8,18,32,18,4]},
+  {z:92, sym:'U',  name:'Уран',        neutrons:146,shells:[2,8,18,32,21,9,2]},
+];
+
+// Fill select
+const sel = document.getElementById('atomSelect');
+ELEMENTS.forEach((el,i) => {
+  const opt = document.createElement('option');
+  opt.value = i;
+  opt.textContent = `${el.sym} — ${el.name} (Z=${el.z})`;
+  sel.appendChild(opt);
+});
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  protons: 1, neutrons: 0, electrons: 1,
+  model: 'bohr', // 'bohr' | 'schrodinger'
+  elementIndex: 0
+};
+
+function getElectronShells(electrons) {
+  // Distribute electrons into shells (simplified)
+  const maxPerShell = [2,8,18,32,32,18,8];
+  let shells = [];
+  let rem = electrons;
+  for (let i=0; i<maxPerShell.length && rem>0; i++) {
+    let n = Math.min(maxPerShell[i], rem);
+    shells.push(n);
+    rem -= n;
+  }
+  return shells;
+}
+
+// ============================================================
+// UI HANDLERS
+// ============================================================
+function onElementSelect() {
+  const idx = parseInt(sel.value);
+  const el = ELEMENTS[idx];
+  state.elementIndex = idx;
+  state.protons = el.z;
+  state.neutrons = el.neutrons;
+  state.electrons = el.z;
+  syncInputs();
+  updateCard();
+  updateInfo();
+  scheduleRender();
+}
+
+function onQuantumChange() {
+  let n = parseInt(document.getElementById('qn').value) || 1;
+  n = Math.max(1, Math.min(7, n));
+  let l = parseInt(document.getElementById('ql').value) || 0;
+  l = Math.max(0, Math.min(n-1, l));
+  let m = parseInt(document.getElementById('qm').value) || 0;
+  m = Math.max(-l, Math.min(l, m));
+  document.getElementById('qn').value = n;
+  document.getElementById('ql').value = l;
+  document.getElementById('qm').value = m;
+  // n determines electron shell highlight — just re-render
+  scheduleRender();
+}
+
+function onNucleusChange() {
+  state.protons   = Math.max(1,   Math.min(118, parseInt(document.getElementById('protons').value)||1));
+  state.neutrons  = Math.max(0,   Math.min(177, parseInt(document.getElementById('neutrons').value)||0));
+  state.electrons = Math.max(0,   Math.min(118, parseInt(document.getElementById('electrons').value)||0));
+  document.getElementById('protons').value   = state.protons;
+  document.getElementById('neutrons').value  = state.neutrons;
+  document.getElementById('electrons').value = state.electrons;
+  // Find matching element
+  const match = ELEMENTS.findIndex(e => e.z === state.protons);
+  if (match >= 0) {
+    state.elementIndex = match;
+    sel.value = match;
+  }
+  updateCard();
+  updateInfo();
+  scheduleRender();
+}
+
+function adj(field, delta) {
+  const inp = document.getElementById(field);
+  inp.value = parseInt(inp.value||0) + delta;
+  onNucleusChange();
+}
+
+function setModel(m) {
+  state.model = m;
+  document.getElementById('btnBohr').classList.toggle('active', m==='bohr');
+  document.getElementById('btnSchro').classList.toggle('active', m==='schrodinger');
+  document.getElementById('modelBadge').textContent = m==='bohr' ? 'МОДЕЛЬ БОРА' : 'МОДЕЛЬ ШРЁДИНГЕРА';
+  scheduleRender();
+}
+
+function syncInputs() {
+  document.getElementById('protons').value   = state.protons;
+  document.getElementById('neutrons').value  = state.neutrons;
+  document.getElementById('electrons').value = state.electrons;
+}
+
+function updateCard() {
+  const el = ELEMENTS[state.elementIndex] || {sym:'?', name:'Пользов.', z: state.protons};
+  document.getElementById('elSymbol').textContent = el.sym;
+  document.getElementById('elName').textContent   = el.name;
+  document.getElementById('elNum').textContent    = `Z = ${state.protons} · A = ${state.protons + state.neutrons}`;
+}
+
+function updateInfo() {
+  document.getElementById('iP').textContent = state.protons;
+  document.getElementById('iN').textContent = state.neutrons;
+  document.getElementById('iE').textContent = state.electrons;
+  document.getElementById('iA').textContent = state.protons + state.neutrons;
+  document.getElementById('iZ').textContent = `+${state.protons}`;
+}
+
+// ============================================================
+// CANVAS 2D RENDERER
+// ============================================================
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, CX, CY;
+
+// Camera
+let camRot = {x: 0.4, y: 0};
+let zoom = 1.0;
+let dragging = false, lastMouse = {x:0, y:0};
+
+// Electron animation
+let elAngles = [];
+let raf;
+let lastTime = 0;
+
+function resize() {
+  const area = canvas.parentElement;
+  W = canvas.width  = area.clientWidth;
+  H = canvas.height = area.clientHeight;
+  CX = W/2; CY = H/2;
+}
+
+window.addEventListener('resize', () => { resize(); scheduleRender(); });
+resize();
+
+// Mouse
+canvas.addEventListener('mousedown', e => { dragging=true; lastMouse={x:e.clientX,y:e.clientY}; });
+window.addEventListener('mouseup', () => dragging=false);
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastMouse.x;
+  const dy = e.clientY - lastMouse.y;
+  camRot.y += dx * 0.008;
+  camRot.x += dy * 0.008;
+  camRot.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camRot.x));
+  lastMouse = {x:e.clientX, y:e.clientY};
+  scheduleRender();
+});
+canvas.addEventListener('wheel', e => {
+  zoom *= e.deltaY > 0 ? 0.92 : 1.08;
+  zoom = Math.max(0.2, Math.min(4, zoom));
+  scheduleRender();
+});
+
+// Touch support
+canvas.addEventListener('touchstart', e => {
+  dragging=true;
+  lastMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};
+});
+canvas.addEventListener('touchend', () => dragging=false);
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const dx = e.touches[0].clientX - lastMouse.x;
+  const dy = e.touches[0].clientY - lastMouse.y;
+  camRot.y += dx * 0.008;
+  camRot.x += dy * 0.008;
+  camRot.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camRot.x));
+  lastMouse = {x:e.touches[0].clientX,y:e.touches[0].clientY};
+  scheduleRender();
+}, {passive:false});
+
+// ============================================================
+// 3D PROJECTION
+// ============================================================
+function project3D(x3, y3, z3) {
+  // Rotate Y
+  const cosY = Math.cos(camRot.y), sinY = Math.sin(camRot.y);
+  let rx = x3*cosY - z3*sinY;
+  let ry = y3;
+  let rz = x3*sinY + z3*cosY;
+  // Rotate X
+  const cosX = Math.cos(camRot.x), sinX = Math.sin(camRot.x);
+  let fx = rx;
+  let fy = ry*cosX - rz*sinX;
+  let fz = ry*sinX + rz*cosX;
+  // Perspective
+  const fov = 500 * zoom;
+  const dz = fov + fz;
+  const px = fx * fov/dz + CX;
+  const py = -fy * fov/dz + CY;
+  return {x:px, y:py, z:fz, scale: fov/dz};
+}
+
+// ============================================================
+// NUCLEUS POSITIONS
+// ============================================================
+function getNucleusPositions(nP, nN) {
+  const total = nP + nN;
+  const positions = [];
+  if (total === 0) return positions;
+  
+  const r0 = 4; // base radius per nucleon
+  const R = r0 * Math.cbrt(total) * 1.2;
+  
+  // Fibonacci sphere packing
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  for (let i=0; i<total; i++) {
+    const y = 1 - (i / (total-1||1)) * 2;
+    const radius = Math.sqrt(Math.max(0,1-y*y));
+    const theta = golden * i;
+    positions.push({
+      x: radius * Math.cos(theta) * R,
+      y: y * R,
+      z: radius * Math.sin(theta) * R,
+      type: i < nP ? 'proton' : 'neutron'
+    });
+  }
+  return positions;
+}
+
+// ============================================================
+// MAIN DRAW
+// ============================================================
+let animFrame = null;
+function scheduleRender() {
+  if (animFrame) return;
+  animFrame = requestAnimationFrame(renderLoop);
+}
+
+function renderLoop(ts) {
+  animFrame = null;
+  const dt = Math.min((ts - lastTime)/1000, 0.05);
+  lastTime = ts;
+  drawScene(ts, dt);
+  // Always animate
+  animFrame = requestAnimationFrame(renderLoop);
+}
+
+function drawScene(ts, dt) {
+  ctx.clearRect(0, 0, W, H);
+
+  const nP = state.protons;
+  const nN = state.neutrons;
+  const nE = state.electrons;
+  const shells = getElectronShells(nE);
+  const scaleFactor = Math.max(0.5, Math.min(2.0, 50 / Math.max(nP+nN, 1)**0.5));
+  const baseScale = zoom * scaleFactor * (Math.min(W,H)/600);
+
+  if (state.model === 'bohr') {
+    drawBohrModel(ts, nP, nN, nE, shells, baseScale);
+  } else {
+    drawSchrodingerModel(ts, nP, nN, nE, shells, baseScale);
+  }
+}
+
+function drawBohrModel(ts, nP, nN, nE, shells, sc) {
+  const nucleons = getNucleusPositions(nP, nN);
+  const nucR = 7 * sc;
+
+  // Ensure electron angles array
+  const totalE = nE;
+  while (elAngles.length < totalE) elAngles.push(Math.random()*Math.PI*2);
+
+  // Shell radii
+  const shellRadii = shells.map((_, i) => (55 + i*45) * sc);
+  const shellTilts = shells.map((_, i) => (i * 0.6));
+  const shellTiltsX = shells.map((_, i) => (i * 0.3 + 0.2));
+
+  // Update electron angles
+  let eIdx = 0;
+  for (let si=0; si<shells.length; si++) {
+    const speed = 0.5 / (si+1);
+    for (let ei=0; ei<shells[si]; ei++, eIdx++) {
+      elAngles[eIdx] = (elAngles[eIdx] || 0) + speed * 0.016;
+    }
+  }
+
+  // Collect all objects for depth sorting
+  let objects = [];
+
+  // Nucleons
+  for (const n of nucleons) {
+    const p = project3D(n.x*sc*0.15, n.y*sc*0.15, n.z*sc*0.15);
+    const r = Math.max(3, nucR * p.scale * 0.4);
+    objects.push({type:'nucleon', p, r, ntype: n.type});
+  }
+
+  // Orbit rings + electrons
+  eIdx = 0;
+  for (let si=0; si<shells.length; si++) {
+    const R = shellRadii[si];
+    const tilt = shellTilts[si];
+    const tiltX = shellTiltsX[si];
+    for (let ei=0; ei<shells[si]; ei++, eIdx++) {
+      const angle = elAngles[eIdx];
+      // 3D orbit: tilt around Y and X
+      const ex3 = R * Math.cos(angle);
+      const ey3 = R * Math.sin(angle) * Math.sin(tiltX) + R * Math.cos(angle) * Math.sin(tilt) * 0.1;
+      const ez3 = R * Math.sin(angle) * Math.cos(tiltX);
+      const p = project3D(ex3, ey3, ez3);
+      objects.push({type:'electron', p, r: Math.max(3, 5*sc*p.scale*0.8), si, ei, angle, R, tilt, tiltX});
+    }
+    objects.push({type:'orbit', si, R, tilt, tiltX});
+  }
+
+  // Sort by depth
+  objects.sort((a,b) => {
+    const za = a.p ? a.p.z : 0;
+    const zb = b.p ? b.p.z : 0;
+    return za - zb;
+  });
+
+  // Draw orbits first (as ellipses)
+  for (let si=0; si<shells.length; si++) {
+    drawOrbit3D(shellRadii[si], shellTilts[si], shellTiltsX[si], si, shells.length);
+  }
+
+  // Draw nucleons + electrons sorted by depth
+  for (const obj of objects) {
+    if (obj.type === 'nucleon') {
+      drawNucleon(obj.p, obj.r, obj.ntype);
+    } else if (obj.type === 'electron') {
+      drawElectron(obj.p, obj.r);
+    }
+  }
+}
+
+function drawOrbit3D(R, tiltY, tiltX, si, total) {
+  // Draw orbit as parametric ellipse
+  const steps = 120;
+  ctx.beginPath();
+  let first = true;
+  for (let i=0; i<=steps; i++) {
+    const angle = (i/steps)*Math.PI*2;
+    const ex3 = R * Math.cos(angle);
+    const ey3 = R * Math.sin(angle) * Math.sin(tiltX) + R * Math.cos(angle) * Math.sin(tiltY) * 0.1;
+    const ez3 = R * Math.sin(angle) * Math.cos(tiltX);
+    const p = project3D(ex3, ey3, ez3);
+    if (first) { ctx.moveTo(p.x, p.y); first=false; }
+    else ctx.lineTo(p.x, p.y);
+  }
+  ctx.strokeStyle = `rgba(0,212,255,${0.12 + si*0.03})`;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawNucleon(p, r, type) {
+  if (!p) return;
+  const [c1, c2] = type==='proton'
+    ? ['#ff8080','#cc2020']
+    : ['#80c0ff','#2060cc'];
+  const grad = ctx.createRadialGradient(p.x-r*0.3, p.y-r*0.3, r*0.05, p.x, p.y, r);
+  grad.addColorStop(0, c1);
+  grad.addColorStop(1, c2);
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.strokeStyle = type==='proton' ? 'rgba(255,160,160,0.6)' : 'rgba(160,200,255,0.6)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  // Glow
+  ctx.shadowColor = type==='proton' ? '#ff4e4e' : '#4e9eff';
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function drawElectron(p, r) {
+  if (!p) return;
+  const grad = ctx.createRadialGradient(p.x-r*0.3, p.y-r*0.3, r*0.05, p.x, p.y, r);
+  grad.addColorStop(0, '#afffee');
+  grad.addColorStop(1, '#00b890');
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fillStyle = grad;
+  ctx.shadowColor = '#00ffcc';
+  ctx.shadowBlur = 12;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+// ============================================================
+// SCHRÖDINGER MODEL
+// ============================================================
+function drawSchrodingerModel(ts, nP, nN, nE, shells, sc) {
+  const nucleons = getNucleusPositions(nP, nN);
+
+  // Draw electron clouds as concentric gaussian blobs
+  for (let si=0; si<shells.length; si++) {
+    const R = (55 + si*45) * sc;
+    const opacity = 0.06 + 0.04 * (shells[si]/8);
+    const cloudR = R * 0.8;
+
+    // Multiple cloud rings
+    for (let ring=3; ring>=0; ring--) {
+      const rr = R * (0.4 + ring*0.18);
+      const grad = ctx.createRadialGradient(CX, CY, rr*0.5, CX, CY, rr);
+      const col = si%2===0 ? `0,255,204` : `0,160,255`;
+      grad.addColorStop(0, `rgba(${col},0)`);
+      grad.addColorStop(0.5, `rgba(${col},${opacity * (1-ring*0.2)})`);
+      grad.addColorStop(1, `rgba(${col},0)`);
+      ctx.beginPath();
+      ctx.arc(CX, CY, rr, 0, Math.PI*2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    // Dotted probability cloud
+    const count = shells[si] * 120;
+    for (let j=0; j<count; j++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi   = Math.random() * Math.PI;
+      const r_rand = R * (0.7 + Math.random()*0.6);
+      const x3 = r_rand * Math.sin(phi) * Math.cos(theta);
+      const y3 = r_rand * Math.cos(phi);
+      const z3 = r_rand * Math.sin(phi) * Math.sin(theta);
+      const prob = Math.exp(-Math.abs(r_rand-R)*0.04) * 0.4;
+      if (Math.random() > prob) continue;
+      const p = project3D(x3, y3, z3);
+      const col2 = si%2===0 ? '0,255,204' : '100,180,255';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.2*p.scale, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${col2},${0.3 + Math.random()*0.4})`;
+      ctx.fill();
+    }
+  }
+
+  // Draw nucleus
+  const nucR = 7 * sc;
+  for (const n of nucleons) {
+    const p = project3D(n.x*sc*0.15, n.y*sc*0.15, n.z*sc*0.15);
+    const r = Math.max(3, nucR * p.scale * 0.4);
+    drawNucleon(p, r, n.type);
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+updateCard();
+updateInfo();
+scheduleRender();
+</script>
+</body>
+</html>
