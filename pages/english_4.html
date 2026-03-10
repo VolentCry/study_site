@@ -182,7 +182,7 @@
                     <span class="menu-title">Математика</span>
                     <div class="submenu">
                         <a href="math_4.html">4 класс</a>
-                        <a href="#">5 класс</a>
+                        <a href="math_5.html">5 класс</a>
                     </div>
                 </div>
 
@@ -739,6 +739,9 @@
                     if (i === 1) {
                         title.innerText = 'Урок 1. Времена';
                         btn.onclick = () => window.location.href = 'english_lessons/lesson_1.html';
+                    } else if (i === 2) {
+                        title.innerText = 'Урок 2. Единицы измерения';
+                        btn.onclick = () => window.location.href = 'english_lessons/lesson_2.html';
                     } else {
                         title.innerText = `Урок ${i}`;
                         btn.onclick = () => showDevMessage(btn);

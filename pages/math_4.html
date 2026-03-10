@@ -30,6 +30,33 @@
                 gap: 24px;
             }
 
+            .page {
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .page.active {
+                display: flex;
+            }
+            .trainers-list {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                max-width: 400px;
+            }
+            .trainers-list .minecraft-button {
+                width: 100%;
+                text-align: center;
+                text-decoration: none;
+                color: white;
+            }
+            .page-trainers .welcome-card {
+                max-width: 500px;
+            }
+
         </style>
     </head>
 
@@ -59,7 +86,7 @@
                     <span class="menu-title">Математика</span>
                     <div class="submenu">
                         <a href="math_4.html">4 класс</a>
-                        <a href="#">5 класс</a>
+                        <a href="math_5.html">5 класс</a>
                     </div>
                 </div>
 
@@ -87,13 +114,44 @@
             </div>
         </div>
 
-        <div class="welcome-container">
-            <div class="welcome-card">
-            <h1 class="welcome-title">Рады тебя видеть, юный строитель!</h1>
-            <p class="welcome-text">Давай решим несколько интересных математических задач из мира Minecraft!</p>
-            <a href="../tasks/tasks.html" class="minecraft-button pulsating-button welcome-button">Задачки</a>
-            <a href="../math_moduls/multiplication_trainer.html" class="minecraft-button mode-button">Тренажёр по умножению</a>
+        <!-- Главная страница -->
+        <div id="page-main" class="page active">
+            <div class="welcome-container">
+                <div class="welcome-card">
+                    <h1 class="welcome-title">Рады тебя видеть, юный строитель!</h1>
+                    <p class="welcome-text">Давай решим несколько интересных математических задач из мира Minecraft!</p>
+                    <a href="../tasks/tasks.html" class="minecraft-button pulsating-button welcome-button">Задачки</a>
+                    <button class="minecraft-button mode-button" onclick="switchPage('trainers')">Тренажёр по умножению</button>
+                </div>
             </div>
         </div>
+
+        <!-- Страница выбора тренажёров -->
+        <div id="page-trainers" class="page">
+            <div class="welcome-card">
+                <h1 class="welcome-title">Тренажёр по умножению</h1>
+                <p class="welcome-text">Выбери тренажёр:</p>
+                <div class="trainers-list">
+                    <a href="../math_moduls/multiplication_trainer.html" class="minecraft-button mode-button">Тренажёр №1</a>
+                    <a href="../math_moduls/multiplication_trainer_medium_level.html" class="minecraft-button mode-button">Тренажёр №2</a>
+                    <a href="../math_moduls/multiplication_trainer_hard_level.html" class="minecraft-button mode-button">Тренажёр №3</a>
+                    <a href="../math_moduls/decimal_fraction_trainer.html" class="minecraft-button mode-button">Тренажёр №4</a>
+                </div>
+                <button class="minecraft-button mode-button" onclick="switchPage('main')" style="margin-top: 20px;">← Назад</button>
+            </div>
+        </div>
+
+        <script>
+            function switchPage(pageId) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById('page-' + pageId);
+                if (target) {
+                    target.classList.add('active');
+                    if (target.scrollTop !== undefined) target.scrollTop = 0;
+                }
+            }
+
+        </script>
+
     </body>
 </html>

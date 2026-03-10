@@ -119,6 +119,107 @@
             color: #000;
         }
 
+        /* --- ФОРМЫ ВХОДА И РЕГИСТРАЦИИ --- */
+        .auth-section {
+            text-align: left;
+        }
+
+        .auth-section h2 {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: var(--color-sand);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 10px;
+            margin-bottom: 8px;
+            color: var(--color-light);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            border: 3px solid var(--color-med);
+            background: rgba(0,0,0,0.5);
+            color: var(--text-color);
+            border-radius: 4px;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-sand);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            border: 3px solid var(--color-med);
+            background: rgba(0,0,0,0.6);
+            color: var(--text-color);
+            transition: 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background: var(--color-med);
+            color: #000;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10px;
+        }
+
+        .auth-switch a {
+            color: var(--color-sand);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .auth-switch a:hover {
+            color: var(--color-light);
+        }
+
+        .auth-error {
+            font-size: 9px;
+            color: #ff6666;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .auth-success {
+            font-size: 9px;
+            color: var(--correct);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .logout-btn {
+            margin-top: 15px;
+            padding: 10px 15px;
+            font-size: 10px;
+        }
+
         /* --- ПУЗЫРЬКИ --- */
         .bubble {
             position: absolute;
@@ -137,13 +238,57 @@
 </head>
 <body>
 
-    <div class="profile-card">
-        <div class="nickname">Игрок_Стив</div>
+    <!-- Форма входа -->
+    <div id="auth-container" class="profile-card auth-section">
+        <div id="login-form">
+            <h2>Вход в аккаунт</h2>
+            <form id="login-submit">
+                <div class="form-group">
+                    <label for="login-name">Имя (логин)</label>
+                    <input type="text" id="login-name" placeholder="Введите имя" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" placeholder="Введите пароль" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="auth-btn">Войти</button>
+                <div id="login-error" class="auth-error hidden"></div>
+            </form>
+            <div class="auth-switch">
+                Нет аккаунта? <a id="show-register">Регистрация</a>
+            </div>
+        </div>
+
+        <div id="register-form" class="hidden">
+            <h2>Регистрация</h2>
+            <form id="register-submit">
+                <div class="form-group">
+                    <label for="reg-name">Имя (логин)</label>
+                    <input type="text" id="reg-name" placeholder="Придумайте имя" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Пароль</label>
+                    <input type="password" id="reg-password" placeholder="Придумайте пароль" autocomplete="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password2">Повторите пароль</label>
+                    <input type="password" id="reg-password2" placeholder="Повторите пароль" autocomplete="new-password" required>
+                </div>
+                <button type="submit" class="auth-btn">Зарегистрироваться</button>
+                <div id="register-message" class="auth-success hidden"></div>
+            </form>
+            <div class="auth-switch">
+                Уже есть аккаунт? <a id="show-login">Вход</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Профиль (показывается после входа) -->
+    <div id="profile-container" class="profile-card hidden">
+        <div class="nickname" id="profile-nickname">Игрок_Стив</div>
         
         <div class="avatar-container">
-            <!-- Если у вас есть картинка, раскомментируйте тег <img> ниже и удалите div заглушки -->
             <div class="avatar-placeholder">?</div>
-            <!-- <img src="URL_ИЛИ_ПУТЬ_К_КАРТИНКЕ.jpg" alt="Фото профиля"> -->
         </div>
         
         <div class="stats">
@@ -151,25 +296,91 @@
             <span id="tasks-count">0</span>
         </div>
         
-        <a href="english_page.html" class="back-btn">< Назад к урокам</a>
+        <a href="index.html" class="back-btn">< Назад к урокам</a>
+        <button type="button" class="back-btn logout-btn" id="logout-btn">Выйти</button>
     </div>
 
     <script>
+        const AUTH_STUB = { name: 'Roma', password: '12345' };
+        const STORAGE_KEY = 'loggedInUser';
+
+        function showAuth() {
+            document.getElementById('auth-container').classList.remove('hidden');
+            document.getElementById('profile-container').classList.add('hidden');
+        }
+
+        function showProfile(userName) {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('profile-container').classList.remove('hidden');
+            document.getElementById('profile-nickname').innerText = userName;
+        }
+
+        function logout() {
+            localStorage.removeItem(STORAGE_KEY);
+            document.getElementById('login-name').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            showAuth();
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+        }
+
         // Инициализация при загрузке страницы
         window.onload = () => {
-            // Читаем количество решённых задач из localStorage (сохранено в вашем english_page.html)
             const tasksCountElement = document.getElementById('tasks-count');
             const savedTasks = localStorage.getItem('totalSolvedTasks');
-            
             if (savedTasks !== null) {
                 tasksCountElement.innerText = savedTasks;
             }
 
-            // Запускаем анимацию пузырьков для красоты
+            const savedUser = localStorage.getItem(STORAGE_KEY);
+            if (savedUser) {
+                showProfile(savedUser);
+            } else {
+                showAuth();
+            }
+
             createBubbles();
+
+            // Вход
+            document.getElementById('login-submit').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('login-name').value.trim();
+                const password = document.getElementById('login-password').value;
+                const errEl = document.getElementById('login-error');
+
+                if (name === AUTH_STUB.name && password === AUTH_STUB.password) {
+                    localStorage.setItem(STORAGE_KEY, name);
+                    errEl.classList.add('hidden');
+                    showProfile(name);
+                } else {
+                    errEl.textContent = 'Неверное имя или пароль. Пока нет БД — только вход: Roma / 12345';
+                    errEl.classList.remove('hidden');
+                }
+            });
+
+            // Регистрация (заглушка — БД нет)
+            document.getElementById('register-submit').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const msg = document.getElementById('register-message');
+                msg.textContent = 'Регистрация временно недоступна (база данных не подключена).';
+                msg.classList.remove('hidden');
+            });
+
+            document.getElementById('show-register').addEventListener('click', () => {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+                document.getElementById('register-message').classList.add('hidden');
+            });
+
+            document.getElementById('show-login').addEventListener('click', () => {
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', logout);
         };
 
-        // Генерация пузырьков (как в основном файле)
         function createBubbles() {
             const body = document.body;
             for (let i = 0; i < 15; i++) {

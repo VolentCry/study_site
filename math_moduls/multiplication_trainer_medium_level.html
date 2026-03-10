@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр умножения (средний) - Математика в Minecraft</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body.trainer-page {
+            background-image: url('../assets/bg/multiplication_trainer_background_.jpg') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            min-height: 100vh !important;
+        }
+    </style>
+</head>
+<body class="trainer-page">
+    <a href="../pages/math_4.html" class="back-button">&#x2190;</a>
+    <h1 class="trainer-title">Тренажёр умножения (средний уровень)</h1>
+
+    <div class="problem-container">
+        <span id="num1" class="number-display">?</span>
+        <span class="operator-display"> &#x00D7; </span>
+        <span id="num2" class="number-display">?</span>
+        <span class="operator-display"> = </span>
+        <input type="number" id="trainer-answer-input" placeholder="Ответ">
+    </div>
+
+    <div class="trainer-controls">
+        <button id="trainer-check-button" class="minecraft-button-variant-two">Проверить</button>
+    </div>
+
+    <div id="trainer-feedback" class="feedback"></div>
+
+    <div class="decoration">
+        <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon">
+    </div>
+
+    <script src="../js/multiplication_trainer_medium.js"></script>
+</body>
+</html>
