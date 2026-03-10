@@ -3,485 +3,1357 @@
     <head>
         <meta charset="UTF-8">
         <title>
-            Классификация звёзд по светимости
+            Классификация звёзд
         </title>
-
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
         
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
         <style>
-            *{margin:0;padding:0;box-sizing:border-box;}
-            body{
-            background:#080b18;
-            font-family:'Raleway',sans-serif;
-            overflow:hidden;width:100vw;height:100vh;
-            cursor:grab;user-select:none;
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
-            body.drag{cursor:grabbing;}
-            canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
-            #viewport{
-            position:absolute;top:0;left:0;
-            width:5200px;height:2800px;
-            z-index:1;transform-origin:0 0;
-            }
-            #arrowSvg{
-            position:absolute;top:0;left:0;
-            width:100%;height:100%;
-            pointer-events:none;z-index:1;overflow:visible;
-            }
-            .nd{
-            position:absolute;border-radius:8px;padding:7px 12px;
-            font-size:12px;font-weight:500;text-align:center;line-height:1.35;
-            cursor:pointer;z-index:2;border:1px solid transparent;
-            transition:transform .18s ease, box-shadow .18s ease;
-            display:flex;align-items:center;justify-content:center;
-            }
-            .nd:hover{
-            transform:translateY(-4px) scale(1.04);
-            box-shadow:0 14px 40px rgba(0,0,0,.7),0 0 22px var(--gl,rgba(255,255,255,.15));
-            z-index:20!important;
-            }
-            .nd.hdr{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;
-            cursor:default;border-radius:5px;padding:6px 10px;
-            background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12);
-            color:rgba(255,255,255,.45);}
-            .nd.hdr:hover{transform:none;box-shadow:none;}
-            .nd.dim{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07);
-            color:rgba(180,180,200,.4);cursor:default;font-size:10px;}
-            .nd.dim:hover{transform:none;box-shadow:none;}
 
-            .c-root {background:linear-gradient(135deg,#1a1030,#251845);border-color:#6040a0;color:#d0b0ff;--gl:rgba(180,100,255,.4);}
-            .c-neb  {background:linear-gradient(135deg,#14203a,#1e2d55);border-color:#3a5080;color:#8ab4e8;--gl:rgba(100,150,255,.3);}
-            .c-blue {background:linear-gradient(135deg,#0d2035,#103050);border-color:#2a6090;color:#6db8ff;--gl:rgba(80,160,255,.35);}
-            .c-lb   {background:linear-gradient(135deg,#0a1a30,#102040);border-color:#205070;color:#50a0d8;--gl:rgba(60,140,230,.3);}
-            .c-ora  {background:linear-gradient(135deg,#2a1a0a,#3d2510);border-color:#8a5020;color:#e8a060;--gl:rgba(255,150,50,.3);}
-            .c-red  {background:linear-gradient(135deg,#2a0f0f,#3d1515);border-color:#8a2020;color:#f07070;--gl:rgba(255,80,80,.3);}
-            .c-yel  {background:linear-gradient(135deg,#201a05,#2e270a);border-color:#7a6510;color:#e8d070;--gl:rgba(255,220,50,.25);}
-            .c-wht  {background:linear-gradient(135deg,#1a1a25,#22222f);border-color:#5a5a7a;color:#c8c8e8;--gl:rgba(200,200,255,.25);}
-            .c-grn  {background:linear-gradient(135deg,#0a1f10,#0f2d18);border-color:#2a6040;color:#60c880;--gl:rgba(80,200,100,.25);}
-            .c-pur  {background:linear-gradient(135deg,#1a0f2a,#25153d);border-color:#5a3090;color:#b080e8;--gl:rgba(160,80,255,.3);}
-            .c-tel  {background:linear-gradient(135deg,#081f1f,#0f2d2d);border-color:#206060;color:#50c0c0;--gl:rgba(50,190,190,.25);}
+            body {
+                background: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(38, 0, 77, 1) 48%, rgba(50, 0, 143, 1) 98%);
+                font-family: 'Raleway',sans-serif;
+                overflow: hidden;
+                width: 100vw;
+                height: 100vh;
+                cursor: grab;
+                user-select: none;
+            }
 
-            #backBtn{
-            position:fixed;top:22px;left:22px;z-index:1000;
-            display:flex;align-items:center;gap:7px;
-            padding:9px 18px;background:rgba(255,255,255,.07);
-            border:1px solid rgba(255,255,255,.14);border-radius:30px;
-            color:#bbb;font-family:'Raleway',sans-serif;font-size:12px;
-            font-weight:500;letter-spacing:.05em;cursor:pointer;
-            backdrop-filter:blur(10px);text-decoration:none;transition:all .2s;
+            body.drag {
+                cursor:grabbing;
             }
-            #backBtn:hover{background:rgba(255,255,255,.13);color:#fff;transform:translateX(-2px);}
-            #backBtn svg{width:15px;height:15px;}
-            #pgTitle{
-                position:fixed;top:24px;left:50%;transform:translateX(-50%);
-                z-index:100;font-family:'Cinzel',serif;font-size:12px;
-                font-weight:600;letter-spacing:.22em;color:rgba(255,255,255,.3);
-                pointer-events:none;text-transform:uppercase;white-space:nowrap;
+
+            canvas#bg {
+                position:fixed;inset:0;z-index:0;pointer-events:none;
             }
-            #hint{
-                position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-                z-index:100;font-size:10px;color:rgba(255,255,255,.16);
-                letter-spacing:.1em;pointer-events:none;
+
+            #viewport {
+                position:absolute;
+                /* canvas space: roughly x: -440 to 5100, y: -2560 to 1500 — we shift by +600,+2700 */
+                width:6200px;height:4800px;
+                top:0;left:0;z-index:1;transform-origin:0 0;
+            }
+
+            #arrowSvg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+                overflow: visible;
+            }
+
+            /* Nebula canvas — lives inside #viewport, behind all nodes */
+            #nebulaCvs {
+                position: absolute;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* ── NODE BASE ── */
+            .nd {
+                position:absolute;border-radius:8px;padding:7px 14px;
+                font-size:12.5px;font-weight:500;text-align:center;line-height:1.4;
+                cursor:pointer;z-index:2;border:1px solid transparent;
+                transition:transform .18s ease,box-shadow .18s ease;
+                display:flex;align-items:center;justify-content:center;
+            }
+
+            .nd:hover {
+                transform:translateY(-4px) scale(1.04);
+                box-shadow:0 14px 36px rgba(0,0,0,.75),0 0 22px var(--gl,rgba(255,255,255,.15));
+                z-index:20!important;
+            }
+
+            /* colour classes — matching canvas colours */
+            .c1 {
+                background: linear-gradient(135deg,#2a0d0d,#3d1515);
+                border-color:#802020;
+                color:#f07070;
+                --gl:rgba(255,80,80,.35);
+            }   /* red */
+            
+            .c2 {
+                background:linear-gradient(135deg,#1e1505,#2d2008);
+                border-color:#7a5510;
+                color:#e8a840;
+                --gl:rgba(255,170,50,.3);
+            }    /* orange */
+            
+            .c3 {
+                background:linear-gradient(135deg,#181a05,#252808);
+                border-color:#707010;
+                color:#d8d050
+                ;--gl:rgba(230,220,50,.25);
+            }   /* yellow */
+            
+            .c4 {
+                background:linear-gradient(135deg,#0a1a10,#102018);
+                border-color:#285030;
+                color:#60c070;
+                --gl:rgba(80,200,100,.25);
+            }   /* green */
+            
+            .c5 {
+                background:linear-gradient(135deg,#0a1828,#102035);
+                border-color:#204870;
+                color:#60a8e8;
+                --gl:rgba(80,160,255,.3);
+            }    /* blue */
+            
+            .c6 {
+                background:linear-gradient(135deg,#14181a,#1c2428);
+                border-color:#306070;
+                color:#70c8d8;
+                --gl:rgba(70,200,220,.3);
+                font-size: 18px;
+            }  
+            
+            .cpurple {
+                background: linear-gradient(135deg,#14082a,#200f3d);
+                border-color:#503080;
+                color:#a870e8;
+                --gl:rgba(150,80,255,.35);
+                font-size: 14px;
+            }
+            
+            .cblue2 {
+                background: linear-gradient(135deg,#080c28,#0f1438);
+                border-color:#303880;
+                color:#7080d8;
+                --gl:rgba(90,110,220,.3);
+            }
+            
+            .cbrown {
+                background: linear-gradient(135deg,#1a1008,#28180a);
+                border-color: #604020;
+                color: c07840;
+                --gl: rgba(190,110,50,.3);
+            }
+            
+            .cgray {
+                background: rgba(255,255,255,.04);
+                border-color: rgba(255,255,255,.12);
+                color: rgba(180,180,200,.7);
+                --gl: rgba(200,200,220,.2);
+                font-size: 14.5px;
+            }
+            
+            .cwine {
+                background: linear-gradient(135deg,#1a0a14,#280f1e);
+                border-color:#602040;
+                color:#c06080;
+                --gl:rgba(200,80,120,.3);}
+            
+            .cdark {background: linear-gradient(135deg,#0e0e18,#141420);
+                border-color:#383860;
+                color:#8888c0;
+                --gl:rgba(120,120,200,.2);
+            }
+
+            /* group frame */
+            .grp {
+                position: absolute;
+                border-radius:12px;
+                border:1px solid rgba(255,255,255,.08);
+                background:rgba(255,255,255,.02);
+                z-index:0;
+                pointer-events:none;
+            }
+            .grp-label{
+                position: absolute;
+                font-family: 'Cinzel',serif;
+                font-size: 15px;
+                letter-spacing: .1em;
+                color:rgba(255,255,255,.25);
+                padding:4px 10px;
+                top:-30px;
+                left:8px;
+                white-space:nowrap;
+                pointer-events:none;
+            }
+
+            /* UI */
+            #backBtn {
+                position:fixed;
+                top:22px;
+                left:22px;
+                z-index:1000;
+                display:flex;
+                align-items:center;
+                gap:7px;
+                padding:9px 18px;
+                background:rgba(255,255,255,.07);
+                border:1px solid rgba(255,255,255,.14);
+                border-radius:30px;color:#bbb;font-family:'Raleway',sans-serif;font-size:12px;font-weight:500;letter-spacing:.05em;cursor:pointer;backdrop-filter:blur(10px);text-decoration:none;transition:all .2s;}
+            
+            #backBtn:hover {
+                background:rgba(255,255,255,.13);
+                color:#fff;
+                transform:translateX(-2px);
+            }
+            
+            #backBtn svg {
+                width:15px;
+                height:15px;
+            }
+
+            /* Кнопка «Терминология» — зеркало backBtn, справа */
+            #termBtn {
+                position: fixed;
+                top: 22px;
+                right: 22px;
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                padding: 9px 18px;
+                background: rgba(255,255,255,.07);
+                border: 1px solid rgba(255,255,255,.14);
+                border-radius: 30px;
+                color: #bbb;
+                font-family: 'Raleway', sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+                letter-spacing: .05em;
+                cursor: pointer;
+                backdrop-filter: blur(10px);
+                text-decoration: none;
+                transition: all .2s;
+                user-select: none;
+            }
+
+            #termBtn:hover {
+                background: rgba(255,255,255,.13);
+                color: #fff;
+                transform: translateX(2px);
+            }
+
+            #termBtn svg {
+                width: 15px;
+                height: 15px;
+            }
+            
+            #pgTitle {
+                position:fixed;
+                top:24px;
+                left:50%;
+                transform:translateX(-50%);
+                z-index:100;
+                font-family:'Cinzel',serif;
+                font-size:12px;
+                font-weight:600;
+                letter-spacing:.22em;
+                color:rgba(255,255,255,.28);
+                pointer-events:none;
+                text-transform:uppercase;
+                white-space:nowrap;}
+            
+            #hint {
+                position:fixed;
+                bottom:18px;
+                left:50%;
+                transform:translateX(-50%);
+                z-index:100;
+                font-size:10px;
+                color:rgba(255,255,255,.15);
+                letter-spacing:.1em;
+                pointer-events:none;
             }
 
             /* MODAL */
-            #mOv{display:none;position:fixed;inset:0;z-index:2000;
-            background:rgba(5,7,18,.9);backdrop-filter:blur(18px);}
-            #mOv.on{display:flex;align-items:center;justify-content:center;
-            animation:fIn .22s ease;}
+            #mOv {
+                display:none;
+                position:fixed;
+                inset:0;z-index:2000;
+                background:rgba(5,7,18,.9);
+                backdrop-filter:blur(18px);
+            }
+
+            #mOv.on {
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                animation:fIn .22s ease;
+            }
+
             @keyframes fIn{from{opacity:0}to{opacity:1}}
-            #mBox{
-            position:relative;width:calc(100vw - 100px);height:calc(100vh - 100px);
-            background:linear-gradient(145deg,#0e1020,#141828,#0e1020);
-            border:1px solid rgba(255,255,255,.1);border-radius:18px;
-            overflow:hidden;animation:sUp .28s cubic-bezier(.34,1.56,.64,1);
-            display:flex;flex-direction:column;align-items:center;
-            justify-content:center;padding:60px 80px;gap:26px;
+
+            #mBox {
+                position:relative;
+                width:calc(100vw - 100px);
+                height:calc(100vh - 100px);
+                background:linear-gradient(145deg,#0e1020,#141828,#0e1020);
+                border:1px solid rgba(255,255,255,.1);
+                border-radius:18px;
+                overflow:hidden;
+                animation:sUp .28s cubic-bezier(.34,1.56,.64,1);
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                justify-content:center;
+                padding:60px 80px;
+                gap:26px;
             }
+
             @keyframes sUp{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
-            #mBox::before,#mBox::after{
-            content:'';position:absolute;width:55px;height:55px;
-            border-color:rgba(255,255,255,.06);border-style:solid;
+
+            #mBox::before,#mBox::after {
+                content:'';
+                position:absolute;
+                width:55px;
+                height:55px;
+                border-color:rgba(255,255,255,.06);
+                border-style:solid;
             }
-            #mBox::before{top:14px;left:14px;border-width:1px 0 0 1px;border-radius:3px 0 0 0;}
-            #mBox::after{bottom:14px;right:14px;border-width:0 1px 1px 0;border-radius:0 0 3px 0;}
-            #mClose{
-            position:absolute;top:18px;right:18px;width:36px;height:36px;
-            border-radius:50%;background:rgba(255,255,255,.06);
-            border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55);
-            font-size:17px;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;transition:all .2s;
+
+            #mBox::before {
+                top:14px;
+                left:14px;
+                border-width:1px 0 0 1px;
+                border-radius:3px 0 0 0;
             }
-            #mClose:hover{background:rgba(255,255,255,.14);color:#fff;transform:scale(1.1);}
-            #mIcon{
-            width:170px;height:170px;border-radius:50%;flex-shrink:0;
-            border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);
-            display:flex;align-items:center;justify-content:center;
-            font-size:68px;position:relative;
+
+            #mBox::after {
+                bottom:14px;
+                right:14px;
+                border-width:0 1px 1px 0;
+                border-radius:0 0 3px 0;
             }
-            #mIcon::before{
-            content:'';position:absolute;inset:-18px;border-radius:50%;
-            background:radial-gradient(circle,var(--mgl,rgba(150,100,255,.2)) 0%,transparent 70%);
-            animation:pulse 3s ease-in-out infinite;
+
+            #mClose {
+                position:absolute;
+                top:18px;
+                right:18px;
+                width:36px;height:36px;
+                border-radius:50%;
+                background:rgba(255,255,255,.06);
+                border:1px solid rgba(255,255,255,.12);
+                color:rgba(255,255,255,.55);
+                font-size:17px;
+                cursor:pointer;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                transition:all .2s;
             }
+
+            #mClose:hover {
+                background:rgba(255,255,255,.14);
+                color:#fff;
+                transform:scale(1.1);
+            }
+
+            #mIcon {
+                width:160px;height:160px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;}
+            #mIcon::before {
+                content:'';position:absolute;inset:-16px;border-radius:50%;background:radial-gradient(circle,var(--mgl,rgba(150,100,255,.2)) 0%,transparent 70%);animation:pulse 3s ease-in-out infinite;}
             @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-            #mTitle{
-            font-family:'Cinzel',serif;font-size:clamp(19px,3vw,32px);
-            font-weight:700;color:#fff;text-align:center;letter-spacing:.05em;
+            #mTitle {
+                font-family:'Cinzel',serif;font-size:clamp(18px,2.5vw,30px);font-weight:700;color:#fff;text-align:center;letter-spacing:.05em;}
+            #mDesc {
+                font-size:14px;line-height:1.9;color:rgba(200,195,220,.82);max-width:660px;text-align:center;font-weight:300;}
+            #mTags {
+                display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+            .tag {
+                padding:4px 12px;border-radius:20px;font-size:10px;letter-spacing:.08em;font-weight:600;text-transform:uppercase;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.42);}
+
+            /* ── TERMINOLOGY OVERLAY ── */
+            #termOv {
+                display: none;
+                position: fixed;
+                inset: 0;
+                z-index: 2000;
+                background: rgba(5,7,18,.9);
+                backdrop-filter: blur(18px);
             }
-            #mDesc{
-            font-size:14px;line-height:1.9;color:rgba(200,195,220,.82);
-            max-width:660px;text-align:center;font-weight:300;letter-spacing:.02em;
+
+            #termOv.on {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fIn .22s ease;
             }
-            #mTags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
-            .tag{padding:4px 12px;border-radius:20px;font-size:10px;
-            letter-spacing:.08em;font-weight:600;text-transform:uppercase;
-            background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-            color:rgba(255,255,255,.42);}
+
+            #termBox {
+                position: relative;
+                width: calc(100vw - 100px);
+                height: calc(100vh - 100px);
+                background: linear-gradient(145deg,#0e1020,#141828,#0e1020);
+                border: 1px solid rgba(255,255,255,.1);
+                border-radius: 18px;
+                overflow: hidden;
+                animation: sUp .28s cubic-bezier(.34,1.56,.64,1);
+                display: flex;
+                flex-direction: column;
+                padding: 56px 60px 40px;
+                gap: 0;
+            }
+
+            #termBox::before,#termBox::after {
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 55px;
+                border-color: rgba(255,255,255,.06);
+                border-style: solid;
+                pointer-events: none;
+            }
+
+            #termBox::before {
+                top: 14px;
+                left: 14px;
+                border-width: 1px 0 0 1px;
+                border-radius: 3px 0 0 0;
+            }
+
+            #termBox::after {
+                bottom: 14px;
+                right: 14px;
+                border-width: 0 1px 1px 0;
+                border-radius: 0 0 3px 0;
+            }
+
+            #termClose {
+                position: absolute;
+                top: 18px;
+                right: 18px;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.06);
+                border: 1px solid rgba(255,255,255,.12);
+                color: rgba(255,255,255,.55);
+                font-size: 17px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all .2s;
+            }
+
+            #termClose:hover {
+                background: rgba(255,255,255,.14);
+                color: #fff;
+                transform: scale(1.1);
+            }
+
+            #termHeading {
+                font-family: 'Cinzel', serif;
+                font-size: clamp(20px, 2.2vw, 30px);
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: .08em;
+                text-align: center;
+                margin-bottom: 32px;
+                flex-shrink: 0;
+                text-shadow: 0 0 50px rgba(160,120,255,.5);
+            }
+
+            #termSearch {
+                flex-shrink: 0;
+                margin-bottom: 22px;
+                padding: 10px 18px;
+                background: rgba(255,255,255,.05);
+                border: 1px solid rgba(255,255,255,.12);
+                border-radius: 30px;
+                color: rgba(255,255,255,.75);
+                font-family: 'Raleway', sans-serif;
+                font-size: 13px;
+                outline: none;
+                width: 100%;
+                max-width: 520px;
+                align-self: center;
+                transition: border-color .2s, background .2s;
+            }
+
+            #termSearch::placeholder {
+                color: rgba(255,255,255,.25);
+            }
+
+            #termSearch:focus {
+                background: rgba(255,255,255,.08);
+                border-color: rgba(160,130,255,.45);
+            }
+
+            #termList {
+                flex: 1;
+                overflow-y: auto;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                gap: 14px;
+                align-content: start;
+                padding-right: 8px;
+            }
+
+            #termList::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            #termList::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            #termList::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,.12);
+                border-radius: 4px;
+            }
+
+            .term-card {
+                background: rgba(255,255,255,.04);
+                border: 1px solid rgba(255,255,255,.08);
+                border-radius: 12px;
+                padding: 16px 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
+                transition: background .18s, border-color .18s;
+            }
+
+            .term-card:hover {
+                background: rgba(255,255,255,.07);
+                border-color: rgba(255,255,255,.15);
+            }
+
+            .term-card-head {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .term-emoji {
+                font-size: 22px;
+                flex-shrink: 0;
+                line-height: 1;
+            }
+
+            .term-name {
+                font-family: 'Cinzel', serif;
+                font-size: 13px;
+                font-weight: 600;
+                color: #e8e0ff;
+                letter-spacing: .04em;
+            }
+
+            .term-desc {
+                font-size: 12px;
+                line-height: 1.75;
+                color: rgba(190,185,215,.7);
+                font-weight: 300;
+            }
+
+            .term-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin-top: 2px;
+            }
+
+            .term-tag {
+                padding: 2px 9px;
+                border-radius: 20px;
+                font-size: 9px;
+                letter-spacing: .07em;
+                font-weight: 600;
+                text-transform: uppercase;
+                background: rgba(255,255,255,.04);
+                border: 1px solid rgba(255,255,255,.09);
+                color: rgba(255,255,255,.35);
+            }
         </style>
     </head>
     <body>
         <canvas id="bg"></canvas>
+
         <a href="/" id="backBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Назад
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Назад
         </a>
-        <div id="pgTitle">Классификация звёзд по светимости</div>
-        <div id="hint">Перетащите для навигации · Нажмите на блок для подробностей</div>
-        <div id="viewport"><svg id="arrowSvg"></svg></div>
+
+        <button id="termBtn">
+            Терминология
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </button>
+
+        <!-- Terminology overlay -->
+        <div id="termOv">
+            <div id="termBox">
+                <button id="termClose">✕</button>
+                <div id="termHeading">
+                    Терминология
+                </div>
+                <input id="termSearch" type="text" placeholder="Поиск по терминам…" autocomplete="off">
+                <div id="termList"></div>
+            </div>
+        </div>
+
+        <div id="pgTitle">
+            Классификация звёзд
+        </div>
+
+        <div id="hint">
+            Перетащите для навигации · Нажмите на блок для подробностей
+        </div>
+
+        <div id="viewport">
+            <canvas id="nebulaCvs"></canvas>
+            <svg id="arrowSvg"></svg>
+        </div>
 
         <div id="mOv">
-        <div id="mBox">
-            <button id="mClose">✕</button>
-            <div id="mIcon"><span id="mEmoji"></span></div>
-            <div id="mTitle"></div>
-            <div id="mDesc"></div>
-            <div id="mTags"></div>
-        </div>
+            <div id="mBox">
+                <button id="mClose">✕</button>
+                <div id="mIcon">
+                    <span id="mEmoji"></span>
+                </div>
+                <div id="mTitle"></div>
+                <div id="mDesc"></div>
+                <div id="mTags"></div>
+            </div>
         </div>
 
         <script>
-            // ── STARFIELD ────────────────────────────────────────────────────
-            const bc=document.getElementById('bg');
-            const bx=bc.getContext('2d');
-            function rsz(){bc.width=innerWidth;bc.height=innerHeight;}
-            rsz();window.addEventListener('resize',rsz);
-            const ST=Array.from({length:240},()=>({x:Math.random()*bc.width,y:Math.random()*bc.height,r:Math.random()*1.2,a:Math.random(),sp:Math.random()*.003+.001}));
-            (function af(){bx.clearRect(0,0,bc.width,bc.height);ST.forEach(s=>{s.a+=s.sp;bx.beginPath();bx.arc(s.x,s.y,s.r,0,Math.PI*2);bx.fillStyle=`rgba(200,210,255,${.12+.4*Math.abs(Math.sin(s.a))})`;bx.fill();});requestAnimationFrame(af);})();
+            // ── OFFSET: shift canvas coords → screen coords ──────────────────
+            // Canvas min x ≈ -440, min y ≈ -2560 → add (OX,OY) to bring into viewport
+            const OX = 500, OY = 2700;
 
-            // ── INFO DATABASE ────────────────────────────────────────────────
-            const DB={
-            'Газопылевое облако':{e:'🌫️',g:'rgba(120,100,70,.4)',t:['Молекулярное облако','Газ и пыль','Гравитация'],d:'Газопылевые (молекулярные) облака — плотные скопления газа (преимущественно водород и гелий) и межзвёздной пыли. Именно из них рождаются звёзды: под действием гравитации или внешнего возмущения облако фрагментируется и даёт начало протозвёздным ядрам. Типичная масса облака — сотни и тысячи солнечных масс.'},
-            'Протозвезда':{e:'🟤',g:'rgba(160,110,60,.45)',t:['Ранняя стадия','Контракция Кельвина–Гельмгольца','Диск аккреции'],d:'Протозвезда образуется при гравитационном коллапсе фрагмента молекулярного облака. Ядро разогревается, но термоядерные реакции ещё не идут — светимость обеспечивается гравитационным сжатием. Окружена вращающимся диском аккреции, из которого могут формироваться планеты. Длительность стадии — от тысяч до миллиона лет.'},
-            'Звёзды класс M':{e:'🔴',g:'rgba(220,70,50,.4)',t:['Красные карлики','0.08–0.5 М☉','Долгожители'],d:'Звёзды класса M — красные карлики, самые многочисленные звёзды Галактики (~70% всех звёзд). Температура поверхности 2400–3700 К, масса 0.08–0.5 М☉. Живут триллионы лет — дольше нынешнего возраста Вселенной. Ближайшая к Солнцу звезда — Проксима Центавра — класс M5.'},
-            'Звёзды класс G, K, F, A':{e:'☀️',g:'rgba(255,215,80,.4)',t:['G: Солнце 5800 К','K: оранжевые','F/A: горячее Солнца'],d:'Звёзды классов A, F, G, K — основная масса «средних» звёзд на главной последовательности. G (Солнце, 5800 К) — жёлтые; K — оранжевые (3900–5200 К); F — желто-белые (6000–7600 К); A — белые (7600–10000 К). Все сжигают водород в гелий, живут от нескольких сотен миллионов до нескольких десятков миллиардов лет.'},
-            'Звёзды класс B, O (8–50 М☉)':{e:'💙',g:'rgba(80,150,255,.5)',t:['Горячие','Массивные','10 000–50 000 К'],d:'Звёзды классов B и O на главной последовательности с массой 8–50 М☉. Класс B: 10 000–30 000 К; класс O: >30 000 К. Их светимость в тысячи и сотни тысяч раз выше солнечной. Живут лишь миллионы лет. Ионизируют межзвёздный газ, создавая туманности HII. Большинство ярчайших звёзд ночного неба относятся к этим классам.'},
-            'Звёзды класс O (> 50 М☉)':{e:'🔵',g:'rgba(60,120,255,.55)',t:['Класс O','Масса >50 М☉','> 30 000 К'],d:'Наиболее горячие и массивные звёзды главной последовательности. Температура поверхности превышает 30 000–50 000 К, светимость — до миллиона солнечных. Мощными звёздными ветрами разгоняют и ионизируют окружающий газ. Живут 1–3 миллиона лет, после чего взрываются сверхновой или переходят в гипергиганты.'},
-            'Гл. посл. (M-класс)':{e:'🔴',g:'rgba(200,60,40,.4)',t:['Главная последовательность','Класс M','Медленный синтез'],d:'Красные карлики на главной последовательности — наиболее стабильные и долгоживущие звёзды. Сжигают водород очень медленно, конвекция перемешивает всё вещество звезды. Из-за малой массы никогда не станут красными гигантами — просто постепенно превратятся в белый карлик, минуя стадию гиганта.'},
-            'Гл. посл. (G,K,F,A)':{e:'⭐',g:'rgba(255,200,80,.4)',t:['Синтез H→He','Миллиарды лет','Стабильная'],d:'Главная последовательность — самый долгий этап жизни звезды средней массы. Термоядерный синтез водорода в гелий в ядре уравновешивает гравитацию. Для звёзд 0.5–8 М☉ эта стадия длится от 1 до 100+ млрд лет в зависимости от массы. Солнце находится на ГП уже 4.6 млрд лет и пробудет ещё примерно столько же.'},
-            'Гл. посл. (B, O)':{e:'🌠',g:'rgba(80,150,255,.45)',t:['Главная последовательность','Класс B/O','CNO-цикл'],d:'Массивные звёзды на главной последовательности сжигают водород преимущественно по CNO-циклу. Их ядра содержат конвективные зоны; звезда быстро обогащается гелием. Из-за огромной светимости топливо расходуется за миллионы лет. Когда водород иссякает, звезда быстро эволюционирует в сверхгигант.'},
-            'Субгигант':{e:'🟡',g:'rgba(220,180,60,.4)',t:['Переходная стадия','Расход ядерного топлива','Расширение'],d:'Субгигант — переходная стадия между главной последовательностью и гигантом. Водород в ядре исчерпан, синтез переходит в оболочку; ядро сжимается, а внешние слои расширяются. Светимость растёт. Солнце через ~5 млрд лет станет субгигантом, увеличившись в ~1.5–2 раза.'},
-            'Красный карлик':{e:'🔴',g:'rgba(220,50,40,.4)',t:['Класс M','0.08–0.5 М☉','Долгожитель'],d:'Красный карлик — конечная стадия эволюции звёзд класса M на главной последовательности (или сама ГП для них). Из-за малой массы звезда полностью конвективна и сжигает топливо очень медленно. Красные карлики будут светить ещё триллионы лет. В конечном счёте они остынут, превратившись в гипотетический «белый карлик» из гелия (без прохождения через стадию гиганта).'},
-            'Красный гигант':{e:'🔴',g:'rgba(255,70,40,.5)',t:['Расширение','Гелиевый синтез','Конец ГП'],d:'Красный гигант — стадия эволюции звёзд 0.5–8 М☉ после исчерпания водорода в ядре. Ядро сжимается и разогревается, а внешние оболочки расширяются до сотен радиусов Солнца. Температура поверхности падает до 3500–5000 К. В ядре начинается тройной альфа-процесс (синтез гелия в углерод). Солнце поглотит Меркурий и Венеру.'},
-            'Горизонтальная ветвь':{e:'🌡️',g:'rgba(210,150,60,.35)',t:['Стабильное горение He','После вспышки He','~100 млн лет'],d:'Горизонтальная ветвь — стадия стабильного горения гелия в ядре звезды малой/средней массы после вспышки гелия на вершине ветви красных гигантов. Звезда имеет примерно постоянную светимость. Многие нестабильные переменные (RR Лиры) находятся на этой стадии. Длится около 100 миллионов лет.'},
-            'АГБ-звезда':{e:'🌺',g:'rgba(220,100,60,.4)',t:['Асимптотическая ветвь','Пульсации','Мириды'],d:'АГБ-звезда (Асимптотическая ветвь гигантов) — поздняя стадия звёзд малой/средней массы. Одновременно горят оболочки — водородная и гелиевая. Звезда пульсирует: это мириды и длиннопериодические переменные. Мощный ветер постепенно сдувает внешние оболочки, создавая будущую планетарную туманность.'},
-            'Планетарная туманность':{e:'🌀',g:'rgba(70,200,150,.45)',t:['Сброс оболочки','Ионизированный газ','~10 000 лет'],d:'Планетарная туманность — светящаяся оболочка ионизированного газа, сброшенная звездой средней массы на стадии АГБ. В центре — горячий белый карлик, чьё УФ-излучение ионизирует газ. Туманность существует около 10 000 лет, затем рассеивается. Примеры: Туманность Кольцо (M57), Туманность Кошачий Глаз.'},
-            'Белый карлик':{e:'💠',g:'rgba(150,170,255,.5)',t:['Предел 1.4 М☉','Давление вырожд. электронов','Остывание'],d:'Белый карлик — конечный этап звёзд с массой до ~8 М☉. Размером с Землю, масса ~0.6 М☉. Поддерживается давлением вырожденного электронного газа. Без термоядерных реакций — лишь медленно остывает. Предел Чандрасекара: 1.4 М☉. При накоплении вещества сверх предела в двойной системе — взрыв сверхновой Ia.'},
-            'Чёрный карлик':{e:'⬛',g:'rgba(70,70,90,.3)',t:['Гипотетический','Остывший белый карлик','> 10¹⁴ лет'],d:'Чёрный карлик — гипотетическое конечное состояние белого карлика, полностью остывшего до температуры реликтового фона. Время остывания ~10¹⁴ лет и более, что намного превышает возраст Вселенной (13.8 млрд лет). Чёрных карликов в наблюдаемой Вселенной пока не существует — это чисто теоретический объект.'},
-            'Вспышка новой':{e:'💫',g:'rgba(255,200,70,.5)',t:['Двойная система','Белый карлик','Термоядерный взрыв'],d:'Новая звезда — термоядерный взрыв на поверхности белого карлика в тесной двойной системе. Вещество от компаньона накапливается до критической температуры и взрывается. Яркость растёт в тысячи раз. Белый карлик выживает — процесс может повторяться («повторная новая»). В отличие от сверхновой, звезда не разрушается.'},
-            'Сверхновая типа Ia':{e:'💥',g:'rgba(255,140,40,.55)',t:['Стандартная свеча','Белый карлик > 1.4 М☉','Ускорение Вселенной'],d:'Сверхновая типа Ia — термоядерный взрыв белого карлика, накопившего массу сверх предела Чандрасекара (1.4 М☉). Весь белый карлик взрывается, остатков нет. Стандартная пиковая светимость делает их «стандартными свечами» для измерения расстояний. Именно с их помощью в 1998 г. открыли ускоренное расширение Вселенной.'},
-            'Голубой сверхгигант':{e:'🔷',g:'rgba(70,130,255,.5)',t:['Класс B/O I','Горячий','Ригель'],d:'Голубой сверхгигант — массивная звезда (10–100 М☉) после главной последовательности. Температура 10 000–50 000 К. Ригель (β Ориона) — классический пример: светимость в 120 000 раз выше солнечной, масса ~21 М☉. Стадия короткая; звезда быстро эволюционирует в жёлтый или красный сверхгигант.'},
-            'Жёлтый сверхгигант':{e:'🌟',g:'rgba(255,220,70,.4)',t:['Переходная','Цефеиды','5000–8000 К'],d:'Жёлтый сверхгигант — промежуточный этап между голубым и красным сверхгигантом. Температура 5000–8000 К. Многие являются цефеидами — переменными с периодом 1–70 суток. Полярная звезда (α Малой Медведицы) — жёлтый сверхгигант-цефеида. Эта стадия крайне нестабильна и нередко сопровождается значительными выбросами вещества.'},
-            'Красный сверхгигант':{e:'🟠',g:'rgba(220,70,30,.5)',t:['Масса 8–35 М☉','Бетельгейзе','Крупнейшие звёзды'],d:'Красный сверхгигант — самые крупные звёзды Вселенной по размеру. Образуются из звёзд 8–35 М☉. Радиус в 500–1500 раз превышает солнечный. Бетельгейзе (~900 R☉) может взорваться в ближайшие 100 000 лет. Температура поверхности 3000–4500 К. Стадия предшествует взрыву сверхновой типа II.'},
-            'Сверхновая (Тип II)':{e:'💥',g:'rgba(255,120,30,.6)',t:['Коллапс ядра','Нейтрино','10⁴⁴ Дж'],d:'Сверхновая типа II — взрыв при коллапсе ядра массивной звезды (>8 М☉). Железное ядро достигает предела Чандрасекара и мгновенно коллапсирует. 99% энергии уносится нейтрино. За секунды светимость превышает светимость целой галактики. В остатке — нейтронная звезда или чёрная дыра. Синтезируются тяжёлые элементы вплоть до железа и выше.'},
-            'Нейтронная звезда':{e:'💫',g:'rgba(60,200,220,.5)',t:['1.4–3 М☉','Диаметр ~20 км','Ядерная плотность'],d:'Нейтронная звезда — сверхплотный остаток сверхновой. Масса 1.4–3 М☉ сжата до диаметра ~20 км. Плотность ядерная: чайная ложка весит сотни миллионов тонн. Состоит почти целиком из нейтронов. Может вращаться сотни раз в секунду, испуская направленные пучки — пульсар. Поверхностная гравитация в 200 миллиардов раз сильнее земной.'},
-            'Пульсар':{e:'📡',g:'rgba(50,220,190,.45)',t:['Нейтронная звезда','Периодические импульсы','Миллисекунды–секунды'],d:'Пульсар — быстро вращающаяся нейтронная звезда с мощным магнитным полем, испускающая периодические радио- или рентгеновские импульсы. Первый пульсар открыт Джослин Белл в 1967 г. Миллисекундные пульсары вращаются до 716 оборотов в секунду — точнее атомных часов. Используются как «космические хронометры» для проверки ОТО.'},
-            'Магнитар':{e:'🧲',g:'rgba(80,255,180,.45)',t:['Поле ~10¹⁵ Гс','Гамма-вспышки','~30 в Галактике'],d:'Магнитар — нейтронная звезда с магнитным полем ~10¹⁵ Гс, в 1000 раз сильнее обычных нейтронных звёзд. Периодически испускает мощные гамма-вспышки. Вспышка SGR 1806-20 в 2004 г. ионизировала ионосферу Земли с расстояния 50 000 световых лет. В Галактике известно около 30 магнитаров.'},
-            'Рентгеновский пульсар':{e:'📻',g:'rgba(50,200,220,.45)',t:['Аккреция','Двойная система','Рентгеновское излучение'],d:'Рентгеновский пульсар — нейтронная звезда в двойной системе, аккрецирующая вещество от компаньона. Вещество направляется магнитным полем на полюса и разогревается до 10⁷–10⁸ К, излучая рентгеновские импульсы. Первый обнаружен в 1971 г. (Cen X-3). Некоторые раскручиваются до миллисекундных пульсаров.'},
-            'Чёрная дыра (стелл.)':{e:'🕳️',g:'rgba(90,40,180,.5)',t:['Масса >3 М☉','Горизонт событий','Гравитационные волны'],d:'Чёрная дыра звёздной массы образуется при коллапсе ядра звезды >25 М☉, если масса остатка >3 М☉. Гравитация не позволяет покинуть область внутри горизонта событий даже свету. Первое прямое наблюдение — LIGO, 2015 (слияние двух ЧД). Обнаруживаются по аккреционным дискам, рентгеновскому излучению и гравитационным волнам.'},
-            'Квазар':{e:'✨',g:'rgba(200,100,255,.5)',t:['АЯГ','Сверхмассивная ЧД','z > 0.1'],d:'Квазар — чрезвычайно яркое активное ядро далёкой галактики, питаемое аккрецией на сверхмассивную чёрную дыру (10⁶–10¹⁰ М☉). Светимость в 10¹³ раз выше солнечной. Один из ярчайших — 3C 273 на расстоянии 2.4 млрд световых лет. Квазары наблюдаются в ранней Вселенной и позволяют изучать её эволюцию.'},
-            'Блазар':{e:'⚡',g:'rgba(180,80,255,.5)',t:['Квазар с джетом','Переменный','BL Lac / FSRQ'],d:'Блазар — активное ядро галактики, релятивистский джет которого направлен практически на наблюдателя. Это делает блазары исключительно яркими переменными источниками от радио до гамма-лучей. Делятся на BL Lac объекты и плоскоспектральные радиоквазары. Являются мощными источниками ультравысокоэнергетических космических лучей.'},
-            'Звезда Вольфа–Райе':{e:'🌐',g:'rgba(100,180,255,.45)',t:['Без водорода','Мощный ветер','WR-звезда'],d:'Звёзды Вольфа–Райе лишились водородной оболочки из-за мощного звёздного ветра или обмена в двойной системе. Температура поверхности 25 000–100 000 К, масса 10–25 М☉. В спектре нет линий водорода — зато ярко выражены He, C, O. Предшественники сверхновых Ib/c и чёрных дыр. Один из ключевых источников тяжёлых элементов.'},
-            'Гипергигант':{e:'🌠',g:'rgba(255,90,20,.55)',t:['Масса >100 М☉','Класс светимости 0','Редчайшие'],d:'Гипергиганты — самые массивные и яркие звёзды, класс светимости 0. Масса >100 М☉, светимость до миллиона солнечных. В Галактике известно лишь несколько десятков кандидатов. R136a1 в туманности Тарантул — рекордсмен (~215 М☉). Теряют колоссальное количество вещества через ветер. Живут 1–3 млн лет и взрываются гиперновыми.'},
-            'Сверхновая (Тип Ib/c)':{e:'💥',g:'rgba(255,100,20,.6)',t:['Коллапс без оболочки','Звезда Вольфа–Райе','Гамма-вспышка'],d:'Сверхновые Ib (без водорода) и Ic (без водорода и гелия) — взрывы массивных звёзд, потерявших оболочки до взрыва. Характерны для звёзд Вольфа–Райе и тесных двойных. Некоторые Ic сопровождаются гамма-всплесками — самыми мощными взрывами во Вселенной (~10⁴⁴ Дж за секунды). В остатке — чёрная дыра звёздной массы.'},
-            'Коричневый карлик':{e:'🟤',g:'rgba(140,70,30,.4)',t:['13–80 М♃','Дейтерий','Субзвёздный'],d:'Коричневый карлик — субзвёздный объект с массой 13–80 М♃, слишком лёгкий для устойчивого синтеза водорода. Может кратковременно сжигать дейтерий. Светит в инфракрасном диапазоне, постепенно остывая. Первый (Teide 1) открыт в 1995 г. В Галактике их примерно столько же, сколько обычных звёзд.'},
-            'Субкарлик (VI)':{e:'🔹',g:'rgba(100,130,200,.4)',t:['Класс VI','Низкая металличность','Ниже ГП на ГР'],d:'Субкарлики (класс VI) — старые звёзды с низким содержанием тяжёлых элементов (металличностью), расположенные ниже главной последовательности на диаграмме ГР. Из-за сниженной непрозрачности их радиус меньше при той же температуре. Часто входят в состав галактического гало и шаровых скоплений.'},
-            '0 — Гипергиганты':{e:'🌠',g:'rgba(255,90,20,.5)',t:['Класс светимости 0'],d:'Класс светимости 0 (гипергиганты) — наиболее яркие и массивные из всех звёзд. Их болометрическая светимость достигает 10⁶ L☉. Примеры: η Киля (~150 М☉), R136a1 (~215 М☉). Редчайший класс — в Галактике известно лишь несколько десятков представителей.'},
-            'Ia — Яркие сверхгиганты':{e:'🔶',g:'rgba(220,70,30,.5)',t:['Класс Ia'],d:'Яркие сверхгиганты класса Ia — наиболее светимые представители сверхгигантов (класс I). Масса 10–70 М☉, светимость 10⁴–10⁶ L☉. Мощный звёздный ветер уносит значительную долю массы. Примеры: Денеб (α Лебедя), ρ Кассиопеи.'},
-            'Ib — Слабые сверхгиганты':{e:'🔸',g:'rgba(200,90,40,.5)',t:['Класс Ib'],d:'Слабые сверхгиганты класса Ib менее яркие, чем Ia, но всё равно во много раз ярче Солнца. Как и Ia, они находятся в конце своей жизни и вскоре взорвутся сверхновой. Имеют меньшую скорость звёздного ветра, чем гипергиганты класса 0.'},
-            'II — Яркие гиганты':{e:'🟡',g:'rgba(230,190,60,.4)',t:['Класс II'],d:'Яркие гиганты класса II занимают промежуточное положение между нормальными гигантами (III) и сверхгигантами (I). Они крупнее и ярче гигантов, но не достигают светимости сверхгигантов. Примеры: β Лебедя (Альбирео B).'},
-            'III — Гиганты':{e:'🟠',g:'rgba(220,150,50,.4)',t:['Класс III','После ГП'],d:'Гиганты класса III — звёзды, покинувшие главную последовательность и расширившиеся. Радиус в 10–100 раз превышает солнечный. Arcturus (α Волопаса) — ярчайший красный гигант северного неба. Aldebaran (α Тельца) — оранжевый гигант в 44 раза крупнее Солнца.'},
-            'IV — Субгиганты':{e:'🟢',g:'rgba(180,220,80,.4)',t:['Класс IV','Переходный'],d:'Субгиганты класса IV чуть крупнее и ярче звёзд главной последовательности того же спектрального типа. Это звёзды, начинающие уходить с ГП — ядро почти исчерпало водород. Примеры: Procyon A (F5 IV), β Водолея.'},
-            'V — Главная последовательность':{e:'⭐',g:'rgba(100,180,255,.4)',t:['Класс V','Основная стадия','Синтез H'],d:'Класс светимости V — звёзды главной последовательности. Это наиболее распространённый класс; около 90% всех звёзд в данный момент находятся на ГП. Солнце — G2V. Чем массивнее звезда, тем ярче и короче её жизнь на главной последовательности.'},
-            'VI — Субкарлики':{e:'🔹',g:'rgba(100,130,200,.4)',t:['Класс VI','Металличность < -1','Гало'],d:'Субкарлики класса VI расположены ниже главной последовательности на ДГР. Низкое содержание тяжёлых элементов уменьшает непрозрачность, из-за чего при той же температуре они имеют меньший радиус. Как правило, это очень старые звёзды галактического гало или шаровых скоплений.'},
-            'VII — Белые карлики':{e:'💠',g:'rgba(150,170,255,.5)',t:['Класс VII','Конечный этап','Предел 1.4 М☉'],d:'Белые карлики класса VII — конечный этап звёзд малой и средней массы. Размером с Землю, но масса ~0.6 М☉. Без термоядерных реакций. Около 97% всех звёзд закончат жизнь белыми карликами. Наиболее известный — Сириус B (ближайший белый карлик, 8.6 световых лет).'},
-            'O (> 30 000 К)':{e:'🔵',g:'rgba(60,120,255,.5)',t:['Горячие','Редкие','Ионизация'],d:'O-звёзды — горячейшие (~30 000–100 000 К) и редчайшие: их менее 0.00003% от всех звёзд. Абсолютная величина до -6. Примеры: звёзды скопления R136. Ионизируют окружающий газ, создавая крупные туманности HII. Все O-звёзды закончат жизнь сверхновыми.'},
-            'B (10–30 тыс. К)':{e:'💙',g:'rgba(80,160,255,.45)',t:['Сине-белые','Ригель, Спика'],d:'B-звёзды — горячие сине-белые звёзды. Составляют ~0.13% всех звёзд. Масса 2–16 М☉. Примеры: Ригель (B8Ia), Спика (B1V). Многие являются двойными. Выброс сильного УФ-излучения ионизирует окружающий газ.'},
-            'A (7.5–10 тыс. К)':{e:'🌟',g:'rgba(200,200,255,.4)',t:['Белые','Сириус, Вега'],d:'A-звёзды — белые звёзды. Составляют ~0.6% всех звёзд. Масса 1.4–2.1 М☉. Сириус A (A1V) — ярчайшая звезда ночного неба. Вега — стандарт нулевой звёздной величины. Некоторые A-звёзды имеют аномальный химический состав (Ap-звёзды).'},
-            'F (6–7.5 тыс. К)':{e:'🌕',g:'rgba(240,220,150,.4)',t:['Желто-белые','Процион, Полярная'],d:'F-звёзды — желто-белые. Составляют ~3% всех звёзд. Масса 1.04–1.4 М☉. Процион A (F5IV-V) — один из ярчайших на ночном небе. Многие цефеиды — F-сверхгиганты. В их атмосферах появляются линии металлов.'},
-            'G (5.2–6 тыс. К)':{e:'☀️',g:'rgba(255,220,80,.4)',t:['Жёлтые','Солнце G2V','7.5% звёзд'],d:'G-звёзды — жёлтые. Составляют ~7.5% звёзд. Масса 0.8–1.04 М☉. Солнце — G2V, температура 5778 К. α Центавра A — G2V, почти близнец Солнца. G-звёзды интересны как потенциальные хозяева обитаемых планет.'},
-            'K (3.7–5.2 тыс. К)':{e:'🟠',g:'rgba(230,140,60,.4)',t:['Оранжевые','Арктур','12% звёзд'],d:'K-звёзды — оранжевые. Составляют ~12% звёзд. Масса 0.45–0.8 М☉. Долго живут на ГП. Арктур (K1.5III) — ближайший красный гигант. ε Эридана (K2V) — ближайшая одиночная K-звезда, изучаемая в контексте поиска экзопланет.'},
-            'M (2.4–3.7 тыс. К)':{e:'🔴',g:'rgba(220,60,40,.4)',t:['Красные карлики','70% звёзд','Долгожители'],d:'M-звёзды — красные карлики, самые распространённые в Галактике (~70%). Масса 0.08–0.5 М☉, слабая светимость. Проксима Центавра (M5.5Ve) — ближайшая звезда к Солнцу. Вокруг многих открыты экзопланеты, в т.ч. в зоне обитаемости.'},
-            'L (1.3–2.1 тыс. К)':{e:'🟫',g:'rgba(140,60,30,.4)',t:['Тёмно-красные','Пыль в атмосфере','Граница звезда/карлик'],d:'L-звёзды — ультрахолодные объекты на границе между красными карликами и коричневыми карликами. В их атмосферах конденсируются пылевые облака из силикатов и железа. Открыты лишь в конце 1990-х гг. с появлением инфракрасных обзоров 2MASS и SDSS.'},
-            'T (600–1300 К)':{e:'🟤',g:'rgba(120,50,20,.4)',t:['Коричневые карлики','Метановые','< 1300 К'],d:'T-класс — коричневые карлики с температурой ниже 1300 К. Характерная черта — полосы метана в спектре (не встречающиеся у более горячих звёзд). Объекты крайне тусклые, видны только в инфракрасном диапазоне. Первый чистый T-карлик — Gliese 229B, открытый в 1995 г.'},
-            'Y (< 600 К)':{e:'🔵',g:'rgba(80,100,200,.35)',t:['Ультрахолодные','< 600 К','WISE'],d:'Y-класс — холоднейшие из известных субзвёздных объектов. Температура поверхности ниже 600 К — сравнима с температурой духовки. Открыты в 2011 г. по данным телескопа WISE. В их атмосферах возможны водяные облака. Самый холодный известный кандидат — WISE 0855-0714 (~250 К).'},
-            };
-
-            // ── LAYOUT ───────────────────────────────────────────────────────
-            // Fixed grid: columns 60, 280, 500, 700, 920, 1140, 1360, 1580, 1800, 2020, 2240, 2460
-            // Row heights: each branch occupies one horizontal row
-            // Y positions: row0=50 (header), then per-branch
-
-            const C = [60,280,500,700,920,1140,1360,1580,1800,2020,2240,2460,2680]; // col x
-            const W = 175; // node width
-            const H = 54;  // approx node height (for arrow centering)
-
-            // Y center of each row
-            const R = {
-            hdr: 50,
-            r1:  160,   // M class
-            r2:  260,   // G,K,F,A medium mass
-            r3:  360,   // nova / horizontal branch side
-            r4:  460,   // B,O high mass
-            r5:  560,   // sn Ib/c branch (very high)
-            r6:  660,   // brown dwarf
-            r7:  800,   // legend area start
-            };
-
-            // Helper: place node
-            function N(id, label, col, row, cls, noModal){
-            return {id, label, x: C[col], y: row - H/2, w: W, cls:'nd '+cls, noModal};
+            function cx(x) { 
+                return x + OX; 
+            }
+            function cy(y) { 
+                return y + OY; 
             }
 
-            const NODES = [
-            // ═══ HEADER ══════════════════════════════════════════════════
-            {id:'hdr0', label:'КЛАССИФИКАЦИЯ ЗВЁЗД ПО СВЕТИМОСТИ', x:C[0], y:14, w:560, cls:'nd hdr', noModal:true},
+            // ── STARFIELD + SHOOTING STARS ───────────────────────────────────
+            const bc = document.getElementById('bg');
+            const bx = bc.getContext('2d');
 
-            // ═══ COLUMN 0: Nebula & Proto ════════════════════════════════
-            N('neb',   'Газопылевое\nоблако', 0, R.r2, 'c-neb'),
-            N('proto', 'Протозвезда',         1, R.r2, 'c-ora'),
+            function rsz() {
+                bc.width  = innerWidth;
+                bc.height = innerHeight;
+            }
+            rsz();
+            window.addEventListener('resize', rsz);
 
-            // ═══ MASS LABELS ════════════════════════════════════════════
-            {id:'lm1', label:'M < 0.5 М☉', x:C[2]+2, y:R.r1-26, w:130, cls:'nd dim', noModal:true},
-            {id:'lm2', label:'0.5 – 8 М☉', x:C[2]+2, y:R.r2-26, w:130, cls:'nd dim', noModal:true},
-            {id:'lm3', label:'8 – 50 М☉',  x:C[2]+2, y:R.r4-26, w:130, cls:'nd dim', noModal:true},
-            {id:'lm4', label:'> 50 М☉',    x:C[2]+2, y:R.r5-26, w:130, cls:'nd dim', noModal:true},
-            {id:'lm5', label:'13–80 М♃',   x:C[2]+2, y:R.r6-26, w:130, cls:'nd dim', noModal:true},
+            // Static twinkling stars
+            const ST = Array.from({ length: 220 }, () => ({
+                x:  Math.random() * 3000,
+                y:  Math.random() * 2000,
+                r:  Math.random() * 1.2,
+                a:  Math.random(),
+                sp: Math.random() * 0.003 + 0.001,
+            }));
 
-            // ═══ BRANCH 1: LOW MASS (row r1) ════════════════════════════
-            N('cl_M',  'Звёзды\nкласс M',          2, R.r1, 'c-red'),
-            N('ms_M',  'Гл. посл.\n(M-класс)',      3, R.r1, 'c-red'),
-            N('rkd',   'Красный\nкарлик',           4, R.r1, 'c-red'),
-            N('wd_m',  'Белый карлик\n(в будущем)', 5, R.r1, 'c-wht'),
+            // Shooting-stars pool
+            const shootStars = [];
 
-            // ═══ BRANCH 2: MEDIUM MASS (row r2) ════════════════════════
-            N('cl_G',  'Звёзды класс\nG, K, F, A', 2, R.r2, 'c-yel'),
-            N('ms_G',  'Гл. посл.\n(G,K,F,A)',     3, R.r2, 'c-yel'),
-            N('subg',  'Субгигант',                4, R.r2, 'c-ora'),
-            N('rg',    'Красный\nгигант',           5, R.r2, 'c-red'),
-            N('hz',    'Горизонт.\nветвь',          5, R.r3, 'c-yel'),  // below rg
-            N('agb',   'АГБ-звезда',               6, R.r2, 'c-ora'),
-            N('pn',    'Планетарная\nтуманность',   7, R.r2, 'c-grn'),
-            N('wd',    'Белый\nкарлик',             8, R.r2, 'c-wht'),
-            N('bkd',   'Чёрный\nкарлик',           9, R.r2, 'c-dim'),
+            function spawnShootingStar() {
+                // Start from a random point along the top or left edge
+                const fromTop = Math.random() < 0.65;
+                const sx = fromTop ? Math.random() * bc.width : 0;
+                const sy = fromTop ? 0 : Math.random() * bc.height * 0.5;
 
-            // Nova side-branch from WD (row r3)
-            N('nova',  'Вспышка\nновой',            8, R.r3, 'c-yel'),
-            N('sn_ia', 'Сверхновая\nТипа Ia',       9, R.r3, 'c-ora'),
+                // Angle roughly 35–55° diagonal (top-left → bottom-right feel)
+                const angle = (Math.PI / 4) + (Math.random() - 0.5) * 0.35;
+                const speed = 7 + Math.random() * 9;
 
-            // ═══ BRANCH 3: HIGH MASS (row r4) ══════════════════════════
-            N('cl_BO', 'Звёзды класс\nB, O (8–50 М☉)', 2, R.r4, 'c-blue'),
-            N('ms_BO', 'Гл. посл.\n(B, O)',         3, R.r4, 'c-blue'),
-            N('bsg',   'Голубой\nсверхгигант',      4, R.r4, 'c-blue'),
-            N('ysg',   'Жёлтый\nсверхгигант',       5, R.r4, 'c-yel'),
-            N('rsg',   'Красный\nсверхгигант',       6, R.r4, 'c-red'),
-            N('sn2',   'Сверхновая\n(Тип II)',       7, R.r4, 'c-ora'),
-            N('ns',    'Нейтронная\nзвезда',         8, R.r4, 'c-tel'),
-            N('pulsar','Пульсар',                    9, R.r3+20, 'c-tel'),
-            N('magnet','Магнитар',                   9, R.r4+20, 'c-grn'),
-            N('xray',  'Рентгеновский\nпульсар',    10, R.r4-40, 'c-tel'),
-            N('bh',    'Чёрная дыра\n(стелл.)',      8, R.r5, 'c-pur'),
-            N('qsr',   'Квазар',                     9, R.r5, 'c-pur'),
-            N('blz',   'Блазар',                    10, R.r5, 'c-pur'),
+                shootStars.push({
+                    x:     sx,
+                    y:     sy,
+                    vx:    Math.cos(angle) * speed,
+                    vy:    Math.sin(angle) * speed,
+                    len:   90 + Math.random() * 160,
+                    life:  1.0,
+                    decay: 0.011 + Math.random() * 0.016,
+                });
+            }
 
-            // ═══ BRANCH 4: VERY HIGH MASS (row r5) ══════════════════════
-            N('cl_O',  'Звёзды класс O\n(> 50 М☉)', 2, R.r5, 'c-lb'),
-            N('hyp',   'Гипергигант',               3, R.r5, 'c-ora'),
-            N('wr',    'Звезда\nВольфа–Райе',        4, R.r5, 'c-blue'),
-            N('snibc', 'Сверхновая\n(Тип Ib/c)',     5, R.r5, 'c-ora'),
-            // -> bh (shared)
+            // Spawn intervals: every 2.5 – 5.5 s, max 4 at once
+            let shootCooldown = 2500 + Math.random() * 3000;
+            let shootElapsed  = 0;
+            let prevTime      = performance.now();
 
-            // ═══ BRANCH 5: BROWN DWARF (row r6) ════════════════════════
-            N('bd',    'Коричневый\nкарлик',         2, R.r6, 'c-ora'),
+            (function loop(now) {
+                const dt = now - prevTime;
+                prevTime = now;
 
-            // ═══ LEGEND AREA ════════════════════════════════════════════
-            // LUMINOSITY CLASSES
-            {id:'hLum', label:'КЛАССЫ СВЕТИМОСТИ ЙЕРКСА', x:C[0], y:R.r7, w:300, cls:'nd hdr', noModal:true},
-            {id:'l0',   label:'0 — Гипергиганты',         x:C[0], y:R.r7+60,  w:220, cls:'nd c-ora'},
-            {id:'l1a',  label:'Ia — Яркие сверхгиганты',  x:C[0], y:R.r7+130, w:220, cls:'nd c-red'},
-            {id:'l1b',  label:'Ib — Слабые сверхгиганты', x:C[0], y:R.r7+200, w:220, cls:'nd c-ora'},
-            {id:'l2',   label:'II — Яркие гиганты',        x:C[0], y:R.r7+270, w:220, cls:'nd c-yel'},
-            {id:'l3',   label:'III — Гиганты',             x:C[0], y:R.r7+340, w:220, cls:'nd c-yel'},
-            {id:'l4',   label:'IV — Субгиганты',           x:C[0], y:R.r7+410, w:220, cls:'nd c-grn'},
-            {id:'l5',   label:'V — Гл. последовательность',x:C[0], y:R.r7+480, w:220, cls:'nd c-blue'},
-            {id:'l6',   label:'VI — Субкарлики',           x:C[0], y:R.r7+550, w:220, cls:'nd c-wht'},
-            {id:'l7',   label:'VII — Белые карлики',       x:C[0], y:R.r7+620, w:220, cls:'nd c-wht'},
+                bx.clearRect(0, 0, bc.width, bc.height);
 
-            // SPECTRAL CLASSES
-            {id:'hSp',  label:'СПЕКТРАЛЬНЫЕ КЛАССЫ',       x:C[1]+45, y:R.r7,    w:260, cls:'nd hdr', noModal:true},
-            {id:'spO',  label:'O (> 30 000 К)',            x:C[1]+45, y:R.r7+60,  w:230, cls:'nd c-blue'},
-            {id:'spB',  label:'B (10–30 тыс. К)',          x:C[1]+45, y:R.r7+130, w:230, cls:'nd c-lb'},
-            {id:'spA',  label:'A (7.5–10 тыс. К)',         x:C[1]+45, y:R.r7+200, w:230, cls:'nd c-wht'},
-            {id:'spF',  label:'F (6–7.5 тыс. К)',          x:C[1]+45, y:R.r7+270, w:230, cls:'nd c-yel'},
-            {id:'spG',  label:'G (5.2–6 тыс. К)',          x:C[1]+45, y:R.r7+340, w:230, cls:'nd c-yel'},
-            {id:'spK',  label:'K (3.7–5.2 тыс. К)',        x:C[1]+45, y:R.r7+410, w:230, cls:'nd c-ora'},
-            {id:'spM',  label:'M (2.4–3.7 тыс. К)',        x:C[1]+45, y:R.r7+480, w:230, cls:'nd c-red'},
-            {id:'spL',  label:'L (1.3–2.1 тыс. К)',        x:C[1]+45, y:R.r7+550, w:230, cls:'nd c-red'},
-            {id:'spT',  label:'T (600–1300 К)',             x:C[1]+45, y:R.r7+620, w:230, cls:'nd c-ora'},
-            {id:'spY',  label:'Y (< 600 К)',                x:C[1]+45, y:R.r7+690, w:230, cls:'nd c-lb'},
+                // ── Twinkling stars
+                ST.forEach(s => {
+                    s.a += s.sp;
+                    bx.beginPath();
+                    bx.arc(s.x % bc.width, s.y % bc.height, s.r, 0, Math.PI * 2);
+                    bx.fillStyle = `rgba(200,210,255,${0.1 + 0.38 * Math.abs(Math.sin(s.a))})`;
+                    bx.fill();
+                });
 
-            // FINAL STATES
-            {id:'hFin', label:'КОНЕЧНЫЕ СОСТОЯНИЯ',        x:C[3]+45, y:R.r7,    w:260, cls:'nd hdr', noModal:true},
-            {id:'fWD',  label:'Белый карлик\n(< 8 М☉)',    x:C[3]+45, y:R.r7+60,  w:230, cls:'nd c-wht'},
-            {id:'fNS',  label:'Нейтронная звезда\n(8–25 М☉)',x:C[3]+45,y:R.r7+130,w:230, cls:'nd c-tel'},
-            {id:'fBH',  label:'Чёрная дыра\n(> 25 М☉)',   x:C[3]+45, y:R.r7+200, w:230, cls:'nd c-pur'},
-            {id:'fBD',  label:'Коричневый карлик\n(не звезда)',x:C[3]+45,y:R.r7+270,w:230,cls:'nd c-ora'},
-            {id:'fBK',  label:'Чёрный карлик\n(теория)',   x:C[3]+45, y:R.r7+340, w:230, cls:'nd c-dim'},
+                // ── Spawn timer
+                shootElapsed += dt;
+                if (shootElapsed >= shootCooldown && shootStars.length < 4) {
+                    spawnShootingStar();
+                    shootElapsed  = 0;
+                    shootCooldown = 2500 + Math.random() * 3000;
+                }
+
+                // ── Draw & update each shooting star
+                for (let i = shootStars.length - 1; i >= 0; i--) {
+                    const s = shootStars[i];
+                    s.x    += s.vx;
+                    s.y    += s.vy;
+                    s.life -= s.decay;
+
+                    // Remove when faded or off-screen
+                    if (s.life <= 0 || s.x > bc.width + 100 || s.y > bc.height + 100) {
+                        shootStars.splice(i, 1);
+                        continue;
+                    }
+
+                    const ang   = Math.atan2(s.vy, s.vx);
+                    const tailX = s.x - Math.cos(ang) * s.len;
+                    const tailY = s.y - Math.sin(ang) * s.len;
+
+                    // Gradient tail: transparent → bright head
+                    const tailGrad = bx.createLinearGradient(tailX, tailY, s.x, s.y);
+                    tailGrad.addColorStop(0,   `rgba(255,255,255,0)`);
+                    tailGrad.addColorStop(0.7, `rgba(220,230,255,${s.life * 0.55})`);
+                    tailGrad.addColorStop(1,   `rgba(255,255,255,${s.life * 0.95})`);
+                    bx.beginPath();
+                    bx.moveTo(tailX, tailY);
+                    bx.lineTo(s.x, s.y);
+                    bx.strokeStyle = tailGrad;
+                    bx.lineWidth   = 1.4;
+                    bx.stroke();
+
+                    // Glowing head dot
+                    const headGrad = bx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 4);
+                    headGrad.addColorStop(0,   `rgba(255,255,255,${s.life})`);
+                    headGrad.addColorStop(0.5, `rgba(190,210,255,${s.life * 0.6})`);
+                    headGrad.addColorStop(1,   `rgba(0,0,0,0)`);
+                    bx.beginPath();
+                    bx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+                    bx.fillStyle = headGrad;
+                    bx.fill();
+                }
+
+                requestAnimationFrame(loop);
+            })(performance.now());
+
+            // ── INFO DB ──────────────────────────────────────────────────────
+            const DB = {
+            'Газопылевое облако':{e:'🌫️',g:'rgba(120,100,70,.4)',t:['Молекулярное облако','Гравитация','Начало жизни'],d:'Газопылевые облака — плотные скопления газа (водород, гелий) и межзвёздной пыли. Под действием гравитации или внешнего толчка (например, ударной волны от сверхновой) облако сжимается и фрагментируется, давая начало протозвёздным ядрам. Эта стадия может длиться от 100 000 лет для массивных звёзд до миллиарда лет для наименее массивных.'},
+            'Протозвезда':{e:'🟤',g:'rgba(180,110,50,.45)',t:['Контракция','Диск аккреции','Нет ядерных реакций'],d:'Протозвезда образуется при гравитационном коллапсе фрагмента молекулярного облака. Ядро разогревается за счёт сжатия (процесс Кельвина–Гельмгольца), но термоядерные реакции ещё не идут. Окружена вращающимся диском аккреции. Когда температура ядра достигает ~10 млн К, запускается синтез водорода — звезда выходит на главную последовательность.'},
+            'Звёзды класс K, J, F, A':{e:'🌕',g:'rgba(230,180,80,.4)',t:['Главная последовательность','0.5–8 М☉','Миллиарды лет'],d:'Звёзды спектральных классов K (оранжевые), F (желто-белые) и A (белые) — звёзды средней массы на главной последовательности. Класс K: 3700–5200 К, масса 0.5–0.8 М☉. Класс F: 6000–7500 К, масса 1–1.4 М☉. Класс A: 7500–10000 К, масса 1.4–2 М☉. Сжигают водород в гелий, стабильны миллиарды лет.'},
+            'Звёзды класс G':{e:'☀️',g:'rgba(255,220,80,.4)',t:['Жёлтые карлики','Солнце G2V','5200–6000 К'],d:'Звёзды класса G — жёлтые карлики с температурой поверхности 5200–6000 К и массой 0.8–1.04 М☉. Составляют около 7.5% всех звёзд. Наше Солнце — G2V. α Центавра A — почти полный близнец Солнца. Продолжительность жизни на главной последовательности — около 10 млрд лет.'},
+            'Звёзды класс M':{e:'🔴',g:'rgba(220,60,40,.4)',t:['Красные карлики','0.08–0.5 М☉','Долгожители'],d:'Звёзды класса M — красные карлики, самые распространённые в Галактике (~70% всех звёзд). Температура 2400–3700 К, масса 0.08–0.5 М☉. Полностью конвективны — сжигают водород медленно и равномерно. Живут триллионы лет. Проксима Центавра (M5.5) — ближайшая звезда к Солнцу.'},
+            'Звёзды класс B, O':{e:'💙',g:'rgba(70,140,255,.5)',t:['8–120 М☉','Горячие','Короткоживущие'],d:'Звёзды классов B и O — самые горячие и массивные на главной последовательности. Класс B: 10 000–30 000 К, масса 2–16 М☉. Класс O: >30 000 К, масса 16–120 М☉. Светимость в тысячи–сотни тысяч раз выше солнечной. Живут 1–10 миллионов лет. Ионизируют межзвёздный газ, образуя туманности HII.'},
+            'Звёзды класс L, T, Y':{e:'🟤',g:'rgba(130,60,20,.4)',t:['Субзвёздные','M☉ < 0.075','Коричневые карлики'],d:'Классы L, T, Y — ультрахолодные субзвёздные объекты (коричневые карлики) на границе между звёздами и планетами. Класс L: 1300–2200 К, пылевые облака в атмосфере. Класс T: 600–1300 К, метановые полосы. Класс Y: <600 К — холоднее некоторых планет. Слишком малы для устойчивого синтеза водорода.'},
+            'Звёзды класс W':{e:'🌐',g:'rgba(80,100,220,.45)',t:['Вольфа-Райе','5–50 М☉','Без водорода'],d:'Звёзды класса W (Вольфа-Райе, WR) — особый класс чрезвычайно массивных, горячих и светящихся звёзд с уникальными спектральными особенностями. Они лишились водородной оболочки через мощный звёздный ветер, обнажив слои с продуктами ядерного горения. Температура поверхности 25 000–100 000 К.'},
+            'Звёзды класс C, S':{e:'🔸',g:'rgba(200,130,50,.4)',t:['Углеродные','Тип C и S','Гиганты'],d:'Звёзды класса C (углеродные) и S — особые типы красных гигантов на асимптотической ветви гигантов. Класс C богат углеродом и его соединениями. Класс S (циркониевые) содержат много оксида циркония — промежуточный тип между кислородными (M) и углеродными (C) звёздами.'},
+            'Коричневые карлики':{e:'🟤',g:'rgba(160,80,30,.4)',t:['13–80 М♃','Дейтерий','Субзвёздный объект'],d:'Коричневые карлики — субзвёздные объекты с массой 13–80 масс Юпитера, слишком лёгкие для устойчивого синтеза водорода. Могут кратковременно сжигать дейтерий. Являются промежуточным состоянием между планетой и звездой. Первый коричневый карлик (Teide 1) открыт в 1995 г.'},
+            'Голубой гигант':{e:'🔷',g:'rgba(60,130,255,.5)',t:['Класс B/O','Горячий гигант','После ГП'],d:'Голубой гигант — горячая массивная звезда класса O или B после главной последовательности, ещё не успевшая расшириться в сверхгигант. Температура поверхности >10 000 К. Чрезвычайно яркие и редкие объекты. Некоторые голубые гиганты являются пульсирующими переменными — β Цефея.'},
+            'Голубой сверхгигант':{e:'🔵',g:'rgba(60,120,255,.5)',t:['Класс B/O Ia','Ригель','~10–100 М☉'],d:'Голубой сверхгигант — массивная звезда класса O или B, класс светимости Ia/Ib. Температура поверхности 10 000–50 000 К. Ригель (β Ориона) — классический пример: светимость в 120 000 раз выше солнечной, масса ~21 М☉. Стадия короткая — звезда быстро эволюционирует в жёлтый или красный сверхгигант.'},
+            'Красный сверхгигант':{e:'🟠',g:'rgba(220,70,30,.5)',t:['8–35 М☉','Бетельгейзе','Крупнейшие по размеру'],d:'Красный сверхгигант — самые крупные звёзды Вселенной по размеру. Образуются из звёзд 8–35 М☉ после исчерпания водорода в ядре. Радиус в 500–1500 раз превышает солнечный. Бетельгейзе (~900 R☉) — один из ближайших. Температура поверхности 3000–4500 К. Предшествует взрыву сверхновой типа II.'},
+            'Сверхновая':{e:'💥',g:'rgba(255,120,30,.6)',t:['Взрыв','Тип II / Ib / Ic','Синтез элементов'],d:'Сверхновая — катастрофический взрыв, знаменующий конец жизни массивной звезды (>8 М☉). При коллапсе железного ядра выделяется ~10⁴⁴ Дж за доли секунды. 99% энергии уносится нейтрино. В остатке — нейтронная звезда или чёрная дыра. Синтезируются все тяжёлые элементы таблицы Менделеева.'},
+            'Звёзды Вольфа-Райе (WR)':{e:'🌐',g:'rgba(80,100,220,.45)',t:['Подклассы WN/WC/WO','Без водорода','Мощный ветер'],d:'Звёзды Вольфа-Райе — горячие, крайне яркие звёзды, лишившиеся водородной оболочки через мощный звёздный ветер. В спектре отсутствуют линии водорода, зато ярко выражены He, C, N или O. Подкласс WN — богат азотом (ранняя стадия), WC — углеродом (промежуточная), WO — кислородом (финальная). Предшественники сверхновых Ib/c.'},
+            'Подкласс WN':{e:'💜',g:'rgba(80,60,180,.4)',t:['Азот','Ранняя стадия WR'],d:'Подкласс WN — ранняя стадия эволюции WR-звёзд. Звезда сбросила водородную оболочку, обнажив слои, обогащённые азотом. В спектре доминируют линии азота и гелия.'},
+            'Подкласс WC':{e:'💜',g:'rgba(80,60,180,.4)',t:['Углерод','Промежуточная стадия WR'],d:'Подкласс WC — промежуточная стадия эволюции WR-звёзд. В соединениях преобладает углерод. Дальнейшая потеря массы обнажает слои с продуктами горения гелия (углерод, кислород).'},
+            'Подкласс WO':{e:'💜',g:'rgba(80,60,180,.4)',t:['Кислород','Финальная стадия WR','10³–10⁴ лет'],d:'Подкласс WO — финальная стадия эволюции WR-звёзд перед взрывом сверхновой. В соединениях преобладает кислород. Длится всего 10³–10⁴ лет — это самые «обнажённые» звёзды, открывающие глубочайшие слои.'},
+            'Подкласс WN/C':{e:'💜',g:'rgba(80,60,180,.4)',t:['Промежуточный','N и C','Редкий'],d:'Подкласс WN/C — редкий переходный тип между азотной (WN) и углеродной (WC) последовательностями WR-звёзд. Имеет промежуточные характеристики — в спектре присутствуют как линии азота, так и углерода.'},
+            'Подкласс WNh':{e:'💜',g:'rgba(80,60,180,.4)',t:['Водород-содержащий','M☉ > 75','WR+H'],d:'Подкласс WNh — особый подтип с высоким содержанием водорода. Представляет массивные звёзды главной последовательности (>75 М☉), которые ещё не потеряли водородную оболочку полностью. Переходные объекты между O-звёздами и классическими WR-звёздами.'},
+            'Красный гигант':{e:'🔴',g:'rgba(255,60,40,.5)',t:['0.5–8 М☉','Расширение','Гелиевый синтез'],d:'Красный гигант — стадия эволюции звёзд 0.5–8 М☉ после исчерпания водорода. Ядро сжимается, а внешние слои расширяются до сотен солнечных радиусов. Температура поверхности 3500–5000 К. В ядре начинается синтез гелия в углерод (тройной альфа-процесс).'},
+            'Сброс оболочки':{e:'🌀',g:'rgba(70,200,150,.4)',t:['Асимптотическая ветвь','Ветер','АГБ'],d:'Сброс оболочки — финальный этап эволюции звёзд малой/средней массы на асимптотической ветви гигантов (АГБ). Нестабильные пульсации и мощный звёздный ветер сдувают внешние оболочки звезды, образуя планетарную туманность вокруг горячего центрального остатка.'},
+            'Планетарная туманность':{e:'🌀',g:'rgba(70,200,150,.45)',t:['Ионизированный газ','~10 000 лет','Белый карлик в центре'],d:'Планетарная туманность — светящаяся оболочка ионизированного газа, сброшенного звездой средней массы. В центре — горячий белый карлик, чьё УФ-излучение заставляет газ светиться. Туманность Кольцо (M57), Туманность Кошачий Глаз — классические примеры. Существует около 10 000 лет.'},
+            'Белый карлик':{e:'💠',g:'rgba(140,170,255,.5)',t:['< 1.4 М☉','Размером с Землю','Предел Чандрасекара'],d:'Белый карлик — конечный этап эволюции звёзд с массой до ~8 М☉. Размером с Землю, масса ~0.6 М☉. Поддерживается давлением вырожденного электронного газа. Без термоядерных реакций — лишь медленно остывает. 97% всех звёзд закончат жизнь белым карликом. Предел Чандрасекара: 1.4 М☉.'},
+            'Чёрный карлик':{e:'⬛',g:'rgba(60,60,80,.3)',t:['Теоретический','Остывший белый карлик','10¹⁵–10¹⁶ лет'],d:'Чёрный карлик — гипотетическое конечное состояние полностью остывшего белого карлика. Время остывания 10¹⁵–10¹⁶ лет многократно превышает возраст Вселенной, поэтому чёрных карликов в наблюдаемой Вселенной пока не существует. Является чисто теоретическим объектом.'},
+            'Нейтронная звезда':{e:'💫',g:'rgba(60,200,220,.5)',t:['1.4–3 М☉','~20 км','Ядерная плотность'],d:'Нейтронная звезда — сверхплотный остаток после взрыва сверхновой (8–25 М☉). Масса 1.4–3 М☉ сжата до диаметра ~20 км. Плотность ядерная: чайная ложка — сотни миллионов тонн. Состоит почти целиком из нейтронов. Поверхностная гравитация в 200 млрд раз сильнее земной.'},
+            'Чёрная дыра':{e:'🕳️',g:'rgba(80,30,180,.5)',t:['M☉ > 25','Горизонт событий','Сингулярность'],d:'Чёрная дыра звёздной массы образуется при коллапсе ядра звезды >25 М☉. Гравитация настолько сильна, что свет не может покинуть область внутри горизонта событий. Первое прямое наблюдение гравитационных волн от слияния двух ЧД — LIGO, 2015. Существуют также «спящие» чёрные дыры без аккреции.'},
+            'Пульсар':{e:'📡',g:'rgba(50,220,190,.45)',t:['Нейтронная звезда','Периодические импульсы','До 716 об/с'],d:'Пульсар — быстро вращающаяся нейтронная звезда с мощным магнитным полем, излучающая периодические импульсы. Ось магнитного поля не совпадает с осью вращения — пучок «подметает» пространство как маяк. Первый пульсар открыт Джослин Белл в 1967 г. Миллисекундные пульсары точнее атомных часов.'},
+            'Магнитар':{e:'🧲',g:'rgba(80,255,180,.45)',t:['~10¹⁵ Гс','Гамма-вспышки','~30 в Галактике'],d:'Магнитар — нейтронная звезда с магнитным полем ~10¹⁵ Гс, в 1000 раз сильнее обычных. Своим полем способны буквально разрывать кору звезды. Периодически испускают мощнейшие гамма-вспышки. Вспышка SGR 1806-20 в 2004 г. ионизировала ионосферу Земли с 50 000 световых лет.'},
+            'Изолированные нейтронные звёзды':{e:'⭐',g:'rgba(60,180,200,.4)',t:['Постаревшие','Одиночные','Остывающие'],d:'Изолированные нейтронные звёзды (INS) — постаревшие нейтронные звёзды, у которых уже иссяк ресурс вращательной энергии для излучения радиоимпульсов. Одиночные, медленно остывают. Наблюдаются в рентгеновском диапазоне — т.н. «Великолепная семёрка» вблизи Солнца.'},
+            'Квазар':{e:'✨',g:'rgba(190,100,255,.5)',t:['АЯГ','Сверхмассивная ЧД','Ранняя Вселенная'],d:'Квазар — чрезвычайно яркое активное ядро далёкой галактики, питаемое аккрецией на сверхмассивную чёрную дыру (10⁶–10¹⁰ М☉). Светимость в триллионы раз выше солнечной. Один из ближайших — 3C 273 (2.4 млрд св. лет). Квазары доминировали в ранней Вселенной.'},
+            'Блазар':{e:'⚡',g:'rgba(180,70,255,.5)',t:['Джет к наблюдателю','Переменный','BL Lac / FSRQ'],d:'Блазар — квазар, чей релятивистский джет направлен практически прямо на наблюдателя. Это делает блазары исключительно яркими переменными источниками от радио до гамма. Блазар и квазар — по сути одно и то же, только у блазара джеты «светят нам в лицо», а у квазара — в стороны.'},
+            'Микроквазар':{e:'🌀',g:'rgba(150,80,220,.45)',t:['Слабое излучение','Нейтронная звезда/ЧД','Двойная система'],d:'Микроквазар — рентгеновская двойная система (нейтронная звезда или чёрная дыра + компаньон) с относительно слабыми джетами. Уменьшенная модель квазара: те же физические процессы аккреции и выброса джетов, только в масштабе звёздной массы. Характерно слабое, переменное излучение.'},
+            'Активно «питающаяся» чёрная дыра':{e:'🕳️',g:'rgba(100,40,200,.5)',t:['Аккреция','«Плодородная» среда','АЯГ'],d:'Чёрная дыра в «плодородной» среде с достаточным количеством вещества для аккреции становится источником мощного излучения. В зависимости от интенсивности и направления джетов такие объекты классифицируются как микроквазары, квазары или блазары.'},
+            'Спящая чёрная дыра':{e:'🕳️',g:'rgba(60,30,120,.4)',t:['Нет аккреции','Неактивная','X-ray transient'],d:'Спящая (неактивная) чёрная дыра — чёрная дыра, лишённая достаточного притока вещества для активной аккреции. Практически не излучает, обнаруживается только через гравитационное влияние на компаньона в двойной системе или через транзиентную рентгеновскую активность.'},
+            'Жёлтый карлик':{e:'🌕',g:'rgba(255,210,60,.4)',t:['Класс G','Главная последовательность','Солнце'],d:'Жёлтый карлик — звезда класса G главной последовательности с температурой 5200–6000 К и массой 0.8–1.04 М☉. Наше Солнце — типичный жёлтый карлик (G2V). Живут около 10 млрд лет, после чего расширяются в красные гиганты. Хорошие кандидаты для систем с обитаемыми планетами.'},
+            'Оранжевый карлик':{e:'🟠',g:'rgba(230,140,50,.4)',t:['Класс K','0.5–0.8 М☉','14–34 млрд лет'],d:'Оранжевый карлик — звезда класса K главной последовательности с температурой 3700–5200 К и массой 0.5–0.8 М☉. Живут 14–34 млрд лет — дольше нашего Солнца. Считаются перспективными для жизни: достаточно стабильны, долгоживущи и не слишком активны в ультрафиолете.'},
+            'Бариевая звезда':{e:'⚗️',g:'rgba(150,130,60,.4)',t:['Класс G или K','Барий','Двойная система'],d:'Бариевая звезда — гигант класса G или K с аномально высоким содержанием бария и других элементов s-процесса. Обогащение произошло в результате переноса вещества от компаньона-звезды AGB в прошлом (сейчас компаньон — белый карлик). Один из ключевых признаков взаимодействия в двойных системах.'},
+            'Красный сверхгигант (ветвь M)':{e:'🔴',g:'rgba(220,60,30,.5)',t:['0.2–0.5 М☉','Медленная эволюция'],d:'Красный сверхгигант из ветви звёзд класса M с массой 0.2–0.5 М☉. Эти звёзды эволюционируют медленнее, чем их более массивные собратья. Конечной стадией станет белый карлик.'},
+            'Голубой карлик':{e:'🔹',g:'rgba(60,140,255,.4)',t:['Теоретический','M☉ < 0.2','Будущее красных карликов'],d:'Голубой карлик — теоретический объект, в который со временем превратится маломассивный красный карлик (M☉ < 0.2). По мере сжигания водорода ядро уплотняется, температура растёт, и звезда становится горячее и голубее, прежде чем превратиться в белый карлик. Ни одного голубого карлика пока не наблюдалось — Вселенная ещё недостаточно стара.'},
+            'Циркониевая звезда Тип S':{e:'🔶',g:'rgba(200,130,50,.4)',t:['Тип S','Цирконий','АГБ-звезда'],d:'Циркониевая звезда типа S — красный гигант или АГБ-звезда с аномально высоким содержанием оксида циркония и других оксидов металлов. Промежуточный тип между кислородными (M) и углеродными (C) звёздами. В спектре заметны молекулярные полосы ZrO.'},
+            'Углеродная звезда Тип C':{e:'🟤',g:'rgba(180,100,30,.4)',t:['Тип C','Углерод','АГБ-звезда'],d:'Углеродная звезда типа C — красный гигант или АГБ-звезда, в атмосфере которой углерода больше, чем кислорода (C/O > 1). Из-за этого в атмосфере образуются молекулы углерода (C₂, CN, CH), придавая звезде характерный красноватый цвет. Конечный продукт обогащения вещества через третий подъём гелия.'},
+            'Сверхмассивная тёмная звезда':{e:'🌑',g:'rgba(100,50,150,.4)',t:['Теоретический','Тёмная материя','Ранняя Вселенная'],d:'Сверхмассивная тёмная звезда — гипотетический объект ранней Вселенной, образованный из тёмной материи. В отличие от обычных звёзд, светится за счёт аннигиляции частиц тёмной материи внутри, а не термоядерного синтеза. Масса до 10⁸ М☉. Возможно, являлись предшественниками сверхмассивных чёрных дыр.'},
+            'Тёмный карлик':{e:'🌑',g:'rgba(50,20,80,.4)',t:['Коричневый карлик','Полностью остывший','Теоретический'],d:'«Тёмный карлик» — полностью остывший коричневый карлик, исчерпавший все источники энергии (в т.ч. дейтерий). Теоретический объект; из-за малой массы и слабого излучения крайне трудно обнаруживается. Не путать с чёрным карликом (остывший белый карлик).'},
+            'Взрыв сверхновой':{e:'💥',g:'rgba(255,100,20,.6)',t:['Финал','Коллапс','10⁴⁴ Дж'],d:'Взрыв сверхновой — катастрофическое высвобождение энергии при коллапсе ядра массивной звезды или термоядерном взрыве белого карлика. За доли секунды выделяется больше энергии, чем Солнце излучает за всю жизнь. Гипотетически «железная» звезда (полностью из Fe-56) может также взорваться.'},
+            '«Железная» звезда':{e:'⚙️',g:'rgba(120,120,140,.4)',t:['Теоретический','Fe-56','10¹⁰⁰⁰ лет'],d:'«Железная» звезда — гипотетический объект, состоящий почти полностью из изотопа железо-56. Через чрезвычайно долгое время (~10¹⁰⁰⁰ лет) все атомы других элементов распадутся до железа через квантовые туннельные эффекты. Звезда становится своего рода планетоподобным объектом с железным ядром.'},
+            'Кварковая звезда':{e:'⚛️',g:'rgba(80,180,150,.45)',t:['Гипотетический','Кварк-глюонная плазма','Плотнее нейтронной'],d:'Кварковая звезда — гипотетическая следующая стадия после нейтронной звезды. Содержит кварковую материю (кварк-глюонную плазму) — привычные частицы (протоны, нейтроны) распались до составляющих кварков. Плотность выше ядерной.'},
+            'Преонная звезда':{e:'🔬',g:'rgba(60,200,180,.45)',t:['Гипотетический','10²⁰ г/см³','~10 м в диаметре'],d:'Преонная звезда — гипотетический объект, идущий после кварковой звезды. Кварки там распадаются на ещё более мелкие фундаментальные частицы — преоны. Плотность ~10²⁰ г/см³, масса до ~100 М☉, но диаметр всего около 10 метров. Крайне теоретический объект.'},
+            'Странные звёзды':{e:'🌌',g:'rgba(100,150,200,.4)',t:['Кварковое вещество','Странные кварки','Стабильность?'],d:'Странные звёзды — гипотетические объекты из стабильного кваркового вещества, содержащего странные кварки (up, down, strange). Если «странная материя» термодинамически стабильна (гипотеза Виттена), такие объекты могут существовать как конкурирующая с нейтронными звёздами форма вещества.'},
+            'Q-звезда (Серая дыра)':{e:'⭕',g:'rgba(100,100,120,.4)',t:['Гипотетический','Без горизонта событий','Экзотика'],d:'Q-звезда (или серая дыра) — гипотетический компактный объект, состоящий из экзотического вещества и внешне похожий на чёрную дыру, но без горизонта событий. Теоретически может существовать в диапазоне масс между нейтронными звёздами и чёрными дырами.'},
+            'Сверхгигант':{e:'🔶',g:'rgba(220,100,40,.5)',t:['Класс I','Очень яркие','Редкие'],d:'Сверхгиганты — звёзды класса светимости I, наиболее яркие и крупные после гипергигантов. Делятся на горячих (голубые, белые) и холодных (жёлтые, красные). Масса 10–70 М☉, светимость 10⁴–10⁶ L☉. Денеб (α Лебедя) — один из самых ярких сверхгигантов северного неба.'},
+            'Яркие гиганты':{e:'🟡',g:'rgba(230,190,60,.4)',t:['Класс II','Промежуточные'],d:'Яркие гиганты класса II — промежуточный класс между нормальными гигантами (III) и сверхгигантами (I). Крупнее и ярче гигантов, но не достигают светимости сверхгигантов. Температура и масса варьируются от горячих голубых до прохладных оранжевых.'},
+            'Гиганты':{e:'🟠',g:'rgba(220,150,50,.4)',t:['Класс III','После ГП','10–100 R☉'],d:'Гиганты класса III — звёзды, покинувшие главную последовательность и расширившиеся в 10–100 раз. Arcturus (α Волопаса) — ярчайший красный гигант северного неба. Aldebaran — оранжевый гигант в 44 раза крупнее Солнца.'},
+            'Звёзды главной последовательности (Карлики)':{e:'⭐',g:'rgba(100,180,255,.4)',t:['Класс V','Синтез H→He','90% всех звёзд'],d:'Звёзды главной последовательности (карлики) — класс светимости V, самый распространённый (~90% всех звёзд). Термоядерный синтез водорода в гелий уравновешивает гравитацию. Солнце — G2V. Диапазон масс: от 0.08 М☉ (красные карлики) до >100 М☉ (O-звёзды).'},
+            'Субкарлики':{e:'🔹',g:'rgba(100,130,200,.4)',t:['Класс VI','Низкая металличность','Ниже ГП'],d:'Субкарлики класса VI расположены ниже главной последовательности на диаграмме ГР. Низкое содержание тяжёлых элементов уменьшает непрозрачность — при той же температуре они имеют меньший радиус. Как правило, старые звёзды галактического гало или шаровых скоплений.'},
+            'Субгиганты':{e:'🟢',g:'rgba(180,220,80,.4)',t:['Класс IV','Покидают ГП','Расширение ядра'],d:'Субгиганты класса IV — звёзды, начинающие уходить с главной последовательности после исчерпания водорода в ядре. Чуть крупнее и ярче ГП-звёзд того же спектрального типа. Солнце станет субгигантом через ~5 млрд лет.'},
+            'Белые карлики (светимость)':{e:'💠',g:'rgba(140,170,255,.5)',t:['Класс VII','Конечный этап','Остывание'],d:'Белые карлики класса светимости VII — конечный этап звёзд малой/средней массы. Размером с Землю, масса ~0.6 М☉. Сириус B — ближайший белый карлик (8.6 световых лет). Постепенно остывают в течение миллиардов лет. Около 97% всех звёзд закончат жизнь белыми карликами.'},
+            'Голубые (гиганты)':{e:'🔵',g:'rgba(60,120,255,.4)',t:['Горячие гиганты','Класс O/B III'],d:'Голубые гиганты — горячие (>10 000 К) крупные звёзды класса O или B в стадии гиганта. Реже встречаются, чем красные или оранжевые гиганты, так как соответствующие звёзды эволюционируют быстро.'},
+            'Красные (гиганты)':{e:'🔴',g:'rgba(220,60,40,.4)',t:['Класс M/K III','Прохладные','Arctur'],d:'Красные гиганты — наиболее распространённый тип гигантов. Прохладные (3500–5000 К), крупные (10–200 R☉). Arcturus — ярчайший красный гигант северного неба на расстоянии 37 световых лет.'},
+            'Жёлтые (гиганты)':{e:'🌟',g:'rgba(255,220,80,.4)',t:['Класс G/K II-III','Цефеиды'],d:'Жёлтые гиганты — звёзды класса G или K в стадии гиганта. Многие являются цефеидами — пульсирующими переменными, используемыми как «стандартные свечи» для измерения расстояний. Полярная звезда — жёлтый сверхгигант-цефеида.'},
+            'Голубые (ГП)':{e:'💙',g:'rgba(60,120,255,.45)',t:['Класс O/B V','ГП-звёзды'],d:'Голубые звёзды главной последовательности классов O и B — горячие, массивные. Самые яркие, но и самые короткоживущие: живут от 1 до 10 млн лет.'},
+            'Оранжевые (ГП)':{e:'🟠',g:'rgba(230,140,50,.4)',t:['Класс K V','Долгоживущие'],d:'Оранжевые звёзды класса K на главной последовательности — стабильные, долгоживущие объекты (14–34 млрд лет). Хорошие кандидаты для систем с обитаемыми планетами благодаря стабильности и умеренному ультрафиолетовому излучению.'},
+            'Красные (ГП)':{e:'🔴',g:'rgba(220,60,40,.4)',t:['Класс M V','Самые распространённые'],d:'Красные карлики класса M на главной последовательности — самые распространённые звёзды (70% всех звёзд). Малые, тусклые, долгоживущие. Многие имеют планеты, в том числе в зоне обитаемости.'},
+            'Жёлтые (ГП)':{e:'☀️',g:'rgba(255,220,80,.35)',t:['Класс G V','Солнце'],d:'Жёлтые звёзды класса G на главной последовательности, подобные Солнцу. Температура 5200–6000 К. Живут около 10 млрд лет.'},
+            'Классификация звёзд по светимости':{e:'📊',g:'rgba(150,150,200,.4)',t:['Йерксская классификация','MK-система','Классы светимости'],d:'Йерксская (MK) классификация — система определения классов светимости звёзд по ширине спектральных линий. Разработана в Йеркской обсерватории в 1943 г. Дополняет Гарвардскую классификацию по температуре (классы O–M). Классы светимости: 0 (гипергиганты) – VII (белые карлики).'},
+            'Чёрная дыра / Нейтронная звезда':{e:'💫',g:'rgba(80,50,180,.45)',t:['8–25 М☉','Остаток сверхновой'],d:'После взрыва сверхновой тип остатка зависит от массы ядра. При массе остатка 1.4–3 М☉ образуется нейтронная звезда; при >3 М☉ — чёрная дыра. Граница неточная и зависит от состава, угловых моментов и других факторов.'},
+            };
+
+            // ── CANVAS DATA: all nodes (only name-blocks, skip pure-info nodes) ──
+            // Coords: raw canvas x,y → add OX,OY
+            // Format: {id, label, x, y, w, h, cls, infoKey}
+
+            const RAW = [
+            // MAIN FLOW
+            {id:'cloud',    label:'Газопылевое облако',     x:-440, y:-30,   w:270, h:120, cls:'c6',       ik:'Газопылевое облако'},
+            {id:'proto',    label:'Протозвезда',             x:-60,  y:0,     w:250, h:60,  cls:'c2',       ik:'Протозвезда'},
+
+            // LEFT BRANCH HEADERS
+            {id:'hBO',      label:'Звёзды класс B, O',       x:400,  y:-278,  w:250, h:60,  cls:'cgray',    ik:'Звёзды класс B, O'},
+            {id:'hKJFA',    label:'Звёзды класс K, J, F, A', x:420,  y:0,     w:250, h:60,  cls:'cgray',    ik:'Звёзды класс K, J, F, A'},
+            {id:'hG',       label:'Звёзды класс G',           x:400,  y:280,   w:250, h:60,  cls:'cgray',    ik:'Звёзды класс G'},
+            {id:'hM',       label:'Звёзды класс M',           x:320,  y:500,   w:250, h:60,  cls:'cgray',    ik:'Звёзды класс M'},
+            {id:'hW',       label:'Звёзды класс W',           x:320,  y:-1042, w:250, h:60,  cls:'cgray',    ik:'Звёзды класс W'},
+            {id:'hLTY',     label:'Звёзды класс L, T, Y',     x:280,  y:-1685, w:250, h:60,  cls:'cgray',    ik:'Звёзды класс L, T, Y'},
+            {id:'hCS',      label:'Звёзды класс C, S',        x:245,  y:720,   w:250, h:60,  cls:'cgray',    ik:'Звёзды класс C, S'},
+
+            // B,O BRANCH
+            {id:'bluegiant',label:'Голубой гигант',           x:815,  y:-278,  w:250, h:60,  cls:'c5',       ik:'Голубой гигант'},
+            {id:'bluesg',   label:'Голубой сверхгигант',      x:1230, y:-278,  w:250, h:60,  cls:'c5',       ik:'Голубой сверхгигант'},
+            {id:'redsg',    label:'Красный сверхгигант',      x:1630, y:-278,  w:250, h:60,  cls:'c1',       ik:'Красный сверхгигант'},
+            {id:'sn1',      label:'Сверхновая',               x:2037, y:-278,  w:250, h:60,  cls:'c6',       ik:'Сверхновая'},
+            {id:'wd_ns',    label:'Чёрная дыра / Нейтронная звезда', x:1720, y:-497, w:280, h:84, cls:'cblue2', ik:'Чёрная дыра / Нейтронная звезда'},
+            {id:'wr_main',  label:'Звёзды Вольфа-Райе (WR)',  x:2037, y:-153,  w:250, h:60,  cls:'cpurple',  ik:'Звёзды Вольфа-Райе (WR)'},
+
+            // WR subclasses
+            {id:'wr_full',  label:'Звёзды Вольфа-Райе (WR)',  x:680,  y:-1042, w:250, h:60,  cls:'cpurple',  ik:'Звёзды Вольфа-Райе (WR)'},
+            {id:'wn',       label:'Подкласс WN',              x:1060, y:-1382, w:250, h:60,  cls:'cpurple',  ik:'Подкласс WN'},
+            {id:'wc',       label:'Подкласс WC',              x:1060, y:-1042, w:250, h:60,  cls:'cpurple',  ik:'Подкласс WC'},
+            {id:'wo',       label:'Подкласс WO',              x:1060, y:-703,  w:250, h:60,  cls:'cpurple',  ik:'Подкласс WO'},
+            {id:'wnc',      label:'Подкласс WN/C',            x:1480, y:-1214, w:250, h:60,  cls:'cpurple',  ik:'Подкласс WN/C'},
+            {id:'wnh',      label:'Подкласс WNh',             x:990,  y:-485,  w:250, h:60,  cls:'cpurple',  ik:'Подкласс WNh'},
+            {id:'ns_wd',    label:'Чёрная дыра / Нейтронная звезда', x:2600, y:-1174, w:280, h:84, cls:'cblue2', ik:'Чёрная дыра / Нейтронная звезда'},
+
+            // K,J,F,A BRANCH
+            {id:'orangedw', label:'Оранжевый карлик (Класс K)',x:815,  y:-140,  w:250, h:60,  cls:'c2',       ik:'Оранжевый карлик'},
+            {id:'redgiant', label:'Красный гигант',            x:1230, y:0,     w:250, h:60,  cls:'c1',       ik:'Красный гигант'},
+            {id:'shell1',   label:'Сброс оболочки',            x:1630, y:0,     w:250, h:60,  cls:'c6',       ik:'Сброс оболочки'},
+            {id:'pn1',      label:'Планетарная туманность',    x:2037, y:258,   w:250, h:60,  cls:'c6',       ik:'Планетарная туманность'},
+            {id:'wd1',      label:'Белый карлик (2,5 < M⊙ < 8)',              x:2617, y:185,   w:250, h:60,  cls:'cblue2',   ik:'Белый карлик'},
+            {id:'wd2',      label:'Белый карлик (0,5 < M⊙ < 2,5)',              x:2617, y:371,   w:250, h:60,  cls:'cblue2',   ik:'Белый карлик'},
+            {id:'bkd',      label:'Чёрный карлик',             x:2037, y:560,   w:250, h:60,  cls:'cblue2',   ik:'Чёрный карлик'},
+
+            // G BRANCH
+            {id:'yellowdw', label:'Жёлтый карлик',            x:815,  y:280,   w:250, h:60,  cls:'c3',       ik:'Жёлтый карлик'},
+            {id:'bariumst', label:'Бариевая звезда (Класс G/K)',x:815, y:140,   w:260, h:60,  cls:'c3',       ik:'Бариевая звезда'},
+
+            // M BRANCH
+            {id:'redsupa',  label:'Красный сверхгигант',      x:815,  y:440,   w:250, h:60,  cls:'c1',       ik:'Красный сверхгигант'},
+            {id:'shell2',   label:'Сброс оболочки',           x:1230, y:440,   w:250, h:60,  cls:'c6',       ik:'Сброс оболочки'},
+            {id:'wd3',      label:'Белый карлик',             x:1630, y:560,   w:250, h:60,  cls:'cblue2',   ik:'Белый карлик'},
+            {id:'bluedw',   label:'Голубой карлик',           x:815,  y:560,   w:250, h:60,  cls:'c5',       ik:'Голубой карлик'},
+
+            // C,S BRANCH
+            {id:'zircst',   label:'Циркониевая звезда\nТип S', x:613, y:681,   w:250, h:60,  cls:'c2',       ik:'Циркониевая звезда Тип S'},
+            {id:'carbst',   label:'Углеродная звезда\nТип C',  x:613, y:781,   w:250, h:60,  cls:'c2',       ik:'Углеродная звезда Тип C'},
+
+            // LTY BRANCH
+            {id:'brownd',   label:'Коричневые карлики',       x:662,  y:-1685, w:250, h:60,  cls:'cbrown',   ik:'Коричневые карлики'},
+            {id:'clL',      label:'Класс L',                  x:1124, y:-1789, w:250, h:60,  cls:'cwine',    ik:'Звёзды класс L, T, Y'},
+            {id:'clT',      label:'Класс T',                  x:1124, y:-1685, w:250, h:60,  cls:'cwine',    ik:'Звёзды класс L, T, Y'},
+            {id:'clY',      label:'Класс Y',                  x:1124, y:-1581, w:250, h:60,  cls:'cwine',    ik:'Звёзды класс L, T, Y'},
+            {id:'darkdw',   label:'"Тёмный карлик"',          x:1124, y:-1932, w:250, h:60,  cls:'cdark',    ik:'Тёмный карлик'},
+            {id:'darksup',  label:'Сверхмассивная тёмная звезда', x:1552, y:-1932, w:250, h:60, cls:'cdark', ik:'Сверхмассивная тёмная звезда'},
+            {id:'bh_dark',  label:'Чёрная дыра',              x:1980, y:-1932, w:250, h:60,  cls:'cpurple',  ik:'Чёрная дыра'},
+
+            // NEUTRON STAR & BH
+            {id:'ns',       label:'Нейтронная звезда',        x:2720, y:-150,  w:250, h:60,  cls:'cblue2',   ik:'Нейтронная звезда'},
+            {id:'pulsar',   label:'Пульсар',                  x:3200, y:-291+36,  w:250, h:60,  cls:'cblue2',   ik:'Пульсар'},
+            {id:'magnetar', label:'Магнитар',                 x:3200, y:-186+36,  w:250, h:60,  cls:'c4',       ik:'Магнитар'},
+            {id:'ins',      label:'Изолированные нейтронные звёзды', x:3200, y:-82+36, w:250, h:60, cls:'cblue2', ik:'Изолированные нейтронные звёзды'},
+            {id:'bh_main',  label:'Чёрная дыра',              x:2720, y:-386,  w:250, h:60,  cls:'cpurple',  ik:'Чёрная дыра'},
+            {id:'sleepbh',  label:'Спящая чёрная дыра',       x:3337, y:-386,  w:250, h:60,  cls:'cpurple',  ik:'Спящая чёрная дыра'},
+            {id:'feedbh',   label:'Активно "питающаяся" чёрная дыра', x:3337, y:-878, w:250, h:60, cls:'cpurple', ik:'Активно «питающаяся» чёрная дыра'},
+            {id:'microq',   label:'Микроквазар',              x:3800, y:-660,  w:250, h:60,  cls:'cpurple',  ik:'Микроквазар'},
+            {id:'quasar',   label:'Квазар',                   x:3800, y:-1100, w:250, h:60,  cls:'cpurple',  ik:'Квазар'},
+            {id:'kvazag',   label:'Квазаг',                   x:3800, y:-878,  w:250, h:60,  cls:'cpurple',  ik:'Квазар'},
+            {id:'blazar',   label:'Блазар',                   x:4100, y:-1100, w:250, h:60,  cls:'cpurple',  ik:'Блазар'},
+
+            // LUMINOSITY CLASSIFICATION — top-down tree, evenly spaced
+            // Row 0 (header):  centred at x≈3727, y=-2110
+            // Row 1 (8 nodes): starting x=2560, step=310, y=-1900
+            // Row 2 (subtypes): y=-1680, placed under their parents
+            {id:'lum_hdr',  label:'Классификация звёзд по светимости', x:3547, y:-2110, w:360, h:60, cls:'c3', ik:'Классификация звёзд по светимости'},
+
+            // Row 1 — 8 classes, step 310px, start x=2560
+            {id:'lum_sg',   label:'Сверхгигант',                           x:2560, y:-1900, w:260, h:60, cls:'c2',     ik:'Сверхгигант'},
+            {id:'lum_bg',   label:'Яркие гиганты',                         x:2880, y:-1900, w:260, h:60, cls:'c2',     ik:'Яркие гиганты'},
+            {id:'lum_g',    label:'Гиганты',                               x:3200, y:-1900, w:260, h:60, cls:'c3',     ik:'Гиганты'},
+            {id:'lum_sub',  label:'Субгиганты',                            x:3520, y:-1900, w:260, h:60, cls:'c4',     ik:'Субгиганты'},
+            {id:'lum_ms',   label:'Звёзды\nгл. последовательности',        x:3840, y:-1900, w:260, h:60, cls:'c5',     ik:'Звёзды главной последовательности (Карлики)'},
+            {id:'lum_msd',  label:'Звёзды\nгл. посл. (Карлики)',           x:4160, y:-1900, w:260, h:60, cls:'c5',     ik:'Звёзды главной последовательности (Карлики)'},
+            {id:'lum_subk', label:'Субкарлики',                            x:4480, y:-1900, w:260, h:60, cls:'cgray',  ik:'Субкарлики'},
+            {id:'lum_wd',   label:'Белые карлики',                         x:4800, y:-1900, w:260, h:60, cls:'cblue2', ik:'Белые карлики (светимость)'},
+
+            // Row 2 — subtypes under their parent nodes
+            // Under lum_g  (x=3200): Голубые(3095), Красные(3335)
+            {id:'lum_gblue',label:'Голубые',   x:3080, y:-1680, w:200, h:60, cls:'c5', ik:'Голубые (гиганты)'},
+            {id:'lum_gred', label:'Красные',   x:3320, y:-1680, w:200, h:60, cls:'c1', ik:'Красные (гиганты)'},
+
+            // Under lum_ms (x=3840): Жёлтые(3770), Красные(3970) — wait, lum_ms has 3 children
+            // lum_ms children: lum_gyel, lum_gora, lum_bred  — spread at 3735, 3935, 4105 (but no overlap with lum_msd row2)
+            // lum_msd children: lum_msblu(4155), lum_gyel2(4355)  — shifted right to avoid overlap
+            {id:'lum_gyel', label:'Жёлтые',    x:3740, y:-1680, w:200, h:60, cls:'c3', ik:'Жёлтые (гиганты)'},
+            {id:'lum_gora', label:'Оранжевые', x:3950, y:-1680, w:200, h:60, cls:'c2', ik:'Оранжевые (ГП)'},
+            {id:'lum_bred', label:'Красные',   x:4120, y:-1680, w:200, h:60, cls:'c1', ik:'Красные (ГП)'},
+            {id:'lum_msblu',label:'Голубые',   x:4340, y:-1680, w:200, h:60, cls:'c5', ik:'Голубые (ГП)'},
+            {id:'lum_gyel2',label:'Жёлтые',    x:4550, y:-1680, w:200, h:60, cls:'c3', ik:'Жёлтые (ГП)'},
+
+            // HYPOTHETICAL (bottom group)
+            {id:'hyp_kv',   label:'Кварковая звезда',         x:170,  y:980,  w:260, h:60,  cls:'c4',       ik:'Кварковая звезда'},
+            {id:'hyp_pr',   label:'Преонная звезда',          x:470,  y:980,  w:260, h:60,  cls:'c4',       ik:'Преонная звезда'},
+            {id:'hyp_q',    label:'Q-звезда (Серая дыра)',    x:770, y:980,  w:260, h:60,  cls:'cgray',    ik:'Q-звезда (Серая дыра)'},
+            {id:'hyp_st',   label:'Странные звёзды',          x:1070, y:980,  w:260, h:60,  cls:'c5',       ik:'Странные звёзды'},
+
+            // HYPOTHETICAL from chyorny karlik
+            {id:'iron',     label:'"Железная" звезда',        x:2600, y:720,   w:250, h:60,  cls:'cgray',    ik:'«Железная» звезда'},
+            {id:'bh_iron',  label:'Чёрная дыра',              x:3051, y:720,   w:250, h:60,  cls:'cpurple',  ik:'Чёрная дыра'},
+            {id:'sn_iron',  label:'Взрыв сверхновой',         x:3051, y:560,   w:250, h:60,  cls:'c6',       ik:'Взрыв сверхновой'},
+
+            // GROUPS (visual only)
             ];
 
-            // ── ARROWS ──────────────────────────────────────────────────────
-            // Format: [fromId, toId, color, dashed]
-            const ARROWS = [
-            // Cloud → Proto → branches
-            ['neb',  'proto','#7a6a50'],
-            ['proto','cl_M', '#c06060'],
-            ['proto','cl_G', '#c0a040'],
-            ['proto','cl_BO','#4080c0'],
-            ['proto','cl_O', '#c07030'],
-            ['proto','bd',   '#906040'],
+            // ── EDGES: [from, to, color, dashed] ─────────────────────────────
+            const EDGES = [
+            // main flow
+            ['cloud','proto','#8a7060'],
+            ['proto','hBO',  '#c07030','','8~15 < M☉ < ~120'],
+            ['proto','hKJFA','#c0a040','','0.5 < M☉ < 8'],
+            ['proto','hG',   '#c0c020','','0.84 < M☉ < 1.2'],
+            ['proto','hM',   '#c05050','','M☉ < 0.5'],
+            ['proto','hW',   '#8060b0','','5 < M☉ < 50'],
+            ['proto','hLTY', '#a07060','','M☉ < 0.075'],
+            ['proto','hCS',  '#c08040'],
 
-            // Branch 1: Low mass
-            ['cl_M', 'ms_M', '#c05050'],
-            ['ms_M', 'rkd',  '#c05050'],
-            ['rkd',  'wd_m', '#9090c0'],
+            // B,O chain
+            ['hBO','bluegiant','#6090d0'],
+            ['bluegiant','bluesg','#6090d0'],
+            ['bluesg','redsg','#c05020'],
+            ['redsg','sn1','#d07010'],
+            ['sn1','wd_ns','#7090c0','','8 < M☉ < 25'],
+            ['sn1','bh_main','#8040c0','','M☉ > 25'],
+            ['redsg','wr_main','#7070d0','dashed','Возможно'],
+            ['wr_main','ns_wd','#7090c0'],
 
-            // Branch 2: Medium mass
-            ['cl_G', 'ms_G', '#c0a040'],
-            ['ms_G', 'subg', '#d09030'],
-            ['subg', 'rg',   '#e06030'],
-            ['rg',   'hz',   '#c09030',true],
-            ['rg',   'agb',  '#e07020'],
-            ['hz',   'agb',  '#c09030',true],
-            ['agb',  'pn',   '#50c070'],
-            ['pn',   'wd',   '#8090c0'],
-            ['wd',   'bkd',  '#606080'],
-            ['wd',   'nova', '#c0a030',true],
-            ['nova', 'sn_ia','#e07020'],
+            // WR full classification
+            ['hW','wr_full','#8060c0'],
+            ['wr_full','wn','#7060c0'],
+            ['wr_full','wc','#7060c0'],
+            ['wr_full','wo','#7060c0'],
+            ['wr_full','wnh','#7060c0','','M☉ > 75'],
+            ['wn','wnc','#604090'],
+            ['wc','wnc','#604090'],
+            ['wnh','wd_ns','#7090c0'],
+            ['wc','ns_wd','#7090c0'],
+            ['wo','ns_wd','#7090c0'],
+            ['wnc','ns_wd','#7090c0'],
 
-            // Branch 3: High mass
-            ['cl_BO','ms_BO','#4080c0'],
-            ['ms_BO','bsg',  '#4080c0'],
-            ['bsg',  'ysg',  '#c0a030'],
-            ['bsg',  'rsg',  '#e05020',true],
-            ['ysg',  'rsg',  '#e05020'],
-            ['rsg',  'sn2',  '#e07010'],
-            ['sn2',  'ns',   '#40b0b0'],
-            ['sn2',  'bh',   '#8040c0'],
-            ['ns',   'pulsar','#40c0b0'],
-            ['ns',   'magnet','#40c080'],
-            ['ns',   'xray', '#40b0c0',true],
-            ['bh',   'qsr',  '#9050d0'],
-            ['qsr',  'blz',  '#8040c0',true],
+            // K,J,F,A chain
+            ['hKJFA','orangedw','#c0a030','','0.5 < M☉ < 0.8'],
+            ['orangedw','redgiant','#c05030'],
+            ['hKJFA','redgiant','#d08020'],
+            ['redgiant','shell1','#70c080'],
+            ['shell1','pn1','#60c0c0'],
+            ['pn1','wd1','#8090c0','','2.5 < M☉ < 8'],
+            ['pn1','wd2','#8090c0','','0.5 < M☉ < 2.5'],
+            ['wd1','bkd','dashed','#9060c0'],
+            ['wd2','bkd','dashed','#9060c0'],
 
-            // Branch 4: Very high mass
-            ['cl_O', 'hyp',  '#c07030'],
-            ['hyp',  'wr',   '#4070c0'],
-            ['wr',   'snibc','#e06010'],
-            ['snibc','bh',   '#8040c0'],
+            // G chain
+            ['hG','yellowdw','#c0c020'],
+            ['yellowdw','redgiant','#c05030'],
+            ['hG','bariumst','dashed','#c09020'],
+            ['hKJFA','bariumst','dashed','#c09020'],
+
+            // M chain
+            ['hM','redsupa','#c04030','','0.2 < M☉ < 0.5'],
+            ['hM','bluedw','#5090d0','','M☉ < 0.2'],
+            ['redsupa','shell2','#70c080'],
+            ['shell2','wd3','#8090c0'],
+            ['wd3','bkd','dashed','#9060c0'],
+            ['bluedw','wd3','#8090c0'],
+
+            // C,S
+            ['hCS','zircst','#c08030'],
+            ['hCS','carbst','#c07020'],
+
+            // L,T,Y
+            ['hLTY','brownd','#c07040'],
+            ['brownd','clL','#b06030'],
+            ['brownd','clT','#b06030'],
+            ['brownd','clY','#b06030'],
+            ['brownd','darkdw','dashed','#805060'],
+            ['darkdw','darksup','dashed','#805060'],
+            ['darksup','bh_dark','dashed','#704090'],
+
+            // NS/BH
+            ['ns','pulsar','#4090b0'],
+            ['ns','magnetar','#40b070'],
+            ['ns','ins','#4080a0'],
+            ['bh_main','sleepbh','#a040c0','','Нет "еды"'],
+            ['bh_main','feedbh','#8040c0','','"Плодородная" среда'],
+            ['feedbh','microq','#7050c0','','Слабое излучение'],
+            ['feedbh','quasar','#7050c0','','Сильное излучение'],
+            ['feedbh','kvazag','#7050c0','','Среднее излучение'],
+            ['quasar','blazar','#6040b0'],
+
+            // Luminosity chart connections — drawn as top→bottom vertical tree
+            // (handled by special drawLumTree() below, NOT via EDGES)
+            // ['lum_hdr','lum_sg','#c08030'],   ← removed from EDGES, see drawLumTree
+            // ['lum_hdr','lum_bg','#c0a030'],
+            // etc.
+
+            // hypothetical
+            ['bkd','iron','dashed','#707080'],
+            ['iron','sn_iron','dashed','#c04030'],
+            ['iron','bh_iron','dashed','#7040a0'],
+
+            // hypothetical group (no explicit edges in canvas for kv/pr/q/strange — shown standalone)
             ];
 
-            // ── BUILD DOM ───────────────────────────────────────────────────
-            const vp  = document.getElementById('viewport');
+            // ── GROUPS ───────────────────────────────────────────────────────
+            const GROUPS = [
+            {label:'Классификация звёзд по светимости', x:2480, y:-2164, w:2660, h:570, color:'rgba(200,180,140,.06)', border:'rgba(200,180,100,.2)'},
+            {label:'Гипотетические звёзды',              x:120,  y:940,  w:1260, h:140, color:'rgba(80,130,160,.06)',  border:'rgba(80,130,160,.2)'},
+            {label:'Хронологическая последовательность', x:1040, y:-1402, w:290,  h:779, color:'rgba(120,100,200,.05)', border:'rgba(120,100,180,.15)'},
+            ];
+
+            // ── BUILD DOM ────────────────────────────────────────────────────
+            const vp = document.getElementById('viewport');
             const svg = document.getElementById('arrowSvg');
-            const nmap = {};
+            const nm = {};
 
-            NODES.forEach(n => {
-            const div = document.createElement('div');
-            div.className = n.cls;
-            div.style.cssText = `left:${n.x}px;top:${n.y}px;width:${n.w}px;position:absolute;`;
-            div.innerHTML = n.label.replace(/\n/g,'<br>');
-            if(!n.noModal){
-                div.addEventListener('click', e => {
-                e.stopPropagation();
-                const key = n.label.replace(/\n/g,' ').trim();
-                const info = DB[key] || Object.values(DB).find((_,i)=>{
-                    const k=Object.keys(DB)[i];
-                    return key.toLowerCase().includes(k.toLowerCase().slice(0,7)) || k.toLowerCase().includes(key.toLowerCase().slice(0,7));
-                });
-                if(info) openModal(key, info);
-                });
-            }
-            vp.appendChild(div);
-            nmap[n.id] = {el:div, x:n.x, y:n.y, w:n.w};
+            // Groups
+            GROUPS.forEach(g => {
+                const div = document.createElement('div');
+                div.className = 'grp';
+                div.style.cssText = `left:${cx(g.x)}px;top:${cy(g.y)}px;width:${g.w}px;height:${g.h}px;background:${g.color};border-color:${g.border};`;
+                const lbl = document.createElement('div');
+                lbl.className = 'grp-label';
+                lbl.textContent = g.label;
+                div.appendChild(lbl);
+                vp.appendChild(div);
             });
 
-            // ── DRAW ARROWS ─────────────────────────────────────────────────
+            // ── NEBULA behind "Газопылевое облако" ───────────────────────────
+            // Cloud node: canvas x=-440, y=-30, w=270, h=120
+            // Centre of the node in viewport coords:
+            const NEBULA_CX = cx(-440) + 135;   // node centre-x
+            const NEBULA_CY = cy(-30)  + 60;    // node centre-y
+            const NEBULA_R  = 460;              // visual radius of the nebula
+
+            const nebCvs = document.getElementById('nebulaCvs');
+            const nebCtx = nebCvs.getContext('2d');
+            const NEB_PAD = 80;
+
+            nebCvs.width  = NEBULA_R * 2 + NEB_PAD * 2;
+            nebCvs.height = NEBULA_R * 2 + NEB_PAD * 2;
+            nebCvs.style.left = (NEBULA_CX - NEBULA_R - NEB_PAD) + 'px';
+            nebCvs.style.top  = (NEBULA_CY - NEBULA_R - NEB_PAD) + 'px';
+
+            // Local origin (centre of the canvas)
+            const NLX = NEBULA_R + NEB_PAD;
+            const NLY = NEBULA_R + NEB_PAD;
+
+            // Pre-baked micro-star positions (deterministic PRNG so they don't jump)
+            const nebStars = Array.from({ length: 70 }, (_, i) => {
+                // Simple deterministic hash
+                const h1 = Math.sin(i * 127.1) * 43758.5453;
+                const h2 = Math.sin(i * 311.7) * 43758.5453;
+                const h3 = Math.sin(i * 74.9)  * 43758.5453;
+                const rand = v => v - Math.floor(v);
+                const angle = rand(h1) * Math.PI * 2;
+                const dist  = rand(h2) * NEBULA_R * 0.82;
+                return {
+                    x:  NLX + Math.cos(angle) * dist,
+                    y:  NLY + Math.sin(angle) * dist * 0.85,
+                    r:  0.5 + rand(h3) * 1.6,
+                    b:  0.25 + rand(Math.sin(i * 53.3) * 9999.9) * 0.75,
+                };
+            });
+
+            function drawNebula(t) {
+                const c = nebCtx;
+                c.clearRect(0, 0, nebCvs.width, nebCvs.height);
+
+                // ── Layer 1: large diffuse outer glow (magenta/rose)
+                const g1 = c.createRadialGradient(NLX, NLY, 0, NLX, NLY, NEBULA_R);
+                g1.addColorStop(0.00, 'rgba(190, 55, 110, 0.30)');
+                g1.addColorStop(0.40, 'rgba(150, 30,  80, 0.20)');
+                g1.addColorStop(0.72, 'rgba( 90, 10,  55, 0.09)');
+                g1.addColorStop(1.00, 'rgba(  0,  0,   0, 0.00)');
+                c.fillStyle = g1;
+                c.beginPath();
+                c.ellipse(NLX, NLY, NEBULA_R, NEBULA_R * 0.80, -0.25, 0, Math.PI * 2);
+                c.fill();
+
+                // ── Layer 2: bright inner core (hot pink), slightly off-centre
+                const g2 = c.createRadialGradient(NLX - 50, NLY - 35, 0, NLX - 50, NLY - 35, NEBULA_R * 0.52);
+                g2.addColorStop(0.00, 'rgba(240, 100, 155, 0.60)');
+                g2.addColorStop(0.30, 'rgba(205,  65, 120, 0.38)');
+                g2.addColorStop(0.70, 'rgba(150,  35,  80, 0.16)');
+                g2.addColorStop(1.00, 'rgba(  0,   0,   0, 0.00)');
+                c.fillStyle = g2;
+                c.beginPath();
+                c.ellipse(NLX - 50, NLY - 35, NEBULA_R * 0.52, NEBULA_R * 0.42, 0.4, 0, Math.PI * 2);
+                c.fill();
+
+                // ── Layer 3: blue/purple lobe (upper-right), like in the reference photo
+                const g3 = c.createRadialGradient(NLX + 95, NLY - 100, 0, NLX + 95, NLY - 100, NEBULA_R * 0.42);
+                g3.addColorStop(0.00, 'rgba(110, 145, 245, 0.42)');
+                g3.addColorStop(0.45, 'rgba( 75, 100, 210, 0.22)');
+                g3.addColorStop(1.00, 'rgba(  0,   0,   0, 0.00)');
+                c.fillStyle = g3;
+                c.beginPath();
+                c.ellipse(NLX + 95, NLY - 100, NEBULA_R * 0.42, NEBULA_R * 0.34, -0.55, 0, Math.PI * 2);
+                c.fill();
+
+                // ── Layer 4: dark dust lanes (multiply blend simulated with dark fills)
+                const dustLanes = [
+                    { ox: -25, oy:  18, rx: 175, ry: 30, rot:  0.55, a: 0.52 },
+                    { ox:  55, oy:  -8, rx: 115, ry: 20, rot: -0.28, a: 0.44 },
+                    { ox: -65, oy: -55, rx:  85, ry: 16, rot:  0.85, a: 0.38 },
+                    { ox:  10, oy:  80, rx: 130, ry: 22, rot:  0.15, a: 0.30 },
+                ];
+                c.save();
+                c.globalCompositeOperation = 'multiply';
+                dustLanes.forEach(d => {
+                    const gd = c.createRadialGradient(
+                        NLX + d.ox, NLY + d.oy, 0,
+                        NLX + d.ox, NLY + d.oy, d.rx
+                    );
+                    gd.addColorStop(0.0, `rgba(8, 0, 18, ${d.a})`);
+                    gd.addColorStop(0.5, `rgba(8, 0, 18, ${d.a * 0.35})`);
+                    gd.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+                    c.fillStyle = gd;
+                    c.beginPath();
+                    c.ellipse(NLX + d.ox, NLY + d.oy, d.rx, d.ry, d.rot, 0, Math.PI * 2);
+                    c.fill();
+                });
+                c.restore();
+
+                // ── Layer 5: micro-stars scattered inside the nebula
+                nebStars.forEach(s => {
+                    const sg = c.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3.5);
+                    sg.addColorStop(0,   `rgba(255,255,255,${s.b})`);
+                    sg.addColorStop(0.4, `rgba(220,205,255,${s.b * 0.4})`);
+                    sg.addColorStop(1,   'rgba(0,0,0,0)');
+                    c.fillStyle = sg;
+                    c.beginPath();
+                    c.arc(s.x, s.y, s.r * 3.5, 0, Math.PI * 2);
+                    c.fill();
+                });
+
+                // ── Layer 6: slow animated breathing glow on the core
+                const pulse = 0.13 + 0.06 * Math.sin(t * 0.00075);
+                const gp = c.createRadialGradient(NLX - 30, NLY - 25, 0, NLX - 30, NLY - 25, NEBULA_R * 0.38);
+                gp.addColorStop(0,   `rgba(255, 175, 215, ${pulse})`);
+                gp.addColorStop(0.6, `rgba(210, 100, 155, ${pulse * 0.3})`);
+                gp.addColorStop(1,   'rgba(0, 0, 0, 0)');
+                c.fillStyle = gp;
+                c.beginPath();
+                c.arc(NLX - 30, NLY - 25, NEBULA_R * 0.38, 0, Math.PI * 2);
+                c.fill();
+            }
+
+            (function nebLoop(t) {
+                drawNebula(t);
+                requestAnimationFrame(nebLoop);
+            })(0);
+
+            // Nodes
+            RAW.forEach(n => {
+            const div = document.createElement('div');
+            div.className = 'nd ' + n.cls;
+            div.style.cssText = `left:${cx(n.x)}px;top:${cy(n.y)}px;width:${n.w}px;min-height:${n.h}px;position:absolute;`;
+            div.innerHTML = n.label.replace(/\n/g,'<br>');
+            div.addEventListener('click', e => {
+                e.stopPropagation();
+                const info = DB[n.ik] || DB[n.label.trim()];
+                if(info) openModal(n.label.replace(/\n/g,' ').trim(), info);
+            });
+            vp.appendChild(div);
+            nm[n.id] = {el:div, x:cx(n.x), y:cy(n.y), w:n.w, h:n.h};
+            });
+
+            // ── DRAW ARROWS ──────────────────────────────────────────────────
             const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
             svg.appendChild(defs);
 
             function drawArrows(){
-            svg.querySelectorAll('path').forEach(p=>p.remove());
-            defs.innerHTML='';
-            ARROWS.forEach(([fid,tid,color,dashed])=>{
-                const a=nmap[fid], b=nmap[tid];
-                if(!a||!b) return;
-                const ah=a.el.offsetHeight||H, bh=b.el.offsetHeight||H;
-                const ax=a.x+a.w, ay=a.y+ah/2;
-                const bx=b.x,     by=b.y+bh/2;
+            svg.querySelectorAll('path,line').forEach(p=>p.remove());
+            defs.innerHTML = '';
+            EDGES.forEach(([fid,tid,c,dash,lbl],idx) => {
+                // handle swapped args
+                let color = c, dashed = dash;
+                if(c==='dashed'){color=dash||'#708090';dashed='dashed';}
 
-                const mkid=`mk_${fid}_${tid}`;
-                const mk=document.createElementNS('http://www.w3.org/2000/svg','marker');
-                mk.setAttribute('id',mkid);mk.setAttribute('markerWidth','7');
-                mk.setAttribute('markerHeight','7');mk.setAttribute('refX','6');
-                mk.setAttribute('refY','3.5');mk.setAttribute('orient','auto');
-                const mkp=document.createElementNS('http://www.w3.org/2000/svg','path');
+                const a = nm[fid], b = nm[tid];
+                if(!a||!b) return;
+                const ah = a.el.offsetHeight||a.h||60;
+                const bh = b.el.offsetHeight||b.h||60;
+
+                // right side of a → left side of b
+                const ax = a.x + a.w;
+                const ay = a.y + ah/2;
+                const bx2 = b.x;
+                const by = b.y + bh/2;
+
+                const mkid = `mk${idx}`;
+                const mk = document.createElementNS('http://www.w3.org/2000/svg','marker');
+                mk.setAttribute('id',mkid);mk.setAttribute('markerWidth','7');mk.setAttribute('markerHeight','7');
+                mk.setAttribute('refX','6');mk.setAttribute('refY','3.5');mk.setAttribute('orient','auto');
+                const mkp = document.createElementNS('http://www.w3.org/2000/svg','path');
                 mkp.setAttribute('d','M0,0 L0,7 L7,3.5 z');
-                mkp.setAttribute('fill',color);mkp.setAttribute('opacity','.75');
+                mkp.setAttribute('fill',color||'#708090');mkp.setAttribute('opacity','.75');
                 mk.appendChild(mkp);defs.appendChild(mk);
 
-                const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+                const path = document.createElementNS('http://www.w3.org/2000/svg','path');
                 let d;
-                if(Math.abs(ay-by)<4){
-                // perfectly horizontal — straight line
-                d=`M${ax},${ay} L${bx},${by}`;
+                const dy = Math.abs(ay-by);
+                if(dy < 5){
+                d = `M${ax},${ay} L${bx2},${by}`;
                 } else {
-                // right-angle elbow: go right to midpoint X, then vertical, then right to dest
-                const mx=(ax+bx)/2;
-                d=`M${ax},${ay} L${mx},${ay} L${mx},${by} L${bx},${by}`;
+                // right-angle elbow
+                const mx = (ax+bx2)/2;
+                d = `M${ax},${ay} L${mx},${ay} L${mx},${by} L${bx2},${by}`;
                 }
-                p.setAttribute('d',d);p.setAttribute('fill','none');
-                p.setAttribute('stroke',color);p.setAttribute('stroke-width','1.7');
-                p.setAttribute('opacity','.6');p.setAttribute('marker-end',`url(#${mkid})`);
-                if(dashed) p.setAttribute('stroke-dasharray','6,4');
-                svg.appendChild(p);
+                path.setAttribute('d',d);
+                path.setAttribute('fill','none');
+                path.setAttribute('stroke',color||'#708090');
+                path.setAttribute('stroke-width','1.6');
+                path.setAttribute('opacity','.55');
+                path.setAttribute('marker-end',`url(#${mkid})`);
+                if(dashed==='dashed') path.setAttribute('stroke-dasharray','7,4');
+                svg.appendChild(path);
             });
             }
-            setTimeout(drawArrows, 120);
+            setTimeout(drawArrows, 180);
 
-            // ── PAN ─────────────────────────────────────────────────────────
-            let tx=0, ty=0, dr=false, ox2, oy2;
+            // ── LUMINOSITY TREE: vertical top-down arrows ─────────────────────
+            // Drawn as proper fan: header bottom-centre → each row-1 top-centre
+            // then row-1 bottom-centre → row-2 top-centre
+            function drawLumTree() {
+                // helper: draw one arrowhead-tipped vertical/fan path
+                function lumArrow(x1, y1, x2, y2, color, idx) {
+                    const mkid = `lmk${idx}`;
+                    const mk = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                    mk.setAttribute('id', mkid);
+                    mk.setAttribute('markerWidth', '7');
+                    mk.setAttribute('markerHeight', '7');
+                    mk.setAttribute('refX', '3.5');
+                    mk.setAttribute('refY', '6');
+                    mk.setAttribute('orient', 'auto');
+                    const mkp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    mkp.setAttribute('d', 'M0,0 L7,0 L3.5,7 z');
+                    mkp.setAttribute('fill', color);
+                    mkp.setAttribute('opacity', '.7');
+                    mk.appendChild(mkp);
+                    defs.appendChild(mk);
+
+                    // elbow: go straight down from x1,y1 to midY, then to x2,midY, then down to x2,y2
+                    const midY = y1 + (y2 - y1) * 0.5;
+                    let d;
+                    if (Math.abs(x1 - x2) < 3) {
+                        d = `M${x1},${y1} L${x2},${y2}`;
+                    } else {
+                        d = `M${x1},${y1} L${x1},${midY} L${x2},${midY} L${x2},${y2}`;
+                    }
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', d);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', color);
+                    path.setAttribute('stroke-width', '1.6');
+                    path.setAttribute('opacity', '.55');
+                    path.setAttribute('marker-end', `url(#${mkid})`);
+                    svg.appendChild(path);
+                }
+
+                // Node centre-bottom / centre-top helpers
+                function bot(id) {
+                    const n = nm[id];
+                    const h = n.el.offsetHeight || n.h || 60;
+                    return { x: n.x + n.w / 2, y: n.y + h };
+                }
+                function top(id) {
+                    const n = nm[id];
+                    return { x: n.x + n.w / 2, y: n.y };
+                }
+
+                let li = 2000; // index offset to avoid conflict with EDGES markers
+
+                // ── Row 0 → Row 1  (header fans out to 8 nodes)
+                const r1nodes = ['lum_sg','lum_bg','lum_g','lum_sub','lum_ms','lum_msd','lum_subk','lum_wd'];
+                const r1colors = ['#c08030','#c0a030','#c0a030','#60b060','#4080c0','#4080c0','#808090','#8090c0'];
+                const hdrBot = bot('lum_hdr');
+                r1nodes.forEach((id, i) => {
+                    const t = top(id);
+                    lumArrow(hdrBot.x, hdrBot.y, t.x, t.y, r1colors[i], li++);
+                });
+
+                // ── Row 1 → Row 2 (lum_g → gblue, gred)
+                const gBot = bot('lum_g');
+                lumArrow(gBot.x, gBot.y, top('lum_gblue').x, top('lum_gblue').y, '#5090d0', li++);
+                lumArrow(gBot.x, gBot.y, top('lum_gred').x,  top('lum_gred').y,  '#c04030', li++);
+
+                // ── Row 1 → Row 2 (lum_ms → gyel, gora, bred)
+                const msBot = bot('lum_ms');
+                lumArrow(msBot.x, msBot.y, top('lum_gyel').x, top('lum_gyel').y, '#c0c020', li++);
+                lumArrow(msBot.x, msBot.y, top('lum_gora').x, top('lum_gora').y, '#c07030', li++);
+                lumArrow(msBot.x, msBot.y, top('lum_bred').x, top('lum_bred').y, '#c04030', li++);
+
+                // ── Row 1 → Row 2 (lum_msd → msblu, gyel2)
+                const msdBot = bot('lum_msd');
+                lumArrow(msdBot.x, msdBot.y, top('lum_msblu').x, top('lum_msblu').y, '#5090d0', li++);
+                lumArrow(msdBot.x, msdBot.y, top('lum_gyel2').x, top('lum_gyel2').y, '#c0c020', li++);
+            }
+
+            setTimeout(drawLumTree, 220);
+
+            // ── PAN ──────────────────────────────────────────────────────────
+            // Start view centered on main flow
+            let tx = -OX + 200, ty = -OY + 300;
+            let dr = false, ox2, oy2;
             function applyT(){vp.style.transform=`translate(${tx}px,${ty}px)`;}
             applyT();
-
             document.addEventListener('mousedown',e=>{
-            if(e.target.closest('#mOv')||e.target.closest('#backBtn')) return;
+            if(e.target.closest('#mOv')||e.target.closest('#backBtn'))return;
             dr=true;ox2=e.clientX-tx;oy2=e.clientY-ty;document.body.classList.add('drag');
             });
             document.addEventListener('mousemove',e=>{
             if(!dr)return;
             tx=e.clientX-ox2;ty=e.clientY-oy2;
-            tx=Math.min(80,Math.max(-(5200-innerWidth+80),tx));
-            ty=Math.min(80,Math.max(-(3000-innerHeight+80),ty));
+            tx=Math.min(300,Math.max(-(6200-innerWidth+300),tx));
+            ty=Math.min(300,Math.max(-(4800-innerHeight+300),ty));
             applyT();
             });
             document.addEventListener('mouseup',()=>{dr=false;document.body.classList.remove('drag');});
@@ -489,8 +1361,8 @@
             document.addEventListener('touchstart',e=>{tox2=e.touches[0].clientX-tx;toy2=e.touches[0].clientY-ty;},{passive:true});
             document.addEventListener('touchmove',e=>{
             tx=e.touches[0].clientX-tox2;ty=e.touches[0].clientY-toy2;
-            tx=Math.min(80,Math.max(-(5200-innerWidth+80),tx));
-            ty=Math.min(80,Math.max(-(3000-innerHeight+80),ty));
+            tx=Math.min(300,Math.max(-(6200-innerWidth+300),tx));
+            ty=Math.min(300,Math.max(-(4800-innerHeight+300),ty));
             applyT();
             },{passive:true});
 
@@ -507,7 +1379,79 @@
             }
             document.getElementById('mClose').onclick=()=>document.getElementById('mOv').classList.remove('on');
             document.getElementById('mOv').addEventListener('click',e=>{if(e.target===document.getElementById('mOv'))document.getElementById('mOv').classList.remove('on');});
-            document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('mOv').classList.remove('on');});
+            document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('mOv').classList.remove('on');document.getElementById('termOv').classList.remove('on');}});
+
+            // ── TERMINOLOGY OVERLAY ──────────────────────────────────────────
+            const termOv    = document.getElementById('termOv');
+            const termList  = document.getElementById('termList');
+            const termSearch = document.getElementById('termSearch');
+
+            // Build sorted entries from DB
+            const termEntries = Object.entries(DB).sort((a, b) => a[0].localeCompare(b[0], 'ru'));
+
+            function renderTerms(filter) {
+                const q = (filter || '').toLowerCase().trim();
+                termList.innerHTML = '';
+                termEntries.forEach(([name, info]) => {
+                    if (q && !name.toLowerCase().includes(q) && !info.d.toLowerCase().includes(q)) return;
+
+                    const card = document.createElement('div');
+                    card.className = 'term-card';
+
+                    // Head: emoji + name
+                    const head = document.createElement('div');
+                    head.className = 'term-card-head';
+
+                    const em = document.createElement('span');
+                    em.className = 'term-emoji';
+                    em.textContent = info.e || '✦';
+
+                    const nm2 = document.createElement('span');
+                    nm2.className = 'term-name';
+                    nm2.textContent = name;
+
+                    head.appendChild(em);
+                    head.appendChild(nm2);
+
+                    // Description
+                    const desc = document.createElement('div');
+                    desc.className = 'term-desc';
+                    desc.textContent = info.d;
+
+                    card.appendChild(head);
+                    card.appendChild(desc);
+
+                    // Tags (if present)
+                    if (info.t && info.t.length) {
+                        const tags = document.createElement('div');
+                        tags.className = 'term-tags';
+                        info.t.forEach(t => {
+                            const sp = document.createElement('span');
+                            sp.className = 'term-tag';
+                            sp.textContent = t;
+                            tags.appendChild(sp);
+                        });
+                        card.appendChild(tags);
+                    }
+
+                    termList.appendChild(card);
+                });
+            }
+
+            // Open
+            document.getElementById('termBtn').addEventListener('click', () => {
+                termSearch.value = '';
+                renderTerms('');
+                termOv.classList.add('on');
+                setTimeout(() => termSearch.focus(), 180);
+            });
+
+            // Close
+            document.getElementById('termClose').onclick = () => termOv.classList.remove('on');
+            termOv.addEventListener('click', e => { if (e.target === termOv) termOv.classList.remove('on'); });
+
+            // Live search
+            termSearch.addEventListener('input', () => renderTerms(termSearch.value));
         </script>
     </body>
 </html>
