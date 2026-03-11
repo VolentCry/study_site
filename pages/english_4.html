@@ -189,9 +189,13 @@
                 <div class="menu-item">
                     <span class="menu-title">Физика</span>
                     <div class="submenu">
-                        <a href="#">4 класс</a>
-                        <a href="#">5 класс</a>
+                        <a href="physics_7.html">7 класс</a>
+                        <a href="physics_8.html">8 класс</a>
                     </div>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="chemistry.html" style="text-decoration: none; color: var(--color-light);">Химия</a></span>
                 </div>
 
                 <div class="menu-item">
@@ -204,6 +208,10 @@
 
                 <div class="menu-item">
                     <span class="menu-title"><a href="informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+                </div>
+
+                <div class="menu-item">
+                    <span class="menu-title"><a href="teacher_materials.html" style="text-decoration: none; color: var(--color-light);">Материалы для учителей</a></span>
                 </div>
                 
                 <a href="../profile.html" class="menu-profile-btn">Профиль</a>
@@ -639,7 +647,7 @@
                 "moon": "луна", 
                 "yesterday": "вчера", 
                 "tomorrow": "завтра", 
-                // "live": "жить, жизнь", 
+                "live": ("жить", "жизнь"), 
                 "person": "человек", 
                 "people": "люди", 
                 "young": "молодой", 
@@ -737,10 +745,10 @@
                     
                     // Делаем первый урок особенным
                     if (i === 1) {
-                        title.innerText = 'Урок 1. Времена';
+                        title.innerText = 'Урок 1. Times (Времена)';
                         btn.onclick = () => window.location.href = 'english_lessons/lesson_1.html';
                     } else if (i === 2) {
-                        title.innerText = 'Урок 2. Единицы измерения';
+                        title.innerText = 'Урок 2. Units of Measurement (Единицы измерения)';
                         btn.onclick = () => window.location.href = 'english_lessons/lesson_2.html';
                     } else {
                         title.innerText = `Урок ${i}`;

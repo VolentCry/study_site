@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>
+            Урок 2 — Units of Measurement
+        </title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+        
+        <style>
+            :root {
+                --bg: #f0f4ff;
+                --primary: #4361ee;
+                --secondary: #f72585;
+                --accent: #4cc9f0;
+                --green: #06d6a0;
+                --yellow: #ffd166;
+                --orange: #ef8c3a;
+                --card-bg: #ffffff;
+                --text: #1a1a2e;
+                --muted: #6c757d;
+                --radius: 16px;
+                --shadow: 0 4px 20px rgba(67,97,238,0.12);
+            }
+
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                font-family: 'Nunito', sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* HERO */
+            .hero {
+                background: linear-gradient(135deg, #4361ee 0%, #7209b7 60%, #f72585 100%);
+                padding: 60px 24px 80px;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .hero::before {
+                content: '';
+                position: absolute; inset: 0;
+                background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            }
+            .hero-badge {
+                display: inline-block;
+                background: rgba(255,255,255,0.2);
+                color: #fff;
+                border: 1px solid rgba(255,255,255,0.3);
+                border-radius: 50px;
+                padding: 6px 20px;
+                font-size: 13px;
+                font-weight: 700;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+            }
+            .hero h1 {
+                font-family: 'Baloo 2', cursive;
+                font-size: clamp(2rem, 5vw, 3.5rem);
+                font-weight: 800;
+                color: #fff;
+                line-height: 1.1;
+                margin-bottom: 12px;
+            }
+            .hero h1 span { color: var(--yellow); }
+            .hero p {
+                color: rgba(255,255,255,0.85);
+                font-size: 1.1rem;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+            .ruler-decoration {
+                margin-top: 30px;
+                display: flex;
+                justify-content: center;
+                gap: 0;
+            }
+            .ruler-decoration .tick {
+                width: 20px; height: 30px;
+                border-left: 2px solid rgba(255,255,255,0.5);
+                display: flex; align-items: flex-end; justify-content: center;
+                padding-bottom: 4px;
+                font-size: 9px; color: rgba(255,255,255,0.6);
+            }
+            .ruler-decoration .tick.big { height: 46px; border-color: rgba(255,255,255,0.9); font-size: 10px; color: rgba(255,255,255,0.9); }
+
+            /* CONTAINER */
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 0 20px 80px;
+            }
+
+            /* SECTION HEADERS */
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                margin: 48px 0 24px;
+            }
+            .section-icon {
+                width: 48px; height: 48px;
+                border-radius: 14px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 22px;
+                flex-shrink: 0;
+            }
+            .section-header h2 {
+                font-family: 'Baloo 2', cursive;
+                font-size: 1.5rem;
+                font-weight: 800;
+            }
+            .section-header p { font-size: 0.9rem; color: var(--muted); margin-top: 2px; }
+
+            /* THEORY */
+            .theory-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 16px;
+            }
+            .theory-block {
+                background: var(--card-bg);
+                border-radius: var(--radius);
+                padding: 24px;
+                box-shadow: var(--shadow);
+                border-top: 5px solid;
+                transition: transform 0.2s;
+            }
+            .theory-block:hover { transform: translateY(-3px); }
+            .theory-block.blue { border-color: var(--primary); }
+            .theory-block.pink { border-color: var(--secondary); }
+            .theory-block.teal { border-color: var(--green); }
+            .theory-block.orange { border-color: var(--orange); }
+            .theory-block h3 {
+                font-family: 'Baloo 2', cursive;
+                font-size: 1.1rem;
+                font-weight: 800;
+                margin-bottom: 14px;
+                display: flex; align-items: center; gap: 8px;
+            }
+            .vocab-item {
+                display: flex; align-items: center; gap: 10px;
+                padding: 8px 0;
+                border-bottom: 1px dashed #eee;
+                font-size: 0.92rem;
+            }
+            .vocab-item:last-child { border-bottom: none; }
+            .vocab-item .en {
+                font-weight: 700;
+                min-width: 100px;
+                color: var(--primary);
+            }
+            .vocab-item .abbr {
+                background: var(--accent);
+                color: #fff;
+                border-radius: 6px;
+                padding: 1px 7px;
+                font-size: 11px;
+                font-weight: 800;
+                flex-shrink: 0;
+            }
+            .vocab-item .ru { color: var(--muted); }
+
+            .question-block {
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                border-radius: var(--radius);
+                padding: 28px;
+                margin-top: 16px;
+                box-shadow: var(--shadow);
+            }
+            .question-block h3 {
+                font-family: 'Baloo 2', cursive;
+                font-size: 1.2rem;
+                color: var(--yellow);
+                margin-bottom: 16px;
+            }
+            .q-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            @media(max-width:600px){ .q-row { grid-template-columns: 1fr; } }
+            .q-card {
+                background: rgba(255,255,255,0.07);
+                border: 1px solid rgba(255,255,255,0.12);
+                border-radius: 12px;
+                padding: 14px 16px;
+            }
+            .q-card .q-en { font-weight: 700; color: var(--accent); font-size: 0.95rem; }
+            .q-card .q-ru { color: rgba(255,255,255,0.65); font-size: 0.83rem; margin-top: 4px; }
+            .q-card .example { color: rgba(255,255,255,0.85); font-size: 0.85rem; margin-top: 8px; font-style: italic; }
+
+            /* TASK CARD */
+            .task-card {
+                background: var(--card-bg);
+                border-radius: var(--radius);
+                padding: 28px;
+                box-shadow: var(--shadow);
+                margin-bottom: 12px;
+            }
+            .task-number {
+                display: inline-flex;
+                align-items: center; justify-content: center;
+                width: 34px; height: 34px;
+                border-radius: 50%;
+                font-weight: 900;
+                font-size: 1rem;
+                color: #fff;
+                margin-bottom: 14px;
+            }
+            .task-title {
+                font-family: 'Baloo 2', cursive;
+                font-weight: 800;
+                font-size: 1.15rem;
+                margin-bottom: 6px;
+            }
+            .task-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+            /* TASK 1 — MATCH CARDS */
+            .match-area {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            @media(max-width:550px){ .match-area { grid-template-columns: 1fr; } }
+            .match-col { display: flex; flex-direction: column; gap: 10px; }
+            .match-col-label {
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                color: var(--muted);
+                margin-bottom: 4px;
+                text-align: center;
+            }
+            .match-card {
+                padding: 12px 18px;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 0.92rem;
+                cursor: pointer;
+                text-align: center;
+                transition: all 0.18s;
+                user-select: none;
+                border: 2px solid transparent;
+                position: relative;
+            }
+            .match-card.ru-card {
+                background: #eef2ff;
+                color: var(--primary);
+                border-color: #c7d2fe;
+            }
+            .match-card.en-card {
+                background: #fdf2f8;
+                color: var(--secondary);
+                border-color: #fbcfe8;
+            }
+            .match-card.selected {
+                transform: scale(1.04);
+                box-shadow: 0 0 0 3px var(--yellow);
+            }
+            .match-card.matched-ok {
+                background: #d1fae5 !important;
+                border-color: var(--green) !important;
+                color: #065f46 !important;
+                cursor: default;
+            }
+            .match-card.matched-ok::after {
+                content: '✓';
+                position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+                color: var(--green);
+                font-weight: 900;
+            }
+            .match-card.wrong-shake {
+                animation: shake 0.4s;
+                background: #fee2e2 !important;
+                border-color: #fca5a5 !important;
+            }
+            @keyframes shake {
+                0%,100%{transform:translateX(0)}
+                20%{transform:translateX(-6px)}
+                40%{transform:translateX(6px)}
+                60%{transform:translateX(-4px)}
+                80%{transform:translateX(4px)}
+            }
+            .match-feedback {
+                margin-top: 16px;
+                text-align: center;
+                font-weight: 700;
+                font-size: 1rem;
+                color: var(--green);
+                min-height: 28px;
+            }
+
+            /* TASK 2 — DROPDOWN */
+            .dropdown-list { display: flex; flex-direction: column; gap: 12px; }
+            .dropdown-row {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 12px 18px;
+                background: #f8faff;
+                border-radius: 12px;
+                border: 2px solid #e0e7ff;
+                transition: border-color 0.2s;
+            }
+            .dropdown-row.correct { border-color: var(--green); background: #f0fdf4; }
+            .dropdown-row.incorrect { border-color: #fca5a5; background: #fff5f5; }
+            .dr-label { font-weight: 700; color: var(--text); min-width: 130px; font-size: 0.95rem; }
+            .dr-select {
+                flex: 1;
+                padding: 8px 14px;
+                border-radius: 10px;
+                border: 1.5px solid #c7d2fe;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: var(--text);
+                background: #fff;
+                cursor: pointer;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+            .dr-select:focus { border-color: var(--primary); }
+            .dr-icon { font-size: 1.2rem; min-width: 28px; }
+            .check-btn {
+                display: block;
+                margin: 20px auto 0;
+                padding: 12px 36px;
+                border-radius: 50px;
+                border: none;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.95rem;
+                font-weight: 800;
+                cursor: pointer;
+                transition: all 0.18s;
+                color: #fff;
+            }
+            .check-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+            /* TASK 3 — FILL BLANKS */
+            .sentence-list { display: flex; flex-direction: column; gap: 14px; }
+            .sentence-row {
+                display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+                padding: 14px 18px;
+                background: #f8faff;
+                border-radius: 12px;
+                border: 2px solid #e0e7ff;
+                font-size: 0.95rem; font-weight: 600;
+                transition: border-color 0.2s;
+            }
+            .sentence-row.correct { border-color: var(--green); background: #f0fdf4; }
+            .sentence-row.incorrect { border-color: #fca5a5; background: #fff5f5; }
+            .blank-input {
+                border: none;
+                border-bottom: 2.5px solid var(--primary);
+                background: transparent;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: var(--primary);
+                width: 110px;
+                text-align: center;
+                outline: none;
+                padding: 2px 4px;
+            }
+            .sentence-hint { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-left: 4px; }
+
+            /* TASK 4 — QUESTIONS QUIZ */
+            .quiz-container { display: flex; flex-direction: column; gap: 16px; }
+            .quiz-question {
+                background: #f8faff;
+                border-radius: 14px;
+                padding: 18px 20px;
+                border: 2px solid #e0e7ff;
+            }
+            .quiz-question p { font-weight: 700; margin-bottom: 12px; font-size: 0.95rem; }
+            .quiz-options { display: flex; flex-wrap: wrap; gap: 8px; }
+            .quiz-opt {
+                padding: 8px 18px;
+                border-radius: 50px;
+                border: 2px solid #c7d2fe;
+                background: #fff;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.88rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.15s;
+                color: var(--text);
+            }
+            .quiz-opt:hover { border-color: var(--primary); background: #eef2ff; }
+            .quiz-opt.selected-opt { border-color: var(--primary); background: var(--primary); color: #fff; }
+            .quiz-opt.opt-correct { border-color: var(--green); background: var(--green); color: #fff; }
+            .quiz-opt.opt-wrong { border-color: #f87171; background: #fee2e2; color: #991b1b; }
+
+            /* SCORE BADGE */
+            .score-badge {
+                display: inline-flex;
+                align-items: center; gap: 8px;
+                padding: 10px 22px;
+                border-radius: 50px;
+                font-weight: 800;
+                font-size: 1rem;
+                margin-top: 16px;
+            }
+
+            /* TASK 5 — DRAG & DROP SORT */
+            .sort-area { display: flex; flex-direction: column; gap: 16px; }
+            .sort-bank {
+                display: flex; flex-wrap: wrap; gap: 10px;
+                min-height: 60px;
+                background: #f0f4ff;
+                border-radius: 14px;
+                padding: 14px;
+                border: 2.5px dashed #c7d2fe;
+                transition: background 0.2s, border-color 0.2s;
+            }
+            .sort-bank.drag-over { background: #e0e7ff; border-color: var(--primary); }
+            .sort-chip {
+                padding: 9px 18px;
+                border-radius: 50px;
+                font-weight: 700;
+                font-size: 0.88rem;
+                cursor: grab;
+                transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+                user-select: none;
+                touch-action: none;
+            }
+            .sort-chip:active { cursor: grabbing; }
+            .sort-chip.dragging { opacity: 0.35; transform: scale(0.95); }
+            .sort-chip.length-chip { background: #dbeafe; color: #1e40af; border: 2px solid #93c5fd; }
+            .sort-chip.weight-chip { background: #fce7f3; color: #9d174d; border: 2px solid #f9a8d4; }
+            .sort-chip.unplaced { background: #e0e7ff; color: #3730a3; border: 2px solid #a5b4fc; }
+            .sort-chip:not(.dragging):hover { transform: scale(1.06); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+            .sort-zones {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            @media(max-width:550px){ .sort-zones { grid-template-columns: 1fr; } }
+            .sort-zone {
+                border-radius: 14px;
+                padding: 16px;
+                min-height: 120px;
+                border: 2.5px dashed;
+                transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            }
+            .sort-zone.length-zone { border-color: #93c5fd; background: #eff6ff; }
+            .sort-zone.weight-zone { border-color: #f9a8d4; background: #fdf2f8; }
+            .sort-zone.drag-over { transform: scale(1.02); }
+            .sort-zone.length-zone.drag-over { background: #dbeafe; border-color: #3b82f6; border-style: solid; }
+            .sort-zone.weight-zone.drag-over { background: #fce7f3; border-color: #ec4899; border-style: solid; }
+            .sort-zone-title {
+                font-size: 11px; font-weight: 900; letter-spacing: 1.5px;
+                text-transform: uppercase; margin-bottom: 12px;
+                display: flex; align-items: center; gap: 6px;
+            }
+            .sort-zone.length-zone .sort-zone-title { color: #1e40af; }
+            .sort-zone.weight-zone .sort-zone-title { color: #9d174d; }
+            .sort-zone-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; }
+            .sort-drop-hint {
+                font-size: 0.78rem; color: #aaa; font-style: italic;
+                width: 100%; text-align: center; padding: 6px 0;
+                pointer-events: none;
+            }
+
+            /* FOOTER */
+            .lesson-footer {
+                text-align: center;
+                padding: 40px 20px;
+                color: var(--muted);
+                font-size: 0.85rem;
+            }
+            .lesson-footer .done-emoji { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+            /* PROGRESS */
+            .progress-bar-wrap {
+                background: rgba(255,255,255,0.2);
+                border-radius: 50px;
+                height: 8px;
+                width: 200px;
+                margin: 20px auto 0;
+                overflow: hidden;
+            }
+
+            .progress-bar-fill {
+                height: 100%;
+                background: var(--yellow);
+                border-radius: 50px;
+                width: 0%;
+                transition: width 0.6s ease;
+            }
+
+            .progress-label {
+                color: rgba(255,255,255,0.8); 
+                font-size: 0.8rem; 
+                margin-top: 6px; 
+                text-align: center; 
+            }
+        </style>
+    </head>
+    <body>
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-badge">
+                Lesson 2 · English
+            </div>
+
+            <h1>Units of <span>Measurement</span></h1>
+            
+            <p>
+                Единицы измерения — длина, вес и полезные вопросы на английском 📏⚖️
+            </p>
+            
+            <div class="ruler-decoration">
+                <div class="tick big">0</div>
+                <div class="tick">1</div><div class="tick">2</div><div class="tick">3</div><div class="tick">4</div>
+                <div class="tick big">5</div>
+                <div class="tick">6</div><div class="tick">7</div><div class="tick">8</div><div class="tick">9</div>
+                <div class="tick big">10</div>
+                <div class="tick">11</div><div class="tick">12</div><div class="tick">13</div><div class="tick">14</div>
+                <div class="tick big">15</div>
+                <div class="tick">16</div><div class="tick">17</div><div class="tick">18</div><div class="tick">19</div>
+                <div class="tick big">20</div>
+            </div>
+            
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+
+            <div class="progress-label" id="progressLabel">0 / 5 заданий</div>
+        </div>
+
+        <div class="container">
+
+        <!-- THEORY -->
+        <div class="section-header">
+            <div class="section-icon" style="background:#eef2ff;">📚</div>
+            <div>
+            <h2>Теория</h2>
+            <p>Изучи словарь перед заданиями</p>
+            </div>
+        </div>
+
+        <div class="theory-grid">
+            <div class="theory-block blue">
+            <h3>📏 Length — Длина</h3>
+            <div class="vocab-item"><span class="en">millimeter</span><span class="abbr">mm</span><span class="ru">миллиметр</span></div>
+            <div class="vocab-item"><span class="en">centimeter</span><span class="abbr">cm</span><span class="ru">сантиметр</span></div>
+            <div class="vocab-item"><span class="en">meter</span><span class="abbr">m</span><span class="ru">метр</span></div>
+            <div class="vocab-item"><span class="en">kilometer</span><span class="abbr">km</span><span class="ru">километр</span></div>
+            <div class="vocab-item"><span class="en">inch</span><span class="abbr">in</span><span class="ru">дюйм</span></div>
+            <div class="vocab-item"><span class="en">foot/feet</span><span class="abbr">ft</span><span class="ru">фут/футы</span></div>
+            </div>
+
+            <div class="theory-block pink">
+            <h3>⚖️ Weight — Вес</h3>
+            <div class="vocab-item"><span class="en">gram</span><span class="abbr">g</span><span class="ru">грамм</span></div>
+            <div class="vocab-item"><span class="en">kilogram</span><span class="abbr">kg</span><span class="ru">килограмм</span></div>
+            <div style="margin-top: 16px;">
+                <h3 style="margin-bottom: 12px;">🔧 Verbs & Adj. — Глаголы</h3>
+                <div class="vocab-item"><span class="en">measure</span><span class="ru">измерять</span></div>
+                <div class="vocab-item"><span class="en">weigh</span><span class="ru">весить</span></div>
+                <div class="vocab-item"><span class="en">heavy</span><span class="ru">тяжёлый</span></div>
+                <div class="vocab-item"><span class="en">light</span><span class="ru">лёгкий</span></div>
+                <div class="vocab-item"><span class="en">long</span><span class="ru">длинный</span></div>
+                <div class="vocab-item"><span class="en">short</span><span class="ru">короткий</span></div>
+            </div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <h3>❓ Полезные вопросы на английском</h3>
+            <div class="q-row">
+            <div class="q-card">
+                <div class="q-en">How long is it?</div>
+                <div class="q-ru">Какой это длины?</div>
+                <div class="example">— It is 30 cm long.</div>
+            </div>
+            <div class="q-card">
+                <div class="q-en">How tall are you?</div>
+                <div class="q-ru">Какого ты роста?</div>
+                <div class="example">— I am 1 m 65 cm tall.</div>
+            </div>
+            </div>
+            <div class="q-row">
+            <div class="q-card">
+                <div class="q-en">How heavy is it?</div>
+                <div class="q-ru">Сколько это весит?</div>
+                <div class="example">— It is 2 kg heavy.</div>
+            </div>
+            <div class="q-card">
+                <div class="q-en">How much does it weigh?</div>
+                <div class="q-ru">Сколько это весит?</div>
+                <div class="example">— It weighs 500 g.</div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TASK 1 -->
+        <div class="section-header">
+            <div class="section-icon" style="background:#fce7f3;">🃏</div>
+            <div>
+            <h2>Задание 1</h2>
+            <p>Соотнеси карточки: найди пару</p>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <div class="task-number" style="background:var(--secondary);">1</div>
+            <div class="task-title">Match the Cards — Найди пару</div>
+            <div class="task-desc">Нажми на русскую карточку, затем на соответствующую английскую.</div>
+            <div class="match-area">
+            <div class="match-col">
+                <div class="match-col-label">🇷🇺 Русский</div>
+                <div class="match-card ru-card" data-id="1" onclick="selectCard(this,'ru')">миллиметр</div>
+                <div class="match-card ru-card" data-id="2" onclick="selectCard(this,'ru')">сантиметр</div>
+                <div class="match-card ru-card" data-id="3" onclick="selectCard(this,'ru')">метр</div>
+                <div class="match-card ru-card" data-id="4" onclick="selectCard(this,'ru')">километр</div>
+                <div class="match-card ru-card" data-id="5" onclick="selectCard(this,'ru')">грамм</div>
+                <div class="match-card ru-card" data-id="6" onclick="selectCard(this,'ru')">килограмм</div>
+                <div class="match-card ru-card" data-id="7" onclick="selectCard(this,'ru')">дюйм</div>
+                <div class="match-card ru-card" data-id="8" onclick="selectCard(this,'ru')">фут</div>
+            </div>
+            <div class="match-col">
+                <div class="match-col-label">🇬🇧 English</div>
+                <div class="match-card en-card" data-id="3" onclick="selectCard(this,'en')">meter (m)</div>
+                <div class="match-card en-card" data-id="6" onclick="selectCard(this,'en')">kilogram (kg)</div>
+                <div class="match-card en-card" data-id="1" onclick="selectCard(this,'en')">millimeter (mm)</div>
+                <div class="match-card en-card" data-id="8" onclick="selectCard(this,'en')">foot (ft)</div>
+                <div class="match-card en-card" data-id="2" onclick="selectCard(this,'en')">centimeter (cm)</div>
+                <div class="match-card en-card" data-id="7" onclick="selectCard(this,'en')">inch (in)</div>
+                <div class="match-card en-card" data-id="4" onclick="selectCard(this,'en')">kilometer (km)</div>
+                <div class="match-card en-card" data-id="5" onclick="selectCard(this,'en')">gram (g)</div>
+            </div>
+            </div>
+            <div class="match-feedback" id="matchFeedback"></div>
+        </div>
+
+        <!-- TASK 2 -->
+        <div class="section-header">
+            <div class="section-icon" style="background:#d1fae5;">📐</div>
+            <div>
+            <h2>Задание 2</h2>
+            <p>Чем измеряют?</p>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <div class="task-number" style="background:var(--green);">2</div>
+            <div class="task-title">What do you use? — Что используют для измерения?</div>
+            <div class="task-desc">Выбери инструмент: Ruler (линейка) или Scales (весы).</div>
+            <div class="dropdown-list" id="dropdownList">
+            <div class="dropdown-row" data-answer="Ruler">
+                <span class="dr-label">centimeter (cm)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Scales">
+                <span class="dr-label">kilogram (kg)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Ruler">
+                <span class="dr-label">meter (m)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Scales">
+                <span class="dr-label">gram (g)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Ruler">
+                <span class="dr-label">kilometer (km)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Ruler">
+                <span class="dr-label">millimeter (mm)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Ruler">
+                <span class="dr-label">inch (in)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            <div class="dropdown-row" data-answer="Ruler">
+                <span class="dr-label">foot (ft)</span>
+                <select class="dr-select"><option value="">— выбери —</option><option>Ruler</option><option>Scales</option></select>
+                <span class="dr-icon"></span>
+            </div>
+            </div>
+            <button class="check-btn" style="background:var(--green);" onclick="checkDropdown()">Проверить ✓</button>
+            <div style="text-align:center; margin-top:12px; font-weight:700; min-height:26px;" id="dropResult"></div>
+        </div>
+
+        <!-- TASK 3 -->
+        <div class="section-header">
+            <div class="section-icon" style="background:#fef3c7;">✍️</div>
+            <div>
+            <h2>Задание 3</h2>
+            <p>Вставь пропущенное слово</p>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <div class="task-number" style="background:var(--yellow); color:#1a1a2e;">3</div>
+            <div class="task-title">Fill in the Blank — Заполни пропуски</div>
+            <div class="task-desc">Вставь подходящее слово из словаря в каждое предложение.</div>
+            <div class="sentence-list" id="sentenceList">
+            <div class="sentence-row" data-answer="long">
+                The table is 2 meters <input class="blank-input" placeholder="???"> <span class="sentence-hint">(длинный)</span>
+            </div>
+            <div class="sentence-row" data-answer="weigh">
+                How much does it <input class="blank-input" placeholder="???"> <span class="sentence-hint">(весить)</span>?
+            </div>
+            <div class="sentence-row" data-answer="heavy">
+                This box is very <input class="blank-input" placeholder="???"> <span class="sentence-hint">(тяжёлый)</span>.
+            </div>
+            <div class="sentence-row" data-answer="measure">
+                Let's <input class="blank-input" placeholder="???"> the room. <span class="sentence-hint">(измерить)</span>
+            </div>
+            <div class="sentence-row" data-answer="short">
+                The pencil is very <input class="blank-input" placeholder="???"> <span class="sentence-hint">(короткий)</span>.
+            </div>
+            <div class="sentence-row" data-answer="light">
+                A feather is very <input class="blank-input" placeholder="???"> <span class="sentence-hint">(лёгкий)</span>.
+            </div>
+            </div>
+            <button class="check-btn" style="background:var(--orange);" onclick="checkSentences()">Проверить ✓</button>
+            <div style="text-align:center; margin-top:12px; font-weight:700; min-height:26px;" id="sentenceResult"></div>
+        </div>
+
+        <!-- TASK 4 -->
+        <div class="section-header">
+            <div class="section-icon" style="background:#ede9fe;">🧠</div>
+            <div>
+            <h2>Задание 4</h2>
+            <p>Выбери правильный вопрос</p>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <div class="task-number" style="background:#7c3aed;">4</div>
+            <div class="task-title">Ask the Right Question — Задай правильный вопрос</div>
+            <div class="task-desc">Прочитай ситуацию и выбери нужный вопрос на английском.</div>
+            <div class="quiz-container" id="quizContainer">
+            <div class="quiz-question" data-answer="0">
+                <p>🦒 Ты хочешь узнать рост жирафа. Что спросишь?</p>
+                <div class="quiz-options">
+                <button class="quiz-opt" onclick="selectQuiz(this,0,0)">How tall is it?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,0,1)">How heavy is it?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,0,2)">How long is it?</button>
+                </div>
+            </div>
+            <div class="quiz-question" data-answer="1">
+                <p>⚽ Ты хочешь узнать вес футбольного мяча. Что спросишь?</p>
+                <div class="quiz-options">
+                <button class="quiz-opt" onclick="selectQuiz(this,1,0)">How tall is it?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,1,1)">How much does it weigh?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,1,2)">How long is it?</button>
+                </div>
+            </div>
+            <div class="quiz-question" data-answer="2">
+                <p>🐍 Ты хочешь узнать длину змеи. Что спросишь?</p>
+                <div class="quiz-options">
+                <button class="quiz-opt" onclick="selectQuiz(this,2,0)">How heavy is it?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,2,1)">How tall is it?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,2,2)">How long is it?</button>
+                </div>
+            </div>
+            <div class="quiz-question" data-answer="0">
+                <p>👦 Друг спрашивает про твой рост. Что он спросит?</p>
+                <div class="quiz-options">
+                <button class="quiz-opt" onclick="selectQuiz(this,3,0)">How tall are you?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,3,1)">How heavy are you?</button>
+                <button class="quiz-opt" onclick="selectQuiz(this,3,2)">How long are you?</button>
+                </div>
+            </div>
+            </div>
+            <button class="check-btn" style="background:#7c3aed;" onclick="checkQuiz()">Проверить ✓</button>
+            <div style="text-align:center; margin-top:12px; font-weight:700; min-height:26px;" id="quizResult"></div>
+        </div>
+
+        <!-- TASK 5 -->
+        <div class="section-header">
+            <div class="section-icon" style="background:#fce7f3;">🗂️</div>
+            <div>
+            <h2>Задание 5</h2>
+            <p>Рассортируй единицы по категориям</p>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <div class="task-number" style="background:var(--secondary);">5</div>
+            <div class="task-title">Sort It Out! — Рассортируй!</div>
+            <div class="task-desc">Перетащи каждое слово в нужную группу: длина или вес.</div>
+            <div class="sort-area">
+            <div class="sort-bank" id="sortBank">
+                <div class="sort-chip unplaced" data-cat="length" draggable="true">kilometer</div>
+                <div class="sort-chip unplaced" data-cat="weight" draggable="true">kilogram</div>
+                <div class="sort-chip unplaced" data-cat="length" draggable="true">meter</div>
+                <div class="sort-chip unplaced" data-cat="weight" draggable="true">gram</div>
+                <div class="sort-chip unplaced" data-cat="length" draggable="true">millimeter</div>
+                <div class="sort-chip unplaced" data-cat="length" draggable="true">inch</div>
+                <div class="sort-chip unplaced" data-cat="length" draggable="true">centimeter</div>
+                <div class="sort-chip unplaced" data-cat="length" draggable="true">foot</div>
+            </div>
+            <div class="sort-zones">
+                <div class="sort-zone length-zone" id="lengthDropZone">
+                <div class="sort-zone-title">📏 Length — Длина</div>
+                <div class="sort-zone-chips" id="lengthZone">
+                    <span class="sort-drop-hint">Перетащи сюда →</span>
+                </div>
+                </div>
+                <div class="sort-zone weight-zone" id="weightDropZone">
+                <div class="sort-zone-title">⚖️ Weight — Вес</div>
+                <div class="sort-zone-chips" id="weightZone">
+                    <span class="sort-drop-hint">Перетащи сюда →</span>
+                </div>
+                </div>
+            </div>
+            </div>
+            <button class="check-btn" style="background:var(--secondary);" onclick="checkSort()">Проверить ✓</button>
+            <div style="text-align:center; margin-top:12px; font-weight:700; min-height:26px;" id="sortResult"></div>
+        </div>
+
+        </div>
+
+        <div class="lesson-footer">
+        <span class="done-emoji">🎉</span>
+        Отличная работа! Ты прошёл урок по Units of Measurement.<br>
+        <strong>Well done!</strong>
+        </div>
+
+        <script>
+        // === PROGRESS ===
+        let completedTasks = new Set();
+        function updateProgress(){
+        const n = completedTasks.size;
+        document.getElementById('progressFill').style.width = (n/5*100)+'%';
+        document.getElementById('progressLabel').textContent = n+' / 5 заданий';
+        }
+
+        // === TASK 1: MATCH ===
+        let selectedRu = null, selectedEn = null;
+        let matchedIds = new Set();
+
+        function selectCard(el, side){
+        if(el.classList.contains('matched-ok')) return;
+        if(side==='ru'){
+            document.querySelectorAll('.ru-card.selected').forEach(c=>c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedRu = el;
+        } else {
+            document.querySelectorAll('.en-card.selected').forEach(c=>c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedEn = el;
+        }
+        if(selectedRu && selectedEn){
+            if(selectedRu.dataset.id === selectedEn.dataset.id){
+            selectedRu.classList.remove('selected'); selectedRu.classList.add('matched-ok'); selectedRu.onclick=null;
+            selectedEn.classList.remove('selected'); selectedEn.classList.add('matched-ok'); selectedEn.onclick=null;
+            matchedIds.add(selectedRu.dataset.id);
+            document.getElementById('matchFeedback').textContent = '✓ Правильно! Ещё ' + (8-matchedIds.size) + ' пар...';
+            if(matchedIds.size===8){
+                document.getElementById('matchFeedback').textContent = '🎉 Все пары найдены! Отлично!';
+                completedTasks.add(1); updateProgress();
+            }
+            } else {
+            selectedRu.classList.add('wrong-shake'); selectedEn.classList.add('wrong-shake');
+            document.getElementById('matchFeedback').style.color='#ef4444';
+            document.getElementById('matchFeedback').textContent = '✗ Не совпадает, попробуй ещё!';
+            setTimeout(()=>{
+                selectedRu.classList.remove('selected','wrong-shake');
+                selectedEn.classList.remove('selected','wrong-shake');
+                document.getElementById('matchFeedback').style.color='var(--green)';
+                document.getElementById('matchFeedback').textContent='';
+            }, 700);
+            }
+            selectedRu=null; selectedEn=null;
+        }
+        }
+
+        // === TASK 2: DROPDOWN ===
+        function checkDropdown(){
+        const rows = document.querySelectorAll('#dropdownList .dropdown-row');
+        let correct=0;
+        rows.forEach(row=>{
+            const sel = row.querySelector('.dr-select');
+            const icon = row.querySelector('.dr-icon');
+            if(sel.value===row.dataset.answer){ row.classList.add('correct'); row.classList.remove('incorrect'); icon.textContent='✅'; correct++; }
+            else if(sel.value){ row.classList.add('incorrect'); row.classList.remove('correct'); icon.textContent='❌'; }
+        });
+        const el = document.getElementById('dropResult');
+        el.textContent = correct+' / '+rows.length+' правильно'+(correct===rows.length?' 🎉':'');
+        el.style.color = correct===rows.length ? 'var(--green)' : 'var(--orange)';
+        if(correct===rows.length){ completedTasks.add(2); updateProgress(); }
+        }
+
+        // === TASK 3: SENTENCES ===
+        function checkSentences(){
+        const rows = document.querySelectorAll('#sentenceList .sentence-row');
+        let correct=0;
+        rows.forEach(row=>{
+            const inp = row.querySelector('.blank-input');
+            if(inp.value.trim().toLowerCase()===row.dataset.answer){ row.classList.add('correct'); row.classList.remove('incorrect'); correct++; }
+            else{ row.classList.add('incorrect'); row.classList.remove('correct'); }
+        });
+        const el = document.getElementById('sentenceResult');
+        el.textContent = correct+' / '+rows.length+' правильно'+(correct===rows.length?' 🎉':'');
+        el.style.color = correct===rows.length ? 'var(--green)' : 'var(--orange)';
+        if(correct===rows.length){ completedTasks.add(3); updateProgress(); }
+        }
+
+        // === TASK 4: QUIZ ===
+        let quizAnswers = {};
+        function selectQuiz(btn, qIdx, optIdx){
+        const q = document.querySelectorAll('.quiz-question')[qIdx];
+        q.querySelectorAll('.quiz-opt').forEach(b=>b.classList.remove('selected-opt'));
+        btn.classList.add('selected-opt');
+        quizAnswers[qIdx] = optIdx;
+        }
+        function checkQuiz(){
+        const questions = document.querySelectorAll('.quiz-question');
+        let correct=0;
+        questions.forEach((q,i)=>{
+            const opts = q.querySelectorAll('.quiz-opt');
+            const correct_idx = parseInt(q.dataset.answer);
+            opts.forEach((o,j)=>{
+            o.classList.remove('opt-correct','opt-wrong','selected-opt');
+            if(j===correct_idx) o.classList.add('opt-correct');
+            else if(quizAnswers[i]===j && j!==correct_idx) o.classList.add('opt-wrong');
+            });
+            if(quizAnswers[i]===correct_idx) correct++;
+        });
+        const el=document.getElementById('quizResult');
+        el.textContent=correct+' / '+questions.length+' правильно'+(correct===questions.length?' 🎉':'');
+        el.style.color=correct===questions.length?'var(--green)':'var(--orange)';
+        if(correct===questions.length){ completedTasks.add(4); updateProgress(); }
+        }
+
+        // === TASK 5: DRAG & DROP SORT ===
+        let dragChip = null;
+
+        function updateHints(){
+        ['lengthZone','weightZone'].forEach(id=>{
+            const zone = document.getElementById(id);
+            const hint = zone.querySelector('.sort-drop-hint');
+            const chips = zone.querySelectorAll('.sort-chip');
+            if(hint) hint.style.display = chips.length ? 'none' : 'block';
+        });
+        // bank hint
+        const bank = document.getElementById('sortBank');
+        let bankHint = bank.querySelector('.sort-drop-hint');
+        if(!bankHint){
+            bankHint = document.createElement('span');
+            bankHint.className='sort-drop-hint';
+            bankHint.textContent='Отлично, все карточки разложены!';
+            bank.appendChild(bankHint);
+        }
+        bankHint.style.display = bank.querySelectorAll('.sort-chip').length===0 ? 'block' : 'none';
+        }
+
+        function initDragDrop(){
+        const allDropZones = [
+            document.getElementById('sortBank'),
+            document.getElementById('lengthDropZone'),
+            document.getElementById('weightDropZone')
+        ];
+
+        document.querySelectorAll('.sort-chip').forEach(chip=>{
+            // Mouse drag
+            chip.addEventListener('dragstart', e=>{
+            dragChip = chip;
+            chip.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            });
+            chip.addEventListener('dragend', ()=>{
+            chip.classList.remove('dragging');
+            allDropZones.forEach(z=>z.classList.remove('drag-over'));
+            dragChip = null;
+            updateHints();
+            });
+
+            // Touch drag
+            let touchClone = null, startX, startY;
+            chip.addEventListener('touchstart', e=>{
+            dragChip = chip;
+            const t = e.touches[0];
+            startX = t.clientX; startY = t.clientY;
+            touchClone = chip.cloneNode(true);
+            touchClone.style.cssText = `position:fixed;pointer-events:none;z-index:9999;opacity:0.85;
+                left:${t.clientX - chip.offsetWidth/2}px;top:${t.clientY - chip.offsetHeight/2}px;
+                transition:none;margin:0;`;
+            document.body.appendChild(touchClone);
+            chip.classList.add('dragging');
+            },{passive:true});
+
+            chip.addEventListener('touchmove', e=>{
+            e.preventDefault();
+            const t = e.touches[0];
+            if(touchClone){
+                touchClone.style.left = (t.clientX - dragChip.offsetWidth/2)+'px';
+                touchClone.style.top  = (t.clientY - dragChip.offsetHeight/2)+'px';
+            }
+            allDropZones.forEach(z=>z.classList.remove('drag-over'));
+            const el = document.elementFromPoint(t.clientX, t.clientY);
+            const zone = el && el.closest('#sortBank, #lengthDropZone, #weightDropZone');
+            if(zone) zone.classList.add('drag-over');
+            },{passive:false});
+
+            chip.addEventListener('touchend', e=>{
+            if(touchClone){ touchClone.remove(); touchClone=null; }
+            chip.classList.remove('dragging');
+            const t = e.changedTouches[0];
+            const el = document.elementFromPoint(t.clientX, t.clientY);
+            const zone = el && el.closest('#sortBank, #lengthDropZone, #weightDropZone');
+            allDropZones.forEach(z=>z.classList.remove('drag-over'));
+            if(zone) dropChipInto(chip, zone);
+            dragChip = null;
+            updateHints();
+            });
+        });
+
+        allDropZones.forEach(zone=>{
+            zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', ()=>zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e=>{
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            if(dragChip) dropChipInto(dragChip, zone);
+            updateHints();
+            });
+        });
+
+        updateHints();
+        }
+
+        function dropChipInto(chip, zone){
+        const targetId = zone.id;
+        if(targetId==='sortBank'){
+            zone.appendChild(chip);
+            chip.className='sort-chip unplaced';
+            chip.draggable=true;
+        } else {
+            const chipsContainer = zone.querySelector('.sort-zone-chips') || zone;
+            chipsContainer.appendChild(chip);
+            const isLength = targetId==='lengthDropZone';
+            chip.className='sort-chip '+(isLength?'length-chip':'weight-chip');
+            chip.draggable=true;
+        }
+        }
+
+        function checkSort(){
+        const lz = document.getElementById('lengthZone');
+        const wz = document.getElementById('weightZone');
+        let ok=true;
+        const lChips = lz.querySelectorAll('.sort-chip');
+        const wChips = wz.querySelectorAll('.sort-chip');
+        lChips.forEach(c=>{ if(c.dataset.cat!=='length') ok=false; });
+        wChips.forEach(c=>{ if(c.dataset.cat!=='weight') ok=false; });
+        const el = document.getElementById('sortResult');
+        if(ok && lChips.length===6 && wChips.length===2){
+            el.textContent='🎉 Всё верно! Молодец!'; el.style.color='var(--green)';
+            completedTasks.add(5); updateProgress();
+        } else {
+            el.textContent='Не все слова на месте — попробуй ещё!'; el.style.color='var(--orange)';
+        }
+        }
+
+        document.addEventListener('DOMContentLoaded', initDragDrop);
+        </script>
+    </body>
+</html>
