@@ -1,0 +1,175 @@
+<style>
+    /* --- БОКОВОЕ МЕНЮ ДЛЯ КАЖДОЙ СТРАНИЦЫ --- */
+    .menu-container { 
+        position: absolute; 
+        top: 20px; 
+        left: 20px; 
+        z-index: 200;
+        height: 100vh;
+    }
+
+    .hamburger-icon { 
+        width: 40px; 
+        height: 35px; 
+        cursor: pointer; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between; 
+        padding-bottom: 10px; 
+    }
+
+    .line { 
+        width: 100%; 
+        height: 6px; 
+        background-color: white; 
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.5); 
+        transition: 0.3s; }
+
+    .sidebar {
+        position: fixed; 
+        top: 0; 
+        left: -280px;
+        width: 280px; 
+        height: 100vh; /* На весь экран */
+        background: var(--frame-bg); 
+        border-right: 4px solid var(--color-light);
+        transition: 0.4s ease; 
+        padding-top: 100px; 
+        z-index: 1000;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menu-container:hover .sidebar { 
+        left: 0; 
+    }
+
+    .menu-container:hover .line {
+        background-color: var(--color-sand); 
+    }
+
+    .menu-item {
+        position: relative;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .menu-title {
+        padding: 15px 25px; font-size: 11px;
+        color: var(--text-color); display: block;
+        cursor: pointer; transition: 0.2s;
+        line-height: 1.4;
+    }
+
+    .menu-item:hover .menu-title {
+        background: rgba(0,0,0,0.3); color: var(--color-sand);
+    }
+
+    /* Выпадающее подменю */
+    .submenu {
+        max-height: 0;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .menu-item:hover .submenu {
+        max-height: 200px;
+    }
+
+    .submenu a {
+        padding: 12px 25px 12px 40px; 
+        text-decoration: none; 
+        font-size: 10px;
+        color: var(--color-light); 
+        display: block; 
+        transition: 0.2s;
+    }
+
+    .submenu a:hover {
+        color: var(--correct); 
+        background: rgba(255,255,255,0.05);
+    }
+
+    .menu-profile-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        display: inline-block;
+        text-decoration: none;
+        color: var(--text-color);
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid var(--color-sand);
+        padding: 10px 15px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .menu-profile-btn:hover {
+        background: var(--color-sand);
+        color: #000;
+    }
+</style>
+
+<div class="menu-container">
+    <div class="menu-container">
+        <div class="hamburger-icon">
+            <div class="line"></div><div class="line"></div><div class="line"></div>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="menu-item">
+                <span class="menu-title"><a href="../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title">Английский язык</span>
+                <div class="submenu">
+                    <a href="pages/english_4.html">4 класс</a>
+                    <a href="#">5 класс</a>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <span class="menu-title">Математика</span>
+                <div class="submenu">
+                    <a href="pages/math_4.html">4 класс</a>
+                    <a href="pages/math_5.html">5 класс</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title">Физика</span>
+                <div class="submenu">
+                    <a href="pages/physics_7.html">7 класс</a>
+                    <a href="pages/physics_8.html">8 класс</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="pages/chemistry.html" style="text-decoration: none; color: var(--color-light);">Химия</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="pages/astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="pages/quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="pages/informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="pages/teacher_materials.html" style="text-decoration: none; color: var(--color-light);">Материалы для учителей</a></span>
+            </div>
+            
+            <a href="../profile.html" class="menu-profile-btn">Профиль</a>
+        </div>
+    </div>
+</div>

@@ -213,56 +213,7 @@
     </head>
 
     <body>
-        <!-- МЕНЮ -->
-        <div class="menu-container">
-            <div class="hamburger-icon">
-                <div class="line"></div><div class="line"></div><div class="line"></div>
-            </div>
-
-            <div class="sidebar" id="sidebar">
-                <div class="menu-item">
-                    <span class="menu-title"><a href="../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
-                </div>
-
-                <div class="menu-item">
-                    <span class="menu-title">Английский язык</span>
-                    <div class="submenu">
-                        <a href="english_4.html">4 класс</a>
-                        <a href="#">5 класс</a>
-                    </div>
-                </div>
-                
-                <div class="menu-item">
-                    <span class="menu-title">Математика</span>
-                    <div class="submenu">
-                        <a href="math_4.html">4 класс</a>
-                        <a href="math_5.html">5 класс</a>
-                    </div>
-                </div>
-
-                <div class="menu-item">
-                    <span class="menu-title">Физика</span>
-                    <div class="submenu">
-                        <a href="#">4 класс</a>
-                        <a href="#">5 класс</a>
-                    </div>
-                </div>
-
-                <div class="menu-item">
-                    <span class="menu-title"><a href="astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
-                </div>
-
-                <div class="menu-item">
-                    <span class="menu-title"><a href="quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
-                </div>
-
-                <div class="menu-item">
-                    <span class="menu-title"><a href="informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
-                </div>
-                
-                <a href="../profile.html" class="menu-profile-btn">Профиль</a>
-            </div>
-        </div>
+        <div id="menu-placeholder"></div>
 
         <canvas id="c"></canvas>
 
@@ -287,6 +238,14 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script>
+            fetch('../menu.html')
+                .then(r => r.text())
+                .then(html => {
+                    document.getElementById('menu-placeholder').innerHTML = html;
+                })
+                .catch(err => console.error('Ошибка загрузки меню', err));
+
+
             const PLANETS = [
             {
                 name: 'Меркурий', number: '01', type: 'Terrestrial Planet',
