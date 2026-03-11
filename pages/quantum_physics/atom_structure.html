@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Атом и его строение</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --void: #000000;
+      --deep: #050508;
+      --nebula: #0a0a14;
+      --glow: #c8a96e;
+      --glow-soft: rgba(200, 169, 110, 0.15);
+      --glow-ring: rgba(200, 169, 110, 0.6);
+      --text: #e8e0d0;
+      --text-dim: rgba(232, 224, 208, 0.45);
+      --accent: #f0e4c8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #06060f 0%, #000000 70%);
+    }
+
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+      opacity: var(--op, 0.6);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--op, 0.6); transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(0.6); }
+    }
+
+    /* Atom SVG */
+    .atom-wrap {
+      position: absolute;
+      width: 72vmin;
+      height: 72vmin;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .atom-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    @keyframes orbitSpin1 {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes orbitSpin2 {
+      from { transform: rotate(60deg); }
+      to { transform: rotate(420deg); }
+    }
+    @keyframes orbitSpin3 {
+      from { transform: rotate(120deg); }
+      to { transform: rotate(480deg); }
+    }
+    @keyframes corePulse {
+      0%, 100% { opacity: 0.85; r: 22; }
+      50% { opacity: 1; r: 25; }
+    }
+    @keyframes glowRing {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    .orbit-path-1 { animation: orbitSpin1 6s linear infinite; transform-origin: 200px 200px; }
+    .orbit-path-2 { animation: orbitSpin2 9s linear infinite; transform-origin: 200px 200px; }
+    .orbit-path-3 { animation: orbitSpin3 12s linear infinite; transform-origin: 200px 200px; }
+
+    /* Hero title */
+    .hero-title {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hero-title h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(5.1rem, 2.8vw, 2rem);
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-shadow:
+        0 0 40px rgba(200, 169, 110, 0.5),
+        0 0 80px rgba(200, 169, 110, 0.2);
+      line-height: 1.4;
+    }
+
+    .hero-title .sub {
+      display: block;
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: clamp(1rem, 1vw, 0.75rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 0.6rem;
+    }
+
+    /* Corner facts */
+    .fact {
+      position: absolute;
+      max-width: 220px;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      color: var(--text-dim);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      transition: color 0.4s;
+    }
+    .fact:hover { color: var(--glow); }
+    .fact .label {
+      display: block;
+      font-family: 'Jost', sans-serif;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--glow);
+      margin-bottom: 6px;
+      opacity: 0.8;
+    }
+    .fact-tl { top: 5.5rem; left: 3rem; }
+    .fact-tr { top: 2.5rem; right: 10.5rem; text-align: right; }
+    .fact-bl { bottom: 6.5rem; left: 4.5rem; }
+    .fact-br { bottom: 8.5rem; right: 7.5rem; text-align: right; }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0.4;
+      animation: fadeFloat 2.5s ease-in-out infinite;
+    }
+    .scroll-hint span {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+    }
+    .scroll-hint svg { width: 16px; opacity: 0.6; }
+    @keyframes fadeFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+      50% { transform: translateX(-50%) translateY(6px); opacity: 0.7; }
+    }
+
+    /* ─── CONTENT SECTION ─── */
+    .content-section {
+      background: var(--deep);
+      padding: 6rem 4rem;
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .content-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glow-ring), transparent);
+      opacity: 0.4;
+    }
+
+    .section-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--glow), transparent);
+      margin-bottom: 2.5rem;
+      opacity: 0.6;
+    }
+
+    .body-text {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: var(--text);
+      opacity: 0.85;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── PARTICLES BLOCK ─── */
+    .particles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      margin: 3rem 0;
+    }
+
+    .particle-card {
+      background: var(--nebula);
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    .particle-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.08);
+      pointer-events: none;
+      transition: border-color 0.4s;
+    }
+
+    .particle-card:hover { background: #0e0e1a; }
+    .particle-card:hover::after { border-color: rgba(200, 169, 110, 0.25); }
+
+    .particle-symbol {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 3rem;
+      color: var(--glow);
+      opacity: 0.3;
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      line-height: 1;
+    }
+
+    .particle-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .particle-charge {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.8rem;
+    }
+
+    .particle-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    /* ─── TABLE SECTION ─── */
+    .table-wrap {
+      margin: 3rem 0;
+      overflow-x: auto;
+    }
+
+    .quantum-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Jost', sans-serif;
+    }
+
+    .quantum-table th {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.8;
+      padding: 0.8rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(200, 169, 110, 0.15);
+      font-weight: 300;
+      white-space: nowrap;
+    }
+
+    .quantum-table td {
+      font-size: 0.8rem;
+      font-weight: 200;
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(200, 169, 110, 0.05);
+      transition: background 0.2s;
+    }
+
+    .quantum-table tr:hover td {
+      background: rgba(200, 169, 110, 0.04);
+    }
+
+    .quantum-table td.level-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--accent);
+      text-align: left;
+      padding-left: 1.5rem;
+    }
+
+    .quantum-table td.total {
+      color: var(--glow);
+      font-weight: 300;
+    }
+
+    .cell-filled {
+      color: var(--text-dim);
+    }
+
+    .cell-empty {
+      opacity: 0.15;
+    }
+
+    /* ─── QUANTUM NUMBERS ─── */
+    .quantum-numbers {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px;
+      margin: 3rem 0;
+    }
+
+    .qn-card {
+      background: var(--nebula);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    .qn-card:hover { background: #0e0e1a; }
+
+    .qn-index {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .qn-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .qn-symbol {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 2.5rem;
+      color: var(--glow);
+      opacity: 0.2;
+      position: absolute;
+      top: 0.5rem;
+      right: 1.2rem;
+      line-height: 1;
+    }
+
+    .qn-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    /* ─── SIMULATION BUTTON ─── */
+    .sim-banner {
+      margin: 4rem 0 0;
+      position: relative;
+      background: var(--nebula);
+      padding: 3rem 2.5rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .sim-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.15);
+    }
+
+    .sim-banner::after {
+      content: '⚛';
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 8rem;
+      opacity: 0.04;
+      pointer-events: none;
+      animation: slowSpin 20s linear infinite;
+    }
+
+    @keyframes slowSpin {
+      from { transform: translateY(-50%) rotate(0deg); }
+      to   { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .sim-text { flex: 1; }
+
+    .sim-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .sim-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+    }
+
+    .sim-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.75rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      max-width: 380px;
+    }
+
+    .sim-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 2rem;
+      background: transparent;
+      border: 1px solid var(--glow);
+      color: var(--glow);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .sim-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--glow-soft);
+      transform: translateX(-100%);
+      transition: transform 0.35s ease;
+      z-index: -1;
+    }
+
+    .sim-btn:hover::before { transform: translateX(0); }
+    .sim-btn:hover {
+      color: var(--accent);
+      border-color: rgba(200, 169, 110, 0.8);
+      box-shadow: 0 0 30px rgba(200, 169, 110, 0.15);
+    }
+
+    .sim-btn svg {
+      width: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ─── PAGE NAV ─── */
+    .page-nav {
+      background: var(--void);
+      padding: 0 4rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .back-link:hover { color: var(--glow); }
+    .back-link svg { width: 14px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--void);
+      text-align: center;
+      padding: 2.5rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(200, 169, 110, 0.2);
+      border-top: 1px solid rgba(200, 169, 110, 0.06);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .fact-tr, .fact-br { display: none; }
+      .fact-tl, .fact-bl { max-width: 140px; font-size: 0.62rem; }
+      .content-section { padding: 4rem 1.5rem; }
+      .particles-grid { grid-template-columns: 1fr; }
+      .quantum-numbers { grid-template-columns: 1fr; }
+      .sim-banner { flex-direction: column; align-items: flex-start; }
+      .page-nav { padding: 0 1.5rem 4rem; }
+    }
+
+        /* --- БОКОВОЕ МЕНЮ ДЛЯ КАЖДОЙ СТРАНИЦЫ --- */
+    .menu-container { 
+        position: absolute; 
+        top: 20px; 
+        left: 20px; 
+        z-index: 200;
+        height: 100vh;
+    }
+
+    .hamburger-icon { 
+        width: 40px; 
+        height: 35px; 
+        cursor: pointer; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between; 
+        padding-bottom: 10px; 
+        padding-left: 15px; 
+    }
+
+    .line { 
+        width: 150%; 
+        height: 6px; 
+        background-color: white; 
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.5); 
+        transition: 0.3s; }
+
+    .sidebar {
+        position: fixed; 
+        top: 0; 
+        left: -280px;
+        width: 280px; 
+        height: 100vh; /* На весь экран */
+        background: var(--frame-bg); 
+        border-right: 4px solid var(--color-light);
+        transition: 0.4s ease; 
+        padding-top: 100px; 
+        z-index: 1000;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menu-container:hover .sidebar { 
+        left: 0; 
+    }
+
+    .menu-container:hover .line {
+        background-color: var(--color-sand); 
+    }
+
+    .menu-item {
+        position: relative;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .menu-title {
+        padding: 15px 25px; font-size: 11px;
+        color: var(--text-color); display: block;
+        cursor: pointer; transition: 0.2s;
+        line-height: 1.4;
+    }
+
+    .menu-item:hover .menu-title {
+        background: rgba(0,0,0,0.3); color: var(--color-sand);
+    }
+
+    /* Выпадающее подменю */
+    .submenu {
+        max-height: 0;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .menu-item:hover .submenu {
+        max-height: 200px;
+    }
+
+    .submenu a {
+        padding: 12px 25px 12px 40px; 
+        text-decoration: none; 
+        font-size: 10px;
+        color: var(--color-light); 
+        display: block; 
+        transition: 0.2s;
+    }
+
+    .submenu a:hover {
+        color: var(--correct); 
+        background: rgba(255,255,255,0.05);
+    }
+
+    .menu-profile-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        display: inline-block;
+        text-decoration: none;
+        color: var(--text-color);
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid var(--color-sand);
+        padding: 10px 15px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .menu-profile-btn:hover {
+        background: var(--color-sand);
+        color: #000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- МЕНЮ -->
+    <div class="menu-container">
+        <div class="hamburger-icon">
+            <div class="line"></div><div class="line"></div><div class="line"></div>
+        </div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="menu-item">
+                <span class="menu-title"><a href="../../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title">Английский язык</span>
+                <div class="submenu">
+                    <a href="../english_4.html">4 класс</a>
+                    <a href="#">5 класс</a>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <span class="menu-title">Математика</span>
+                <div class="submenu">
+                    <a href="../math_4.html">4 класс</a>
+                    <a href="../math_5.html">5 класс</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title">Физика</span>
+                <div class="submenu">
+                    <a href="../physics_7.html">7 класс</a>
+                    <a href="../physics_8.html">8 класс</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="../chemistry.html" style="text-decoration: none; color: var(--color-light);">Химия</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="../astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="../quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="../informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+            </div>
+
+            <div class="menu-item">
+                <span class="menu-title"><a href="../teacher_materials.html" style="text-decoration: none; color: var(--color-light);">Материалы для учителей</a></span>
+            </div>
+            
+            <a href="../../profile.html" class="menu-profile-btn">Профиль</a>
+        </div>
+    </div> 
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+
+    <div class="stars" id="stars"></div>
+
+    <!-- Animated Atom SVG -->
+    <div class="atom-wrap">
+      <svg class="atom-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f0e4c8" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#c8a96e" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c8a96e" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="bloom">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        <!-- Background glow -->
+        <circle cx="200" cy="200" r="160" fill="url(#glowGrad)"/>
+
+        <!-- Orbit 1 (ellipse rotated) -->
+        <g class="orbit-path-1">
+          <ellipse cx="200" cy="200" rx="130" ry="42" fill="none"
+            stroke="rgba(200,169,110,0.18)" stroke-width="1" stroke-dasharray="6 8"/>
+          <circle cx="330" cy="200" r="5" fill="#c8a96e" filter="url(#bloom)" opacity="0.95"/>
+        </g>
+
+        <!-- Orbit 2 (rotated 60deg) -->
+        <g class="orbit-path-2">
+          <ellipse cx="200" cy="200" rx="130" ry="42" fill="none"
+            stroke="rgba(200,169,110,0.13)" stroke-width="1" stroke-dasharray="6 8"/>
+          <circle cx="330" cy="200" r="4.5" fill="#e8d0a0" filter="url(#bloom)" opacity="0.9"/>
+        </g>
+
+        <!-- Orbit 3 (rotated 120deg) -->
+        <g class="orbit-path-3">
+          <ellipse cx="200" cy="200" rx="130" ry="42" fill="none"
+            stroke="rgba(200,169,110,0.10)" stroke-width="1" stroke-dasharray="6 8"/>
+          <circle cx="330" cy="200" r="4" fill="#d4b87e" filter="url(#bloom)" opacity="0.85"/>
+        </g>
+
+        <!-- Nucleus -->
+        <circle cx="200" cy="200" r="26" fill="url(#coreGrad)" opacity="0.9">
+          <animate attributeName="r" values="24;27;24" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="200" cy="200" r="36" fill="none" stroke="rgba(200,169,110,0.25)" stroke-width="1">
+          <animate attributeName="r" values="34;38;34" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.25;0.5;0.25" dur="3s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+
+    <!-- Corner facts -->
+    <!-- <div class="fact fact-tl">
+      <span class="label">Планетарная модель</span>
+      Резерфорд в 1911 году предложил модель атома с компактным ядром в центре. Эта схема и сейчас помогает нам визуализировать структуру.
+    </div>
+
+    <div class="fact fact-tr">
+      <span class="label">Невидимый мир</span>
+      На одной волне фиолетового света умещается до 1000 атомов. Увидеть атом таким, какой он есть, принципиально невозможно.
+    </div>
+
+    <div class="fact fact-bl">
+      <span class="label">Масса в ядре</span>
+      99,9% массы атома сосредоточено в ядре, хотя его размер — лишь одна стотысячная от размера всего атома.
+    </div>
+
+    <div class="fact fact-br">
+      <span class="label">Квантовый адрес</span>
+      Положение каждого электрона описывается четырьмя квантовыми числами — своего рода координатами в атомном пространстве.
+    </div> -->
+
+    <!-- Title -->
+    <div class="hero-title">
+      <h1>Атом и его строение</h1>
+      <span class="sub">Основа всего сущего — от ядра до электронных оболочек</span>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint">
+      <span>Далее</span>
+      <svg viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 0v20M1 13l7 7 7-7" stroke="#c8a96e" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div style="background: var(--deep);">
+    <div class="content-section" id="particles">
+
+      <!-- Что такое атом -->
+      <div class="section-label">§ 01 — Основы</div>
+      <h2 class="section-title">Что такое атом</h2>
+      <div class="section-divider"></div>
+
+      <p class="body-text">
+        <strong style="color: var(--accent); font-weight: 300;">Атом</strong> — это наименьшая частица вещества (в классической физике), из которой состоит всё вокруг. Атом можно условно разделить на две части: <em style="color: var(--glow);">ядро</em> и <em style="color: var(--glow);">электроны</em>. Ядро состоит из скопления протонов (минимум 1) и нейтронов (минимум 0).
+      </p>
+
+      <p class="body-text">
+        Каждый элемент имеет определённое количество всех этих частиц в таком соотношении, чтобы протонов и электронов было одинаково — атом должен быть нейтрально заряженным. Вся основная масса атома всегда сконцентрирована в его ядре, так как протоны и нейтроны весят намного больше, чем электроны.
+      </p>
+
+      <p class="body-text">
+        Атом выглядит — <em>никак</em>. Конечно, многие представляют его как некое подобие Солнечной системы — это так называемая <em style="color: var(--glow);">планетарная модель атома</em>. Но данная схема лишь упрощает понимание: даже взяв самую короткую волну видимого света (фиолетовый), мы всё равно не увидим атом, так как на ней умещается до 1000 атомов. Атом в 1000 раз меньше длины волны фиолетового цвета.
+      </p>
+
+      <!-- 3 частицы -->
+      <div class="particles-grid">
+
+        <div class="particle-card">
+          <div class="particle-symbol">n</div>
+          <div class="particle-charge">Нейтральный заряд</div>
+          <div class="particle-name">Нейтрон</div>
+          <div class="particle-desc">
+            Электрически нейтральная частица ядра. Вместе с протонами формирует ядро атома. Масса нейтрона чуть больше массы протона.
+          </div>
+        </div>
+
+        <div class="particle-card">
+          <div class="particle-symbol">e⁻</div>
+          <div class="particle-charge">Отрицательный заряд</div>
+          <div class="particle-name">Электрон</div>
+          <div class="particle-desc">
+            Отрицательно заряженная частица, вращающаяся вокруг ядра. Масса электрона в ~1836 раз меньше массы протона — практически невесома.
+          </div>
+        </div>
+
+        <div class="particle-card">
+          <div class="particle-symbol">p⁺</div>
+          <div class="particle-charge">Положительный заряд</div>
+          <div class="particle-name">Протон</div>
+          <div class="particle-desc">
+            Положительно заряженная частица ядра. Число протонов определяет химический элемент и совпадает с числом электронов в нейтральном атоме.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Электронная оболочка -->
+      <div class="section-label" id="shell">§ 02 — Электронная оболочка</div>
+      <h2 class="section-title">Электронная оболочка атома</h2>
+      <div class="section-divider"></div>
+
+      <p class="body-text">
+        Электронная оболочка — это область пространства вокруг ядра атома, где наиболее вероятно нахождение электрона. Наглядно эту область отображают с помощью <em style="color: var(--glow);">электронных облаков</em>: чем гуще точки на схеме, тем выше вероятность обнаружить электрон в этой точке.
+      </p>
+
+      <p class="body-text">
+        Электронная оболочка прежде всего зависит от главного квантового числа <em style="color: var(--glow);">(n)</em>. Каждая из оболочек состоит из одного или нескольких подуровней, которые в свою очередь состоят из <em style="color: var(--glow);">орбиталей</em> — на каждой орбитали допускается не более 2 электронов.
+      </p>
+
+      <p class="body-text">
+        Электронная оболочка атома состоит из N‑го количества уровней, которые нумеруют 1, 2, 3… либо обозначают K, L, M… Каждый уровень имеет подуровни и орбитали. Количество электронов на данной оболочке вычисляется по формуле: <strong style="color: var(--glow);">2n²</strong>, где <em>n</em> — номер уровня.
+      </p>
+
+      <!-- Таблица уровней -->
+      <div class="section-label" id="table">§ 03 — Таблица уровней</div>
+      <h2 class="section-title">Уровни электронных оболочек</h2>
+      <div class="section-divider"></div>
+
+      <div class="table-wrap">
+        <table class="quantum-table">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding-left:1.5rem;">Уровень</th>
+              <th>0 (s)</th>
+              <th>1 (p)</th>
+              <th>2 (d)</th>
+              <th>3 (f)</th>
+              <th>4 (g)</th>
+              <th>5 (h)</th>
+              <th>6 (i)</th>
+              <th>Итого</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="level-name">1. (K)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="total">2</td>
+            </tr>
+            <tr>
+              <td class="level-name">2. (L)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-filled">6</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="total">8</td>
+            </tr>
+            <tr>
+              <td class="level-name">3. (M)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-filled">6</td>
+              <td class="cell-filled">10</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="total">18</td>
+            </tr>
+            <tr>
+              <td class="level-name">4. (N)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-filled">6</td>
+              <td class="cell-filled">10</td>
+              <td class="cell-filled">14</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="total">32</td>
+            </tr>
+            <tr>
+              <td class="level-name">5. (O)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-filled">6</td>
+              <td class="cell-filled">10</td>
+              <td class="cell-filled">14</td>
+              <td class="cell-filled">18</td>
+              <td class="cell-empty">—</td>
+              <td class="cell-empty">—</td>
+              <td class="total">50</td>
+            </tr>
+            <tr>
+              <td class="level-name">6. (P)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-filled">6</td>
+              <td class="cell-filled">10</td>
+              <td class="cell-filled">14</td>
+              <td class="cell-filled">18</td>
+              <td class="cell-filled">22</td>
+              <td class="cell-empty">—</td>
+              <td class="total">72</td>
+            </tr>
+            <tr>
+              <td class="level-name">7. (Q)</td>
+              <td class="cell-filled">2</td>
+              <td class="cell-filled">6</td>
+              <td class="cell-filled">10</td>
+              <td class="cell-filled">14</td>
+              <td class="cell-filled">18</td>
+              <td class="cell-filled">22</td>
+              <td class="cell-filled">26</td>
+              <td class="total">98</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Квантовые числа -->
+      <div class="section-label" id="quantum">§ 04 — Квантовые числа</div>
+      <h2 class="section-title">Квантовые числа</h2>
+      <div class="section-divider"></div>
+
+      <p class="body-text">
+        Квантовое число — это своего рода <em style="color: var(--glow);">адрес электрона</em>. С точки зрения классической физики атом рассматривается как планетарная модель, но с точки зрения квантовой физики мы не знаем точного положения электрона — можем лишь определить теоретическую область (электронное облако), где он с наибольшей вероятностью находится. Для описания положения электрона существуют четыре основных квантовых числа:
+      </p>
+
+      <div class="quantum-numbers">
+
+        <div class="qn-card">
+          <div class="qn-symbol">n</div>
+          <div class="qn-index">01 / Главное</div>
+          <div class="qn-name">Главное квантовое число</div>
+          <div class="qn-desc">
+            Обозначает уровень электронной оболочки от 1 до 7, соответственно от K до Q. Определяет энергию электрона и его среднее расстояние от ядра.
+          </div>
+        </div>
+
+        <div class="qn-card">
+          <div class="qn-symbol">ℓ</div>
+          <div class="qn-index">02 / Орбитальное</div>
+          <div class="qn-name">Орбитальное число</div>
+          <div class="qn-desc">
+            Обозначает подуровень — от 0 до 6, от s до i. Определяет форму орбитали и угловой момент электрона.
+          </div>
+        </div>
+
+        <div class="qn-card">
+          <div class="qn-symbol">m</div>
+          <div class="qn-index">03 / Магнитное</div>
+          <div class="qn-name">Магнитное число</div>
+          <div class="qn-desc">
+            Определяет конкретную орбиталь внутри подуровня — пространственную ориентацию орбитали относительно внешнего магнитного поля.
+          </div>
+        </div>
+
+        <div class="qn-card">
+          <div class="qn-symbol">s</div>
+          <div class="qn-index">04 / Спиновое</div>
+          <div class="qn-name">Спиновое число</div>
+          <div class="qn-desc">
+            Отвечает на вопрос: почему на орбитали может быть лишь два электрона? Спин принимает значения +½ или −½, и два электрона на одной орбитали имеют противоположные спины.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3D Симуляция — кнопка -->
+      <div class="sim-banner">
+        <div class="sim-text">
+          <div class="sim-label">Интерактивная фича</div>
+          <div class="sim-title">Давай затестим — 3D Конструктор Атома</div>
+          <div class="sim-desc">
+            Собери свой атом из протонов, нейтронов и электронов. Переключайся между моделью Бора и квантовой моделью Шрёдингера. Крути и масштабируй в реальном времени.
+          </div>
+        </div>
+        <a href="../physics/atoms_maker.html" class="sim-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1C5.925 1 1 6.477 1 12"/>
+            <path d="M1 12C1 17.523 5.925 23 12 23"/>
+            <path d="M23 12C23 6.477 18.075 1 12 1"/>
+            <path d="M12 23C18.075 23 23 17.523 23 12"/>
+            <path d="M3.05 9h17.9M3.05 15h17.9"/>
+          </svg>
+          Открыть симуляцию
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Back nav -->
+    <div class="page-nav">
+      <a href="../quantum_physics.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Вернуться к квантовой физике
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    Квантовая физика · Наука · Атом и его строение
+  </footer>
+
+  <script>
+    // Generate stars
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 160; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 1.8 + 0.4;
+      star.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        top: ${Math.random() * 100}%;
+        left: ${Math.random() * 100}%;
+        --d: ${(Math.random() * 4 + 2).toFixed(1)}s;
+        --delay: -${(Math.random() * 4).toFixed(1)}s;
+        --op: ${(Math.random() * 0.5 + 0.2).toFixed(2)};
+      `;
+      starsEl.appendChild(star);
+    }
+  </script>
+</body>
+</html>

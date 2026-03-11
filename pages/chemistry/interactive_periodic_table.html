@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Периодическая таблица элементов</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Unbounded:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #7070a0;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+
+    --alkali: #ff4757;
+    --alkali-earth: #ff6348;
+    --transition: #ffa502;
+    --post-transition: #7bed9f;
+    --metalloid: #70a1ff;
+    --nonmetal: #eccc68;
+    --halogen: #a29bfe;
+    --noble: #fd79a8;
+    --lanthanide: #00cec9;
+    --actinide: #6c5ce7;
+    --unknown: #636e72;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    /* -webkit-background-clip: text; */
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  .search-icon { color: var(--text-dim); font-size: 14px; }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    background: none;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+
+  .tab:hover:not(.active) { color: var(--text); background: var(--border); }
+
+  /* PROPERTY SELECTOR */
+  .property-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    flex-wrap: wrap;
+  }
+
+  .prop-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .prop-btn.active, .prop-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+
+  /* TABLE */
+  .table-container {
+    padding: 20px 16px;
+    overflow-x: auto;
+  }
+
+  .periodic-table {
+    display: grid;
+    grid-template-columns: repeat(18, minmax(54px, 64px));
+    grid-template-rows: repeat(10, minmax(54px, 64px));
+    gap: 3px;
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  /* ELEMENT CELL */
+  .element {
+    position: relative;
+    border-radius: 6px;
+    padding: 4px 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+    background: var(--surface2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .element::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    border-radius: inherit;
+    transition: opacity 0.2s;
+  }
+
+  .element:hover {
+    transform: scale(1.12);
+    z-index: 10;
+    border-color: rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  .element:hover::before { opacity: 0.35; }
+
+  .element.highlighted { transform: scale(1.05); z-index: 5; }
+  .element.dimmed { opacity: 0.15; filter: grayscale(0.5); }
+
+  .el-number {
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1;
+  }
+
+  .el-symbol {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    margin: 2px 0;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  .el-name {
+    font-size: 8px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+
+  .el-mass {
+    font-size: 8px;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    line-height: 1;
+  }
+
+  /* Category colors */
+  .cat-alkali::before { background: var(--alkali); }
+  .cat-alkali { border-color: rgba(255,71,87,0.3); }
+  .cat-alkali-earth::before { background: var(--alkali-earth); }
+  .cat-alkali-earth { border-color: rgba(255,99,72,0.3); }
+  .cat-transition::before { background: var(--transition); }
+  .cat-transition { border-color: rgba(255,165,2,0.3); }
+  .cat-post-transition::before { background: var(--post-transition); }
+  .cat-post-transition { border-color: rgba(123,237,159,0.3); }
+  .cat-metalloid::before { background: var(--metalloid); }
+  .cat-metalloid { border-color: rgba(112,161,255,0.3); }
+  .cat-nonmetal::before { background: var(--nonmetal); }
+  .cat-nonmetal { border-color: rgba(236,204,104,0.3); }
+  .cat-halogen::before { background: var(--halogen); }
+  .cat-halogen { border-color: rgba(162,155,254,0.3); }
+  .cat-noble::before { background: var(--noble); }
+  .cat-noble { border-color: rgba(253,121,168,0.3); }
+  .cat-lanthanide::before { background: var(--lanthanide); }
+  .cat-lanthanide { border-color: rgba(0,206,201,0.3); }
+  .cat-actinide::before { background: var(--actinide); }
+  .cat-actinide { border-color: rgba(108,92,231,0.3); }
+  .cat-unknown::before { background: var(--unknown); }
+
+  /* LEGEND */
+  .legend {
+    grid-column: 1 / 4;
+    grid-row: 1 / 4;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+    background: none;
+    cursor: default;
+    border: none;
+  }
+
+  .legend:hover { transform: none; box-shadow: none; }
+
+  .legend-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* PERIOD/GROUP LABELS */
+  .period-label, .group-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+    cursor: default;
+  }
+
+  .period-label:hover, .group-label:hover { transform: none; }
+
+  /* PLACEHOLDER */
+  .placeholder {
+    background: none;
+    border: none;
+    cursor: default;
+  }
+  .placeholder:hover { transform: none; box-shadow: none; }
+
+  /* SEPARATOR ROW */
+  .separator {
+    grid-column: 1 / -1;
+    height: 8px;
+    background: none;
+    border: none;
+    cursor: default;
+  }
+  .separator:hover { transform: none; }
+
+  /* PANEL */
+  .detail-panel {
+    position: fixed;
+    right: -480px;
+    top: 0;
+    width: 460px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 200;
+    overflow-y: auto;
+    transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-panel.open { right: 0; }
+
+  .panel-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .panel-element-big {
+    width: 100px;
+    height: 110px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .panel-element-big::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0.2;
+  }
+
+  .panel-number { font-size: 11px; color: rgba(255,255,255,0.5); position: absolute; top: 8px; left: 10px; }
+  .panel-symbol { font-family: 'Unbounded', sans-serif; font-size: 42px; font-weight: 700; color: #fff; line-height: 1; }
+  .panel-name-ru { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+  .panel-mass { font-size: 10px; color: rgba(255,255,255,0.5); }
+
+  .panel-title-block { flex: 1; }
+  .panel-name-big { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .panel-latin { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .panel-category-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  .close-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .close-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .panel-body { padding: 16px 24px; flex: 1; }
+
+  .panel-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+
+  .panel-tab {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .panel-tab.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+  .panel-tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+  .panel-content { display: none; }
+  .panel-content.active { display: block; }
+
+  /* PROPERTIES GRID */
+  .props-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .prop-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .prop-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .prop-value { font-size: 14px; font-weight: 600; color: var(--text); }
+  .prop-unit { font-size: 9px; color: var(--text-dim); }
+
+  .prop-card.full { grid-column: 1 / -1; }
+
+  /* ELECTRON CONFIG */
+  .electron-config {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    margin-top: 4px;
+    word-break: break-all;
+  }
+
+  /* BOHR MODEL */
+  .bohr-model {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    position: relative;
+  }
+
+  .bohr-svg { overflow: visible; }
+
+  /* ISOTOPES */
+  .isotope-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .isotope-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  .isotope-symbol { font-weight: 600; color: var(--accent); }
+  .isotope-info { color: var(--text-dim); font-size: 10px; }
+  .stable-badge { background: rgba(0,206,201,0.15); color: var(--lanthanide); padding: 2px 8px; border-radius: 10px; font-size: 9px; }
+  .unstable-badge { background: rgba(255,71,87,0.15); color: var(--alkali); padding: 2px 8px; border-radius: 10px; font-size: 9px; }
+
+  /* SPECTRUM BAR */
+  .spectrum-section { margin-top: 12px; }
+  .spectrum-label { font-size: 10px; color: var(--text-dim); margin-bottom: 6px; }
+  .spectrum-bar {
+    height: 24px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #000, #ff0000 16%, #ff7f00 33%, #ffff00 50%, #00ff00 66%, #0000ff 83%, #8b00ff 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* OVERLAY */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .overlay.active { opacity: 1; pointer-events: all; }
+
+  /* PROPERTY DISPLAY COLORS */
+  .prop-display .element .el-mass {
+    display: none;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .periodic-table {
+      grid-template-columns: repeat(18, minmax(40px, 50px));
+      grid-template-rows: repeat(10, minmax(40px, 50px));
+    }
+    .el-symbol { font-size: 13px; }
+    .el-name { font-size: 7px; }
+    .el-number { font-size: 7px; }
+    .el-mass { font-size: 7px; }
+  }
+
+  /* VALUE BAR for property mode */
+  .val-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 0 0 0 5px;
+    transition: width 0.3s;
+  }
+
+  /* TABLE INFO (period/group labels in corners) */
+  .table-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px 0;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: fixed;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    pointer-events: none;
+    z-index: 300;
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 200px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .tooltip.visible { opacity: 1; }
+  .tooltip-symbol { font-family: 'Unbounded', sans-serif; font-size: 16px; font-weight: 700; }
+  .tooltip-name { color: var(--text-dim); margin-top: 2px; }
+  .tooltip-prop { color: var(--accent); margin-top: 4px; font-weight: 600; }
+
+  /* SUMMARY STRIP */
+  .summary-strip {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px 24px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    z-index: 50;
+    flex-wrap: wrap;
+  }
+
+  .summary-item span { color: var(--text); font-weight: 600; }
+
+  /* PHASE BADGES */
+  .phase-solid { color: #74b9ff; }
+  .phase-liquid { color: #00cec9; }
+  .phase-gas { color: #fdcb6e; }
+  .phase-unknown-ph { color: var(--text-dim); }
+
+  /* WIKI SECTION */
+  .wiki-section { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+  .wiki-section p { margin-bottom: 10px; }
+
+  /* ANIMATED HIGHLIGHT */
+  @keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(0,212,255,0.15); }
+  }
+
+  .element.search-match {
+    animation: pulse-border 1.5s infinite;
+    border-color: var(--accent) !important;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">ЭЛЕМЕНТЫ</div>
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Поиск элемента, символа, Z...">
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setView('table')" id="tab-table">Таблица</button>
+    <button class="tab" onclick="setView('list')" id="tab-list">Список</button>
+    <button class="tab" onclick="setView('properties')" id="tab-props">Свойства</button>
+  </div>
+</div>
+
+<!-- PROPERTY BAR -->
+<div class="property-bar" id="propertyBar">
+  <button class="prop-btn active" onclick="setProperty('category')" id="prop-category">Категория</button>
+  <button class="prop-btn" onclick="setProperty('mass')" id="prop-mass">Атомная масса</button>
+  <button class="prop-btn" onclick="setProperty('density')" id="prop-density">Плотность</button>
+  <button class="prop-btn" onclick="setProperty('melt')" id="prop-melt">Т. плавления</button>
+  <button class="prop-btn" onclick="setProperty('boil')" id="prop-boil">Т. кипения</button>
+  <button class="prop-btn" onclick="setProperty('electronegativity')" id="prop-electronegativity">Электроотрицат.</button>
+  <button class="prop-btn" onclick="setProperty('ionization')" id="prop-ionization">1-я ионизация</button>
+  <button class="prop-btn" onclick="setProperty('radius')" id="prop-radius">Атомный радиус</button>
+  <button class="prop-btn" onclick="setProperty('electrons')" id="prop-electrons">Эл. конфигурация</button>
+  <button class="prop-btn" onclick="setProperty('phase')" id="prop-phase">Фаза (25°C)</button>
+  <button class="prop-btn" onclick="setProperty('oxidation')" id="prop-oxidation">Степ. окисления</button>
+  <button class="prop-btn" onclick="setProperty('year')" id="prop-year">Год открытия</button>
+</div>
+
+<!-- TABLE INFO -->
+<div class="table-info">
+  <span>Группы →</span>
+  <span>Периоды ↓</span>
+</div>
+
+<!-- TABLE VIEW -->
+<div class="table-container" id="tableView">
+  <div class="periodic-table" id="periodicTable"></div>
+</div>
+
+<!-- LIST VIEW -->
+<div id="listView" style="display:none; padding:20px 24px;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px;" id="listContainer"></div>
+</div>
+
+<!-- PROPERTIES VIEW -->
+<div id="propertiesView" style="display:none; padding:20px 24px;">
+  <div id="propertiesChart"></div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="panel-header">
+    <div class="panel-element-big" id="panelBigElement">
+      <div class="panel-number" id="panelNumber"></div>
+      <div class="panel-symbol" id="panelSymbol"></div>
+      <div class="panel-name-ru" id="panelNameRu"></div>
+      <div class="panel-mass" id="panelMassHeader"></div>
+    </div>
+    <div class="panel-title-block">
+      <div class="panel-name-big" id="panelNameBig"></div>
+      <div class="panel-latin" id="panelLatin"></div>
+      <div class="panel-category-badge" id="panelCategoryBadge"></div>
+      <div style="margin-top:8px; font-size:11px; color:var(--text-dim)" id="panelPhase"></div>
+      <div style="margin-top:4px; font-size:11px; color:var(--text-dim)" id="panelYear"></div>
+    </div>
+    <button class="close-btn" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="setPanelTab('overview')">Обзор</button>
+      <button class="panel-tab" onclick="setPanelTab('physical')">Физ. свойства</button>
+      <button class="panel-tab" onclick="setPanelTab('atomic')">Атомные</button>
+      <button class="panel-tab" onclick="setPanelTab('isotopes')">Изотопы</button>
+    </div>
+    <div class="panel-content active" id="tab-overview"></div>
+    <div class="panel-content" id="tab-physical"></div>
+    <div class="panel-content" id="tab-atomic"></div>
+    <div class="panel-content" id="tab-isotopes"></div>
+  </div>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-symbol" id="tt-symbol"></div>
+  <div class="tooltip-name" id="tt-name"></div>
+  <div class="tooltip-prop" id="tt-prop"></div>
+</div>
+
+<!-- SUMMARY STRIP -->
+<div class="summary-strip">
+  <div class="summary-item">Элементов: <span>118</span></div>
+  <div class="summary-item">Металлов: <span>92</span></div>
+  <div class="summary-item">Неметаллов: <span>17</span></div>
+  <div class="summary-item">Синтетических: <span>24</span></div>
+  <div class="summary-item" id="hoverInfo" style="color:var(--text-dim)">Наведите на элемент</div>
+</div>
+
+<script>
+// ============================
+// FULL ELEMENT DATA (118 elements)
+// ============================
+const elements = [
+  { z:1, symbol:'H', name:'Водород', latin:'Hydrogenium', cat:'nonmetal', group:1, period:1, mass:1.008, density:0.00009, melt:-259.16, boil:-252.88, en:2.2, ie1:1312, radius:53, phase:'gas', ox:[-1,1], year:1766, config:'1s¹', shells:[1], isotopes:[{sym:'¹H',stab:true,abund:'99.98%'},{sym:'²H',stab:true,abund:'0.02%'},{sym:'³H',stab:false,t12:'12.3 лет'}], desc:'Лёгкий бесцветный газ, самый распространённый элемент во вселенной. Составляет ~75% всей барионной массы. Используется в качестве топлива и в химическом синтезе.', discoverer:'Г. Кавендиш' },
+  { z:2, symbol:'He', name:'Гелий', latin:'Helium', cat:'noble', group:18, period:1, mass:4.003, density:0.000164, melt:-272.2, boil:-268.93, en:null, ie1:2372, radius:31, phase:'gas', ox:[0], year:1895, config:'1s²', shells:[2], isotopes:[{sym:'³He',stab:true,abund:'0.0002%'},{sym:'⁴He',stab:true,abund:'99.99%'}], desc:'Благородный газ, второй по лёгкости. Используется в криогенике, воздушных шарах, а также как защитный газ в сварке.', discoverer:'П. Жансен' },
+  { z:3, symbol:'Li', name:'Литий', latin:'Lithium', cat:'alkali', group:1, period:2, mass:6.941, density:0.534, melt:180.5, boil:1342, en:0.98, ie1:520, radius:167, phase:'solid', ox:[1], year:1817, config:'[He] 2s¹', shells:[2,1], isotopes:[{sym:'⁶Li',stab:true,abund:'7.59%'},{sym:'⁷Li',stab:true,abund:'92.4%'}], desc:'Мягкий серебристо-белый щелочной металл. Применяется в аккумуляторах, стекольной промышленности и психиатрии.', discoverer:'Й. Арфведсон' },
+  { z:4, symbol:'Be', name:'Бериллий', latin:'Beryllium', cat:'alkali-earth', group:2, period:2, mass:9.012, density:1.85, melt:1287, boil:2470, en:1.57, ie1:900, radius:112, phase:'solid', ox:[2], year:1798, config:'[He] 2s²', shells:[2,2], isotopes:[{sym:'⁹Be',stab:true,abund:'100%'}], desc:'Лёгкий жёсткий металл серо-стального цвета. Применяется в аэрокосмической промышленности и ядерных реакторах.', discoverer:'Л. Вокелен' },
+  { z:5, symbol:'B', name:'Бор', latin:'Borium', cat:'metalloid', group:13, period:2, mass:10.81, density:2.08, melt:2075, boil:4000, en:2.04, ie1:801, radius:87, phase:'solid', ox:[3], year:1808, config:'[He] 2s² 2p¹', shells:[2,3], isotopes:[{sym:'¹⁰B',stab:true,abund:'19.9%'},{sym:'¹¹B',stab:true,abund:'80.1%'}], desc:'Металлоид, полупроводник. Используется в производстве жаропрочного стекла и керамики.', discoverer:'Ж. Гей-Люссак' },
+  { z:6, symbol:'C', name:'Углерод', latin:'Carboneum', cat:'nonmetal', group:14, period:2, mass:12.011, density:2.267, melt:3550, boil:4027, en:2.55, ie1:1086, radius:67, phase:'solid', ox:[-4,2,4], year:null, config:'[He] 2s² 2p²', shells:[2,4], isotopes:[{sym:'¹²C',stab:true,abund:'98.9%'},{sym:'¹³C',stab:true,abund:'1.1%'},{sym:'¹⁴C',stab:false,t12:'5730 лет'}], desc:'Основа органической химии. Существует в виде алмаза, графита, фуллеренов и других аллотропов.', discoverer:'Известен с древности' },
+  { z:7, symbol:'N', name:'Азот', latin:'Nitrogenium', cat:'nonmetal', group:15, period:2, mass:14.007, density:0.00117, melt:-210.1, boil:-195.79, en:3.04, ie1:1402, radius:56, phase:'gas', ox:[-3,1,2,3,4,5], year:1772, config:'[He] 2s² 2p³', shells:[2,5], isotopes:[{sym:'¹⁴N',stab:true,abund:'99.6%'},{sym:'¹⁵N',stab:true,abund:'0.4%'}], desc:'Составляет ~78% атмосферы Земли. Используется в удобрениях, взрывчатых веществах и криогенике.', discoverer:'Д. Резерфорд' },
+  { z:8, symbol:'O', name:'Кислород', latin:'Oxygenium', cat:'nonmetal', group:16, period:2, mass:15.999, density:0.00133, melt:-218.79, boil:-182.95, en:3.44, ie1:1314, radius:48, phase:'gas', ox:[-2,-1], year:1774, config:'[He] 2s² 2p⁴', shells:[2,6], isotopes:[{sym:'¹⁶O',stab:true,abund:'99.76%'},{sym:'¹⁷O',stab:true,abund:'0.04%'},{sym:'¹⁸O',stab:true,abund:'0.2%'}], desc:'Жизненно важный газ, составляет ~21% атмосферы. Необходим для дыхания и горения.', discoverer:'К. Шееле' },
+  { z:9, symbol:'F', name:'Фтор', latin:'Fluorum', cat:'halogen', group:17, period:2, mass:18.998, density:0.00158, melt:-219.62, boil:-188.12, en:3.98, ie1:1681, radius:42, phase:'gas', ox:[-1], year:1886, config:'[He] 2s² 2p⁵', shells:[2,7], isotopes:[{sym:'¹⁹F',stab:true,abund:'100%'}], desc:'Наиболее электроотрицательный и один из самых реакционноспособных элементов. Используется в производстве тефлона.', discoverer:'А. Муассан' },
+  { z:10, symbol:'Ne', name:'Неон', latin:'Neon', cat:'noble', group:18, period:2, mass:20.18, density:0.00084, melt:-248.59, boil:-246.08, en:null, ie1:2081, radius:38, phase:'gas', ox:[0], year:1898, config:'[He] 2s² 2p⁶', shells:[2,8], isotopes:[{sym:'²⁰Ne',stab:true,abund:'90.5%'},{sym:'²¹Ne',stab:true,abund:'0.27%'},{sym:'²²Ne',stab:true,abund:'9.25%'}], desc:'Благородный газ, используется в неоновых лампах, лазерах и холодильных установках.', discoverer:'У. Рамзай' },
+  { z:11, symbol:'Na', name:'Натрий', latin:'Natrium', cat:'alkali', group:1, period:3, mass:22.99, density:0.968, melt:97.79, boil:882.8, en:0.93, ie1:496, radius:190, phase:'solid', ox:[1], year:1807, config:'[Ne] 3s¹', shells:[2,8,1], isotopes:[{sym:'²³Na',stab:true,abund:'100%'}], desc:'Мягкий серебристый металл, необходимый для жизнедеятельности. Основной компонент поваренной соли.', discoverer:'Г. Дэви' },
+  { z:12, symbol:'Mg', name:'Магний', latin:'Magnesium', cat:'alkali-earth', group:2, period:3, mass:24.305, density:1.738, melt:650, boil:1090, en:1.31, ie1:738, radius:145, phase:'solid', ox:[2], year:1755, config:'[Ne] 3s²', shells:[2,8,2], isotopes:[{sym:'²⁴Mg',stab:true,abund:'79%'},{sym:'²⁵Mg',stab:true,abund:'10%'},{sym:'²⁶Mg',stab:true,abund:'11%'}], desc:'Лёгкий серебристо-белый металл. Используется в авиации, пиротехнике и как добавка к сплавам.', discoverer:'Г. Дэви' },
+  { z:13, symbol:'Al', name:'Алюминий', latin:'Aluminium', cat:'post-transition', group:13, period:3, mass:26.982, density:2.698, melt:660.32, boil:2519, en:1.61, ie1:578, radius:118, phase:'solid', ox:[3], year:1825, config:'[Ne] 3s² 3p¹', shells:[2,8,3], isotopes:[{sym:'²⁷Al',stab:true,abund:'100%'}], desc:'Лёгкий прочный металл серебристого цвета. Наиболее распространённый металл в земной коре.', discoverer:'Х. Эрстед' },
+  { z:14, symbol:'Si', name:'Кремний', latin:'Silicium', cat:'metalloid', group:14, period:3, mass:28.086, density:2.33, melt:1414, boil:3265, en:1.9, ie1:786, radius:111, phase:'solid', ox:[-4,4], year:1824, config:'[Ne] 3s² 3p²', shells:[2,8,4], isotopes:[{sym:'²⁸Si',stab:true,abund:'92.2%'},{sym:'²⁹Si',stab:true,abund:'4.7%'},{sym:'³⁰Si',stab:true,abund:'3.1%'}], desc:'Основа полупроводниковой промышленности. Второй по распространённости элемент в земной коре.', discoverer:'Й. Берцелиус' },
+  { z:15, symbol:'P', name:'Фосфор', latin:'Phosphorus', cat:'nonmetal', group:15, period:3, mass:30.974, density:1.82, melt:44.15, boil:280.5, en:2.19, ie1:1012, radius:98, phase:'solid', ox:[-3,1,3,5], year:1669, config:'[Ne] 3s² 3p³', shells:[2,8,5], isotopes:[{sym:'³¹P',stab:true,abund:'100%'}], desc:'Необходим для жизни, входит в состав ДНК и АТФ. Существует в нескольких аллотропных формах.', discoverer:'Х. Бранд' },
+  { z:16, symbol:'S', name:'Сера', latin:'Sulphur', cat:'nonmetal', group:16, period:3, mass:32.06, density:2.07, melt:115.21, boil:444.61, en:2.58, ie1:1000, radius:88, phase:'solid', ox:[-2,2,4,6], year:null, config:'[Ne] 3s² 3p⁴', shells:[2,8,6], isotopes:[{sym:'³²S',stab:true,abund:'94.9%'},{sym:'³³S',stab:true,abund:'0.75%'},{sym:'³⁴S',stab:true,abund:'4.3%'}], desc:'Жёлтый твёрдый неметалл. Используется в производстве серной кислоты, резины и пороха.', discoverer:'Известна с древности' },
+  { z:17, symbol:'Cl', name:'Хлор', latin:'Chlorum', cat:'halogen', group:17, period:3, mass:35.45, density:0.00295, melt:-101.5, boil:-34.05, en:3.16, ie1:1251, radius:79, phase:'gas', ox:[-1,1,3,5,7], year:1774, config:'[Ne] 3s² 3p⁵', shells:[2,8,7], isotopes:[{sym:'³⁵Cl',stab:true,abund:'75.8%'},{sym:'³⁷Cl',stab:true,abund:'24.2%'}], desc:'Желто-зелёный ядовитый газ с резким запахом. Используется для дезинфекции воды и в химическом производстве.', discoverer:'К. Шееле' },
+  { z:18, symbol:'Ar', name:'Аргон', latin:'Argon', cat:'noble', group:18, period:3, mass:39.948, density:0.00164, melt:-189.35, boil:-185.85, en:null, ie1:1521, radius:71, phase:'gas', ox:[0], year:1894, config:'[Ne] 3s² 3p⁶', shells:[2,8,8], isotopes:[{sym:'³⁶Ar',stab:true,abund:'0.34%'},{sym:'³⁸Ar',stab:true,abund:'0.06%'},{sym:'⁴⁰Ar',stab:true,abund:'99.6%'}], desc:'Третий по распространённости газ в атмосфере Земли. Используется как инертная защитная атмосфера.', discoverer:'У. Рамзай' },
+  { z:19, symbol:'K', name:'Калий', latin:'Kalium', cat:'alkali', group:1, period:4, mass:39.098, density:0.862, melt:63.38, boil:759, en:0.82, ie1:419, radius:243, phase:'solid', ox:[1], year:1807, config:'[Ar] 4s¹', shells:[2,8,8,1], isotopes:[{sym:'³⁹K',stab:true,abund:'93.3%'},{sym:'⁴⁰K',stab:false,t12:'1.25 млрд лет'},{sym:'⁴¹K',stab:true,abund:'6.7%'}], desc:'Мягкий реакционноспособный щелочной металл. Необходим для жизни, регулирует водный баланс в клетках.', discoverer:'Г. Дэви' },
+  { z:20, symbol:'Ca', name:'Кальций', latin:'Calcium', cat:'alkali-earth', group:2, period:4, mass:40.078, density:1.55, melt:842, boil:1484, en:1.0, ie1:590, radius:194, phase:'solid', ox:[2], year:1808, config:'[Ar] 4s²', shells:[2,8,8,2], isotopes:[{sym:'⁴⁰Ca',stab:true,abund:'96.9%'},{sym:'⁴²Ca',stab:true,abund:'0.65%'}], desc:'Пятый по распространённости элемент в земной коре. Основной строительный материал костей и зубов.', discoverer:'Г. Дэви' },
+  { z:21, symbol:'Sc', name:'Скандий', latin:'Scandium', cat:'transition', group:3, period:4, mass:44.956, density:2.985, melt:1541, boil:2836, en:1.36, ie1:633, radius:184, phase:'solid', ox:[3], year:1879, config:'[Ar] 3d¹ 4s²', shells:[2,8,9,2], isotopes:[{sym:'⁴⁵Sc',stab:true,abund:'100%'}], desc:'Редкий мягкий металл серебристо-белого цвета. Используется в авиакосмических сплавах.', discoverer:'Л. Нильсон' },
+  { z:22, symbol:'Ti', name:'Титан', latin:'Titanium', cat:'transition', group:4, period:4, mass:47.867, density:4.506, melt:1668, boil:3287, en:1.54, ie1:659, radius:176, phase:'solid', ox:[2,3,4], year:1791, config:'[Ar] 3d² 4s²', shells:[2,8,10,2], isotopes:[{sym:'⁴⁶Ti',stab:true,abund:'8.25%'},{sym:'⁴⁸Ti',stab:true,abund:'73.7%'}], desc:'Лёгкий прочный металл. Широко используется в авиации, медицине и спортивном инвентаре.', discoverer:'У. Грегор' },
+  { z:23, symbol:'V', name:'Ванадий', latin:'Vanadium', cat:'transition', group:5, period:4, mass:50.942, density:6.11, melt:1910, boil:3407, en:1.63, ie1:651, radius:171, phase:'solid', ox:[2,3,4,5], year:1801, config:'[Ar] 3d³ 4s²', shells:[2,8,11,2], isotopes:[{sym:'⁵¹V',stab:true,abund:'99.7%'}], desc:'Твёрдый голубовато-серый металл. Используется в производстве стали и катализаторов.', discoverer:'А. дель Рио' },
+  { z:24, symbol:'Cr', name:'Хром', latin:'Chromium', cat:'transition', group:6, period:4, mass:51.996, density:7.14, melt:1907, boil:2671, en:1.66, ie1:653, radius:166, phase:'solid', ox:[2,3,6], year:1797, config:'[Ar] 3d⁵ 4s¹', shells:[2,8,13,1], isotopes:[{sym:'⁵²Cr',stab:true,abund:'83.8%'}], desc:'Блестящий твёрдый металл. Используется для покрытий (хромирование) и в нержавеющей стали.', discoverer:'Л. Воклен' },
+  { z:25, symbol:'Mn', name:'Марганец', latin:'Manganum', cat:'transition', group:7, period:4, mass:54.938, density:7.47, melt:1246, boil:2061, en:1.55, ie1:717, radius:161, phase:'solid', ox:[2,3,4,7], year:1774, config:'[Ar] 3d⁵ 4s²', shells:[2,8,13,2], isotopes:[{sym:'⁵⁵Mn',stab:true,abund:'100%'}], desc:'Серебристо-серый металл. Применяется в сталеплавильном производстве и производстве батарей.', discoverer:'К. Шееле' },
+  { z:26, symbol:'Fe', name:'Железо', latin:'Ferrum', cat:'transition', group:8, period:4, mass:55.845, density:7.874, melt:1538, boil:2861, en:1.83, ie1:763, radius:156, phase:'solid', ox:[2,3], year:null, config:'[Ar] 3d⁶ 4s²', shells:[2,8,14,2], isotopes:[{sym:'⁵⁴Fe',stab:true,abund:'5.85%'},{sym:'⁵⁶Fe',stab:true,abund:'91.7%'}], desc:'Наиболее распространённый металл на Земле. Основа современной цивилизации — сталь и чугун.', discoverer:'Известно с древности' },
+  { z:27, symbol:'Co', name:'Кобальт', latin:'Cobaltum', cat:'transition', group:9, period:4, mass:58.933, density:8.9, melt:1495, boil:2927, en:1.88, ie1:760, radius:152, phase:'solid', ox:[2,3], year:1735, config:'[Ar] 3d⁷ 4s²', shells:[2,8,15,2], isotopes:[{sym:'⁵⁹Co',stab:true,abund:'100%'}], desc:'Твёрдый блестящий металл синевато-серого оттенка. Используется в сплавах, красках и литиевых батареях.', discoverer:'Г. Брандт' },
+  { z:28, symbol:'Ni', name:'Никель', latin:'Niccolum', cat:'transition', group:10, period:4, mass:58.693, density:8.908, melt:1455, boil:2913, en:1.91, ie1:737, radius:149, phase:'solid', ox:[2], year:1751, config:'[Ar] 3d⁸ 4s²', shells:[2,8,16,2], isotopes:[{sym:'⁵⁸Ni',stab:true,abund:'68.1%'},{sym:'⁶⁰Ni',stab:true,abund:'26.2%'}], desc:'Серебристо-белый металл с лёгким золотистым блеском. Применяется в монетах, аккумуляторах и покрытиях.', discoverer:'А. Кронстедт' },
+  { z:29, symbol:'Cu', name:'Медь', latin:'Cuprum', cat:'transition', group:11, period:4, mass:63.546, density:8.96, melt:1084.6, boil:2560, en:1.9, ie1:746, radius:145, phase:'solid', ox:[1,2], year:null, config:'[Ar] 3d¹⁰ 4s¹', shells:[2,8,18,1], isotopes:[{sym:'⁶³Cu',stab:true,abund:'69.2%'},{sym:'⁶⁵Cu',stab:true,abund:'30.8%'}], desc:'Один из первых металлов, освоенных человечеством. Отличный проводник электричества и тепла.', discoverer:'Известна с древности' },
+  { z:30, symbol:'Zn', name:'Цинк', latin:'Zincum', cat:'transition', group:12, period:4, mass:65.38, density:7.134, melt:419.53, boil:907, en:1.65, ie1:906, radius:142, phase:'solid', ox:[2], year:1746, config:'[Ar] 3d¹⁰ 4s²', shells:[2,8,18,2], isotopes:[{sym:'⁶⁴Zn',stab:true,abund:'48.6%'},{sym:'⁶⁶Zn',stab:true,abund:'27.9%'}], desc:'Синевато-белый металл. Широко используется для гальванизации стали и в производстве латуни.', discoverer:'А. Маргграф' },
+  { z:31, symbol:'Ga', name:'Галлий', latin:'Gallium', cat:'post-transition', group:13, period:4, mass:69.723, density:5.907, melt:29.76, boil:2204, en:1.81, ie1:579, radius:136, phase:'solid', ox:[3], year:1875, config:'[Ar] 3d¹⁰ 4s² 4p¹', shells:[2,8,18,3], isotopes:[{sym:'⁶⁹Ga',stab:true,abund:'60.1%'},{sym:'⁷¹Ga',stab:true,abund:'39.9%'}], desc:'Мягкий металл, плавящийся при температуре немного выше комнатной. Используется в полупроводниках.', discoverer:'П. Лекок де Буабодран' },
+  { z:32, symbol:'Ge', name:'Германий', latin:'Germanium', cat:'metalloid', group:14, period:4, mass:72.63, density:5.323, melt:938.25, boil:2833, en:2.01, ie1:762, radius:122, phase:'solid', ox:[2,4], year:1886, config:'[Ar] 3d¹⁰ 4s² 4p²', shells:[2,8,18,4], isotopes:[{sym:'⁷²Ge',stab:true,abund:'27.5%'},{sym:'⁷⁴Ge',stab:true,abund:'36.3%'}], desc:'Металлоид серовато-белого цвета. Применяется в полупроводниках, инфракрасной оптике и волоконной оптике.', discoverer:'К. Винклер' },
+  { z:33, symbol:'As', name:'Мышьяк', latin:'Arsenicum', cat:'metalloid', group:15, period:4, mass:74.922, density:5.727, melt:817, boil:887, en:2.18, ie1:947, radius:119, phase:'solid', ox:[-3,3,5], year:null, config:'[Ar] 3d¹⁰ 4s² 4p³', shells:[2,8,18,5], isotopes:[{sym:'⁷⁵As',stab:true,abund:'100%'}], desc:'Металлоид, известный с древности. Ядовитый, но используется в полупроводниках и пестицидах.', discoverer:'Альберт Великий' },
+  { z:34, symbol:'Se', name:'Селен', latin:'Selenium', cat:'nonmetal', group:16, period:4, mass:78.971, density:4.809, melt:220.8, boil:685, en:2.55, ie1:941, radius:116, phase:'solid', ox:[-2,2,4,6], year:1817, config:'[Ar] 3d¹⁰ 4s² 4p⁴', shells:[2,8,18,6], isotopes:[{sym:'⁷⁸Se',stab:true,abund:'23.8%'},{sym:'⁸⁰Se',stab:true,abund:'49.6%'}], desc:'Неметалл с фотоэлектрическими свойствами. Необходим в следовых количествах для организмов.', discoverer:'Й. Берцелиус' },
+  { z:35, symbol:'Br', name:'Бром', latin:'Bromum', cat:'halogen', group:17, period:4, mass:79.904, density:3.103, melt:-7.2, boil:58.9, en:2.96, ie1:1140, radius:114, phase:'liquid', ox:[-1,1,3,5], year:1826, config:'[Ar] 3d¹⁰ 4s² 4p⁵', shells:[2,8,18,7], isotopes:[{sym:'⁷⁹Br',stab:true,abund:'50.7%'},{sym:'⁸¹Br',stab:true,abund:'49.3%'}], desc:'Один из двух нежидких при комнатной температуре элементов-неметаллов. Используется в пестицидах и фотографии.', discoverer:'А. Балар' },
+  { z:36, symbol:'Kr', name:'Криптон', latin:'Krypton', cat:'noble', group:18, period:4, mass:83.798, density:0.00347, melt:-157.36, boil:-153.22, en:3.0, ie1:1351, radius:88, phase:'gas', ox:[0,2], year:1898, config:'[Ar] 3d¹⁰ 4s² 4p⁶', shells:[2,8,18,8], isotopes:[{sym:'⁸⁴Kr',stab:true,abund:'57.0%'}], desc:'Благородный газ. Используется в люминесцентных лампах и лазерах. Ранее использовался как эталон метра.', discoverer:'У. Рамзай' },
+  { z:37, symbol:'Rb', name:'Рубидий', latin:'Rubidium', cat:'alkali', group:1, period:5, mass:85.468, density:1.532, melt:39.3, boil:688, en:0.82, ie1:403, radius:265, phase:'solid', ox:[1], year:1861, config:'[Kr] 5s¹', shells:[2,8,18,8,1], isotopes:[{sym:'⁸⁵Rb',stab:true,abund:'72.2%'},{sym:'⁸⁷Rb',stab:false,t12:'4.9×10¹⁰ лет'}], desc:'Мягкий серебристо-белый металл. Используется в атомных часах и исследованиях квантовых вычислений.', discoverer:'Р. Бунзен' },
+  { z:38, symbol:'Sr', name:'Стронций', latin:'Strontium', cat:'alkali-earth', group:2, period:5, mass:87.62, density:2.64, melt:777, boil:1382, en:0.95, ie1:550, radius:219, phase:'solid', ox:[2], year:1790, config:'[Kr] 5s²', shells:[2,8,18,8,2], isotopes:[{sym:'⁸⁸Sr',stab:true,abund:'82.6%'}], desc:'Мягкий серебристо-жёлтый металл. ⁸⁷Sr используется в изотопной геохимии, ⁹⁰Sr — радиоактивный загрязнитель.', discoverer:'У. Крукшанк' },
+  { z:39, symbol:'Y', name:'Иттрий', latin:'Yttrium', cat:'transition', group:3, period:5, mass:88.906, density:4.469, melt:1526, boil:3336, en:1.22, ie1:600, radius:212, phase:'solid', ox:[3], year:1794, config:'[Kr] 4d¹ 5s²', shells:[2,8,18,9,2], isotopes:[{sym:'⁸⁹Y',stab:true,abund:'100%'}], desc:'Серебристый металл. Используется в лазерах (YAG), сверхпроводниках и производстве цветных телевизоров.', discoverer:'Ю. Гадолин' },
+  { z:40, symbol:'Zr', name:'Цирконий', latin:'Zirconium', cat:'transition', group:4, period:5, mass:91.224, density:6.52, melt:1855, boil:4409, en:1.33, ie1:640, radius:206, phase:'solid', ox:[4], year:1789, config:'[Kr] 4d² 5s²', shells:[2,8,18,10,2], isotopes:[{sym:'⁹⁰Zr',stab:true,abund:'51.5%'}], desc:'Блестящий серебристо-белый металл. Используется в ядерных реакторах и ювелирных изделиях (кубический цирконий).', discoverer:'М. Клапрот' },
+  { z:41, symbol:'Nb', name:'Ниобий', latin:'Niobium', cat:'transition', group:5, period:5, mass:92.906, density:8.57, melt:2477, boil:4744, en:1.6, ie1:652, radius:198, phase:'solid', ox:[3,5], year:1801, config:'[Kr] 4d⁴ 5s¹', shells:[2,8,18,12,1], isotopes:[{sym:'⁹³Nb',stab:true,abund:'100%'}], desc:'Светло-серый мягкий металл. Используется в суперсплавах для реактивных двигателей и в сверхпроводниках.', discoverer:'Ч. Хатчет' },
+  { z:42, symbol:'Mo', name:'Молибден', latin:'Molybdaenum', cat:'transition', group:6, period:5, mass:95.96, density:10.28, melt:2623, boil:4639, en:2.16, ie1:685, radius:190, phase:'solid', ox:[2,3,4,6], year:1781, config:'[Kr] 4d⁵ 5s¹', shells:[2,8,18,13,1], isotopes:[{sym:'⁹⁸Mo',stab:true,abund:'24.4%'}], desc:'Серебристо-белый твёрдый металл. Важная добавка к стальным сплавам, повышающая прочность.', discoverer:'К. Шееле' },
+  { z:43, symbol:'Tc', name:'Технеций', latin:'Technetium', cat:'transition', group:7, period:5, mass:97, density:11.5, melt:2157, boil:4265, en:1.9, ie1:702, radius:183, phase:'solid', ox:[4,7], year:1937, config:'[Kr] 4d⁵ 5s²', shells:[2,8,18,13,2], isotopes:[{sym:'⁹⁸Tc',stab:false,t12:'4.2 млн лет'},{sym:'⁹⁹Tc',stab:false,t12:'211 тыс. лет'}], desc:'Первый искусственно синтезированный элемент. ⁹⁹ᵐTc широко используется в ядерной медицине.', discoverer:'Э. Сегрe' },
+  { z:44, symbol:'Ru', name:'Рутений', latin:'Ruthenium', cat:'transition', group:8, period:5, mass:101.07, density:12.45, melt:2334, boil:4150, en:2.2, ie1:711, radius:178, phase:'solid', ox:[2,3,4,6,8], year:1844, config:'[Kr] 4d⁷ 5s¹', shells:[2,8,18,15,1], isotopes:[{sym:'¹⁰²Ru',stab:true,abund:'31.6%'}], desc:'Редкий твёрдый металл платиновой группы. Используется в катализаторах и электронике.', discoverer:'К. Клаус' },
+  { z:45, symbol:'Rh', name:'Родий', latin:'Rhodium', cat:'transition', group:9, period:5, mass:102.906, density:12.41, melt:1964, boil:3695, en:2.28, ie1:720, radius:173, phase:'solid', ox:[1,3], year:1803, config:'[Kr] 4d⁸ 5s¹', shells:[2,8,18,16,1], isotopes:[{sym:'¹⁰³Rh',stab:true,abund:'100%'}], desc:'Редкий серебристо-белый металл. Применяется в каталитических нейтрализаторах автомобилей.', discoverer:'У. Волластон' },
+  { z:46, symbol:'Pd', name:'Палладий', latin:'Palladium', cat:'transition', group:10, period:5, mass:106.42, density:12.023, melt:1554.9, boil:2963, en:2.2, ie1:805, radius:169, phase:'solid', ox:[2,4], year:1803, config:'[Kr] 4d¹⁰', shells:[2,8,18,18], isotopes:[{sym:'¹⁰⁶Pd',stab:true,abund:'27.3%'}], desc:'Мягкий серебристо-белый металл. Используется в катализаторах, ювелирных изделиях и электронике.', discoverer:'У. Волластон' },
+  { z:47, symbol:'Ag', name:'Серебро', latin:'Argentum', cat:'transition', group:11, period:5, mass:107.868, density:10.49, melt:961.78, boil:2162, en:1.93, ie1:731, radius:165, phase:'solid', ox:[1], year:null, config:'[Kr] 4d¹⁰ 5s¹', shells:[2,8,18,18,1], isotopes:[{sym:'¹⁰⁷Ag',stab:true,abund:'51.8%'},{sym:'¹⁰⁹Ag',stab:true,abund:'48.2%'}], desc:'Блестящий белый металл, наилучший проводник электричества. Использовался в монетах и украшениях с древности.', discoverer:'Известно с древности' },
+  { z:48, symbol:'Cd', name:'Кадмий', latin:'Cadmium', cat:'transition', group:12, period:5, mass:112.414, density:8.65, melt:321.07, boil:767, en:1.69, ie1:868, radius:158, phase:'solid', ox:[2], year:1817, config:'[Kr] 4d¹⁰ 5s²', shells:[2,8,18,18,2], isotopes:[{sym:'¹¹⁴Cd',stab:true,abund:'28.7%'}], desc:'Мягкий синевато-белый металл. Используется в никель-кадмиевых аккумуляторах и жёлтых пигментах.', discoverer:'Ф. Штромейер' },
+  { z:49, symbol:'In', name:'Индий', latin:'Indium', cat:'post-transition', group:13, period:5, mass:114.818, density:7.31, melt:156.6, boil:2072, en:1.78, ie1:558, radius:167, phase:'solid', ox:[3], year:1863, config:'[Kr] 4d¹⁰ 5s² 5p¹', shells:[2,8,18,18,3], isotopes:[{sym:'¹¹⁵In',stab:false,t12:'4.4×10¹⁴ лет',abund:'95.7%'}], desc:'Мягкий серебристо-белый металл. Используется в производстве экранов ITO и полупроводников.', discoverer:'Ф. Райх' },
+  { z:50, symbol:'Sn', name:'Олово', latin:'Stannum', cat:'post-transition', group:14, period:5, mass:118.711, density:7.287, melt:231.93, boil:2602, en:1.96, ie1:709, radius:145, phase:'solid', ox:[2,4], year:null, config:'[Kr] 4d¹⁰ 5s² 5p²', shells:[2,8,18,18,4], isotopes:[{sym:'¹²⁰Sn',stab:true,abund:'32.6%'}], desc:'Мягкий серебристо-белый металл, известный с бронзового века. Используется в пайке и покрытиях.', discoverer:'Известно с древности' },
+  { z:51, symbol:'Sb', name:'Сурьма', latin:'Stibium', cat:'metalloid', group:15, period:5, mass:121.76, density:6.685, melt:630.63, boil:1587, en:2.05, ie1:834, radius:133, phase:'solid', ox:[-3,3,5], year:null, config:'[Kr] 4d¹⁰ 5s² 5p³', shells:[2,8,18,18,5], isotopes:[{sym:'¹²¹Sb',stab:true,abund:'57.2%'},{sym:'¹²³Sb',stab:true,abund:'42.8%'}], desc:'Хрупкий блестящий металлоид. Используется в огнеупорных соединениях и полупроводниках.', discoverer:'Известна с древности' },
+  { z:52, symbol:'Te', name:'Теллур', latin:'Tellurium', cat:'metalloid', group:16, period:5, mass:127.6, density:6.232, melt:449.51, boil:988, en:2.1, ie1:869, radius:123, phase:'solid', ox:[-2,2,4,6], year:1782, config:'[Kr] 4d¹⁰ 5s² 5p⁴', shells:[2,8,18,18,6], isotopes:[{sym:'¹³⁰Te',stab:true,abund:'34.1%'}], desc:'Хрупкий серебристо-белый металлоид. Используется в производстве тонкоплёночных солнечных элементов CdTe.', discoverer:'Ф. Мюллер фон Рейхенштейн' },
+  { z:53, symbol:'I', name:'Йод', latin:'Iodum', cat:'halogen', group:17, period:5, mass:126.904, density:4.933, melt:113.7, boil:184.3, en:2.66, ie1:1008, radius:115, phase:'solid', ox:[-1,1,3,5,7], year:1811, config:'[Kr] 4d¹⁰ 5s² 5p⁵', shells:[2,8,18,18,7], isotopes:[{sym:'¹²⁷I',stab:true,abund:'100%'}], desc:'Тёмно-серое с металлическим блеском твёрдое вещество. Необходим для работы щитовидной железы.', discoverer:'Б. Куртуа' },
+  { z:54, symbol:'Xe', name:'Ксенон', latin:'Xenon', cat:'noble', group:18, period:5, mass:131.293, density:0.00546, melt:-111.79, boil:-108.13, en:2.6, ie1:1170, radius:108, phase:'gas', ox:[0,2,4,6], year:1898, config:'[Kr] 4d¹⁰ 5s² 5p⁶', shells:[2,8,18,18,8], isotopes:[{sym:'¹³²Xe',stab:true,abund:'26.9%'}], desc:'Благородный газ. Используется в высокоинтенсивных ксеноновых лампах, лазерах и анестезии.', discoverer:'У. Рамзай' },
+  { z:55, symbol:'Cs', name:'Цезий', latin:'Caesium', cat:'alkali', group:1, period:6, mass:132.905, density:1.879, melt:28.44, boil:671, en:0.79, ie1:376, radius:298, phase:'solid', ox:[1], year:1860, config:'[Xe] 6s¹', shells:[2,8,18,18,8,1], isotopes:[{sym:'¹³³Cs',stab:true,abund:'100%'}], desc:'Мягкий золотисто-жёлтый металл. Используется в атомных часах — стандарт измерения секунды.', discoverer:'Р. Бунзен' },
+  { z:56, symbol:'Ba', name:'Барий', latin:'Barium', cat:'alkali-earth', group:2, period:6, mass:137.327, density:3.594, melt:727, boil:1897, en:0.89, ie1:503, radius:253, phase:'solid', ox:[2], year:1808, config:'[Xe] 6s²', shells:[2,8,18,18,8,2], isotopes:[{sym:'¹³⁸Ba',stab:true,abund:'71.7%'}], desc:'Мягкий серебристо-белый металл. Используется в рентгенографии, стекле и пиротехнике (зелёный огонь).', discoverer:'Г. Дэви' },
+  { z:57, symbol:'La', name:'Лантан', latin:'Lanthanum', cat:'lanthanide', group:3, period:6, mass:138.905, density:6.145, melt:920, boil:3464, en:1.1, ie1:538, radius:250, phase:'solid', ox:[3], year:1839, config:'[Xe] 5d¹ 6s²', shells:[2,8,18,18,9,2], isotopes:[{sym:'¹³⁹La',stab:true,abund:'99.9%'}], desc:'Мягкий пластичный серебристый металл. Используется в никель-металлгидридных аккумуляторах и оптических стёклах.', discoverer:'К. Мосандер' },
+  { z:58, symbol:'Ce', name:'Церий', latin:'Cerium', cat:'lanthanide', group:3, period:6, mass:140.116, density:6.77, melt:798, boil:3443, en:1.12, ie1:534, radius:248, phase:'solid', ox:[3,4], year:1803, config:'[Xe] 4f¹ 5d¹ 6s²', shells:[2,8,18,19,9,2], isotopes:[{sym:'¹⁴⁰Ce',stab:true,abund:'88.5%'}], desc:'Наиболее распространённый лантанид. Используется в каталитических нейтрализаторах и в производстве стекла.', discoverer:'В. Хизингер' },
+  { z:59, symbol:'Pr', name:'Празеодим', latin:'Praseodymium', cat:'lanthanide', group:3, period:6, mass:140.908, density:6.773, melt:931, boil:3520, en:1.13, ie1:527, radius:247, phase:'solid', ox:[3], year:1885, config:'[Xe] 4f³ 6s²', shells:[2,8,18,21,8,2], isotopes:[{sym:'¹⁴¹Pr',stab:true,abund:'100%'}], desc:'Мягкий серебристый металл. Используется в сильных постоянных магнитах, лазерах и очках для сварщиков.', discoverer:'К. Ауэр фон Вельсбах' },
+  { z:60, symbol:'Nd', name:'Неодим', latin:'Neodymium', cat:'lanthanide', group:3, period:6, mass:144.242, density:7.007, melt:1016, boil:3074, en:1.14, ie1:533, radius:206, phase:'solid', ox:[3], year:1885, config:'[Xe] 4f⁴ 6s²', shells:[2,8,18,22,8,2], isotopes:[{sym:'¹⁴²Nd',stab:true,abund:'27.2%'}], desc:'Серебристый металл. Основа мощнейших постоянных магнитов Nd-Fe-B, применяемых в компьютерах и электромоторах.', discoverer:'К. Ауэр фон Вельсбах' },
+  { z:61, symbol:'Pm', name:'Прометий', latin:'Promethium', cat:'lanthanide', group:3, period:6, mass:145, density:7.26, melt:1042, boil:3000, en:1.13, ie1:540, radius:205, phase:'solid', ox:[3], year:1945, config:'[Xe] 4f⁵ 6s²', shells:[2,8,18,23,8,2], isotopes:[{sym:'¹⁴⁵Pm',stab:false,t12:'17.7 лет'},{sym:'¹⁴⁷Pm',stab:false,t12:'2.62 года'}], desc:'Единственный лантанид без стабильных изотопов. Используется в атомных батареях и как источник излучения.', discoverer:'Дж. Мариннский' },
+  { z:62, symbol:'Sm', name:'Самарий', latin:'Samarium', cat:'lanthanide', group:3, period:6, mass:150.36, density:7.52, melt:1072, boil:1794, en:1.17, ie1:545, radius:238, phase:'solid', ox:[2,3], year:1879, config:'[Xe] 4f⁶ 6s²', shells:[2,8,18,24,8,2], isotopes:[{sym:'¹⁵²Sm',stab:true,abund:'26.7%'}], desc:'Серебристый металл. Используется в магнитах SmCo (кобальт-самариевых), нейтронных поглотителях реакторов.', discoverer:'П. Буабодран' },
+  { z:63, symbol:'Eu', name:'Европий', latin:'Europium', cat:'lanthanide', group:3, period:6, mass:151.964, density:5.243, melt:826, boil:1529, en:1.2, ie1:547, radius:231, phase:'solid', ox:[2,3], year:1901, config:'[Xe] 4f⁷ 6s²', shells:[2,8,18,25,8,2], isotopes:[{sym:'¹⁵¹Eu',stab:true,abund:'47.8%'},{sym:'¹⁵³Eu',stab:true,abund:'52.2%'}], desc:'Наиболее реакционноспособный лантанид. Используется как красный фосфор в экранах телевизоров и евробанкнотах.', discoverer:'Э. Демарсе' },
+  { z:64, symbol:'Gd', name:'Гадолиний', latin:'Gadolinium', cat:'lanthanide', group:3, period:6, mass:157.25, density:7.9, melt:1312, boil:3273, en:1.2, ie1:593, radius:233, phase:'solid', ox:[3], year:1886, config:'[Xe] 4f⁷ 5d¹ 6s²', shells:[2,8,18,25,9,2], isotopes:[{sym:'¹⁵⁸Gd',stab:true,abund:'24.8%'}], desc:'Металл с наибольшей магнитной восприимчивостью. Широко используется как контрастное вещество для МРТ.', discoverer:'Ж. Мариньяк' },
+  { z:65, symbol:'Tb', name:'Тербий', latin:'Terbium', cat:'lanthanide', group:3, period:6, mass:158.925, density:8.23, melt:1356, boil:3230, en:1.2, ie1:566, radius:225, phase:'solid', ox:[3,4], year:1843, config:'[Xe] 4f⁹ 6s²', shells:[2,8,18,27,8,2], isotopes:[{sym:'¹⁵⁹Tb',stab:true,abund:'100%'}], desc:'Редкоземельный металл серебристо-белого цвета. Используется в сплавах Terfenol-D (магнитострикционные материалы).', discoverer:'К. Мосандер' },
+  { z:66, symbol:'Dy', name:'Диспрозий', latin:'Dysprosium', cat:'lanthanide', group:3, period:6, mass:162.5, density:8.55, melt:1412, boil:2567, en:1.22, ie1:573, radius:228, phase:'solid', ox:[3], year:1886, config:'[Xe] 4f¹⁰ 6s²', shells:[2,8,18,28,8,2], isotopes:[{sym:'¹⁶⁴Dy',stab:true,abund:'28.2%'}], desc:'Металл с высокой магнитной восприимчивостью. Используется в постоянных магнитах ветряных турбин.', discoverer:'П. Буабодран' },
+  { z:67, symbol:'Ho', name:'Гольмий', latin:'Holmium', cat:'lanthanide', group:3, period:6, mass:164.93, density:8.79, melt:1474, boil:2700, en:1.23, ie1:581, radius:226, phase:'solid', ox:[3], year:1878, config:'[Xe] 4f¹¹ 6s²', shells:[2,8,18,29,8,2], isotopes:[{sym:'¹⁶⁵Ho',stab:true,abund:'100%'}], desc:'Мягкий серебристый металл. Обладает наибольшим магнитным моментом среди всех природных элементов.', discoverer:'Я. Делафонтен' },
+  { z:68, symbol:'Er', name:'Эрбий', latin:'Erbium', cat:'lanthanide', group:3, period:6, mass:167.259, density:9.066, melt:1529, boil:2868, en:1.24, ie1:589, radius:226, phase:'solid', ox:[3], year:1843, config:'[Xe] 4f¹² 6s²', shells:[2,8,18,30,8,2], isotopes:[{sym:'¹⁶⁶Er',stab:true,abund:'33.5%'}], desc:'Редкоземельный металл розовато-красного оттенка соединений. Используется в волоконно-оптических усилителях.', discoverer:'К. Мосандер' },
+  { z:69, symbol:'Tm', name:'Тулий', latin:'Thulium', cat:'lanthanide', group:3, period:6, mass:168.934, density:9.32, melt:1545, boil:1950, en:1.25, ie1:597, radius:222, phase:'solid', ox:[3], year:1879, config:'[Xe] 4f¹³ 6s²', shells:[2,8,18,31,8,2], isotopes:[{sym:'¹⁶⁹Tm',stab:true,abund:'100%'}], desc:'Один из редчайших лантанидов. Используется в портативных рентгеновских аппаратах и лазерах.', discoverer:'П. Клеве' },
+  { z:70, symbol:'Yb', name:'Иттербий', latin:'Ytterbium', cat:'lanthanide', group:3, period:6, mass:173.045, density:6.965, melt:824, boil:1196, en:1.1, ie1:603, radius:222, phase:'solid', ox:[2,3], year:1878, config:'[Xe] 4f¹⁴ 6s²', shells:[2,8,18,32,8,2], isotopes:[{sym:'¹⁷⁴Yb',stab:true,abund:'31.8%'}], desc:'Мягкий пластичный серебристый металл. Используется в оптических атомных часах и стрессовых датчиках.', discoverer:'Ж. Мариньяк' },
+  { z:71, symbol:'Lu', name:'Лютеций', latin:'Lutetium', cat:'lanthanide', group:3, period:6, mass:174.967, density:9.84, melt:1663, boil:3402, en:1.27, ie1:524, radius:217, phase:'solid', ox:[3], year:1907, config:'[Xe] 4f¹⁴ 5d¹ 6s²', shells:[2,8,18,32,9,2], isotopes:[{sym:'¹⁷⁵Lu',stab:true,abund:'97.4%'}], desc:'Твёрдейший и плотнейший лантанид. Используется в ПЭТ-сканерах и как катализатор нефтепереработки.', discoverer:'Г. Урбен' },
+  { z:72, symbol:'Hf', name:'Гафний', latin:'Hafnium', cat:'transition', group:4, period:6, mass:178.49, density:13.31, melt:2233, boil:4603, en:1.3, ie1:659, radius:208, phase:'solid', ox:[4], year:1923, config:'[Xe] 4f¹⁴ 5d² 6s²', shells:[2,8,18,32,10,2], isotopes:[{sym:'¹⁸⁰Hf',stab:true,abund:'35.1%'}], desc:'Блестящий серебристый металл. Используется в ядерных реакторах (поглощает нейтроны) и в микроэлектронике.', discoverer:'Д. Костер' },
+  { z:73, symbol:'Ta', name:'Тантал', latin:'Tantalum', cat:'transition', group:5, period:6, mass:180.948, density:16.65, melt:3017, boil:5458, en:1.5, ie1:761, radius:200, phase:'solid', ox:[5], year:1802, config:'[Xe] 4f¹⁴ 5d³ 6s²', shells:[2,8,18,32,11,2], isotopes:[{sym:'¹⁸¹Ta',stab:true,abund:'99.9%'}], desc:'Твёрдый синевато-серый металл. Используется в конденсаторах мобильных телефонов и хирургических имплантатах.', discoverer:'А. Экеберг' },
+  { z:74, symbol:'W', name:'Вольфрам', latin:'Wolframium', cat:'transition', group:6, period:6, mass:183.84, density:19.25, melt:3422, boil:5555, en:2.36, ie1:770, radius:193, phase:'solid', ox:[2,4,6], year:1783, config:'[Xe] 4f¹⁴ 5d⁴ 6s²', shells:[2,8,18,32,12,2], isotopes:[{sym:'¹⁸⁴W',stab:true,abund:'30.6%'}], desc:'Самая высокая температура плавления среди всех металлов. Используется в нитях накаливания и твёрдых сплавах.', discoverer:'Х. и Ф. Д\'Эльюяр' },
+  { z:75, symbol:'Re', name:'Рений', latin:'Rhenium', cat:'transition', group:7, period:6, mass:186.207, density:21.02, melt:3186, boil:5596, en:1.9, ie1:760, radius:188, phase:'solid', ox:[4,6,7], year:1925, config:'[Xe] 4f¹⁴ 5d⁵ 6s²', shells:[2,8,18,32,13,2], isotopes:[{sym:'¹⁸⁷Re',stab:false,t12:'4.1×10¹⁰ лет',abund:'62.6%'}], desc:'Один из редчайших элементов. Используется в суперсплавах реактивных двигателей и нефтяных катализаторах.', discoverer:'В. Ноддак' },
+  { z:76, symbol:'Os', name:'Осмий', latin:'Osmium', cat:'transition', group:8, period:6, mass:190.23, density:22.59, melt:3033, boil:5012, en:2.2, ie1:840, radius:185, phase:'solid', ox:[3,4,6,8], year:1803, config:'[Xe] 4f¹⁴ 5d⁶ 6s²', shells:[2,8,18,32,14,2], isotopes:[{sym:'¹⁹²Os',stab:true,abund:'41.0%'}], desc:'Самый плотный природный элемент. Используется в сплавах для перьев авторучек и хирургических имплантатов.', discoverer:'С. Теннант' },
+  { z:77, symbol:'Ir', name:'Иридий', latin:'Iridium', cat:'transition', group:9, period:6, mass:192.217, density:22.56, melt:2446, boil:4428, en:2.2, ie1:880, radius:180, phase:'solid', ox:[3,4], year:1803, config:'[Xe] 4f¹⁴ 5d⁷ 6s²', shells:[2,8,18,32,15,2], isotopes:[{sym:'¹⁹¹Ir',stab:true,abund:'37.3%'},{sym:'¹⁹³Ir',stab:true,abund:'62.7%'}], desc:'Наиболее коррозионностойкий металл. Используется в свечах зажигания, наконечниках перьев и ядерных источниках.', discoverer:'С. Теннант' },
+  { z:78, symbol:'Pt', name:'Платина', latin:'Platinum', cat:'transition', group:10, period:6, mass:195.084, density:21.45, melt:1768.3, boil:3825, en:2.28, ie1:870, radius:177, phase:'solid', ox:[2,4], year:1748, config:'[Xe] 4f¹⁴ 5d⁹ 6s¹', shells:[2,8,18,32,17,1], isotopes:[{sym:'¹⁹⁵Pt',stab:true,abund:'33.8%'}], desc:'Благородный металл серебристо-белого цвета. Используется в ювелирных изделиях, катализаторах и медицине.', discoverer:'А. де Уллоа' },
+  { z:79, symbol:'Au', name:'Золото', latin:'Aurum', cat:'transition', group:11, period:6, mass:196.967, density:19.282, melt:1064.18, boil:2856, en:2.54, ie1:890, radius:174, phase:'solid', ox:[1,3], year:null, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s¹', shells:[2,8,18,32,18,1], isotopes:[{sym:'¹⁹⁷Au',stab:true,abund:'100%'}], desc:'Самый ковкий и тягучий металл. Использовалось в украшениях и монетах с древних времён.', discoverer:'Известно с древности' },
+  { z:80, symbol:'Hg', name:'Ртуть', latin:'Hydrargyrum', cat:'transition', group:12, period:6, mass:200.592, density:13.534, melt:-38.83, boil:356.73, en:2.0, ie1:1007, radius:171, phase:'liquid', ox:[1,2], year:null, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s²', shells:[2,8,18,32,18,2], isotopes:[{sym:'²⁰²Hg',stab:true,abund:'29.9%'}], desc:'Единственный металл, жидкий при комнатной температуре. Используется в термометрах и люминесцентных лампах.', discoverer:'Известна с древности' },
+  { z:81, symbol:'Tl', name:'Таллий', latin:'Thallium', cat:'post-transition', group:13, period:6, mass:204.38, density:11.85, melt:304, boil:1473, en:1.62, ie1:589, radius:156, phase:'solid', ox:[1,3], year:1861, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹', shells:[2,8,18,32,18,3], isotopes:[{sym:'²⁰³Tl',stab:true,abund:'29.5%'},{sym:'²⁰⁵Tl',stab:true,abund:'70.5%'}], desc:'Мягкий серый металл. Используется в полупроводниках и в медицинской диагностике.', discoverer:'У. Крукс' },
+  { z:82, symbol:'Pb', name:'Свинец', latin:'Plumbum', cat:'post-transition', group:14, period:6, mass:207.2, density:11.342, melt:327.46, boil:1749, en:2.33, ie1:716, radius:154, phase:'solid', ox:[2,4], year:null, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²', shells:[2,8,18,32,18,4], isotopes:[{sym:'²⁰⁸Pb',stab:true,abund:'52.4%'}], desc:'Мягкий тяжёлый серый металл. Используется в аккумуляторах, защите от радиации и в качестве балластного материала.', discoverer:'Известен с древности' },
+  { z:83, symbol:'Bi', name:'Висмут', latin:'Bismuthum', cat:'post-transition', group:15, period:6, mass:208.98, density:9.807, melt:271.5, boil:1564, en:2.02, ie1:703, radius:143, phase:'solid', ox:[3], year:1753, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³', shells:[2,8,18,32,18,5], isotopes:[{sym:'²⁰⁹Bi',stab:false,t12:'1.9×10¹⁹ лет',abund:'100%'}], desc:'Хрупкий кристаллический металл с радужным оттенком. Самый слабо радиоактивный элемент. Используется в косметике.', discoverer:'К. Жофруа' },
+  { z:84, symbol:'Po', name:'Полоний', latin:'Polonium', cat:'post-transition', group:16, period:6, mass:209, density:9.32, melt:254, boil:962, en:2.0, ie1:812, radius:135, phase:'solid', ox:[2,4], year:1898, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴', shells:[2,8,18,32,18,6], isotopes:[{sym:'²¹⁰Po',stab:false,t12:'138 дней'},{sym:'²⁰⁹Po',stab:false,t12:'103 года'}], desc:'Высокорадиоактивный металл. Открыт Марией Кюри, назван в честь Польши. Используется как источник α-частиц.', discoverer:'М. и П. Кюри' },
+  { z:85, symbol:'At', name:'Астат', latin:'Astatinum', cat:'halogen', group:17, period:6, mass:210, density:7.0, melt:302, boil:337, en:2.2, ie1:890, radius:127, phase:'solid', ox:[-1,1], year:1940, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵', shells:[2,8,18,32,18,7], isotopes:[{sym:'²¹⁰At',stab:false,t12:'8.1 ч'},{sym:'²¹¹At',stab:false,t12:'7.2 ч'}], desc:'Редчайший природный элемент — в земной коре его менее 30 г. Используется в экспериментальной онкологии.', discoverer:'Д. Корсон' },
+  { z:86, symbol:'Rn', name:'Радон', latin:'Radon', cat:'noble', group:18, period:6, mass:222, density:0.00973, melt:-71, boil:-61.7, en:2.2, ie1:1037, radius:120, phase:'gas', ox:[0], year:1900, config:'[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶', shells:[2,8,18,32,18,8], isotopes:[{sym:'²²²Rn',stab:false,t12:'3.82 дней'}], desc:'Радиоактивный благородный газ. Является второй по значимости причиной рака лёгких (после курения).', discoverer:'Э. Дорн' },
+  { z:87, symbol:'Fr', name:'Франций', latin:'Francium', cat:'alkali', group:1, period:7, mass:223, density:1.87, melt:21, boil:650, en:0.7, ie1:393, radius:348, phase:'solid', ox:[1], year:1939, config:'[Rn] 7s¹', shells:[2,8,18,32,18,8,1], isotopes:[{sym:'²²³Fr',stab:false,t12:'22 мин'}], desc:'Наиболее нестабильный природный элемент и второй по редкости. Практического применения почти не имеет.', discoverer:'М. Перей' },
+  { z:88, symbol:'Ra', name:'Радий', latin:'Radium', cat:'alkali-earth', group:2, period:7, mass:226, density:5.5, melt:700, boil:1737, en:0.9, ie1:509, radius:283, phase:'solid', ox:[2], year:1898, config:'[Rn] 7s²', shells:[2,8,18,32,18,8,2], isotopes:[{sym:'²²⁶Ra',stab:false,t12:'1600 лет'},{sym:'²²⁸Ra',stab:false,t12:'5.75 лет'}], desc:'Радиоактивный щелочноземельный металл. Открыт Марией и Пьером Кюри. Исторически применялся в медицине.', discoverer:'М. и П. Кюри' },
+  { z:89, symbol:'Ac', name:'Актиний', latin:'Actinium', cat:'actinide', group:3, period:7, mass:227, density:10.07, melt:1051, boil:3198, en:1.1, ie1:499, radius:260, phase:'solid', ox:[3], year:1899, config:'[Rn] 6d¹ 7s²', shells:[2,8,18,32,18,9,2], isotopes:[{sym:'²²⁷Ac',stab:false,t12:'21.8 лет'}], desc:'Радиоактивный редкоземельный металл серебристо-белого цвета. Используется как источник нейтронов.', discoverer:'А. Дебьерн' },
+  { z:90, symbol:'Th', name:'Торий', latin:'Thorium', cat:'actinide', group:3, period:7, mass:232.038, density:11.72, melt:1750, boil:4788, en:1.3, ie1:587, radius:237, phase:'solid', ox:[4], year:1829, config:'[Rn] 6d² 7s²', shells:[2,8,18,32,18,10,2], isotopes:[{sym:'²³²Th',stab:false,t12:'14.1 млрд лет',abund:'100%'}], desc:'Слабо радиоактивный серебристый металл. Рассматривается как топливо для ядерных реакторов будущего.', discoverer:'Й. Берцелиус' },
+  { z:91, symbol:'Pa', name:'Протактиний', latin:'Protactinium', cat:'actinide', group:3, period:7, mass:231.036, density:15.37, melt:1572, boil:4000, en:1.5, ie1:568, radius:243, phase:'solid', ox:[4,5], year:1913, config:'[Rn] 5f² 6d¹ 7s²', shells:[2,8,18,32,20,9,2], isotopes:[{sym:'²³¹Pa',stab:false,t12:'32760 лет',abund:'100%'}], desc:'Радиоактивный металл серебристо-белого цвета. Один из редчайших природных элементов.', discoverer:'К. Фаянс' },
+  { z:92, symbol:'U', name:'Уран', latin:'Uranium', cat:'actinide', group:3, period:7, mass:238.029, density:19.05, melt:1135, boil:4131, en:1.38, ie1:598, radius:240, phase:'solid', ox:[3,4,5,6], year:1789, config:'[Rn] 5f³ 6d¹ 7s²', shells:[2,8,18,32,21,9,2], isotopes:[{sym:'²³⁵U',stab:false,t12:'703 млн лет',abund:'0.72%'},{sym:'²³⁸U',stab:false,t12:'4.47 млрд лет',abund:'99.3%'}], desc:'Плотный радиоактивный металл. Основное топливо ядерных реакторов и атомного оружия.', discoverer:'М. Клапрот' },
+  { z:93, symbol:'Np', name:'Нептуний', latin:'Neptunium', cat:'actinide', group:3, period:7, mass:237, density:20.45, melt:644, boil:4000, en:1.36, ie1:605, radius:221, phase:'solid', ox:[3,4,5,6], year:1940, config:'[Rn] 5f⁴ 6d¹ 7s²', shells:[2,8,18,32,22,9,2], isotopes:[{sym:'²³⁷Np',stab:false,t12:'2.14 млн лет'}], desc:'Первый трансурановый элемент, синтезированный искусственно. Образуется в ядерных реакторах как побочный продукт.', discoverer:'Э. МакМиллан' },
+  { z:94, symbol:'Pu', name:'Плутоний', latin:'Plutonium', cat:'actinide', group:3, period:7, mass:244, density:19.816, melt:640, boil:3228, en:1.28, ie1:585, radius:243, phase:'solid', ox:[3,4,5,6], year:1940, config:'[Rn] 5f⁶ 7s²', shells:[2,8,18,32,24,8,2], isotopes:[{sym:'²³⁹Pu',stab:false,t12:'24100 лет'},{sym:'²⁴⁴Pu',stab:false,t12:'80.8 млн лет'}], desc:'Радиоактивный металл серебристого цвета. ²³⁹Pu используется в ядерном оружии и как топливо реакторов.', discoverer:'Г. Сиборг' },
+  { z:95, symbol:'Am', name:'Америций', latin:'Americium', cat:'actinide', group:3, period:7, mass:243, density:13.69, melt:1176, boil:2011, en:1.3, ie1:578, radius:244, phase:'solid', ox:[3,4,5,6], year:1944, config:'[Rn] 5f⁷ 7s²', shells:[2,8,18,32,25,8,2], isotopes:[{sym:'²⁴¹Am',stab:false,t12:'432 лет'},{sym:'²⁴³Am',stab:false,t12:'7370 лет'}], desc:'Синтетический актинид. ²⁴¹Am используется в бытовых детекторах дыма.', discoverer:'Г. Сиборг' },
+  { z:96, symbol:'Cm', name:'Кюрий', latin:'Curium', cat:'actinide', group:3, period:7, mass:247, density:13.51, melt:1345, boil:3110, en:1.3, ie1:581, radius:245, phase:'solid', ox:[3], year:1944, config:'[Rn] 5f⁷ 6d¹ 7s²', shells:[2,8,18,32,25,9,2], isotopes:[{sym:'²⁴⁷Cm',stab:false,t12:'15.6 млн лет'}], desc:'Радиоактивный синтетический металл. Назван в честь Пьера и Марии Кюри. Используется в космических зондах.', discoverer:'Г. Сиборг' },
+  { z:97, symbol:'Bk', name:'Берклий', latin:'Berkelium', cat:'actinide', group:3, period:7, mass:247, density:14.78, melt:1050, boil:null, en:1.3, ie1:601, radius:244, phase:'solid', ox:[3,4], year:1949, config:'[Rn] 5f⁹ 7s²', shells:[2,8,18,32,27,8,2], isotopes:[{sym:'²⁴⁷Bk',stab:false,t12:'1380 лет'}], desc:'Синтетический радиоактивный металл. Назван в честь Беркли (Калифорния). Синтезируется в количестве микрограммов.', discoverer:'С. Томпсон' },
+  { z:98, symbol:'Cf', name:'Калифорний', latin:'Californium', cat:'actinide', group:3, period:7, mass:251, density:15.1, melt:900, boil:null, en:1.3, ie1:608, radius:245, phase:'solid', ox:[2,3], year:1950, config:'[Rn] 5f¹⁰ 7s²', shells:[2,8,18,32,28,8,2], isotopes:[{sym:'²⁵²Cf',stab:false,t12:'2.65 лет'}], desc:'Синтетический актинид. ²⁵²Cf используется как нейтронный источник в нейтрон-активационном анализе и стартёрах реакторов.', discoverer:'С. Томпсон' },
+  { z:99, symbol:'Es', name:'Эйнштейний', latin:'Einsteinium', cat:'actinide', group:3, period:7, mass:252, density:8.84, melt:860, boil:996, en:1.3, ie1:619, radius:245, phase:'solid', ox:[2,3], year:1952, config:'[Rn] 5f¹¹ 7s²', shells:[2,8,18,32,29,8,2], isotopes:[{sym:'²⁵²Es',stab:false,t12:'471.7 дней'}], desc:'Синтетический радиоактивный элемент, названный в честь Альберта Эйнштейна. Открыт после испытания ядерной бомбы.', discoverer:'А. Гиорсо' },
+  { z:100, symbol:'Fm', name:'Фермий', latin:'Fermium', cat:'actinide', group:3, period:7, mass:257, density:null, melt:1527, boil:null, en:1.3, ie1:627, radius:245, phase:'solid', ox:[2,3], year:1952, config:'[Rn] 5f¹² 7s²', shells:[2,8,18,32,30,8,2], isotopes:[{sym:'²⁵⁷Fm',stab:false,t12:'100.5 дней'}], desc:'Синтетический актинид, названный в честь Энрико Ферми. Синтезируется в ничтожных количествах.', discoverer:'А. Гиорсо' },
+  { z:101, symbol:'Md', name:'Менделевий', latin:'Mendelevium', cat:'actinide', group:3, period:7, mass:258, density:null, melt:827, boil:null, en:1.3, ie1:635, radius:246, phase:'solid', ox:[2,3], year:1955, config:'[Rn] 5f¹³ 7s²', shells:[2,8,18,32,31,8,2], isotopes:[{sym:'²⁵⁸Md',stab:false,t12:'51.5 дней'}], desc:'Синтетический радиоактивный элемент, названный в честь Дмитрия Менделеева.', discoverer:'А. Гиорсо' },
+  { z:102, symbol:'No', name:'Нобелий', latin:'Nobelium', cat:'actinide', group:3, period:7, mass:259, density:null, melt:827, boil:null, en:1.3, ie1:642, radius:246, phase:'solid', ox:[2,3], year:1958, config:'[Rn] 5f¹⁴ 7s²', shells:[2,8,18,32,32,8,2], isotopes:[{sym:'²⁵⁹No',stab:false,t12:'58 мин'}], desc:'Синтетический актинид, названный в честь Альфреда Нобеля. Синтезируется в единичных атомах.', discoverer:'Г. Сиборг' },
+  { z:103, symbol:'Lr', name:'Лоуренсий', latin:'Lawrencium', cat:'actinide', group:3, period:7, mass:266, density:null, melt:1627, boil:null, en:1.3, ie1:470, radius:246, phase:'solid', ox:[3], year:1961, config:'[Rn] 5f¹⁴ 7s² 7p¹', shells:[2,8,18,32,32,8,3], isotopes:[{sym:'²⁶²Lr',stab:false,t12:'3.6 ч'}], desc:'Синтетический элемент, последний актинид. Назван в честь Эрнеста Лоуренса, изобретателя циклотрона.', discoverer:'А. Гиорсо' },
+  { z:104, symbol:'Rf', name:'Резерфордий', latin:'Rutherfordium', cat:'transition', group:4, period:7, mass:267, density:23.2, melt:2100, boil:5500, en:null, ie1:580, radius:null, phase:'solid', ox:[4], year:1964, config:'[Rn] 5f¹⁴ 6d² 7s²', shells:[2,8,18,32,32,10,2], isotopes:[{sym:'²⁶⁵Rf',stab:false,t12:'13 ч'}], desc:'Синтетический трансактинид. Назван в честь Эрнеста Резерфорда.', discoverer:'Г. Флёров' },
+  { z:105, symbol:'Db', name:'Дубний', latin:'Dubnium', cat:'transition', group:5, period:7, mass:268, density:29.3, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:[5], year:1967, config:'[Rn] 5f¹⁴ 6d³ 7s²', shells:[2,8,18,32,32,11,2], isotopes:[{sym:'²⁶⁸Db',stab:false,t12:'28 ч'}], desc:'Синтетический элемент. Назван в честь г. Дубны (Россия), где был синтезирован.', discoverer:'Г. Флёров' },
+  { z:106, symbol:'Sg', name:'Сиборгий', latin:'Seaborgium', cat:'transition', group:6, period:7, mass:269, density:35.0, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:[6], year:1974, config:'[Rn] 5f¹⁴ 6d⁴ 7s²', shells:[2,8,18,32,32,12,2], isotopes:[{sym:'²⁶⁹Sg',stab:false,t12:'14 мин'}], desc:'Синтетический трансактинид. Назван в честь Гленна Сиборга — единственный элемент, названный при жизни учёного.', discoverer:'А. Гиорсо' },
+  { z:107, symbol:'Bh', name:'Борий', latin:'Bohrium', cat:'transition', group:7, period:7, mass:270, density:37.1, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:[7], year:1981, config:'[Rn] 5f¹⁴ 6d⁵ 7s²', shells:[2,8,18,32,32,13,2], isotopes:[{sym:'²⁷⁰Bh',stab:false,t12:'61 с'}], desc:'Синтетический радиоактивный элемент. Назван в честь Нильса Бора.', discoverer:'П. Армбрустер' },
+  { z:108, symbol:'Hs', name:'Хассий', latin:'Hassium', cat:'transition', group:8, period:7, mass:277, density:40.7, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:[4,8], year:1984, config:'[Rn] 5f¹⁴ 6d⁶ 7s²', shells:[2,8,18,32,32,14,2], isotopes:[{sym:'²⁷⁰Hs',stab:false,t12:'22 с'}], desc:'Синтетический элемент. Назван в честь земли Гессен (Германия), где находится лаборатория GSI.', discoverer:'П. Армбрустер' },
+  { z:109, symbol:'Mt', name:'Мейтнерий', latin:'Meitnerium', cat:'unknown', group:9, period:7, mass:278, density:37.4, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:1982, config:'[Rn] 5f¹⁴ 6d⁷ 7s²', shells:[2,8,18,32,32,15,2], isotopes:[{sym:'²⁷⁸Mt',stab:false,t12:'7.6 с'}], desc:'Синтетический элемент. Назван в честь физика Лизы Мейтнер.', discoverer:'П. Армбрустер' },
+  { z:110, symbol:'Ds', name:'Дармштадтий', latin:'Darmstadtium', cat:'unknown', group:10, period:7, mass:281, density:34.8, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:1994, config:'[Rn] 5f¹⁴ 6d⁸ 7s²', shells:[2,8,18,32,32,16,2], isotopes:[{sym:'²⁸¹Ds',stab:false,t12:'12.7 с'}], desc:'Синтетический сверхтяжёлый элемент. Назван в честь г. Дармштадт (Германия).', discoverer:'С. Гофманн' },
+  { z:111, symbol:'Rg', name:'Рентгений', latin:'Roentgenium', cat:'unknown', group:11, period:7, mass:282, density:28.7, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:1994, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s¹', shells:[2,8,18,32,32,17,1], isotopes:[{sym:'²⁸²Rg',stab:false,t12:'100 с'}], desc:'Синтетический сверхтяжёлый элемент. Назван в честь Вильгельма Рентгена.', discoverer:'С. Гофманн' },
+  { z:112, symbol:'Cn', name:'Коперниций', latin:'Copernicium', cat:'transition', group:12, period:7, mass:285, density:23.7, melt:null, boil:357, en:null, ie1:null, radius:null, phase:'gas', ox:[0,2,4], year:1996, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s²', shells:[2,8,18,32,32,18,2], isotopes:[{sym:'²⁸⁵Cn',stab:false,t12:'29 с'}], desc:'Синтетический сверхтяжёлый элемент. Назван в честь Николая Коперника.', discoverer:'С. Гофманн' },
+  { z:113, symbol:'Nh', name:'Нихоний', latin:'Nihonium', cat:'post-transition', group:13, period:7, mass:286, density:16.0, melt:430, boil:1130, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:2004, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹', shells:[2,8,18,32,32,18,3], isotopes:[{sym:'²⁸⁶Nh',stab:false,t12:'9.5 с'}], desc:'Синтетический элемент. Назван в честь Японии (Nihon — японское название страны). Синтезирован в RIKEN.', discoverer:'К. Морита' },
+  { z:114, symbol:'Fl', name:'Флеровий', latin:'Flerovium', cat:'post-transition', group:14, period:7, mass:289, density:14.0, melt:null, boil:null, en:null, ie1:null, radius:null, phase:'solid', ox:[0,2], year:1998, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²', shells:[2,8,18,32,32,18,4], isotopes:[{sym:'²⁸⁹Fl',stab:false,t12:'2.65 с'}], desc:'Синтетический сверхтяжёлый элемент. Назван в честь Г. Флёрова и его лаборатории в Дубне (Россия).', discoverer:'Ю. Оганесян' },
+  { z:115, symbol:'Mc', name:'Московий', latin:'Moscovium', cat:'post-transition', group:15, period:7, mass:290, density:13.5, melt:670, boil:1400, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:2003, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³', shells:[2,8,18,32,32,18,5], isotopes:[{sym:'²⁹⁰Mc',stab:false,t12:'650 мс'}], desc:'Синтетический элемент. Назван в честь Московской области, где расположен ОИЯИ (Дубна).', discoverer:'Ю. Оганесян' },
+  { z:116, symbol:'Lv', name:'Ливерморий', latin:'Livermorium', cat:'post-transition', group:16, period:7, mass:293, density:12.9, melt:364, boil:762, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:2000, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴', shells:[2,8,18,32,32,18,6], isotopes:[{sym:'²⁹³Lv',stab:false,t12:'61 мс'}], desc:'Синтетический сверхтяжёлый элемент. Назван в честь Ливерморской национальной лаборатории (Калифорния).', discoverer:'Ю. Оганесян' },
+  { z:117, symbol:'Ts', name:'Теннессин', latin:'Tennessine', cat:'halogen', group:17, period:7, mass:294, density:7.17, melt:700, boil:883, en:null, ie1:null, radius:null, phase:'solid', ox:null, year:2010, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵', shells:[2,8,18,32,32,18,7], isotopes:[{sym:'²⁹⁴Ts',stab:false,t12:'51 мс'}], desc:'Синтетический элемент. Назван в честь штата Теннесси, где расположена Ок-Риджская национальная лаборатория.', discoverer:'Ю. Оганесян' },
+  { z:118, symbol:'Og', name:'Оганесон', latin:'Oganesson', cat:'noble', group:18, period:7, mass:294, density:5.0, melt:325, boil:450, en:null, ie1:839, radius:152, phase:'solid', ox:[0,2,4,6], year:2002, config:'[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶', shells:[2,8,18,32,32,18,8], isotopes:[{sym:'²⁹⁴Og',stab:false,t12:'0.89 мс'}], desc:'Самый тяжёлый известный элемент. Назван в честь физика-ядерщика Юрия Оганесяна.', discoverer:'Ю. Оганесян' },
+];
+
+// ============================
+// LAYOUT MAPPING
+// ============================
+function getGridPosition(el) {
+  const { group, period, z } = el;
+  let row = period;
+  let col = group;
+  // Lanthanides row 8, actinides row 9
+  if (el.cat === 'lanthanide') { row = 8; col = z - 57 + 4; }
+  if (el.cat === 'actinide') { row = 9; col = z - 89 + 4; }
+  return { row, col };
+}
+
+const CAT_NAMES = {
+  'alkali': 'Щелочные металлы',
+  'alkali-earth': 'Щёлочноземельные',
+  'transition': 'Переходные металлы',
+  'post-transition': 'Постпереходные металлы',
+  'metalloid': 'Металлоиды',
+  'nonmetal': 'Неметаллы',
+  'halogen': 'Галогены',
+  'noble': 'Благородные газы',
+  'lanthanide': 'Лантаниды',
+  'actinide': 'Актиниды',
+  'unknown': 'Неизвестная категория',
+};
+
+const CAT_COLORS = {
+  'alkali': '#ff4757',
+  'alkali-earth': '#ff6348',
+  'transition': '#ffa502',
+  'post-transition': '#7bed9f',
+  'metalloid': '#70a1ff',
+  'nonmetal': '#eccc68',
+  'halogen': '#a29bfe',
+  'noble': '#fd79a8',
+  'lanthanide': '#00cec9',
+  'actinide': '#6c5ce7',
+  'unknown': '#636e72',
+};
+
+let currentProperty = 'category';
+let currentView = 'table';
+let selectedElement = null;
+let currentPanelTab = 'overview';
+
+// ============================
+// BUILD TABLE
+// ============================
+function buildTable() {
+  const table = document.getElementById('periodicTable');
+  table.innerHTML = '';
+
+  // Create 10 rows × 18 cols grid
+  // Row 1-7 = periods 1-7, Row 8 = separator/lanthanide label, Row 9-10 = lanthanides/actinides
+  const cells = {};
+  // Initialize empty cells
+  for (let r = 1; r <= 10; r++) {
+    for (let c = 1; c <= 18; c++) {
+      cells[`${r}-${c}`] = null;
+    }
+  }
+
+  // Place elements
+  elements.forEach(el => {
+    const pos = getGridPosition(el);
+    cells[`${pos.row}-${pos.col}`] = el;
+  });
+
+  // Build grid items
+  for (let r = 1; r <= 10; r++) {
+    for (let c = 1; c <= 18; c++) {
+      const el = cells[`${r}-${c}`];
+      const div = document.createElement('div');
+
+      if (r === 8 && c === 1) {
+        // Separator row label
+        div.className = 'element placeholder';
+        div.style.gridRow = r;
+        div.style.gridColumn = c;
+        div.style.fontSize = '9px';
+        div.style.color = 'var(--lanthanide)';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'center';
+        div.style.borderTop = '1px dashed rgba(0,206,201,0.3)';
+        div.style.gridColumn = '1 / 4';
+        div.textContent = '57–71';
+        table.appendChild(div);
+        continue;
+      }
+
+      if (r === 9 && c === 1) {
+        div.className = 'element placeholder';
+        div.style.gridRow = r;
+        div.style.gridColumn = '1 / 4';
+        div.style.fontSize = '9px';
+        div.style.color = 'var(--actinide)';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'center';
+        div.textContent = '89–103';
+        table.appendChild(div);
+        continue;
+      }
+
+      if ((r === 8 || r === 9) && c < 4) continue;
+
+      if (el) {
+        div.className = `element cat-${el.cat}`;
+        div.style.gridRow = r;
+        div.style.gridColumn = c;
+        div.dataset.z = el.z;
+        div.innerHTML = `
+          <div class="el-number">${el.z}</div>
+          <div class="el-symbol">${el.symbol}</div>
+          <div class="el-name">${el.name}</div>
+          <div class="el-mass" id="el-mass-${el.z}">${el.mass}</div>
+        `;
+        div.addEventListener('click', () => openPanel(el));
+        div.addEventListener('mouseenter', (e) => showTooltip(e, el));
+        div.addEventListener('mouseleave', hideTooltip);
+        div.id = `el-${el.z}`;
+      } else {
+        div.className = 'element placeholder';
+        div.style.gridRow = r;
+        div.style.gridColumn = c;
+        div.style.background = 'none';
+        div.style.border = 'none';
+      }
+      table.appendChild(div);
+    }
+  }
+
+  updatePropertyDisplay();
+}
+
+// ============================
+// PROPERTY DISPLAY
+// ============================
+function setProperty(prop) {
+  currentProperty = prop;
+  document.querySelectorAll('.prop-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('prop-' + prop).classList.add('active');
+  updatePropertyDisplay();
+}
+
+function getPropertyValue(el, prop) {
+  switch(prop) {
+    case 'mass': return el.mass;
+    case 'density': return el.density;
+    case 'melt': return el.melt;
+    case 'boil': return el.boil;
+    case 'electronegativity': return el.en;
+    case 'ionization': return el.ie1;
+    case 'radius': return el.radius;
+    case 'year': return el.year;
+    case 'electrons': return el.shells ? el.shells.reduce((a,b)=>a+b,0) : null;
+    default: return null;
+  }
+}
+
+function updatePropertyDisplay() {
+  const prop = currentProperty;
+  
+  // Collect all values for scaling
+  let values = [];
+  if (prop !== 'category' && prop !== 'phase' && prop !== 'oxidation' && prop !== 'electrons') {
+    elements.forEach(el => {
+      const v = getPropertyValue(el, prop);
+      if (v !== null && v !== undefined) values.push(v);
+    });
+  }
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+
+  elements.forEach(el => {
+    const div = document.getElementById(`el-${el.z}`);
+    if (!div) return;
+
+    // Remove old val bars
+    const oldBar = div.querySelector('.val-bar');
+    if (oldBar) oldBar.remove();
+
+    const massEl = document.getElementById(`el-mass-${el.z}`);
+
+    if (prop === 'category') {
+      div.style.background = '';
+      div.style.borderColor = '';
+      if (massEl) massEl.textContent = el.mass;
+    } else if (prop === 'phase') {
+      const phaseColors = { solid: '#74b9ff', liquid: '#00cec9', gas: '#fdcb6e', unknown: '#636e72' };
+      const c = phaseColors[el.phase] || '#636e72';
+      div.style.background = `${c}22`;
+      div.style.borderColor = `${c}66`;
+      if (massEl) {
+        const phaseNames = { solid: 'Тв.', liquid: 'Жидк.', gas: 'Газ' };
+        massEl.textContent = phaseNames[el.phase] || '?';
+      }
+    } else if (prop === 'oxidation') {
+      if (massEl && el.ox) massEl.textContent = el.ox.join(',');
+      div.style.background = '';
+    } else if (prop === 'electrons') {
+      const shells = el.shells || [];
+      if (massEl) massEl.textContent = shells.join('-');
+      div.style.background = '';
+    } else {
+      const v = getPropertyValue(el, prop);
+      if (v !== null && v !== undefined) {
+        const ratio = max === min ? 0.5 : (v - min) / (max - min);
+        const r = Math.round(255 * (1-ratio));
+        const g = Math.round(200 * ratio);
+        const b = Math.round(150 * ratio);
+        div.style.background = `rgba(${r},${g},${b},0.25)`;
+        div.style.borderColor = `rgba(${r},${g},${b},0.5)`;
+        
+        const bar = document.createElement('div');
+        bar.className = 'val-bar';
+        bar.style.width = `${ratio * 100}%`;
+        bar.style.background = `rgb(${r},${g},${b})`;
+        div.appendChild(bar);
+
+        const units = { mass:'а.е.м.', density:'г/см³', melt:'°C', boil:'°C', electronegativity:'', ionization:'кДж/моль', radius:'пм', year:'г.' };
+        if (massEl) massEl.textContent = v + (units[prop] ? '' : '');
+      } else {
+        div.style.background = '#1a1a24';
+        div.style.borderColor = '#2a2a3a';
+        if (massEl) massEl.textContent = '—';
+      }
+    }
+  });
+}
+
+// ============================
+// SEARCH
+// ============================
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  elements.forEach(el => {
+    const div = document.getElementById(`el-${el.z}`);
+    if (!div || div.classList.contains('placeholder')) return;
+    if (!q) {
+      div.classList.remove('search-match', 'dimmed');
+      return;
+    }
+    const match = el.symbol.toLowerCase().includes(q) || 
+                  el.name.toLowerCase().includes(q) || 
+                  el.latin.toLowerCase().includes(q) ||
+                  String(el.z) === q;
+    if (match) {
+      div.classList.add('search-match');
+      div.classList.remove('dimmed');
+    } else {
+      div.classList.remove('search-match');
+      div.classList.add('dimmed');
+    }
+  });
+  document.getElementById('hoverInfo').textContent = q ? `Поиск: "${q}"` : 'Наведите на элемент';
+});
+
+// ============================
+// TOOLTIP
+// ============================
+function showTooltip(e, el) {
+  const tt = document.getElementById('tooltip');
+  document.getElementById('tt-symbol').textContent = el.symbol;
+  document.getElementById('tt-name').textContent = `${el.z}. ${el.name} / ${el.latin}`;
+  
+  const prop = currentProperty;
+  let propText = '';
+  if (prop === 'category') propText = CAT_NAMES[el.cat];
+  else if (prop === 'phase') propText = `Фаза: ${el.phase}`;
+  else if (prop === 'mass') propText = `Масса: ${el.mass} а.е.м.`;
+  else if (prop === 'density') propText = el.density ? `Плотность: ${el.density} г/см³` : 'Плотность: н/д';
+  else if (prop === 'melt') propText = el.melt !== null ? `Тпл: ${el.melt}°C` : 'Тпл: н/д';
+  else if (prop === 'boil') propText = el.boil !== null ? `Ткип: ${el.boil}°C` : 'Ткип: н/д';
+  else if (prop === 'electronegativity') propText = el.en ? `Эл-отриц: ${el.en}` : 'Эл-отриц: —';
+  else if (prop === 'ionization') propText = el.ie1 ? `1-я ион: ${el.ie1} кДж/моль` : '1-я ион: н/д';
+  else if (prop === 'radius') propText = el.radius ? `Радиус: ${el.radius} пм` : 'Радиус: н/д';
+  else if (prop === 'year') propText = el.year ? `Открыт: ${el.year}` : 'Известен с древности';
+  
+  document.getElementById('tt-prop').textContent = propText;
+  tt.classList.add('visible');
+  document.getElementById('hoverInfo').textContent = `${el.z} ${el.symbol} — ${el.name}`;
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+  document.getElementById('hoverInfo').textContent = 'Наведите на элемент';
+}
+
+document.addEventListener('mousemove', (e) => {
+  const tt = document.getElementById('tooltip');
+  if (tt.classList.contains('visible')) {
+    let x = e.clientX + 16;
+    let y = e.clientY + 16;
+    if (x + 220 > window.innerWidth) x = e.clientX - 220;
+    if (y + 100 > window.innerHeight) y = e.clientY - 100;
+    tt.style.left = x + 'px';
+    tt.style.top = y + 'px';
+  }
+});
+
+// ============================
+// DETAIL PANEL
+// ============================
+function openPanel(el) {
+  selectedElement = el;
+  const color = CAT_COLORS[el.cat];
+  
+  // Header
+  const bigEl = document.getElementById('panelBigElement');
+  bigEl.style.background = `${color}22`;
+  bigEl.style.borderColor = `${color}44`;
+  bigEl.querySelector('.panel-number').textContent = el.z;
+  bigEl.querySelector('.panel-symbol').textContent = el.symbol;
+  bigEl.querySelector('.panel-name-ru').textContent = el.name;
+  bigEl.querySelector('.panel-mass').textContent = el.mass;
+
+  document.getElementById('panelNameBig').textContent = el.name;
+  document.getElementById('panelLatin').textContent = el.latin;
+  
+  const badge = document.getElementById('panelCategoryBadge');
+  badge.textContent = CAT_NAMES[el.cat];
+  badge.style.background = `${color}22`;
+  badge.style.color = color;
+  badge.style.border = `1px solid ${color}44`;
+
+  const phaseNames = { solid: '⬛ Твёрдое вещество', liquid: '💧 Жидкость', gas: '💨 Газ' };
+  document.getElementById('panelPhase').textContent = `${phaseNames[el.phase] || '?'} при 25°C`;
+  document.getElementById('panelYear').textContent = el.year ? `📅 Открыт: ${el.year} г. · ${el.discoverer}` : `📅 Известен с древности`;
+
+  // Tabs content
+  buildOverviewTab(el, color);
+  buildPhysicalTab(el, color);
+  buildAtomicTab(el, color);
+  buildIsotopesTab(el, color);
+
+  // Reset to first tab
+  setPanelTab('overview');
+
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('active');
+}
+
+function closePanel() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+}
+
+function setPanelTab(tab) {
+  currentPanelTab = tab;
+  document.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.panel-tab[onclick="setPanelTab('${tab}')"]`).classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+}
+
+function buildOverviewTab(el, color) {
+  const container = document.getElementById('tab-overview');
+  container.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div class="wiki-section">
+        <p>${el.desc}</p>
+      </div>
+    </div>
+    <div class="props-grid">
+      <div class="prop-card">
+        <div class="prop-label">Атомный номер</div>
+        <div class="prop-value" style="color:${color}">${el.z}</div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Атомная масса</div>
+        <div class="prop-value">${el.mass} <span class="prop-unit">а.е.м.</span></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Группа / Период</div>
+        <div class="prop-value">${el.cat === 'lanthanide' || el.cat === 'actinide' ? '—' : el.group} / ${el.period}</div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Фаза при 25°C</div>
+        <div class="prop-value phase-${el.phase}">${{solid:'Твёрдое',liquid:'Жидкость',gas:'Газ'}[el.phase] || '?'}</div>
+      </div>
+      <div class="prop-card full">
+        <div class="prop-label">Электронная конфигурация</div>
+        <div class="electron-config">${el.config}</div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:4px">Оболочки: ${el.shells ? el.shells.join(' · ') : '—'}</div>
+      </div>
+      ${el.ox ? `<div class="prop-card full">
+        <div class="prop-label">Степени окисления</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          ${el.ox.map(o=>`<span style="background:${color}22;color:${color};padding:2px 8px;border-radius:4px;font-size:13px;font-weight:600">${o>0?'+'+o:o}</span>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function buildPhysicalTab(el, color) {
+  const container = document.getElementById('tab-physical');
+  const fmt = (v, unit, dec=2) => v !== null && v !== undefined ? `${typeof v === 'number' ? v.toFixed ? v : v : v} ${unit}` : '—';
+  
+  container.innerHTML = `
+    <div class="props-grid">
+      <div class="prop-card">
+        <div class="prop-label">Плотность</div>
+        <div class="prop-value">${el.density ? el.density : '—'} <span class="prop-unit">${el.density ? 'г/см³' : ''}</span></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Температура плавления</div>
+        <div class="prop-value">${el.melt !== null && el.melt !== undefined ? el.melt + '°C' : '—'}</div>
+        <div class="prop-unit">${el.melt !== null && el.melt !== undefined ? (el.melt + 273.15).toFixed(2) + ' K' : ''}</div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Температура кипения</div>
+        <div class="prop-value">${el.boil !== null && el.boil !== undefined ? el.boil + '°C' : '—'}</div>
+        <div class="prop-unit">${el.boil !== null && el.boil !== undefined ? (el.boil + 273.15).toFixed(2) + ' K' : ''}</div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Агрегатное состояние</div>
+        <div class="prop-value phase-${el.phase}">${{solid:'Твёрдое',liquid:'Жидкость',gas:'Газ'}[el.phase] || '?'}</div>
+      </div>
+    </div>
+    ${el.melt !== null && el.boil !== null && el.melt !== undefined && el.boil !== undefined ? `
+    <div style="margin-top:16px;">
+      <div class="prop-label" style="margin-bottom:8px">Диапазон жидкого состояния</div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-bottom:6px">
+          <span>${el.melt}°C</span><span>→ жидкость →</span><span>${el.boil}°C</span>
+        </div>
+        <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;background:linear-gradient(to right,${color},${color}88);width:100%;border-radius:4px;"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:6px">Диапазон: ${(el.boil - el.melt).toFixed(1)}°C</div>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+function buildAtomicTab(el, color) {
+  const container = document.getElementById('tab-atomic');
+  
+  // Bohr model SVG
+  const shells = el.shells || [];
+  const shellColors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9f43','#00d2d3'];
+  let svgContent = '';
+  const cx = 110, cy = 110;
+  
+  // Nucleus
+  const nucRadius = 12 + Math.min(el.z * 0.3, 15);
+  svgContent += `<circle cx="${cx}" cy="${cy}" r="${nucRadius}" fill="${color}44" stroke="${color}" stroke-width="1.5"/>`;
+  svgContent += `<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="${color}" font-weight="bold">${el.z}</text>`;
+  
+  shells.forEach((count, i) => {
+    const r = nucRadius + 22 + i * 22;
+    svgContent += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${shellColors[i%7]}33" stroke-width="1" stroke-dasharray="3 3"/>`;
+    for (let j = 0; j < Math.min(count, 20); j++) {
+      const angle = (j / count) * 2 * Math.PI - Math.PI/2;
+      const ex = cx + r * Math.cos(angle);
+      const ey = cy + r * Math.sin(angle);
+      svgContent += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="3" fill="${shellColors[i%7]}" opacity="0.9"/>`;
+    }
+    if (count > 20) {
+      svgContent += `<text x="${cx + r + 4}" y="${cy}" font-size="8" fill="${shellColors[i%7]}" opacity="0.7">+${count-20}</text>`;
+    }
+  });
+
+  const svgSize = nucRadius + 22 + shells.length * 22 + 20;
+  
+  container.innerHTML = `
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <svg width="${svgSize*2}" height="${svgSize*2}" viewBox="0 0 ${svgSize*2} ${svgSize*2}" style="max-width:220px">
+        <g transform="translate(${svgSize - cx}, ${svgSize - cy})">${svgContent}</g>
+      </svg>
+    </div>
+    <div class="props-grid">
+      <div class="prop-card">
+        <div class="prop-label">Электроотрицательность</div>
+        <div class="prop-value" style="color:${color}">${el.en || '—'}</div>
+        <div class="prop-unit">по Полингу</div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">1-я ионизация</div>
+        <div class="prop-value">${el.ie1 || '—'} <span class="prop-unit">${el.ie1 ? 'кДж/моль' : ''}</span></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Атомный радиус</div>
+        <div class="prop-value">${el.radius || '—'} <span class="prop-unit">${el.radius ? 'пм' : ''}</span></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-label">Электронов на оболочках</div>
+        <div class="prop-value" style="font-size:12px">${shells.join(' | ')}</div>
+      </div>
+      <div class="prop-card full">
+        <div class="prop-label">Конфигурация</div>
+        <div class="electron-config">${el.config}</div>
+      </div>
+    </div>
+  `;
+}
+
+function buildIsotopesTab(el, color) {
+  const container = document.getElementById('tab-isotopes');
+  const isotopes = el.isotopes || [];
+  
+  container.innerHTML = `
+    <div class="isotope-list">
+      ${isotopes.map(iso => `
+        <div class="isotope-item">
+          <div>
+            <div class="isotope-symbol">${iso.sym} ${el.symbol}</div>
+            <div class="isotope-info">${iso.abund ? `Распространённость: ${iso.abund}` : iso.t12 ? `T½: ${iso.t12}` : ''}</div>
+          </div>
+          <div>${iso.stab ? '<span class="stable-badge">стабильный</span>' : '<span class="unstable-badge">нестабильный</span>'}</div>
+        </div>
+      `).join('')}
+      ${isotopes.length === 0 ? '<div style="color:var(--text-dim);font-size:12px;padding:16px">Данные недоступны</div>' : ''}
+    </div>
+    <div style="margin-top:16px; padding:12px; background:var(--surface2); border:1px solid var(--border); border-radius:8px;">
+      <div class="prop-label" style="margin-bottom:6px">Атомная масса</div>
+      <div style="font-size:20px; font-weight:600; color:${color}">${el.mass}</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px">а.е.м. (среднее по изотопам)</div>
+    </div>
+  `;
+}
+
+// ============================
+// VIEW SWITCHING
+// ============================
+function setView(view) {
+  currentView = view;
+  ['table','list','properties'].forEach(v => {
+    document.getElementById(v+'View').style.display = 'none';
+    document.getElementById('tab-'+v).classList.remove('active');
+  });
+  
+  if (view === 'table') {
+    document.getElementById('tableView').style.display = 'block';
+  } else if (view === 'list') {
+    document.getElementById('listView').style.display = 'block';
+    buildListView();
+  } else if (view === 'properties') {
+    document.getElementById('propertiesView').style.display = 'block';
+    buildPropertiesView();
+  }
+  
+  document.getElementById('tab-'+view).classList.add('active');
+}
+
+function buildListView() {
+  const container = document.getElementById('listContainer');
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  container.innerHTML = '';
+  
+  elements.filter(el => !q || el.name.toLowerCase().includes(q) || el.symbol.toLowerCase().includes(q) || String(el.z) === q)
+    .forEach(el => {
+      const color = CAT_COLORS[el.cat];
+      const div = document.createElement('div');
+      div.style.cssText = `background:var(--surface2);border:1px solid ${color}33;border-radius:8px;padding:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px`;
+      div.onmouseenter = () => div.style.borderColor = color;
+      div.onmouseleave = () => div.style.borderColor = `${color}33`;
+      div.onclick = () => openPanel(el);
+      div.innerHTML = `
+        <div style="width:44px;height:44px;border-radius:8px;background:${color}22;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;color:${color};flex-shrink:0">${el.symbol}</div>
+        <div style="flex:1;overflow:hidden">
+          <div style="font-size:12px;font-weight:600;color:var(--text)">${el.z}. ${el.name}</div>
+          <div style="font-size:10px;color:var(--text-dim)">${el.latin}</div>
+          <div style="font-size:10px;color:${color};margin-top:2px">${CAT_NAMES[el.cat]}</div>
+        </div>
+        <div style="text-align:right;font-size:10px;color:var(--text-dim)">${el.mass}<br><span style="color:${el.phase==='gas'?'#fdcb6e':el.phase==='liquid'?'#00cec9':'#74b9ff'}">${{solid:'тв.',liquid:'жидк.',gas:'газ'}[el.phase]||'?'}</span></div>
+      `;
+      container.appendChild(div);
+    });
+}
+
+function buildPropertiesView() {
+  const container = document.getElementById('propertiesChart');
+  
+  const props = [
+    { key: 'en', label: 'Электроотрицательность (Полинг)', unit: '', color: '#a29bfe' },
+    { key: 'ie1', label: 'Первая энергия ионизации', unit: 'кДж/моль', color: '#fd79a8' },
+    { key: 'radius', label: 'Атомный радиус', unit: 'пм', color: '#00cec9' },
+    { key: 'density', label: 'Плотность', unit: 'г/см³', color: '#ffa502' },
+  ];
+  
+  container.innerHTML = props.map(prop => {
+    const data = elements
+      .filter(el => el[prop.key] !== null && el[prop.key] !== undefined && el.period <= 6)
+      .sort((a,b) => a.z - b.z);
+    
+    if (!data.length) return '';
+    
+    const maxV = Math.max(...data.map(d => d[prop.key]));
+    const barW = Math.max(4, Math.min(16, Math.floor(900 / data.length)));
+    
+    return `
+      <div style="margin-bottom:32px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text)">${prop.label}</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-bottom:12px">Элементы периодов 1–6 · ${prop.unit}</div>
+        <div style="display:flex;align-items:flex-end;gap:1px;height:120px;overflow-x:auto;padding-bottom:4px">
+          ${data.map(el => `
+            <div title="${el.symbol}: ${el[prop.key]} ${prop.unit}"
+                 onclick="openPanel(elements.find(e=>e.z==${el.z}))"
+                 style="flex-shrink:0;width:${barW}px;background:${prop.color};height:${Math.max(4, (el[prop.key]/maxV)*115)}px;
+                        border-radius:2px 2px 0 0;cursor:pointer;transition:opacity 0.2s;opacity:0.8;position:relative"
+                 onmouseenter="this.style.opacity=1;this.title=''"
+                 onmouseleave="this.style.opacity=0.8">
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-dim);margin-top:4px;overflow:hidden">
+          <span>H</span>
+          ${data.filter((_,i) => i % Math.ceil(data.length/10) === 0).map(el => `<span>${el.symbol}</span>`).join('')}
+          <span>${data[data.length-1].symbol}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Init
+buildTable();
+
+// Make setPanelTab and openPanel globally accessible for panel content onclick handlers
+window.elements = elements;
+window.openPanel = openPanel;
+</script>
+</body>
+</html>
