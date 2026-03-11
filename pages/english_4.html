@@ -206,11 +206,55 @@
             <p class="instruction">Выберите нужный тест для проверки вашего словарного запаса:</p>
             
             <div class="tests-container">
-                <button class="mc-button" onclick="">Уровень Pre A1</button>
+                <button class="mc-button" onclick="startPreA1Test()">Уровень Pre A1</button>
                 <button class="mc-button" onclick="">Уровень A1</button>
             </div>
 
             <button class="mc-button" onclick="switchPage('english')">Назад</button>
+        </div>
+        <!-- Страница теста Pre A1 -->
+        <div id="page-vocab-preA1" class="page">
+            <h1>Словарный запас: уровень Pre A1</h1>
+            <h2 id="preA1-progress">Слово 1 / 0</h2>
+
+            <div class="dictation-wrapper">
+                <p class="instruction" id="preA1-instruction" style="font-size: 0.9rem; margin-bottom: 20px;">
+                    Переведите слово на РУССКИЙ:
+                </p>
+
+                <div class="text-frame" id="preA1-word" style="font-size: 1.5rem; color: var(--correct); min-height: 80px;">...</div>
+
+                <input
+                    type="text"
+                    id="preA1-input"
+                    class="mc-input"
+                    placeholder="Введите перевод и нажмите Enter..."
+                    autocomplete="off"
+                    style="font-size: 0.8rem; padding: 15px; margin-bottom: 20px;"
+                >
+
+                <div class="result-text" id="preA1-feedback" style="display: none; margin-bottom: 15px; font-size: 1rem;"></div>
+
+                <button class="mc-button" id="preA1-submit" onclick="submitPreA1Answer()">Ответить</button>
+            </div>
+        </div>
+
+        <div id="page-vocab-preA1-finish" class="page">
+            <h1>Тест Pre A1 завершён!</h1>
+            <div style="background: var(--frame-bg); border: 4px solid var(--color-sand); padding: 30px; margin: 30px 0; text-align: center; box-shadow: 6px 6px 0px rgba(0,0,0,0.5); min-width: 350px;">
+                <h3 style="color: var(--color-sand); margin-bottom: 20px; font-size: 1rem; text-shadow: 2px 2px 0 #000;">Ваши результаты:</h3>
+                <div style="font-size: 1rem; line-height: 2.5; color: white;">
+                    <p>Правильных ответов: <span id="preA1-final-correct" style="color: var(--correct); font-size: 1.5rem;">0</span>
+                        <span style="font-size: 1rem;"> / <span id="preA1-total">0</span></span>
+                    </p>
+                    <p style="margin-top: 15px; border-top: 2px dashed var(--color-med); padding-top: 15px;">
+                        Точность: <span id="preA1-final-percent" style="color: var(--color-sand); font-size: 2rem;">0%</span>
+                    </p>
+                </div>
+            </div>
+
+            <button class="mc-button" onclick="switchPage('vocabulary')">К выбору тестов</button>
+            <button class="mc-button" onclick="switchPage('english')">Главное меню</button>
         </div>
         <!-- ============================================================= -->
 
@@ -465,6 +509,7 @@
         </div>
 
         <!-- JS -->
+        <script src="../js/vocab_pre_a1.js"></script>
         <script>
             // --- ДАННЫЕ СЛОВАРЯ ДЛЯ ДИКТАНТА ---
             const fullVocabulary = {
@@ -876,6 +921,109 @@
                 switchPage('dictation-finish');
             }
             // =========================================================
+
+            // ---------- ТЕСТ НА СЛОВАРНЫЙ ЗАПАС Pre A1 ----------
+            let preA1Index = 0;
+            let preA1Correct = 0;
+            let preA1State = 'idle';
+
+            function startPreA1Test() {
+                if (!window.preA1Vocabulary || !Array.isArray(window.preA1Vocabulary) || window.preA1Vocabulary.length === 0) {
+                    alert('Список слов Pre A1 пока пуст. Добавь слова в js/vocab_pre_a1.js');
+                    return;
+                }
+
+                preA1Index = 0;
+                preA1Correct = 0;
+                preA1State = 'waiting';
+
+                document.getElementById('preA1-total').innerText = preA1Vocabulary.length;
+
+                switchPage('vocab-preA1');
+                showNextPreA1Word();
+
+                const input = document.getElementById('preA1-input');
+                input.onkeydown = function(e) {
+                    if (e.key === 'Enter') submitPreA1Answer();
+                };
+            }
+
+            function showNextPreA1Word() {
+                const total = preA1Vocabulary.length;
+                if (preA1Index >= total) {
+                    finishPreA1Test();
+                    return;
+                }
+
+                preA1State = 'waiting';
+
+                const current = preA1Vocabulary[preA1Index];
+                const wordEl = document.getElementById('preA1-word');
+                const progressEl = document.getElementById('preA1-progress');
+                const inputEl = document.getElementById('preA1-input');
+                const feedbackEl = document.getElementById('preA1-feedback');
+
+                progressEl.innerText = `Слово ${preA1Index + 1} / ${total}`;
+                document.getElementById('preA1-instruction').innerText = 'Переведите на РУССКИЙ:';
+
+                wordEl.innerText = current.en;
+
+                inputEl.value = '';
+                inputEl.classList.remove('correct', 'wrong');
+                inputEl.disabled = false;
+
+                feedbackEl.style.display = 'none';
+                document.getElementById('preA1-submit').style.display = 'block';
+
+                setTimeout(() => inputEl.focus(), 100);
+            }
+
+            function submitPreA1Answer() {
+                if (preA1State !== 'waiting') return;
+
+                const inputEl = document.getElementById('preA1-input');
+                const feedbackEl = document.getElementById('preA1-feedback');
+                const userInput = inputEl.value.trim().toLowerCase();
+
+                const current = preA1Vocabulary[preA1Index];
+
+                // Поддержка нескольких переводов через запятую, используя общий парсер
+                const expectedList = parseAnswers(current.ru);
+
+                const isCorrect = expectedList.includes(userInput);
+
+                preA1State = 'showing_result';
+                inputEl.disabled = true;
+                document.getElementById('preA1-submit').style.display = 'none';
+
+                if (isCorrect) {
+                    preA1Correct++;
+                    inputEl.classList.add('correct');
+                    feedbackEl.innerText = 'Правильно! ✓';
+                    feedbackEl.style.color = 'var(--correct)';
+                } else {
+                    inputEl.classList.add('wrong');
+                    feedbackEl.innerText = `Ошибка! Правильно: ${expectedList.join(' или ')}`;
+                    feedbackEl.style.color = 'var(--wrong)';
+                }
+
+                feedbackEl.style.display = 'block';
+
+                preA1Index++;
+                setTimeout(() => {
+                    showNextPreA1Word();
+                }, 2000);
+            }
+
+            function finishPreA1Test() {
+                const total = preA1Vocabulary.length;
+                const percent = total > 0 ? Math.round((preA1Correct / total) * 100) : 0;
+
+                document.getElementById('preA1-final-correct').innerText = preA1Correct;
+                document.getElementById('preA1-final-percent').innerText = `${percent}%`;
+
+                switchPage('vocab-preA1-finish');
+            }
 
             function startTest() {
                 globalCorrect = 0;
