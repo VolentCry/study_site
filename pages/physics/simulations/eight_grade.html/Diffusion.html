@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            Диффузия — ФизикаПро
+        </title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+        <style>
+            *, *::before, *::after { 
+                box-sizing: border-box; 
+                margin: 0; 
+                padding: 0; 
+            }
+
+            :root {
+                --bg: #050c1a; 
+                --bg2: #071222;
+                --accent: #38bdf8; 
+                --accent2: #818cf8; 
+                --accent3: #f472b6; 
+                --gold: #fbbf24; 
+                --green: #34d399;
+                --text: #e2e8f0; 
+                --text2: #94a3b8;
+                --card-bg: rgba(14,28,54,0.85); 
+                --border: rgba(56,189,248,0.2);
+                --col-a: #38bdf8; 
+                --col-b: #f472b6;
+            }
+
+            html { 
+                scroll-behavior: smooth; 
+            }
+
+            body { 
+                font-family: 'Raleway', sans-serif; 
+                background: var(--bg); 
+                color: var(--text); 
+                overflow-x: hidden; 
+                min-height: 100vh; 
+            }
+
+            nav {
+                position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 0 48px; height: 64px;
+                background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-logo { 
+                font-family:'Playfair Display',serif; 
+                font-size:20px; 
+                font-weight:700; 
+                background:linear-gradient(90deg, var(--accent), var(--accent2)); 
+                -webkit-background-clip:text; 
+                -webkit-text-fill-color:transparent; 
+                text-decoration:none; 
+            }
+
+            .nav-links { 
+                display:flex; 
+                gap:32px; 
+                align-items:center; 
+            }
+            .nav-links a { 
+                font-size:14px; 
+                font-weight:600; 
+                color:var(--text2); 
+                text-decoration:none; 
+                letter-spacing:.05em; 
+                text-transform:uppercase; 
+                transition:color .2s; 
+            }
+
+            .nav-links a:hover { 
+                color:var(--accent); 
+            }
+
+            .nav-back { 
+                border:1px solid var(--border); 
+                border-radius:30px; 
+                padding:6px 16px; 
+                font-size:13px; 
+                font-weight:600; 
+                color:var(--text2); 
+                text-decoration:none; 
+                letter-spacing:.04em; 
+                text-transform:uppercase; 
+                transition:color .2s; 
+            }
+
+            .nav-back:hover { 
+                color:var(--accent); 
+                border-color:rgba(56,189,248,.4); 
+            }
+
+            #page-top { 
+                padding:96px 24px 0; 
+                text-align:center; position:relative; overflow:hidden; 
+            }
+
+            #page-top::before { 
+                content:''; 
+                position:absolute; inset:0; background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(129,140,248,.08) 0%,transparent 70%); pointer-events:none; 
+            }
+
+            .breadcrumb { 
+                font-size:12px; 
+                font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--text2); margin-bottom:14px; opacity:0; animation:fadeUp .6s .1s forwards; 
+            }
+
+            .breadcrumb span { 
+                color:var(--accent); 
+            }
+
+            .page-title { 
+                font-family:'Playfair Display',serif; 
+                font-size:clamp(34px,5vw,64px); 
+                font-weight:900; 
+                line-height:1.1; 
+                background:linear-gradient(135deg,#fff 0%,var(--accent2) 50%,var(--accent3) 100%); 
+                -webkit-background-clip:text; 
+                -webkit-text-fill-color:transparent; 
+                opacity:0; 
+                animation:fadeUp .7s .2s forwards; 
+            }
+            
+            .page-sub { font-size:16px; font-weight:300; color:var(--text2); line-height:1.7; max-width:600px; margin:14px auto 0; opacity:0; animation:fadeUp .7s .35s forwards; }
+            .tags-row { display:flex; gap:10px; justify-content:center; margin-top:20px; flex-wrap:wrap; opacity:0; animation:fadeUp .7s .45s forwards; }
+            .tag { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:5px 14px; border-radius:20px; }
+            .tag-blue   { background:rgba(56,189,248,.12);  color:var(--accent);  border:1px solid rgba(56,189,248,.2); }
+            .tag-purple { background:rgba(129,140,248,.1);  color:var(--accent2); border:1px solid rgba(129,140,248,.2); }
+            .tag-pink   { background:rgba(244,114,182,.1);  color:var(--accent3); border:1px solid rgba(244,114,182,.2); }
+            .tag-gold   { background:rgba(251,191,36,.1);   color:var(--gold);    border:1px solid rgba(251,191,36,.2); }
+
+            #main { max-width:1280px; margin:48px auto 0; padding:0 24px 80px; display:grid; grid-template-columns:1fr 380px; gap:28px; align-items:start; }
+            @media(max-width:1024px){ #main{ grid-template-columns:1fr; } }
+
+            .canvas-panel { background:var(--card-bg); border:1px solid var(--border); border-radius:24px; overflow:hidden; }
+            .canvas-header { padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+            .canvas-title { font-size:15px; font-weight:700; }
+            .status-badge { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:5px 14px; border-radius:20px; }
+            .s-ready  { background:rgba(56,189,248,.12);  color:var(--accent); }
+            .s-run    { background:rgba(251,191,36,.12);  color:var(--gold); }
+            .s-mixed  { background:rgba(52,211,153,.12);  color:var(--green); }
+
+            .mode-tabs { display:flex; border-bottom:1px solid var(--border); }
+            .mode-tab { flex:1; padding:12px 8px; text-align:center; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text2); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; }
+            .mode-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+            #simCanvas { display:block; width:100%; background:#030810; }
+
+            .graph-wrap { background:#030810; border-top:1px solid var(--border); padding:14px 18px 12px; }
+            .graph-title { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text2); margin-bottom:6px; }
+            #graphCanvas { display:block; width:100%; }
+
+            .meters-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; border-top:1px solid var(--border); background:var(--border); }
+            .meter { background:var(--bg2); padding:14px 16px; text-align:center; }
+            .meter-label { font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--text2); }
+            .meter-val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; margin-top:4px; line-height:1; }
+            .meter-unit { font-size:10px; color:var(--text2); margin-top:2px; }
+
+            .side-panel { display:flex; flex-direction:column; gap:20px; }
+            .card { background:var(--card-bg); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+            .card-head { padding:16px 20px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); display:flex; align-items:center; gap:8px; }
+            .card-head-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+            .card-body { padding:20px; display:flex; flex-direction:column; gap:18px; }
+
+            .ctrl-row { display:flex; flex-direction:column; gap:8px; }
+            .ctrl-label-row { display:flex; justify-content:space-between; align-items:baseline; }
+            .ctrl-name { font-size:13px; font-weight:600; color:var(--text); }
+            .ctrl-val-box { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--accent); }
+            .ctrl-val-box small { font-family:'Raleway',sans-serif; font-size:11px; color:var(--text2); font-weight:400; }
+            .ctrl-desc { font-size:11px; color:var(--text2); line-height:1.5; }
+
+            input[type=range] { -webkit-appearance:none; width:100%; height:4px; border-radius:4px; background:rgba(56,189,248,.15); outline:none; cursor:pointer; }
+            input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; box-shadow:0 0 8px rgba(56,189,248,.4); transition:transform .15s; }
+            input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.25); }
+
+            .btn-row { display:flex; gap:10px; }
+            .btn-sim { flex:1; padding:12px 8px; border-radius:12px; font-family:'Raleway',sans-serif; font-size:13px; font-weight:700; letter-spacing:.04em; cursor:pointer; transition:all .2s; border:none; }
+            .btn-start { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; box-shadow:0 0 24px rgba(56,189,248,.2); }
+            .btn-start:hover { transform:translateY(-2px); box-shadow:0 0 36px rgba(56,189,248,.4); }
+            .btn-start:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+            .btn-reset { background:transparent; color:var(--text2); border:1px solid rgba(148,163,184,.2); }
+            .btn-reset:hover { border-color:var(--accent); color:var(--accent); }
+
+            .formula-block { background:rgba(56,189,248,.05); border:1px solid rgba(56,189,248,.12); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+            .formula-row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+            .formula-expr { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--accent); white-space:nowrap; }
+            .formula-meaning { font-size:12px; color:var(--text2); text-align:right; line-height:1.4; }
+            .formula-divider { height:1px; background:rgba(56,189,248,.12); }
+            .fact { display:flex; gap:12px; align-items:flex-start; }
+            .fact-icon { font-size:18px; flex-shrink:0; margin-top:2px; }
+            .fact-text { font-size:13px; color:var(--text2); line-height:1.6; }
+            .fact-text strong { color:var(--text); }
+
+            /* Substance presets */
+            .substance-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:16px 20px; }
+            .sub-btn { padding:10px 12px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,.03); border:1px solid var(--border); transition:all .2s; display:flex; flex-direction:column; gap:3px; }
+            .sub-btn:hover { border-color:rgba(56,189,248,.5); background:rgba(56,189,248,.05); }
+            .sub-btn.active { border-color:var(--accent); background:rgba(56,189,248,.1); }
+            .sub-icon { font-size:20px; }
+            .sub-name { font-size:12px; font-weight:700; color:var(--text); }
+            .sub-state { font-size:10px; color:var(--accent); font-weight:600; }
+            .sub-desc { font-size:10px; color:var(--text2); }
+
+            @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+            .reveal { opacity:0; transform:translateY(20px); transition:opacity .6s,transform .6s; }
+            .reveal.visible { opacity:1; transform:translateY(0); }
+            footer { padding:36px 24px; border-top:1px solid var(--border); text-align:center; color:var(--text2); font-size:14px; }
+            footer span { color:var(--accent); }
+        </style>
+    </head>
+    <body>
+        <nav>
+        <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+        <div class="nav-links">
+            <a href="simulations.html" class="nav-back">← Все симуляции</a>
+            <a href="index.html#classes">Классы</a>
+        </div>
+        </nav>
+
+        <div id="page-top">
+        <p class="breadcrumb">Симуляции · <span>8 класс</span> · Молекулярная физика</p>
+        <h1 class="page-title">Диффузия</h1>
+        <p class="page-sub">Наблюдай хаотичное движение молекул и их постепенное перемешивание. Исследуй, как температура ускоряет диффузию, а агрегатное состояние — замедляет.</p>
+        <div class="tags-row">
+            <span class="tag tag-blue">8 класс</span>
+            <span class="tag tag-purple">Броуновское движение</span>
+            <span class="tag tag-pink">Тепловое движение</span>
+            <span class="tag tag-gold">Второй закон термодинамики</span>
+        </div>
+        </div>
+
+        <div id="main">
+        <div>
+            <div class="canvas-panel reveal">
+            <div class="canvas-header">
+                <span class="canvas-title">Симуляция</span>
+                <span class="status-badge s-ready" id="statusBadge">Готово</span>
+            </div>
+            <div class="mode-tabs">
+                <div class="mode-tab active" onclick="setMode('free',this)">Газ</div>
+                <div class="mode-tab"        onclick="setMode('liquid',this)">Жидкость</div>
+                <div class="mode-tab"        onclick="setMode('barrier',this)">Перегородка</div>
+            </div>
+            <canvas id="simCanvas" height="420"></canvas>
+            <div class="graph-wrap">
+                <div class="graph-title">Концентрация c(x) — распределение частиц по горизонтали</div>
+                <canvas id="graphCanvas" height="100"></canvas>
+            </div>
+            <div class="meters-row">
+                <div class="meter">
+                <div class="meter-label">Время</div>
+                <div class="meter-val" style="color:var(--accent)" id="mTime">0.0</div>
+                <div class="meter-unit">с</div>
+                </div>
+                <div class="meter">
+                <div class="meter-label">Смешивание</div>
+                <div class="meter-val" style="color:var(--gold)" id="mMix">0</div>
+                <div class="meter-unit">%</div>
+                </div>
+                <div class="meter">
+                <div class="meter-label">Температура</div>
+                <div class="meter-val" style="color:var(--accent3)" id="mTemp">300</div>
+                <div class="meter-unit">К</div>
+                </div>
+                <div class="meter">
+                <div class="meter-label">Скорость</div>
+                <div class="meter-val" style="color:var(--green)" id="mSpeed">1.0×</div>
+                <div class="meter-unit">отн.</div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="side-panel">
+
+            <div class="card reveal" style="transition-delay:.1s">
+            <div class="card-head"><div class="card-head-dot"></div>Параметры</div>
+            <div class="card-body">
+                <div class="ctrl-row">
+                <div class="ctrl-label-row">
+                    <span class="ctrl-name">Температура T</span>
+                    <span class="ctrl-val-box" id="tempVal">300 <small>К</small></span>
+                </div>
+                <input type="range" id="slTemp" min="100" max="900" value="300" step="10">
+                <span class="ctrl-desc">Выше T → быстрее тепловое движение → быстрее диффузия.</span>
+                </div>
+
+                <div class="ctrl-row">
+                <div class="ctrl-label-row">
+                    <span class="ctrl-name">Число частиц</span>
+                    <span class="ctrl-val-box" id="nVal">160 <small>шт</small></span>
+                </div>
+                <input type="range" id="slN" min="40" max="320" value="160" step="20">
+                <span class="ctrl-desc">Больше частиц — нагляднее статистика концентрации.</span>
+                </div>
+
+                <div class="ctrl-row">
+                <div class="ctrl-label-row">
+                    <span class="ctrl-name">Радиус частицы</span>
+                    <span class="ctrl-val-box" id="rVal">4 <small>пкс</small></span>
+                </div>
+                <input type="range" id="slR" min="2" max="8" value="4" step="1">
+                <span class="ctrl-desc">Маленькие частицы — более лёгкий газ, диффузия быстрее.</span>
+                </div>
+
+                <div class="btn-row">
+                <button class="btn-sim btn-start" id="btnStart" onclick="startSim()">▶ Запустить</button>
+                <button class="btn-sim btn-reset" onclick="resetSim()">↺ Сброс</button>
+                </div>
+            </div>
+            </div>
+
+            <!-- SUBSTANCE PRESETS -->
+            <div class="card reveal" style="transition-delay:.17s">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--gold)"></div>Вещество</div>
+            <div class="substance-grid">
+                <div class="sub-btn active" onclick="setSubstance(this,300,4,'gas')">
+                <div class="sub-icon">💨</div>
+                <div class="sub-name">Воздух</div>
+                <div class="sub-state">Газ · 300 К</div>
+                <div class="sub-desc">Быстрая диффузия</div>
+                </div>
+                <div class="sub-btn" onclick="setSubstance(this,600,3,'gas')">
+                <div class="sub-icon">🔥</div>
+                <div class="sub-name">Горячий газ</div>
+                <div class="sub-state">Газ · 600 К</div>
+                <div class="sub-desc">Вдвое быстрее</div>
+                </div>
+                <div class="sub-btn" onclick="setSubstance(this,300,5,'liquid')">
+                <div class="sub-icon">💧</div>
+                <div class="sub-name">Вода</div>
+                <div class="sub-state">Жидкость · 300 К</div>
+                <div class="sub-desc">Медленная диффузия</div>
+                </div>
+                <div class="sub-btn" onclick="setSubstance(this,350,5,'liquid')">
+                <div class="sub-icon">☕</div>
+                <div class="sub-name">Горячий чай</div>
+                <div class="sub-state">Жидкость · 350 К</div>
+                <div class="sub-desc">Краска быстрее</div>
+                </div>
+            </div>
+            </div>
+
+            <!-- THEORY -->
+            <div class="card reveal" style="transition-delay:.24s">
+            <div class="card-head"><div class="card-head-dot" style="background:var(--accent2)"></div>Теория</div>
+            <div class="card-body">
+                <div class="formula-block">
+                <div class="formula-row">
+                    <span class="formula-expr">J = −D · dc/dx</span>
+                    <span class="formula-meaning">первый закон Фика: поток ∝ градиенту концентрации</span>
+                </div>
+                <div class="formula-divider"></div>
+                <div class="formula-row">
+                    <span class="formula-expr">D ∝ T / (r · √M)</span>
+                    <span class="formula-meaning">коэффициент диффузии растёт с T и падает с массой</span>
+                </div>
+                <div class="formula-divider"></div>
+                <div class="formula-row">
+                    <span class="formula-expr">&lt;x²&gt; = 2Dt</span>
+                    <span class="formula-meaning">среднеквадратичное смещение растёт как √t</span>
+                </div>
+                <div class="formula-divider"></div>
+                <div class="formula-row">
+                    <span class="formula-expr">v̄ = √(3RT/M)</span>
+                    <span class="formula-meaning">средняя скорость молекул газа (закон Больцмана)</span>
+                </div>
+                </div>
+                <div class="fact">
+                <span class="fact-icon">👃</span>
+                <p class="fact-text">Запах духов распространяется по комнате именно благодаря диффузии — молекулы хаотично блуждают и постепенно <strong>заполняют всё пространство</strong>.</p>
+                </div>
+                <div class="fact">
+                <span class="fact-icon">🫁</span>
+                <p class="fact-text">Кислород в лёгких переходит в кровь через тонкие стенки альвеол тоже диффузией — из <strong>высокой</strong> концентрации в <strong>низкую</strong>.</p>
+                </div>
+                <div class="fact">
+                <span class="fact-icon">🔬</span>
+                <p class="fact-text"><strong>Броун</strong> в 1827 году заметил непрерывное беспорядочное дрожание пыльцы в воде — это и есть видимый эффект молекулярных столкновений.</p>
+                </div>
+            </div>
+            </div>
+
+        </div>
+        </div>
+
+        <footer><p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p></footer>
+
+        <script>
+        /* ══════════════════════════════════
+        CONFIG & STATE
+        ══════════════════════════════════ */
+        const G_COL_A = '#38bdf8'; // left-side particles
+        const G_COL_B = '#f472b6'; // right-side particles
+
+        let temperature = 300;
+        let nTotal      = 160;
+        let pRadius     = 4;
+        let mode        = 'free';
+        let medium      = 'gas';   // 'gas' | 'liquid'
+
+        let running  = false;
+        let simTime  = 0;
+        let rafId    = null;
+        let lastTs   = null;
+
+        // Particle system
+        let particles = [];
+
+        // Barrier state
+        let barrierOpen  = false;
+        let barrierX     = 0.5; // fraction of canvas width
+
+        const C  = document.getElementById('simCanvas'),  ctx  = C.getContext('2d');
+        const GC = document.getElementById('graphCanvas'), gctx = GC.getContext('2d');
+
+        /* ══════════════════════════════════
+        PARTICLE CLASS
+        ══════════════════════════════════ */
+        function makeParticle(x, y, side){
+        const speed = baseSpeed();
+        const angle = Math.random() * Math.PI * 2;
+        return {
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            side,       // 'A' (blue) or 'B' (pink)
+            r: pRadius,
+            trail: [],
+        };
+        }
+
+        function baseSpeed(){
+        // v ∝ √T, scaled to pixels/s
+        const gasScale    = 90;
+        const liquidScale = 22;
+        const scale = medium==='liquid' ? liquidScale : gasScale;
+        return scale * Math.sqrt(temperature / 300);
+        }
+
+        /* ══════════════════════════════════
+        INIT
+        ══════════════════════════════════ */
+        function initParticles(){
+        const W = C.width, H = C.height;
+        particles = [];
+        const half = Math.floor(nTotal / 2);
+
+        if(mode === 'barrier'){
+            // All A left, all B right — barrier in middle
+            barrierOpen = false;
+            for(let i=0;i<half;i++){
+            const x = pRadius + Math.random() * (W/2 - pRadius*2 - 12);
+            const y = pRadius + Math.random() * (H - pRadius*2);
+            particles.push(makeParticle(x, y, 'A'));
+            }
+            for(let i=0;i<half;i++){
+            const x = W/2 + 12 + Math.random() * (W/2 - pRadius*2 - 12);
+            const y = pRadius + Math.random() * (H - pRadius*2);
+            particles.push(makeParticle(x, y, 'B'));
+            }
+        } else {
+            // Segregated: A on left half, B on right half
+            for(let i=0;i<half;i++){
+            const x = pRadius + Math.random() * (W/2 - pRadius*2);
+            const y = pRadius + Math.random() * (H - pRadius*2);
+            particles.push(makeParticle(x, y, 'A'));
+            }
+            for(let i=0;i<half;i++){
+            const x = W/2 + Math.random() * (W/2 - pRadius*2);
+            const y = pRadius + Math.random() * (H - pRadius*2);
+            particles.push(makeParticle(x, y, 'B'));
+            }
+        }
+        }
+
+        /* ══════════════════════════════════
+        SIMULATION LOOP
+        ══════════════════════════════════ */
+        function startSim(){
+        if(running) return;
+        if(particles.length === 0) initParticles();
+        running = true; lastTs = null;
+        document.getElementById('btnStart').disabled = true;
+        setStatus('s-run', 'Диффузия');
+        rafId = requestAnimationFrame(simLoop);
+        }
+
+        function stopSim(){
+        running = false;
+        if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+        document.getElementById('btnStart').disabled = false;
+        }
+
+        function resetSim(){
+        stopSim(); simTime = 0;
+        initParticles();
+        setStatus('s-ready', 'Готово');
+        repaint(); drawGraph(); updateMeters();
+        }
+
+        function simLoop(ts){
+        if(!running) return;
+        if(!lastTs){ lastTs=ts; rafId=requestAnimationFrame(simLoop); return; }
+        const dt = Math.min((ts-lastTs)/1000, 0.04); lastTs=ts;
+        simTime += dt;
+
+        step(dt);
+        repaint(); drawGraph(); updateMeters();
+
+        // Check if well-mixed
+        const mix = mixIndex();
+        if(mix > 97){
+            setStatus('s-mixed','Перемешано!');
+        }
+
+        rafId = requestAnimationFrame(simLoop);
+        }
+
+        function step(dt){
+        const W = C.width, H = C.height;
+        const r = pRadius;
+        const bx = barrierOpen ? -1 : W * barrierX; // barrier x position
+
+        // Update speeds to match current temperature
+        const targetSpeed = baseSpeed();
+
+        particles.forEach(p => {
+            // Rescale speed to target (simulate thermostat)
+            const curSpeed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+            if(curSpeed > 0.01){
+            const factor = targetSpeed / curSpeed;
+            p.vx *= 0.99 + 0.01 * factor;
+            p.vy *= 0.99 + 0.01 * factor;
+            }
+
+            // Random thermal kick (Brownian)
+            const kickStr = medium === 'liquid' ? 0.3 : 0.15;
+            p.vx += (Math.random()-0.5) * targetSpeed * kickStr;
+            p.vy += (Math.random()-0.5) * targetSpeed * kickStr;
+
+            // Speed limit
+            const sp = Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+            const maxSp = targetSpeed * 2.5;
+            if(sp > maxSp){ p.vx *= maxSp/sp; p.vy *= maxSp/sp; }
+
+            // Move
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+
+            // Wall bounces
+            if(p.x - r < 0){       p.x = r;   p.vx = Math.abs(p.vx); }
+            if(p.x + r > W){       p.x = W-r; p.vx = -Math.abs(p.vx); }
+            if(p.y - r < 0){       p.y = r;   p.vy = Math.abs(p.vy); }
+            if(p.y + r > H){       p.y = H-r; p.vy = -Math.abs(p.vy); }
+
+            // Barrier collision (mode=barrier, not open)
+            if(mode==='barrier' && !barrierOpen){
+            if(p.x - r < bx && p.x + r > bx - 8){
+                if(p.vx > 0 && p.x < bx){ p.x = bx - r - 1; p.vx = -Math.abs(p.vx)*0.9; }
+                if(p.vx < 0 && p.x > bx){ p.x = bx + r + 1; p.vx =  Math.abs(p.vx)*0.9; }
+            }
+            }
+
+            // Trail for liquid mode
+            if(medium === 'liquid'){
+            p.trail.push({x: p.x, y: p.y});
+            if(p.trail.length > 18) p.trail.shift();
+            } else {
+            p.trail = [];
+            }
+        });
+
+        // Particle-particle collisions (simplified — only check close pairs)
+        if(medium === 'gas'){
+            for(let i=0;i<particles.length;i++){
+            for(let j=i+1;j<particles.length;j++){
+                const pi=particles[i], pj=particles[j];
+                const dx=pj.x-pi.x, dy=pj.y-pi.y;
+                const dist2 = dx*dx+dy*dy;
+                const minD  = (pi.r+pj.r)*(pi.r+pj.r);
+                if(dist2 < minD && dist2 > 0.01){
+                // Elastic collision (equal masses, simplified)
+                const d=Math.sqrt(dist2);
+                const nx=dx/d, ny=dy/d;
+                const dvx=pi.vx-pj.vx, dvy=pi.vy-pj.vy;
+                const dot=dvx*nx+dvy*ny;
+                if(dot>0){
+                    pi.vx-=dot*nx; pi.vy-=dot*ny;
+                    pj.vx+=dot*nx; pj.vy+=dot*ny;
+                    // Separate
+                    const overlap=(pi.r+pj.r-d)/2;
+                    pi.x-=nx*overlap; pi.y-=ny*overlap;
+                    pj.x+=nx*overlap; pj.y+=ny*overlap;
+                }
+                }
+            }
+            }
+        }
+        }
+
+        /* ══════════════════════════════════
+        MIX INDEX  0→100%
+        ══════════════════════════════════ */
+        function mixIndex(){
+        if(!particles.length) return 0;
+        const W = C.width;
+        // Count A-particles on right side and B-particles on left side
+        let crossed = 0;
+        const half = particles.length / 2;
+        particles.forEach(p=>{
+            if(p.side==='A' && p.x > W/2) crossed++;
+            if(p.side==='B' && p.x < W/2) crossed++;
+        });
+        // Perfect mix = each half has 50% A, 50% B
+        return Math.round((crossed / half) * 50);
+        }
+
+        /* ══════════════════════════════════
+        RENDER
+        ══════════════════════════════════ */
+        function repaint(){
+        const W=C.width, H=C.height;
+        if(!W) return;
+        ctx.clearRect(0,0,W,H);
+
+        // BG gradient
+        const bg=ctx.createLinearGradient(0,0,0,H);
+        bg.addColorStop(0,'#020810'); bg.addColorStop(1,'#030f1c');
+        ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+        // Concentration gradient background (shows diffusion progress)
+        drawConcentrationBg(W, H);
+
+        // Barrier
+        if(mode === 'barrier' && !barrierOpen){
+            const bx = W * barrierX;
+            ctx.fillStyle = 'rgba(148,163,184,0.15)';
+            ctx.fillRect(bx-4, 0, 8, H);
+            ctx.strokeStyle = 'rgba(148,163,184,0.4)'; ctx.lineWidth=2; ctx.setLineDash([6,6]);
+            ctx.beginPath(); ctx.moveTo(bx,0); ctx.lineTo(bx,H); ctx.stroke(); ctx.setLineDash([]);
+
+            // Remove barrier hint
+            ctx.fillStyle='rgba(148,163,184,0.55)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+            ctx.fillText('↓ Нажмите, чтобы убрать перегородку', bx, H-12);
+        }
+
+        // Trails (liquid mode)
+        if(medium==='liquid'){
+            particles.forEach(p=>{
+            if(p.trail.length<2) return;
+            ctx.beginPath();
+            p.trail.forEach((pt,i)=>{
+                const a = i/p.trail.length*0.25;
+                if(i===0) ctx.moveTo(pt.x,pt.y);
+                else ctx.lineTo(pt.x,pt.y);
+            });
+            ctx.strokeStyle = p.side==='A'
+                ? `rgba(56,189,248,0.2)` : `rgba(244,114,182,0.2)`;
+            ctx.lineWidth=1; ctx.stroke();
+            });
+        }
+
+        // Particles
+        particles.forEach(p => {
+            const col = p.side==='A' ? G_COL_A : G_COL_B;
+            const r   = p.r;
+
+            // Glow for gas
+            if(medium==='gas'){
+            ctx.beginPath(); ctx.arc(p.x, p.y, r+3, 0, Math.PI*2);
+            ctx.fillStyle = p.side==='A'
+                ? 'rgba(56,189,248,0.08)' : 'rgba(244,114,182,0.08)';
+            ctx.fill();
+            }
+
+            // Main circle
+            const g = ctx.createRadialGradient(p.x-r*0.3, p.y-r*0.3, r*0.05, p.x, p.y, r);
+            g.addColorStop(0,'rgba(255,255,255,0.6)');
+            g.addColorStop(0.5, col+'cc');
+            g.addColorStop(1,   col+'44');
+            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+            ctx.fillStyle=g; ctx.fill();
+        });
+
+        // Mode-specific overlays
+        if(mode==='free' || mode==='liquid'){
+            // Mid-line divider (initial state reference)
+            if(simTime < 0.1){
+            ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.setLineDash([4,6]);
+            ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]);
+            }
+        }
+
+        // Time & temp overlay
+        ctx.fillStyle='rgba(148,163,184,0.45)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='left';
+        ctx.fillText('T = '+temperature+' К  ·  '+particles.length+' частиц', 12, 18);
+        ctx.textAlign='right';
+        ctx.fillText(medium==='gas'?'Газ':'Жидкость', W-12, 18);
+        }
+
+        function drawConcentrationBg(W, H){
+        // Soft gradient showing where each species is concentrated
+        const cols = 40;
+        const cw = W / cols;
+        const countA = new Array(cols).fill(0);
+        const countB = new Array(cols).fill(0);
+        particles.forEach(p=>{
+            const col = Math.floor(p.x / cw);
+            if(col>=0 && col<cols){
+            if(p.side==='A') countA[col]++;
+            else             countB[col]++;
+            }
+        });
+        const maxCount = Math.max(...countA, ...countB, 1);
+        for(let i=0;i<cols;i++){
+            const aFrac = countA[i]/maxCount, bFrac = countB[i]/maxCount;
+            if(aFrac > 0.01){
+            ctx.fillStyle=`rgba(56,189,248,${aFrac*0.07})`;
+            ctx.fillRect(i*cw,0,cw,H);
+            }
+            if(bFrac > 0.01){
+            ctx.fillStyle=`rgba(244,114,182,${bFrac*0.07})`;
+            ctx.fillRect(i*cw,0,cw,H);
+            }
+        }
+        }
+
+        /* ══════════════════════════════════
+        GRAPH — concentration profile c(x)
+        ══════════════════════════════════ */
+        function drawGraph(){
+        const W=GC.width, H=GC.height;
+        if(!W) return;
+        gctx.clearRect(0,0,W,H);
+        gctx.fillStyle='#030810'; gctx.fillRect(0,0,W,H);
+
+        const pL=36,pR=14,pT=10,pB=20, gW=W-pL-pR, gH=H-pT-pB;
+        const bins = 32;
+        const binW = C.width / bins;
+        const cA = new Array(bins).fill(0);
+        const cB = new Array(bins).fill(0);
+        particles.forEach(p=>{
+            const b = Math.min(bins-1, Math.floor(p.x / binW));
+            if(p.side==='A') cA[b]++;
+            else             cB[b]++;
+        });
+        const maxC = Math.max(...cA, ...cB, 1);
+
+        // Grid
+        for(let i=0;i<=4;i++){
+            gctx.strokeStyle='rgba(255,255,255,0.04)'; gctx.lineWidth=1;
+            gctx.beginPath(); gctx.moveTo(pL,pT+i*gH/4); gctx.lineTo(W-pR,pT+i*gH/4); gctx.stroke();
+        }
+
+        // A curve
+        gctx.strokeStyle=G_COL_A; gctx.lineWidth=2; gctx.beginPath();
+        cA.forEach((c,i)=>{
+            const gx=pL+gW*(i+.5)/bins, gy=pT+gH*(1-c/maxC);
+            i===0?gctx.moveTo(gx,gy):gctx.lineTo(gx,gy);
+        });
+        gctx.stroke();
+
+        // B curve
+        gctx.strokeStyle=G_COL_B; gctx.lineWidth=2; gctx.beginPath();
+        cB.forEach((c,i)=>{
+            const gx=pL+gW*(i+.5)/bins, gy=pT+gH*(1-c/maxC);
+            i===0?gctx.moveTo(gx,gy):gctx.lineTo(gx,gy);
+        });
+        gctx.stroke();
+
+        // Midline
+        gctx.strokeStyle='rgba(255,255,255,0.1)'; gctx.lineWidth=1; gctx.setLineDash([3,5]);
+        gctx.beginPath(); gctx.moveTo(pL+gW/2,pT); gctx.lineTo(pL+gW/2,pT+gH); gctx.stroke(); gctx.setLineDash([]);
+
+        // Axes
+        gctx.strokeStyle='rgba(255,255,255,0.18)'; gctx.lineWidth=1;
+        gctx.beginPath(); gctx.moveTo(pL,pT); gctx.lineTo(pL,pT+gH); gctx.lineTo(W-pR,pT+gH); gctx.stroke();
+        gctx.fillStyle='rgba(148,163,184,0.5)'; gctx.font='9px Raleway,sans-serif';
+        gctx.textAlign='center'; gctx.fillText('x →',pL+gW/2,H-3);
+        gctx.textAlign='left';   gctx.fillStyle=G_COL_A; gctx.font='bold 9px Raleway,sans-serif';
+        gctx.fillText('c(x) A',pL+3,pT+9);
+        gctx.fillStyle=G_COL_B; gctx.fillText('c(x) B',pL+44,pT+9);
+        }
+
+        /* ══════════════════════════════════
+        METERS
+        ══════════════════════════════════ */
+        function updateMeters(){
+        const mix = mixIndex();
+        const relSpeed = Math.sqrt(temperature/300).toFixed(2);
+        document.getElementById('mTime').textContent  = simTime.toFixed(1);
+        document.getElementById('mMix').textContent   = Math.min(mix, 100);
+        document.getElementById('mTemp').textContent  = temperature;
+        document.getElementById('mSpeed').textContent = relSpeed+'×';
+        if(mix>=97) setStatus('s-mixed','Перемешано!');
+        }
+
+        function setStatus(cls,text){
+        const b=document.getElementById('statusBadge');
+        b.className='status-badge '+cls; b.textContent=text;
+        }
+
+        /* ══════════════════════════════════
+        CONTROLS
+        ══════════════════════════════════ */
+        document.getElementById('slTemp').oninput = function(){
+        temperature = +this.value;
+        document.getElementById('tempVal').innerHTML = temperature+' <small>К</small>';
+        document.getElementById('mTemp').textContent = temperature;
+        };
+        document.getElementById('slN').oninput = function(){
+        nTotal = +this.value;
+        document.getElementById('nVal').innerHTML = nTotal+' <small>шт</small>';
+        if(!running) resetSim();
+        };
+        document.getElementById('slR').oninput = function(){
+        pRadius = +this.value;
+        document.getElementById('rVal').innerHTML = pRadius+' <small>пкс</small>';
+        if(!running) resetSim();
+        };
+
+        function setMode(m, el){
+        mode = m; stopSim();
+        document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+        el.classList.add('active');
+        initParticles();
+        setStatus('s-ready','Готово');
+        repaint(); drawGraph(); updateMeters();
+        }
+
+        function setSubstance(el, T, r, med){
+        temperature = T; pRadius = r; medium = med;
+        document.getElementById('slTemp').value = T;
+        document.getElementById('tempVal').innerHTML = T+' <small>К</small>';
+        document.getElementById('slR').value = r;
+        document.getElementById('rVal').innerHTML = r+' <small>пкс</small>';
+        document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
+        el.classList.add('active');
+        stopSim(); initParticles();
+        setStatus('s-ready','Готово');
+        repaint(); drawGraph(); updateMeters();
+        }
+
+        // Click canvas to open barrier
+        C.addEventListener('click', e=>{
+        if(mode!=='barrier') return;
+        const r=C.getBoundingClientRect();
+        const mx=(e.clientX-r.left)*(C.width/r.width);
+        const bx=C.width*barrierX;
+        if(Math.abs(mx-bx)<40){
+            barrierOpen=true;
+            // Give all particles a small random kick after barrier removed
+            particles.forEach(p=>{
+            p.vx+=(Math.random()-.5)*baseSpeed()*0.5;
+            p.vy+=(Math.random()-.5)*baseSpeed()*0.5;
+            });
+            if(!running) startSim();
+        }
+        });
+
+        /* ══════════════════════════════════
+        RESIZE + BOOT
+        ══════════════════════════════════ */
+        function resize(){
+        const w=C.parentElement?.offsetWidth||600; C.width=w>0?w:600;
+        const gw=GC.parentElement?.offsetWidth||600; GC.width=gw>0?gw:600;
+        }
+        const _ro=new ResizeObserver(()=>{ resize(); repaint(); drawGraph(); });
+        _ro.observe(C.parentElement);
+        window.addEventListener('resize',()=>{ resize(); resetSim(); });
+        requestAnimationFrame(()=>{
+        resize(); initParticles();
+        repaint(); drawGraph(); updateMeters();
+        });
+
+        const _rev=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:.1});
+        document.querySelectorAll('.reveal').forEach(el=>_rev.observe(el));
+        </script>
+    </body>
+</html>

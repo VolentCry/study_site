@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сила трения — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222;
+  --accent: #38bdf8; --accent2: #818cf8; --accent3: #f472b6; --gold: #fbbf24; --green: #34d399;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(56,189,248,0.2);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-size: 14px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: 0.04em; text-transform: uppercase; transition: color 0.2s; }
+.nav-back:hover { color: var(--accent); border-color: rgba(56,189,248,0.4); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(244,114,182,0.07) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; opacity: 0; animation: fadeUp 0.6s 0.1s forwards; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(34px,5vw,64px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg,#fff 0%,var(--accent3) 55%,var(--gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0; animation: fadeUp 0.7s 0.2s forwards; }
+.page-sub { font-size: 16px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 600px; margin: 14px auto 0; opacity: 0; animation: fadeUp 0.7s 0.35s forwards; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s 0.45s forwards; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-blue   { background: rgba(56,189,248,.12);  color: var(--accent);  border: 1px solid rgba(56,189,248,.2); }
+.tag-gold   { background: rgba(251,191,36,.1);   color: var(--gold);    border: 1px solid rgba(251,191,36,.2); }
+.tag-pink   { background: rgba(244,114,182,.1);  color: var(--accent3); border: 1px solid rgba(244,114,182,.2); }
+.tag-green  { background: rgba(52,211,153,.1);   color: var(--green);   border: 1px solid rgba(52,211,153,.2); }
+
+#main { max-width: 1280px; margin: 48px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; }
+.canvas-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.canvas-title { font-size: 15px; font-weight: 700; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.status-static  { background: rgba(56,189,248,.12);  color: var(--accent); }
+.status-sliding { background: rgba(251,191,36,.12);  color: var(--gold); }
+.status-moving  { background: rgba(52,211,153,.12);  color: var(--green); }
+
+.mode-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.mode-tab { flex: 1; padding: 12px 8px; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+#simCanvas { display: block; width: 100%; background: #030810; }
+
+.graph-wrap { background: #030810; border-top: 1px solid var(--border); padding: 14px 18px 12px; }
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text2); margin-bottom: 6px; }
+#graphCanvas { display: block; width: 100%; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+.meter { background: var(--bg2); padding: 14px 16px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+.side-panel { display: flex; flex-direction: column; gap: 20px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+.card-head { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.card-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 8px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway',sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(56,189,248,0.15); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 8px rgba(56,189,248,0.4); transition: transform 0.15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.btn-row { display: flex; gap: 10px; }
+.btn-sim { flex: 1; padding: 12px 8px; border-radius: 12px; font-family: 'Raleway',sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s; border: none; }
+.btn-start { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #fff; box-shadow: 0 0 24px rgba(56,189,248,0.2); }
+.btn-start:hover { transform: translateY(-2px); box-shadow: 0 0 36px rgba(56,189,248,0.4); }
+.btn-start:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.btn-reset { background: transparent; color: var(--text2); border: 1px solid rgba(148,163,184,0.2); }
+.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Surface presets */
+.surfaces-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px 20px; }
+.surf-btn { padding: 10px 12px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--border); transition: all 0.2s; display: flex; flex-direction: column; gap: 4px; }
+.surf-btn:hover { border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.05); }
+.surf-btn.active { border-color: var(--accent); background: rgba(56,189,248,0.1); }
+.surf-icon { font-size: 18px; }
+.surf-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.surf-mu { font-size: 11px; color: var(--accent); font-weight: 600; }
+.surf-desc { font-size: 10px; color: var(--text2); }
+
+.formula-block { background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.12); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.formula-meaning { font-size: 12px; color: var(--text2); text-align: right; line-height: 1.4; }
+.formula-divider { height: 1px; background: rgba(56,189,248,0.12); }
+
+.fact { display: flex; gap: 12px; align-items: flex-start; }
+.fact-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+.fact-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.fact-text strong { color: var(--text); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.reveal { opacity:0; transform:translateY(20px); transition: opacity 0.6s, transform 0.6s; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+footer { padding: 36px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 14px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="index.html#classes">Классы</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>7 класс</span> · Механика</p>
+  <h1 class="page-title">Сила трения</h1>
+  <p class="page-sub">Толкай блок с разной силой и наблюдай переход от покоя к скольжению. Исследуй разницу между статическим и кинетическим трением на разных поверхностях.</p>
+  <div class="tags-row">
+    <span class="tag tag-blue">7 класс</span>
+    <span class="tag tag-pink">Fтр = μ · N</span>
+    <span class="tag tag-gold">μs > μk</span>
+    <span class="tag tag-green">Скольжение</span>
+  </div>
+</div>
+
+<div id="main">
+  <div>
+    <div class="canvas-panel reveal">
+      <div class="canvas-header">
+        <span class="canvas-title">Симуляция</span>
+        <span class="status-badge status-static" id="statusBadge">Покой</span>
+      </div>
+      <div class="mode-tabs">
+        <div class="mode-tab active" onclick="setMode('push',this)">Толчок</div>
+        <div class="mode-tab"        onclick="setMode('ramp',this)">Наклонная плоскость</div>
+        <div class="mode-tab"        onclick="setMode('compare',this)">Сравнение</div>
+      </div>
+      <canvas id="simCanvas" height="420"></canvas>
+      <div class="graph-wrap">
+        <div class="graph-title">Fтр(F) — зависимость трения от приложенной силы · v(t) — скорость</div>
+        <canvas id="graphCanvas" height="110"></canvas>
+      </div>
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Прил. сила</div>
+          <div class="meter-val" style="color:var(--accent)" id="mF">0.0</div>
+          <div class="meter-unit">Н</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Сила трения</div>
+          <div class="meter-val" style="color:var(--accent3)" id="mFtr">0.0</div>
+          <div class="meter-unit">Н</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Ускорение</div>
+          <div class="meter-val" style="color:var(--gold)" id="mA">0.00</div>
+          <div class="meter-unit">м/с²</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Скорость</div>
+          <div class="meter-val" style="color:var(--green)" id="mV">0.0</div>
+          <div class="meter-unit">м/с</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+
+    <div class="card reveal" style="transition-delay:.1s">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры</div>
+      <div class="card-body">
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Приложенная сила F</span>
+            <span class="ctrl-val-box" id="fVal">0 <small>Н</small></span>
+          </div>
+          <input type="range" id="slF" min="0" max="60" value="0" step="1">
+          <span class="ctrl-desc">Горизонтальная сила, толкающая блок вправо.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Масса блока m</span>
+            <span class="ctrl-val-box" id="massVal">2.0 <small>кг</small></span>
+          </div>
+          <input type="range" id="slMass" min="0.5" max="10" value="2" step="0.5">
+          <span class="ctrl-desc">Влияет на нормальную реакцию N = mg.</span>
+        </div>
+
+        <div class="ctrl-row" id="angleRow" style="display:none">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Угол наклона α</span>
+            <span class="ctrl-val-box" id="angleVal">20 <small>°</small></span>
+          </div>
+          <input type="range" id="slAngle" min="0" max="60" value="20" step="1">
+          <span class="ctrl-desc">Блок начнёт скользить, когда tg α > μs.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-start" id="btnLaunch" onclick="launch()">▶ Запустить</button>
+          <button class="btn-sim btn-reset" onclick="resetSim()">↺ Сброс</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SURFACE PRESETS -->
+    <div class="card reveal" style="transition-delay:.18s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--gold)"></div>Поверхность</div>
+      <div class="surfaces-grid">
+        <div class="surf-btn active" onclick="setSurface(this,'ice',0.05,0.03)">
+          <div class="surf-icon">🧊</div>
+          <div class="surf-name">Лёд</div>
+          <div class="surf-mu">μs=0.05 · μk=0.03</div>
+          <div class="surf-desc">Очень гладкая</div>
+        </div>
+        <div class="surf-btn" onclick="setSurface(this,'wood',0.4,0.3)">
+          <div class="surf-icon">🪵</div>
+          <div class="surf-name">Дерево</div>
+          <div class="surf-mu">μs=0.40 · μk=0.30</div>
+          <div class="surf-desc">Типичная поверхность</div>
+        </div>
+        <div class="surf-btn" onclick="setSurface(this,'rubber',0.8,0.6)">
+          <div class="surf-icon">⚫</div>
+          <div class="surf-name">Резина</div>
+          <div class="surf-mu">μs=0.80 · μk=0.60</div>
+          <div class="surf-desc">Шина на асфальте</div>
+        </div>
+        <div class="surf-btn" onclick="setSurface(this,'metal',0.15,0.1)">
+          <div class="surf-icon">🔩</div>
+          <div class="surf-name">Металл</div>
+          <div class="surf-mu">μs=0.15 · μk=0.10</div>
+          <div class="surf-desc">Металл по металлу</div>
+        </div>
+        <div class="surf-btn" onclick="setSurface(this,'sand',0.6,0.5)">
+          <div class="surf-icon">🏜️</div>
+          <div class="surf-name">Песок</div>
+          <div class="surf-mu">μs=0.60 · μk=0.50</div>
+          <div class="surf-desc">Рыхлая поверхность</div>
+        </div>
+        <div class="surf-btn" onclick="setSurface(this,'glass',0.2,0.15)">
+          <div class="surf-icon">🪟</div>
+          <div class="surf-name">Стекло</div>
+          <div class="surf-mu">μs=0.20 · μk=0.15</div>
+          <div class="surf-desc">Полированная</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THEORY -->
+    <div class="card reveal" style="transition-delay:.26s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--accent2)"></div>Теория</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">Fтр = μ · N</span>
+            <span class="formula-meaning">сила трения пропорциональна нормальной реакции</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">N = m · g</span>
+            <span class="formula-meaning">нормальная реакция на горизонтальной плоскости</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">μs > μk</span>
+            <span class="formula-meaning">статическое трение всегда больше кинетического</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">a = (F − Fтр) / m</span>
+            <span class="formula-meaning">ускорение блока при скольжении</span>
+          </div>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🔬</span>
+          <p class="fact-text"><strong>Три закона Амонтона–Кулона:</strong> трение не зависит от площади контакта, пропорционально нормальной силе, а кинетическое не зависит от скорости.</p>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🚗</span>
+          <p class="fact-text">При торможении автомобиля выгоднее <strong>не блокировать колёса</strong> — трение качения меньше трения скольжения, поэтому ABS удерживает колёса вращающимися.</p>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🧊</span>
+          <p class="fact-text">На льду коньки скользят не потому что лёд тает под давлением, а из-за <strong>молекулярного квазижидкого слоя</strong> на поверхности льда.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p></footer>
+
+<script>
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let muS = 0.05, muK = 0.03, surfName = 'ice';
+let appliedF = 0, blockMass = 2.0, rampAngle = 20;
+let mode = 'push';
+
+// dynamics
+let running = false, simTime = 0;
+let blockX = 0;        // metres from start
+let blockV = 0;        // m/s
+let isSliding = false;
+let rafId = null, lastTs = null;
+
+// history for graphs
+let vHistory = [];     // {t, v, F, Ftr}
+let gHistory = [];     // for F-Ftr graph in push mode
+
+const G = 9.81;
+const C = document.getElementById('simCanvas'), ctx = C.getContext('2d');
+const GC = document.getElementById('graphCanvas'), gctx = GC.getContext('2d');
+
+/* ══════════════════════════════════
+   CONTROLS
+══════════════════════════════════ */
+document.getElementById('slF').oninput = function(){
+  appliedF = +this.value;
+  document.getElementById('fVal').innerHTML = appliedF + ' <small>Н</small>';
+  gHistory.push({ F: appliedF, Ftr: computeFtr(appliedF) });
+  if(gHistory.length > 200) gHistory.shift();
+  if(!running) { repaint(); drawGraph(); updateMeters(); }
+};
+
+document.getElementById('slMass').oninput = function(){
+  blockMass = +this.value;
+  document.getElementById('massVal').innerHTML = blockMass.toFixed(1) + ' <small>кг</small>';
+  if(!running) { repaint(); drawGraph(); updateMeters(); }
+};
+
+document.getElementById('slAngle').oninput = function(){
+  rampAngle = +this.value;
+  document.getElementById('angleVal').innerHTML = rampAngle + ' <small>°</small>';
+  if(!running) { repaint(); drawGraph(); updateMeters(); }
+};
+
+function setSurface(el, name, ms, mk){
+  document.querySelectorAll('.surf-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  muS = ms; muK = mk; surfName = name;
+  resetSim();
+}
+
+function setMode(m, el){
+  mode = m;
+  stopSim();
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('angleRow').style.display = m==='ramp' ? '' : 'none';
+  document.getElementById('slF').parentElement.parentElement.style.display = m==='ramp' ? 'none' : '';
+  resetSim();
+}
+
+/* ══════════════════════════════════
+   PHYSICS HELPERS
+══════════════════════════════════ */
+function normalForce(){
+  if(mode==='ramp'){
+    const a = rampAngle * Math.PI / 180;
+    return blockMass * G * Math.cos(a);
+  }
+  return blockMass * G;
+}
+
+function computeFtr(F){
+  const N = normalForce();
+  const maxStatic = muS * N;
+  const kinetic   = muK * N;
+  if(!isSliding){
+    return Math.min(Math.abs(F), maxStatic) * Math.sign(F || 1);
+  }
+  return kinetic * (blockV >= 0 ? -1 : 1);
+}
+
+function driveForce(){
+  if(mode==='ramp'){
+    const a = rampAngle * Math.PI / 180;
+    return blockMass * G * Math.sin(a); // gravity component along slope
+  }
+  return appliedF;
+}
+
+function checkSliding(){
+  const F = driveForce();
+  const N = normalForce();
+  return Math.abs(F) > muS * N;
+}
+
+/* ══════════════════════════════════
+   SIMULATION LOOP
+══════════════════════════════════ */
+function launch(){
+  if(running) return;
+  isSliding = checkSliding();
+  if(!isSliding && mode !== 'ramp'){
+    // just show static case, no animation needed
+    repaint(); drawGraph(); updateMeters();
+    setStatus('static', 'Покой');
+    return;
+  }
+  running = true; lastTs = null;
+  document.getElementById('btnLaunch').disabled = true;
+  setStatus('sliding', isSliding ? 'Скольжение!' : 'Движение');
+  rafId = requestAnimationFrame(simLoop);
+}
+
+function simLoop(ts){
+  if(!running) return;
+  if(!lastTs){ lastTs = ts; rafId = requestAnimationFrame(simLoop); return; }
+  const dt = Math.min((ts - lastTs) / 1000, 0.04);
+  lastTs = ts; simTime += dt;
+
+  const F  = driveForce();
+  const N  = normalForce();
+  const Fk = muK * N;
+
+  // re-check sliding state
+  if(isSliding && Math.abs(blockV) < 0.001 && Math.abs(F) <= muS * N){
+    isSliding = false; blockV = 0;
+    stopSim(); setStatus('static','Остановка'); repaint(); return;
+  }
+
+  const friction = isSliding ? Fk * (blockV >= 0 ? -1 : 1) : -F;
+  const netF = F + friction;
+  const accel = isSliding ? netF / blockMass : 0;
+
+  blockV += accel * dt;
+  blockX += blockV * dt;
+
+  vHistory.push({ t: simTime, v: blockV, F: F, Ftr: Math.abs(friction), accel });
+  if(vHistory.length > 500) vHistory.shift();
+
+  // bounce at wall boundaries
+  const W = C.width;
+  const maxX = (W - 160) / worldScale();
+  if(blockX > maxX){ blockX = maxX; blockV = 0; isSliding = false; stopSim(); setStatus('static','Стена!'); }
+
+  repaint(); drawGraph(); updateMeters();
+  if(running) rafId = requestAnimationFrame(simLoop);
+}
+
+function stopSim(){
+  running = false;
+  if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  document.getElementById('btnLaunch').disabled = false;
+}
+
+function resetSim(){
+  stopSim();
+  blockX = 0; blockV = 0; simTime = 0; isSliding = false;
+  vHistory = []; gHistory = [];
+  appliedF = 0;
+  document.getElementById('slF').value = 0;
+  document.getElementById('fVal').innerHTML = '0 <small>Н</small>';
+  setStatus('static','Покой');
+  requestAnimationFrame(()=>{ repaint(); drawGraph(); updateMeters(); });
+}
+
+/* ══════════════════════════════════
+   HELPERS
+══════════════════════════════════ */
+function worldScale(){ return Math.min(C.width, 700) * 0.6; } // px per metre
+function setStatus(type, text){ const b=document.getElementById('statusBadge'); b.className='status-badge status-'+type; b.textContent=text; }
+
+function updateMeters(){
+  const F   = running || mode==='ramp' ? driveForce() : appliedF;
+  const N   = normalForce();
+  const Ftr = isSliding ? muK*N : Math.min(Math.abs(F), muS*N);
+  const net = isSliding ? (Math.abs(F) - Ftr) : 0;
+  const acc = isSliding ? net / blockMass : 0;
+  document.getElementById('mF').textContent   = F.toFixed(1);
+  document.getElementById('mFtr').textContent = Ftr.toFixed(1);
+  document.getElementById('mA').textContent   = acc.toFixed(2);
+  document.getElementById('mV').textContent   = blockV.toFixed(1);
+}
+
+/* ══════════════════════════════════
+   RENDER
+══════════════════════════════════ */
+function repaint(){
+  const W=C.width, H=C.height;
+  if(W===0) return;
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#020810'); bg.addColorStop(1,'#030f1c');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  if(mode==='compare') paintCompare(W,H);
+  else if(mode==='ramp') paintRamp(W,H);
+  else paintPush(W,H);
+}
+
+/* ── PUSH MODE ── */
+function paintPush(W, H){
+  const groundY = H - 80;
+  const sc = worldScale();
+
+  paintSurface(ctx, W, groundY, surfName);
+
+  // block position
+  const bW=70, bH=52;
+  const bx = 80 + blockX * sc;
+  const by = groundY - bH;
+
+  // motion trail (heat marks / skid marks)
+  if(isSliding && blockX > 0.01){
+    const trailW = blockX * sc;
+    ctx.fillStyle = 'rgba(244,114,182,0.08)';
+    ctx.fillRect(80, groundY-4, trailW, 4);
+    // skid marks
+    for(let tx=80; tx<80+trailW; tx+=8){
+      ctx.fillStyle=`rgba(244,114,182,${0.04+Math.random()*0.04})`;
+      ctx.fillRect(tx, groundY-3, 4, 3);
+    }
+  }
+
+  // force arrow (applied)
+  if(appliedF > 0){
+    const arrowLen = Math.min(appliedF * 1.8, 90);
+    paintArrow(ctx, bx-arrowLen-8, by+bH/2, bx-8, by+bH/2, '#38bdf8', 2.5, 'F='+appliedF+'Н');
+  }
+
+  // friction arrow
+  const N = normalForce();
+  const Ftr_val = isSliding ? muK*N : Math.min(appliedF, muS*N);
+  if(Ftr_val > 0.5){
+    const fLen = Math.min(Ftr_val * 1.8, 80);
+    const dir = isSliding ? -1 : (appliedF > 0 ? -1 : 1);
+    paintArrow(ctx, bx+bW+8, by+bH/2, bx+bW+8+fLen*dir, by+bH/2, '#f472b6', 2.5, 'Fтр');
+  }
+
+  // Normal and weight arrows (short)
+  paintArrow(ctx, bx+bW/2, by, bx+bW/2, by-36, '#fbbf24', 2, 'N');
+  paintArrow(ctx, bx+bW/2, by+bH, bx+bW/2, by+bH+36, '#818cf8', 2, 'mg');
+
+  // Block
+  paintBlock(ctx, bx, by, bW, bH, blockMass, isSliding);
+
+  // Friction μ label on surface
+  ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText(`μs=${muS} · μk=${muK}`, 16, groundY+22);
+
+  // Threshold annotation
+  const threshold = muS * N;
+  ctx.fillStyle='rgba(244,114,182,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='right';
+  ctx.fillText(`Порог: ${threshold.toFixed(1)} Н`, W-16, groundY+22);
+
+  // state label
+  const stateCol = isSliding ? '#fbbf24' : (appliedF>threshold?'#f472b6':'#34d399');
+  const stateText = isSliding ? '⚡ Скольжение' : (appliedF>=threshold?'⚡ Вот-вот сдвинется':'✓ Статическое равновесие');
+  ctx.fillStyle = stateCol; ctx.font = 'bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(stateText, W/2, groundY - bH - 22);
+}
+
+/* ── RAMP MODE ── */
+function paintRamp(W, H){
+  const a = rampAngle * Math.PI / 180;
+  const rampLen = Math.min(W*0.7, 440);
+  const pivotX = W*0.12, pivotY = H-60;
+  const topX = pivotX + Math.cos(a)*rampLen, topY = pivotY - Math.sin(a)*rampLen;
+
+  // Ramp surface texture
+  const surfGrad = ctx.createLinearGradient(pivotX,pivotY,topX,topY);
+  surfGrad.addColorStop(0, surfaceColor(surfName, 0.5));
+  surfGrad.addColorStop(1, surfaceColor(surfName, 0.3));
+  ctx.fillStyle=surfGrad;
+  ctx.beginPath();
+  ctx.moveTo(pivotX,pivotY); ctx.lineTo(topX,topY);
+  ctx.lineTo(topX,pivotY); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle=surfaceColor(surfName, 0.8); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pivotX,pivotY); ctx.lineTo(topX,topY); ctx.stroke();
+
+  // Angle arc
+  ctx.strokeStyle='rgba(56,189,248,0.4)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(pivotX, pivotY, 40, -a, 0); ctx.stroke();
+  ctx.fillStyle='rgba(56,189,248,0.7)'; ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText(rampAngle+'°', pivotX+44, pivotY-8);
+
+  // Block on ramp
+  const bW=56, bH=44;
+  const slideT = Math.min(blockX * worldScale() * 0.012, rampLen*0.7);
+  const bCx = topX - Math.cos(a)*(80+slideT);
+  const bCy = topY + Math.sin(a)*(80+slideT);
+
+  ctx.save();
+  ctx.translate(bCx, bCy);
+  ctx.rotate(-a);
+  // block body
+  const stressed = isSliding;
+  const col = stressed ? '#fbbf24' : '#38bdf8';
+  ctx.fillStyle='rgba(5,10,22,0.95)'; ctx.beginPath(); ctx.roundRect(-bW/2,-bH,bW,bH,6); ctx.fill();
+  ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.beginPath(); ctx.roundRect(-bW/2,-bH,bW,bH,6); ctx.stroke();
+  ctx.fillStyle=col; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(blockMass.toFixed(1)+' кг', 0, -bH/2+5);
+
+  // Forces on ramp
+  const sinA=Math.sin(a), cosA=Math.cos(a);
+  const mgSin = blockMass*G*sinA, mgCos=blockMass*G*cosA;
+  const Ftr_val = isSliding ? muK*mgCos : Math.min(mgSin, muS*mgCos);
+
+  // gravity component along ramp
+  paintArrow(ctx, 0,-bH/2, mgSin*0.8*Math.sign(blockV||1),-bH/2, '#818cf8',2,'mg·sinα');
+  // friction (up the ramp)
+  if(Ftr_val>0.3) paintArrow(ctx,0,-bH/2,-Ftr_val*0.8,-bH/2,'#f472b6',2,'Fтр');
+  // normal
+  paintArrow(ctx,0,-bH,-mgCos*0.04*0,0 -bH - Math.min(mgCos*0.5,40),'#fbbf24',2,'N'); // normal perp to ramp
+
+  ctx.restore();
+
+  // label whether sliding
+  const willSlide = Math.tan(a) > muS;
+  const col2 = willSlide ? '#f472b6' : '#34d399';
+  ctx.fillStyle=col2; ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(willSlide ? '⚡ tan α > μs — блок скользит' : '✓ tan α ≤ μs — блок в покое', W/2, 36);
+
+  ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='11px Raleway,sans-serif';
+  ctx.fillText(`tg α = ${Math.tan(a).toFixed(3)}   μs = ${muS}`, W/2, 54);
+
+  updateMeters();
+}
+
+/* ── COMPARE MODE ── */
+function paintCompare(W, H){
+  const surfaces=[
+    {name:'Лёд',   ms:0.05,mk:0.03,icon:'🧊',col:'#60a5fa'},
+    {name:'Дерево',ms:0.40,mk:0.30,icon:'🪵',col:'#a3e635'},
+    {name:'Резина',ms:0.80,mk:0.60,icon:'⚫',col:'#f472b6'},
+  ];
+  const groundY=H-60, F=appliedF||20, bW=52, bH=42;
+  const colW=W/3;
+
+  surfaces.forEach((s,i)=>{
+    const cx=colW*i+colW/2;
+    // mini surface
+    ctx.fillStyle=surfaceColor(s.name,0.3); ctx.fillRect(colW*i+10,groundY,colW-20,14);
+    ctx.strokeStyle=surfaceColor(s.name,0.7); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(colW*i+10,groundY); ctx.lineTo(colW*(i+1)-10,groundY); ctx.stroke();
+
+    const N=blockMass*G;
+    const Ftr=Math.min(F,s.ms*N);
+    const sliding=F>s.ms*N;
+    const disp = sliding ? (F - s.mk*N)/blockMass * 0.8 : 0; // visual displacement
+    const bx=cx-bW/2+disp*2;
+
+    // block
+    const bc=sliding?'#fbbf24':'#38bdf8';
+    ctx.fillStyle='rgba(5,10,22,0.95)'; ctx.beginPath(); ctx.roundRect(bx,groundY-bH,bW,bH,6); ctx.fill();
+    ctx.strokeStyle=bc; ctx.lineWidth=1.5; ctx.beginPath(); ctx.roundRect(bx,groundY-bH,bW,bH,6); ctx.stroke();
+
+    // force arrows
+    if(F>0) paintArrow(ctx,bx-50,groundY-bH/2,bx,groundY-bH/2,'#38bdf8',2,'F');
+    if(Ftr>0.5) paintArrow(ctx,bx+bW,groundY-bH/2,bx+bW+Math.min(Ftr*1.2,60),groundY-bH/2,'#f472b6',2,'Fтр');
+
+    // labels
+    ctx.fillStyle=bc; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(sliding?'СКОЛЬЗИТ':'СТОИТ', cx, groundY-bH-14);
+    ctx.fillStyle='rgba(148,163,184,0.6)'; ctx.font='10px Raleway,sans-serif';
+    ctx.fillText(s.icon+' '+s.name, cx, H-32);
+    ctx.fillText('μs='+s.ms, cx, H-18);
+    ctx.fillText('Fтр='+Ftr.toFixed(1)+'Н', cx, H-6);
+
+    // column divider
+    if(i<2){ ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.setLineDash([4,6]); ctx.beginPath(); ctx.moveTo(colW*(i+1),20); ctx.lineTo(colW*(i+1),H-20); ctx.stroke(); ctx.setLineDash([]); }
+  });
+
+  ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('F = '+F+' Н  ·  m = '+blockMass.toFixed(1)+' кг  ·  Двигайте слайдер силы', W/2, 20);
+}
+
+/* ── SURFACE PAINTER ── */
+function paintSurface(ctx, W, groundY, surf){
+  const col1=surfaceColor(surf,0.35), col2=surfaceColor(surf,0.15);
+  const sg=ctx.createLinearGradient(0,groundY,0,groundY+55);
+  sg.addColorStop(0,col1); sg.addColorStop(1,col2);
+  ctx.fillStyle=sg; ctx.fillRect(0,groundY,W,55);
+  ctx.strokeStyle=surfaceColor(surf,0.7); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(W,groundY); ctx.stroke();
+
+  // texture strokes
+  if(surf==='ice'){
+    for(let x=0;x<W;x+=30){ ctx.strokeStyle='rgba(147,210,255,0.12)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,groundY); ctx.lineTo(x+20,groundY+50); ctx.stroke(); }
+  } else if(surf==='wood'){
+    for(let x=0;x<W;x+=18){ ctx.strokeStyle='rgba(180,130,80,0.1)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x,groundY+2); ctx.lineTo(x,groundY+54); ctx.stroke(); }
+  } else if(surf==='rubber'||surf==='sand'){
+    for(let x=0;x<W;x+=6){ for(let y=groundY+2;y<groundY+12;y+=6){ ctx.fillStyle='rgba(0,0,0,0.08)'; ctx.fillRect(x,y,3,3); } }
+  }
+}
+
+function surfaceColor(surf, alpha){
+  const map={ice:`rgba(147,210,255,${alpha})`,wood:`rgba(180,120,60,${alpha})`,rubber:`rgba(60,60,60,${alpha})`,metal:`rgba(150,160,175,${alpha})`,sand:`rgba(210,180,90,${alpha})`,glass:`rgba(180,220,255,${alpha})`};
+  return map[surf]||`rgba(100,120,140,${alpha})`;
+}
+
+/* ── BLOCK ── */
+function paintBlock(ctx,x,y,w,h,m,sliding){
+  const col=sliding?'#fbbf24':'#38bdf8';
+  if(sliding){ ctx.shadowColor='#fbbf24'; ctx.shadowBlur=14; }
+  ctx.fillStyle='rgba(5,10,22,0.96)'; ctx.beginPath(); ctx.roundRect(x,y,w,h,7); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.beginPath(); ctx.roundRect(x,y,w,h,7); ctx.stroke();
+  ctx.fillStyle=col; ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(m.toFixed(1)+' кг', x+w/2, y+h/2+5);
+  // wheels if sliding
+  if(sliding){
+    [-1,1].forEach(d=>{ ctx.beginPath(); ctx.arc(x+w/2+d*w*0.28,y+h+5,7,0,Math.PI*2); ctx.fillStyle='#1e293b'; ctx.fill(); ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1.5; ctx.stroke(); });
+  }
+}
+
+function paintArrow(ctx,x1,y1,x2,y2,col,lw,lbl){
+  ctx.strokeStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.save(); ctx.translate(x2,y2); ctx.rotate(a);
+  ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(10,0); ctx.lineTo(0,4); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  if(lbl){
+    const lx=(x1+x2)/2, ly=(y1+y2)/2;
+    ctx.fillStyle=col; ctx.font='bold 10px Raleway,sans-serif';
+    ctx.textAlign='center'; ctx.fillText(lbl, lx, ly-7);
+  }
+}
+
+/* ══════════════════════════════════
+   GRAPH
+══════════════════════════════════ */
+function drawGraph(){
+  const W=GC.width, H=GC.height;
+  if(W===0) return;
+  gctx.clearRect(0,0,W,H);
+  gctx.fillStyle='#030810'; gctx.fillRect(0,0,W,H);
+
+  const pL=44,pR=14,pT=10,pB=22, gW=W-pL-pR, gH=H-pT-pB;
+
+  // grid
+  for(let i=0;i<=4;i++){
+    gctx.strokeStyle='rgba(255,255,255,0.04)'; gctx.lineWidth=1;
+    gctx.beginPath(); gctx.moveTo(pL,pT+i*gH/4); gctx.lineTo(W-pR,pT+i*gH/4); gctx.stroke();
+  }
+
+  const N=blockMass*G;
+  const FsMax=muS*N, FkMax=muK*N;
+  const Fmax=80;
+
+  if(mode==='push'){
+    // Ftr(F) diagram — the classic friction graph
+    // static zone
+    gctx.strokeStyle='#34d399'; gctx.lineWidth=2.5; gctx.beginPath();
+    gctx.moveTo(pL, pT+gH);
+    gctx.lineTo(pL+gW*(FsMax/Fmax), pT+gH*(1-FsMax/N/muS)); // diagonal up to peak
+    gctx.stroke();
+    // drop from μs to μk
+    const px_s=pL+gW*(FsMax/Fmax), py_s=pT+gH*(1-FsMax/Fmax);
+    const py_k=pT+gH*(1-FkMax/Fmax);
+    gctx.strokeStyle='rgba(244,114,182,0.5)'; gctx.lineWidth=1.5; gctx.setLineDash([3,4]);
+    gctx.beginPath(); gctx.moveTo(px_s,py_s); gctx.lineTo(px_s,py_k); gctx.stroke(); gctx.setLineDash([]);
+    // kinetic plateau
+    gctx.strokeStyle='#f472b6'; gctx.lineWidth=2.5;
+    gctx.beginPath(); gctx.moveTo(px_s,py_k); gctx.lineTo(W-pR,py_k); gctx.stroke();
+
+    // Current F marker
+    const curX=pL+gW*(appliedF/Fmax);
+    const curFtr=Math.min(appliedF,FsMax);
+    const curY=pT+gH*(1-curFtr/Fmax);
+    if(appliedF>0){
+      gctx.strokeStyle='rgba(255,255,255,0.15)'; gctx.lineWidth=1; gctx.setLineDash([2,4]);
+      gctx.beginPath(); gctx.moveTo(curX,pT); gctx.lineTo(curX,pT+gH); gctx.stroke(); gctx.setLineDash([]);
+      const dotC=appliedF>FsMax?'#f472b6':'#34d399';
+      gctx.fillStyle=dotC; gctx.beginPath(); gctx.arc(curX,curY,4,0,Math.PI*2); gctx.fill();
+    }
+
+    // labels
+    gctx.fillStyle='rgba(148,163,184,0.55)'; gctx.font='9px Raleway,sans-serif';
+    gctx.textAlign='center'; gctx.fillText('Приложенная сила F, Н →',pL+gW/2,H-4);
+    gctx.textAlign='right'; gctx.fillText((FsMax).toFixed(0)+'Н (μsN)',pL-2,py_s+4);
+    gctx.fillText((FkMax).toFixed(0)+'Н (μkN)',pL-2,py_k+4);
+    gctx.fillStyle='#34d399'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='left';
+    gctx.fillText('Fтр (стат)',pL+4,pT+10);
+    gctx.fillStyle='#f472b6'; gctx.fillText('Fтр (кин)',pL+70,pT+10);
+
+  } else if(mode==='ramp' || (mode==='push' && vHistory.length>2)){
+    // v(t) plot
+    if(vHistory.length < 2) return;
+    const tMax=Math.max(...vHistory.map(p=>p.t),0.1);
+    const vMax=Math.max(...vHistory.map(p=>Math.abs(p.v)),0.1);
+    gctx.strokeStyle='#34d399'; gctx.lineWidth=2; gctx.beginPath();
+    vHistory.forEach((p,i)=>{
+      const gx=pL+gW*(p.t/tMax), gy=pT+gH*(1-Math.abs(p.v)/vMax);
+      i===0?gctx.moveTo(gx,gy):gctx.lineTo(gx,gy);
+    });
+    gctx.stroke();
+    gctx.fillStyle='rgba(148,163,184,0.5)'; gctx.font='9px Raleway,sans-serif'; gctx.textAlign='center';
+    gctx.fillText('t, с →',pL+gW/2,H-4);
+    gctx.fillStyle='#34d399'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='left';
+    gctx.fillText('v(t)',pL+4,pT+10);
+  }
+
+  // axes
+  gctx.strokeStyle='rgba(255,255,255,0.18)'; gctx.lineWidth=1;
+  gctx.beginPath(); gctx.moveTo(pL,pT); gctx.lineTo(pL,pT+gH); gctx.lineTo(W-pR,pT+gH); gctx.stroke();
+}
+
+/* ══════════════════════════════════
+   RESIZE + BOOT
+══════════════════════════════════ */
+function resize(){
+  const w=C.parentElement?.offsetWidth||600;
+  C.width=w>0?w:600;
+  const gw=GC.parentElement?.offsetWidth||600;
+  GC.width=gw>0?gw:600;
+}
+const _ro=new ResizeObserver(()=>{ resize(); repaint(); drawGraph(); });
+_ro.observe(C.parentElement);
+window.addEventListener('resize',()=>{ resize(); repaint(); drawGraph(); });
+requestAnimationFrame(()=>{ resize(); repaint(); drawGraph(); updateMeters(); });
+
+const _rev=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>_rev.observe(el));
+</script>
+</body>
+</html>

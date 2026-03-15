@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Архимедова сила — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222;
+  --accent: #38bdf8; --accent2: #818cf8; --accent3: #f472b6; --gold: #fbbf24; --green: #34d399;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(56,189,248,0.2);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-decoration:none; }
+.nav-links { display:flex; gap:32px; align-items:center; }
+.nav-links a { font-size:14px; font-weight:600; color:var(--text2); text-decoration:none; letter-spacing:.05em; text-transform:uppercase; transition:color .2s; }
+.nav-links a:hover { color:var(--accent); }
+.nav-back { border:1px solid var(--border); border-radius:30px; padding:6px 16px; font-size:13px; font-weight:600; color:var(--text2); text-decoration:none; letter-spacing:.04em; text-transform:uppercase; transition:color .2s; }
+.nav-back:hover { color:var(--accent); border-color:rgba(56,189,248,.4); }
+
+#page-top { padding:96px 24px 0; text-align:center; position:relative; overflow:hidden; }
+#page-top::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.08) 0%,transparent 70%); pointer-events:none; }
+.breadcrumb { font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--text2); margin-bottom:14px; opacity:0; animation:fadeUp .6s .1s forwards; }
+.breadcrumb span { color:var(--accent); }
+.page-title { font-family:'Playfair Display',serif; font-size:clamp(34px,5vw,64px); font-weight:900; line-height:1.1; background:linear-gradient(135deg,#fff 0%,var(--accent) 55%,var(--green) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; opacity:0; animation:fadeUp .7s .2s forwards; }
+.page-sub { font-size:16px; font-weight:300; color:var(--text2); line-height:1.7; max-width:600px; margin:14px auto 0; opacity:0; animation:fadeUp .7s .35s forwards; }
+.tags-row { display:flex; gap:10px; justify-content:center; margin-top:20px; flex-wrap:wrap; opacity:0; animation:fadeUp .7s .45s forwards; }
+.tag { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:5px 14px; border-radius:20px; }
+.tag-blue  { background:rgba(56,189,248,.12);  color:var(--accent);  border:1px solid rgba(56,189,248,.2); }
+.tag-gold  { background:rgba(251,191,36,.1);   color:var(--gold);    border:1px solid rgba(251,191,36,.2); }
+.tag-green { background:rgba(52,211,153,.1);   color:var(--green);   border:1px solid rgba(52,211,153,.2); }
+.tag-purple{ background:rgba(129,140,248,.1);  color:var(--accent2); border:1px solid rgba(129,140,248,.2); }
+
+#main { max-width:1280px; margin:48px auto 0; padding:0 24px 80px; display:grid; grid-template-columns:1fr 380px; gap:28px; align-items:start; }
+@media(max-width:1024px){ #main{ grid-template-columns:1fr; } }
+
+.canvas-panel { background:var(--card-bg); border:1px solid var(--border); border-radius:24px; overflow:hidden; }
+.canvas-header { padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.canvas-title { font-size:15px; font-weight:700; }
+.status-badge { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:5px 14px; border-radius:20px; }
+.s-sink    { background:rgba(244,114,182,.12); color:var(--accent3); }
+.s-float   { background:rgba(52,211,153,.12);  color:var(--green); }
+.s-neutral { background:rgba(56,189,248,.12);  color:var(--accent); }
+
+.mode-tabs { display:flex; border-bottom:1px solid var(--border); }
+.mode-tab { flex:1; padding:12px 8px; text-align:center; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text2); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; }
+.mode-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+#simCanvas { display:block; width:100%; background:#030810; cursor:ns-resize; }
+
+.graph-wrap { background:#030810; border-top:1px solid var(--border); padding:14px 18px 12px; }
+.graph-title { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text2); margin-bottom:6px; }
+#graphCanvas { display:block; width:100%; }
+
+.meters-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; border-top:1px solid var(--border); background:var(--border); }
+.meter { background:var(--bg2); padding:14px 16px; text-align:center; }
+.meter-label { font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--text2); }
+.meter-val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; margin-top:4px; line-height:1; }
+.meter-unit { font-size:10px; color:var(--text2); margin-top:2px; }
+
+.side-panel { display:flex; flex-direction:column; gap:20px; }
+.card { background:var(--card-bg); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+.card-head { padding:16px 20px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); display:flex; align-items:center; gap:8px; }
+.card-head-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+.card-body { padding:20px; display:flex; flex-direction:column; gap:18px; }
+
+.ctrl-row { display:flex; flex-direction:column; gap:8px; }
+.ctrl-label-row { display:flex; justify-content:space-between; align-items:baseline; }
+.ctrl-name { font-size:13px; font-weight:600; color:var(--text); }
+.ctrl-val-box { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--accent); }
+.ctrl-val-box small { font-family:'Raleway',sans-serif; font-size:11px; color:var(--text2); font-weight:400; }
+.ctrl-desc { font-size:11px; color:var(--text2); line-height:1.5; }
+
+input[type=range] { -webkit-appearance:none; width:100%; height:4px; border-radius:4px; background:rgba(56,189,248,.15); outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; box-shadow:0 0 8px rgba(56,189,248,.4); transition:transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.25); }
+
+.bodies-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:16px 20px; }
+.body-btn { padding:10px 8px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,.03); border:1px solid var(--border); transition:all .2s; text-align:center; display:flex; flex-direction:column; gap:3px; align-items:center; }
+.body-btn:hover { border-color:rgba(56,189,248,.5); background:rgba(56,189,248,.05); }
+.body-btn.active { border-color:var(--accent); background:rgba(56,189,248,.1); }
+.body-icon { font-size:22px; }
+.body-name { font-size:11px; font-weight:700; color:var(--text); }
+.body-rho  { font-size:10px; color:var(--accent); font-weight:600; }
+
+.liquids-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:16px 20px; }
+.liq-btn { padding:10px 12px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,.03); border:1px solid var(--border); transition:all .2s; display:flex; flex-direction:column; gap:3px; }
+.liq-btn:hover { border-color:rgba(56,189,248,.5); background:rgba(56,189,248,.05); }
+.liq-btn.active { border-color:var(--accent); background:rgba(56,189,248,.1); }
+.liq-name { font-size:12px; font-weight:700; color:var(--text); }
+.liq-rho  { font-size:11px; color:var(--accent); font-weight:600; }
+.liq-desc { font-size:10px; color:var(--text2); }
+
+.formula-block { background:rgba(56,189,248,.05); border:1px solid rgba(56,189,248,.12); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+.formula-row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.formula-expr { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--accent); white-space:nowrap; }
+.formula-meaning { font-size:12px; color:var(--text2); text-align:right; line-height:1.4; }
+.formula-divider { height:1px; background:rgba(56,189,248,.12); }
+.fact { display:flex; gap:12px; align-items:flex-start; }
+.fact-icon { font-size:18px; flex-shrink:0; margin-top:2px; }
+.fact-text { font-size:13px; color:var(--text2); line-height:1.6; }
+.fact-text strong { color:var(--text); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.reveal { opacity:0; transform:translateY(20px); transition:opacity .6s,transform .6s; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+footer { padding:36px 24px; border-top:1px solid var(--border); text-align:center; color:var(--text2); font-size:14px; }
+footer span { color:var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="index.html#classes">Классы</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>7 класс</span> · Механика</p>
+  <h1 class="page-title">Архимедова сила</h1>
+  <p class="page-sub">Погружай тела в разные жидкости и наблюдай, как выталкивающая сила зависит от объёма вытесненной жидкости. Найди условия плавания, утопания и нейтральной плавучести.</p>
+  <div class="tags-row">
+    <span class="tag tag-blue">7 класс</span>
+    <span class="tag tag-gold">Fа = ρжgV</span>
+    <span class="tag tag-green">Плавание тел</span>
+    <span class="tag tag-purple">Архимед</span>
+  </div>
+</div>
+
+<div id="main">
+  <div>
+    <div class="canvas-panel reveal">
+      <div class="canvas-header">
+        <span class="canvas-title">Симуляция</span>
+        <span class="status-badge s-neutral" id="statusBadge">Покой</span>
+      </div>
+      <div class="mode-tabs">
+        <div class="mode-tab active" onclick="setMode('dip',this)">Погружение</div>
+        <div class="mode-tab"        onclick="setMode('float',this)">Плавание</div>
+        <div class="mode-tab"        onclick="setMode('compare',this)">Сравнение жидкостей</div>
+      </div>
+      <canvas id="simCanvas" height="460"></canvas>
+      <div class="graph-wrap">
+        <div class="graph-title">Fа(V) — сила Архимеда vs объём погружения · mg — вес тела</div>
+        <canvas id="graphCanvas" height="110"></canvas>
+      </div>
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Сила Архимеда</div>
+          <div class="meter-val" style="color:var(--accent)" id="mFa">0.0</div>
+          <div class="meter-unit">Н</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Вес тела</div>
+          <div class="meter-val" style="color:var(--accent3)" id="mMg">0.0</div>
+          <div class="meter-unit">Н</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Погружение</div>
+          <div class="meter-val" style="color:var(--gold)" id="mDip">0</div>
+          <div class="meter-unit">%</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Равновесие</div>
+          <div class="meter-val" style="color:var(--green); font-size:14px" id="mState">—</div>
+          <div class="meter-unit"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+
+    <!-- PARAMS -->
+    <div class="card reveal" style="transition-delay:.1s">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Плотность тела ρт</span>
+            <span class="ctrl-val-box" id="rhoBodyVal">800 <small>кг/м³</small></span>
+          </div>
+          <input type="range" id="slRhoBody" min="100" max="8000" value="800" step="50">
+          <span class="ctrl-desc">Для воды ρж = 1000 кг/м³ — тело тонет, если ρт > ρж.</span>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Объём тела V</span>
+            <span class="ctrl-val-box" id="volVal">0.50 <small>л</small></span>
+          </div>
+          <input type="range" id="slVol" min="0.1" max="5" value="0.5" step="0.1">
+          <span class="ctrl-desc">Больше объём — больше вытесненной жидкости.</span>
+        </div>
+        <div class="ctrl-row" id="dipRow">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Глубина погружения</span>
+            <span class="ctrl-val-box" id="dipVal">50 <small>%</small></span>
+          </div>
+          <input type="range" id="slDip" min="0" max="100" value="50" step="1">
+          <span class="ctrl-desc">Доля объёма тела, находящаяся под водой.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODIES -->
+    <div class="card reveal" style="transition-delay:.16s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--gold)"></div>Тела</div>
+      <div class="bodies-grid">
+        <div class="body-btn" onclick="setBody(this,917)">
+          <div class="body-icon">🧊</div>
+          <div class="body-name">Лёд</div>
+          <div class="body-rho">917 кг/м³</div>
+        </div>
+        <div class="body-btn" onclick="setBody(this,700)">
+          <div class="body-icon">🪵</div>
+          <div class="body-name">Дерево</div>
+          <div class="body-rho">700 кг/м³</div>
+        </div>
+        <div class="body-btn active" onclick="setBody(this,800)">
+          <div class="body-icon">🧴</div>
+          <div class="body-name">Масло</div>
+          <div class="body-rho">800 кг/м³</div>
+        </div>
+        <div class="body-btn" onclick="setBody(this,2700)">
+          <div class="body-icon">🪨</div>
+          <div class="body-name">Алюминий</div>
+          <div class="body-rho">2700 кг/м³</div>
+        </div>
+        <div class="body-btn" onclick="setBody(this,7800)">
+          <div class="body-icon">🔩</div>
+          <div class="body-name">Сталь</div>
+          <div class="body-rho">7800 кг/м³</div>
+        </div>
+        <div class="body-btn" onclick="setBody(this,1025)">
+          <div class="body-icon">🫧</div>
+          <div class="body-name">Пробка</div>
+          <div class="body-rho">120 кг/м³</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIQUIDS -->
+    <div class="card reveal" style="transition-delay:.22s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--accent2)"></div>Жидкость</div>
+      <div class="liquids-grid">
+        <div class="liq-btn active" onclick="setLiquid(this,1000,'water','#0e7490')">
+          <div class="liq-name">💧 Вода</div>
+          <div class="liq-rho">1000 кг/м³</div>
+          <div class="liq-desc">Пресная</div>
+        </div>
+        <div class="liq-btn" onclick="setLiquid(this,1025,'sea','#164e63')">
+          <div class="liq-name">🌊 Море</div>
+          <div class="liq-rho">1025 кг/м³</div>
+          <div class="liq-desc">Солёная вода</div>
+        </div>
+        <div class="liq-btn" onclick="setLiquid(this,1235,'dead','#155e75')">
+          <div class="liq-name">🏔 Мёртвое море</div>
+          <div class="liq-rho">1235 кг/м³</div>
+          <div class="liq-desc">Насыщ. рассол</div>
+        </div>
+        <div class="liq-btn" onclick="setLiquid(this,870,'oil','#78350f')">
+          <div class="liq-name">🛢 Масло</div>
+          <div class="liq-rho">870 кг/м³</div>
+          <div class="liq-desc">Нефтяное масло</div>
+        </div>
+        <div class="liq-btn" onclick="setLiquid(this,13600,'mercury','#374151')">
+          <div class="liq-name">🔘 Ртуть</div>
+          <div class="liq-rho">13600 кг/м³</div>
+          <div class="liq-desc">Жидкий металл</div>
+        </div>
+        <div class="liq-btn" onclick="setLiquid(this,789,'alcohol','#4c1d95')">
+          <div class="liq-name">🍶 Спирт</div>
+          <div class="liq-rho">789 кг/м³</div>
+          <div class="liq-desc">Этанол</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THEORY -->
+    <div class="card reveal" style="transition-delay:.3s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--accent2)"></div>Теория</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">Fа = ρж · g · Vпогр</span>
+            <span class="formula-meaning">сила равна весу вытесненной жидкости</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">ρт &lt; ρж → плывёт</span>
+            <span class="formula-meaning">тело легче жидкости — всплывает</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">ρт = ρж → нейтрально</span>
+            <span class="formula-meaning">нейтральная плавучесть</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">ρт &gt; ρж → тонет</span>
+            <span class="formula-meaning">тело тяжелее жидкости</span>
+          </div>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🛁</span>
+          <p class="fact-text"><strong>Архимед</strong> открыл закон, вскочив из ванны и крикнув «Эврика!» — он искал способ проверить, не разбавлено ли золото короны серебром.</p>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🚢</span>
+          <p class="fact-text">Стальной корабль плавает, потому что его <strong>средняя плотность</strong> (сталь + воздух) меньше плотности воды.</p>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🎈</span>
+          <p class="fact-text">Тот же закон работает в газах: воздушный шар всплывает, потому что горячий воздух легче холодного — Архимед и для воздуха!</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p></footer>
+
+<script>
+const G = 9.81;
+
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let rhoBody = 800;   // kg/m³
+let volume  = 0.5e-3; // m³  (0.5 litre)
+let dipPct  = 50;    // 0–100 % submerged (dip mode)
+let rhoLiq  = 1000;
+let liqColor= '#0e7490';
+let liqName = 'water';
+let mode    = 'dip';
+
+// float animation
+let floatY    = 0;     // current body centre Y offset (pixels, from surface)
+let floatV    = 0;
+let rafId     = null, lastTs = null;
+let animating = false;
+
+const C  = document.getElementById('simCanvas'),  ctx  = C.getContext('2d');
+const GC = document.getElementById('graphCanvas'), gctx = GC.getContext('2d');
+
+/* ══════════════════════════════════
+   CONTROLS
+══════════════════════════════════ */
+document.getElementById('slRhoBody').oninput = function(){
+  rhoBody = +this.value;
+  document.getElementById('rhoBodyVal').innerHTML = rhoBody + ' <small>кг/м³</small>';
+  document.querySelectorAll('.body-btn').forEach(b=>b.classList.remove('active'));
+  onChange();
+};
+document.getElementById('slVol').oninput = function(){
+  volume = +this.value * 1e-3;
+  document.getElementById('volVal').innerHTML = (+this.value).toFixed(2) + ' <small>л</small>';
+  onChange();
+};
+document.getElementById('slDip').oninput = function(){
+  dipPct = +this.value;
+  document.getElementById('dipVal').innerHTML = dipPct + ' <small>%</small>';
+  if(mode==='dip') { repaint(); drawGraph(); updateMeters(); }
+};
+
+function setBody(el, rho){
+  // special case for cork preset (stored as 1025 but actually 120)
+  const actualRho = el.querySelector('.body-rho').textContent.match(/\d+/)[0]*1;
+  rhoBody = actualRho;
+  document.getElementById('slRhoBody').value = Math.min(actualRho, 8000);
+  document.getElementById('rhoBodyVal').innerHTML = actualRho + ' <small>кг/м³</small>';
+  document.querySelectorAll('.body-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  onChange();
+}
+
+function setLiquid(el, rho, name, col){
+  rhoLiq = rho; liqName = name; liqColor = col;
+  document.querySelectorAll('.liq-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  onChange();
+}
+
+function setMode(m, el){
+  mode = m; stopAnim();
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dipRow').style.display = m==='dip' ? '' : 'none';
+  onChange();
+}
+
+function onChange(){
+  if(mode==='float') startFloatAnim();
+  else { repaint(); drawGraph(); updateMeters(); }
+}
+
+/* ══════════════════════════════════
+   PHYSICS
+══════════════════════════════════ */
+function archForce(submergedFraction){
+  return rhoLiq * G * volume * submergedFraction;
+}
+function bodyWeight(){ return rhoBody * G * volume; }
+
+// Equilibrium submersion fraction for floating body
+function eqSubFrac(){
+  if(rhoBody >= rhoLiq) return 1.0; // sinks
+  return rhoBody / rhoLiq;
+}
+
+function floatState(){
+  if(rhoBody < rhoLiq)  return 'float';
+  if(rhoBody === rhoLiq) return 'neutral';
+  return 'sink';
+}
+
+/* ══════════════════════════════════
+   FLOAT ANIMATION (simple spring)
+══════════════════════════════════ */
+function startFloatAnim(){
+  stopAnim();
+  // start body above surface and let it find equilibrium
+  const state = floatState();
+  // floatY = vertical position of body centre, 0 = at liquid surface level
+  // positive = above surface, negative = below
+  floatY = -30; floatV = 0; animating = true; lastTs = null;
+  rafId = requestAnimationFrame(animLoop);
+}
+
+function stopAnim(){
+  animating = false;
+  if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+}
+
+function animLoop(ts){
+  if(!animating) return;
+  if(!lastTs){ lastTs=ts; rafId=requestAnimationFrame(animLoop); return; }
+  const dt = Math.min((ts-lastTs)/1000, 0.04); lastTs=ts;
+
+  // Body half-height in sim pixels (approx)
+  const bodyR = bodyRadius();
+  // submerged fraction based on floatY
+  // floatY=0 means centre at surface → half submerged
+  // floatY = -bodyR → fully out; floatY = +bodyR → fully under
+  const sub = Math.max(0, Math.min(1, (floatY + bodyR) / (2*bodyR)));
+  const Fa  = archForce(sub);
+  const mg  = bodyWeight();
+  const net = Fa - mg; // upward positive
+  const acc = net / (rhoBody * volume); // m/s²
+  // scale: 1 pixel ≈ 0.002 m
+  const pixPerM = 500;
+  floatV += acc * pixPerM * dt;
+  floatV *= 0.97; // damping
+  floatY += floatV * dt;
+
+  // boundaries
+  const maxDown = bodyR * 0.9;
+  if(floatState()==='sink' && floatY > maxDown){ floatY=maxDown; floatV=0; }
+  if(floatY < -bodyR*3){ floatY=-bodyR*3; floatV=0; }
+
+  repaint(); updateMeters();
+  rafId = requestAnimationFrame(animLoop);
+}
+
+function bodyRadius(){
+  // visual radius proportional to cube root of volume
+  return Math.cbrt(volume * 1e6) * 14 + 10;
+}
+
+/* ══════════════════════════════════
+   RENDER
+══════════════════════════════════ */
+function repaint(){
+  const W=C.width, H=C.height;
+  if(!W) return;
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#020810'); bg.addColorStop(1,'#030f1c');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  if(mode==='compare') paintCompare(W,H);
+  else if(mode==='float') paintFloat(W,H);
+  else paintDip(W,H);
+}
+
+/* ── DIP MODE ── */
+function paintDip(W,H){
+  const liquidTop = H * 0.32;
+  const liquidH   = H * 0.55;
+  const cx = W/2;
+
+  paintLiquid(ctx, 0, liquidTop, W, liquidH, liqColor, liqName, rhoLiq);
+
+  // body size
+  const bR = bodyRadius() * 1.6;
+  const bH = bR * 2;
+
+  // position: dipPct controls how far down the body is
+  const dipFrac = dipPct / 100;
+  // body top = liquidTop - bH*(1-dipFrac)
+  const bodyTop = liquidTop - bH*(1-dipFrac);
+  const bodyCy  = bodyTop + bR;
+
+  // submerged rect highlight
+  if(dipPct > 0){
+    const subTop = Math.max(liquidTop, bodyTop);
+    const subH   = Math.min(bH * dipFrac, bH - (subTop - bodyTop));
+    const hl = ctx.createLinearGradient(0,subTop,0,subTop+subH);
+    hl.addColorStop(0,'rgba(56,189,248,0.08)');
+    hl.addColorStop(1,'rgba(56,189,248,0.18)');
+    ctx.fillStyle=hl;
+    ctx.beginPath();
+    ctx.roundRect(cx-bR*0.95, subTop, bR*1.9, Math.max(0,subH), 8);
+    ctx.fill();
+  }
+
+  // body
+  paintBody(ctx, cx, bodyCy, bR, rhoBody, rhoLiq);
+
+  // displaced volume wedge
+  if(dipPct>0){
+    const dV = volume * dipFrac;
+    const dVlabel = (dV*1e3).toFixed(3)+' л';
+    ctx.fillStyle='rgba(56,189,248,0.35)'; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('Vвыт = '+dVlabel, 16, liquidTop+18);
+  }
+
+  // Force arrows
+  const sub = dipPct/100;
+  const Fa  = archForce(sub);
+  const mg  = bodyWeight();
+  const arrowScale = 2.2;
+
+  // Archimedes force (up)
+  const faLen = Math.min(Fa*arrowScale, 110);
+  if(Fa > 0.05) paintArrow(ctx, cx+bR+22, bodyCy, cx+bR+22, bodyCy-faLen, '#38bdf8', 2.5, 'Fа='+Fa.toFixed(1)+'Н');
+  // Weight (down)
+  const mgLen = Math.min(mg*arrowScale, 110);
+  paintArrow(ctx, cx-bR-22, bodyCy, cx-bR-22, bodyCy+mgLen, '#f472b6', 2.5, 'mg='+mg.toFixed(1)+'Н');
+
+  // balance indicator
+  const diff = Fa - mg;
+  const balCol = Math.abs(diff)<0.01?'#34d399':diff>0?'#38bdf8':'#f472b6';
+  const balText = Math.abs(diff)<0.3?'⚖ Равновесие':diff>0?'↑ Всплывает':'↓ Тонет';
+  ctx.fillStyle=balCol; ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(balText, cx, liquidTop - 22);
+
+  // rho labels
+  ctx.fillStyle='rgba(148,163,184,0.55)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('ρт = '+rhoBody+' кг/м³', 14, H-28);
+  ctx.textAlign='right';
+  ctx.fillText('ρж = '+rhoLiq+' кг/м³', W-14, H-28);
+
+  updateMeters();
+}
+
+/* ── FLOAT MODE ── */
+function paintFloat(W,H){
+  const surfaceY = H * 0.48;
+  const liquidH  = H * 0.45;
+  paintLiquid(ctx, 0, surfaceY, W, liquidH, liqColor, liqName, rhoLiq);
+
+  const cx = W/2;
+  const bR = bodyRadius() * 1.7;
+  const bodyCy = surfaceY + floatY;
+
+  // submerged highlight
+  if(bodyCy + bR > surfaceY){
+    const subTop = Math.max(surfaceY, bodyCy - bR);
+    const subBot = Math.min(surfaceY + liquidH, bodyCy + bR);
+    ctx.fillStyle='rgba(56,189,248,0.1)';
+    ctx.beginPath(); ctx.arc(cx, bodyCy, bR, 0, Math.PI*2); ctx.fill();
+  }
+
+  // compute actual submerged fraction from floatY
+  const sub = Math.max(0, Math.min(1, (floatY + bR)/(2*bR)));
+  const Fa  = archForce(sub);
+  const mg  = bodyWeight();
+
+  paintBody(ctx, cx, bodyCy, bR, rhoBody, rhoLiq);
+
+  // arrows
+  const sc2 = 2.0;
+  const faLen = Math.min(Fa*sc2, 100);
+  const mgLen = Math.min(mg*sc2, 100);
+  if(Fa>0.05) paintArrow(ctx, cx+bR+20, bodyCy, cx+bR+20, bodyCy-faLen, '#38bdf8', 2.5, 'Fа');
+  paintArrow(ctx, cx-bR-20, bodyCy, cx-bR-20, bodyCy+mgLen, '#f472b6', 2.5, 'mg');
+
+  // state banner
+  const state = floatState();
+  const sc=state==='float'?'#34d399':state==='neutral'?'#38bdf8':'#f472b6';
+  const st=state==='float'?'🌊 Плавает — ρт < ρж':state==='neutral'?'⚖ Нейтральная плавучесть':'⬇ Тонет — ρт > ρж';
+  ctx.fillStyle=sc; ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(st, cx, surfaceY - 24);
+
+  // eq submersion for floating
+  if(state==='float'){
+    const eqFrac = eqSubFrac();
+    ctx.fillStyle='rgba(52,211,153,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('В равновесии: '+Math.round(eqFrac*100)+'% под водой', cx, surfaceY - 8);
+  }
+
+  ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('ρт = '+rhoBody+' · ρж = '+rhoLiq, 14, H-20);
+
+  updateMeters(sub);
+}
+
+/* ── COMPARE MODE ── */
+function paintCompare(W,H){
+  const liquids=[
+    {name:'Вода',    rho:1000, col:'#0e7490'},
+    {name:'Мёртвое море', rho:1235, col:'#155e75'},
+    {name:'Ртуть',   rho:13600, col:'#374151'},
+  ];
+  const cols = liquids.length;
+  const cw = W / cols;
+  const liqTop = H*0.38, liqH = H*0.45;
+  const bR = bodyRadius() * 1.2;
+
+  liquids.forEach((liq,i)=>{
+    const cx = cw*i + cw/2;
+    // mini tank
+    paintLiquid(ctx, cw*i+8, liqTop, cw-16, liqH, liq.col, liq.name, liq.rho);
+
+    // body position in this liquid
+    const state = rhoBody < liq.rho ? 'float' : rhoBody===liq.rho ? 'neutral' : 'sink';
+    let bodyCy;
+    if(state==='float'){
+      const subFrac = rhoBody/liq.rho;
+      bodyCy = liqTop + bR*(2*subFrac-1)*0.5;
+    } else if(state==='sink'){
+      bodyCy = liqTop + liqH - bR - 8;
+    } else {
+      bodyCy = liqTop + liqH/2;
+    }
+
+    paintBody(ctx, cx, bodyCy, bR, rhoBody, liq.rho);
+
+    const Fa = rhoLiq===liq.rho ? archForce(1) : liq.rho*G*volume*Math.min(1,rhoBody/liq.rho + (state==='sink'?1-rhoBody/liq.rho:0));
+    const stateCol = state==='float'?'#34d399':state==='neutral'?'#38bdf8':'#f472b6';
+    const stateStr = state==='float'?'Плывёт':state==='neutral'?'Нейтр.':'Тонет';
+
+    ctx.fillStyle=stateCol; ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(stateStr, cx, liqTop-14);
+
+    ctx.fillStyle='rgba(148,163,184,0.5)'; ctx.font='10px Raleway,sans-serif';
+    ctx.fillText(liq.name, cx, H-34);
+    ctx.fillText('ρж='+liq.rho+' кг/м³', cx, H-20);
+
+    if(i<cols-1){
+      ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1; ctx.setLineDash([4,6]);
+      ctx.beginPath(); ctx.moveTo(cw*(i+1),20); ctx.lineTo(cw*(i+1),H-20); ctx.stroke(); ctx.setLineDash([]);
+    }
+  });
+
+  ctx.fillStyle='rgba(148,163,184,0.45)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Тело: ρт = '+rhoBody+' кг/м³', W/2, 20);
+  updateMeters();
+}
+
+/* ── SHARED PAINTERS ── */
+function paintLiquid(ctx, x, y, w, h, col, name, rho){
+  // liquid body
+  const lg = ctx.createLinearGradient(x,y,x,y+h);
+  const hex = col.replace('#','');
+  const r=parseInt(hex.slice(0,2)||'0e',16), gr=parseInt(hex.slice(2,4)||'74',16), b=parseInt(hex.slice(4,6)||'90',16);
+  lg.addColorStop(0,`rgba(${r},${gr},${b},0.55)`);
+  lg.addColorStop(1,`rgba(${r},${gr},${b},0.35)`);
+  ctx.fillStyle=lg; ctx.fillRect(x,y,w,h);
+
+  // surface line with shimmer
+  ctx.strokeStyle=`rgba(${r+60},${gr+60},${b+60},0.6)`; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w,y); ctx.stroke();
+
+  // subtle wave ripples on surface
+  ctx.strokeStyle=`rgba(${r+80},${gr+80},${b+80},0.2)`; ctx.lineWidth=1;
+  for(let wx=x;wx<x+w;wx+=32){
+    ctx.beginPath(); ctx.moveTo(wx,y+4);
+    ctx.quadraticCurveTo(wx+8,y+1,wx+16,y+4); ctx.stroke();
+  }
+
+  // wall borders
+  ctx.strokeStyle=`rgba(${r},${gr},${b},0.5)`; ctx.lineWidth=1.5;
+  ctx.strokeRect(x, y, w, h);
+
+  // grid lines inside
+  for(let gy=y+40;gy<y+h;gy+=40){
+    ctx.strokeStyle=`rgba(${r},${gr},${b},0.2)`; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x+4,gy); ctx.lineTo(x+w-4,gy); ctx.stroke();
+  }
+}
+
+function paintBody(ctx, cx, cy, r, rhoT, rhoL){
+  // colour by density ratio
+  const ratio = rhoT / rhoL;
+  let col;
+  if(ratio < 0.5)       col = '#34d399';  // very light — green
+  else if(ratio < 0.95) col = '#38bdf8';  // floats — blue
+  else if(ratio < 1.05) col = '#a78bfa';  // neutral — purple
+  else if(ratio < 3)    col = '#fbbf24';  // heavy — gold
+  else                  col = '#f472b6';  // very heavy — pink
+
+  // glow
+  ctx.shadowColor=col; ctx.shadowBlur=16;
+  const g=ctx.createRadialGradient(cx-r*0.3,cy-r*0.3,r*0.1,cx,cy,r);
+  g.addColorStop(0,'rgba(255,255,255,0.5)'); g.addColorStop(0.4,col+'cc'); g.addColorStop(1,col+'44');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+
+  // density label
+  ctx.fillStyle='rgba(255,255,255,0.8)'; ctx.font=`bold ${Math.max(9,Math.min(12,r*0.35))}px Raleway,sans-serif`; ctx.textAlign='center';
+  ctx.fillText(rhoT+' кг/м³', cx, cy+4);
+}
+
+function paintArrow(ctx,x1,y1,x2,y2,col,lw,lbl){
+  ctx.strokeStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.save(); ctx.translate(x2,y2); ctx.rotate(a);
+  ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(10,0); ctx.lineTo(0,4); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  if(lbl){
+    ctx.fillStyle=col; ctx.font='bold 10px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(lbl,(x1+x2)/2+14,(y1+y2)/2);
+  }
+}
+
+/* ══════════════════════════════════
+   METERS + STATUS
+══════════════════════════════════ */
+function updateMeters(subFrac){
+  let sub = subFrac;
+  if(sub === undefined){
+    if(mode==='dip') sub = dipPct/100;
+    else if(mode==='float') sub = Math.max(0,Math.min(1,(floatY+bodyRadius()*1.7)/(bodyRadius()*3.4)));
+    else sub = floatState()==='sink'?1:eqSubFrac();
+  }
+  const Fa = archForce(sub);
+  const mg = bodyWeight();
+  const pct= Math.round(sub*100);
+  document.getElementById('mFa').textContent = Fa.toFixed(2);
+  document.getElementById('mMg').textContent = mg.toFixed(2);
+  document.getElementById('mDip').textContent= pct;
+
+  const state = floatState();
+  const stateEl = document.getElementById('mState');
+  if(Math.abs(Fa-mg) < mg*0.03 || state==='neutral'){
+    stateEl.textContent='⚖ Равн.'; stateEl.style.color='var(--green)';
+    setStatus('s-neutral','Нейтрально');
+  } else if(Fa > mg){
+    stateEl.textContent='↑ Всплыв.'; stateEl.style.color='var(--accent)';
+    setStatus('s-float','Всплывает');
+  } else {
+    stateEl.textContent='↓ Тонет'; stateEl.style.color='var(--accent3)';
+    setStatus('s-sink','Тонет');
+  }
+}
+
+function setStatus(cls,text){
+  const b=document.getElementById('statusBadge');
+  b.className='status-badge '+cls; b.textContent=text;
+}
+
+/* ══════════════════════════════════
+   GRAPH — Fa(V)
+══════════════════════════════════ */
+function drawGraph(){
+  const W=GC.width, H=GC.height;
+  if(!W) return;
+  gctx.clearRect(0,0,W,H);
+  gctx.fillStyle='#030810'; gctx.fillRect(0,0,W,H);
+
+  const pL=48,pR=14,pT=10,pB=22, gW=W-pL-pR, gH=H-pT-pB;
+  const Vmax = volume * 1.5;
+  const FaMax = rhoLiq * G * Vmax * 1.05;
+  const mg = bodyWeight();
+
+  // grid
+  for(let i=0;i<=4;i++){
+    gctx.strokeStyle='rgba(255,255,255,0.04)'; gctx.lineWidth=1;
+    gctx.beginPath(); gctx.moveTo(pL,pT+i*gH/4); gctx.lineTo(W-pR,pT+i*gH/4); gctx.stroke();
+  }
+
+  // Fa(V) line — blue
+  gctx.strokeStyle='#38bdf8'; gctx.lineWidth=2.5; gctx.beginPath();
+  for(let px=0;px<=gW;px+=2){
+    const V=Vmax*px/gW, Fa=rhoLiq*G*V;
+    const gx=pL+px, gy=pT+gH*(1-Fa/FaMax);
+    px===0?gctx.moveTo(gx,gy):gctx.lineTo(gx,gy);
+  }
+  gctx.stroke();
+
+  // mg horizontal line — pink
+  const mgY = pT + gH*(1 - mg/FaMax);
+  if(mgY>=pT && mgY<=pT+gH){
+    gctx.strokeStyle='#f472b6'; gctx.lineWidth=1.5; gctx.setLineDash([5,5]);
+    gctx.beginPath(); gctx.moveTo(pL,mgY); gctx.lineTo(W-pR,mgY); gctx.stroke();
+    gctx.setLineDash([]);
+    gctx.fillStyle='#f472b6'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='right';
+    gctx.fillText('mg='+mg.toFixed(1)+'Н', W-pR-2, mgY-3);
+  }
+
+  // intersection — equilibrium volume
+  const Veq = mg/(rhoLiq*G);
+  if(Veq<=Vmax){
+    const eqX=pL+gW*(Veq/Vmax), eqY=pT+gH*(1-mg/FaMax);
+    gctx.fillStyle='#34d399'; gctx.beginPath(); gctx.arc(eqX,eqY,5,0,Math.PI*2); gctx.fill();
+    gctx.strokeStyle='rgba(52,211,153,0.3)'; gctx.lineWidth=1; gctx.setLineDash([2,4]);
+    gctx.beginPath(); gctx.moveTo(eqX,pT); gctx.lineTo(eqX,pT+gH); gctx.stroke(); gctx.setLineDash([]);
+    gctx.fillStyle='#34d399'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='center';
+    gctx.fillText('Veq='+(Veq*1e3).toFixed(2)+'л',eqX,pT+10);
+  }
+
+  // current V marker
+  const sub = mode==='dip'?dipPct/100:Math.min(1,eqSubFrac());
+  const curV = volume*sub;
+  const mx=pL+gW*(curV/Vmax);
+  if(curV>0){
+    gctx.strokeStyle='rgba(255,255,255,0.15)'; gctx.lineWidth=1; gctx.setLineDash([2,4]);
+    gctx.beginPath(); gctx.moveTo(mx,pT); gctx.lineTo(mx,pT+gH); gctx.stroke(); gctx.setLineDash([]);
+    const curFa=rhoLiq*G*curV;
+    const dotY=pT+gH*(1-curFa/FaMax);
+    gctx.fillStyle='#38bdf8'; gctx.beginPath(); gctx.arc(mx,dotY,4,0,Math.PI*2); gctx.fill();
+  }
+
+  // axes & labels
+  gctx.strokeStyle='rgba(255,255,255,0.18)'; gctx.lineWidth=1;
+  gctx.beginPath(); gctx.moveTo(pL,pT); gctx.lineTo(pL,pT+gH); gctx.lineTo(W-pR,pT+gH); gctx.stroke();
+  gctx.fillStyle='rgba(148,163,184,0.5)'; gctx.font='9px Raleway,sans-serif';
+  gctx.textAlign='center'; gctx.fillText('Vпогр, л →',pL+gW/2,H-4);
+  gctx.textAlign='right';  gctx.fillText(FaMax.toFixed(0)+'Н',pL-2,pT+8);
+  gctx.fillStyle='#38bdf8'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='left';
+  gctx.fillText('Fа(V)',pL+4,pT+10);
+  gctx.fillStyle='#f472b6'; gctx.fillText('mg',pL+44,pT+10);
+  gctx.fillStyle='#34d399'; gctx.fillText('Veq',pL+72,pT+10);
+}
+
+/* ══════════════════════════════════
+   RESIZE + BOOT
+══════════════════════════════════ */
+function resize(){
+  const w=C.parentElement?.offsetWidth||600; C.width=w>0?w:600;
+  const gw=GC.parentElement?.offsetWidth||600; GC.width=gw>0?gw:600;
+}
+const _ro=new ResizeObserver(()=>{ resize(); repaint(); drawGraph(); });
+_ro.observe(C.parentElement);
+window.addEventListener('resize',()=>{ resize(); repaint(); drawGraph(); });
+requestAnimationFrame(()=>{ resize(); repaint(); drawGraph(); updateMeters(); });
+
+const _rev=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>_rev.observe(el));
+</script>
+</body>
+</html>

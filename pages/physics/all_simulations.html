@@ -283,32 +283,28 @@
   </div>
 </section>
 
-<footer>
-  <p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p>
-</footer>
-
 <script>
 /* ─── DATA ─── */
 const grades = [
   {
     id: 'grid7', tag: '7 класс', color: '#38bdf8', color2: '#0ea5e9',
     sims: [
-      { name: 'Равномерное движение',    draw: drawMotion,     url: null },
-      { name: 'Сложение скоростей',      draw: drawVectors,    url: null },
+      { name: 'Равномерное движение',    draw: drawMotion,     url: 'simulations/seven_grade/Motion.html' },
+      { name: 'Сложение скоростей',      draw: drawVectors,    url: 'simulations/seven_grade/Velocity_addition.html' },
       { name: 'Инерция',                 draw: drawInertia,    url: null },
-      { name: 'Свободное падение',       draw: drawFall,       url: 'simulations/free_fall.html' },
-      { name: 'Закон Гука',              draw: drawSpring,     url: null },
-      { name: 'Сила трения',             draw: drawFriction,   url: null },
+      { name: 'Свободное падение',       draw: drawFall,       url: 'simulations/seven_grade/Free_fall.html' },
+      { name: 'Закон Гука',              draw: drawSpring,     url: 'simulations/seven_grade/Hooke.html' },
+      { name: 'Сила трения',             draw: drawFriction,   url: 'simulations/seven_grade/Friction.html' },
       { name: 'Равнодействующая сил',    draw: drawResultant,  url: null },
       { name: 'Давление в жидкостях',    draw: drawPressure,   url: null },
-      { name: 'Архимедова сила',         draw: drawArchimedes, url: null },
+      { name: 'Архимедова сила',         draw: drawArchimedes, url: 'simulations/seven_grade/Archimedes.html' },
       { name: 'Рычаг и блок',            draw: drawLever,      url: null },
     ]
   },
   {
     id: 'grid8', tag: '8 класс', color: '#818cf8', color2: '#6366f1',
     sims: [
-      { name: 'Диффузия',                draw: drawDiffusion,  url: null },
+      { name: 'Диффузия',                draw: drawDiffusion,  url: 'simulations/eight_grade/Diffusion.html' },
       { name: 'Агрегатные состояния',    draw: drawStates,     url: null },
       { name: 'График нагревания',       draw: drawHeating,    url: null },
       { name: 'Конвекция и теплообмен',  draw: drawConvection, url: null },

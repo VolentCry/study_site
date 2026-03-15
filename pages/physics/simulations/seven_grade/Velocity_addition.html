@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сложение скоростей — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#050c1a;--bg2:#071222;--accent:#38bdf8;--accent2:#818cf8;--accent3:#f472b6;--gold:#fbbf24;--green:#34d399;--text:#e2e8f0;--text2:#94a3b8;--card-bg:rgba(14,28,54,.85);--border:rgba(56,189,248,.2)}
+html{scroll-behavior:smooth}body{font-family:'Raleway',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(5,12,26,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+.nav-links{display:flex;gap:32px;align-items:center}.nav-links a{font-size:14px;font-weight:600;color:var(--text2);text-decoration:none;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}.nav-links a:hover{color:var(--accent)}
+.nav-back{border:1px solid var(--border);border-radius:30px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;letter-spacing:.04em;text-transform:uppercase;transition:color .2s}.nav-back:hover{color:var(--accent);border-color:rgba(56,189,248,.4)}
+#page-top{padding:96px 24px 0;text-align:center;position:relative;overflow:hidden}
+#page-top::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(56,189,248,.08) 0%,transparent 70%);pointer-events:none}
+.breadcrumb{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text2);margin-bottom:14px;opacity:0;animation:fadeUp .6s .1s forwards}.breadcrumb span{color:var(--accent)}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(34px,5vw,64px);font-weight:900;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%,var(--green) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0;animation:fadeUp .7s .2s forwards}
+.page-sub{font-size:16px;font-weight:300;color:var(--text2);line-height:1.7;max-width:600px;margin:14px auto 0;opacity:0;animation:fadeUp .7s .35s forwards}
+.tags-row{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;opacity:0;animation:fadeUp .7s .45s forwards}
+.tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px}
+.tag-blue{background:rgba(56,189,248,.12);color:var(--accent);border:1px solid rgba(56,189,248,.2)}.tag-gold{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}.tag-green{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}.tag-purple{background:rgba(129,140,248,.1);color:var(--accent2);border:1px solid rgba(129,140,248,.2)}
+#main{max-width:1280px;margin:48px auto 0;padding:0 24px 80px;display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
+@media(max-width:1024px){#main{grid-template-columns:1fr}}
+.canvas-panel{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;overflow:hidden}
+.canvas-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.canvas-title{font-size:15px;font-weight:700}.status-badge{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:20px}
+.s-ready{background:rgba(56,189,248,.12);color:var(--accent)}.s-run{background:rgba(251,191,36,.12);color:var(--gold)}
+.mode-tabs{display:flex;border-bottom:1px solid var(--border)}.mode-tab{flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}.mode-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+#simCanvas{display:block;width:100%;background:#030810;cursor:default}
+.graph-wrap{background:#030810;border-top:1px solid var(--border);padding:14px 18px 12px}.graph-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}#graphCanvas{display:block;width:100%}
+.meters-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border-top:1px solid var(--border);background:var(--border)}.meter{background:var(--bg2);padding:14px 16px;text-align:center}.meter-label{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text2)}.meter-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-top:4px;line-height:1}.meter-unit{font-size:10px;color:var(--text2);margin-top:2px}
+.side-panel{display:flex;flex-direction:column;gap:20px}.card{background:var(--card-bg);border:1px solid var(--border);border-radius:20px;overflow:hidden}.card-head{padding:16px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:8px}.card-head-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}.card-body{padding:20px;display:flex;flex-direction:column;gap:18px}
+.ctrl-row{display:flex;flex-direction:column;gap:8px}.ctrl-label-row{display:flex;justify-content:space-between;align-items:baseline}.ctrl-name{font-size:13px;font-weight:600;color:var(--text)}.ctrl-val-box{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--accent)}.ctrl-val-box small{font-family:'Raleway',sans-serif;font-size:11px;color:var(--text2);font-weight:400}.ctrl-desc{font-size:11px;color:var(--text2);line-height:1.5}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:rgba(56,189,248,.15);outline:none;cursor:pointer}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px rgba(56,189,248,.4);transition:transform .15s}input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
+.btn-row{display:flex;gap:10px}.btn-sim{flex:1;padding:12px 8px;border-radius:12px;font-family:'Raleway',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border:none}.btn-start{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 0 24px rgba(56,189,248,.2)}.btn-start:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(56,189,248,.4)}.btn-start:disabled{opacity:.35;cursor:not-allowed;transform:none}.btn-reset{background:transparent;color:var(--text2);border:1px solid rgba(148,163,184,.2)}.btn-reset:hover{border-color:var(--accent);color:var(--accent)}
+.formula-block{background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.12);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}.formula-row{display:flex;justify-content:space-between;align-items:center;gap:12px}.formula-expr{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--accent);white-space:nowrap}.formula-meaning{font-size:12px;color:var(--text2);text-align:right;line-height:1.4}.formula-divider{height:1px;background:rgba(56,189,248,.12)}
+.fact{display:flex;gap:12px;align-items:flex-start}.fact-icon{font-size:18px;flex-shrink:0;margin-top:2px}.fact-text{font-size:13px;color:var(--text2);line-height:1.6}.fact-text strong{color:var(--text)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}.reveal.visible{opacity:1;transform:translateY(0)}
+footer{padding:36px 24px;border-top:1px solid var(--border);text-align:center;color:var(--text2);font-size:14px}footer span{color:var(--accent)}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="index.html#classes">Классы</a>
+  </div>
+</nav>
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>7 класс</span> · Кинематика</p>
+  <h1 class="page-title">Сложение скоростей</h1>
+  <p class="page-sub">Скорости складываются как векторы — по правилу параллелограмма. Лодка в реке, самолёт в ветер: результирующая скорость зависит от модулей и угла между ними.</p>
+  <div class="tags-row">
+    <span class="tag tag-blue">7 класс</span>
+    <span class="tag tag-gold">v⃗ = v⃗₁ + v⃗₂</span>
+    <span class="tag tag-green">Параллелограмм</span>
+    <span class="tag tag-purple">Снос</span>
+  </div>
+</div>
+<div id="main">
+  <div>
+    <div class="canvas-panel reveal">
+      <div class="canvas-header">
+        <span class="canvas-title">Симуляция</span>
+        <span class="status-badge s-ready" id="statusBadge">Готово</span>
+      </div>
+      <div class="mode-tabs">
+        <div class="mode-tab active" onclick="setMode('river',this)">Лодка в реке</div>
+        <div class="mode-tab" onclick="setMode('plane',this)">Самолёт</div>
+        <div class="mode-tab" onclick="setMode('vectors',this)">Векторы</div>
+      </div>
+      <canvas id="simCanvas" height="420"></canvas>
+      <div class="graph-wrap">
+        <div class="graph-title">|v|(φ) — модуль результирующей от угла · Траектория</div>
+        <canvas id="graphCanvas" height="110"></canvas>
+      </div>
+      <div class="meters-row">
+        <div class="meter"><div class="meter-label">|v₁|</div><div class="meter-val" style="color:var(--accent)" id="mV1">6</div><div class="meter-unit">м/с</div></div>
+        <div class="meter"><div class="meter-label">|v₂|</div><div class="meter-val" style="color:var(--gold)" id="mV2">4</div><div class="meter-unit">м/с</div></div>
+        <div class="meter"><div class="meter-label">|v_рез|</div><div class="meter-val" style="color:var(--green)" id="mVr">7.21</div><div class="meter-unit">м/с</div></div>
+        <div class="meter"><div class="meter-label">Снос α</div><div class="meter-val" style="color:var(--accent2)" id="mAlpha">33.7</div><div class="meter-unit">°</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="side-panel">
+    <div class="card reveal" style="transition-delay:.1s">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row"><span class="ctrl-name" id="v1label">Скорость лодки v₁</span><span class="ctrl-val-box" id="v1Val">6 <small>м/с</small></span></div>
+          <input type="range" id="slV1" min="1" max="20" value="6" step="0.5">
+          <span class="ctrl-desc" id="v1desc">Собственная скорость лодки поперёк реки.</span>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-label-row"><span class="ctrl-name" id="v2label">Скорость течения v₂</span><span class="ctrl-val-box" id="v2Val">4 <small>м/с</small></span></div>
+          <input type="range" id="slV2" min="0" max="20" value="4" step="0.5">
+          <span class="ctrl-desc" id="v2desc">Скорость течения вдоль берега.</span>
+        </div>
+        <div class="ctrl-row" id="angleRow" style="display:none">
+          <div class="ctrl-label-row"><span class="ctrl-name">Угол ветра φ</span><span class="ctrl-val-box" id="angVal">60 <small>°</small></span></div>
+          <input type="range" id="slAng" min="0" max="360" value="60" step="5">
+          <span class="ctrl-desc">Направление ветра относительно курса самолёта.</span>
+        </div>
+        <div class="ctrl-row" id="angVecRow" style="display:none">
+          <div class="ctrl-label-row"><span class="ctrl-name">Угол между v₁ и v₂</span><span class="ctrl-val-box" id="angVecVal">90 <small>°</small></span></div>
+          <input type="range" id="slAngVec" min="0" max="360" value="90" step="5">
+          <span class="ctrl-desc">Меняй угол и смотри на изменение результирующей.</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sim btn-start" id="btnStart" onclick="startSim()">▶ Запустить</button>
+          <button class="btn-sim btn-reset" onclick="resetSim()">↺ Сброс</button>
+        </div>
+      </div>
+    </div>
+    <div class="card reveal" style="transition-delay:.18s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--accent2)"></div>Теория</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row"><span class="formula-expr">v⃗ = v⃗₁ + v⃗₂</span><span class="formula-meaning">результирующая — векторная сумма</span></div>
+          <div class="formula-divider"></div>
+          <div class="formula-row"><span class="formula-expr">|v| = √(v₁²+v₂²)</span><span class="formula-meaning">при перпендикулярных скоростях</span></div>
+          <div class="formula-divider"></div>
+          <div class="formula-row"><span class="formula-expr">tg α = v₂/v₁</span><span class="formula-meaning">угол сноса в реке</span></div>
+          <div class="formula-divider"></div>
+          <div class="formula-row"><span class="formula-expr">|v|² = v₁²+v₂²+2v₁v₂cosφ</span><span class="formula-meaning">общий случай: теорема косинусов</span></div>
+        </div>
+        <div class="fact"><span class="fact-icon">🚤</span><p class="fact-text">Чтобы лодка доплыла точно напротив — нужно направить её <strong>вверх по течению</strong> на угол arcsin(v₂/v₁). Только если v₁ > v₂.</p></div>
+        <div class="fact"><span class="fact-icon">✈️</span><p class="fact-text">Навигационные системы постоянно вычисляют угол сноса — без этого самолёт <strong>уносит в сторону</strong> даже при небольшом ветре.</p></div>
+        <div class="fact"><span class="fact-icon">⚽</span><p class="fact-text">Удар по мячу при движении — типичное сложение скоростей. Голкипер учитывает <strong>суммарный вектор</strong>, а не просто направление удара.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p></footer>
+<script>
+const C=document.getElementById('simCanvas'),ctx=C.getContext('2d');
+const GC=document.getElementById('graphCanvas'),gctx=GC.getContext('2d');
+
+let mode='river', v1=6, v2=4, angPlane=60, angVec=90;
+let running=false, rafId=null, lastTs=null;
+let objX=0, objY=0, trail=[], animTime=0;
+
+/* ── Controls ── */
+document.getElementById('slV1').oninput=e=>{v1=+e.target.value;document.getElementById('v1Val').innerHTML=v1+' <small>м/с</small>';calc();if(!running)repaint();drawGraph();};
+document.getElementById('slV2').oninput=e=>{v2=+e.target.value;document.getElementById('v2Val').innerHTML=v2+' <small>м/с</small>';calc();if(!running)repaint();drawGraph();};
+document.getElementById('slAng').oninput=e=>{angPlane=+e.target.value;document.getElementById('angVal').innerHTML=e.target.value+' <small>°</small>';calc();if(!running)repaint();drawGraph();};
+document.getElementById('slAngVec').oninput=e=>{angVec=+e.target.value;document.getElementById('angVecVal').innerHTML=e.target.value+' <small>°</small>';calc();if(!running)repaint();drawGraph();};
+
+function setMode(m,el){
+  mode=m; stopSim(); trail=[];
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+  document.getElementById('angleRow').style.display=m==='plane'?'':'none';
+  document.getElementById('angVecRow').style.display=m==='vectors'?'':'none';
+  const L={river:['Скорость лодки v₁','Скорость течения v₂'],plane:['Скорость самолёта v₁','Скорость ветра v₂'],vectors:['Вектор v₁','Вектор v₂']};
+  document.getElementById('v1label').textContent=L[m][0];
+  document.getElementById('v2label').textContent=L[m][1];
+  initObj(); calc(); repaint(); drawGraph();
+}
+
+function initObj(){
+  const W=C.width, H=C.height;
+  objX=W*0.08; objY=mode==='river'?H*0.78:H*0.5;
+  trail=[]; animTime=0;
+}
+
+/* ── Sim ── */
+function startSim(){
+  if(running)return; if(!trail.length)initObj();
+  running=true; lastTs=null;
+  document.getElementById('btnStart').disabled=true;
+  setStatus('s-run','Движение');
+  rafId=requestAnimationFrame(loop);
+}
+function stopSim(){running=false;if(rafId){cancelAnimationFrame(rafId);rafId=null;}document.getElementById('btnStart').disabled=false;}
+function resetSim(){stopSim();initObj();setStatus('s-ready','Готово');repaint();drawGraph();calc();}
+
+function loop(ts){
+  if(!running)return;
+  if(!lastTs){lastTs=ts;rafId=requestAnimationFrame(loop);return;}
+  const dt=Math.min((ts-lastTs)/1000,.04);lastTs=ts; animTime+=dt;
+  const SC=C.width/130;
+  if(mode==='river'){
+    objY-=v1*dt*SC;
+    objX+=v2*dt*SC;
+  } else if(mode==='plane'){
+    const ar=angPlane*Math.PI/180;
+    objX+=v1*dt*SC;
+    objX+=v2*Math.cos(ar)*dt*SC;
+    objY+=v2*Math.sin(ar)*dt*SC;
+  }
+  trail.push({x:objX,y:objY});
+  if(trail.length>500)trail.shift();
+  const W=C.width,H=C.height;
+  if(objX>W+60||objY<-60||objY>H+60){stopSim();setStatus('s-ready','Финиш!');}
+  repaint(); drawGraph(); calc();
+  if(running)rafId=requestAnimationFrame(loop);
+}
+
+/* ── Render ── */
+function repaint(){
+  const W=C.width,H=C.height; if(!W)return;
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#020810'); bg.addColorStop(1,'#030f1c');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  if(mode==='river')paintRiver(W,H);
+  else if(mode==='plane')paintPlane(W,H);
+  else paintVectors(W,H);
+}
+
+function paintRiver(W,H){
+  const rT=H*.2,rB=H*.8;
+  // Banks
+  ctx.fillStyle='rgba(180,150,70,.15)'; ctx.fillRect(0,0,W,rT); ctx.fillRect(0,rB,W,H-rB);
+  // River
+  const rg=ctx.createLinearGradient(0,rT,0,rB);
+  rg.addColorStop(0,'rgba(14,116,144,.45)'); rg.addColorStop(0.5,'rgba(7,80,110,.35)'); rg.addColorStop(1,'rgba(14,116,144,.45)');
+  ctx.fillStyle=rg; ctx.fillRect(0,rT,W,rB-rT);
+  // Shore lines
+  ctx.strokeStyle='rgba(56,189,248,.5)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,rT); ctx.lineTo(W,rT); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,rB); ctx.lineTo(W,rB); ctx.stroke();
+  // Current arrows
+  for(let x=40;x<W-20;x+=80){
+    const y=(rT+rB)/2;
+    arrow(ctx,x,y,x+40,y,'rgba(56,189,248,.22)',1.5,'');
+    arrow(ctx,x,y-60,x+40,y-60,'rgba(56,189,248,.12)',1,'');
+    arrow(ctx,x,y+60,x+40,y+60,'rgba(56,189,248,.12)',1,'');
+  }
+  // Wave ripples
+  for(let y=rT+20;y<rB-10;y+=28){
+    ctx.strokeStyle='rgba(56,189,248,.06)'; ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let x=0;x<W;x+=4) ctx.lineTo(x,y+Math.sin(x*.04)*3);
+    ctx.stroke();
+  }
+  // Start/end markers
+  const sx=W*.08;
+  ctx.setLineDash([4,6]); ctx.strokeStyle='rgba(52,211,153,.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(sx,rT); ctx.lineTo(sx,rB); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(52,211,153,.6)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('цель',sx,rT-6);
+  // Labels
+  ctx.fillStyle='rgba(56,189,248,.6)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='right';
+  ctx.fillText('v₂='+v2+' м/с (течение →)',W-10,(rT+rB)/2-10);
+  ctx.fillStyle='rgba(148,163,184,.5)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('Ширина реки',8,(rT+rB)/2+4);
+  // Trail
+  if(trail.length>1){
+    ctx.beginPath(); trail.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle='rgba(52,211,153,.5)'; ctx.lineWidth=2; ctx.stroke();
+    // Drift distance label at end
+    const last=trail[trail.length-1];
+    if(last.x-sx>10){
+      const drift=((last.x-sx)/(C.width/130)).toFixed(1);
+      ctx.fillStyle='rgba(244,114,182,.7)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+      ctx.fillText('Снос: '+drift+' м',sx+((last.x-sx)/2),rT-6);
+    }
+  }
+  // Boat + vectors
+  const bx=Math.min(objX,W-30), by=Math.max(rT+14,Math.min(rB-14,objY));
+  if(objY>rT-30 && objY<rB+30){
+    // Glow
+    const gl=ctx.createRadialGradient(bx,by,0,bx,by,35);
+    gl.addColorStop(0,'rgba(56,189,248,.15)'); gl.addColorStop(1,'rgba(56,189,248,0)');
+    ctx.beginPath(); ctx.arc(bx,by,35,0,Math.PI*2); ctx.fillStyle=gl; ctx.fill();
+    // Vectors
+    const vr=Math.sqrt(v1*v1+v2*v2), ar=Math.atan2(-v1,v2);
+    arrow(ctx,bx,by,bx,by-v1*10,'#38bdf8',2.5,'v₁');
+    arrow(ctx,bx,by,bx+v2*10,by,'#fbbf24',2.5,'v₂');
+    arrow(ctx,bx,by,bx+Math.cos(ar)*vr*10,by+Math.sin(ar)*vr*10,'#34d399',3,'v');
+    // Parallelogram dashes
+    ctx.setLineDash([3,5]); ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(bx,by-v1*10); ctx.lineTo(bx+Math.cos(ar)*vr*10,by+Math.sin(ar)*vr*10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx+v2*10,by); ctx.lineTo(bx+Math.cos(ar)*vr*10,by+Math.sin(ar)*vr*10); ctx.stroke();
+    ctx.setLineDash([]);
+    // Boat
+    drawBoat(ctx,bx,by);
+  }
+  // Angle label
+  const alpha=(Math.atan2(v2,v1)*180/Math.PI).toFixed(1);
+  ctx.fillStyle=+alpha>45?'#f472b6':'#34d399'; ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Снос α = '+alpha+'°', W/2, rT-14);
+}
+
+function paintPlane(W,H){
+  // Sky
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'rgba(14,30,90,.35)'); sky.addColorStop(1,'rgba(5,12,26,.1)');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+  // Horizon clouds
+  [[W*.15,H*.15,55],[W*.55,H*.12,40],[W*.82,H*.22,30],[W*.38,H*.28,22]].forEach(([cx2,cy2,r])=>{
+    ctx.fillStyle='rgba(255,255,255,.04)'; ctx.beginPath(); ctx.ellipse(cx2,cy2,r,r*.4,0,0,Math.PI*2); ctx.fill();
+  });
+  // Wind field
+  const ar=angPlane*Math.PI/180;
+  for(let y=30;y<H;y+=55){for(let x=30;x<W;x+=70){
+    const len=v2*3;
+    arrow(ctx,x,y,x+Math.cos(ar)*len,y+Math.sin(ar)*len,'rgba(129,140,248,.18)',1,'');
+  }}
+  ctx.fillStyle='rgba(129,140,248,.55)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='right';
+  ctx.fillText('Ветер v₂='+v2+' м/с · φ='+angPlane+'°',W-10,20);
+  // Planned course line
+  if(trail.length>0){
+    ctx.setLineDash([4,6]); ctx.strokeStyle='rgba(56,189,248,.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(trail[0].x,trail[0].y); ctx.lineTo(trail[0].x+W,trail[0].y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(56,189,248,.4)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('Запланированный курс',trail[0].x+8,trail[0].y-6);
+  }
+  // Trail
+  if(trail.length>1){
+    ctx.beginPath(); trail.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle='rgba(244,114,182,.5)'; ctx.lineWidth=2; ctx.stroke();
+    // Drift arrow at end
+    const last=trail[trail.length-1], first=trail[0];
+    if(Math.abs(last.y-first.y)>5){
+      ctx.strokeStyle='rgba(244,114,182,.4)'; ctx.lineWidth=1.5; ctx.setLineDash([3,4]);
+      ctx.beginPath(); ctx.moveTo(last.x,first.y); ctx.lineTo(last.x,last.y); ctx.stroke(); ctx.setLineDash([]);
+      const driftM=Math.abs((last.y-first.y)/(C.width/130)).toFixed(1);
+      ctx.fillStyle='rgba(244,114,182,.7)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='left';
+      ctx.fillText('снос '+driftM+' м',last.x+6,(first.y+last.y)/2);
+    }
+  }
+  // Plane + vectors
+  const px2=Math.min(objX,W-40), py=Math.max(30,Math.min(H-30,objY));
+  ctx.font='28px sans-serif'; ctx.textAlign='center'; ctx.fillText('✈',px2,py+9);
+  const rx=v1+v2*Math.cos(ar),ry=v2*Math.sin(ar),rm=Math.sqrt(rx*rx+ry*ry);
+  arrow(ctx,px2,py,px2+v1*10,py,'#38bdf8',2.5,'v₁='+v1);
+  arrow(ctx,px2,py,px2+v2*Math.cos(ar)*10,py+v2*Math.sin(ar)*10,'#818cf8',2.5,'v₂='+v2);
+  arrow(ctx,px2,py,px2+rx/rm*rm*10,py+ry/rm*rm*10,'#34d399',3,'v='+rm.toFixed(1));
+  ctx.setLineDash([3,5]); ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(px2+v1*10,py); ctx.lineTo(px2+rx/rm*rm*10,py+ry/rm*rm*10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px2+v2*Math.cos(ar)*10,py+v2*Math.sin(ar)*10); ctx.lineTo(px2+rx/rm*rm*10,py+ry/rm*rm*10); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function paintVectors(W,H){
+  const cx=W/2, cy=H/2, SC=11;
+  const ar=angVec*Math.PI/180;
+  const v2x=v2*Math.cos(ar)*SC, v2y=-v2*Math.sin(ar)*SC;
+  const v1x=v1*SC, v1y=0;
+  const rx=v1x+v2x, ry=v1y+v2y;
+  // Subtle grid
+  for(let x=cx%60;x<W;x+=60){ctx.strokeStyle='rgba(255,255,255,.03)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=cy%60;y<H;y+=60){ctx.strokeStyle='rgba(255,255,255,.03)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1; ctx.setLineDash([3,5]);
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke(); ctx.setLineDash([]);
+  // Parallelogram
+  ctx.fillStyle='rgba(52,211,153,.05)';
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+v1x,cy+v1y); ctx.lineTo(cx+rx,cy+ry); ctx.lineTo(cx+v2x,cy+v2y); ctx.closePath(); ctx.fill();
+  ctx.setLineDash([4,5]); ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(cx+v1x,cy+v1y); ctx.lineTo(cx+rx,cy+ry); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+v2x,cy+v2y); ctx.lineTo(cx+rx,cy+ry); ctx.stroke(); ctx.setLineDash([]);
+  // Vectors
+  arrow(ctx,cx,cy,cx+v1x,cy+v1y,'#38bdf8',3,'v₁ = '+v1+' м/с');
+  arrow(ctx,cx,cy,cx+v2x,cy+v2y,'#fbbf24',3,'v₂ = '+v2+' м/с');
+  const vmod=Math.sqrt(rx*rx+ry*ry);
+  arrow(ctx,cx,cy,cx+rx,cy+ry,'#34d399',3.5,'v = '+vmod.toFixed(2)+' м/с');
+  // Origin
+  const og=ctx.createRadialGradient(cx,cy,0,cx,cy,8);
+  og.addColorStop(0,'rgba(255,255,255,.6)'); og.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2); ctx.fillStyle=og; ctx.fill();
+  // Angle arc
+  ctx.strokeStyle='rgba(251,191,36,.4)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(cx,cy,50,0,-ar,ar>0); ctx.stroke();
+  ctx.fillStyle='rgba(251,191,36,.7)'; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('φ='+angVec+'°',cx+56,cy-10);
+  // Min/Max labels
+  ctx.fillStyle='rgba(148,163,184,.4)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('φ=0°: v_max = '+(v1+v2), W*.15, H*.92);
+  ctx.fillText('φ=180°: v_min = '+Math.abs(v1-v2), W*.5, H*.92);
+  ctx.fillText('φ=90°: v = '+Math.sqrt(v1*v1+v2*v2).toFixed(1), W*.85, H*.92);
+}
+
+function arrow(ctx,x1,y1,x2,y2,col,lw,lbl){
+  ctx.strokeStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.save(); ctx.translate(x2,y2); ctx.rotate(a);
+  ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(10,0); ctx.lineTo(0,4); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  if(lbl){ctx.fillStyle=col;ctx.font='bold 11px Raleway,sans-serif';ctx.textAlign='center';ctx.fillText(lbl,(x1+x2)/2,(y1+y2)/2-10);}
+}
+
+function drawBoat(ctx,x,y){
+  const g=ctx.createRadialGradient(x-5,y-5,2,x,y,18);
+  g.addColorStop(0,'rgba(186,230,253,1)'); g.addColorStop(1,'rgba(8,100,130,.9)');
+  ctx.beginPath(); ctx.ellipse(x,y,18,11,0,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle='rgba(125,211,252,.6)'; ctx.lineWidth=1.5; ctx.stroke();
+}
+
+/* ── Graph ── */
+function drawGraph(){
+  const W=GC.width, H=GC.height; if(!W)return;
+  gctx.clearRect(0,0,W,H); gctx.fillStyle='#030810'; gctx.fillRect(0,0,W,H);
+  const pL=12,pR=12,pT=8,pB=18,gW=W-pL-pR,gH=H-pT-pB;
+
+  if(mode==='vectors'){
+    // |v|(φ) curve
+    const Vmax=v1+v2+1;
+    for(let i=0;i<=4;i++){gctx.strokeStyle='rgba(255,255,255,.04)';gctx.lineWidth=1;gctx.beginPath();gctx.moveTo(pL,pT+i*gH/4);gctx.lineTo(W-pR,pT+i*gH/4);gctx.stroke();}
+    gctx.strokeStyle='#34d399'; gctx.lineWidth=2.5; gctx.beginPath();
+    for(let px=0;px<=gW;px+=2){
+      const phi=px/gW*Math.PI*2;
+      const vr=Math.sqrt(v1*v1+v2*v2+2*v1*v2*Math.cos(phi));
+      const gy=pT+gH*(1-vr/Vmax);
+      px===0?gctx.moveTo(pL+px,gy):gctx.lineTo(pL+px,gy);
+    }
+    gctx.stroke();
+    // Current φ marker
+    const curPhi=angVec*Math.PI/180;
+    const curV=Math.sqrt(v1*v1+v2*v2+2*v1*v2*Math.cos(curPhi));
+    const mx=pL+gW*(curPhi/(Math.PI*2));
+    const my=pT+gH*(1-curV/(v1+v2+1));
+    gctx.strokeStyle='rgba(255,255,255,.15)'; gctx.lineWidth=1; gctx.setLineDash([2,4]);
+    gctx.beginPath(); gctx.moveTo(mx,pT); gctx.lineTo(mx,pT+gH); gctx.stroke(); gctx.setLineDash([]);
+    gctx.fillStyle='#fbbf24'; gctx.beginPath(); gctx.arc(mx,my,4,0,Math.PI*2); gctx.fill();
+    gctx.fillStyle='rgba(148,163,184,.5)'; gctx.font='9px Raleway,sans-serif'; gctx.textAlign='center';
+    gctx.fillText('φ: 0° → 360°',pL+gW/2,H-3);
+    gctx.fillStyle='#34d399'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='left'; gctx.fillText('|v|(φ)',pL+3,pT+10);
+  } else if(trail.length>3){
+    // Normalised trajectory
+    const xs=trail.map(p=>p.x), ys=trail.map(p=>p.y);
+    const mnX=Math.min(...xs),mxX=Math.max(...xs)+1,mnY=Math.min(...ys),mxY=Math.max(...ys)+1;
+    const rng=Math.max(mxX-mnX,mxY-mnY,1);
+    gctx.strokeStyle='#34d399'; gctx.lineWidth=2; gctx.beginPath();
+    trail.forEach((p,i)=>{
+      const gx=pL+(p.x-mnX)/rng*gW;
+      const gy=pT+(p.y-mnY)/rng*gH;
+      i===0?gctx.moveTo(gx,gy):gctx.lineTo(gx,gy);
+    }); gctx.stroke();
+    gctx.fillStyle='rgba(148,163,184,.5)'; gctx.font='9px Raleway,sans-serif'; gctx.textAlign='center';
+    gctx.fillText('Траектория (x vs y)',pL+gW/2,H-3);
+    gctx.fillStyle='#34d399'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='left'; gctx.fillText('путь',pL+3,pT+10);
+  } else {
+    gctx.fillStyle='rgba(148,163,184,.25)'; gctx.font='11px Raleway,sans-serif'; gctx.textAlign='center';
+    gctx.fillText('Запустите симуляцию — появится траектория',W/2,H/2+4);
+  }
+  gctx.strokeStyle='rgba(255,255,255,.18)'; gctx.lineWidth=1;
+  gctx.beginPath(); gctx.moveTo(pL,pT); gctx.lineTo(pL,pT+gH); gctx.lineTo(W-pR,pT+gH); gctx.stroke();
+}
+
+/* ── Meters ── */
+function calc(){
+  let vr, alpha;
+  if(mode==='river'){
+    vr=Math.sqrt(v1*v1+v2*v2);
+    alpha=(Math.atan2(v2,v1)*180/Math.PI).toFixed(1);
+  } else if(mode==='plane'){
+    const ar=angPlane*Math.PI/180;
+    const rx=v1+v2*Math.cos(ar), ry=v2*Math.sin(ar);
+    vr=Math.sqrt(rx*rx+ry*ry);
+    alpha=(Math.atan2(ry,rx)*180/Math.PI).toFixed(1);
+  } else {
+    const ar=angVec*Math.PI/180;
+    vr=Math.sqrt(v1*v1+v2*v2+2*v1*v2*Math.cos(ar));
+    alpha=angVec;
+  }
+  document.getElementById('mV1').textContent=v1;
+  document.getElementById('mV2').textContent=v2;
+  document.getElementById('mVr').textContent=(+vr).toFixed(2);
+  document.getElementById('mAlpha').textContent=alpha;
+}
+function setStatus(cls,txt){const b=document.getElementById('statusBadge');b.className='status-badge '+cls;b.textContent=txt;}
+
+/* ── Resize + Boot ── */
+function resize(){
+  const w=C.parentElement?.offsetWidth||600; C.width=w>0?w:600;
+  const gw=GC.parentElement?.offsetWidth||600; GC.width=gw>0?gw:600;
+}
+const _ro=new ResizeObserver(()=>{resize();repaint();drawGraph();});_ro.observe(C.parentElement);
+window.addEventListener('resize',()=>{resize();repaint();drawGraph();});
+const _rev=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>_rev.observe(el));
+requestAnimationFrame(()=>{resize();initObj();repaint();drawGraph();calc();});
+</script>
+</body>
+</html>
