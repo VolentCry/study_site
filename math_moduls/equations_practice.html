@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практика уравнений</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --c1: #16A34A; --c1l: #DCFCE7; --c1g2: #4ADE80;
+  --c2: #2563EB; --c2l: #DBEAFE; --c2g2: #60A5FA;
+  --c3: #D97706; --c3l: #FEF3C7; --c3g2: #FCD34D;
+  --c4: #DB2777; --c4l: #FCE7F3; --c4g2: #F472B6;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #FAFAF7;
+  color: #1C1C1E;
+  min-height: 100vh;
+  padding: 0 16px 80px;
+  overflow-x: hidden;
+}
+
+/* ─── background deco ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 15%, rgba(22,163,74,.06) 0 120px, transparent 120px),
+    radial-gradient(circle at 90% 20%, rgba(37,99,235,.06) 0 100px, transparent 100px),
+    radial-gradient(circle at 50% 80%, rgba(219,39,119,.05) 0 140px, transparent 140px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.floating-bg span {
+  position: absolute;
+  font-size: 1.6rem;
+  opacity: .05;
+  animation: floatUp linear infinite;
+  user-select: none;
+}
+@keyframes floatUp {
+  0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+  10%  { opacity: .05; }
+  90%  { opacity: .05; }
+  100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+}
+
+/* ─── toggle ─── */
+.toggle-wrap {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border-radius: 50px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.12);
+}
+.tog-lbl {
+  font-weight: 800;
+  font-size: .85rem;
+  transition: color .3s;
+}
+.tog-lbl.on  { color: #DB2777; }
+.tog-lbl.off { color: #CBD5E1; }
+
+.switch { position: relative; width: 48px; height: 26px; cursor: pointer; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0;
+  background: #E2E8F0;
+  border-radius: 50px;
+  transition: .3s;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 4px; top: 4px;
+  background: white;
+  border-radius: 50%;
+  transition: .3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+input:checked + .slider { background: linear-gradient(135deg, #DB2777, #9333EA); }
+input:checked + .slider::before { transform: translateX(22px); }
+
+/* ─── header ─── */
+header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 48px 0 28px;
+}
+.site-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  background: linear-gradient(135deg, #16A34A 0%, #2563EB 50%, #DB2777 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+.site-sub {
+  margin-top: 8px;
+  color: #6B7280;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ─── main layout ─── */
+.blocks {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ─── block card ─── */
+.block-card {
+  background: white;
+  border-radius: 24px;
+  padding: 28px 28px 22px;
+  box-shadow: 0 2px 20px rgba(0,0,0,.07);
+  border-top: 6px solid var(--bc);
+}
+
+.bhead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bbadge {
+  background: var(--bc);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: .8rem;
+  padding: 3px 12px;
+  border-radius: 50px;
+  letter-spacing: .02em;
+}
+.btitle {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.35rem;
+  color: var(--bc);
+}
+
+/* ─── progress bar ─── */
+.prog-wrap { margin: 14px 0 22px; }
+.prog-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: .78rem;
+  font-weight: 800;
+  color: #94A3B8;
+  margin-bottom: 7px;
+}
+.prog-track {
+  height: 13px;
+  background: #F1F5F9;
+  border-radius: 50px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 50px;
+  transition: width .9s cubic-bezier(.25,.46,.45,.94);
+  background: linear-gradient(90deg, var(--bc), var(--bc2));
+}
+
+/* ─── celebration banner ─── */
+.celebration {
+  display: none;
+  margin: 10px 0 -4px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, var(--bc), var(--bc2));
+  border-radius: 14px;
+  color: white;
+  font-weight: 800;
+  font-size: .95rem;
+  text-align: center;
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(.8); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+/* ─── equations list ─── */
+.eq-list { display: flex; flex-direction: column; gap: 11px; }
+
+.eq-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  background: var(--bgl);
+  border-radius: 14px;
+  border: 2px solid transparent;
+  transition: border-color .25s, background .25s;
+}
+.eq-row.correct { border-color: #16A34A; background: #F0FDF4; }
+.eq-row.wrong   { border-color: #EF4444; background: #FEF2F2; animation: shake .35s ease; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-7px); }
+  75%      { transform: translateX(7px); }
+}
+
+.eq-num {
+  font-weight: 900;
+  color: #CBD5E1;
+  font-size: .85rem;
+  min-width: 22px;
+}
+.eq-txt {
+  flex: 1;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.eq-var {
+  color: var(--bc);
+  font-style: italic;
+  font-size: 1.15rem;
+  transition: color .3s;
+}
+.symbols-mode .eq-var {
+  font-style: normal;
+  font-size: 1.05rem;
+}
+
+.eq-ans {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.ans-lbl {
+  font-weight: 800;
+  font-size: .9rem;
+  color: #6B7280;
+  min-width: 28px;
+  text-align: right;
+}
+.ans-input {
+  width: 86px;
+  padding: 7px 10px;
+  border: 2px solid #E2E8F0;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s;
+  background: white;
+}
+.ans-input:focus  { border-color: var(--bc); }
+.ans-input:disabled { background: #F8FAFC; color: #9CA3AF; cursor: not-allowed; }
+.ans-icon { font-size: 1.1rem; min-width: 22px; text-align: center; }
+
+/* ─── check button ─── */
+.check-btn {
+  display: block;
+  margin: 20px auto 0;
+  padding: 13px 38px;
+  background: var(--bc);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  transition: transform .18s, box-shadow .18s;
+  letter-spacing: .02em;
+}
+.check-btn:hover  { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.2); }
+.check-btn:active { transform: translateY(0); }
+
+/* ─── system block ─── */
+.systems-wrap { display: flex; flex-direction: column; gap: 22px; }
+
+.sys-group {
+  border-left: 4px solid var(--bc);
+  padding-left: 18px;
+}
+.sys-name {
+  font-weight: 900;
+  font-size: .8rem;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 4px;
+}
+.sys-hint {
+  font-size: .82rem;
+  color: #94A3B8;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+/* ─── responsive ─── */
+@media (max-width: 520px) {
+  .block-card { padding: 20px 14px 18px; }
+  .eq-row { flex-wrap: wrap; }
+  .eq-txt { font-size: .97rem; }
+  .ans-input { width: 72px; }
+  .toggle-wrap { padding: 6px 10px; gap: 6px; }
+  .tog-lbl { font-size: .78rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Floating background symbols -->
+<div class="floating-bg" id="floatBg"></div>
+
+<!-- Toggle -->
+<div class="toggle-wrap">
+  <span class="tog-lbl on" id="lbl-letters">Буковки</span>
+  <label class="switch">
+    <input type="checkbox" id="modeToggle">
+    <span class="slider"></span>
+  </label>
+  <span class="tog-lbl off" id="lbl-symbols">Значки</span>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="site-title">🧮 Практика уравнений</div>
+  <p class="site-sub">Реши уравнения и заполни все прогресс-бары! Ты справишься 💪</p>
+</header>
+
+<!-- Blocks go here -->
+<div class="blocks" id="mainBlocks"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════
+
+const LETTERS = { x:'x', y:'y', z:'z', a:'a', b:'b', c:'c' };
+const SYMBOLS = { x:'★', y:'✿', z:'☀', a:'♦', b:'♥', c:'●' };
+let useSymbols = false;
+
+// Helper constructors for equation parts
+const T = s  => ({ t: 'text', v: s });
+const V = nm => ({ t: 'var',  v: nm });
+
+function vShow(name) {
+  return (useSymbols ? SYMBOLS : LETTERS)[name] || name;
+}
+
+// ═══════════════════════════════════════════════════
+//  EQUATION DATA
+// ═══════════════════════════════════════════════════
+
+const BLOCKS = [
+  {
+    id: 1, badge: 'Блок 1', title: 'Простой уровень', emoji: '🌱',
+    bc: 'var(--c1)', bc2: 'var(--c1g2)', bgl: 'var(--c1l)',
+    bcVal: '#16A34A',
+    type: 'simple',
+    eqs: [
+      { parts: [V('x'), T(' + 8 = 19')],           var: 'x', ans: 11   },
+      { parts: [T('7 + '), V('y'), T(' = 31')],     var: 'y', ans: 24   },
+      { parts: [V('z'), T(' × 2 = 82')],            var: 'z', ans: 41   },
+      { parts: [V('x'), T(' − 13 = 25')],           var: 'x', ans: 38   },
+      { parts: [T('48 ÷ '), V('y'), T(' = 6')],     var: 'y', ans: 8    },
+    ]
+  },
+  {
+    id: 2, badge: 'Блок 2', title: 'Средний уровень', emoji: '🚀',
+    bc: 'var(--c2)', bc2: 'var(--c2g2)', bgl: 'var(--c2l)',
+    bcVal: '#2563EB',
+    type: 'simple',
+    eqs: [
+      { parts: [T('3'), V('x'), T(' + 5 = 20')],                                    var: 'x', ans: 5 },
+      { parts: [T('4'), V('y'), T(' − 6 = 18')],                                    var: 'y', ans: 6 },
+      { parts: [T('('), V('x'), T(' + 3) × 2 = 22')],                              var: 'x', ans: 8 },
+      { parts: [V('z'), T(' + '), V('z'), T(' + '), V('z'), T(' = 27')],            var: 'z', ans: 9 },
+      { parts: [T('5'), V('x'), T(' − 3'), V('x'), T(' = 14')],                    var: 'x', ans: 7 },
+    ]
+  },
+  {
+    id: 3, badge: 'Блок 3', title: 'Сложный уровень', emoji: '🔥',
+    bc: 'var(--c3)', bc2: 'var(--c3g2)', bgl: 'var(--c3l)',
+    bcVal: '#D97706',
+    type: 'simple',
+    eqs: [
+      { parts: [T('2'), V('x'), T(' − 3 = 2')],                                    var: 'x', ans: 2.5 },
+      { parts: [T('4'), V('y'), T(' + 1 = 15')],                                    var: 'y', ans: 3.5 },
+      { parts: [T('2('), V('z'), T(' + 3) − 1 = 8')],                             var: 'z', ans: 1.5 },
+      { parts: [T('3'), V('x'), T(' + 1,5 = 9')],                                  var: 'x', ans: 2.5 },
+      { parts: [T('6'), V('z'), T(' + 1 = 28')],                                    var: 'z', ans: 4.5 },
+    ]
+  },
+  {
+    id: 4, badge: 'Блок 4', title: 'Профессиональный уровень', emoji: '🏆',
+    bc: 'var(--c4)', bc2: 'var(--c4g2)', bgl: 'var(--c4l)',
+    bcVal: '#DB2777',
+    type: 'system',
+    systems: [
+      {
+        name: 'Система уравнений № 1',
+        hint: '💡 Реши первое уравнение, а потом подставляй ответы в следующие!',
+        eqs: [
+          { parts: [V('x'), T(' + 7 = 18')],                                         var: 'x', ans: 11 },
+          { parts: [T('2'), V('y'), T(' + '), V('x'), T(' = 25')],                   var: 'y', ans: 7  },
+          { parts: [V('x'), T(' + '), V('y'), T(' + '), V('z'), T(' = 27')],         var: 'z', ans: 9  },
+        ]
+      },
+      {
+        name: 'Система уравнений № 2',
+        hint: '💡 Каждый найденный ответ поможет найти следующий!',
+        eqs: [
+          { parts: [T('3'), V('a'), T(' = 15')],                                     var: 'a', ans: 5 },
+          { parts: [V('a'), T(' + '), V('b'), T(' = 12')],                           var: 'b', ans: 7 },
+          { parts: [T('2'), V('a'), T(' + '), V('b'), T(' + '), V('c'), T(' = 20')], var: 'c', ans: 3 },
+        ]
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════
+//  RENDERING HELPERS
+// ═══════════════════════════════════════════════════
+
+function renderParts(parts) {
+  return parts.map(p => {
+    if (p.t === 'text') return `<span>${p.v}</span>`;
+    return `<span class="eq-var" data-vn="${p.v}">${vShow(p.v)}</span>`;
+  }).join('');
+}
+
+function eqId(bid, eIdx, sIdx = null) {
+  return sIdx !== null ? `b${bid}s${sIdx}e${eIdx}` : `b${bid}e${eIdx}`;
+}
+
+function renderEqRow(eq, eIdx, bid, sIdx = null) {
+  const id = eqId(bid, eIdx, sIdx);
+  return `
+    <div class="eq-row" id="row-${id}">
+      <span class="eq-num">${eIdx + 1}.</span>
+      <div class="eq-txt">${renderParts(eq.parts)}</div>
+      <div class="eq-ans">
+        <span class="ans-lbl" data-vn="${eq.var}">${vShow(eq.var)} =</span>
+        <input class="ans-input" id="inp-${id}" type="text" inputmode="decimal" placeholder="?" autocomplete="off">
+        <span class="ans-icon" id="ico-${id}"></span>
+      </div>
+    </div>`;
+}
+
+function totalEqs(block) {
+  if (block.type === 'simple') return block.eqs.length;
+  return block.systems.reduce((s, sys) => s + sys.eqs.length, 0);
+}
+
+function renderBlock(block) {
+  const total = totalEqs(block);
+
+  let innerHtml = '';
+  if (block.type === 'simple') {
+    innerHtml = `<div class="eq-list">${block.eqs.map((e,i)=>renderEqRow(e,i,block.id)).join('')}</div>`;
+  } else {
+    const sysHtml = block.systems.map((sys, si) => `
+      <div class="sys-group">
+        <div class="sys-name">${sys.name}</div>
+        <div class="sys-hint">${sys.hint}</div>
+        <div class="eq-list">${sys.eqs.map((e,i)=>renderEqRow(e,i,block.id,si)).join('')}</div>
+      </div>`).join('');
+    innerHtml = `<div class="systems-wrap">${sysHtml}</div>`;
+  }
+
+  return `
+    <div class="block-card" id="card-${block.id}"
+         style="--bc:${block.bc};--bc2:${block.bc2};--bgl:${block.bgl};">
+      <div class="bhead">
+        <span class="bbadge">${block.badge}</span>
+        <span class="btitle">${block.emoji} ${block.title}</span>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-meta">
+          <span id="pmeta-${block.id}">0 из ${total} решено</span>
+          <span id="ppct-${block.id}">0%</span>
+        </div>
+        <div class="prog-track">
+          <div class="prog-fill" id="pfill-${block.id}"></div>
+        </div>
+      </div>
+      <div id="celeb-${block.id}" class="celebration"></div>
+      ${innerHtml}
+      <button class="check-btn" onclick="checkBlock(${block.id})">✅ Проверить ответы</button>
+    </div>`;
+}
+
+function buildAll() {
+  document.getElementById('mainBlocks').innerHTML = BLOCKS.map(renderBlock).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  CHECKING
+// ═══════════════════════════════════════════════════
+
+function parseNum(str) {
+  return parseFloat(str.trim().replace(',', '.'));
+}
+
+function checkSingleEq(eq, id) {
+  const inp  = document.getElementById(`inp-${id}`);
+  const row  = document.getElementById(`row-${id}`);
+  const ico  = document.getElementById(`ico-${id}`);
+  if (!inp || inp.disabled) return inp && inp.disabled ? true : false;
+
+  const val = parseNum(inp.value);
+  const ok  = !isNaN(val) && Math.abs(val - eq.ans) < 0.01;
+
+  row.classList.remove('correct', 'wrong');
+  void row.offsetWidth; // reflow for shake
+
+  if (ok) {
+    row.classList.add('correct');
+    ico.textContent = '✅';
+    inp.disabled = true;
+    return true;
+  } else {
+    row.classList.add('wrong');
+    ico.textContent = inp.value.trim() === '' ? '' : '❌';
+    return false;
+  }
+}
+
+function checkBlock(bid) {
+  const block = BLOCKS.find(b => b.id === bid);
+  let correct = 0, total = 0;
+
+  if (block.type === 'simple') {
+    block.eqs.forEach((eq, i) => {
+      if (checkSingleEq(eq, eqId(bid, i))) correct++;
+      total++;
+    });
+  } else {
+    block.systems.forEach((sys, si) => {
+      sys.eqs.forEach((eq, i) => {
+        if (checkSingleEq(eq, eqId(bid, i, si))) correct++;
+        total++;
+      });
+    });
+  }
+
+  // Progress
+  const pct = Math.round((correct / total) * 100);
+  document.getElementById(`pfill-${bid}`).style.width = pct + '%';
+  document.getElementById(`pmeta-${bid}`).textContent = `${correct} из ${total} решено`;
+  document.getElementById(`ppct-${bid}`).textContent = pct + '%';
+
+  // Celebration
+  const celeb = document.getElementById(`celeb-${bid}`);
+  if (correct === total) {
+    celeb.style.display = 'block';
+    celeb.textContent = '🎉 Отлично! Все ответы верны! Ты молодец!';
+    celeb.style.animation = 'none';
+    void celeb.offsetWidth;
+    celeb.style.animation = '';
+  } else {
+    celeb.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  MODE TOGGLE (letters ↔ symbols)
+// ═══════════════════════════════════════════════════
+
+document.getElementById('modeToggle').addEventListener('change', function () {
+  useSymbols = this.checked;
+
+  const lblL = document.getElementById('lbl-letters');
+  const lblS = document.getElementById('lbl-symbols');
+  if (useSymbols) {
+    lblL.className = 'tog-lbl off';
+    lblS.className = 'tog-lbl on';
+    document.body.classList.add('symbols-mode');
+  } else {
+    lblL.className = 'tog-lbl on';
+    lblS.className = 'tog-lbl off';
+    document.body.classList.remove('symbols-mode');
+  }
+
+  // Update all variable spans & labels in-place (no re-render → state preserved)
+  document.querySelectorAll('[data-vn]').forEach(el => {
+    el.textContent = vShow(el.getAttribute('data-vn'))
+      + (el.classList.contains('ans-lbl') ? ' =' : '');
+  });
+});
+
+// ═══════════════════════════════════════════════════
+//  FLOATING BACKGROUND
+// ═══════════════════════════════════════════════════
+
+(function spawnFloaters() {
+  const symbols = ['+', '−', '×', '÷', '=', '?', '★', '✿', '☀', '♦', '♥', '●',
+                   '2', '3', '7', '9', 'x', 'y', 'z'];
+  const container = document.getElementById('floatBg');
+  for (let i = 0; i < 28; i++) {
+    const s = document.createElement('span');
+    s.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    s.style.left  = Math.random() * 100 + 'vw';
+    s.style.animationDuration  = (18 + Math.random() * 22) + 's';
+    s.style.animationDelay     = -(Math.random() * 30) + 's';
+    s.style.fontSize = (.9 + Math.random() * 1.2) + 'rem';
+    container.appendChild(s);
+  }
+})();
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+
+buildAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Волновая функция</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+
+  <style>
+    :root {
+      --void: #000000;
+      --deep: #050508;
+      --nebula: #0a0a14;
+      --glow: #c8a96e;
+      --glow-soft: rgba(200, 169, 110, 0.15);
+      --glow-ring: rgba(200, 169, 110, 0.6);
+      --text: #e8e0d0;
+      --text-dim: rgba(232, 224, 208, 0.45);
+      --accent: #f0e4c8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #06060f 0%, #000000 70%);
+    }
+
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+      opacity: var(--op, 0.6);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--op, 0.6); transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(0.6); }
+    }
+
+    /* Wave SVG */
+    .wave-wrap {
+      position: absolute;
+      width: 76vmin;
+      height: 76vmin;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wave-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Hero title */
+    .hero-title {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hero-title h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3.4rem, 6vw, 5.2rem);
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-shadow:
+        0 0 40px rgba(200, 169, 110, 0.5),
+        0 0 80px rgba(200, 169, 110, 0.2);
+      line-height: 1.4;
+    }
+
+    .hero-title .sub {
+      display: block;
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: clamp(0.6rem, 1vw, 0.75rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 0.6rem;
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0.4;
+      animation: fadeFloat 2.5s ease-in-out infinite;
+    }
+    .scroll-hint span {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+    }
+    .scroll-hint svg { width: 16px; opacity: 0.6; }
+    @keyframes fadeFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+      50% { transform: translateX(-50%) translateY(6px); opacity: 0.7; }
+    }
+
+    /* ─── CONTENT SECTION ─── */
+    .content-section {
+      background: var(--deep);
+      padding: 6rem 4rem;
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .content-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glow-ring), transparent);
+      opacity: 0.4;
+    }
+
+    .section-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--glow), transparent);
+      margin-bottom: 2.5rem;
+      opacity: 0.6;
+    }
+
+    .body-text {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: var(--text);
+      opacity: 0.85;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── FORMULA BOX ─── */
+    .formula-block {
+      background: var(--nebula);
+      border: 1px solid rgba(200, 169, 110, 0.12);
+      border-left: 2px solid rgba(200, 169, 110, 0.5);
+      padding: 1.8rem 2rem;
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.4s, background 0.4s;
+    }
+
+    .formula-block:hover {
+      background: #0e0e1a;
+      border-color: rgba(200, 169, 110, 0.28);
+      border-left-color: var(--glow);
+    }
+
+    .formula-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+
+    .formula-content {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--accent);
+      padding: 0.4rem 0;
+    }
+
+    /* ─── STATES GRID ─── */
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      margin: 3rem 0;
+    }
+
+    .state-card {
+      background: var(--nebula);
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    .state-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.08);
+      pointer-events: none;
+      transition: border-color 0.4s;
+    }
+
+    .state-card:hover { background: #0e0e1a; }
+    .state-card:hover::after { border-color: rgba(200, 169, 110, 0.25); }
+
+    .state-symbol {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 2.6rem;
+      color: var(--glow);
+      opacity: 0.25;
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      line-height: 1;
+    }
+
+    .state-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .state-tag {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.8rem;
+    }
+
+    .state-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    /* ─── QN CARDS ─── */
+    .qn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px;
+      margin: 3rem 0;
+    }
+
+    .qn-card {
+      background: var(--nebula);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    .qn-card:hover { background: #0e0e1a; }
+
+    .qn-index {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .qn-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .qn-symbol {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 2.5rem;
+      color: var(--glow);
+      opacity: 0.18;
+      position: absolute;
+      top: 0.5rem;
+      right: 1.2rem;
+      line-height: 1;
+    }
+
+    .qn-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    /* ─── WAVE CANVAS ─── */
+    .canvas-wrap {
+      background: var(--nebula);
+      border: 1px solid rgba(200, 169, 110, 0.1);
+      padding: 2rem 2rem 1.4rem;
+      margin: 2.5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .canvas-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.08);
+      pointer-events: none;
+    }
+
+    .canvas-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+    }
+
+    .canvas-legend {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+    }
+
+    .legend-line {
+      width: 22px;
+      height: 1.5px;
+      border-radius: 1px;
+    }
+
+    .canvas-hint {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      opacity: 0.4;
+      text-align: center;
+      margin-top: 0.6rem;
+    }
+
+    /* ─── NOTE ─── */
+    .note-block {
+      background: var(--nebula);
+      border: 1px solid rgba(200, 169, 110, 0.15);
+      border-left: 2px solid var(--glow);
+      padding: 1.4rem 1.8rem;
+      margin: 2rem 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text-dim);
+    }
+
+    .note-block strong {
+      color: var(--glow);
+      font-style: normal;
+      font-weight: 300;
+    }
+
+    /* ─── TIMELINE ─── */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      margin: 2.5rem 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(200,169,110,0.5), transparent);
+    }
+
+    .tl-item {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -1.72rem;
+      top: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--glow);
+      box-shadow: 0 0 8px rgba(200,169,110,0.6);
+    }
+
+    .tl-year {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.8;
+      margin-bottom: 0.3rem;
+    }
+
+    .tl-text {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: var(--text-dim);
+    }
+
+    .tl-text strong {
+      color: var(--text);
+      font-weight: 300;
+    }
+
+    /* ─── SIM BANNER ─── */
+    .sim-banner {
+      margin: 4rem 0 0;
+      position: relative;
+      background: var(--nebula);
+      padding: 3rem 2.5rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .sim-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.15);
+    }
+
+    .sim-banner::after {
+      content: 'ψ';
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 9rem;
+      font-style: italic;
+      opacity: 0.04;
+      pointer-events: none;
+      animation: slowFloat 8s ease-in-out infinite;
+    }
+
+    @keyframes slowFloat {
+      0%, 100% { transform: translateY(-50%) rotate(-5deg); }
+      50% { transform: translateY(-55%) rotate(-3deg); }
+    }
+
+    .sim-text { flex: 1; }
+
+    .sim-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .sim-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+    }
+
+    .sim-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.75rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      max-width: 380px;
+    }
+
+    .sim-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 2rem;
+      background: transparent;
+      border: 1px solid var(--glow);
+      color: var(--glow);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .sim-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--glow-soft);
+      transform: translateX(-100%);
+      transition: transform 0.35s ease;
+      z-index: -1;
+    }
+
+    .sim-btn:hover::before { transform: translateX(0); }
+    .sim-btn:hover {
+      color: var(--accent);
+      border-color: rgba(200, 169, 110, 0.8);
+      box-shadow: 0 0 30px rgba(200, 169, 110, 0.15);
+    }
+
+    .sim-btn svg { width: 14px; flex-shrink: 0; }
+
+    /* ─── PAGE NAV ─── */
+    .page-nav {
+      background: var(--void);
+      padding: 0 4rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .back-link:hover { color: var(--glow); }
+    .back-link svg { width: 14px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--void);
+      text-align: center;
+      padding: 2.5rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(200, 169, 110, 0.2);
+      border-top: 1px solid rgba(200, 169, 110, 0.06);
+    }
+
+    /* ─── MENU ─── */
+    .menu-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 200;
+      height: 100vh;
+    }
+
+    .hamburger-icon {
+      width: 40px;
+      height: 35px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      padding-left: 15px;
+    }
+
+    .line {
+      width: 150%;
+      height: 6px;
+      background-color: white;
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+      transition: 0.3s;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100vh;
+      background: #06060f;
+      border-right: 4px solid rgba(200,169,110,0.4);
+      transition: 0.4s ease;
+      padding-top: 100px;
+      z-index: 1000;
+      box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .menu-container:hover .sidebar { left: 0; }
+    .menu-container:hover .line { background-color: var(--glow); }
+
+    .menu-item {
+      position: relative;
+      border-bottom: 1px solid rgba(200,169,110,0.1);
+    }
+
+    .menu-title {
+      padding: 15px 25px;
+      font-size: 11px;
+      color: var(--text-dim);
+      display: block;
+      cursor: pointer;
+      transition: 0.2s;
+      line-height: 1.4;
+      letter-spacing: 0.1em;
+    }
+
+    .menu-item:hover .menu-title { background: rgba(0,0,0,0.3); color: var(--glow); }
+
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      background: rgba(0,0,0,0.4);
+      transition: max-height 0.3s ease-in-out;
+    }
+
+    .menu-item:hover .submenu { max-height: 200px; }
+
+    .submenu a {
+      padding: 12px 25px 12px 40px;
+      text-decoration: none;
+      font-size: 10px;
+      color: var(--text-dim);
+      display: block;
+      transition: 0.2s;
+      letter-spacing: 0.1em;
+    }
+
+    .submenu a:hover { color: var(--glow); background: rgba(255,255,255,0.05); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .content-section { padding: 4rem 1.5rem; }
+      .states-grid { grid-template-columns: 1fr; }
+      .qn-grid { grid-template-columns: 1fr; }
+      .sim-banner { flex-direction: column; align-items: flex-start; }
+      .page-nav { padding: 0 1.5rem 4rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- МЕНЮ -->
+  <div class="menu-container">
+    <div class="hamburger-icon">
+      <div class="line"></div><div class="line"></div><div class="line"></div>
+    </div>
+    <div class="sidebar">
+      <div class="menu-item">
+        <span class="menu-title"><a href="../../index.html" style="text-decoration:none;color:inherit;">Главная</a></span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-title">Физика</span>
+        <div class="submenu">
+          <a href="../physics_7.html">7 класс</a>
+          <a href="../physics_8.html">8 класс</a>
+        </div>
+      </div>
+      <div class="menu-item">
+        <span class="menu-title"><a href="../quantum_physics.html" style="text-decoration:none;color:inherit;">Квантовая физика</a></span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-title"><a href="../astronomy.html" style="text-decoration:none;color:inherit;">Астрономия</a></span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-title"><a href="../chemistry.html" style="text-decoration:none;color:inherit;">Химия</a></span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-title"><a href="../informatics.html" style="text-decoration:none;color:inherit;">Информатика</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="stars" id="stars"></div>
+
+    <!-- Animated Wave SVG -->
+    <div class="wave-wrap">
+      <svg class="wave-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c8a96e" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="bloom">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        <!-- Background glow -->
+        <circle cx="200" cy="200" r="180" fill="url(#glowGrad)"/>
+
+        <!-- Outer probability ring -->
+        <ellipse cx="200" cy="200" rx="155" ry="155" fill="none"
+          stroke="rgba(200,169,110,0.08)" stroke-width="1" stroke-dasharray="3 9"/>
+
+        <!-- Wave path 1 — Re(ψ) -->
+        <path id="wavePath1" fill="none" stroke="rgba(200,169,110,0.55)" stroke-width="1.5">
+          <animate attributeName="d"
+            values="
+              M 45,200 C 80,130 110,130 145,200 S 210,270 245,200 S 310,130 355,200;
+              M 45,200 C 80,270 110,270 145,200 S 210,130 245,200 S 310,270 355,200;
+              M 45,200 C 80,130 110,130 145,200 S 210,270 245,200 S 310,130 355,200"
+            dur="4s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- Wave path 2 — Im(ψ), dimmer, offset -->
+        <path id="wavePath2" fill="none" stroke="rgba(200,169,110,0.22)" stroke-width="1">
+          <animate attributeName="d"
+            values="
+              M 45,200 C 80,270 110,270 145,200 S 210,130 245,200 S 310,270 355,200;
+              M 45,200 C 80,130 110,130 145,200 S 210,270 245,200 S 310,130 355,200;
+              M 45,200 C 80,270 110,270 145,200 S 210,130 245,200 S 310,270 355,200"
+            dur="4s" repeatCount="indefinite"/>
+        </path>
+
+        <!-- Probability envelope — |ψ|² -->
+        <ellipse cx="200" cy="200" rx="90" ry="22" fill="none"
+          stroke="rgba(240,228,200,0.18)" stroke-width="1.2">
+          <animate attributeName="rx" values="88;96;88" dur="4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+        </ellipse>
+
+        <!-- Particle dot -->
+        <circle cx="200" cy="200" r="7" fill="url(#glowGrad2)" opacity="0.9" filter="url(#bloom)">
+          <animate attributeName="cx" values="110;290;110" dur="4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+        </circle>
+        <defs>
+          <radialGradient id="glowGrad2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f0e4c8" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Axis -->
+        <line x1="40" y1="200" x2="360" y2="200"
+          stroke="rgba(200,169,110,0.12)" stroke-width="1"/>
+
+        <!-- ψ label -->
+        <text x="362" y="204" font-family="Georgia,serif" font-style="italic"
+          font-size="16" fill="rgba(200,169,110,0.4)">ψ</text>
+      </svg>
+    </div>
+
+    <!-- Title -->
+    <div class="hero-title">
+      <h1>Волновая функция</h1>
+      <span class="sub">Квантовое состояние — от амплитуды до вероятности</span>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint">
+      <span>Далее</span>
+      <svg viewBox="0 0 16 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 0v20M1 13l7 7 7-7" stroke="#c8a96e" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div style="background: var(--deep);">
+    <div class="content-section">
+
+      <!-- § 01 — Определение -->
+      <div class="section-label">§ 01 — Основы</div>
+      <h2 class="section-title">Что такое волновая функция</h2>
+      <div class="section-divider"></div>
+
+      <p class="body-text">
+        <strong style="color:var(--accent);font-weight:300;">Волновая функция</strong> (обозначается <em style="color:var(--glow);">ψ</em>) — это центральный объект квантовой механики. Она полностью описывает квантовое состояние физической системы: отдельной частицы, атома или целой молекулы.
+      </p>
+
+      <p class="body-text">
+        Сама по себе ψ не является физически наблюдаемой величиной — она принимает <em style="color:var(--glow);">комплексные</em> значения. Физический смысл несёт её квадрат модуля. Согласно борновской интерпретации, <em style="color:var(--glow);">|ψ|²</em> — это плотность вероятности обнаружить частицу в данной точке пространства.
+      </p>
+
+      <div class="formula-block">
+        <div class="formula-label">Борновская интерпретация (Born rule, 1926)</div>
+        <div class="formula-content">
+          \[ |\psi(\mathbf{r},\, t)|^2 \, dV \;=\; P(\mathbf{r},\, t)\, dV \]
+        </div>
+      </div>
+
+      <p class="body-text">
+        Поскольку частица обязательно должна находиться <em>где-то</em> в пространстве, волновая функция должна удовлетворять условию нормировки: интеграл плотности вероятности по всему пространству равен единице.
+      </p>
+
+      <div class="formula-block">
+        <div class="formula-label">Условие нормировки</div>
+        <div class="formula-content">
+          \[ \int_{-\infty}^{+\infty} |\psi(\mathbf{r},\, t)|^2 \, d^3r \;=\; 1 \]
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <div class="canvas-wrap">
+        <div class="canvas-label">Визуализация — Re(ψ), Im(ψ) и |ψ|² волнового пакета</div>
+        <canvas id="waveCanvas" height="130"></canvas>
+        <div class="canvas-legend">
+          <div class="legend-item">
+            <div class="legend-line" style="background:rgba(200,169,110,0.85)"></div>
+            Re(ψ) — вещественная часть
+          </div>
+          <div class="legend-item">
+            <div class="legend-line" style="background:rgba(200,169,110,0.35)"></div>
+            Im(ψ) — мнимая часть
+          </div>
+          <div class="legend-item">
+            <div class="legend-line" style="background:rgba(240,228,200,0.7);height:2.5px"></div>
+            |ψ|² — плотность вероятности
+          </div>
+        </div>
+      </div>
+
+      <!-- § 02 — Уравнение Шрёдингера -->
+      <div class="section-label" style="margin-top:4rem;">§ 02 — Динамика</div>
+      <h2 class="section-title">Уравнение Шрёдингера</h2>
+      <div class="section-divider"></div>
+
+      <p class="body-text">
+        Эволюция волновой функции во времени описывается <strong style="color:var(--accent);font-weight:300;">уравнением Шрёдингера</strong> — фундаментальным постулатом квантовой механики. Оно играет роль, аналогичную второму закону Ньютона в классической механике.
+      </p>
+
+      <div class="formula-block">
+        <div class="formula-label">Нестационарное уравнение Шрёдингера</div>
+        <div class="formula-content">
+          \[ i\hbar \,\frac{\partial \psi}{\partial t} \;=\; \hat{H}\,\psi \]
+        </div>
+      </div>
+
+      <p class="body-text">
+        Здесь <em style="color:var(--glow);">ℏ</em> — приведённая постоянная Планка, а <em style="color:var(--glow);">Ĥ</em> — оператор Гамильтона, отвечающий полной энергии системы. Для частицы в потенциале V(r) он принимает вид:
+      </p>
+
+      <div class="formula-block">
+        <div class="formula-label">Оператор Гамильтона</div>
+        <div class="formula-content">
+          \[ \hat{H} \;=\; -\frac{\hbar^2}{2m}\nabla^2 \;+\; V(\mathbf{r}) \]
+        </div>
+      </div>
+
+      <p class="body-text">
+        Когда потенциал не зависит от времени, решение уравнения распадается на пространственную и временну́ю части: <em style="color:var(--glow);">ψ(r, t) = φ(r) · e<sup>−iEt/ℏ</sup></em>. Функция φ(r) находится из стационарного уравнения Шрёдингера.
+      </p>
+
+      <!-- § 03 — Виды волновой функции -->
+      <div class="section-label" style="margin-top:4rem;">§ 03 — Виды</div>
+      <h2 class="section-title">Виды волновой функции двух электронов</h2>
+      <div class="section-divider"></div>
+
+      <p class="body-text">
+        Рассмотрим систему из двух <em style="color:var(--glow);">запутанных</em> электронов. Каждый электрон обладает спином — собственным угловым моментом, проекция которого на любую ось принимает значения <em style="color:var(--glow);">+½ℏ</em> («спин вверх») или <em style="color:var(--glow);">−½ℏ</em> («спин вниз»).
+      </p>
+
+      <div class="states-grid">
+
+        <div class="state-card">
+          <div class="state-symbol">S=0</div>
+          <div class="state-tag">Антисимметричное</div>
+          <div class="state-name">Синглет</div>
+          <div class="state-desc">
+            Суммарный спин системы равен нулю. Спины строго противоположны при любом направлении измерения.
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-symbol">↑↑</div>
+          <div class="state-tag">Симметричное · m<sub>s</sub> = +1</div>
+          <div class="state-name">Триплет +1</div>
+          <div class="state-desc">
+            Оба электрона имеют спин вверх. Проекция полного спина на ось z равна +ℏ.
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-symbol">↓↓</div>
+          <div class="state-tag">Симметричное · m<sub>s</sub> = −1</div>
+          <div class="state-name">Триплет −1</div>
+          <div class="state-desc">
+            Оба электрона имеют спин вниз. Проекция полного спина на ось z равна −ℏ.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Singlet formula -->
+      <div class="formula-block">
+        <div class="formula-label">Синглетное состояние (S = 0) — идеальная антикорреляция</div>
+        <div class="formula-content">
+          \[ |\psi_{\text{singlet}}\rangle \;=\; \frac{1}{\sqrt{2}}\Bigl(|\!\uparrow\downarrow\rangle \;-\; |\!\downarrow\uparrow\rangle\Bigr) \]
+        </div>
+      </div>
+
+      <p class="body-text">
+        Если измерить спин первого электрона с помощью прибора Штерна–Герлаха и получить «спин вверх», то у второго электрона спин мгновенно окажется «вниз» — независимо от расстояния между частицами. Это <em style="color:var(--glow);">квантовая запутанность</em>.
+      </p>
+
+      <p class="body-text">
+        Критически важный момент, который часто упускается: корреляции в синглетном состоянии зависят от направления измерения. При одинаковых осях результаты строго противоположны; при разных осях корреляции описываются формулой:
+      </p>
+
+      <div class="formula-block">
+        <div class="formula-label">Вероятность одинаковых результатов при угле θ между осями</div>
+        <div class="formula-content">
+          \[ P(\text{одинаковые}) \;=\; \frac{1 - \cos\theta}{2} \]
+        </div>
+      </div>
+
+      <!-- Triplet formula -->
+      <div class="formula-block">
+        <div class="formula-label">Триплетные состояния (S = 1) — три состояния с m_s = −1, 0, +1</div>
+        <div class="formula-content">
+          \[
+            |\psi_{+1}\rangle = |\!\uparrow\uparrow\rangle, \quad
+            |\psi_{0}\rangle = \tfrac{1}{\sqrt{2}}\bigl(|\!\uparrow\downarrow\rangle + |\!\downarrow\uparrow\rangle\bigr), \quad
+            |\psi_{-1}\rangle = |\!\downarrow\downarrow\rangle
+          \]
+        </div>
+      </div>
+
+      <div class="note-block">
+        Эти предсказания квантовой механики были многократно проверены экспериментально, начиная с работ <strong>Алена Аспекта в 1982 году</strong>. Серия экспериментов окончательно опровергла гипотезу локальных скрытых переменных Эйнштейна–Подольского–Розена.
+      </div>
+
+      <!-- § 04 — Ключевые принципы -->
+      <div class="section-label" style="margin-top:4rem;">§ 04 — Принципы</div>
+      <h2 class="section-title">Ключевые принципы</h2>
+      <div class="section-divider"></div>
+
+      <div class="qn-grid">
+
+        <div class="qn-card">
+          <div class="qn-symbol">∑</div>
+          <div class="qn-index">01 / Суперпозиция</div>
+          <div class="qn-name">Принцип суперпозиции</div>
+          <div class="qn-desc">
+            Если ψ₁ и ψ₂ — решения уравнения Шрёдингера, то αψ₁ + βψ₂ тоже решение. До измерения частица существует во всех допустимых состояниях сразу. Измерение «коллапсирует» функцию в одно из них.
+          </div>
+        </div>
+
+        <div class="qn-card">
+          <div class="qn-symbol">∞</div>
+          <div class="qn-index">02 / Запутанность</div>
+          <div class="qn-name">Квантовая запутанность</div>
+          <div class="qn-desc">
+            Состояние двух и более частиц не может быть описано независимо. Измерение одной частицы мгновенно определяет состояние другой — на любом расстоянии.
+          </div>
+        </div>
+
+        <div class="qn-card">
+          <div class="qn-symbol">Δ</div>
+          <div class="qn-index">03 / Неопределённость</div>
+          <div class="qn-name">Принцип Гейзенберга</div>
+          <div class="qn-desc">
+            Чем точнее известна координата частицы x, тем менее определён её импульс p, и наоборот. Формально: Δx · Δp ≥ ℏ/2. Это не ограничение приборов, а фундаментальное свойство природы.
+          </div>
+        </div>
+
+        <div class="qn-card">
+          <div class="qn-symbol">⊥</div>
+          <div class="qn-index">04 / Принцип Паули</div>
+          <div class="qn-name">Запрет Паули</div>
+          <div class="qn-desc">
+            Два фермиона не могут одновременно занимать одно и то же квантовое состояние. Волновая функция системы фермионов антисимметрична относительно перестановки любых двух частиц.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- § 05 — История -->
+      <div class="section-label" style="margin-top:4rem;">§ 05 — История</div>
+      <h2 class="section-title">История открытий</h2>
+      <div class="section-divider"></div>
+
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-year">1924</div>
+          <p class="tl-text"><strong>Луи де Бройль</strong> предположил, что любая частица обладает волновыми свойствами. Длина волны материи: λ = h/p.</p>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-year">1925 — 1926</div>
+          <p class="tl-text"><strong>Эрвин Шрёдингер</strong> вывел волновое уравнение. <strong>Вернер Гейзенберг</strong> параллельно создал матричную механику — математически эквивалентный подход.</p>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-year">1926</div>
+          <p class="tl-text"><strong>Макс Борн</strong> предложил вероятностную интерпретацию: |ψ|² — плотность вероятности. За это открытие он получил Нобелевскую премию в 1954 году.</p>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-year">1935</div>
+          <p class="tl-text"><strong>Эйнштейн, Подольский, Розен</strong> опубликовали парадокс ЭПР, поставив под сомнение полноту квантовой механики и введя понятие «жуткого дальнодействия».</p>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-year">1964</div>
+          <p class="tl-text"><strong>Джон Белл</strong> вывел неравенства — математический критерий, позволяющий экспериментально отличить квантовую запутанность от классических скрытых переменных.</p>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-year">1982</div>
+          <p class="tl-text"><strong>Ален Аспект</strong> провёл первый строгий эксперимент, нарушивший неравенства Белла, — тем самым подтвердив нелокальную природу квантовой механики.</p>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-year">2022</div>
+          <p class="tl-text"><strong>Аспект, Клаузер, Цайлингер</strong> — Нобелевская премия по физике за эксперименты с запутанными фотонами и нарушением неравенств Белла.</p>
+        </div>
+
+      </div>
+
+      <!-- Интерактивный canvas -->
+      <div class="canvas-wrap" style="margin-top:1rem;">
+        <div class="canvas-label">Интерактивно — плотность вероятности |ψ|² · наведите мышь</div>
+        <canvas id="probCanvas" height="160"></canvas>
+        <div class="canvas-hint">Двигайте мышь по горизонтали — центр пакета следует за курсором</div>
+      </div>
+
+      <!-- Sim banner -->
+      <div class="sim-banner">
+        <div class="sim-text">
+          <div class="sim-label">Интерактивная фича</div>
+          <div class="sim-title">3D Визуализация волновых функций атома</div>
+          <div class="sim-desc">
+            Наблюдай электронные орбитали водорода в трёхмерном пространстве. Переключайся между квантовыми числами n, ℓ, m и смотри, как меняется форма вероятностного облака.
+          </div>
+        </div>
+        <a href="tools/wave_simulator.html" class="sim-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            <path d="M8 12c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z"/>
+            <path d="M2 12h3M19 12h3M12 2v3M12 19v3"/>
+          </svg>
+          Открыть симуляцию
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Back nav -->
+    <div class="page-nav">
+      <a href="../quantum_physics.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Вернуться к квантовой физике
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    Квантовая физика · Наука · Волновая функция
+  </footer>
+
+  <script>
+    // ── Stars ──
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 160; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 1.8 + 0.4;
+      star.style.cssText = `
+        width:${size}px;height:${size}px;
+        top:${Math.random()*100}%;left:${Math.random()*100}%;
+        --d:${(Math.random()*4+2).toFixed(1)}s;
+        --delay:-${(Math.random()*4).toFixed(1)}s;
+        --op:${(Math.random()*0.5+0.2).toFixed(2)};
+      `;
+      starsEl.appendChild(star);
+    }
+
+    // ── Wave animation canvas ──
+    const wc = document.getElementById('waveCanvas');
+    const wCtx = wc.getContext('2d');
+    let wt = 0;
+
+    function resizeWave() {
+      wc.width  = wc.offsetWidth  * devicePixelRatio;
+      wc.height = 130             * devicePixelRatio;
+      wCtx.scale(devicePixelRatio, devicePixelRatio);
+    }
+    resizeWave();
+    window.addEventListener('resize', () => { resizeWave(); });
+
+    function drawWave() {
+      const W = wc.offsetWidth, H = 130;
+      wCtx.clearRect(0, 0, W, H);
+      const cy = H / 2, A = 44, k = 4.5;
+
+      // Re(ψ)
+      wCtx.beginPath();
+      wCtx.strokeStyle = 'rgba(200,169,110,0.85)';
+      wCtx.lineWidth = 1.6;
+      for (let px = 0; px <= W; px++) {
+        const x = (px - W/2) / W;
+        const env = Math.exp(-x*x / (2*0.036));
+        const y = A * env * Math.cos(k * 2 * Math.PI * x - wt);
+        px === 0 ? wCtx.moveTo(px, cy - y) : wCtx.lineTo(px, cy - y);
+      }
+      wCtx.stroke();
+
+      // Im(ψ)
+      wCtx.beginPath();
+      wCtx.strokeStyle = 'rgba(200,169,110,0.3)';
+      wCtx.lineWidth = 1.2;
+      for (let px = 0; px <= W; px++) {
+        const x = (px - W/2) / W;
+        const env = Math.exp(-x*x / (2*0.036));
+        const y = A * env * Math.sin(k * 2 * Math.PI * x - wt);
+        px === 0 ? wCtx.moveTo(px, cy - y) : wCtx.lineTo(px, cy - y);
+      }
+      wCtx.stroke();
+
+      // |ψ|²
+      wCtx.beginPath();
+      wCtx.strokeStyle = 'rgba(240,228,200,0.65)';
+      wCtx.lineWidth = 2.2;
+      for (let px = 0; px <= W; px++) {
+        const x = (px - W/2) / W;
+        const env = Math.exp(-x*x / (2*0.036));
+        const re = A * env * Math.cos(k * 2 * Math.PI * x - wt);
+        const im = A * env * Math.sin(k * 2 * Math.PI * x - wt);
+        const prob = Math.sqrt(re*re + im*im) * 0.88;
+        px === 0 ? wCtx.moveTo(px, cy - prob) : wCtx.lineTo(px, cy - prob);
+      }
+      wCtx.stroke();
+
+      // axis
+      wCtx.beginPath();
+      wCtx.strokeStyle = 'rgba(200,169,110,0.1)';
+      wCtx.lineWidth = 1;
+      wCtx.moveTo(0, cy); wCtx.lineTo(W, cy);
+      wCtx.stroke();
+
+      wt += 0.022;
+      requestAnimationFrame(drawWave);
+    }
+    drawWave();
+
+    // ── Probability density interactive ──
+    const pc = document.getElementById('probCanvas');
+    const pCtx = pc.getContext('2d');
+    let mouseX = null, pt = 0;
+
+    function resizeProb() {
+      pc.width  = pc.offsetWidth  * devicePixelRatio;
+      pc.height = 160             * devicePixelRatio;
+      pCtx.scale(devicePixelRatio, devicePixelRatio);
+    }
+    resizeProb();
+    window.addEventListener('resize', resizeProb);
+
+    pc.addEventListener('mousemove', e => {
+      mouseX = (e.clientX - pc.getBoundingClientRect().left) / pc.offsetWidth;
+    });
+    pc.addEventListener('mouseleave', () => { mouseX = null; });
+
+    function drawProb() {
+      const W = pc.offsetWidth, H = 160;
+      pCtx.clearRect(0, 0, W, H);
+
+      const center = mouseX !== null ? mouseX * W : W / 2;
+      const sigma  = W * 0.11;
+      const base   = H - 18;
+
+      // fill under |ψ|²
+      pCtx.beginPath();
+      for (let px = 0; px <= W; px++) {
+        const prob = Math.exp(-1*(px-center)**2 / (2*sigma*sigma));
+        const yp   = base - prob * (H - 38);
+        px === 0 ? pCtx.moveTo(px, yp) : pCtx.lineTo(px, yp);
+      }
+      const grad = pCtx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, 'rgba(200,169,110,0.22)');
+      grad.addColorStop(1, 'rgba(200,169,110,0)');
+      pCtx.strokeStyle = 'rgba(200,169,110,0.7)';
+      pCtx.lineWidth = 1.6;
+      pCtx.stroke();
+      pCtx.lineTo(W, base); pCtx.lineTo(0, base);
+      pCtx.closePath();
+      pCtx.fillStyle = grad;
+      pCtx.fill();
+
+      // Re(ψ) wave under envelope
+      pCtx.beginPath();
+      pCtx.strokeStyle = 'rgba(240,228,200,0.2)';
+      pCtx.lineWidth = 1.2;
+      for (let px = 0; px <= W; px++) {
+        const env = Math.exp(-1*(px-center)**2 / (2*sigma*sigma));
+        const y   = env * Math.cos(6 * 2*Math.PI * (px-center)/W - pt) * (H-38) * 0.38;
+        px === 0 ? pCtx.moveTo(px, H/2 - y) : pCtx.lineTo(px, H/2 - y);
+      }
+      pCtx.stroke();
+
+      // baseline
+      pCtx.beginPath();
+      pCtx.strokeStyle = 'rgba(200,169,110,0.1)';
+      pCtx.lineWidth = 1;
+      pCtx.moveTo(0, base); pCtx.lineTo(W, base);
+      pCtx.stroke();
+
+      // cursor
+      if (mouseX !== null) {
+        const cx   = mouseX * W;
+        const prob = 1.0;
+        const yp   = base - prob * (H - 38);
+
+        pCtx.beginPath();
+        pCtx.strokeStyle = 'rgba(200,169,110,0.35)';
+        pCtx.lineWidth = 1;
+        pCtx.setLineDash([4, 5]);
+        pCtx.moveTo(cx, base); pCtx.lineTo(cx, yp);
+        pCtx.stroke();
+        pCtx.setLineDash([]);
+
+        const realProb = Math.exp(-1*(cx-center)**2 / (2*sigma*sigma));
+        const ypt = base - realProb * (H - 38);
+        pCtx.beginPath();
+        pCtx.arc(cx, ypt, 3.5, 0, Math.PI*2);
+        pCtx.fillStyle = 'rgba(200,169,110,0.9)';
+        pCtx.fill();
+
+        pCtx.font = "11px 'Jost', sans-serif";
+        pCtx.fillStyle = 'rgba(200,169,110,0.7)';
+        pCtx.letterSpacing = '0.05em';
+        pCtx.fillText(`|ψ|² = ${realProb.toFixed(3)}`, cx + 9, ypt - 5);
+      }
+
+      pt += 0.018;
+      requestAnimationFrame(drawProb);
+    }
+    drawProb();
+  </script>
+</body>
+</html>

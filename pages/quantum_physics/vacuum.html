@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вакуум — Квантовая физика</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --void: #000000;
+      --deep: #050508;
+      --nebula: #0a0a14;
+      --glow: #c8a96e;
+      --glow-soft: rgba(200, 169, 110, 0.15);
+      --glow-ring: rgba(200, 169, 110, 0.6);
+      --text: #e8e0d0;
+      --text-dim: rgba(232, 224, 208, 0.45);
+      --accent: #f0e4c8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #06060f 0%, #000000 70%);
+    }
+
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+      opacity: var(--op, 0.6);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--op, 0.6); transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(0.6); }
+    }
+
+    /* ─── VACUUM CANVAS ANIMATION ─── */
+
+    /* Hero title */
+    .hero-title {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hero-title h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3.8rem, 7vw, 5.5rem);
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      text-shadow:
+        0 0 40px rgba(200, 169, 110, 0.5),
+        0 0 80px rgba(200, 169, 110, 0.2);
+      line-height: 1.4;
+    }
+
+    .hero-title .sub {
+      display: block;
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: clamp(0.6rem, 1vw, 0.75rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 0.6rem;
+    }
+
+    /* Hero canvas */
+    #heroCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0.4;
+      animation: fadeFloat 2.5s ease-in-out infinite;
+    }
+    .scroll-hint span {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+    }
+    .scroll-hint svg { width: 16px; opacity: 0.6; }
+    @keyframes fadeFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+      50% { transform: translateX(-50%) translateY(6px); opacity: 0.7; }
+    }
+
+    /* ─── CONTENT SECTION ─── */
+    .content-section {
+      background: var(--deep);
+      padding: 6rem 4rem;
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .content-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glow-ring), transparent);
+      opacity: 0.4;
+    }
+
+    .section-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--glow), transparent);
+      margin-bottom: 2.5rem;
+      opacity: 0.6;
+    }
+
+    .body-text {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: var(--text);
+      opacity: 0.85;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── NOTE BLOCK ─── */
+    .note-block {
+      background: var(--nebula);
+      border: 1px solid rgba(200, 169, 110, 0.15);
+      border-left: 2px solid var(--glow);
+      padding: 1.4rem 1.8rem;
+      margin: 2rem 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text-dim);
+    }
+
+    .note-block strong {
+      color: var(--glow);
+      font-style: normal;
+      font-weight: 300;
+    }
+
+    /* ─── FORMULA BLOCK ─── */
+    .formula-block {
+      background: var(--nebula);
+      border: 1px solid rgba(200, 169, 110, 0.12);
+      border-left: 2px solid rgba(200, 169, 110, 0.5);
+      padding: 1.8rem 2rem;
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.4s, background 0.4s;
+    }
+
+    .formula-block:hover {
+      background: #0e0e1a;
+      border-color: rgba(200, 169, 110, 0.28);
+      border-left-color: var(--glow);
+    }
+
+    .formula-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+
+    .formula-content {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--accent);
+      padding: 0.4rem 0;
+    }
+
+    .formula-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.75rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      margin-top: 0.9rem;
+    }
+
+    /* ─── VACUUM STATES CARDS ─── */
+    .states-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5px;
+      margin: 3rem 0;
+    }
+
+    .state-card {
+      background: var(--nebula);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    .state-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.08);
+      pointer-events: none;
+      transition: border-color 0.4s;
+    }
+
+    .state-card:hover { background: #0e0e1a; }
+    .state-card:hover::after { border-color: rgba(200, 169, 110, 0.25); }
+
+    .state-bg-symbol {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 5rem;
+      color: var(--glow);
+      opacity: 0.06;
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .state-tag {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.75;
+      margin-bottom: 0.7rem;
+    }
+
+    .state-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.7rem;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+      line-height: 1.2;
+    }
+
+    .state-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.8rem;
+      line-height: 1.75;
+      color: var(--text-dim);
+    }
+
+    .state-highlight {
+      display: inline;
+      color: var(--text);
+    }
+
+    /* ─── ENERGY DIAGRAM ─── */
+    .energy-diagram {
+      background: var(--nebula);
+      border: 1px solid rgba(200, 169, 110, 0.1);
+      padding: 2rem;
+      margin: 2.5rem 0;
+    }
+
+    .diagram-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+      margin-bottom: 1.4rem;
+    }
+
+    /* ─── EFFECTS GRID ─── */
+    .effects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      margin: 3rem 0;
+    }
+
+    .effect-card {
+      background: var(--nebula);
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+
+    .effect-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(200, 169, 110, 0.08);
+      pointer-events: none;
+      transition: border-color 0.4s;
+    }
+
+    .effect-card:hover { background: #0e0e1a; }
+    .effect-card:hover::after { border-color: rgba(200, 169, 110, 0.22); }
+
+    .effect-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 2.2rem;
+      color: var(--glow);
+      opacity: 0.18;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .effect-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1.05rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.03em;
+    }
+
+    .effect-desc {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.74rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    /* ─── TIMELINE ─── */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      margin: 2.5rem 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(200,169,110,0.5), transparent);
+    }
+
+    .tl-item {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -1.72rem;
+      top: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--glow);
+      box-shadow: 0 0 8px rgba(200,169,110,0.6);
+    }
+
+    .tl-year {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.8;
+      margin-bottom: 0.3rem;
+    }
+
+    .tl-text {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: var(--text-dim);
+    }
+
+    .tl-text strong {
+      color: var(--text);
+      font-weight: 300;
+    }
+
+    /* ─── PAGE NAV ─── */
+    .page-nav {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 4rem;
+      background: var(--deep);
+      position: relative;
+    }
+
+    .page-nav::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,169,110,0.3), transparent);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover { color: var(--glow); }
+    .back-link svg { width: 14px; transition: transform 0.3s; }
+    .back-link:hover svg { transform: translateX(-4px); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--void);
+      text-align: center;
+      padding: 2.5rem 1rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+  <section class="hero">
+    <div class="stars" id="stars"></div>
+
+    <!-- Canvas: vacuum decay bubble expanding across the field -->
+    <canvas id="heroCanvas"></canvas>
+
+    <!-- Hero text -->
+    <div class="hero-title">
+      <h1>Вакуум</h1>
+      <span class="sub">Квантовая физика · Пустота, которой нет</span>
+    </div>
+
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint">
+      <span>Прокрутить</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(200,169,110,0.6)" stroke-width="1.5" stroke-linecap="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════ CONTENT ═══════════════════════════ -->
+  <div class="content-section">
+
+    <!-- §01 Что такое вакуум -->
+    <div class="section-label">§ 01 — Определение</div>
+    <h2 class="section-title">Что такое вакуум?</h2>
+    <div class="section-divider"></div>
+
+    <p class="body-text">
+      В классическом понимании <em style="color:var(--glow);">вакуум</em> — это пространство, практически лишённое вещества, с давлением значительно меньшим, чем атмосферное. Само слово происходит от латинского <em>vacuum</em> — «пустота».
+    </p>
+
+    <p class="body-text">
+      Однако современная физика радикально переосмыслила этот термин. В квантовой теории поля вакуум — это не «ничто», а <em style="color:var(--glow);">низкоэнергетическое состояние квантовых полей</em>. В нём постоянно рождаются и аннигилируют виртуальные частицы, а само это состояние обладает собственной, ненулевой энергией — так называемой <em style="color:var(--glow);">нулевой энергией вакуума</em>.
+    </p>
+
+    <div class="note-block">
+      <strong>Принцип неопределённости Гейзенберга</strong> запрещает любому квантовому полю находиться в состоянии строгого покоя. Даже в «пустом» пространстве поля флуктуируют: ΔE · Δt ≥ ℏ/2. Именно эти неустранимые флуктуации и порождают виртуальные частицы.
+    </div>
+
+    <p class="body-text">
+      Виртуальные частицы — это промежуточные квантовые состояния, которые не наблюдаются напрямую, но реально влияют на физические процессы. Они существуют в течение крайне малого времени и аннигилируют прежде, чем их можно обнаружить непосредственно. Тем не менее их косвенные эффекты — измеримы и хорошо подтверждены экспериментально.
+    </p>
+
+    <!-- §02 Виды вакуума -->
+    <div class="section-label" style="margin-top:3.5rem;">§ 02 — Классификация</div>
+    <h2 class="section-title">Ложный и истинный вакуум</h2>
+    <div class="section-divider"></div>
+
+    <p class="body-text">
+      В квантовой физике вакуум подразделяется на два принципиально различных состояния в зависимости от уровня энергии квантовых полей:
+    </p>
+
+    <div class="states-grid">
+      <div class="state-card">
+        <div class="state-bg-symbol">Л</div>
+        <div class="state-tag">Состояние I</div>
+        <div class="state-name">Ложный вакуум</div>
+        <div class="state-desc">
+          Состояние вакуума, имеющее <span class="state-highlight">локальный минимум энергии</span>, но не достигшее абсолютного минимума. Энергии в нём больше, чем у истинного вакуума, — однако она всё равно очень мала. При определённых условиях или «толчке» ложный вакуум способен «соскользнуть» в истинный. Этот процесс называется <span class="state-highlight">вакуумным распадом (vacuum decay)</span>.
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-bg-symbol">И</div>
+        <div class="state-tag">Состояние II</div>
+        <div class="state-name">Истинный вакуум</div>
+        <div class="state-desc">
+          Состояние вакуума с <span class="state-highlight">абсолютным минимумом энергии</span> — более низкой энергии для данного набора квантовых полей достичь невозможно. Является глобально стабильным состоянием. Наш наблюдаемый мир, по всей видимости, существует в области ложного вакуума, а не истинного.
+        </div>
+      </div>
+    </div>
+
+    <!-- Диаграмма энергетического потенциала -->
+    <div class="energy-diagram">
+      <div class="diagram-label">Схема — Потенциальная яма вакуума</div>
+      <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+        <defs>
+          <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c8a96e" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#c8a96e" stop-opacity="0.3"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Axes -->
+        <line x1="40" y1="20" x2="40" y2="215" stroke="rgba(200,169,110,0.25)" stroke-width="1"/>
+        <line x1="35" y1="215" x2="720" y2="215" stroke="rgba(200,169,110,0.25)" stroke-width="1"/>
+
+        <!-- Axis labels -->
+        <text x="30" y="16" fill="rgba(200,169,110,0.5)" font-family="Jost,sans-serif" font-size="9" text-anchor="middle" letter-spacing="1">E</text>
+        <text x="725" y="218" fill="rgba(200,169,110,0.5)" font-family="Jost,sans-serif" font-size="9" letter-spacing="1">φ</text>
+
+        <!-- Potential curve: big dip (false vacuum) then deeper dip (true vacuum) -->
+        <!-- Path: starts top-left, falls to false vacuum local min, rises over barrier, falls to deeper true vacuum, rises again -->
+        <path d="M55,30 C80,30 110,60 140,100 C165,132 175,148 185,160 C198,175 210,180 220,178 C232,175 240,170 250,158 C265,140 280,120 310,110 C335,104 355,108 375,118 C400,130 415,155 430,170 C445,185 460,196 480,198 C500,199 520,193 540,178 C560,162 575,140 595,130 C615,122 635,125 660,145 C685,165 705,190 720,210"
+              fill="none" stroke="url(#curveGrad)" stroke-width="2.2" stroke-linecap="round"/>
+
+        <!-- False vacuum marker -->
+        <circle cx="220" cy="178" r="5" fill="#c8a96e" opacity="0.7"/>
+        <line x1="220" y1="178" x2="220" y2="215" stroke="rgba(200,169,110,0.2)" stroke-width="1" stroke-dasharray="3 4"/>
+        <text x="220" y="228" fill="rgba(200,169,110,0.6)" font-family="Jost,sans-serif" font-size="9" text-anchor="middle">Ложный</text>
+        <text x="220" y="238" fill="rgba(200,169,110,0.6)" font-family="Jost,sans-serif" font-size="9" text-anchor="middle">вакуум</text>
+
+        <!-- True vacuum marker -->
+        <circle cx="480" cy="198" r="5" fill="#f0e4c8" opacity="0.8"/>
+        <line x1="480" y1="198" x2="480" y2="215" stroke="rgba(240,228,200,0.2)" stroke-width="1" stroke-dasharray="3 4"/>
+        <text x="480" y="228" fill="rgba(240,228,200,0.65)" font-family="Jost,sans-serif" font-size="9" text-anchor="middle">Истинный</text>
+        <text x="480" y="238" fill="rgba(240,228,200,0.65)" font-family="Jost,sans-serif" font-size="9" text-anchor="middle">вакуум</text>
+
+        <!-- Barrier annotation -->
+        <text x="360" y="100" fill="rgba(200,169,110,0.35)" font-family="Jost,sans-serif" font-size="8" text-anchor="middle" letter-spacing="2">БАРЬЕР</text>
+
+        <!-- Arrow indicating tunnel / decay -->
+        <path d="M245,162 Q310,105 430,168" fill="none" stroke="rgba(200,169,110,0.2)" stroke-width="1" stroke-dasharray="4 5"/>
+        <text x="330" y="128" fill="rgba(200,169,110,0.3)" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10" text-anchor="middle">вакуумный распад</text>
+
+        <!-- Energy level lines -->
+        <line x1="42" y1="178" x2="55" y2="178" stroke="rgba(200,169,110,0.2)" stroke-width="1"/>
+        <line x1="42" y1="198" x2="55" y2="198" stroke="rgba(240,228,200,0.15)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <!-- §03 Вакуумный распад -->
+    <div class="section-label" style="margin-top:3.5rem;">§ 03 — Вакуумный распад</div>
+    <h2 class="section-title">Распад вакуума</h2>
+    <div class="section-divider"></div>
+
+    <p class="body-text">
+      Если Вселенная находится в состоянии ложного вакуума, то при определённых условиях — случайной квантовой флуктуации достаточной амплитуды — он может <em style="color:var(--glow);">туннелировать</em> через потенциальный барьер и перейти в истинный вакуум. Этот процесс называют <em style="color:var(--glow);">вакуумным распадом</em> (или вакуумным разрывом).
+    </p>
+
+    <p class="body-text">
+      Переход начался бы в некоторой точке пространства и распространялся бы со скоростью света в виде расширяющегося «пузыря» нового вакуума. Внутри этого пузыря все физические константы — заряды элементарных частиц, масса электрона, постоянная тонкой структуры — были бы другими. Привычные атомы и молекулы мгновенно перестали бы существовать.
+    </p>
+
+    <div class="note-block">
+      Вакуумный распад был бы абсолютно <strong>необратимым</strong> и распространялся бы со <strong>скоростью света</strong> — это делает его принципиально не обнаруживаемым заранее. Никакой сигнал не смог бы опередить границу такого пузыря.
+    </div>
+
+    <p class="body-text">
+      Вероятность вакуумного распада чрезвычайно мала — существующая Вселенная устойчива на временах, многократно превышающих её нынешний возраст (~13,8 млрд лет). Тем не менее данный сценарий является одним из теоретически допустимых финалов Вселенной в рамках квантовой теории поля.
+    </p>
+
+    <!-- §04 Структура вакуума -->
+    <div class="section-label" style="margin-top:3.5rem;">§ 04 — Структура</div>
+    <h2 class="section-title">Структура вакуума и законы физики</h2>
+    <div class="section-divider"></div>
+
+    <p class="body-text">
+      Одна из наиболее глубоких идей современной теоретической физики состоит в том, что <em style="color:var(--glow);">структура вакуума</em> определяет все наблюдаемые законы природы. Фундаментальные константы — скорость света, масса элементарных частиц, постоянная Планка — задаются не произвольно, а следуют из минимума энергии квантовых полей, то есть из конфигурации самого вакуума.
+    </p>
+
+    <p class="body-text">
+      Если бы ложный вакуум нашей Вселенной имел чуть иную энергию, параметры фундаментальных полей были бы другими — а значит, были бы другими и масса протона, и сила электромагнитного взаимодействия, и сам набор элементарных частиц. Мир, физика и химия которого отличалась бы принципиально. Это делает вакуум не просто «пустотой», а <em style="color:var(--glow);">фундаментом реальности</em>.
+    </p>
+
+    <div class="note-block">
+      В рамках теории <strong>мультивселенной</strong> разные «карманные вселенные» могут иметь разные вакуумные состояния — и, следовательно, разные наборы физических законов. Наша Вселенная уникальна своей конфигурацией вакуума, которая оказалась совместима с возникновением сложных структур и жизни.
+    </div>
+
+    <!-- §05 Наблюдаемые эффекты -->
+    <div class="section-label" style="margin-top:3.5rem;">§ 05 — Эксперименты</div>
+    <h2 class="section-title">Измеримые эффекты квантового вакуума</h2>
+    <div class="section-divider"></div>
+
+    <p class="body-text">
+      Квантовый вакуум — не абстракция: его эффекты экспериментально подтверждены с высокой точностью. Ниже — три важнейших явления, которые доказывают, что «пустота» физически активна:
+    </p>
+
+    <div class="effects-grid">
+      <div class="effect-card">
+        <div class="effect-num">01</div>
+        <div class="effect-name">Эффект Казимира</div>
+        <div class="effect-desc">
+          Две параллельные незаряженные металлические пластины в вакууме притягиваются друг к другу. Причина — виртуальные фотоны между пластинами «отсечены» граничными условиями, поэтому их давление снаружи превышает давление изнутри. Эффект измерен экспериментально с точностью до 1%.
+        </div>
+      </div>
+      <div class="effect-card">
+        <div class="effect-num">02</div>
+        <div class="effect-name">Лэмбовский сдвиг</div>
+        <div class="effect-desc">
+          Энергетические уровни атома водорода немного смещены относительно предсказаний уравнения Дирака. Причина — взаимодействие электрона с флуктуациями вакуума. Измерен Лэмбом и Резерфордом в 1947 г. и стал одним из первых триумфов квантовой электродинамики (КЭД).
+        </div>
+      </div>
+      <div class="effect-card">
+        <div class="effect-num">03</div>
+        <div class="effect-name">Спонтанное излучение</div>
+        <div class="effect-desc">
+          Возбуждённый атом в абсолютной «пустоте» самопроизвольно испускает фотон и переходит в основное состояние. Это происходит из-за взаимодействия с вакуумными флуктуациями поля излучения — без них атом оставался бы возбуждённым бесконечно долго.
+        </div>
+      </div>
+    </div>
+
+    <!-- §06 Нулевая энергия -->
+    <div class="section-label" style="margin-top:3.5rem;">§ 06 — Нулевая энергия</div>
+    <h2 class="section-title">Нулевая энергия вакуума</h2>
+    <div class="section-divider"></div>
+
+    <p class="body-text">
+      Каждое квантовое поле обладает так называемой <em style="color:var(--glow);">нулевой энергией</em> (Zero-Point Energy, ZPE) — минимальной энергией, которую оно имеет даже в отсутствие каких-либо частиц. Для квантового осциллятора эта энергия равна:
+    </p>
+
+    <div class="formula-block">
+      <div class="formula-label">Нулевая энергия квантового осциллятора</div>
+      <div class="formula-content">
+        E₀ = ½ ℏω
+      </div>
+      <div class="formula-desc">
+        где <em>ℏ</em> — приведённая постоянная Планка (≈ 1,055 × 10⁻³⁴ Дж·с), <em>ω</em> — угловая частота осциллятора. Квантовое поле можно представить как бесконечный набор таких осцилляторов для каждого значения импульса.
+      </div>
+    </div>
+
+    <p class="body-text">
+      Суммирование нулевых энергий по всем модам поля даёт формально бесконечную величину — это так называемая <em style="color:var(--glow);">ультрафиолетовая расходимость</em>. В практических расчётах её устраняют методом <em style="color:var(--glow);">перенормировки</em>: в наблюдаемые физические величины входит лишь разность энергий, а не абсолютное значение. Тем не менее конечная часть вакуумной энергии, по всей видимости, связана с наблюдаемой <em style="color:var(--glow);">космологической постоянной Λ</em> и ускоренным расширением Вселенной.
+    </p>
+
+    <!-- §07 История -->
+    <div class="section-label" style="margin-top:3.5rem;">§ 07 — История открытий</div>
+    <h2 class="section-title">Ключевые открытия</h2>
+    <div class="section-divider"></div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-year">1913</div>
+        <div class="tl-text"><strong>Планк</strong> вводит понятие нулевой энергии при описании квантового осциллятора, впервые указав на то, что даже при T = 0 система обладает ненулевой энергией.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1926–1927</div>
+        <div class="tl-text"><strong>Гейзенберг</strong> формулирует принцип неопределённости (ΔE · Δt ≥ ℏ/2), который теоретически обосновывает неустранимость квантовых флуктуаций вакуума.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1947</div>
+        <div class="tl-text"><strong>Уиллис Лэмб и Роберт Резерфорд</strong> измеряют сдвиг уровней атома водорода (лэмбовский сдвиг), экспериментально подтвердив влияние вакуумных флуктуаций на атомные спектры.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1948</div>
+        <div class="tl-text"><strong>Хендрик Казимир</strong> теоретически предсказывает притяжение между нейтральными проводящими пластинами в вакууме. Эффект экспериментально подтверждён в 1997 году Ламоро с точностью ~5%, а позднее — с точностью до 1%.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1977</div>
+        <div class="tl-text"><strong>Сидни Коулман</strong> разрабатывает математическую теорию вакуумного распада — квантово-механического туннелирования из ложного вакуума в истинный через потенциальный барьер.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1998</div>
+        <div class="tl-text">Открытие <strong>ускоренного расширения Вселенной</strong> (Перлматтер, Шмидт, Рисс) — Нобелевская премия 2011. Данные указывают на ненулевую плотность энергии вакуума, связанную с космологической постоянной.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Page nav -->
+  <div class="page-nav">
+    <a href="../quantum_physics.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Вернуться к квантовой физике
+    </a>
+  </div>
+
+  <footer>
+    Квантовая физика · Наука · Вакуум
+  </footer>
+
+  <script>
+    // ── Stars ──
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 160; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 1.8 + 0.4;
+      star.style.cssText = `
+        width: ${size}px; height: ${size}px;
+        top: ${Math.random() * 100}%; left: ${Math.random() * 100}%;
+        --d: ${(Math.random() * 4 + 2).toFixed(1)}s;
+        --delay: -${(Math.random() * 4).toFixed(1)}s;
+        --op: ${(Math.random() * 0.5 + 0.2).toFixed(2)};
+      `;
+      starsEl.appendChild(star);
+    }
+
+    // ── Canvas: vacuum decay bubble + field distortion + virtual particles ──
+    const canvas = document.getElementById('heroCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Virtual particle pairs
+    const PAIRS = 28;
+    const pairs = Array.from({ length: PAIRS }, () => makeParticle());
+
+    function makeParticle() {
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = 60 + Math.random() * 320;
+      return {
+        angle, dist,
+        life: Math.random(),          // 0–1 phase offset
+        speed: 0.004 + Math.random() * 0.006,
+        size: 1.4 + Math.random() * 2.2,
+        separation: 6 + Math.random() * 10,
+      };
+    }
+
+    // Bubble state — slow cycle: nucleate → expand → reset
+    let bubbleR = 0;
+    let bubblePhase = 0;           // 0 = dormant, 1 = expanding, 2 = fading
+    let bubbleOpacity = 0;
+    let bubbleTimer = 180;         // frames until next nucleation
+
+    // Grid of field points to distort
+    const GRID = 22;
+    let fieldPts = [];
+    function buildField(w, h) {
+      fieldPts = [];
+      for (let y = 0; y <= GRID; y++)
+        for (let x = 0; x <= GRID; x++)
+          fieldPts.push({ bx: (x / GRID) * w, by: (y / GRID) * h });
+    }
+    buildField(window.innerWidth, window.innerHeight);
+    window.addEventListener('resize', () => buildField(canvas.width, canvas.height));
+
+    let t = 0;
+
+    function draw() {
+      t++;
+      const W = canvas.width, H = canvas.height;
+      const cx = W * 0.5, cy = H * 0.5;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // ── Background field grid (gentle warp lines) ──
+      ctx.save();
+      ctx.strokeStyle = 'rgba(200,169,110,0.045)';
+      ctx.lineWidth = 0.8;
+      const spacing = W / GRID;
+      // Horizontal warped lines
+      for (let row = 0; row <= GRID; row++) {
+        ctx.beginPath();
+        for (let col = 0; col <= GRID; col++) {
+          const bx = (col / GRID) * W;
+          const by = (row / GRID) * H;
+          const dx = bx - cx, dy = by - cy;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          // bubble distortion
+          let push = 0;
+          if (bubblePhase === 1 || bubblePhase === 2) {
+            const edge = d - bubbleR;
+            if (Math.abs(edge) < 60) {
+              push = (Math.cos((edge / 60) * Math.PI) + 1) * 0.5 * 12 * bubbleOpacity;
+            }
+          }
+          const wave = Math.sin(d * 0.018 - t * 0.022) * 2.5;
+          const nx = bx + (dx / d) * (push + wave);
+          const ny = by + (dy / d) * (push + wave);
+          col === 0 ? ctx.moveTo(nx, ny) : ctx.lineTo(nx, ny);
+        }
+        ctx.stroke();
+      }
+      // Vertical warped lines
+      for (let col = 0; col <= GRID; col++) {
+        ctx.beginPath();
+        for (let row = 0; row <= GRID; row++) {
+          const bx = (col / GRID) * W;
+          const by = (row / GRID) * H;
+          const dx = bx - cx, dy = by - cy;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          let push = 0;
+          if (bubblePhase === 1 || bubblePhase === 2) {
+            const edge = d - bubbleR;
+            if (Math.abs(edge) < 60) {
+              push = (Math.cos((edge / 60) * Math.PI) + 1) * 0.5 * 12 * bubbleOpacity;
+            }
+          }
+          const wave = Math.sin(d * 0.018 - t * 0.022) * 2.5;
+          const nx = bx + (dx / d) * (push + wave);
+          const ny = by + (dy / d) * (push + wave);
+          row === 0 ? ctx.moveTo(nx, ny) : ctx.lineTo(nx, ny);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // ── Bubble lifecycle ──
+      if (bubblePhase === 0) {
+        bubbleTimer--;
+        if (bubbleTimer <= 0) {
+          bubblePhase = 1;
+          bubbleR = 0;
+          bubbleOpacity = 0;
+        }
+      } else if (bubblePhase === 1) {
+        bubbleR += 1.6;
+        bubbleOpacity = Math.min(1, bubbleOpacity + 0.025);
+        if (bubbleR > Math.max(W, H) * 0.72) bubblePhase = 2;
+      } else if (bubblePhase === 2) {
+        bubbleR += 1.6;
+        bubbleOpacity -= 0.018;
+        if (bubbleOpacity <= 0) {
+          bubblePhase = 0;
+          bubbleTimer = 260 + Math.random() * 180;
+        }
+      }
+
+      // ── Draw bubble ──
+      if ((bubblePhase === 1 || bubblePhase === 2) && bubbleOpacity > 0) {
+        // Inner glow fill (true vacuum interior)
+        const innerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, bubbleR);
+        innerGrad.addColorStop(0,   `rgba(200,169,110,${0.055 * bubbleOpacity})`);
+        innerGrad.addColorStop(0.7, `rgba(200,169,110,${0.022 * bubbleOpacity})`);
+        innerGrad.addColorStop(1,   'rgba(200,169,110,0)');
+        ctx.beginPath();
+        ctx.arc(cx, cy, bubbleR, 0, Math.PI * 2);
+        ctx.fillStyle = innerGrad;
+        ctx.fill();
+
+        // Wall — bright ring
+        const wallGrad = ctx.createRadialGradient(cx, cy, Math.max(0, bubbleR - 18), cx, cy, bubbleR + 8);
+        wallGrad.addColorStop(0,   'rgba(200,169,110,0)');
+        wallGrad.addColorStop(0.5, `rgba(200,169,110,${0.55 * bubbleOpacity})`);
+        wallGrad.addColorStop(1,   'rgba(200,169,110,0)');
+        ctx.beginPath();
+        ctx.arc(cx, cy, bubbleR, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(200,169,110,${0.7 * bubbleOpacity})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Outer shockwave ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, bubbleR + 22, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(200,169,110,${0.18 * bubbleOpacity})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // ── Virtual particle pairs ──
+      pairs.forEach(p => {
+        p.life += p.speed;
+        if (p.life > 1) {
+          // respawn at new location
+          p.angle = Math.random() * Math.PI * 2;
+          p.dist  = 60 + Math.random() * Math.min(W, H) * 0.42;
+          p.life  = 0;
+          p.speed = 0.004 + Math.random() * 0.006;
+          p.size  = 1.4 + Math.random() * 2.2;
+          p.separation = 6 + Math.random() * 10;
+        }
+
+        // Bell curve opacity: appears, peaks, vanishes
+        const op = Math.sin(p.life * Math.PI);
+        if (op <= 0) return;
+
+        const px = cx + Math.cos(p.angle) * p.dist;
+        const py = cy + Math.sin(p.angle) * p.dist;
+        const halfSep = p.separation * 0.5;
+        const perpX = -Math.sin(p.angle), perpY = Math.cos(p.angle);
+
+        // Particle (+)
+        ctx.beginPath();
+        ctx.arc(px + perpX * halfSep, py + perpY * halfSep, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,169,110,${op * 0.85})`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(200,169,110,${op * 0.5})`;
+        ctx.fill();
+
+        // Antiparticle (–) — slightly dimmer
+        ctx.beginPath();
+        ctx.arc(px - perpX * halfSep, py - perpY * halfSep, p.size * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,169,110,${op * 0.5})`;
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+      });
+
+      // ── Subtle central origin glow ──
+      const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
+      coreGrad.addColorStop(0,   'rgba(200,169,110,0.07)');
+      coreGrad.addColorStop(1,   'rgba(200,169,110,0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, 90, 0, Math.PI * 2);
+      ctx.fillStyle = coreGrad;
+      ctx.fill();
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>

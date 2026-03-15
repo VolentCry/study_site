@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Физика — королева наук</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050c1a;
+    --bg2: #071222;
+    --bg3: #0a1830;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #f472b6;
+    --gold: #fbbf24;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --card-bg: rgba(14, 28, 54, 0.85);
+    --border: rgba(56, 189, 248, 0.2);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 64px;
+    background: rgba(5, 12, 26, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; font-weight: 600; color: var(--text2);
+    text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 100px 24px 60px;
+    overflow: hidden;
+  }
+  #starfield {
+    position: absolute; inset: 0; z-index: 0;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 20px; opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    opacity: 0; animation: fadeUp 0.9s 0.4s forwards;
+  }
+  .hero-sub {
+    font-size: 18px; font-weight: 300; color: var(--text2);
+    max-width: 540px; line-height: 1.7; margin: 24px auto 0;
+    opacity: 0; animation: fadeUp 0.9s 0.65s forwards;
+  }
+  .hero-cta {
+    margin-top: 48px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.9s 0.85s forwards;
+  }
+  .btn-primary {
+    padding: 14px 36px; border-radius: 50px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-family: 'Raleway', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(56,189,248,0.3);
+    text-decoration: none;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(56,189,248,0.5); }
+  .btn-outline {
+    padding: 14px 36px; border-radius: 50px;
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--text); font-family: 'Raleway', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .scroll-hint {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--text2); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    animation: bounce 2s infinite;
+  }
+  .scroll-arrow { width: 20px; height: 20px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(45deg); }
+
+  /* ─── SECTION COMMON ─── */
+  section { padding: 100px 24px; }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+  }
+  .section-desc { font-size: 17px; font-weight: 300; color: var(--text2); max-width: 560px; line-height: 1.7; }
+
+  /* ─── CLASSES ─── */
+  #classes { background: var(--bg2); }
+  .classes-inner { max-width: 1160px; margin: 0 auto; }
+  .classes-header { text-align: center; margin-bottom: 64px; }
+  .classes-header .section-desc { margin: 0 auto; }
+  .classes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+  .class-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+    cursor: pointer;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .class-card::before {
+    content: '';
+    position: absolute; inset: 0; opacity: 0;
+    transition: opacity 0.25s;
+    border-radius: 20px;
+  }
+  .class-card:nth-child(1)::before { background: linear-gradient(135deg, rgba(56,189,248,.1), transparent); }
+  .class-card:nth-child(2)::before { background: linear-gradient(135deg, rgba(129,140,248,.1), transparent); }
+  .class-card:nth-child(3)::before { background: linear-gradient(135deg, rgba(244,114,182,.1), transparent); }
+  .class-card:nth-child(4)::before { background: linear-gradient(135deg, rgba(251,191,36,.1), transparent); }
+  .class-card:hover { transform: translateY(-6px); }
+  .class-card:hover::before { opacity: 1; }
+  .class-card:nth-child(1):hover { border-color: var(--accent); box-shadow: 0 20px 60px rgba(56,189,248,.15); }
+  .class-card:nth-child(2):hover { border-color: var(--accent2); box-shadow: 0 20px 60px rgba(129,140,248,.15); }
+  .class-card:nth-child(3):hover { border-color: var(--accent3); box-shadow: 0 20px 60px rgba(244,114,182,.15); }
+  .class-card:nth-child(4):hover { border-color: var(--gold); box-shadow: 0 20px 60px rgba(251,191,36,.15); }
+  .class-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px; font-weight: 900; line-height: 1;
+    margin-bottom: 8px;
+  }
+  .class-card:nth-child(1) .class-number { color: var(--accent); }
+  .class-card:nth-child(2) .class-number { color: var(--accent2); }
+  .class-card:nth-child(3) .class-number { color: var(--accent3); }
+  .class-card:nth-child(4) .class-number { color: var(--gold); }
+  .class-label { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 20px; }
+  .class-topics { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .class-topics li {
+    font-size: 14px; font-weight: 400; color: var(--text2);
+    padding-left: 16px; position: relative;
+  }
+  .class-topics li::before {
+    content: '→'; position: absolute; left: 0;
+    font-size: 12px; color: var(--text2); opacity: 0.6;
+  }
+  .class-count {
+    margin-top: 28px; font-size: 13px; font-weight: 600;
+    color: var(--text2); display: flex; align-items: center; gap: 6px;
+  }
+  .class-count span { font-weight: 700; }
+  .class-card:nth-child(1) .class-count span { color: var(--accent); }
+  .class-card:nth-child(2) .class-count span { color: var(--accent2); }
+  .class-card:nth-child(3) .class-count span { color: var(--accent3); }
+  .class-card:nth-child(4) .class-count span { color: var(--gold); }
+
+  /* ─── SIMULATIONS DEMO ─── */
+  #sim-demo { background: var(--bg); }
+  .sim-demo-inner { max-width: 1160px; margin: 0 auto; }
+  .sim-demo-header { margin-bottom: 64px; }
+  .sim-demos-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  }
+  @media (max-width: 800px) { .sim-demos-row { grid-template-columns: 1fr; } }
+  .sim-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px; overflow: hidden;
+  }
+  .sim-box-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sim-box-title { font-size: 16px; font-weight: 700; }
+  .sim-box-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
+  }
+  .tag-blue { background: rgba(56,189,248,.15); color: var(--accent); }
+  .tag-purple { background: rgba(129,140,248,.15); color: var(--accent2); }
+  .sim-canvas-wrap { padding: 0; background: #030810; }
+  canvas { display: block; width: 100%; }
+  .sim-controls {
+    padding: 16px 28px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .sim-controls label { font-size: 13px; color: var(--text2); font-weight: 600; }
+  .sim-controls input[type=range] {
+    -webkit-appearance: none; height: 4px; border-radius: 4px;
+    background: rgba(56,189,248,.2); outline: none; width: 120px;
+  }
+  .sim-controls input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+  }
+  .sim-val { font-size: 13px; font-weight: 700; color: var(--accent); min-width: 30px; }
+
+  /* ─── SIMULATIONS GRID ─── */
+  #sim-grid { background: var(--bg2); }
+  .sim-grid-inner { max-width: 1160px; margin: 0 auto; }
+  .sim-grid-header { text-align: center; margin-bottom: 64px; }
+  .sim-grid-header .section-desc { margin: 0 auto; }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px) { .cards-grid { grid-template-columns: 1fr; } }
+  .sim-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .sim-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(56,189,248,.5);
+    box-shadow: 0 16px 48px rgba(56,189,248,.12);
+  }
+  .sim-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .sim-card-title { font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .sim-card-desc { font-size: 13px; font-weight: 400; color: var(--text2); line-height: 1.6; }
+  .sim-card-meta {
+    margin-top: auto; display: flex; align-items: center; justify-content: space-between;
+  }
+  .sim-class-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 12px;
+    background: rgba(56,189,248,.1); color: var(--accent);
+  }
+  .sim-arrow { color: var(--text2); font-size: 18px; transition: color 0.2s, transform 0.2s; }
+  .sim-card:hover .sim-arrow { color: var(--accent); transform: translateX(4px); }
+
+  .all-sims-wrap { text-align: center; margin-top: 56px; }
+  .btn-all {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 44px; border-radius: 50px;
+    background: transparent;
+    border: 1.5px solid rgba(56,189,248,.4);
+    color: var(--text); font-family: 'Raleway', sans-serif;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+    cursor: pointer; transition: all 0.25s; text-decoration: none;
+  }
+  .btn-all:hover {
+    border-color: var(--accent); color: var(--accent);
+    box-shadow: 0 0 30px rgba(56,189,248,.2);
+  }
+  .btn-all-arrow { font-size: 18px; transition: transform 0.2s; }
+  .btn-all:hover .btn-all-arrow { transform: translateX(4px); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 48px 24px;
+    border-top: 1px solid var(--border);
+    text-align: center; background: var(--bg);
+    color: var(--text2); font-size: 14px;
+  }
+  footer span { color: var(--accent); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(8px); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⚛ ФизикаПро</div>
+  <div class="nav-links">
+    <a href="#classes">Классы</a>
+    <a href="#sim-grid">Симуляции</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="starfield"></canvas>
+  <div class="hero-content">
+    <h1 class="hero-title">Физика&thinsp;—<br>королева наук!</h1>
+    <p class="hero-sub">
+      Интерактивные уроки, живые симуляции и задачи для 7–11 классов.
+      Погружайся в мир физики прямо сейчас.
+    </p>
+    <div class="hero-cta">
+      <a href="#classes" class="btn-primary">Начать учиться</a>
+      <a href="#sim-demo" class="btn-outline">Посмотреть симуляции</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Прокрутите</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- CLASSES -->
+<section id="classes">
+  <div class="classes-inner">
+    <div class="classes-header reveal">
+      <p class="section-label">Программа обучения</p>
+      <h2 class="section-title">Выберите свой класс</h2>
+      <p class="section-desc">От механики до квантовой физики — полная школьная программа с объяснениями, задачами и симуляциями.</p>
+    </div>
+    <div class="classes-grid">
+      <div class="class-card reveal">
+        <div class="class-number">7</div>
+        <div class="class-label">класс</div>
+        <ul class="class-topics">
+          <li>Введение в физику</li>
+          <li>Механическое движение</li>
+          <li>Силы и давление</li>
+          <li>Работа и энергия</li>
+        </ul>
+        <div class="class-count"><span>24</span> темы · <span>120</span> задач</div>
+      </div>
+      <div class="class-card reveal">
+        <div class="class-number">8</div>
+        <div class="class-label">класс</div>
+        <ul class="class-topics">
+          <li>Тепловые явления</li>
+          <li>Электрические явления</li>
+          <li>Световые явления</li>
+          <li>Магнетизм</li>
+        </ul>
+        <div class="class-count"><span>28</span> тем · <span>145</span> задач</div>
+      </div>
+      <div class="class-card reveal">
+        <div class="class-number">9</div>
+        <div class="class-label">класс</div>
+        <ul class="class-topics">
+          <li>Законы Ньютона</li>
+          <li>Законы сохранения</li>
+          <li>Колебания и волны</li>
+          <li>Ядерная физика</li>
+        </ul>
+        <div class="class-count"><span>32</span> темы · <span>180</span> задач</div>
+      </div>
+      <div class="class-card reveal">
+        <div class="class-number">10–11</div>
+        <div class="class-label">класс</div>
+        <ul class="class-topics">
+          <li>Электродинамика</li>
+          <li>Оптика и спектры</li>
+          <li>Квантовая физика</li>
+          <li>Материалы для ЕГЭ</li>
+        </ul>
+        <div class="class-count"><span>48</span> тем · <span>260</span> задач</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULATION DEMOS -->
+<section id="sim-demo">
+  <div class="sim-demo-inner">
+    <div class="sim-demo-header reveal">
+      <p class="section-label">Интерактивные симуляции</p>
+      <h2 class="section-title">Физика в действии</h2>
+      <p class="section-desc">Управляйте параметрами и наблюдайте за изменениями в реальном времени — без формул, только интуиция.</p>
+    </div>
+    <div class="sim-demos-row reveal">
+      <!-- Pendulum -->
+      <div class="sim-box">
+        <div class="sim-box-header">
+          <div class="sim-box-title">🔵 Маятник Ньютона</div>
+          <div class="sim-box-tag tag-blue">Механика · 7 класс</div>
+        </div>
+        <div class="sim-canvas-wrap">
+          <canvas id="pendulumCanvas" height="260"></canvas>
+        </div>
+        <div class="sim-controls">
+          <label for="pendLength">Длина:</label>
+          <input type="range" id="pendLength" min="60" max="160" value="110">
+          <span class="sim-val" id="pendLenVal">110</span>
+          <label for="pendGrav">g:</label>
+          <input type="range" id="pendGrav" min="3" max="20" value="10" step="0.5">
+          <span class="sim-val" id="pendGravVal">10</span>
+        </div>
+      </div>
+      <!-- Wave -->
+      <div class="sim-box">
+        <div class="sim-box-header">
+          <div class="sim-box-title">〰️ Стоячая волна</div>
+          <div class="sim-box-tag tag-purple">Колебания · 9 класс</div>
+        </div>
+        <div class="sim-canvas-wrap">
+          <canvas id="waveCanvas" height="260"></canvas>
+        </div>
+        <div class="sim-controls">
+          <label for="waveFreq">Частота:</label>
+          <input type="range" id="waveFreq" min="1" max="6" value="2" step="1">
+          <span class="sim-val" id="waveFreqVal">2</span>
+          <label for="waveAmp">Амплитуда:</label>
+          <input type="range" id="waveAmp" min="10" max="80" value="45">
+          <span class="sim-val" id="waveAmpVal">45</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULATIONS GRID -->
+<section id="sim-grid">
+  <div class="sim-grid-inner">
+    <div class="sim-grid-header reveal">
+      <p class="section-label">Каталог симуляций</p>
+      <h2 class="section-title">Все физические явления</h2>
+      <p class="section-desc">Более 40 интерактивных симуляций для визуального изучения физики от простого к сложному.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(56,189,248,.12)">🔵</div>
+        <div class="sim-card-title">Маятник</div>
+        <div class="sim-card-desc">Изучи зависимость периода колебаний от длины нити и силы тяжести.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">7 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(129,140,248,.12)">⚙️</div>
+        <div class="sim-card-title">Законы Ньютона</div>
+        <div class="sim-card-desc">Наблюдай, как сила и масса влияют на ускорение тела.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">7–9 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(244,114,182,.12)">🌊</div>
+        <div class="sim-card-title">Стоячие волны</div>
+        <div class="sim-card-desc">Визуализация интерференции двух волн и возникновения узлов.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">9 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(251,191,36,.12)">⚡</div>
+        <div class="sim-card-title">Электрические цепи</div>
+        <div class="sim-card-desc">Собирай схемы с резисторами, источниками тока и измеряй напряжение.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">8 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(56,189,248,.12)">🌡️</div>
+        <div class="sim-card-title">Идеальный газ</div>
+        <div class="sim-card-desc">Изучай закон Бойля–Мариотта и законы Гей-Люссака.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">10 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(129,140,248,.12)">🔭</div>
+        <div class="sim-card-title">Линзы и зеркала</div>
+        <div class="sim-card-desc">Построение изображений в собирающих и рассеивающих линзах.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">8 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(244,114,182,.12)">🧲</div>
+        <div class="sim-card-title">Магнитное поле</div>
+        <div class="sim-card-desc">Визуализация силовых линий вокруг прямого проводника и соленоида.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">9–10 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(251,191,36,.12)">☢️</div>
+        <div class="sim-card-title">Радиоактивный распад</div>
+        <div class="sim-card-desc">Моделирование распада ядер и построение кривой активности.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">9 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+      <div class="sim-card reveal">
+        <div class="sim-icon" style="background:rgba(56,189,248,.12)">🌌</div>
+        <div class="sim-card-title">Фотоэффект</div>
+        <div class="sim-card-desc">Связь частоты света, энергии фотона и кинетической энергии электрона.</div>
+        <div class="sim-card-meta">
+          <span class="sim-class-badge">11 класс</span>
+          <span class="sim-arrow">→</span>
+        </div>
+      </div>
+    </div>
+    <div class="all-sims-wrap reveal">
+      <a href="physics/all_simulations.html" class="btn-all">
+        Все симуляции
+        <span class="btn-all-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p>
+</footer>
+
+<script>
+/* ── STARFIELD ── */
+(function(){
+  const c = document.getElementById('starfield');
+  const ctx = c.getContext('2d');
+  let W, H, stars=[];
+  function init(){
+    W = c.width = c.parentElement.offsetWidth;
+    H = c.height = c.parentElement.offsetHeight;
+    stars = Array.from({length:160},()=>({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*1.5+0.3,
+      a: Math.random(),
+      speed: Math.random()*0.4+0.1,
+      dir: Math.random()*Math.PI*2
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#050c1a';
+    ctx.fillRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.a += 0.005; 
+      const alpha = (Math.sin(s.a)+1)/2 * 0.8 + 0.2;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(200,220,255,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',init);
+  init(); draw();
+})();
+
+/* ── PENDULUM ── */
+(function(){
+  const c = document.getElementById('pendulumCanvas');
+  const ctx = c.getContext('2d');
+  const lenSlider = document.getElementById('pendLength');
+  const gravSlider = document.getElementById('pendGrav');
+  const lenVal = document.getElementById('pendLenVal');
+  const gravVal = document.getElementById('pendGravVal');
+
+  let angle = Math.PI/4, omega=0, t=0;
+  let L, g;
+
+  function resize(){
+    c.width = c.parentElement.offsetWidth;
+    c.height = 260;
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  lenSlider.oninput = () => lenVal.textContent = lenSlider.value;
+  gravSlider.oninput = () => gravVal.textContent = gravSlider.value;
+
+  function draw(){
+    L = parseInt(lenSlider.value);
+    g = parseFloat(gravSlider.value);
+    const W=c.width, H=c.height;
+    const dt = 0.016;
+    const alpha = -(g/L)*Math.sin(angle);
+    omega += alpha*dt;
+    omega *= 0.999;
+    angle += omega*dt;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#030810';
+    ctx.fillRect(0,0,W,H);
+
+    const ox=W/2, oy=28;
+    const bx = ox + Math.sin(angle)*L;
+    const by = oy + Math.cos(angle)*L;
+
+    // trail
+    if(!draw.trail) draw.trail=[];
+    draw.trail.push({x:bx,y:by});
+    if(draw.trail.length>60) draw.trail.shift();
+    ctx.beginPath();
+    draw.trail.forEach((p,i)=>{
+      if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+    });
+    ctx.strokeStyle='rgba(56,189,248,0.25)'; ctx.lineWidth=2; ctx.stroke();
+
+    // rod
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(bx,by);
+    ctx.strokeStyle='rgba(148,163,184,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+
+    // pivot
+    ctx.beginPath(); ctx.arc(ox,oy,5,0,Math.PI*2);
+    ctx.fillStyle='#94a3b8'; ctx.fill();
+
+    // bob
+    const grad=ctx.createRadialGradient(bx-4,by-4,2,bx,by,18);
+    grad.addColorStop(0,'rgba(125,211,252,1)');
+    grad.addColorStop(1,'rgba(14,116,144,0.9)');
+    ctx.beginPath(); ctx.arc(bx,by,16,0,Math.PI*2);
+    ctx.fillStyle=grad; ctx.fill();
+
+    // info
+    ctx.fillStyle='rgba(148,163,184,0.7)';
+    ctx.font='12px Raleway,sans-serif';
+    const period = 2*Math.PI*Math.sqrt(L/g);
+    ctx.fillText(`T = ${period.toFixed(2)} с`, 16, H-12);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── WAVE ── */
+(function(){
+  const c = document.getElementById('waveCanvas');
+  const ctx = c.getContext('2d');
+  const freqSlider = document.getElementById('waveFreq');
+  const ampSlider = document.getElementById('waveAmp');
+  const freqVal = document.getElementById('waveFreqVal');
+  const ampVal = document.getElementById('waveAmpVal');
+
+  freqSlider.oninput = () => freqVal.textContent = freqSlider.value;
+  ampSlider.oninput  = () => ampVal.textContent  = ampSlider.value;
+
+  let t=0;
+  function resize(){ c.width=c.parentElement.offsetWidth; c.height=260; }
+  resize(); window.addEventListener('resize', resize);
+
+  function draw(){
+    const W=c.width, H=c.height;
+    const freq = parseInt(freqSlider.value);
+    const amp  = parseInt(ampSlider.value);
+    t+=0.04;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#030810';
+    ctx.fillRect(0,0,W,H);
+
+    const cy = H/2;
+
+    // Grid lines
+    for(let y=40;y<H;y+=40){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
+      ctx.strokeStyle='rgba(56,189,248,0.05)'; ctx.lineWidth=1; ctx.stroke();
+    }
+
+    // Wave 1
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=2){
+      const y = cy + amp*Math.sin(2*Math.PI*freq*(x/W) - t);
+      x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='rgba(56,189,248,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+
+    // Wave 2
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=2){
+      const y = cy + amp*Math.sin(2*Math.PI*freq*(x/W) + t);
+      x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='rgba(129,140,248,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+
+    // Standing wave (sum)
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=1){
+      const y1 = amp*Math.sin(2*Math.PI*freq*(x/W) - t);
+      const y2 = amp*Math.sin(2*Math.PI*freq*(x/W) + t);
+      const y = cy + (y1+y2)*0.5;
+      x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2.5; ctx.stroke();
+
+    // Center line
+    ctx.beginPath(); ctx.setLineDash([4,6]);
+    ctx.moveTo(0,cy); ctx.lineTo(W,cy);
+    ctx.strokeStyle='rgba(148,163,184,0.2)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Nodes dots
+    for(let k=0;k<=freq;k++){
+      const x = k*(W/freq);
+      ctx.beginPath(); ctx.arc(x,cy,5,0,Math.PI*2);
+      ctx.fillStyle='rgba(244,114,182,0.8)'; ctx.fill();
+    }
+
+    ctx.fillStyle='rgba(148,163,184,0.7)';
+    ctx.font='12px Raleway,sans-serif';
+    ctx.fillText(`Гармоника: ${freq} | Узлов: ${freq+1}`, 16, H-12);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{ threshold:0.12 });
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>

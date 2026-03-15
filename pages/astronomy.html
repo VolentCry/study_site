@@ -1,609 +1,783 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Астрономия — Изучай Вселенную</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:      #2dd4bf;
+    --teal-dim:  #0d9488;
+    --teal-glow: rgba(45,212,191,0.35);
+    --violet:    #a855f7;
+    --violet-dim:#7c3aed;
+    --violet-glow: rgba(168,85,247,0.35);
+    --indigo:    #6366f1;
+    --bg:        #04060f;
+    --surface:   #0b0f1e;
+    --surface2:  #111827;
+    --border:    rgba(45,212,191,0.18);
+    --text:      #e2e8f0;
+    --muted:     #94a3b8;
+  }
 
-        <title>
-            Solar System
-        </title>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        <link rel="stylesheet" href="../style.css">
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Raleway', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
 
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@300;400;600&display=swap');
+  /* ── STARFIELD ── */
+  #starfield {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: #fff;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--del, 0s);
+    opacity: 0;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0; transform: scale(0.6); }
+    50%      { opacity: var(--op, 0.8); transform: scale(1); }
+  }
 
-            *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  /* ── LAYOUT ── */
+  .page { position: relative; z-index: 1; }
 
-            :root {
-                --bg: #03050d;
-                --text: #e8e4da;
-                --accent: #c8a96e;
-                --muted: #4a4f6a;
-                --panel-bg: rgba(6, 10, 24, 0.92);
-                --border: rgba(200, 169, 110, 0.2);
-            }
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 20% 40%, rgba(168,85,247,.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 60%, rgba(45,212,191,.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
 
-            html, body {
-                width: 100%; height: 100%;
-                background: var(--bg);
-                color: var(--text);
-                font-family: 'Space Mono', monospace;
-                overflow: hidden;
-                cursor: default;
-            }
+  .hero-planet {
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%,
+      #7c3aed 0%, #2dd4bf 40%, #0f172a 75%);
+    box-shadow:
+      0 0 60px rgba(168,85,247,.5),
+      0 0 120px rgba(45,212,191,.2),
+      inset -30px -20px 60px rgba(0,0,0,.7);
+    margin-bottom: 2.5rem;
+    animation: float 6s ease-in-out infinite;
+    position: relative;
+  }
+  .hero-planet::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotateX(75deg);
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 3px solid rgba(45,212,191,.4);
+    box-shadow: 0 0 18px rgba(45,212,191,.25);
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-18px); }
+  }
 
-            canvas {
-                display: block;
-                position: fixed;
-                top: 0; left: 0;
-            }
+  .hero-tag {
+    font-family: 'Cinzel', serif;
+    font-size: .75rem; letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--teal);
+    opacity: .8;
+    margin-bottom: .8rem;
+  }
+  .hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #fff 20%, var(--teal) 60%, var(--violet));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.2rem;
+  }
+  .hero p {
+    max-width: 540px;
+    font-size: 1.1rem; line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+  }
 
-            /* Header */
-            #header {
-                position: fixed;
-                top: 32px; left: 40px;
-                z-index: 10;
-                pointer-events: none;
-            }
-            #header h1 {
-                font-family: 'Cormorant Garamond', serif;
-                font-weight: 300;
-                font-size: 13px;
-                letter-spacing: 0.35em;
-                text-transform: uppercase;
-                color: var(--accent);
-                opacity: 0.8;
-                text-align: center;
-            }
-            #header p {
-                font-size: 9px;
-                letter-spacing: 0.2em;
-                color: var(--muted);
-                margin-top: 4px;
-            }
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: .55rem;
+    padding: .75rem 1.7rem;
+    border-radius: 999px;
+    font-family: 'Raleway', sans-serif;
+    font-size: .95rem; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+    transition: transform .2s, box-shadow .2s, filter .2s;
+    border: none;
+  }
+  .btn:hover { transform: translateY(-3px) scale(1.04); filter: brightness(1.15); }
 
-            /* Hint */
-            #hint {
-                position: fixed;
-                bottom: 32px; left: 50%;
-                transform: translateX(-50%);
-                z-index: 10;
-                font-size: 9px;
-                letter-spacing: 0.25em;
-                color: var(--muted);
-                text-transform: uppercase;
-                pointer-events: none;
-                transition: opacity 0.6s;
-            }
+  .btn-solar {
+    background: linear-gradient(135deg, var(--teal-dim), var(--teal));
+    color: #04060f;
+    box-shadow: 0 0 24px var(--teal-glow);
+  }
+  .btn-stars {
+    background: transparent;
+    color: var(--violet);
+    border: 1.5px solid var(--violet);
+    box-shadow: 0 0 20px var(--violet-glow);
+  }
+  .btn-stars:hover {
+    background: rgba(168,85,247,.12);
+  }
+  .btn svg { flex-shrink: 0; }
 
-            /* Planet panel */
-            #panel {
-                position: fixed;
-                right: -420px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 360px;
-                z-index: 20;
-                background: var(--panel-bg);
-                border: 1px solid var(--border);
-                backdrop-filter: blur(20px);
-                padding: 40px 36px;
-                transition: right 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-            #panel.open { right: 32px; }
+  /* ── SCROLL HINT ── */
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: .4rem;
+    color: var(--muted); font-size: .7rem; letter-spacing: .2em;
+    text-transform: uppercase; animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(6px); }
+  }
 
-            #panel-close {
-                position: absolute;
-                top: 16px; right: 20px;
-                background: none;
-                border: none;
-                color: var(--muted);
-                font-family: 'Space Mono', monospace;
-                font-size: 11px;
-                cursor: pointer;
-                letter-spacing: 0.15em;
-                transition: color 0.2s;
-            }
-            #panel-close:hover { color: var(--accent); }
+  /* ── SECTION ── */
+  section {
+    padding: 5rem 1.5rem;
+    max-width: 1280px; margin: 0 auto;
+  }
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: .72rem; letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--teal); margin-bottom: .6rem;
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight: 700;
+    background: linear-gradient(90deg, #fff 40%, var(--violet));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 3rem;
+  }
 
-            #panel-number {
-                font-size: 9px;
-                letter-spacing: 0.3em;
-                color: var(--muted);
-                text-transform: uppercase;
-                margin-bottom: 8px;
-            }
+  /* ── CONSTELLATIONS GRID ── */
+  .constellations {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.4rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.6rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+    cursor: default;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--teal-glow) 0%, transparent 60%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .card:hover { transform: translateY(-6px); border-color: var(--teal); box-shadow: 0 8px 40px var(--teal-glow); }
+  .card:hover::before { opacity: 1; }
 
-            #panel-name {
-                font-family: 'Cormorant Garamond', serif;
-                font-weight: 300;
-                font-size: 42px;
-                line-height: 1;
-                letter-spacing: 0.04em;
-                color: var(--text);
-                margin-bottom: 6px;
-            }
+  .card-svg {
+    width: 100%; height: 140px;
+    display: block; margin-bottom: 1.2rem;
+  }
 
-            #panel-type {
-                font-size: 9px;
-                letter-spacing: 0.25em;
-                color: var(--accent);
-                text-transform: uppercase;
-                margin-bottom: 28px;
-            }
+  .card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--teal); margin-bottom: .3rem;
+  }
+  .card-latin {
+    font-size: .78rem; color: var(--muted);
+    letter-spacing: .08em; margin-bottom: .7rem;
+  }
+  .card-desc { font-size: .88rem; line-height: 1.6; color: #cbd5e1; }
 
-            #panel-desc {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 15px;
-                line-height: 1.75;
-                color: rgba(232, 228, 218, 0.7);
-                margin-bottom: 32px;
-            }
+  .card-badge {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(168,85,247,.2);
+    border: 1px solid rgba(168,85,247,.4);
+    color: var(--violet);
+    font-size: .65rem; letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .2rem .6rem; border-radius: 999px;
+  }
 
-            #panel-stats {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
-                margin-bottom: 28px;
-            }
+  /* ── FACTS ── */
+  .facts-wrap {
+    background: linear-gradient(160deg, var(--surface) 0%, var(--surface2) 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(99,102,241,.25);
+    padding: 3rem;
+    position: relative; overflow: hidden;
+  }
+  .facts-wrap::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 280px; height: 280px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,85,247,.15), transparent 70%);
+    pointer-events: none;
+  }
 
-            .stat {
-                border-top: 1px solid var(--border);
-                padding-top: 12px;
-            }
-            .stat-label {
-                font-size: 8px;
-                letter-spacing: 0.25em;
-                color: var(--muted);
-                text-transform: uppercase;
-                margin-bottom: 4px;
-            }
-            .stat-value {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 16px;
-                color: var(--text);
-                font-weight: 400;
-            }
+  .facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.4rem;
+    margin-top: 2rem;
+  }
+  .fact-item {
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .fact-icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    background: rgba(45,212,191,.1);
+    border: 1px solid rgba(45,212,191,.2);
+  }
+  .fact-text strong {
+    display: block; font-size: .9rem; font-weight: 600;
+    color: var(--text); margin-bottom: .25rem;
+  }
+  .fact-text span { font-size: .82rem; color: var(--muted); line-height: 1.5; }
 
-            #panel-facts {
-                border-top: 1px solid var(--border);
-                padding-top: 20px;
-            }
-            #panel-facts h3 {
-                font-size: 8px;
-                letter-spacing: 0.3em;
-                color: var(--muted);
-                text-transform: uppercase;
-                margin-bottom: 14px;
-            }
-            .fact {
-                display: flex;
-                align-items: flex-start;
-                gap: 10px;
-                margin-bottom: 10px;
-            }
-            .fact::before {
-                content: '—';
-                color: var(--accent);
-                font-size: 11px;
-                flex-shrink: 0;
-                margin-top: 1px;
-            }
-            .fact span {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 13px;
-                line-height: 1.6;
-                color: rgba(232, 228, 218, 0.65);
-            }
+  /* ── NUMBER BAND ── */
+  .number-band {
+    display: flex; gap: 0; flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 4rem;
+  }
+  .num-item {
+    flex: 1; min-width: 160px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .num-item:last-child { border-right: none; }
+  .num-value {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--teal), var(--violet));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block; margin-bottom: .35rem;
+  }
+  .num-label { font-size: .8rem; color: var(--muted); letter-spacing: .06em; }
 
-            /* Planet label tooltips */
-            .planet-label {
-                position: fixed;
-                pointer-events: none;
-                font-size: 9px;
-                letter-spacing: 0.2em;
-                text-transform: uppercase;
-                color: rgba(232, 228, 218, 0.5);
-                transform: translate(-50%, -50%);
-                transition: opacity 0.3s;
-                z-index: 5;
-            }
-        </style>
-    </head>
+  /* ── CTA STRIP ── */
+  .cta-strip {
+    background: linear-gradient(135deg,
+      rgba(45,212,191,.08) 0%,
+      rgba(168,85,247,.12) 50%,
+      rgba(99,102,241,.08) 100%);
+    border: 1px solid rgba(45,212,191,.2);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .cta-strip::after {
+    content: '✦';
+    position: absolute; right: 1.5rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 8rem; opacity: .04; color: var(--teal);
+    pointer-events: none;
+  }
+  .cta-text h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.7rem; font-weight: 700; color: #fff;
+    margin-bottom: .5rem;
+  }
+  .cta-text p { color: var(--muted); font-size: .95rem; max-width: 440px; line-height: 1.6; }
+  .cta-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
 
-    <body>
-        <div id="menu-placeholder"></div>
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 2.5rem;
+    color: var(--muted); font-size: .8rem;
+    border-top: 1px solid var(--border);
+    position: relative; z-index: 1;
+  }
 
-        <canvas id="c"></canvas>
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--teal-dim), transparent);
+    margin: 0 auto 4rem;
+  }
 
-        <div id="header">
-            <h1>Солнечная система</h1>
-            <p>Интерактивная 3D симуляция</p>
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .facts-wrap { padding: 1.8rem; }
+    .cta-strip  { padding: 2rem 1.5rem; flex-direction: column; }
+    .num-item   { min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- STARFIELD -->
+<div id="starfield"></div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-planet"></div>
+    <p class="hero-tag">Предмет · Астрономия</p>
+    <h1>Вселенная<br>без границ</h1>
+    <p>Изучай звёзды, галактики и тайны космоса. От созвездий над нашими головами до чёрных дыр на краю времени.</p>
+    <div class="hero-cta">
+      <a href="#solar-simulator" class="btn btn-solar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="4.22" y1="4.22" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.78" y2="19.78"/>
+          <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.78" y2="4.22"/>
+        </svg>
+        Симулятор солнечной системы
+      </a>
+      <a href="#star-canvas" class="btn btn-stars">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        Типы звёзд
+      </a>
+    </div>
+    <div class="scroll-hint">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      листай вниз
+    </div>
+  </header>
+
+  <!-- NUMBERS -->
+  <section>
+    <div class="number-band">
+      <div class="num-item">
+        <span class="num-value">~2 трлн</span>
+        <span class="num-label">галактик во Вселенной</span>
+      </div>
+      <div class="num-item">
+        <span class="num-value">8</span>
+        <span class="num-label">планет Солнечной системы</span>
+      </div>
+      <div class="num-item">
+        <span class="num-value">88</span>
+        <span class="num-label">официальных созвездий</span>
+      </div>
+      <div class="num-item">
+        <span class="num-value">13,8 млрд</span>
+        <span class="num-label">лет — возраст Вселенной</span>
+      </div>
+    </div>
+
+    <!-- CONSTELLATIONS -->
+    <p class="section-label">Карты неба</p>
+    <h2 class="section-title">Созвездия</h2>
+
+    <div class="constellations">
+
+      <!-- Orion -->
+      <div class="card">
+        <span class="card-badge">Зима</span>
+        <svg class="card-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow1"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- lines -->
+          <g stroke="rgba(45,212,191,.3)" stroke-width="1.2" fill="none">
+            <line x1="80" y1="30" x2="100" y2="55"/>
+            <line x1="160" y1="30" x2="140" y2="55"/>
+            <line x1="100" y1="55" x2="140" y2="55"/>
+            <line x1="100" y1="55" x2="100" y2="80"/>
+            <line x1="140" y1="55" x2="140" y2="80"/>
+            <line x1="100" y1="80" x2="115" y2="75"/>
+            <line x1="140" y1="80" x2="125" y2="75"/>
+            <line x1="115" y1="75" x2="125" y2="75"/>
+            <line x1="100" y1="80" x2="85" y2="110"/>
+            <line x1="140" y1="80" x2="155" y2="110"/>
+          </g>
+          <!-- stars -->
+          <g filter="url(#glow1)">
+            <circle cx="80"  cy="30"  r="4"   fill="#7c3aed"/>
+            <circle cx="160" cy="30"  r="5.5" fill="#2dd4bf"/>
+            <circle cx="100" cy="55"  r="3.5" fill="#a5b4fc"/>
+            <circle cx="140" cy="55"  r="3.5" fill="#a5b4fc"/>
+            <circle cx="115" cy="75"  r="3"   fill="#e2e8f0"/>
+            <circle cx="125" cy="75"  r="3"   fill="#e2e8f0"/>
+            <circle cx="130" cy="71"  r="2.5" fill="#e2e8f0"/>
+            <circle cx="100" cy="80"  r="3"   fill="#a5b4fc"/>
+            <circle cx="140" cy="80"  r="3"   fill="#a5b4fc"/>
+            <circle cx="85"  cy="110" r="4.5" fill="#2dd4bf"/>
+            <circle cx="155" cy="110" r="5"   fill="#f97316"/>
+          </g>
+        </svg>
+        <p class="card-name">Орион</p>
+        <p class="card-latin">Orion · Охотник</p>
+        <p class="card-desc">Одно из ярчайших созвездий неба. Бетельгейзе и Ригель — два его маяка. Пояс Ориона указывает прямо на Сириус.</p>
+      </div>
+
+      <!-- Ursa Major -->
+      <div class="card">
+        <span class="card-badge">Весь год</span>
+        <svg class="card-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow2"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g stroke="rgba(168,85,247,.3)" stroke-width="1.2" fill="none">
+            <line x1="40"  y1="90" x2="70"  y2="80"/>
+            <line x1="70"  y1="80" x2="100" y2="85"/>
+            <line x1="100" y1="85" x2="130" y2="75"/>
+            <line x1="130" y1="75" x2="155" y2="50"/>
+            <line x1="155" y1="50" x2="185" y2="45"/>
+            <line x1="185" y1="45" x2="210" y2="60"/>
+            <line x1="40"  y1="90" x2="50"  y2="115"/>
+            <line x1="70"  y1="80" x2="65"  y2="108"/>
+            <line x1="100" y1="85" x2="105" y2="112"/>
+            <line x1="130" y1="75" x2="128" y2="105"/>
+          </g>
+          <g filter="url(#glow2)">
+            <circle cx="40"  cy="90"  r="4"   fill="#a855f7"/>
+            <circle cx="70"  cy="80"  r="4"   fill="#a855f7"/>
+            <circle cx="100" cy="85"  r="3.5" fill="#c084fc"/>
+            <circle cx="130" cy="75"  r="4"   fill="#2dd4bf"/>
+            <circle cx="155" cy="50"  r="5"   fill="#2dd4bf"/>
+            <circle cx="185" cy="45"  r="4.5" fill="#2dd4bf"/>
+            <circle cx="210" cy="60"  r="4"   fill="#c084fc"/>
+            <circle cx="50"  cy="115" r="2.5" fill="#94a3b8"/>
+            <circle cx="65"  cy="108" r="2.5" fill="#94a3b8"/>
+            <circle cx="105" cy="112" r="2.5" fill="#94a3b8"/>
+            <circle cx="128" cy="105" r="2.5" fill="#94a3b8"/>
+          </g>
+        </svg>
+        <p class="card-name">Большая Медведица</p>
+        <p class="card-latin">Ursa Major · Большая Медведица</p>
+        <p class="card-desc">Астеризм «Большой ковш» — один из самых узнаваемых на небе. Две крайние звезды ковша указывают на Полярную звезду.</p>
+      </div>
+
+      <!-- Scorpius -->
+      <div class="card">
+        <span class="card-badge">Лето</span>
+        <svg class="card-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow3"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g stroke="rgba(45,212,191,.25)" stroke-width="1.2" fill="none">
+            <line x1="40"  y1="40"  x2="65"  y2="50"/>
+            <line x1="65"  y1="50"  x2="90"  y2="45"/>
+            <line x1="90"  y1="45"  x2="110" y2="55"/>
+            <line x1="110" y1="55"  x2="110" y2="75"/>
+            <line x1="110" y1="75"  x2="125" y2="90"/>
+            <line x1="125" y1="90"  x2="140" y2="100"/>
+            <line x1="140" y1="100" x2="160" y2="110"/>
+            <line x1="160" y1="110" x2="180" y2="105"/>
+            <line x1="180" y1="105" x2="205" y2="90"/>
+            <line x1="205" y1="90"  x2="220" y2="75"/>
+            <line x1="220" y1="75"  x2="230" y2="55"/>
+          </g>
+          <g filter="url(#glow3)">
+            <circle cx="40"  cy="40"  r="3.5" fill="#a5b4fc"/>
+            <circle cx="65"  cy="50"  r="3.5" fill="#a5b4fc"/>
+            <circle cx="90"  cy="45"  r="3"   fill="#a5b4fc"/>
+            <circle cx="110" cy="55"  r="6"   fill="#f97316"/><!-- Antares -->
+            <circle cx="110" cy="75"  r="3"   fill="#c084fc"/>
+            <circle cx="125" cy="90"  r="3"   fill="#c084fc"/>
+            <circle cx="140" cy="100" r="3"   fill="#c084fc"/>
+            <circle cx="160" cy="110" r="3.5" fill="#2dd4bf"/>
+            <circle cx="180" cy="105" r="3.5" fill="#2dd4bf"/>
+            <circle cx="205" cy="90"  r="3"   fill="#2dd4bf"/>
+            <circle cx="220" cy="75"  r="3"   fill="#a5b4fc"/>
+            <circle cx="230" cy="55"  r="4"   fill="#2dd4bf"/>
+          </g>
+        </svg>
+        <p class="card-name">Скорпион</p>
+        <p class="card-latin">Scorpius · Scorpion</p>
+        <p class="card-desc">Антарес — «соперник Марса» — сверхгигант с радиусом ~700 солнечных. В центре Млечного пути, богат туманностями.</p>
+      </div>
+
+      <!-- Cassiopeia -->
+      <div class="card">
+        <span class="card-badge">Осень</span>
+        <svg class="card-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow4"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g stroke="rgba(168,85,247,.3)" stroke-width="1.5" fill="none">
+            <line x1="40"  y1="100" x2="80"  y2="40"/>
+            <line x1="80"  y1="40"  x2="130" y2="90"/>
+            <line x1="130" y1="90"  x2="180" y2="40"/>
+            <line x1="180" y1="40"  x2="220" y2="80"/>
+          </g>
+          <g filter="url(#glow4)">
+            <circle cx="40"  cy="100" r="4.5" fill="#a855f7"/>
+            <circle cx="80"  cy="40"  r="4.5" fill="#2dd4bf"/>
+            <circle cx="130" cy="90"  r="5"   fill="#2dd4bf"/>
+            <circle cx="180" cy="40"  r="4.5" fill="#a855f7"/>
+            <circle cx="220" cy="80"  r="4.5" fill="#c084fc"/>
+          </g>
+        </svg>
+        <p class="card-name">Кассиопея</p>
+        <p class="card-latin">Cassiopeia · Царица</p>
+        <p class="card-desc">Узнаваемая «W» из пяти звёзд. Всегда видна из России — незаходящее созвездие, противоположное Большой Медведице.</p>
+      </div>
+
+      <!-- Leo -->
+      <div class="card">
+        <span class="card-badge">Весна</span>
+        <svg class="card-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow5"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g stroke="rgba(45,212,191,.25)" stroke-width="1.2" fill="none">
+            <line x1="50"  y1="100" x2="80"  y2="70"/>
+            <line x1="80"  y1="70"  x2="110" y2="60"/>
+            <line x1="110" y1="60"  x2="140" y2="65"/>
+            <line x1="140" y1="65"  x2="170" y2="40"/>
+            <line x1="170" y1="40"  x2="190" y2="60"/>
+            <line x1="190" y1="60"  x2="180" y2="80"/>
+            <line x1="180" y1="80"  x2="160" y2="90"/>
+            <line x1="160" y1="90"  x2="140" y2="65"/>
+          </g>
+          <g filter="url(#glow5)">
+            <circle cx="50"  cy="100" r="4"   fill="#a5b4fc"/>
+            <circle cx="80"  cy="70"  r="3.5" fill="#a5b4fc"/>
+            <circle cx="110" cy="60"  r="3.5" fill="#c084fc"/>
+            <circle cx="140" cy="65"  r="5.5" fill="#fde68a"/><!-- Regulus -->
+            <circle cx="170" cy="40"  r="3.5" fill="#a5b4fc"/>
+            <circle cx="190" cy="60"  r="3.5" fill="#2dd4bf"/>
+            <circle cx="180" cy="80"  r="3.5" fill="#2dd4bf"/>
+            <circle cx="160" cy="90"  r="3"   fill="#c084fc"/>
+          </g>
+        </svg>
+        <p class="card-name">Лев</p>
+        <p class="card-latin">Leo · Lion</p>
+        <p class="card-desc">Регул — сердце льва, в 360 раз ярче Солнца. Серп Льва напоминает вопросительный знак — один из ярких весенних астеризмов.</p>
+      </div>
+
+      <!-- Cygnus -->
+      <div class="card">
+        <span class="card-badge">Лето</span>
+        <svg class="card-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow6"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g stroke="rgba(168,85,247,.3)" stroke-width="1.3" fill="none">
+            <line x1="130" y1="20"  x2="130" y2="120"/>
+            <line x1="40"  y1="70"  x2="220" y2="70"/>
+            <line x1="130" y1="20"  x2="85"  y2="45"/>
+            <line x1="130" y1="20"  x2="175" y2="45"/>
+          </g>
+          <g filter="url(#glow6)">
+            <circle cx="130" cy="20"  r="5.5" fill="#2dd4bf"/><!-- Deneb -->
+            <circle cx="130" cy="70"  r="4"   fill="#a855f7"/>
+            <circle cx="130" cy="120" r="4"   fill="#a5b4fc"/>
+            <circle cx="40"  cy="70"  r="3.5" fill="#c084fc"/>
+            <circle cx="220" cy="70"  r="3.5" fill="#c084fc"/>
+            <circle cx="85"  cy="45"  r="3"   fill="#a5b4fc"/>
+            <circle cx="175" cy="45"  r="3"   fill="#a5b4fc"/>
+          </g>
+        </svg>
+        <p class="card-name">Лебедь</p>
+        <p class="card-latin">Cygnus · Swan</p>
+        <p class="card-desc">Астеризм «Северный Крест» виден летом. Денеб — вершина. В Лебеде находится Cygnus X-1 — первая обнаруженная чёрная дыра.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider" style="max-width:1280px;"></div>
+
+  <!-- FACTS -->
+  <section>
+    <p class="section-label">Это интересно</p>
+    <h2 class="section-title">Факты о Вселенной</h2>
+    <div class="facts-wrap">
+      <div class="facts-grid">
+        <div class="fact-item">
+          <div class="fact-icon">☀️</div>
+          <div class="fact-text">
+            <strong>Свет от Солнца идёт 8 минут</strong>
+            <span>Расстояние ~150 млн км. Если бы Солнце погасло, мы узнали бы об этом только через 8 минут 20 секунд.</span>
+          </div>
         </div>
-
-        <div id="hint">
-            Click on a planet to explore
+        <div class="fact-item">
+          <div class="fact-icon">⭐</div>
+          <div class="fact-text">
+            <strong>Звёзд больше, чем песчинок</strong>
+            <span>Во Вселенной около 10²⁴ звёзд — это примерно в 10 раз больше всех песчинок на всех пляжах Земли.</span>
+          </div>
         </div>
-
-        <div id="panel">
-            <button id="panel-close">[ Назад ]</button>
-            <div id="panel-number"></div>
-            <div id="panel-name"></div>
-            <div id="panel-type"></div>
-            <div id="panel-desc"></div>
-            <div id="panel-stats"></div>
-            <div id="panel-facts"></div>
+        <div class="fact-item">
+          <div class="fact-icon">🕳️</div>
+          <div class="fact-text">
+            <strong>Чёрная дыра в центре нашей галактики</strong>
+            <span>Стрелец A* — чёрная дыра массой 4 миллиона солнц. Первое фото получено коллаборацией EHT в 2022 году.</span>
+          </div>
         </div>
+        <div class="fact-item">
+          <div class="fact-icon">❄️</div>
+          <div class="fact-text">
+            <strong>Бумеранг — самое холодное место</strong>
+            <span>Туманность Бумеранг — −272 °C. Холоднее, чем средняя температура фонового излучения Вселенной (−270 °C).</span>
+          </div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-icon">💫</div>
+          <div class="fact-text">
+            <strong>Туманность Орёл рождает звёзды</strong>
+            <span>«Столпы Творения» — активная звездообразующая область. Новые звёзды там появляются прямо сейчас.</span>
+          </div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-icon">🌌</div>
+          <div class="fact-text">
+            <strong>Вселенная расширяется с ускорением</strong>
+            <span>Тёмная энергия составляет ~68% всего содержимого Вселенной и «разгоняет» её расширение.</span>
+          </div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-icon">🪐</div>
+          <div class="fact-text">
+            <strong>Кольца Сатурна почти невидимы сбоку</strong>
+            <span>Кольца имеют тысячи километров в поперечнике, но их толщина — от 10 до 1 000 метров.</span>
+          </div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-icon">🔭</div>
+          <div class="fact-text">
+            <strong>Телескоп Джеймс Уэбб видит прошлое</strong>
+            <span>JWST наблюдал галактики возрастом 13,4 млрд лет — когда Вселенной было всего ~400 миллионов лет.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script>
-            fetch('../menu.html')
-                .then(r => r.text())
-                .then(html => {
-                    document.getElementById('menu-placeholder').innerHTML = html;
-                })
-                .catch(err => console.error('Ошибка загрузки меню', err));
+  <!-- CTA STRIP -->
+  <section>
+    <div class="cta-strip" id="solar-simulator">
+      <div class="cta-text">
+        <h2>Исследуй Солнечную систему</h2>
+        <p>Интерактивный симулятор позволяет увидеть орбиты планет в реальном масштабе, изменить скорость времени и изучить каждый объект.</p>
+      </div>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-solar" style="font-size:1rem; padding:.9rem 2rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          Открыть симулятор
+        </a>
+      </div>
+    </div>
+  </section>
 
+  <!-- CTA STRIP 2 -->
+  <section style="padding-top:0" id="star-canvas">
+    <div class="cta-strip" style="background: linear-gradient(135deg, rgba(168,85,247,.1) 0%, rgba(99,102,241,.12) 50%, rgba(45,212,191,.06) 100%); border-color: rgba(168,85,247,.25);">
+      <div class="cta-text">
+        <h2>Классификация звёзд</h2>
+        <p>Полная канвас-доска с диаграммой Герцшпрунга–Рассела, типами звёзд, схемами эволюции и подробными пояснениями к каждому классу.</p>
+      </div>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-stars" style="font-size:1rem; padding:.9rem 2rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Открыть канвас
+        </a>
+      </div>
+    </div>
+  </section>
 
-            const PLANETS = [
-            {
-                name: 'Меркурий', number: '01', type: 'Terrestrial Planet',
-                color: '#8a8a8a', emissive: '#2a2a2a', size: 0.38,
-                orbit: 3.8, speed: 4.15, tilt: 0.03,
-                desc: 'Самая маленькая планета в нашей Солнечной системе и ближайшая к Солнцу. Меркурий совершает гонку вокруг Солнца каждые 88 дней и имеет экстремальные колебания температуры.',
-                stats: [
-                    { label: 'Диаметр', value: '4,879 км' },
-                    { label: 'Отдолённость', value: '57.9 млн. км' },
-                    { label: 'Длительсноть суток', value: '1,408 ч' },
-                    { label: 'Кол-во спутников', value: '0' },
-                ],
-                facts: [
-                    'Колебания температуры от 180°C до 430°C',
-                    'Имеет большое железное ядро, которое составляет 85% от его радиуса',
-                    'Covered in craters like our Moon',
-                ]
-            },
-            {
-                name: 'Венера', number: '02', type: 'Terrestrial Planet',
-                color: '#c9a96e', emissive: '#3d2a10', size: 0.95,
-                orbit: 5.5, speed: 1.62, tilt: 177.4,
-                desc: 'The hottest planet in our solar system despite not being the closest to the Sun. Venus rotates backwards and its thick atmosphere creates a runaway greenhouse effect.',
-                stats: [
-                    { label: 'Диаметр', value: '12,104 км' },
-                    { label: 'Отдолённость', value: '108.2 млн. км' },
-                    { label: 'Длительсноть суток', value: '5,832 ч' },
-                    { label: 'Кол-во спутников', value: '0' },
-                ],
-                facts: [
-                    'Surface temperature reaches 465°C — hot enough to melt lead',
-                    'A day on Venus is longer than its year',
-                    'Rotates in the opposite direction to most planets',
-                ]
-            },
-            {
-                name: 'Земля', number: '03', type: 'Terrestrial Planet',
-                color: '#3a6b8a', emissive: '#0d2535', size: 1.0,
-                orbit: 7.5, speed: 1.0, tilt: 23.5,
-                desc: 'Our home world. The only known planet to harbor life, with liquid water on the surface, a protective magnetic field, and an atmosphere fine-tuned for life.',
-                stats: [
-                    { label: 'Диаметр', value: '12,742 км' },
-                    { label: 'Отдолённость', value: '149.6 млн. км' },
-                    { label: 'Длительсноть суток', value: '24 ч' },
-                    { label: 'Кол-во спутников', value: '1' },
-                ],
-                facts: [
-                    '71% of the surface is covered by water',
-                    'The only planet not named after a god',
-                    'Earth\'s magnetic field protects life from solar radiation',
-                ]
-            },
-            {
-                name: 'Марс', number: '04', type: 'Terrestrial Planet',
-                color: '#c1440e', emissive: '#3d1205', size: 0.53,
-                orbit: 10.0, speed: 0.53, tilt: 25.2,
-                desc: 'The Red Planet, named for its iron-rich dust. Mars has the tallest volcano and longest canyon in the solar system, and is the most likely candidate for future human colonization.',
-                stats: [
-                    { label: 'Диаметр', value: '6,779 км' },
-                    { label: 'Отдолённость', value: '227.9 млн. км' },
-                    { label: 'Длительсноть суток', value: '24.6 ч' },
-                    { label: 'Кол-во спутников', value: '2' },
-                ],
-                facts: [
-                    'Olympus Mons is 3× taller than Everest at 21.9 км',
-                    'Has the longest canyon: Valles Marineris, 4,000 км wide',
-                    'A Martian year lasts 687 Earth days',
-                ]
-            },
-            {
-                name: 'Юпитер', number: '05', type: 'Газовый гигант',
-                color: '#c8a97a', emissive: '#3a2510', size: 2.6,
-                orbit: 15.0, speed: 0.084, tilt: 3.1,
-                desc: 'The largest planet in the solar system — so massive that all other planets could fit inside it. The Great Red Spot is a storm that has raged for centuries.',
-                stats: [
-                    { label: 'Диаметр', value: '139,820 км' },
-                    { label: 'Отдолённость', value: '778.5 млн. км' },
-                    { label: 'Длительсноть суток', value: '9.9 ч' },
-                    { label: 'Кол-во спутников', value: '95' },
-                ],
-                facts: [
-                    'The Great Red Spot is a 350-year-old storm larger than Earth',
-                    'Has a faint ring system discovered in 1979',
-                    'Its moon Europa may have a subsurface ocean with life',
-                ]
-            },
-            {
-                name: 'Стаурн', number: '06', type: 'Газовый гигант',
-                color: '#e8d5a3', emissive: '#3a3010', size: 2.2,
-                orbit: 20.5, speed: 0.034, tilt: 26.7,
-                hasRings: true,
-                desc: 'The jewel of the solar system, famous for its spectacular ring system made of ice and rock. Saturn is so light it could theoretically float on water.',
-                stats: [
-                    { label: 'Диаметр', value: '116,460 км' },
-                    { label: 'Отдолённость', value: '1.43 млрд. км' },
-                    { label: 'Длительсноть суток', value: '10.7 ч' },
-                    { label: 'Кол-во спутников', value: '146' },
-                ],
-                facts: [
-                    'Its rings span 282,000 км but are less than 1 км thick',
-                    'Less dense than water — it would float if placed in a vast ocean',
-                    'Titan, its largest moon, has rain of liquid methane',
-                ]
-            },
-            {
-                name: 'Уран', number: '07', type: 'Ледяной гигант',
-                color: '#7de8e8', emissive: '#0d3d3d', size: 1.6,
-                orbit: 26.5, speed: 0.012, tilt: 97.8,
-                desc: 'The tilted planet — Uranus orbits the Sun on its side, likely due to a massive ancient collision. It is the coldest planetary atmosphere in our solar system.',
-                stats: [
-                    { label: 'Диаметр', value: '50,724 км' },
-                    { label: 'Отдолённость', value: '2.87 млрд. км' },
-                    { label: 'Длительсноть суток', value: '17.2 ч' },
-                    { label: 'Кол-во спутников', value: '27' },
-                ],
-                facts: [
-                    'Axial tilt of 97.8° means it rolls around the Sun on its side',
-                    'Coldest planetary atmosphere: −224°C',
-                    'Has 13 known rings and 27 moons, all named after Shakespeare characters',
-                ]
-            },
-            {
-                name: 'Нептун', number: '08', type: 'Ледяной Гигант',
-                color: '#3b5fc0', emissive: '#0a1540', size: 1.5,
-                orbit: 32.5, speed: 0.006, tilt: 28.3,
-                desc: 'The windiest planet in the solar system, with storms reaching 2,100 км/h. Neptune was predicted mathematically before it was ever observed through a telescope.',
-                stats: [
-                    { label: 'Диаметр', value: '49,244 км' },
-                    { label: 'Отдолённость', value: '4.50 млрд. км' },
-                    { label: 'Длительсноть суток', value: '16.1 ч' },
-                    { label: 'Кол-во спутников', value: '16' },
-                ],
-                facts: [
-                    'Скорость ветра может достигать 2100 км/ч - самая быстрая в солнечной системе.',
-                    'Один год Нептуна равняется 165 земным годам',
-                    'Тритон, его луна, вращается назад и медленно движется вперёд',
-                ]
-            },
-            ];
+  <footer>
+    <p style="opacity:.5; letter-spacing: .1em; font-family:'Cinzel',serif; font-size:.7rem;">АСТРОНОМИЯ · ИЗУЧАЙ ВСЕЛЕННУЮ</p>
+  </footer>
 
-            // ── Three.js setup ──────────────────────────────────────────────
-            const canvas = document.getElementById('c');
-            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x03050d, 1);
+</div>
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 22, 50);
-            camera.lookAt(0, 0, 0);
+<script>
+// Generate starfield
+const field = document.getElementById('starfield');
+for (let i = 0; i < 220; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.5 + .6;
+  const dur  = (Math.random() * 4 + 2).toFixed(1);
+  const del  = (Math.random() * 5).toFixed(1);
+  const op   = (Math.random() * .5 + .3).toFixed(2);
+  Object.assign(s.style, {
+    width:  size + 'px',
+    height: size + 'px',
+    top:    Math.random() * 100 + '%',
+    left:   Math.random() * 100 + '%',
+    '--dur': dur + 's',
+    '--del': '-' + del + 's',
+    '--op':  op,
+  });
+  field.appendChild(s);
+}
 
-            // Lighting
-            const ambient = new THREE.AmbientLight(0x111122, 0.6);
-            scene.add(ambient);
-            const sunLight = new THREE.PointLight(0xfff5e0, 3.5, 200);
-            sunLight.position.set(0, 0, 0);
-            scene.add(sunLight);
+// Stagger card entrance
+const cards = document.querySelectorAll('.card');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, _) => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '0';
+      e.target.style.transform = 'translateY(30px)';
+      e.target.style.transition = 'opacity .5s ease, transform .5s ease';
+      const delay = Array.from(cards).indexOf(e.target) % 3 * 0.1;
+      setTimeout(() => {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }, delay * 1000 + 80);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
 
-            // Stars background
-            (function createStars() {
-            const geo = new THREE.BufferGeometry();
-            const count = 3000;
-            const pos = new Float32Array(count * 3);
-            for (let i = 0; i < count * 3; i++) {
-                pos[i] = (Math.random() - 0.5) * 800;
-            }
-            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.18, sizeAttenuation: true, transparent: true, opacity: 0.6 });
-            scene.add(new THREE.Points(geo, mat));
-            })();
+cards.forEach(c => { c.style.opacity = '0'; observer.observe(c); });
+</script>
 
-            // Sun
-            const sunGeo = new THREE.SphereGeometry(2.2, 32, 32);
-            const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff0a0 });
-            const sun = new THREE.Mesh(sunGeo, sunMat);
-            scene.add(sun);
-
-            // Sun glow
-            const glowGeo = new THREE.SphereGeometry(2.8, 32, 32);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.08, side: THREE.BackSide });
-            scene.add(new THREE.Mesh(glowGeo, glowMat));
-
-            // Planet meshes
-            const planetMeshes = [];
-            const orbitLines = [];
-
-            PLANETS.forEach((p, i) => {
-            // Orbit ring
-            const orbitGeo = new THREE.RingGeometry(p.orbit - 0.02, p.orbit + 0.02, 128);
-            const orbitMat = new THREE.MeshBasicMaterial({ color: 0x2a2f4a, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
-            const orbitMesh = new THREE.Mesh(orbitGeo, orbitMat);
-            orbitMesh.rotation.x = Math.PI / 2;
-            scene.add(orbitMesh);
-            orbitLines.push(orbitMesh);
-
-            // Planet
-            const geo = new THREE.SphereGeometry(p.size * 0.55, 32, 32);
-            const mat = new THREE.MeshStandardMaterial({
-                color: p.color,
-                emissive: p.emissive,
-                roughness: 0.85,
-                metalness: 0.05,
-            });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.userData = { planet: p, index: i, angle: (i / PLANETS.length) * Math.PI * 2 };
-            scene.add(mesh);
-
-            // Saturn rings
-            if (p.hasRings) {
-                const rGeo = new THREE.RingGeometry(p.size * 0.7, p.size * 1.2, 64);
-                const rMat = new THREE.MeshBasicMaterial({ color: 0xd4c49a, transparent: true, opacity: 0.45, side: THREE.DoubleSide });
-                const ring = new THREE.Mesh(rGeo, rMat);
-                ring.rotation.x = Math.PI / 2.4;
-                mesh.add(ring);
-            }
-
-            planetMeshes.push(mesh);
-            });
-
-            // ── State ───────────────────────────────────────────────────────
-            let selectedPlanet = null;
-            let systemAngle = 0;
-            const SYSTEM_SPEED = 0.0008;
-
-            // Camera tracking
-            let camTarget = new THREE.Vector3(0, 22, 50);
-            let camLookAt = new THREE.Vector3(0, 0, 0);
-            let isTracking = false;
-            let trackOffset = new THREE.Vector3(0, 2.5, 7);
-
-            // ── Raycasting ──────────────────────────────────────────────────
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
-
-            canvas.addEventListener('click', (e) => {
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const hits = raycaster.intersectObjects(planetMeshes, false);
-            if (hits.length > 0) {
-                openPanel(hits[0].object);
-            }
-            });
-
-            canvas.style.cursor = 'crosshair';
-            canvas.addEventListener('mousemove', (e) => {
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const hits = raycaster.intersectObjects(planetMeshes, false);
-            canvas.style.cursor = hits.length > 0 ? 'pointer' : 'crosshair';
-            });
-
-            // ── Panel ───────────────────────────────────────────────────────
-            const panel = document.getElementById('panel');
-            const hint = document.getElementById('hint');
-
-            function openPanel(mesh) {
-            const p = mesh.userData.planet;
-            selectedPlanet = mesh;
-            isTracking = true;
-
-            document.getElementById('panel-number').textContent = p.number + ' / 08';
-            document.getElementById('panel-name').textContent = p.name;
-            document.getElementById('panel-type').textContent = p.type;
-            document.getElementById('panel-desc').textContent = p.desc;
-
-            const statsEl = document.getElementById('panel-stats');
-            statsEl.innerHTML = p.stats.map(s => `
-                <div class="stat">
-                <div class="stat-label">${s.label}</div>
-                <div class="stat-value">${s.value}</div>
-                </div>
-            `).join('');
-
-            const factsEl = document.getElementById('panel-facts');
-            factsEl.innerHTML = `<h3>Notable facts</h3>` + p.facts.map(f => `
-                <div class="fact"><span>${f}</span></div>
-            `).join('');
-
-            panel.classList.add('open');
-            hint.style.opacity = '0';
-
-            // Highlight selected orbit
-            orbitLines.forEach((o, i) => {
-                o.material.opacity = i === mesh.userData.index ? 0.9 : 0.2;
-                o.material.color.setHex(i === mesh.userData.index ? 0xc8a96e : 0x2a2f4a);
-            });
-            }
-
-            document.getElementById('panel-close').addEventListener('click', closePanel);
-
-            function closePanel() {
-            panel.classList.remove('open');
-            selectedPlanet = null;
-            isTracking = false;
-            hint.style.opacity = '1';
-            // Reset camera
-            camTarget.set(0, 22, 50);
-            camLookAt.set(0, 0, 0);
-            // Reset orbit lines
-            orbitLines.forEach(o => {
-                o.material.opacity = 0.5;
-                o.material.color.setHex(0x2a2f4a);
-            });
-            }
-
-            // ── Animation loop ──────────────────────────────────────────────
-            const clock = new THREE.Clock();
-            const tempVec = new THREE.Vector3();
-
-            function animate() {
-            requestAnimationFrame(animate);
-            const dt = clock.getDelta();
-
-            systemAngle += SYSTEM_SPEED;
-
-            // Update planet positions
-            planetMeshes.forEach((mesh) => {
-                const p = mesh.userData.planet;
-                const angle = systemAngle * p.speed + mesh.userData.angle;
-                mesh.position.x = Math.cos(angle) * p.orbit;
-                mesh.position.z = Math.sin(angle) * p.orbit;
-                mesh.position.y = Math.sin(angle * 0.5) * 0.3;
-                mesh.rotation.y += 0.005 * p.speed;
-            });
-
-            // Sun slow rotation
-            sun.rotation.y += 0.001;
-
-            // Camera follow
-            if (isTracking && selectedPlanet) {
-                const pp = selectedPlanet.userData.planet;
-                const target = selectedPlanet.position.clone();
-                const dist = pp.size * 0.55 * 6 + 4;
-                const desired = target.clone().add(new THREE.Vector3(0, dist * 0.4, dist));
-                camTarget.lerp(desired, 0.04);
-                camLookAt.lerp(target, 0.06);
-            } else if (!isTracking) {
-                camTarget.lerp(new THREE.Vector3(0, 22, 50), 0.03);
-                camLookAt.lerp(new THREE.Vector3(0, 0, 0), 0.03);
-            }
-
-            camera.position.copy(camTarget);
-            camera.lookAt(camLookAt);
-
-            renderer.render(scene, camera);
-            }
-
-            animate();
-
-            // ── Resize ──────────────────────────────────────────────────────
-            window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        </script>
-    </body>
+</body>
 </html>

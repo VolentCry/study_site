@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Свободное падение — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #38bdf8; --accent2: #818cf8; --accent3: #f472b6; --gold: #fbbf24;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(56,189,248,0.2);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a {
+  font-size: 14px; font-weight: 600; color: var(--text2);
+  text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-back {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: var(--text2);
+  text-decoration: none; letter-spacing: 0.04em; text-transform: uppercase;
+  transition: color 0.2s; border: 1px solid var(--border); border-radius: 30px;
+  padding: 6px 16px;
+}
+.nav-back:hover { color: var(--accent); border-color: rgba(56,189,248,0.4); }
+
+/* ── PAGE HEADER ── */
+#page-top {
+  padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden;
+}
+#page-top::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56,189,248,0.09) 0%, transparent 70%);
+  pointer-events: none;
+}
+.breadcrumb {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text2); margin-bottom: 14px;
+  opacity: 0; animation: fadeUp 0.6s 0.1s forwards;
+}
+.breadcrumb span { color: var(--accent); }
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(34px, 5vw, 64px); font-weight: 900; line-height: 1.1;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+}
+.page-sub {
+  font-size: 16px; font-weight: 300; color: var(--text2); line-height: 1.7;
+  max-width: 600px; margin: 14px auto 0;
+  opacity: 0; animation: fadeUp 0.7s 0.35s forwards;
+}
+.tags-row {
+  display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp 0.7s 0.45s forwards;
+}
+.tag {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px;
+}
+.tag-blue  { background: rgba(56,189,248,.12); color: var(--accent); border: 1px solid rgba(56,189,248,.2); }
+.tag-gold  { background: rgba(251,191,36,.1);  color: var(--gold);   border: 1px solid rgba(251,191,36,.2); }
+.tag-purple{ background: rgba(129,140,248,.1); color: var(--accent2); border: 1px solid rgba(129,140,248,.2); }
+
+/* ── MAIN LAYOUT ── */
+#main {
+  max-width: 1280px; margin: 48px auto 0; padding: 0 24px 80px;
+  display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start;
+}
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+/* ── CANVAS PANEL ── */
+.canvas-panel {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 24px; overflow: hidden; position: sticky; top: 80px;
+}
+.canvas-header {
+  padding: 18px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.canvas-title { font-size: 15px; font-weight: 700; }
+.status-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px; transition: all 0.3s;
+}
+.status-ready  { background: rgba(56,189,248,.12); color: var(--accent); }
+.status-running{ background: rgba(251,191,36,.12); color: var(--gold); }
+.status-done   { background: rgba(129,140,248,.12); color: var(--accent2); }
+
+#simCanvas { display: block; width: 100%; background: #030810; }
+
+/* ── LIVE METERS ── */
+.meters-row {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+  border-top: 1px solid var(--border); background: var(--border);
+}
+.meter {
+  background: var(--bg2); padding: 14px 16px; text-align: center;
+}
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text2); }
+.meter-val {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  margin-top: 4px; line-height: 1; transition: color 0.3s;
+}
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-t { color: var(--accent); }
+.mv-h { color: var(--gold); }
+.mv-v { color: var(--accent3); }
+.mv-a { color: var(--accent2); }
+
+/* ── CONTROLS PANEL ── */
+.side-panel { display: flex; flex-direction: column; gap: 20px; }
+
+.card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+}
+.card-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text2); display: flex; align-items: center; gap: 8px;
+}
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+/* SLIDERS */
+.ctrl-row { display: flex; flex-direction: column; gap: 8px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box {
+  font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;
+  color: var(--accent);
+}
+.ctrl-val-box small { font-family: 'Raleway',sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+input[type=range] {
+  -webkit-appearance: none; width: 100%; height: 4px;
+  border-radius: 4px; background: rgba(56,189,248,0.15); outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); cursor: pointer; transition: transform 0.15s;
+  box-shadow: 0 0 8px rgba(56,189,248,0.5);
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 10px; }
+.btn-sim {
+  flex: 1; padding: 12px 8px; border-radius: 12px; font-family: 'Raleway',sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer;
+  transition: all 0.2s; border: none;
+}
+.btn-start {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; box-shadow: 0 0 24px rgba(56,189,248,0.25);
+}
+.btn-start:hover { transform: translateY(-2px); box-shadow: 0 0 36px rgba(56,189,248,0.4); }
+.btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-reset {
+  background: transparent; color: var(--text2);
+  border: 1px solid rgba(148,163,184,0.2);
+}
+.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+/* PRESET PLANETS */
+.planets-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; padding: 16px 20px; }
+.planet-btn {
+  padding: 10px 6px; border-radius: 12px; cursor: pointer;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  transition: all 0.2s; text-align: center; display: flex; flex-direction: column; gap: 4px;
+}
+.planet-btn:hover { border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.05); }
+.planet-btn.active { border-color: var(--accent); background: rgba(56,189,248,0.1); }
+.planet-icon { font-size: 20px; }
+.planet-name { font-size: 11px; font-weight: 700; color: var(--text2); }
+.planet-g { font-size: 10px; color: var(--accent); font-weight: 600; }
+
+/* MODE TABS */
+.mode-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.mode-tab {
+  flex: 1; padding: 12px 8px; text-align: center;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.mode-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* THEORY CARD */
+.formula-block {
+  background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.12);
+  border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr {
+  font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--accent);
+}
+.formula-meaning { font-size: 12px; color: var(--text2); text-align: right; max-width: 160px; line-height: 1.4; }
+.formula-divider { height: 1px; background: rgba(56,189,248,0.12); }
+
+/* GRAPH PANEL */
+.graph-wrap {
+  background: #030810; border-top: 1px solid var(--border);
+  padding: 16px 20px 12px; position: relative;
+}
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; }
+#graphCanvas { display: block; width: 100%; }
+
+/* FACTS */
+.fact { display: flex; gap: 12px; align-items: flex-start; }
+.fact-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+.fact-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.fact-text strong { color: var(--text); }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* FOOTER */
+footer {
+  padding: 36px 24px; border-top: 1px solid var(--border);
+  text-align: center; color: var(--text2); font-size: 14px;
+}
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="simulations.html" class="nav-back">← Все симуляции</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>7 класс</span> · Механика</p>
+  <h1 class="page-title">Свободное падение</h1>
+  <p class="page-sub">Наблюдай, как тело падает под действием силы тяжести. Меняй высоту, планету и режим отображения — и изучай физику в действии.</p>
+  <div class="tags-row">
+    <span class="tag tag-blue">7 класс</span>
+    <span class="tag tag-gold">h = gt²/2</span>
+    <span class="tag tag-purple">v = gt</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LEFT: CANVAS -->
+  <div>
+    <div class="canvas-panel reveal">
+      <div class="canvas-header">
+        <span class="canvas-title">Симуляция</span>
+        <span class="status-badge status-ready" id="statusBadge">Готово</span>
+      </div>
+
+      <div class="mode-tabs">
+        <div class="mode-tab active" data-mode="fall" onclick="setMode('fall',this)">Падение</div>
+        <div class="mode-tab" data-mode="strobe" onclick="setMode('strobe',this)">Стробоскоп</div>
+        <div class="mode-tab" data-mode="vacuum" onclick="setMode('vacuum',this)">Вакуум vs воздух</div>
+      </div>
+
+      <canvas id="simCanvas" height="520"></canvas>
+
+      <div class="graph-wrap">
+        <div class="graph-title">График h(t) и v(t)</div>
+        <canvas id="graphCanvas" height="120"></canvas>
+      </div>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Время</div>
+          <div class="meter-val mv-t" id="mTime">0.00</div>
+          <div class="meter-unit">сек</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Высота</div>
+          <div class="meter-val mv-h" id="mHeight">—</div>
+          <div class="meter-unit">м</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Скорость</div>
+          <div class="meter-val mv-v" id="mSpeed">0.0</div>
+          <div class="meter-unit">м/с</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Ускорение</div>
+          <div class="meter-val mv-a" id="mAccel">—</div>
+          <div class="meter-unit">м/с²</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS -->
+  <div class="side-panel">
+
+    <!-- PARAMETERS -->
+    <div class="card reveal" style="transition-delay:0.1s">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры</div>
+      <div class="card-body">
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Начальная высота</span>
+            <span class="ctrl-val-box" id="hVal">80 <small>м</small></span>
+          </div>
+          <input type="range" id="slH" min="10" max="200" value="80" step="5">
+          <span class="ctrl-desc">С какой высоты начинает падать тело.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Масса тела</span>
+            <span class="ctrl-val-box" id="mVal">5 <small>кг</small></span>
+          </div>
+          <input type="range" id="slM" min="1" max="50" value="5" step="1">
+          <span class="ctrl-desc">В вакууме масса не влияет на скорость падения.</span>
+        </div>
+
+        <div class="ctrl-row" id="airCtrlRow">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Сопротивление воздуха</span>
+            <span class="ctrl-val-box" id="airVal">0.0 <small>к</small></span>
+          </div>
+          <input type="range" id="slAir" min="0" max="2" value="0" step="0.1">
+          <span class="ctrl-desc">Коэффициент сопр. воздуха (0 = вакуум).</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-start" id="btnStart" onclick="startSim()">▶ Запустить</button>
+          <button class="btn-sim btn-reset" onclick="resetSim()">↺ Сброс</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLANETS -->
+    <div class="card reveal" style="transition-delay:0.18s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--gold)"></div>Планеты</div>
+      <div class="planets-grid">
+        <div class="planet-btn active" onclick="setPlanet(this,9.81,'🌍','Земля')">
+          <div class="planet-icon">🌍</div>
+          <div class="planet-name">Земля</div>
+          <div class="planet-g">9.81 м/с²</div>
+        </div>
+        <div class="planet-btn" onclick="setPlanet(this,1.62,'🌕','Луна')">
+          <div class="planet-icon">🌕</div>
+          <div class="planet-name">Луна</div>
+          <div class="planet-g">1.62 м/с²</div>
+        </div>
+        <div class="planet-btn" onclick="setPlanet(this,3.72,'🔴','Марс')">
+          <div class="planet-icon">🔴</div>
+          <div class="planet-name">Марс</div>
+          <div class="planet-g">3.72 м/с²</div>
+        </div>
+        <div class="planet-btn" onclick="setPlanet(this,24.79,'🟠','Юпитер')">
+          <div class="planet-icon">🟠</div>
+          <div class="planet-name">Юпитер</div>
+          <div class="planet-g">24.79 м/с²</div>
+        </div>
+        <div class="planet-btn" onclick="setPlanet(this,274,'☀️','Солнце')">
+          <div class="planet-icon">☀️</div>
+          <div class="planet-name">Солнце</div>
+          <div class="planet-g">274 м/с²</div>
+        </div>
+        <div class="planet-btn" onclick="setPlanet(this,8.87,'♀️','Венера')">
+          <div class="planet-icon">♀️</div>
+          <div class="planet-name">Венера</div>
+          <div class="planet-g">8.87 м/с²</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THEORY -->
+    <div class="card reveal" style="transition-delay:0.26s">
+      <div class="card-head"><div class="card-head-dot" style="background:var(--accent2)"></div>Теория</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">h = h₀ − gt²/2</span>
+            <span class="formula-meaning">высота в момент t</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">v = g · t</span>
+            <span class="formula-meaning">скорость нарастает равномерно</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">t = √(2h/g)</span>
+            <span class="formula-meaning">время до падения на землю</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">vₘₐₓ = √(2gh)</span>
+            <span class="formula-meaning">скорость у земли</span>
+          </div>
+        </div>
+
+        <div class="fact">
+          <span class="fact-icon">🔬</span>
+          <p class="fact-text"><strong>Галилей</strong> доказал, что все тела падают с одинаковым ускорением независимо от массы, сбросив ядра с Пизанской башни.</p>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">🌙</span>
+          <p class="fact-text">На Луне нет атмосферы — там <strong>перо и молоток</strong> падают одновременно. Это показали астронавты «Аполлона-15» в 1971 году.</p>
+        </div>
+        <div class="fact">
+          <span class="fact-icon">📐</span>
+          <p class="fact-text">Ускорение свободного падения на Земле <strong>g ≈ 9,81 м/с²</strong>, но у полюсов чуть больше, а у экватора — меньше.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p></footer>
+
+<script>
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let g = 9.81;
+let H0 = 80;
+let mass = 5;
+let airK = 0;
+let mode = 'fall';
+
+let simRunning = false;
+let simDone = false;
+let t = 0;
+let y = 0;      // pixels from top of canvas
+let v = 0;      // m/s
+let raf = null;
+
+let hHistory = [];   // {t, h, v}
+let strobePoints = [];
+
+const C = document.getElementById('simCanvas');
+const ctx = C.getContext('2d');
+const GC = document.getElementById('graphCanvas');
+const gctx = GC.getContext('2d');
+
+/* ════════════════════════════════════════════
+   UI BINDINGS
+════════════════════════════════════════════ */
+document.getElementById('slH').oninput = function(){
+  H0 = +this.value;
+  document.getElementById('hVal').innerHTML = H0 + ' <small>м</small>';
+  if (!simRunning) resetSim();
+};
+document.getElementById('slM').oninput = function(){
+  mass = +this.value;
+  document.getElementById('mVal').innerHTML = mass + ' <small>кг</small>';
+};
+document.getElementById('slAir').oninput = function(){
+  airK = +this.value;
+  document.getElementById('airVal').innerHTML = airK.toFixed(1) + ' <small>к</small>';
+};
+
+function setPlanet(el, gv, icon, name){
+  document.querySelectorAll('.planet-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  g = gv;
+  document.getElementById('mAccel').textContent = gv.toFixed(2);
+  if (!simRunning) resetSim();
+}
+
+function setMode(m, el){
+  mode = m;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  resetSim();
+}
+
+/* ════════════════════════════════════════════
+   SIMULATION CORE
+════════════════════════════════════════════ */
+function startSim(){
+  if(simDone) resetSim();
+  simRunning = true;
+  document.getElementById('btnStart').disabled = true;
+  setStatus('running','Падение…');
+  if(raf) cancelAnimationFrame(raf);
+  loop();
+}
+
+function resetSim(){
+  simRunning = false; simDone = false; t = 0; v = 0;
+  hHistory = []; strobePoints = [];
+  document.getElementById('btnStart').disabled = false;
+  setStatus('ready','Готово');
+  updateMeters(0, H0, 0);
+  if(raf) cancelAnimationFrame(raf);
+  drawScene(H0, 0, false);
+  drawGraph();
+}
+
+let lastTs = null;
+function loop(ts){
+  if(!simRunning) return;
+  if(!lastTs){ lastTs = ts; raf = requestAnimationFrame(loop); return; }
+  let dt = Math.min((ts - lastTs)/1000, 0.05);
+  lastTs = ts;
+
+  // Physics step — Euler with optional air drag
+  // a = g - k*v²/m  (drag opposes motion, downward = positive)
+  const accel = g - (airK * v * v) / mass;
+  v += accel * dt;
+  t += dt;
+
+  const h = Math.max(0, H0 - 0.5 * g * t * t + (airK > 0 ? airDragH() : 0));
+
+  // strobe snapshot every 0.15s
+  if(mode === 'strobe' && Math.round(t/0.15) > strobePoints.length){
+    strobePoints.push({ h, v });
+  }
+
+  hHistory.push({ t, h, v });
+
+  updateMeters(t, h, v);
+  drawScene(h, v, true);
+  drawGraph();
+
+  if(h <= 0){
+    simRunning = false; simDone = true;
+    document.getElementById('btnStart').disabled = true;
+    setStatus('done','Приземление!');
+    drawScene(0, v, false);
+    lastTs = null;
+    return;
+  }
+  lastTs = ts;
+  raf = requestAnimationFrame(loop);
+}
+
+// Very simplified drag correction (approximate)
+function airDragH(){
+  if(airK === 0 || t === 0) return 0;
+  return -(airK * v * v * t) / (2 * mass);
+}
+
+function setStatus(type, text){
+  const b = document.getElementById('statusBadge');
+  b.className = 'status-badge status-' + type;
+  b.textContent = text;
+}
+
+function updateMeters(time, h, speed){
+  document.getElementById('mTime').textContent   = time.toFixed(2);
+  document.getElementById('mHeight').textContent = h > 0 ? h.toFixed(1) : '0.0';
+  document.getElementById('mSpeed').textContent  = speed.toFixed(1);
+  document.getElementById('mAccel').textContent  = g.toFixed(2);
+}
+
+/* ════════════════════════════════════════════
+   CANVAS DRAW
+════════════════════════════════════════════ */
+function resize(){
+  C.width = C.offsetWidth;
+  GC.width = GC.offsetWidth;
+}
+window.addEventListener('resize', ()=>{ resize(); drawScene(H0, 0, false); drawGraph(); });
+resize();
+
+function px(h){ return map(h, H0, 0, 40, C.height - 60); }
+
+function drawScene(h, speed, running){
+  const W = C.width, H = C.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Background gradient
+  const bgGrad = ctx.createLinearGradient(0,0,0,H);
+  bgGrad.addColorStop(0,'#020810');
+  bgGrad.addColorStop(1,'#030f1c');
+  ctx.fillStyle = bgGrad; ctx.fillRect(0,0,W,H);
+
+  // Stars
+  ctx.fillStyle='rgba(200,220,255,0.15)';
+  [[W*0.1,H*0.08],[W*0.25,H*0.03],[W*0.7,H*0.06],[W*0.85,H*0.12],[W*0.5,H*0.02]].forEach(([sx,sy])=>{
+    ctx.beginPath(); ctx.arc(sx,sy,1,0,Math.PI*2); ctx.fill();
+  });
+
+  const groundY = H - 48;
+  const cx = W / 2;
+
+  // ── MODE: STROBE ──────────────────────────────
+  if(mode === 'strobe'){
+    strobePoints.forEach((p,i)=>{
+      const py_ = map(p.h, H0, 0, 40, groundY - 18);
+      const alpha = 0.15 + i/strobePoints.length * 0.5;
+      ctx.beginPath(); ctx.arc(cx, py_, 14, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(56,189,248,${alpha})`; ctx.fill();
+      ctx.strokeStyle = `rgba(56,189,248,${alpha+0.2})`; ctx.lineWidth=1;
+      ctx.stroke();
+      // interval label
+      if(i < strobePoints.length-1){
+        const nextP = strobePoints[i+1];
+        const ny_ = map(nextP.h, H0, 0, 40, groundY - 18);
+        const mid = (py_+ny_)/2;
+        ctx.fillStyle=`rgba(56,189,248,${alpha})`;
+        ctx.font='10px Raleway,sans-serif'; ctx.textAlign='left';
+        ctx.fillText(`Δh=${(p.h-nextP.h).toFixed(1)}м`, cx+20, mid);
+      }
+    });
+  }
+
+  // ── MODE: VACUUM vs AIR ──────────────────────
+  let hVac = H0;
+  if(mode === 'vacuum' && running && t > 0){
+    hVac = Math.max(0, H0 - 0.5 * g * t * t);
+    const pyVac = map(hVac, H0, 0, 40, groundY-18);
+    // vacuum ball (ghost)
+    ctx.beginPath(); ctx.arc(cx - 40, pyVac, 16, 0, Math.PI*2);
+    ctx.fillStyle='rgba(129,140,248,0.3)'; ctx.fill();
+    ctx.strokeStyle='rgba(129,140,248,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle='rgba(129,140,248,0.7)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('вакуум', cx-40, pyVac-22);
+  }
+
+  // ── HEIGHT SCALE (left ruler) ───────────────
+  const rulerX = 32;
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(rulerX, 28); ctx.lineTo(rulerX, groundY); ctx.stroke();
+  const steps = 5;
+  for(let i=0;i<=steps;i++){
+    const hm = H0 * (1 - i/steps);
+    const ry = map(hm, H0, 0, 40, groundY);
+    ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(rulerX-5,ry); ctx.lineTo(rulerX+5,ry); ctx.stroke();
+    // dotted horizontal line
+    ctx.setLineDash([3,6]); ctx.strokeStyle='rgba(255,255,255,0.04)';
+    ctx.beginPath(); ctx.moveTo(rulerX+5,ry); ctx.lineTo(W-10,ry); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(148,163,184,0.55)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(hm)+'м', rulerX-8, ry+4);
+  }
+
+  // ── TRAJECTORY TRAIL ────────────────────────
+  if(hHistory.length > 1 && mode !== 'strobe'){
+    ctx.beginPath();
+    hHistory.forEach((p,i)=>{
+      const py_ = map(p.h, H0, 0, 40, groundY-18);
+      i===0 ? ctx.moveTo(cx, py_) : ctx.lineTo(cx, py_);
+    });
+    ctx.strokeStyle='rgba(56,189,248,0.2)'; ctx.lineWidth=1.5;
+    ctx.setLineDash([3,5]); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // ── VELOCITY VECTOR ─────────────────────────
+  const ballY = map(h, H0, 0, 40, groundY-18);
+  if(running && speed > 0 && h > 0){
+    const vLen = Math.min(speed * 2.5, 80);
+    ctx.strokeStyle='#f472b6'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx+28, ballY); ctx.lineTo(cx+28, ballY+vLen); ctx.stroke();
+    // arrowhead
+    ctx.fillStyle='#f472b6';
+    ctx.beginPath(); ctx.moveTo(cx+28,ballY+vLen+10); ctx.lineTo(cx+23,ballY+vLen); ctx.lineTo(cx+33,ballY+vLen); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#f472b6'; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('v='+speed.toFixed(1), cx+36, ballY+vLen/2+5);
+  }
+
+  // ── BALL ────────────────────────────────────
+  if(h >= 0){
+    // glow
+    if(running){
+      const glow = ctx.createRadialGradient(cx, ballY, 0, cx, ballY, 40);
+      glow.addColorStop(0,'rgba(56,189,248,0.15)'); glow.addColorStop(1,'rgba(56,189,248,0)');
+      ctx.beginPath(); ctx.arc(cx, ballY, 40, 0, Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+    }
+    // ball body
+    const bgrad = ctx.createRadialGradient(cx-6, ballY-6, 2, cx, ballY, 20);
+    bgrad.addColorStop(0,'rgba(186,230,253,1)');
+    bgrad.addColorStop(0.4,'rgba(56,189,248,1)');
+    bgrad.addColorStop(1,'rgba(8,100,130,0.9)');
+    ctx.beginPath(); ctx.arc(cx, ballY, 20, 0, Math.PI*2);
+    ctx.fillStyle = bgrad; ctx.fill();
+    ctx.strokeStyle='rgba(125,211,252,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+    // highlight
+    ctx.beginPath(); ctx.arc(cx-6,ballY-6,5,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+
+    // height label
+    const hLabel = h.toFixed(1)+'м';
+    ctx.fillStyle='rgba(56,189,248,0.8)'; ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(hLabel, cx+26, ballY-8);
+  }
+
+  // ── GROUND ──────────────────────────────────
+  // ground surface
+  const groundGrad = ctx.createLinearGradient(0, groundY, 0, H);
+  groundGrad.addColorStop(0,'rgba(56,189,248,0.12)'); groundGrad.addColorStop(1,'rgba(56,189,248,0.02)');
+  ctx.fillStyle=groundGrad; ctx.fillRect(0, groundY, W, H-groundY);
+  ctx.strokeStyle='rgba(56,189,248,0.4)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(W,groundY); ctx.stroke();
+  // ground label
+  ctx.fillStyle='rgba(56,189,248,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Земля  0 м', cx, groundY+16);
+
+  // ── IMPACT EFFECT ───────────────────────────
+  if(simDone){
+    for(let i=0;i<12;i++){
+      const ang = (i/12)*Math.PI*2, r=25+Math.random()*30;
+      ctx.strokeStyle=`rgba(56,189,248,${0.1+Math.random()*0.3})`; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(cx,groundY); ctx.lineTo(cx+Math.cos(ang)*r,groundY+Math.sin(ang)*r*0.4); ctx.stroke();
+    }
+    ctx.fillStyle='rgba(56,189,248,0.15)';
+    ctx.beginPath(); ctx.ellipse(cx, groundY, 40, 8, 0, 0, Math.PI*2); ctx.fill();
+    // final speed label
+    ctx.fillStyle=col(1); ctx.font='bold 14px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(`Финальная скорость: ${speed.toFixed(1)} м/с`, cx, groundY-35);
+    ctx.fillStyle='rgba(148,163,184,0.7)'; ctx.font='12px Raleway,sans-serif';
+    const tFall = Math.sqrt(2*H0/g);
+    ctx.fillText(`Расчётное время: ${tFall.toFixed(2)} с`, cx, groundY-18);
+  }
+
+  // ── START MARKER ────────────────────────────
+  ctx.strokeStyle='rgba(251,191,36,0.35)'; ctx.lineWidth=1; ctx.setLineDash([4,5]);
+  ctx.beginPath(); ctx.moveTo(36, 40); ctx.lineTo(W-10, 40); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(251,191,36,0.5)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('h₀='+H0+'м', 38, 34);
+
+  // ── MODE LABEL ──────────────────────────────
+  if(mode==='vacuum' && running){
+    ctx.fillStyle='rgba(129,140,248,0.8)'; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('синий = вакуум  |  голубой = с воздухом (при k>0)', W/2, H-8);
+  }
+}
+
+function col(a){ return `rgba(56,189,248,${a})`; }
+
+/* ════════════════════════════════════════════
+   GRAPH
+════════════════════════════════════════════ */
+function drawGraph(){
+  const W = GC.width, H = GC.height;
+  gctx.clearRect(0,0,W,H);
+  gctx.fillStyle='#030810'; gctx.fillRect(0,0,W,H);
+
+  if(hHistory.length < 2) return;
+
+  const maxT = Math.max(...hHistory.map(p=>p.t), 0.1);
+  const maxV = Math.max(...hHistory.map(p=>p.v), 1);
+  const padL=38, padR=12, padT=8, padB=20;
+  const gW=W-padL-padR, gH=H-padT-padB;
+
+  // grid
+  for(let i=0;i<=4;i++){
+    const gy=padT+i*(gH/4);
+    gctx.strokeStyle='rgba(255,255,255,0.05)'; gctx.lineWidth=1;
+    gctx.beginPath(); gctx.moveTo(padL,gy); gctx.lineTo(W-padR,gy); gctx.stroke();
+  }
+
+  // h(t) curve — gold
+  gctx.strokeStyle='#fbbf24'; gctx.lineWidth=2; gctx.beginPath();
+  hHistory.forEach((p,i)=>{
+    const x=padL+map(p.t,0,maxT,0,gW), y=padT+map(p.h,H0,0,0,gH);
+    i===0?gctx.moveTo(x,y):gctx.lineTo(x,y);
+  });
+  gctx.stroke();
+
+  // v(t) curve — pink
+  gctx.strokeStyle='#f472b6'; gctx.lineWidth=2; gctx.beginPath();
+  hHistory.forEach((p,i)=>{
+    const x=padL+map(p.t,0,maxT,0,gW), y=padT+map(p.v,0,maxV,gH,0);
+    i===0?gctx.moveTo(x,y):gctx.lineTo(x,y);
+  });
+  gctx.stroke();
+
+  // axes
+  gctx.strokeStyle='rgba(255,255,255,0.2)'; gctx.lineWidth=1;
+  gctx.beginPath(); gctx.moveTo(padL,padT); gctx.lineTo(padL,padT+gH); gctx.lineTo(W-padR,padT+gH); gctx.stroke();
+
+  // labels
+  gctx.fillStyle='rgba(148,163,184,0.6)'; gctx.font='9px Raleway,sans-serif'; gctx.textAlign='right';
+  gctx.fillText(H0+'м', padL-2, padT+6);
+  gctx.fillText('0', padL-2, padT+gH+2);
+  gctx.textAlign='center';
+  gctx.fillText('t, с', padL+gW/2, H-3);
+
+  // legend
+  gctx.fillStyle='#fbbf24'; gctx.font='bold 9px Raleway,sans-serif'; gctx.textAlign='left';
+  gctx.fillText('h(t)', padL+4, padT+10);
+  gctx.fillStyle='#f472b6'; gctx.fillText('v(t)', padL+36, padT+10);
+}
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+function map(v,a,b,c,d){ return c+(v-a)/(b-a)*(d-c); }
+
+/* ════════════════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════════════════ */
+const ro = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+/* ── INITIAL DRAW ── */
+drawScene(H0, 0, false);
+drawGraph();
+updateMeters(0, H0, 0);
+document.getElementById('mAccel').textContent = g.toFixed(2);
+</script>
+</body>
+</html>

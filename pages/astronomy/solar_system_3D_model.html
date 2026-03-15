@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Солнечная система — 3D Симуляция</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@300;400;600&display=swap');
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #03050d; --text: #e8e4da; --accent: #c8a96e;
+            --muted: #4a4f6a; --panel-bg: rgba(6, 10, 24, 0.94);
+            --border: rgba(200, 169, 110, 0.2);
+        }
+        html, body { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; overflow: hidden; }
+        canvas { display: block; position: fixed; top: 0; left: 0; }
+
+        #header { position: fixed; top: 32px; left: 40px; z-index: 10; pointer-events: none; }
+        #header h1 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 13px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); opacity: 0.8; }
+        #header p { font-size: 9px; letter-spacing: 0.2em; color: var(--muted); margin-top: 4px; }
+
+        #hint { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 10; font-size: 9px; letter-spacing: 0.25em; color: var(--muted); text-transform: uppercase; pointer-events: none; transition: opacity 0.6s; text-align: center; line-height: 1.8; }
+        #controls-hint { position: fixed; bottom: 32px; right: 40px; z-index: 10; font-size: 8px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; pointer-events: none; line-height: 2; opacity: 0.6; }
+        #controls-hint span { color: var(--accent); opacity: 0.8; }
+
+        /* ─── Settings toggle ─── */
+        #settings-toggle {
+            position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+            z-index: 30; width: 36px; height: 80px;
+            background: var(--panel-bg); border: 1px solid var(--border); border-left: none;
+            border-radius: 0 8px 8px 0; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+            transition: background 0.2s, left 0.5s cubic-bezier(0.16,1,0.3,1);
+            backdrop-filter: blur(12px);
+        }
+        #settings-toggle:hover { background: rgba(200,169,110,0.1); }
+        .s-bar { width: 14px; height: 1px; background: var(--accent); opacity: 0.7; transition: transform 0.3s, opacity 0.3s; }
+        #settings-toggle.open { left: 280px; }
+        #settings-toggle.open .s-bar:nth-child(1) { transform: rotate(45deg) translate(4px,4px); }
+        #settings-toggle.open .s-bar:nth-child(2) { opacity: 0; }
+        #settings-toggle.open .s-bar:nth-child(3) { transform: rotate(-45deg) translate(4px,-4px); }
+
+        /* ─── Settings sidebar ─── */
+        #settings-sidebar {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100vh;
+            z-index: 29; background: var(--panel-bg); border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px); padding: 48px 28px 32px;
+            transition: left 0.5s cubic-bezier(0.16,1,0.3,1);
+            overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--muted) transparent;
+        }
+        #settings-sidebar.open { left: 0; }
+        .s-title { font-size: 9px; letter-spacing: 0.35em; color: var(--accent); text-transform: uppercase; margin-bottom: 32px; }
+        .s-section { margin-bottom: 28px; }
+        .s-label { font-size: 7px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .toggle-name { font-size: 10px; letter-spacing: 0.1em; color: rgba(232,228,218,0.7); }
+        .tw { position: relative; width: 36px; height: 18px; cursor: pointer; }
+        .tw input { opacity: 0; width: 0; height: 0; }
+        .tw-track { position: absolute; inset: 0; background: rgba(74,79,106,0.6); border: 1px solid var(--border); border-radius: 9px; transition: background 0.3s; }
+        .tw input:checked ~ .tw-track { background: rgba(200,169,110,0.3); border-color: var(--accent); }
+        .tw-thumb { position: absolute; top: 3px; left: 3px; width: 10px; height: 10px; background: var(--muted); border-radius: 50%; transition: transform 0.3s, background 0.3s; }
+        .tw input:checked ~ .tw-track .tw-thumb { transform: translateX(18px); background: var(--accent); }
+        .speed-val { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text); margin-bottom: 10px; }
+        .speed-val span { font-size: 11px; color: var(--muted); letter-spacing: 0.15em; }
+        input[type=range] { 
+            width: 100%; 
+            /* -webkit-appearance: none;  */
+            height: 2px; background: var(--border); border-radius: 1px; outline: none; cursor: pointer; margin-bottom: 8px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); cursor: pointer; }
+        .presets { display: flex; gap: 6px; flex-wrap: wrap; }
+        .pb { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.1em; color: var(--muted); background: none; border: 1px solid var(--border); padding: 4px 8px; cursor: pointer; transition: all 0.2s; }
+        .pb:hover, .pb.active { color: var(--accent); border-color: var(--accent); background: rgba(200,169,110,0.08); }
+        #btn-reset { width: 100%; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text); background: none; border: 1px solid var(--border); padding: 12px; cursor: pointer; transition: all 0.3s; margin-top: 8px; }
+        #btn-reset:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,169,110,0.06); }
+
+        /* ─── Info Panel ─── */
+        #panel {
+            position: fixed; right: -440px; top: 50%; transform: translateY(-50%);
+            width: 380px; max-height: 88vh; overflow-y: auto;
+            z-index: 20; background: var(--panel-bg); border: 1px solid var(--border);
+            backdrop-filter: blur(20px); padding: 40px 36px 28px;
+            transition: right 0.7s cubic-bezier(0.16,1,0.3,1);
+            scrollbar-width: thin; scrollbar-color: var(--muted) transparent;
+        }
+        #panel.open { right: 32px; }
+        #panel-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; letter-spacing: 0.15em; transition: color 0.2s; }
+        #panel-close:hover { color: var(--accent); }
+        #panel-badge { font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        #panel-badge.moon { color: var(--accent); background: rgba(200,169,110,0.08); border: 1px solid var(--border); padding: 3px 8px; display: inline-block; }
+        #panel-parent { font-size: 8px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        #panel-number { font-size: 9px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        #panel-name { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 42px; line-height: 1; letter-spacing: 0.04em; color: var(--text); margin-bottom: 6px; }
+        #panel-type { font-size: 9px; letter-spacing: 0.25em; color: var(--accent); text-transform: uppercase; margin-bottom: 28px; }
+        #panel-desc { font-family: 'Cormorant Garamond', serif; font-size: 15px; line-height: 1.75; color: rgba(232,228,218,0.7); margin-bottom: 32px; }
+        #panel-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+        .stat { border-top: 1px solid var(--border); padding-top: 12px; }
+        .stat-label { font-size: 8px; letter-spacing: 0.25em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text); }
+        #panel-facts { border-top: 1px solid var(--border); padding-top: 20px; margin-bottom: 28px; }
+        #panel-facts h3, #panel-moons h3 { font-size: 8px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
+        .fact { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .fact::before { content: '—'; color: var(--accent); font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+        .fact span { font-family: 'Cormorant Garamond', serif; font-size: 13px; line-height: 1.6; color: rgba(232,228,218,0.65); }
+        #panel-moons { border-top: 1px solid var(--border); padding-top: 20px; margin-bottom: 28px; }
+        .moon-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .moon-tag { font-family: 'Cormorant Garamond', serif; font-size: 12px; color: rgba(232,228,218,0.6); background: rgba(200,169,110,0.07); border: 1px solid var(--border); padding: 3px 8px; }
+        .moon-more { font-size: 10px; color: var(--muted); letter-spacing: 0.15em; padding: 3px 8px; align-self: center; }
+        #btn-more { width: 100%; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); background: rgba(200,169,110,0.06); border: 1px solid var(--border); padding: 13px; cursor: pointer; transition: all 0.3s; display: none; }
+        #btn-more:hover { background: rgba(200,169,110,0.14); border-color: var(--accent); }
+        #btn-more.vis { display: block; }
+
+        /* ─── Detail Modal ─── */
+        #detail-overlay {
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(3,5,13,0.82); backdrop-filter: blur(10px);
+            opacity: 0; pointer-events: none; transition: opacity 0.4s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #detail-overlay.open { opacity: 1; pointer-events: all; }
+        #detail-modal {
+            width: min(860px, 94vw); max-height: 90vh;
+            background: var(--panel-bg); border: 1px solid var(--border);
+            overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--muted) transparent;
+            padding: 56px 64px; position: relative;
+            transform: translateY(30px); transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+        }
+        #detail-overlay.open #detail-modal { transform: translateY(0); }
+        #detail-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; letter-spacing: 0.15em; transition: color 0.2s; }
+        #detail-close:hover { color: var(--accent); }
+        .d-hero { display: flex; align-items: flex-end; gap: 32px; margin-bottom: 48px; border-bottom: 1px solid var(--border); padding-bottom: 40px; }
+        .d-orb { flex-shrink: 0; width: 80px; height: 80px; border-radius: 50%; }
+        .d-badge { font-size: 8px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+        .d-name { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 64px; line-height: 1; color: var(--text); }
+        .d-type { font-size: 9px; letter-spacing: 0.25em; color: var(--accent); text-transform: uppercase; margin-top: 8px; }
+        .d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+        .d-sec-title { font-size: 8px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .d-desc { font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.8; color: rgba(232,228,218,0.75); }
+        .d-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .d-stat { border-top: 1px solid var(--border); padding-top: 12px; }
+        .d-stat-label { font-size: 7px; letter-spacing: 0.25em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+        .d-stat-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--text); }
+        .d-full { margin-bottom: 40px; }
+        .d-fact { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+        .d-fact::before { content: '—'; color: var(--accent); font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+        .d-fact span { font-family: 'Cormorant Garamond', serif; font-size: 15px; line-height: 1.65; color: rgba(232,228,218,0.7); }
+        .d-moons { display: flex; flex-wrap: wrap; gap: 8px; }
+        .d-moon-chip { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: rgba(232,228,218,0.65); background: rgba(200,169,110,0.06); border: 1px solid var(--border); padding: 5px 12px; }
+        .d-moon-chip.dim { opacity: 0.4; }
+        .d-moon-count { font-size: 9px; letter-spacing: 0.15em; color: var(--muted); padding: 5px 12px; align-self: center; }
+    </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="header">
+    <h1>Солнечная система</h1>
+    <p>Интерактивная 3D симуляция</p>
+</div>
+<div id="hint">Нажмите на планету или спутник · Удерживайте ЛКМ чтобы вращать</div>
+<div id="controls-hint">
+    <span>ЛКМ</span> вращение<br>
+    <span>ПКМ / SHIFT</span> сдвиг<br>
+    <span>КОЛЕСО</span> масштаб<br>
+    <span>2×КЛИК</span> сброс вида
+</div>
+
+<!-- Settings -->
+<button id="settings-toggle" aria-label="Настройки">
+    <div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div>
+</button>
+<div id="settings-sidebar">
+    <div class="s-title">⚙ Настройки</div>
+    <div class="s-section">
+        <div class="s-label">Отображение</div>
+        <div class="toggle-row">
+            <span class="toggle-name">Показывать спутники</span>
+            <label class="tw"><input type="checkbox" id="tog-moons" checked><div class="tw-track"><div class="tw-thumb"></div></div></label>
+        </div>
+        <div class="toggle-row">
+            <span class="toggle-name">Орбиты планет</span>
+            <label class="tw"><input type="checkbox" id="tog-orbits" checked><div class="tw-track"><div class="tw-thumb"></div></div></label>
+        </div>
+    </div>
+    <div class="s-section">
+        <div class="s-label">Вращение</div>
+        <div class="toggle-row">
+            <span class="toggle-name">Включить анимацию</span>
+            <label class="tw"><input type="checkbox" id="tog-rotation" checked><div class="tw-track"><div class="tw-thumb"></div></div></label>
+        </div>
+        <div class="speed-val" id="speed-display">1.0× <span>скорость</span></div>
+        <input type="range" id="speed-slider" min="0" max="10" step="0.1" value="1">
+        <div class="presets">
+            <button class="pb" data-s="0.1">×0.1</button>
+            <button class="pb active" data-s="1">×1</button>
+            <button class="pb" data-s="2">×2</button>
+            <button class="pb" data-s="5">×5</button>
+            <button class="pb" data-s="10">×10</button>
+        </div>
+    </div>
+    <div class="s-section">
+        <div class="s-label">Сброс</div>
+        <button id="btn-reset">↺ Сбросить всё</button>
+    </div>
+</div>
+
+<!-- Info panel -->
+<div id="panel">
+    <button id="panel-close">[ Закрыть ]</button>
+    <span id="panel-badge"></span>
+    <div id="panel-parent"></div>
+    <div id="panel-number"></div>
+    <div id="panel-name"></div>
+    <div id="panel-type"></div>
+    <div id="panel-desc"></div>
+    <div id="panel-stats"></div>
+    <div id="panel-facts"></div>
+    <div id="panel-moons"></div>
+    <button id="btn-more">Подробнее ↗</button>
+</div>
+
+<!-- Detail overlay -->
+<div id="detail-overlay">
+    <div id="detail-modal">
+        <button id="detail-close">[ Закрыть ]</button>
+        <div id="detail-content"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════
+const MOON_INFO = {
+    'Луна':{ desc:'Единственный естественный спутник Земли. Луна — пятый по величине спутник в Солнечной системе. Она оказывает огромное влияние на жизнь нашей планеты: создаёт приливы и отливы, стабилизирует ось вращения Земли и замедляет её вращение.', stats:[{label:'Диаметр',value:'3 474 км'},{label:'Расстояние',value:'384 400 км'},{label:'Орбитальный период',value:'27,3 сут'},{label:'Возраст',value:'4,5 млрд лет'}], facts:['Луна удаляется от Земли на 3,8 см в год','На Луне нет атмосферы и магнитного поля','Человек впервые ступил на Луну 20 июля 1969 года','Гравитация составляет 1/6 земной'] },
+    'Фобос':{ desc:'Крупнейший и ближайший к Марсу спутник. Фобос движется по орбите быстрее, чем Марс вращается вокруг своей оси — он восходит на западе и садится на востоке. Через ~50 млн лет разрушится и образует кольцо вокруг Марса.', stats:[{label:'Размер',value:'26×22×18 км'},{label:'Расстояние',value:'9 376 км'},{label:'Орбитальный период',value:'7,65 ч'},{label:'Альбедо',value:'0,071'}], facts:['Обращается вокруг Марса трижды в сутки','Постепенно приближается к Марсу на 1,8 м/100 лет','Покрыт реголитом толщиной ~100 м','Назван в честь бога страха (др.-греч.)'] },
+    'Деймос':{ desc:'Меньший и более далёкий спутник Марса. Деймос движется почти по круговой орбите и крайне медленно пересекает небо Марса. Его поверхность более гладкая, чем у Фобоса, из-за более толстого слоя реголита.', stats:[{label:'Размер',value:'15×12×10 км'},{label:'Расстояние',value:'23 460 км'},{label:'Орбитальный период',value:'30,3 ч'},{label:'Альбедо',value:'0,068'}], facts:['Назван в честь бога ужаса (др.-греч.)','Один из самых маленьких спутников Солнечной системы','С Марса выглядит как яркая звезда','Вероятно, захваченный астероид пояса'] },
+    'Ио':{ desc:'Наиболее вулканически активное тело в Солнечной системе. На Ио постоянно извергаются сотни вулканов, выбрасывая серу и диоксид серы на высоту до 500 км. Поверхность обновляется быстрее, чем на любом другом объекте.', stats:[{label:'Диаметр',value:'3 643 км'},{label:'Расстояние',value:'421 800 км'},{label:'Орбитальный период',value:'1,77 сут'},{label:'Температура',value:'от −143°C до +1600°C'}], facts:['Более 400 активных вулканов','Приливный разогрев от гравитации Юпитера','Поверхность покрыта серными озёрами','Открыта Галилеем в 1610 году'] },
+    'Европа':{ desc:'Под ледяной корой Европы скрывается глобальный солёный океан — один из главных кандидатов на внеземную жизнь в Солнечной системе. Поверхность покрыта сетью трещин и хаотичных гребней.', stats:[{label:'Диаметр',value:'3 122 км'},{label:'Расстояние',value:'671 100 км'},{label:'Орбитальный период',value:'3,55 сут'},{label:'Глубина океана',value:'~100 км'}], facts:['Подледный океан содержит вдвое больше воды, чем все земные океаны','Зафиксированы гейзеры водяного пара','Толщина ледяной коры от 10 до 30 км','Цель миссии NASA Europa Clipper'] },
+    'Ганимед':{ desc:'Крупнейший спутник в Солнечной системе — больше Меркурия. Ганимед — единственный спутник с собственным магнитным полем. Под его поверхностью также предполагается наличие солёного океана.', stats:[{label:'Диаметр',value:'5 268 км'},{label:'Расстояние',value:'1 070 400 км'},{label:'Орбитальный период',value:'7,15 сут'},{label:'Альбедо',value:'0,43'}], facts:['Крупнейший спутник в Солнечной системе — больше Меркурия','Единственный спутник с собственным магнитным полем','Открыта Галилеем в 1610 году','Вероятно, имеет подповерхностный океан'] },
+    'Каллисто':{ desc:'Самый удалённый из четырёх галилеевых спутников Юпитера. Поверхность Каллисто является одной из наиболее кратерированных в Солнечной системе. Под поверхностью вероятен жидководный океан.', stats:[{label:'Диаметр',value:'4 821 км'},{label:'Расстояние',value:'1 882 700 км'},{label:'Орбитальный период',value:'16,7 сут'},{label:'Кратерирование',value:'максимальное'}], facts:['Наиболее кратерированное тело в Солнечной системе','Геологически неактивна миллиарды лет','Малое радиационное воздействие — кандидат для базы','Открыта Галилеем в 1610 году'] },
+    'Титан':{ desc:'Крупнейший спутник Сатурна и единственное тело в Солнечной системе (помимо Земли) с плотной атмосферой и жидкими поверхностными водоёмами. Но вместо воды — озёра из жидкого метана.', stats:[{label:'Диаметр',value:'5 150 км'},{label:'Расстояние',value:'1 221 870 км'},{label:'Орбитальный период',value:'15,9 сут'},{label:'Температура',value:'−179°C'}], facts:['Единственный спутник с плотной атмосферой (N₂ + CH₄)','Реки, озёра и моря из жидкого метана','Зонд «Гюйгенс» совершил посадку в 2005 году','Давление у поверхности на 50% выше земного'] },
+    'Рея':{ desc:'Второй по величине спутник Сатурна. Рея — ледяное тело, покрытое многочисленными ударными кратерами. Возможно, имеет собственное разреженное кольцо — первый подобный случай у спутника.', stats:[{label:'Диаметр',value:'1 528 км'},{label:'Расстояние',value:'527 108 км'},{label:'Орбитальный период',value:'4,52 сут'},{label:'Состав',value:'75% водяной лёд'}], facts:['Второй по величине спутник Сатурна','Возможно, имеет разреженное кольцо из твёрдых частиц','Поверхность — ярко-белые и тёмные полушария','Открыта Кассини в 1672 году'] },
+    'Диона':{ desc:'Один из плотных спутников Сатурна, состоящий преимущественно изо льда. На поверхности видны ледяные утёсы и обрывы высотой до нескольких сотен метров — следы тектонических разломов.', stats:[{label:'Диаметр',value:'1 123 км'},{label:'Расстояние',value:'377 396 км'},{label:'Орбитальный период',value:'2,74 сут'},{label:'Плотность',value:'1,48 г/см³'}], facts:['Ледяные утёсы высотой до 500 м','Возможно, имеет подповерхностный океан','Открыта Джованни Кассини в 1684 году','Два меньших спутника делят её орбиту (троянцы)'] },
+    'Тефия':{ desc:'Ледяной спутник Сатурна, состоящий почти полностью из водяного льда. На его поверхности расположен один из крупнейших ударных кратеров в Солнечной системе — Одиссей (400 км).', stats:[{label:'Диаметр',value:'1 062 км'},{label:'Расстояние',value:'294 619 км'},{label:'Орбитальный период',value:'1,89 сут'},{label:'Состав',value:'~98% водяной лёд'}], facts:['Кратер Одиссей — 400 км в диаметре','Один из наименее плотных спутников Солнечной системы','Открыта Кассини в 1684 году','Два троянских спутника: Телесто и Калипсо'] },
+    'Титания':{ desc:'Крупнейший спутник Урана. Поверхность изрезана огромными каньонами и разломами, свидетельствующими о мощных геологических процессах в прошлом. Назван в честь царицы фей из «Сна в летнюю ночь».', stats:[{label:'Диаметр',value:'1 577 км'},{label:'Расстояние',value:'435 910 км'},{label:'Орбитальный период',value:'8,71 сут'},{label:'Альбедо',value:'0,35'}], facts:['Крупнейший спутник Урана','Назван в честь персонажа Шекспира','Разломы и долины длиной до 1 500 км','Открыт Уильямом Гершелем в 1787 году'] },
+    'Оберон':{ desc:'Второй по величине спутник Урана. Поверхность покрыта многочисленными кратерами с тёмными пятнами на дне — возможно, смесь льда и углеводородов. Открыт одновременно с Титанией.', stats:[{label:'Диаметр',value:'1 523 км'},{label:'Расстояние',value:'583 520 км'},{label:'Орбитальный период',value:'13,5 сут'},{label:'Альбедо',value:'0,31'}], facts:['Самый удалённый крупный спутник Урана','Назван в честь короля фей (Шекспир)','Тёмные геологические отложения на дне кратеров','Открыт Уильямом Гершелем в 1787 году'] },
+    'Умбриэль':{ desc:'Один из крупных спутников Урана, примечательный очень тёмной и древней поверхностью. Геологически неактивен миллиарды лет. Загадочное яркое кольцо Вунда на полюсе до сих пор не объяснено.', stats:[{label:'Диаметр',value:'1 169 км'},{label:'Расстояние',value:'266 000 км'},{label:'Орбитальный период',value:'4,14 сут'},{label:'Альбедо',value:'0,21'}], facts:['Самый тёмный крупный спутник Урана','Назван в честь духа тьмы (А. Поуп)','Загадочное яркое кольцо Вунда на полюсе','Открыт Уильямом Лассел в 1851 году'] },
+    'Ариэль':{ desc:'Один из крупных спутников Урана с относительно молодой и яркой поверхностью. Ариэль имеет сеть долин и каньонов, говорящих о геологической активности в прошлом.', stats:[{label:'Диаметр',value:'1 158 км'},{label:'Расстояние',value:'191 020 км'},{label:'Орбитальный период',value:'2,52 сут'},{label:'Альбедо',value:'0,53'}], facts:['Самая яркая поверхность из крупных спутников Урана','Назван в честь духа воздуха (Шекспир)','Долины и разломы длиной сотни километров','Открыта Уильямом Лассел в 1851 году'] },
+    'Тритон':{ desc:'Крупнейший спутник Нептуна и одно из самых холодных тел Солнечной системы. Тритон вращается в направлении, противоположном вращению Нептуна — признак захвата из пояса Койпера.', stats:[{label:'Диаметр',value:'2 707 км'},{label:'Расстояние',value:'354 759 км'},{label:'Орбитальный период',value:'−5,88 сут (ретро)'},{label:'Температура',value:'−235°C'}], facts:['Единственный крупный спутник с ретроградной орбитой','Через ~3,6 млрд лет разрушится приливными силами','Активные азотные гейзеры высотой 8 км','Самое холодное известное тело Солнечной системы'] },
+    'Протей':{ desc:'Второй по величине спутник Нептуна, открытый «Вояджером-2» в 1989 году. Протей имеет неправильную форму и очень тёмную поверхность. Размер близок к максимальному без гидростатического равновесия.', stats:[{label:'Размер',value:'418×390×364 км'},{label:'Расстояние',value:'117 647 км'},{label:'Орбитальный период',value:'1,12 сут'},{label:'Альбедо',value:'0,096'}], facts:['Открыт «Вояджером-2» в 1989 году','Почти не отражает света','Один из крупнейших неправильных спутников','Находится вблизи внешнего кольца Нептуна'] },
+    'Нереида':{ desc:'Третий по величине спутник Нептуна с очень вытянутой орбитой (эксцентриситет 0,75 — один из наибольших). Вероятно, была выброшена на такую орбиту в момент захвата Тритона.', stats:[{label:'Диаметр',value:'340 км'},{label:'Мин. расстояние',value:'1 353 600 км'},{label:'Орбитальный период',value:'360 сут'},{label:'Эксцентриситет',value:'0,75'}], facts:['Один из наибольших эксцентриситетов орбит спутников','Открыта Джерардом Койпером в 1949 году','Расстояние от Нептуна меняется в 7 раз','Возможно, выброшена Тритоном при его захвате'] },
+};
+
+const PLANETS = [
+    { name:'Меркурий', number:'01', type:'Планета земной группы', color:'#8a8a8a', emissive:'#2a2a2a', size:0.38, orbit:3.8, speed:4.15, desc:'Наименьшая планета в Солнечной системе и ближайшая к Солнцу. Совершает оборот каждые 88 дней и испытывает экстремальные перепады температур.', descLong:'Меркурий — первая планета от Солнца и наименьшая в Солнечной системе. Поверхность испещрена кратерами — Меркурий практически лишён атмосферы и не может защититься от метеоритов. Гравитация в 2,5 раза слабее земной. Железное ядро планеты непропорционально велико — его радиус составляет около 85% от общего. Магнитное поле в 100 раз слабее земного, но оно существует. Несмотря на близость к Солнцу, в полярных кратерах, куда никогда не достигает свет, сохраняется водяной лёд. Исследование Меркурия крайне затруднено: для достижения планеты необходимо погасить значительную скорость.', stats:[{label:'Диаметр',value:'4 879 км'},{label:'Расстояние',value:'57,9 млн км'},{label:'Сутки',value:'1 408 ч'},{label:'Спутников',value:'0'}], facts:['Перепад температур от −180°C до +430°C','Железное ядро составляет ~85% радиуса планеты','Поверхность покрыта кратерами, как Луна','Год длится 88 земных дней'], moons:[], moonCount:0 },
+    { name:'Венера', number:'02', type:'Планета земной группы', color:'#c9a96e', emissive:'#3d2a10', size:0.95, orbit:5.5, speed:1.62, desc:'Самая горячая планета Солнечной системы. Вращается в обратную сторону, а её плотная атмосфера создаёт неуправляемый парниковый эффект.', descLong:'Венера — вторая планета от Солнца и самое яркое тело на ночном небе после Луны. Плотная атмосфера на 96% состоит из углекислого газа, создавая парниковый эффект: температура на поверхности постоянно держится около 465°C. Давление у поверхности в 92 раза превышает земное. Венера вращается медленно и в обратном направлении — Солнце там восходит на западе. Сутки длиннее года. Советские зонды «Венера» успешно совершали посадки в 1970–1985 гг. и передавали данные несколько часов до отказа из-за экстремальных условий.', stats:[{label:'Диаметр',value:'12 104 км'},{label:'Расстояние',value:'108,2 млн км'},{label:'Сутки',value:'5 832 ч'},{label:'Спутников',value:'0'}], facts:['Температура поверхности 465°C — плавит свинец','День на Венере длиннее её года','Вращается в направлении, противоположном большинству планет','Давление у поверхности в 92 раза выше земного'], moons:[], moonCount:0 },
+    { name:'Земля', number:'03', type:'Планета земной группы', color:'#3a6b8a', emissive:'#0d2535', size:1.0, orbit:7.5, speed:1.0, desc:'Наш родной мир. Единственная известная планета, населённая жизнью: жидкая вода, защитное магнитное поле и атмосфера, приспособленная для живых организмов.', descLong:'Земля — третья планета от Солнца и единственная известная нам обитаемая планета. Возраст — около 4,54 млрд лет. Мощное магнитное поле защищает от солнечного ветра. Атмосфера состоит из азота (78%), кислорода (21%) и примесей. Уникальная особенность — обилие жидкой воды (71% поверхности), которая является ключевым условием для жизни. Луна стабилизирует наклон оси и создаёт приливы. Земля — единственная планета, не носящая имени бога, — её название происходит от праславянского «земь» (почва, земля). Тектоника плит постоянно перестраивает поверхность.', stats:[{label:'Диаметр',value:'12 742 км'},{label:'Расстояние',value:'149,6 млн км'},{label:'Сутки',value:'24 ч'},{label:'Спутников',value:'1'}], facts:['71% поверхности покрыт водой','Единственная планета, не названная в честь бога','Магнитное поле защищает жизнь от солнечной радиации','Наклон оси 23,5° создаёт смену сезонов'], moons:[{name:'Луна',color:'#aaaaaa',size:0.27,orbit:1.3,speed:13.4}], moonCount:1 },
+    { name:'Марс', number:'04', type:'Планета земной группы', color:'#c1440e', emissive:'#3d1205', size:0.53, orbit:10.0, speed:0.53, desc:'Красная планета — самый высокий вулкан и самый длинный каньон в Солнечной системе. Наиболее вероятный кандидат для будущей колонизации.', descLong:'Марс — четвёртая планета, прозванная Красной из-за оксида железа в почве. Тонкая атмосфера (~95% CO₂) почти не защищает от радиации и создаёт давление в 100 раз ниже земного. Гора Олимп — крупнейший вулкан Солнечной системы (21,9 км). Долина Маринера — каньон длиной 4 000 км и глубиной 7 км. Признаки древних рек и озёр указывают на тёплый влажный климат в прошлом. На Марсе работали марсоходы Curiosity и Perseverance. Марс — главный кандидат для колонизации: сутки близки к земным, есть вода в виде льда и ресурсы.', stats:[{label:'Диаметр',value:'6 779 км'},{label:'Расстояние',value:'227,9 млн км'},{label:'Сутки',value:'24,6 ч'},{label:'Спутников',value:'2'}], facts:['Олимп — вулкан высотой 21,9 км, втрое выше Эвереста','Долина Маринера — каньон длиной 4 000 км','Марсианский год — 687 земных дней','На поверхности найдены следы древних рек и озёр'], moons:[{name:'Фобос',color:'#888877',size:0.12,orbit:0.7,speed:30},{name:'Деймос',color:'#998877',size:0.09,orbit:1.1,speed:12}], moonCount:2 },
+    { name:'Юпитер', number:'05', type:'Газовый гигант', color:'#c8a97a', emissive:'#3a2510', size:2.6, orbit:15.0, speed:0.084, desc:'Крупнейшая планета Солнечной системы. Большое Красное Пятно — шторм, бушующий уже несколько веков. Мог бы вместить все остальные планеты.', descLong:'Юпитер — пятая и крупнейшая планета. Его масса в 2,5 раза больше суммарной массы всех остальных планет. Состоит преимущественно из водорода и гелия. Большое Красное Пятно — атмосферный антициклон размером с Землю, наблюдаемый с XVII века. Магнитное поле в 14 раз мощнее земного создаёт огромные радиационные пояса. Юпитер служит «небесным щитом» — его гравитация перехватывает многие кометы и астероиды. Внутри под давлением водород переходит в металлическую жидкость, проводящую электричество. У Юпитера 95 известных спутников, четыре из которых (галилеевы) открыты ещё в 1610 году.', stats:[{label:'Диаметр',value:'139 820 км'},{label:'Расстояние',value:'778,5 млн км'},{label:'Сутки',value:'9,9 ч'},{label:'Спутников',value:'95'}], facts:['Большое Красное Пятно — шторм 350+ лет, крупнее Земли','Кольцевая система открыта в 1979 году','Европа — кандидат на внеземную жизнь (подлёдный океан)','Самая быстро вращающаяся планета: сутки 9,9 ч'], moons:[{name:'Ио',color:'#e8d850',size:0.30,orbit:3.8,speed:20},{name:'Европа',color:'#c8d8e8',size:0.25,orbit:4.8,speed:10},{name:'Ганимед',color:'#a09080',size:0.40,orbit:6.0,speed:5},{name:'Каллисто',color:'#706860',size:0.35,orbit:7.5,speed:2.5}], moonCount:95, moonExtra:['Амальтея','Гималия','Элара','Пасифе','Синопе','Лиситея','Карме','Ананке','Леда','Фива'] },
+    { name:'Сатурн', number:'06', type:'Газовый гигант', color:'#e8d5a3', emissive:'#3a3010', size:2.2, orbit:20.5, speed:0.034, hasRings:true, desc:'Жемчужина Солнечной системы с великолепными кольцами изо льда и камня. Настолько лёгкий, что теоретически мог бы плавать на воде.', descLong:'Сатурн — шестая планета и второй газовый гигант. Его кольца — одно из красивейших зрелищ Солнечной системы: они простираются на 282 000 км, но их толщина менее 1 км. Кольца состоят из частиц льда и камня различного размера. Плотность Сатурна (0,69 г/см³) меньше плотности воды. На полюсе — загадочный устойчивый гексагональный шторм диаметром ~30 000 км. Спутник Энцелад выбрасывает гейзеры воды, а Титан — единственный спутник с плотной атмосферой и метановыми озёрами. У Сатурна рекордное число спутников — 146.', stats:[{label:'Диаметр',value:'116 460 км'},{label:'Расстояние',value:'1,43 млрд км'},{label:'Сутки',value:'10,7 ч'},{label:'Спутников',value:'146'}], facts:['Кольца простираются на 282 000 км, но толщиной менее 1 км','Менее плотный, чем вода — плавал бы в океане','На Титане идут дожди из жидкого метана','На северном полюсе — постоянный шестиугольный шторм'], moons:[{name:'Титан',color:'#d4a84a',size:0.36,orbit:4.5,speed:5},{name:'Рея',color:'#c0c0c0',size:0.22,orbit:5.8,speed:8},{name:'Диона',color:'#b0b8c0',size:0.18,orbit:7.0,speed:12},{name:'Тефия',color:'#d0d8e0',size:0.17,orbit:8.2,speed:16}], moonCount:146, moonExtra:['Мимас','Энцелад','Гиперион','Япет','Феба','Янус','Эпиметей','Прометей'] },
+    { name:'Уран', number:'07', type:'Ледяной гигант', color:'#7de8e8', emissive:'#0d3d3d', size:1.6, orbit:26.5, speed:0.012, desc:'Наклонённая планета — вращается вокруг Солнца «лёжа на боку». Обладает самой холодной планетарной атмосферой в Солнечной системе.', descLong:'Уран — седьмая планета и первый из ледяных гигантов. Наклон оси 97,8° — видимо, результат столкновения с планетоидом в прошлом. Полюса планеты попеременно смотрят на Солнце в течение 42 лет. Состоит из ядра из камня и льда, мантии из воды, аммиака и метана (ледяная мантия), и атмосферы из водорода, гелия и метана. Метан поглощает красный свет, придавая Урану характерный голубоватый оттенок. Уран — единственная планета, вращающаяся «на боку», и единственный ледяной гигант, не имеющий зонда в пути. Все его спутники носят имена персонажей Шекспира и Поупа.', stats:[{label:'Диаметр',value:'50 724 км'},{label:'Расстояние',value:'2,87 млрд км'},{label:'Сутки',value:'17,2 ч'},{label:'Спутников',value:'27'}], facts:['Наклон оси 97,8° — планета вращается «на боку»','Самая холодная атмосфера: −224°C','27 лун, все имена — из произведений Шекспира','Имеет 13 тёмных узких колец'], moons:[{name:'Титания',color:'#c8d0e0',size:0.25,orbit:3.2,speed:6},{name:'Оберон',color:'#b0b8c8',size:0.23,orbit:4.2,speed:4},{name:'Умбриэль',color:'#909098',size:0.19,orbit:5.0,speed:8},{name:'Ариэль',color:'#d0d8e8',size:0.20,orbit:5.9,speed:12}], moonCount:27, moonExtra:['Миранда','Пак','Калибан','Сикоракс','Просперо','Сетебос'] },
+    { name:'Нептун', number:'08', type:'Ледяной гигант', color:'#3b5fc0', emissive:'#0a1540', size:1.5, orbit:32.5, speed:0.006, desc:'Самая ветреная планета — скорость штормов до 2 100 км/ч. Был математически предсказан раньше, чем обнаружен в телескоп.', descLong:'Нептун — восьмая и последняя планета. Открыт в 1846 году по математическим расчётам Леверье и Адамса — триумф небесной механики. Нептун — самая ветреная планета: скорость ветра достигает 2 100 км/ч. Синий цвет — результат поглощения красного света метаном. Единственный визит — «Вояджер-2» в 1989 году. Во время пролёта был обнаружен «Большой тёмный пятно» — гигантский шторм, аналог Большого Красного Пятна Юпитера. Крупнейший спутник Тритон имеет ретроградную орбиту — признак захвата из пояса Койпера. Через несколько млрд лет Тритон разрушится, образовав кольца.', stats:[{label:'Диаметр',value:'49 244 км'},{label:'Расстояние',value:'4,50 млрд км'},{label:'Сутки',value:'16,1 ч'},{label:'Спутников',value:'16'}], facts:['Скорость ветра до 2 100 км/ч — максимум в Солнечной системе','Один год Нептуна = 165 земным годам','Тритон вращается «против» Нептуна и движется по сужающейся спирали','Открыт математически в 1846 году — до наблюдения в телескоп'], moons:[{name:'Тритон',color:'#a0c8e0',size:0.27,orbit:3.5,speed:-7},{name:'Протей',color:'#808890',size:0.13,orbit:4.6,speed:14},{name:'Нереида',color:'#909898',size:0.10,orbit:6.0,speed:4}], moonCount:16, moonExtra:['Ларисса','Галатея','Деспина','Таласса','Наяда'] },
+];
+
+// ═══════════════════════════════════════
+//  THREE.JS SETUP
+// ═══════════════════════════════════════
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x03050d, 1);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+scene.add(new THREE.AmbientLight(0x111122, 0.6));
+scene.add(new THREE.PointLight(0xfff5e0, 3.5, 500));
+
+// Stars
+(() => {
+    const pos = new Float32Array(5000 * 3);
+    for (let i = 0; i < pos.length; i++) pos[i] = (Math.random() - 0.5) * 1600;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.2, transparent: true, opacity: 0.6 })));
+})();
+
+const sun = new THREE.Mesh(new THREE.SphereGeometry(2.2, 32, 32), new THREE.MeshBasicMaterial({ color: 0xfff0a0 }));
+scene.add(sun);
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(2.8, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.08, side: THREE.BackSide })));
+
+const planetMeshes = [], orbitLines = [], allMoonMeshes = [];
+
+PLANETS.forEach((p, i) => {
+    const orbitMesh = new THREE.Mesh(
+        new THREE.RingGeometry(p.orbit - 0.02, p.orbit + 0.02, 128),
+        new THREE.MeshBasicMaterial({ color: 0x2a2f4a, side: THREE.DoubleSide, transparent: true, opacity: 0.5 })
+    );
+    orbitMesh.rotation.x = Math.PI / 2;
+    scene.add(orbitMesh);
+    orbitLines.push(orbitMesh);
+
+    const pivot = new THREE.Object3D();
+    scene.add(pivot);
+
+    const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(p.size * 0.55, 32, 32),
+        new THREE.MeshStandardMaterial({ color: p.color, emissive: p.emissive, roughness: 0.85, metalness: 0.05 })
+    );
+    mesh.position.x = p.orbit;
+    mesh.userData = { planet: p, index: i, angle: (i / PLANETS.length) * Math.PI * 2, pivot, moonData: [] };
+    pivot.add(mesh);
+
+    if (p.hasRings) {
+        const ring = new THREE.Mesh(
+            new THREE.RingGeometry(p.size * 0.7, p.size * 1.2, 64),
+            new THREE.MeshBasicMaterial({ color: 0xd4c49a, transparent: true, opacity: 0.45, side: THREE.DoubleSide })
+        );
+        ring.rotation.x = Math.PI / 2.4;
+        mesh.add(ring);
+    }
+
+    (p.moons || []).forEach((m, mi) => {
+        const orb = new THREE.Mesh(
+            new THREE.RingGeometry(m.orbit * 0.55 - 0.01, m.orbit * 0.55 + 0.01, 64),
+            new THREE.MeshBasicMaterial({ color: 0x3a3f5a, side: THREE.DoubleSide, transparent: true, opacity: 0 })
+        );
+        orb.rotation.x = Math.PI / 2;
+        mesh.add(orb);
+
+        const mpivot = new THREE.Object3D();
+        mpivot.rotation.y = (mi / p.moons.length) * Math.PI * 2;
+        mesh.add(mpivot);
+
+        const mmesh = new THREE.Mesh(
+            new THREE.SphereGeometry(m.size * 0.35, 16, 16),
+            new THREE.MeshStandardMaterial({ color: m.color, roughness: 0.9 })
+        );
+        mmesh.position.x = m.orbit * 0.55;
+        mmesh.userData = { moon: m, parentPlanet: p, orbitMesh: orb };
+        mpivot.add(mmesh);
+        mesh.userData.moonData.push({ pivot: mpivot, mesh: mmesh, orbitMesh: orb, data: m });
+        allMoonMeshes.push(mmesh);
+    });
+
+    planetMeshes.push(mesh);
+});
+
+// ═══════════════════════════════════════
+//  CAMERA CONTROLS
+// ═══════════════════════════════════════
+const ctrl = {
+    isOrbit: false, isPan: false, lx: 0, ly: 0,
+    s: { theta: 0.6, phi: 1.0, r: 55 },
+    tgt: new THREE.Vector3()
+};
+function updateCam() {
+    const { theta, phi, r } = ctrl.s, sp = Math.sin(phi);
+    camera.position.set(ctrl.tgt.x + r * sp * Math.sin(theta), ctrl.tgt.y + r * Math.cos(phi), ctrl.tgt.z + r * sp * Math.cos(theta));
+    camera.lookAt(ctrl.tgt);
+}
+updateCam();
+
+canvas.addEventListener('mousedown', e => {
+    if (isTracking) return;
+    if (e.button === 0 && !e.shiftKey) {
+        const mx = (e.clientX / window.innerWidth) * 2 - 1, my = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
+        if (raycaster.intersectObjects(planetMeshes, false).length > 0) return;
+        if (moonsOn && raycaster.intersectObjects(allMoonMeshes, false).length > 0) return;
+        ctrl.isOrbit = true;
+    } else if (e.button === 2 || (e.button === 0 && e.shiftKey)) { ctrl.isPan = true; }
+    ctrl.lx = e.clientX; ctrl.ly = e.clientY;
+});
+canvas.addEventListener('mousemove', e => {
+    if (!ctrl.isOrbit && !ctrl.isPan) return;
+    const dx = e.clientX - ctrl.lx, dy = e.clientY - ctrl.ly;
+    ctrl.lx = e.clientX; ctrl.ly = e.clientY;
+    if (ctrl.isOrbit) {
+        ctrl.s.theta -= dx * 0.005;
+        ctrl.s.phi = Math.max(0.1, Math.min(Math.PI - 0.1, ctrl.s.phi + dy * 0.005));
+    } else {
+        const ps = ctrl.s.r * 0.001;
+        const right = new THREE.Vector3(); right.crossVectors(camera.getWorldDirection(new THREE.Vector3()), camera.up).normalize();
+        ctrl.tgt.addScaledVector(right, -dx * ps); ctrl.tgt.addScaledVector(camera.up, dy * ps);
+    }
+    updateCam();
+});
+window.addEventListener('mouseup', () => { ctrl.isOrbit = false; ctrl.isPan = false; });
+canvas.addEventListener('wheel', e => { if (isTracking) return; e.preventDefault(); ctrl.s.r = Math.max(5, Math.min(200, ctrl.s.r + e.deltaY * 0.05)); updateCam(); }, { passive: false });
+canvas.addEventListener('dblclick', () => { if (isTracking) return; ctrl.s = { theta: 0.6, phi: 1.0, r: 55 }; ctrl.tgt.set(0, 0, 0); updateCam(); });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+// ═══════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════
+let simSpeed = 1, simPaused = false, moonsOn = true;
+const SYSTEM_SPEED = 0.0008;
+
+const settBtn = document.getElementById('settings-toggle');
+const settBar = document.getElementById('settings-sidebar');
+settBtn.addEventListener('click', () => {
+    const o = settBar.classList.toggle('open');
+    settBtn.classList.toggle('open', o);
+});
+
+document.getElementById('tog-rotation').addEventListener('change', e => { simPaused = !e.target.checked; });
+document.getElementById('tog-moons').addEventListener('change', e => {
+    moonsOn = e.target.checked;
+    allMoonMeshes.forEach(m => m.visible = moonsOn);
+    if (selectedPlanet) selectedPlanet.userData.moonData.forEach(m => { m.orbitMesh.material.opacity = moonsOn ? 0.35 : 0; });
+});
+document.getElementById('tog-orbits').addEventListener('change', e => { orbitLines.forEach(o => o.visible = e.target.checked); });
+
+const sld = document.getElementById('speed-slider');
+const sdsp = document.getElementById('speed-display');
+sld.addEventListener('input', () => { simSpeed = parseFloat(sld.value); sdsp.innerHTML = `${simSpeed.toFixed(1)}× <span>скорость</span>`; document.querySelectorAll('.pb').forEach(b => b.classList.remove('active')); });
+document.querySelectorAll('.pb').forEach(btn => {
+    btn.addEventListener('click', () => {
+        simSpeed = parseFloat(btn.dataset.s); sld.value = simSpeed;
+        sdsp.innerHTML = `${simSpeed.toFixed(1)}× <span>скорость</span>`;
+        document.querySelectorAll('.pb').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+    });
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+    simSpeed = 1; simPaused = false; moonsOn = true;
+    sld.value = 1; sdsp.innerHTML = `1.0× <span>скорость</span>`;
+    document.getElementById('tog-rotation').checked = true;
+    document.getElementById('tog-moons').checked = true;
+    document.getElementById('tog-orbits').checked = true;
+    orbitLines.forEach(o => { o.visible = true; o.material.opacity = 0.5; o.material.color.setHex(0x2a2f4a); });
+    allMoonMeshes.forEach(m => m.visible = true);
+    document.querySelectorAll('.pb').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-s="1"]').classList.add('active');
+    closePanel();
+    ctrl.s = { theta: 0.6, phi: 1.0, r: 55 }; ctrl.tgt.set(0, 0, 0); updateCam();
+});
+
+// ═══════════════════════════════════════
+//  PANEL LOGIC
+// ═══════════════════════════════════════
+const raycaster = new THREE.Raycaster();
+let selectedPlanet = null, isTracking = false, trackInit = false;
+let trackPos = new THREE.Vector3(), trackLook = new THREE.Vector3();
+let currentDetail = null;
+
+const panel = document.getElementById('panel');
+const hint = document.getElementById('hint');
+const btnMore = document.getElementById('btn-more');
+
+canvas.addEventListener('click', e => {
+    const mx = (e.clientX / window.innerWidth) * 2 - 1, my = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
+    if (moonsOn) {
+        const hm = raycaster.intersectObjects(allMoonMeshes, false);
+        if (hm.length) { openMoonPanel(hm[0].object); return; }
+    }
+    const hp = raycaster.intersectObjects(planetMeshes, false);
+    if (hp.length) openPlanetPanel(hp[0].object);
+});
+
+canvas.addEventListener('mousemove', e => {
+    const mx = (e.clientX / window.innerWidth) * 2 - 1, my = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
+    const hp = raycaster.intersectObjects(planetMeshes, false).length;
+    const hm = moonsOn ? raycaster.intersectObjects(allMoonMeshes, false).length : 0;
+    canvas.style.cursor = (hp || hm) ? 'pointer' : (ctrl.isOrbit || ctrl.isPan ? 'grabbing' : 'grab');
+});
+
+function fillPanel(num, badge, badgeMoon, parent, name, type, desc, stats, facts, moonsHtml) {
+    document.getElementById('panel-number').textContent = num;
+    const b = document.getElementById('panel-badge');
+    b.textContent = badge; b.className = badgeMoon ? 'moon' : '';
+    document.getElementById('panel-parent').textContent = parent;
+    document.getElementById('panel-name').textContent = name;
+    document.getElementById('panel-type').textContent = type;
+    document.getElementById('panel-desc').textContent = desc;
+    document.getElementById('panel-stats').innerHTML = stats.map(s => `<div class="stat"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div></div>`).join('');
+    document.getElementById('panel-facts').innerHTML = facts.length ? `<h3>Интересные факты</h3>${facts.map(f=>`<div class="fact"><span>${f}</span></div>`).join('')}` : '';
+    document.getElementById('panel-moons').innerHTML = moonsHtml;
+}
+
+function showPanel(mesh) {
+    if (selectedPlanet && selectedPlanet.userData.moonData) selectedPlanet.userData.moonData.forEach(m => m.orbitMesh.material.opacity = 0);
+    selectedPlanet = mesh; isTracking = true; trackInit = false;
+    if (mesh.userData.moonData && moonsOn) mesh.userData.moonData.forEach(m => m.orbitMesh.material.opacity = 0.35);
+    panel.classList.add('open'); hint.style.opacity = '0'; btnMore.classList.add('vis');
+    orbitLines.forEach((o, i) => { const sel = i === mesh.userData.index; o.material.opacity = sel ? 0.9 : 0.2; o.material.color.setHex(sel ? 0xc8a96e : 0x2a2f4a); });
+}
+
+function openPlanetPanel(mesh) {
+    const p = mesh.userData.planet;
+    const moons = p.moonCount > 0
+        ? `<h3>Спутники (${p.moonCount})</h3><div class="moon-list">${p.moons.map(m=>`<span class="moon-tag">${m.name}</span>`).join('')}${(p.moonExtra||[]).map(m=>`<span class="moon-tag" style="opacity:.45">${m}</span>`).join('')}${(p.moonCount - p.moons.length - (p.moonExtra||[]).length) > 0 ? `<span class="moon-more">+${p.moonCount - p.moons.length - (p.moonExtra||[]).length} др.</span>` : ''}</div>`
+        : `<h3>Спутники</h3><div style="font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(232,228,218,0.4)">Спутников нет</div>`;
+    fillPanel(p.number + ' / 08', '', false, '', p.name, p.type, p.desc, p.stats, p.facts, moons);
+    currentDetail = { type: 'planet', p };
+    showPanel(mesh);
+}
+
+function openMoonPanel(mmesh) {
+    const m = mmesh.userData.moon, pp = mmesh.userData.parentPlanet;
+    const info = MOON_INFO[m.name] || {};
+    const parentMesh = planetMeshes.find(pm => pm.userData.planet === pp);
+    fillPanel('', '◎ Спутник', true, `Планета: ${pp.name}`, m.name, `Спутник планеты ${pp.name}`, info.desc || `Естественный спутник ${pp.name}.`, info.stats || [], info.facts || [], '');
+    currentDetail = { type: 'moon', m, pp, info };
+    showPanel(parentMesh);
+}
+
+document.getElementById('panel-close').addEventListener('click', closePanel);
+function closePanel() {
+    if (selectedPlanet?.userData.moonData) selectedPlanet.userData.moonData.forEach(m => m.orbitMesh.material.opacity = 0);
+    panel.classList.remove('open'); btnMore.classList.remove('vis');
+    selectedPlanet = null; isTracking = false; hint.style.opacity = '1';
+    ctrl.s = { theta: 0.6, phi: 1.0, r: 55 }; ctrl.tgt.set(0, 0, 0); updateCam();
+    orbitLines.forEach(o => { o.material.opacity = 0.5; o.material.color.setHex(0x2a2f4a); });
+    closeDetail();
+}
+
+// ─── Detail modal ───
+const detailOv = document.getElementById('detail-overlay');
+btnMore.addEventListener('click', openDetail);
+document.getElementById('detail-close').addEventListener('click', closeDetail);
+detailOv.addEventListener('click', e => { if (e.target === detailOv) closeDetail(); });
+
+function openDetail() {
+    if (!currentDetail) return;
+    const dc = document.getElementById('detail-content');
+    if (currentDetail.type === 'planet') {
+        const p = currentDetail.p;
+        const mc = p.moons.map(m => `<div class="d-moon-chip">${m.name}</div>`).join('');
+        const ec = (p.moonExtra||[]).map(m => `<div class="d-moon-chip dim">${m}</div>`).join('');
+        const more = (p.moonCount - p.moons.length - (p.moonExtra||[]).length) > 0 ? `<div class="d-moon-count">+${p.moonCount - p.moons.length - (p.moonExtra||[]).length} других</div>` : '';
+        dc.innerHTML = `
+        <div class="d-hero">
+            <div class="d-orb" style="background:radial-gradient(circle at 35% 35%,${p.color},#030510)"></div>
+            <div><div class="d-badge">Планета ${p.number} из 08</div><div class="d-name">${p.name}</div><div class="d-type">${p.type}</div></div>
+        </div>
+        <div class="d-grid">
+            <div><div class="d-sec-title">Описание</div><div class="d-desc">${p.descLong || p.desc}</div></div>
+            <div><div class="d-sec-title">Параметры</div><div class="d-stats">${p.stats.map(s=>`<div class="d-stat"><div class="d-stat-label">${s.label}</div><div class="d-stat-value">${s.value}</div></div>`).join('')}</div></div>
+        </div>
+        <div class="d-full"><div class="d-sec-title">Интересные факты</div><div>${p.facts.map(f=>`<div class="d-fact"><span>${f}</span></div>`).join('')}</div></div>
+        ${p.moonCount > 0 ? `<div class="d-full"><div class="d-sec-title">Спутники (${p.moonCount})</div><div class="d-moons">${mc}${ec}${more}</div></div>` : ''}`;
+    } else {
+        const { m, pp, info } = currentDetail;
+        dc.innerHTML = `
+        <div class="d-hero">
+            <div class="d-orb" style="background:radial-gradient(circle at 35% 35%,${m.color},#030510)"></div>
+            <div><div class="d-badge">Спутник · ${pp.name}</div><div class="d-name">${m.name}</div><div class="d-type">Естественный спутник планеты ${pp.name}</div></div>
+        </div>
+        <div class="d-grid">
+            <div><div class="d-sec-title">Описание</div><div class="d-desc">${info.desc || `Естественный спутник планеты ${pp.name}.`}</div></div>
+            <div><div class="d-sec-title">Параметры</div><div class="d-stats">${(info.stats||[]).map(s=>`<div class="d-stat"><div class="d-stat-label">${s.label}</div><div class="d-stat-value">${s.value}</div></div>`).join('')}</div></div>
+        </div>
+        ${info.facts ? `<div class="d-full"><div class="d-sec-title">Интересные факты</div><div>${info.facts.map(f=>`<div class="d-fact"><span>${f}</span></div>`).join('')}</div></div>` : ''}`;
+    }
+    detailOv.classList.add('open');
+    document.getElementById('detail-modal').scrollTop = 0;
+}
+function closeDetail() { detailOv.classList.remove('open'); }
+
+// ═══════════════════════════════════════
+//  ANIMATION
+// ═══════════════════════════════════════
+let sysAngle = 0;
+function animate() {
+    requestAnimationFrame(animate);
+    if (!simPaused) sysAngle += SYSTEM_SPEED * simSpeed;
+    planetMeshes.forEach(mesh => {
+        const p = mesh.userData.planet, a = sysAngle * p.speed + mesh.userData.angle;
+        mesh.userData.pivot.rotation.y = a;
+        mesh.position.x = p.orbit; mesh.position.y = Math.sin(a * 0.5) * 0.3; mesh.position.z = 0;
+        if (!simPaused) { mesh.rotation.y += 0.005 * p.speed * simSpeed; }
+        mesh.userData.moonData.forEach(m => { if (!simPaused) m.pivot.rotation.y += m.data.speed * 0.001 * simSpeed; });
+    });
+    if (!simPaused) sun.rotation.y += 0.001 * simSpeed;
+
+    if (isTracking && selectedPlanet) {
+        const wp = new THREE.Vector3(); selectedPlanet.getWorldPosition(wp);
+        const d = selectedPlanet.userData.planet.size * 0.55 * 6 + 4;
+        const des = wp.clone().add(new THREE.Vector3(0, d * 0.4, d));
+        if (!trackInit) { trackPos.copy(camera.position); trackLook.copy(wp); trackInit = true; }
+        trackPos.lerp(des, 0.04); trackLook.lerp(wp, 0.06);
+        camera.position.copy(trackPos); camera.lookAt(trackLook);
+    } else { trackInit = false; }
+
+    renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

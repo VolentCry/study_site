@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChemGenius — Химия</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #00b8a9;
+    --teal-light: #00d4c3;
+    --teal-dark: #008f84;
+    --blue: #3a7bd5;
+    --blue-light: #5b93e8;
+    --orange: #ff6b35;
+    --green: #2ecc71;
+    --purple: #9b59b6;
+    --red: #e74c3c;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1a2332;
+    --muted: #6b7c93;
+    --border: #e2eaf3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    background: white;
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 900; font-size: 1.3rem;
+  }
+  .nav-logo span { color: var(--teal); }
+  .nav-logo svg { color: var(--teal); }
+  .nav-sep { flex: 1; }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color .2s; }
+  .nav-links a:hover { color: var(--teal); }
+  .nav-btn {
+    background: var(--teal); color: white; border: none;
+    padding: 8px 20px; border-radius: 20px; font-weight: 700;
+    font-family: 'Nunito', sans-serif; cursor: pointer; font-size: 0.9rem;
+    transition: background .2s, transform .1s;
+  }
+  .nav-btn:hover { background: var(--teal-dark); transform: scale(1.03); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #0a1628 0%, #0d2340 40%, #0a3d3a 100%);
+    overflow: hidden;
+    padding: 80px 40px 100px;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+
+  .hero-particles {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: float-particle linear infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+  }
+
+  .hero-content { position: relative; z-index: 2; flex: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,184,169,0.2); border: 1px solid rgba(0,184,169,0.4);
+    color: var(--teal-light); border-radius: 20px; padding: 6px 16px;
+    font-size: 0.82rem; font-weight: 700; margin-bottom: 20px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900; color: white; line-height: 1.15;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--teal-light); font-style: normal; }
+  .hero p {
+    color: rgba(255,255,255,0.7); font-size: 1.1rem;
+    max-width: 480px; line-height: 1.7; margin-bottom: 32px;
+  }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--teal); color: white; border: none;
+    padding: 14px 28px; border-radius: 30px; font-weight: 800;
+    font-family: 'Nunito', sans-serif; cursor: pointer; font-size: 1rem;
+    transition: all .2s; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,184,169,0.4);
+  }
+  .btn-primary:hover { background: var(--teal-light); transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,184,169,0.5); }
+  .btn-ghost {
+    background: transparent; color: white; border: 2px solid rgba(255,255,255,0.3);
+    padding: 12px 24px; border-radius: 30px; font-weight: 700;
+    font-family: 'Nunito', sans-serif; cursor: pointer; font-size: 1rem;
+    transition: all .2s;
+  }
+  .btn-ghost:hover { border-color: white; background: rgba(255,255,255,0.08); }
+
+  /* LAB VISUAL */
+  .hero-visual {
+    position: relative; z-index: 2;
+    width: 340px; height: 320px; flex-shrink: 0;
+  }
+  .lab-svg { width: 100%; height: 100%; }
+
+  /* Bubble animations */
+  @keyframes bubble-rise-1 { 0%{transform:translateY(0) scale(1);opacity:.8} 100%{transform:translateY(-38px) scale(1.2);opacity:0} }
+  @keyframes bubble-rise-2 { 0%{transform:translateY(0) scale(1);opacity:.7} 100%{transform:translateY(-30px) scale(1.1);opacity:0} }
+  @keyframes bubble-rise-3 { 0%{transform:translateY(0) scale(1);opacity:.6} 100%{transform:translateY(-44px) scale(1.3);opacity:0} }
+  .bub1 { animation: bubble-rise-1 1.6s ease-in infinite; }
+  .bub2 { animation: bubble-rise-2 2.1s ease-in .4s infinite; }
+  .bub3 { animation: bubble-rise-3 1.9s ease-in .9s infinite; }
+  .bub4 { animation: bubble-rise-1 2.4s ease-in .2s infinite; }
+  .bub5 { animation: bubble-rise-2 1.7s ease-in .7s infinite; }
+  .bub6 { animation: bubble-rise-3 2.2s ease-in 1.1s infinite; }
+
+  /* Steam puffs */
+  @keyframes steam { 0%{transform:translateY(0) scaleX(1);opacity:.5} 100%{transform:translateY(-30px) scaleX(1.8);opacity:0} }
+  .steam1 { animation: steam 2s ease-out infinite; }
+  .steam2 { animation: steam 2.4s ease-out .6s infinite; }
+  .steam3 { animation: steam 2.1s ease-out 1.2s infinite; }
+
+  /* Liquid sway */
+  @keyframes sway { 0%,100%{d:path("M82,148 Q102,143 122,148 L122,178 Q102,175 82,178 Z")} 50%{d:path("M82,151 Q102,144 122,150 L122,178 Q102,176 82,178 Z")} }
+  @keyframes liquid-pulse { 0%,100%{opacity:.85} 50%{opacity:1} }
+  .liquid-anim { animation: liquid-pulse 2s ease-in-out infinite; }
+  .liquid-anim2 { animation: liquid-pulse 1.8s ease-in-out .4s infinite; }
+  .liquid-anim3 { animation: liquid-pulse 2.3s ease-in-out .8s infinite; }
+
+  /* Glow pulse */
+  @keyframes glow-pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+  .glow1 { animation: glow-pulse 2s ease-in-out infinite; }
+  .glow2 { animation: glow-pulse 1.6s ease-in-out .5s infinite; }
+  .glow3 { animation: glow-pulse 2.2s ease-in-out 1s infinite; }
+
+  /* Drip */
+  @keyframes drip { 0%{transform:translateY(0) scaleY(1);opacity:1} 80%{transform:translateY(18px) scaleY(1.5);opacity:.8} 100%{transform:translateY(22px) scaleY(.5);opacity:0} }
+  .drip1 { animation: drip 2.8s ease-in 0.5s infinite; }
+
+  /* Spark */
+  @keyframes spark { 0%,100%{opacity:0} 10%,90%{opacity:1} 50%{opacity:.3} }
+  .spark { animation: spark 1.4s ease-in-out infinite; }
+
+  /* STATS RIBBON */
+  .stats-ribbon {
+    background: white;
+    padding: 24px 40px;
+    display: flex; gap: 0; align-items: stretch;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .stat-item {
+    flex: 1; text-align: center; padding: 8px 20px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-size: 2rem; font-weight: 900; color: var(--teal);
+    font-family: 'Space Mono', monospace; line-height: 1;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-top: 4px; }
+
+  /* SECTIONS */
+  .section { padding: 60px 40px; max-width: 1200px; margin: 0 auto; }
+  .section-title {
+    font-size: 1.8rem; font-weight: 900; color: var(--text);
+    margin-bottom: 8px;
+  }
+  .section-title span { color: var(--teal); }
+  .section-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 36px; }
+
+  /* PERIODIC TABLE TEASER */
+  .periodic-section {
+    background: linear-gradient(135deg, #0d2340 0%, #0a3d3a 100%);
+    padding: 60px 40px;
+  }
+  .periodic-section .section-title { color: white; }
+  .periodic-section .section-sub { color: rgba(255,255,255,0.6); }
+  .periodic-grid {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: center; max-width: 900px; margin: 0 auto;
+  }
+  .element-card {
+    width: 68px; height: 68px; border-radius: 8px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .element-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(255,255,255,0); transition: background .15s;
+  }
+  .element-card:hover { transform: scale(1.12) translateY(-3px); z-index: 10; }
+  .element-card:hover::before { background: rgba(255,255,255,0.1); }
+  .element-card:hover .elem-name { opacity: 1; }
+  .elem-num { font-size: 0.6rem; color: rgba(255,255,255,0.5); font-family: 'Space Mono', monospace; align-self: flex-start; padding: 4px 5px 0; }
+  .elem-symbol { font-size: 1.4rem; font-weight: 900; color: white; line-height: 1; }
+  .elem-weight { font-size: 0.55rem; color: rgba(255,255,255,0.5); font-family: 'Space Mono', monospace; }
+  .elem-name {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.8); font-size: 0.55rem;
+    color: white; text-align: center; padding: 2px;
+    opacity: 0; transition: opacity .15s;
+  }
+
+  /* ELEMENT CATEGORIES */
+  .nonmetal { background: linear-gradient(135deg, #1a5276, #1a3a5c); }
+  .alkali { background: linear-gradient(135deg, #7d3c98, #5b2c6f); }
+  .alkaline { background: linear-gradient(135deg, #196f3d, #145a32); }
+  .transition { background: linear-gradient(135deg, #1a5276, #154360); }
+  .noble { background: linear-gradient(135deg, #7e5109, #6e2f1a); }
+  .halogen { background: linear-gradient(135deg, #117a65, #0e6655); }
+  .metalloid { background: linear-gradient(135deg, #283747, #1c2833); }
+  .actinide { background: linear-gradient(135deg, #922b21, #7b241c); }
+
+  /* INTERACTIVE QUIZ */
+  .quiz-section { background: white; padding: 60px 40px; }
+  .quiz-wrapper {
+    max-width: 700px; margin: 0 auto;
+    background: linear-gradient(135deg, #f8fbff, #f0f8f7);
+    border-radius: 20px; padding: 40px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+  }
+  .quiz-progress-bar {
+    height: 6px; background: var(--border); border-radius: 10px;
+    margin-bottom: 30px; overflow: hidden;
+  }
+  .quiz-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue));
+    border-radius: 10px; transition: width .4s ease;
+  }
+  .quiz-q-num { font-size: 0.8rem; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+  .quiz-question { font-size: 1.3rem; font-weight: 800; margin-bottom: 24px; line-height: 1.4; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quiz-opt {
+    padding: 14px 18px; border-radius: 12px;
+    border: 2px solid var(--border); background: white;
+    font-family: 'Nunito', sans-serif; font-size: 0.95rem;
+    font-weight: 600; cursor: pointer; text-align: left;
+    transition: all .15s; color: var(--text);
+  }
+  .quiz-opt:hover { border-color: var(--teal); background: rgba(0,184,169,0.04); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(46,204,113,0.1); color: #1a7341; }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(231,76,60,0.1); color: #922b21; }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-feedback {
+    margin-top: 20px; padding: 14px 18px; border-radius: 12px;
+    font-weight: 700; display: none; align-items: center; gap: 10px;
+    font-size: 0.95rem;
+  }
+  .quiz-feedback.show { display: flex; }
+  .quiz-feedback.good { background: rgba(46,204,113,0.1); color: #1a7341; border: 1px solid rgba(46,204,113,0.3); }
+  .quiz-feedback.bad { background: rgba(231,76,60,0.1); color: #922b21; border: 1px solid rgba(231,76,60,0.3); }
+  .quiz-score {
+    text-align: center; padding: 30px; display: none;
+  }
+  .quiz-score.show { display: block; }
+  .score-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 2.5rem; font-weight: 900;
+    color: white; box-shadow: 0 8px 30px rgba(0,184,169,0.4);
+  }
+
+  /* TOPICS GRID */
+  .topics-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .topic-card {
+    background: white; border-radius: 16px; padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    cursor: pointer; transition: all .2s; position: relative; overflow: hidden;
+  }
+  .topic-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px; border-radius: 16px 16px 0 0;
+  }
+  .topic-card.t1::before { background: var(--teal); }
+  .topic-card.t2::before { background: var(--orange); }
+  .topic-card.t3::before { background: var(--blue); }
+  .topic-card.t4::before { background: var(--purple); }
+  .topic-card.t5::before { background: var(--green); }
+  .topic-card.t6::before { background: var(--red); }
+  .topic-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+  .topic-icon { font-size: 2rem; margin-bottom: 12px; }
+  .topic-name { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; }
+  .topic-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+  .topic-meta { display: flex; gap: 12px; }
+  .topic-tag {
+    font-size: 0.75rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    background: var(--bg); color: var(--muted);
+  }
+  .topic-progress-bar {
+    height: 4px; background: var(--border); border-radius: 4px;
+    margin-top: 14px; overflow: hidden;
+  }
+  .topic-progress-fill { height: 100%; border-radius: 4px; }
+  .t1 .topic-progress-fill { background: var(--teal); }
+  .t2 .topic-progress-fill { background: var(--orange); }
+  .t3 .topic-progress-fill { background: var(--blue); }
+  .t4 .topic-progress-fill { background: var(--purple); }
+  .t5 .topic-progress-fill { background: var(--green); }
+  .t6 .topic-progress-fill { background: var(--red); }
+
+  /* REACTION BUILDER */
+  .reaction-section { background: #f8fbff; padding: 60px 40px; }
+  .reaction-builder {
+    max-width: 900px; margin: 0 auto;
+    background: white; border-radius: 20px; padding: 36px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .reaction-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 24px; }
+
+  /* One-line equation row */
+  .reaction-equation {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .reaction-group {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    justify-content: center;
+  }
+  .reaction-group-label {
+    font-size: 0.72rem; font-weight: 800; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .05em;
+    margin-bottom: 6px; text-align: center;
+  }
+  .reaction-group-wrap { display: flex; flex-direction: column; align-items: center; }
+  .reagent-btn {
+    padding: 10px 16px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--bg); font-family: 'Space Mono', monospace;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    transition: all .15s; color: var(--text);
+  }
+  .reagent-btn.selected { border-color: var(--teal); background: rgba(0,184,169,0.08); color: var(--teal); }
+  .reaction-op {
+    font-size: 1.6rem; font-weight: 900; color: var(--muted); line-height: 1;
+    padding-top: 22px; /* align with buttons, not labels */
+  }
+  .reaction-arrow {
+    font-size: 1.8rem; color: var(--teal); padding-top: 22px;
+  }
+  .reaction-product-wrap { display: flex; flex-direction: column; align-items: center; }
+  .reaction-product {
+    padding: 12px 20px; border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0,184,169,0.1), rgba(58,123,213,0.1));
+    border: 2px solid var(--teal); font-family: 'Space Mono', monospace;
+    font-size: 1rem; font-weight: 700; color: var(--teal);
+    min-width: 130px; text-align: center; min-height: 44px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* Centered button below the equation */
+  .reaction-actions {
+    display: flex; justify-content: center; margin-top: 28px;
+  }
+  .check-btn {
+    background: var(--teal); color: white; border: none;
+    padding: 12px 36px; border-radius: 25px; font-weight: 800;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; cursor: pointer;
+    transition: all .2s; box-shadow: 0 4px 16px rgba(0,184,169,0.3);
+  }
+  .check-btn:hover { background: var(--teal-dark); transform: translateY(-1px); }
+  .reaction-result {
+    margin-top: 16px; padding: 14px; border-radius: 10px;
+    font-weight: 700; font-size: 0.95rem; display: none; text-align: center;
+  }
+  .reaction-result.show { display: block; }
+  .reaction-result.ok { background: rgba(46,204,113,0.1); color: #1a7341; border: 1px solid rgba(46,204,113,0.3); }
+  .reaction-result.fail { background: rgba(231,76,60,0.1); color: #922b21; border: 1px solid rgba(231,76,60,0.3); }
+
+  /* FORMULA CARDS */
+  .formula-scroll {
+    display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .formula-card {
+    min-width: 180px; background: white; border-radius: 14px;
+    padding: 20px; border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    text-align: center; cursor: pointer; transition: all .2s;
+    flex-shrink: 0;
+  }
+  .formula-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+  .formula-chem {
+    font-family: 'Space Mono', monospace; font-size: 1.5rem;
+    font-weight: 700; color: var(--text); margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .formula-chem sub { font-size: 0.8em; }
+  .formula-name { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+  .formula-flip {
+    margin-top: 8px; font-size: 0.78rem; color: var(--teal);
+    font-weight: 700; opacity: 0; transition: opacity .2s;
+  }
+  .formula-card:hover .formula-flip { opacity: 1; }
+
+  /* FLOATING MOLECULES BG */
+  canvas#molecules-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; opacity: 0.03;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #0d2340; color: rgba(255,255,255,0.6);
+    padding: 40px; text-align: center; font-size: 0.9rem;
+  }
+  footer strong { color: var(--teal); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 200; display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; padding: 36px;
+    max-width: 500px; width: 90%; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modal-in .3s ease;
+  }
+  @keyframes modal-in { from { transform: scale(0.85) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--bg); border: none; width: 32px; height: 32px;
+    border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); transition: background .15s;
+  }
+  .modal-close:hover { background: var(--border); }
+  .modal-elem-symbol {
+    font-family: 'Space Mono', monospace; font-size: 4rem;
+    font-weight: 700; color: var(--teal); text-align: center;
+    margin-bottom: 8px;
+  }
+  .modal-elem-name { text-align: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 4px; }
+  .modal-elem-num { text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+  .modal-props { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-prop {
+    background: var(--bg); border-radius: 10px; padding: 12px;
+  }
+  .modal-prop-label { font-size: 0.75rem; color: var(--muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
+  .modal-prop-val { font-size: 1rem; font-weight: 800; font-family: 'Space Mono', monospace; }
+
+  /* ANIMATIONS */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-up {
+    opacity: 0; animation: fade-up .6s ease forwards;
+  }
+  .delay-1 { animation-delay: .1s; }
+  .delay-2 { animation-delay: .2s; }
+  .delay-3 { animation-delay: .3s; }
+  .delay-4 { animation-delay: .4s; }
+
+  @media (max-width: 768px) {
+    .hero { flex-direction: column; padding: 40px 20px; }
+    .hero-visual { width: 220px; height: 220px; }
+    .stats-ribbon { flex-wrap: wrap; }
+    .quiz-options { grid-template-columns: 1fr; }
+    .periodic-grid { gap: 4px; }
+    .element-card { width: 52px; height: 52px; }
+    .elem-symbol { font-size: 1.1rem; }
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .section { padding: 40px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+    </svg>
+    Chem<span>Genius</span>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-links">
+    <a href="#">Консекты</a>
+    <a href="#">Инструменты</a>
+    <a href="#">Тесты</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-particles" id="particles"></div>
+  
+  <div class="hero-content animate-up">
+    <h1>Химия — <em>наука о превращениях</em></h1>
+    <p>Открой мир атомов, молекул и реакций. От школьной программы до олимпиадных задач — всё в одном месте.</p>
+  </div>
+
+  <div class="hero-visual animate-up delay-2">
+    <svg class="lab-svg" viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="glowTeal" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#00d4c3" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#00d4c3" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="glowOrange" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff6b35" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#ff6b35" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="glowBlue" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#5b93e8" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#5b93e8" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+        <filter id="blur4"><feGaussianBlur stdDeviation="4"/></filter>
+        <linearGradient id="tableGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a2e4a"/>
+          <stop offset="100%" stop-color="#0d1e33"/>
+        </linearGradient>
+        <linearGradient id="flaskGrad1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0.04)"/>
+        </linearGradient>
+      </defs>
+
+      <!-- TABLE / BENCH -->
+      <rect x="10" y="222" width="320" height="14" rx="4" fill="url(#tableGrad)" opacity="0.9"/>
+      <rect x="20" y="232" width="300" height="50" rx="3" fill="#0d1e33" opacity="0.7"/>
+      <!-- table legs -->
+      <rect x="30" y="236" width="8" height="46" rx="2" fill="#0a1628" opacity="0.8"/>
+      <rect x="302" y="236" width="8" height="46" rx="2" fill="#0a1628" opacity="0.8"/>
+
+      <!-- === FLASK LEFT (Erlenmeyer, teal liquid, bubbling) === -->
+      <!-- glow -->
+      <ellipse cx="102" cy="190" rx="38" ry="30" fill="url(#glowTeal)" class="glow1" filter="url(#blur4)"/>
+      <!-- flask body -->
+      <path d="M82,148 L72,195 Q72,215 102,215 Q132,215 132,195 L122,148 Z" fill="url(#flaskGrad1)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+      <!-- liquid fill -->
+      <path d="M76,196 Q102,188 128,196 L130,210 Q102,218 74,210 Z" fill="#00b8a9" opacity="0.75" class="liquid-anim"/>
+      <path d="M74,207 Q102,200 130,207 L130,215 Q102,220 74,215 Z" fill="#00d4c3" opacity="0.6" class="liquid-anim"/>
+      <!-- flask neck -->
+      <rect x="94" y="118" width="16" height="32" rx="2" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+      <!-- neck opening -->
+      <ellipse cx="102" cy="118" rx="10" ry="4" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <!-- bubbles in teal flask -->
+      <circle class="bub1" cx="93" cy="200" r="3.5" fill="none" stroke="#00fff0" stroke-width="1.2" opacity=".8"/>
+      <circle class="bub2" cx="108" cy="205" r="2.5" fill="none" stroke="#00fff0" stroke-width="1" opacity=".7"/>
+      <circle class="bub3" cx="115" cy="198" r="4" fill="none" stroke="#00fff0" stroke-width="1.2" opacity=".6"/>
+      <!-- steam from teal -->
+      <ellipse class="steam1" cx="98" cy="114" rx="5" ry="3" fill="rgba(0,212,195,0.4)" filter="url(#blur2)"/>
+      <ellipse class="steam2" cx="106" cy="110" rx="4" ry="2.5" fill="rgba(0,212,195,0.3)" filter="url(#blur2)"/>
+
+      <!-- === ROUND FLASK CENTER (orange/hot) === -->
+      <!-- glow -->
+      <ellipse cx="190" cy="195" rx="44" ry="34" fill="url(#glowOrange)" class="glow2" filter="url(#blur4)"/>
+      <!-- round bottom flask body -->
+      <circle cx="190" cy="196" r="32" fill="url(#flaskGrad1)" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+      <!-- liquid in round flask -->
+      <path d="M162,204 Q190,195 218,204 L218,215 Q190,222 162,215 Z" fill="#ff6b35" opacity="0.7" class="liquid-anim2"/>
+      <path d="M160,211 Q190,204 220,211 L218,220 Q190,226 162,220 Z" fill="#ff8c5a" opacity="0.55" class="liquid-anim2"/>
+      <!-- neck -->
+      <rect x="183" y="138" width="14" height="28" rx="2" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+      <ellipse cx="190" cy="138" rx="9" ry="3.5" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <!-- stopper/cork -->
+      <rect x="185" y="128" width="10" height="12" rx="3" fill="#c8a96e" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <!-- bubbles orange -->
+      <circle class="bub4" cx="180" cy="202" r="4" fill="none" stroke="#ffb347" stroke-width="1.3" opacity=".7"/>
+      <circle class="bub5" cx="196" cy="207" r="3" fill="none" stroke="#ffb347" stroke-width="1.1" opacity=".65"/>
+      <circle class="bub6" cx="204" cy="199" r="4.5" fill="none" stroke="#ffb347" stroke-width="1.2" opacity=".6"/>
+      <!-- heat / burner glow under round flask -->
+      <ellipse cx="190" cy="229" rx="20" ry="5" fill="#ff6b35" opacity="0.3" class="glow2" filter="url(#blur2)"/>
+      <!-- burner stand -->
+      <rect x="178" y="222" width="24" height="4" rx="2" fill="#2a3f5f"/>
+      <rect x="185" y="226" width="10" height="10" rx="1" fill="#1e2f48"/>
+      <!-- flame -->
+      <ellipse class="spark" cx="190" cy="222" rx="5" ry="7" fill="url(#glowOrange)" filter="url(#blur2)"/>
+      <path class="spark" d="M187,224 Q190,215 193,224 Q191,220 190,218 Q189,220 187,224Z" fill="#ffcc44" opacity=".9"/>
+
+      <!-- === TALL BEAKER RIGHT (blue liquid, drip tube) === -->
+      <!-- glow -->
+      <ellipse cx="272" cy="188" rx="32" ry="28" fill="url(#glowBlue)" class="glow3" filter="url(#blur4)"/>
+      <!-- beaker body -->
+      <path d="M250,148 L247,215 Q247,222 272,222 Q297,222 297,215 L294,148 Z" fill="url(#flaskGrad1)" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+      <!-- measurement lines -->
+      <line x1="252" y1="175" x2="260" y2="175" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <line x1="252" y1="190" x2="260" y2="190" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <line x1="252" y1="205" x2="260" y2="205" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <!-- liquid -->
+      <path d="M250,192 Q272,185 294,192 L296,215 Q272,221 248,215 Z" fill="#3a7bd5" opacity="0.7" class="liquid-anim3"/>
+      <path d="M249,207 Q272,201 295,207 L296,215 Q272,221 248,215 Z" fill="#5b93e8" opacity="0.55" class="liquid-anim3"/>
+      <!-- beaker lip/spout -->
+      <path d="M289,148 L296,142" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/>
+      <!-- drip from spout -->
+      <ellipse class="drip1" cx="297" cy="145" rx="2" ry="3.5" fill="#5b93e8" opacity=".85"/>
+      <!-- bubbles blue -->
+      <circle class="bub2" cx="263" cy="200" r="3" fill="none" stroke="#7fb3ff" stroke-width="1.1" opacity=".7"/>
+      <circle class="bub3" cx="278" cy="206" r="4" fill="none" stroke="#7fb3ff" stroke-width="1.2" opacity=".6"/>
+      <circle class="bub1" cx="270" cy="195" r="2.5" fill="none" stroke="#7fb3ff" stroke-width="1" opacity=".75"/>
+
+      <!-- CONDENSING TUBE connecting flasks (decorative) -->
+      <path d="M102,130 Q145,90 178,132" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 4"/>
+      <!-- small droplet on tube -->
+      <circle cx="145" cy="96" r="3" fill="#00d4c3" opacity=".6"/>
+
+      <!-- THERMOMETER on right side -->
+      <rect x="316" y="148" width="6" height="68" rx="3" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+      <rect x="317" y="170" width="4" height="40" rx="2" fill="#e74c3c" opacity=".8"/>
+      <circle cx="319" cy="218" r="7" fill="#e74c3c" opacity=".85"/>
+      <circle cx="319" cy="218" r="4.5" fill="#ff6b6b" opacity=".9"/>
+
+      <!-- LABEL on round flask -->
+      <rect x="174" y="190" width="32" height="14" rx="3" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+      <text x="190" y="200" text-anchor="middle" font-size="7" fill="white" opacity=".9" font-family="monospace">H₂SO₄</text>
+
+      <!-- highlight reflections on glass -->
+      <path d="M79,160 Q81,170 80,185" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M161,165 Q163,178 162,195" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M251,158 Q253,172 252,190" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
+</div>
+
+<!-- STATS RIBBON -->
+<div class="stats-ribbon">
+  <div class="stat-item animate-up delay-1">
+    <div class="stat-num" data-count="118">0</div>
+    <div class="stat-label">Элементов в таблице</div>
+  </div>
+  <div class="stat-item animate-up delay-2">
+    <div class="stat-num" data-count="40">0</div>
+    <div class="stat-label">Тем в курсе</div>
+  </div>
+  <div class="stat-item animate-up delay-3">
+    <div class="stat-num" data-count="500" data-suffix="+">0</div>
+    <div class="stat-label">Задач с решениями</div>
+  </div>
+  <div class="stat-item animate-up delay-4">
+    <div class="stat-num" data-count="12">0</div>
+    <div class="stat-label">Интерактивных инструментов</div>
+  </div>
+</div>
+
+<!-- TOPICS -->
+<div class="section">
+  <div class="section-title">📚 Темы курса</div>
+  <div class="section-sub">Структурированные материалы для глубокого понимания химии</div>
+  <div class="topics-grid">
+    <div class="topic-card t1 animate-up">
+      <div class="topic-icon">⚛️</div>
+      <div class="topic-name">Строение атома</div>
+      <div class="topic-desc">Протоны, нейтроны, электроны. Электронные оболочки и орбитали.</div>
+      <div class="topic-meta"><span class="topic-tag">8 уроков</span><span class="topic-tag">Начальный</span></div>
+      <div class="topic-progress-bar"><div class="topic-progress-fill" style="width:65%"></div></div>
+    </div>
+    <div class="topic-card t2 animate-up delay-1">
+      <div class="topic-icon">🔗</div>
+      <div class="topic-name">Химическая связь</div>
+      <div class="topic-desc">Ковалентная, ионная, металлическая. Полярность и электроотрицательность.</div>
+      <div class="topic-meta"><span class="topic-tag">10 уроков</span><span class="topic-tag">Средний</span></div>
+      <div class="topic-progress-bar"><div class="topic-progress-fill" style="width:30%"></div></div>
+    </div>
+    <div class="topic-card t3 animate-up delay-2">
+      <div class="topic-icon">⚗️</div>
+      <div class="topic-name">Химические реакции</div>
+      <div class="topic-desc">Типы реакций, уравнивание, скорость и равновесие.</div>
+      <div class="topic-meta"><span class="topic-tag">12 уроков</span><span class="topic-tag">Средний</span></div>
+      <div class="topic-progress-bar"><div class="topic-progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-card t4 animate-up delay-3">
+      <div class="topic-icon">🧪</div>
+      <div class="topic-name">Кислоты и основания</div>
+      <div class="topic-desc">pH, нейтрализация, буферные растворы. Теории Аррениуса и Брёнстеда.</div>
+      <div class="topic-meta"><span class="topic-tag">9 уроков</span><span class="topic-tag">Средний</span></div>
+      <div class="topic-progress-bar"><div class="topic-progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-card t5 animate-up delay-1">
+      <div class="topic-icon">🌿</div>
+      <div class="topic-name">Органическая химия</div>
+      <div class="topic-desc">Углеводороды, функциональные группы, реакции органических соединений.</div>
+      <div class="topic-meta"><span class="topic-tag">15 уроков</span><span class="topic-tag">Продвинутый</span></div>
+      <div class="topic-progress-bar"><div class="topic-progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-card t6 animate-up delay-2">
+      <div class="topic-icon">⚡</div>
+      <div class="topic-name">Электрохимия</div>
+      <div class="topic-desc">Окислительно-восстановительные реакции, гальванические элементы, электролиз.</div>
+      <div class="topic-meta"><span class="topic-tag">8 уроков</span><span class="topic-tag">Продвинутый</span></div>
+      <div class="topic-progress-bar"><div class="topic-progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PERIODIC TABLE -->
+<div class="periodic-section">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-title" style="color:white">🔬 Таблица Менделеева</div>
+    <div class="section-sub">Нажми на любой элемент, чтобы узнать подробнее</div>
+    <div class="periodic-grid" id="periodic-grid"></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="quiz-section">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-title">🧠 Проверь себя</div>
+    <div class="section-sub">Мини-тест по базовым понятиям химии</div>
+    <div class="quiz-wrapper">
+      <div id="quiz-body">
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress" style="width:0%"></div></div>
+        <div class="quiz-q-num" id="quiz-num">Вопрос 1 из 5</div>
+        <div class="quiz-question" id="quiz-question"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+        <button class="check-btn" id="quiz-next" style="display:none;margin-top:16px" onclick="nextQuestion()">Следующий вопрос →</button>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div class="score-circle" id="score-display"></div>
+        <div style="font-size:1.4rem;font-weight:900;margin-bottom:8px" id="score-msg"></div>
+        <div style="color:var(--muted);margin-bottom:24px">Хочешь улучшить результат?</div>
+        <button class="check-btn" onclick="restartQuiz()">🔄 Пройти снова</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REACTION BUILDER -->
+<div class="reaction-section">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-title">⚗️ Конструктор реакций</div>
+    <div class="section-sub">Выбери реагенты и узнай продукт реакции</div>
+    <div class="reaction-builder">
+      <div class="reaction-title">Выбери реагент A и реагент B</div>
+      <div class="reaction-equation">
+        <!-- Reagent A -->
+        <div class="reaction-group-wrap">
+          <div class="reaction-group-label">Реагент A</div>
+          <div class="reaction-group">
+            <button class="reagent-btn" onclick="selectReagent('a','H₂')" id="r-H₂">H₂</button>
+            <button class="reagent-btn" onclick="selectReagent('a','Na')" id="r-Na">Na</button>
+            <button class="reagent-btn" onclick="selectReagent('a','Fe')" id="r-Fe">Fe</button>
+            <button class="reagent-btn" onclick="selectReagent('a','C')" id="r-C">C</button>
+          </div>
+        </div>
+        <!-- + -->
+        <div class="reaction-op">+</div>
+        <!-- Reagent B -->
+        <div class="reaction-group-wrap">
+          <div class="reaction-group-label">Реагент B</div>
+          <div class="reaction-group">
+            <button class="reagent-btn" onclick="selectReagent('b','O₂')" id="r-O₂">O₂</button>
+            <button class="reagent-btn" onclick="selectReagent('b','Cl₂')" id="r-Cl₂">Cl₂</button>
+            <button class="reagent-btn" onclick="selectReagent('b','H₂O')" id="r-H₂O">H₂O</button>
+            <button class="reagent-btn" onclick="selectReagent('b','HCl')" id="r-HCl">HCl</button>
+          </div>
+        </div>
+        <!-- → -->
+        <div class="reaction-arrow">→</div>
+        <!-- Product -->
+        <div class="reaction-product-wrap">
+          <div class="reaction-group-label">Продукт</div>
+          <div class="reaction-product" id="reaction-product">?</div>
+        </div>
+      </div>
+      <div class="reaction-actions">
+        <button class="check-btn" onclick="checkReaction()">Получить соединение</button>
+      </div>
+      <div class="reaction-result" id="reaction-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ELEMENT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-elem-symbol" id="modal-symbol"></div>
+    <div class="modal-elem-name" id="modal-name"></div>
+    <div class="modal-elem-num" id="modal-num"></div>
+    <div class="modal-props" id="modal-props"></div>
+  </div>
+</div>
+
+<script>
+// PARTICLES
+(function() {
+  const container = document.getElementById('particles');
+  const colors = ['#00b8a9','#3a7bd5','#ff6b35','#2ecc71','#9b59b6'];
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size=Math.random()*12+4;
+    p.style.cssText=`
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*15+8}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// COUNTER ANIMATION
+function animateCounters() {
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target=+el.dataset.count, suffix=el.dataset.suffix||'';
+    let cur=0, step=Math.max(1,Math.floor(target/40));
+    const iv=setInterval(()=>{
+      cur=Math.min(cur+step,target);
+      el.textContent=cur+suffix;
+      if(cur>=target)clearInterval(iv);
+    },30);
+  });
+}
+setTimeout(animateCounters, 400);
+
+// PERIODIC TABLE DATA
+const elements = [
+  {sym:'H',name:'Водород',num:1,mass:'1.008',cat:'nonmetal',period:'1',config:'1s¹',state:'Газ'},
+  {sym:'He',name:'Гелий',num:2,mass:'4.003',cat:'noble',period:'1',config:'1s²',state:'Газ'},
+  {sym:'Li',name:'Литий',num:3,mass:'6.941',cat:'alkali',period:'2',config:'[He]2s¹',state:'Твёрдое'},
+  {sym:'Be',name:'Бериллий',num:4,mass:'9.012',cat:'alkaline',period:'2',config:'[He]2s²',state:'Твёрдое'},
+  {sym:'B',name:'Бор',num:5,mass:'10.81',cat:'metalloid',period:'2',config:'[He]2s²2p¹',state:'Твёрдое'},
+  {sym:'C',name:'Углерод',num:6,mass:'12.01',cat:'nonmetal',period:'2',config:'[He]2s²2p²',state:'Твёрдое'},
+  {sym:'N',name:'Азот',num:7,mass:'14.01',cat:'nonmetal',period:'2',config:'[He]2s²2p³',state:'Газ'},
+  {sym:'O',name:'Кислород',num:8,mass:'16.00',cat:'nonmetal',period:'2',config:'[He]2s²2p⁴',state:'Газ'},
+  {sym:'F',name:'Фтор',num:9,mass:'19.00',cat:'halogen',period:'2',config:'[He]2s²2p⁵',state:'Газ'},
+  {sym:'Ne',name:'Неон',num:10,mass:'20.18',cat:'noble',period:'2',config:'[He]2s²2p⁶',state:'Газ'},
+  {sym:'Na',name:'Натрий',num:11,mass:'22.99',cat:'alkali',period:'3',config:'[Ne]3s¹',state:'Твёрдое'},
+  {sym:'Mg',name:'Магний',num:12,mass:'24.31',cat:'alkaline',period:'3',config:'[Ne]3s²',state:'Твёрдое'},
+  {sym:'Al',name:'Алюминий',num:13,mass:'26.98',cat:'transition',period:'3',config:'[Ne]3s²3p¹',state:'Твёрдое'},
+  {sym:'Si',name:'Кремний',num:14,mass:'28.09',cat:'metalloid',period:'3',config:'[Ne]3s²3p²',state:'Твёрдое'},
+  {sym:'P',name:'Фосфор',num:15,mass:'30.97',cat:'nonmetal',period:'3',config:'[Ne]3s²3p³',state:'Твёрдое'},
+  {sym:'S',name:'Сера',num:16,mass:'32.06',cat:'nonmetal',period:'3',config:'[Ne]3s²3p⁴',state:'Твёрдое'},
+  {sym:'Cl',name:'Хлор',num:17,mass:'35.45',cat:'halogen',period:'3',config:'[Ne]3s²3p⁵',state:'Газ'},
+  {sym:'Ar',name:'Аргон',num:18,mass:'39.95',cat:'noble',period:'3',config:'[Ne]3s²3p⁶',state:'Газ'},
+  {sym:'K',name:'Калий',num:19,mass:'39.10',cat:'alkali',period:'4',config:'[Ar]4s¹',state:'Твёрдое'},
+  {sym:'Ca',name:'Кальций',num:20,mass:'40.08',cat:'alkaline',period:'4',config:'[Ar]4s²',state:'Твёрдое'},
+  {sym:'Fe',name:'Железо',num:26,mass:'55.85',cat:'transition',period:'4',config:'[Ar]3d⁶4s²',state:'Твёрдое'},
+  {sym:'Cu',name:'Медь',num:29,mass:'63.55',cat:'transition',period:'4',config:'[Ar]3d¹⁰4s¹',state:'Твёрдое'},
+  {sym:'Zn',name:'Цинк',num:30,mass:'65.38',cat:'transition',period:'4',config:'[Ar]3d¹⁰4s²',state:'Твёрдое'},
+  {sym:'Br',name:'Бром',num:35,mass:'79.90',cat:'halogen',period:'4',config:'[Ar]3d¹⁰4s²4p⁵',state:'Жидкость'},
+  {sym:'Kr',name:'Криптон',num:36,mass:'83.80',cat:'noble',period:'4',config:'[Ar]3d¹⁰4s²4p⁶',state:'Газ'},
+  {sym:'Ag',name:'Серебро',num:47,mass:'107.9',cat:'transition',period:'5',config:'[Kr]4d¹⁰5s¹',state:'Твёрдое'},
+  {sym:'I',name:'Йод',num:53,mass:'126.9',cat:'halogen',period:'5',config:'[Kr]4d¹⁰5s²5p⁵',state:'Твёрдое'},
+  {sym:'Au',name:'Золото',num:79,mass:'197.0',cat:'transition',period:'6',config:'[Xe]4f¹⁴5d¹⁰6s¹',state:'Твёрдое'},
+  {sym:'Hg',name:'Ртуть',num:80,mass:'200.6',cat:'transition',period:'6',config:'[Xe]4f¹⁴5d¹⁰6s²',state:'Жидкость'},
+  {sym:'Pb',name:'Свинец',num:82,mass:'207.2',cat:'transition',period:'6',config:'[Xe]4f¹⁴5d¹⁰6s²6p²',state:'Твёрдое'},
+  {sym:'U',name:'Уран',num:92,mass:'238.0',cat:'actinide',period:'7',config:'[Rn]5f³6d¹7s²',state:'Твёрдое'},
+];
+
+const grid = document.getElementById('periodic-grid');
+elements.forEach(el=>{
+  const card=document.createElement('div');
+  card.className=`element-card ${el.cat}`;
+  card.innerHTML=`
+    <span class="elem-num">${el.num}</span>
+    <span class="elem-symbol">${el.sym}</span>
+    <span class="elem-weight">${el.mass}</span>
+    <span class="elem-name">${el.name}</span>
+  `;
+  card.onclick=()=>showModal(el);
+  grid.appendChild(card);
+});
+
+function showModal(el) {
+  document.getElementById('modal-symbol').textContent=el.sym;
+  document.getElementById('modal-name').textContent=el.name;
+  document.getElementById('modal-num').textContent=`Атомный номер: ${el.num}`;
+  document.getElementById('modal-props').innerHTML=`
+    <div class="modal-prop"><div class="modal-prop-label">Атомная масса</div><div class="modal-prop-val">${el.mass}</div></div>
+    <div class="modal-prop"><div class="modal-prop-label">Период</div><div class="modal-prop-val">${el.period}</div></div>
+    <div class="modal-prop"><div class="modal-prop-label">Электронная конф.</div><div class="modal-prop-val" style="font-size:0.8rem">${el.config}</div></div>
+    <div class="modal-prop"><div class="modal-prop-label">Агрегатное состояние</div><div class="modal-prop-val" style="font-size:0.85rem">${el.state}</div></div>
+  `;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(e) {
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('show');
+}
+
+// QUIZ
+const questions = [
+  { q:'Какой элемент обозначается символом «Fe»?', opts:['Фтор','Железо','Франций','Фосфор'], ans:1 },
+  { q:'Сколько электронов содержится в атоме кислорода?', opts:['6','7','8','9'], ans:2 },
+  { q:'Чему равен pH нейтрального раствора при 25°C?', opts:['0','5','7','14'], ans:2 },
+  { q:'Какой тип реакции: 2H₂ + O₂ → 2H₂O?', opts:['Разложение','Соединение','Замещение','Обмен'], ans:1 },
+  { q:'В какой группе таблицы Менделеева находятся инертные газы?', opts:['I','VII','0 (XVIII)','VIII'], ans:2 },
+];
+let qIdx=0, score=0;
+function loadQuestion() {
+  const q=questions[qIdx];
+  document.getElementById('quiz-num').textContent=`Вопрос ${qIdx+1} из ${questions.length}`;
+  document.getElementById('quiz-question').textContent=q.q;
+  document.getElementById('quiz-progress').style.width=`${(qIdx/questions.length)*100}%`;
+  const opts=document.getElementById('quiz-options');
+  opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='quiz-opt'; b.textContent=o;
+    b.onclick=()=>answer(i,b,q.ans);
+    opts.appendChild(b);
+  });
+  document.getElementById('quiz-feedback').className='quiz-feedback';
+  document.getElementById('quiz-next').style.display='none';
+}
+function answer(i,btn,correct) {
+  document.querySelectorAll('.quiz-opt').forEach(b=>{b.disabled=true});
+  const fb=document.getElementById('quiz-feedback');
+  if(i===correct){
+    btn.classList.add('correct');
+    fb.className='quiz-feedback show good';
+    fb.innerHTML='✅ Правильно! Отличная работа!';
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-opt')[correct].classList.add('correct');
+    fb.className='quiz-feedback show bad';
+    fb.innerHTML=`❌ Неверно. Правильный ответ: <strong>${questions[qIdx].opts[correct]}</strong>`;
+  }
+  document.getElementById('quiz-next').style.display='block';
+}
+function nextQuestion() {
+  qIdx++;
+  if(qIdx>=questions.length){
+    document.getElementById('quiz-progress').style.width='100%';
+    document.getElementById('quiz-body').style.display='none';
+    const sc=document.getElementById('quiz-score');
+    sc.classList.add('show');
+    document.getElementById('score-display').textContent=`${score}/${questions.length}`;
+    const msgs=['Нужно повторить материал 📚','Неплохо, но есть куда расти! 💪','Хороший результат! 🎉','Почти идеально! ⭐','Отлично! Ты настоящий химик! 🏆'];
+    document.getElementById('score-msg').textContent=msgs[score];
+  } else { loadQuestion(); }
+}
+function restartQuiz() {
+  qIdx=0; score=0;
+  document.getElementById('quiz-body').style.display='block';
+  document.getElementById('quiz-score').classList.remove('show');
+  loadQuestion();
+}
+loadQuestion();
+
+// REACTION BUILDER
+const reactions = {
+  'H₂+O₂': {prod:'2H₂O', info:'💧 Образуется вода — реакция горения водорода'},
+  'H₂+Cl₂': {prod:'2HCl', info:'💨 Хлороводород — бесцветный газ с резким запахом'},
+  'Na+O₂': {prod:'Na₂O', info:'🔥 Оксид натрия — быстро реагирует с водой'},
+  'Na+H₂O': {prod:'NaOH + H₂↑', info:'⚡ Бурная реакция с выделением водорода!'},
+  'Na+Cl₂': {prod:'NaCl', info:'🧂 Поваренная соль — всем знакомое вещество'},
+  'Fe+O₂': {prod:'Fe₂O₃', info:'🟫 Ржавчина — оксид железа(III)'},
+  'Fe+Cl₂': {prod:'FeCl₃', info:'🟠 Хлорид железа(III) — жёлто-коричневые кристаллы'},
+  'Fe+HCl': {prod:'FeCl₂ + H₂↑', info:'🫧 Железо растворяется в соляной кислоте'},
+  'C+O₂': {prod:'CO₂', info:'🌫️ Углекислый газ — продукт горения угля'},
+  'C+H₂': {prod:'CH₄', info:'🔥 Метан — самый простой углеводород'},
+};
+let selA=null, selB=null;
+function selectReagent(side, val) {
+  document.querySelectorAll('.reagent-btn').forEach(b=>b.classList.remove('selected'));
+  if(side==='a') selA=val; else selB=val;
+  if(selA) document.getElementById('r-'+selA).classList.add('selected');
+  if(selB) document.getElementById('r-'+selB).classList.add('selected');
+  document.getElementById('reaction-product').textContent='?';
+  document.getElementById('reaction-result').className='reaction-result';
+}
+function checkReaction() {
+  if(!selA||!selB){
+    const r=document.getElementById('reaction-result');
+    r.className='reaction-result show fail';
+    r.textContent='⚠️ Выбери оба реагента!'; return;
+  }
+  const key=`${selA}+${selB}`;
+  const rkey=`${selB}+${selA}`;
+  const rxn=reactions[key]||reactions[rkey];
+  const prod=document.getElementById('reaction-product');
+  const res=document.getElementById('reaction-result');
+  if(rxn){
+    prod.textContent=rxn.prod;
+    res.className='reaction-result show ok';
+    res.innerHTML=rxn.info;
+  } else {
+    prod.textContent='—';
+    res.className='reaction-result show fail';
+    res.textContent='🔬 Эти реагенты не реагируют при обычных условиях';
+  }
+}
+</script>
+</body>
+</html>

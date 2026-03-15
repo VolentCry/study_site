@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Все симуляции — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+    --accent: #38bdf8; --accent2: #818cf8; --accent3: #f472b6; --gold: #fbbf24;
+    --text: #e2e8f0; --text2: #94a3b8;
+    --card-bg: rgba(14,28,54,0.85); --border: rgba(56,189,248,0.2);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 64px;
+    background: rgba(5,12,26,0.9); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; font-weight: 600; color: var(--text2);
+    text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+  /* PAGE HERO */
+  #page-hero {
+    position: relative; padding: 140px 24px 80px;
+    text-align: center; overflow: hidden;
+    background: var(--bg);
+  }
+  #page-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(56,189,248,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #mini-stars { position: absolute; inset: 0; z-index: 0; }
+  .page-hero-inner { position: relative; z-index: 2; }
+  .page-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px;
+    opacity: 0; animation: fadeUp 0.7s 0.1s forwards;
+  }
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 6vw, 72px); font-weight: 900; line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    opacity: 0; animation: fadeUp 0.8s 0.25s forwards;
+  }
+  .page-sub {
+    font-size: 17px; font-weight: 300; color: var(--text2); line-height: 1.7;
+    max-width: 520px; margin: 20px auto 0;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .page-stats {
+    display: flex; gap: 40px; justify-content: center; margin-top: 40px; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.8s 0.55s forwards;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; letter-spacing: 0.04em; }
+
+  /* GRADE SECTION */
+  .grade-section { padding: 80px 24px 60px; }
+  .grade-section:nth-child(odd) { background: var(--bg2); }
+  .grade-section:nth-child(even) { background: var(--bg); }
+  .grade-inner { max-width: 1200px; margin: 0 auto; }
+
+  /* GRADE HEADING */
+  .grade-heading {
+    display: flex; align-items: center; gap: 24px; margin-bottom: 48px;
+  }
+  .grade-num-badge {
+    font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; line-height: 1;
+    flex-shrink: 0;
+  }
+  .grade-divider-line { flex: 1; height: 1px; }
+  .grade-info { flex-shrink: 0; text-align: right; }
+  .grade-title-text {
+    font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1.2;
+  }
+  .grade-subtitle { font-size: 13px; color: var(--text2); margin-top: 4px; letter-spacing: 0.04em; }
+
+  /* Color per grade */
+  .g7 .grade-num-badge { color: var(--accent); }
+  .g7 .grade-divider-line { background: linear-gradient(90deg, rgba(56,189,248,0.4), transparent); }
+  .g8 .grade-num-badge { color: var(--accent2); }
+  .g8 .grade-divider-line { background: linear-gradient(90deg, rgba(129,140,248,0.4), transparent); }
+  .g9 .grade-num-badge { color: var(--accent3); }
+  .g9 .grade-divider-line { background: linear-gradient(90deg, rgba(244,114,182,0.4), transparent); }
+  .g10 .grade-num-badge { color: var(--gold); }
+  .g10 .grade-divider-line { background: linear-gradient(90deg, rgba(251,191,36,0.4), transparent); }
+
+  /* SIM CARDS GRID */
+  .sim-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 1100px) { .sim-cards-grid { grid-template-columns: repeat(4,1fr); } }
+  @media (max-width: 860px)  { .sim-cards-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 600px)  { .sim-cards-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .sim-tile {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    cursor: pointer; text-decoration: none; color: inherit;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .sim-tile:hover { transform: translateY(-6px); }
+  .g7 .sim-tile:hover { border-color: rgba(56,189,248,0.6); box-shadow: 0 16px 40px rgba(56,189,248,0.15); }
+  .g8 .sim-tile:hover { border-color: rgba(129,140,248,0.6); box-shadow: 0 16px 40px rgba(129,140,248,0.15); }
+  .g9 .sim-tile:hover { border-color: rgba(244,114,182,0.6); box-shadow: 0 16px 40px rgba(244,114,182,0.15); }
+  .g10 .sim-tile:hover { border-color: rgba(251,191,36,0.6); box-shadow: 0 16px 40px rgba(251,191,36,0.15); }
+
+  /* tiles without a page yet */
+  .sim-tile.coming-soon { cursor: default; }
+  .sim-tile.coming-soon:hover { transform: none; box-shadow: none; border-color: var(--border); }
+  .coming-badge {
+    position: absolute; top: 10px; right: 10px; z-index: 4;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 10px;
+    background: rgba(148,163,184,0.15); color: var(--text2);
+    border: 1px solid rgba(148,163,184,0.2);
+  }
+  .sim-tile.coming-soon .tile-thumb { opacity: 0.45; filter: grayscale(0.4); }
+  .sim-tile.coming-soon .tile-name  { color: var(--text2); }
+
+  /* ready tile arrow indicator */
+  .tile-arrow {
+    position: absolute; bottom: 14px; right: 14px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .g7 .sim-tile:not(.coming-soon) .tile-arrow { background: rgba(56,189,248,0.15); color: var(--accent); }
+  .g8 .sim-tile:not(.coming-soon) .tile-arrow { background: rgba(129,140,248,0.15); color: var(--accent2); }
+  .g9 .sim-tile:not(.coming-soon) .tile-arrow { background: rgba(244,114,182,0.15); color: var(--accent3); }
+  .g10 .sim-tile:not(.coming-soon) .tile-arrow { background: rgba(251,191,36,0.15); color: var(--gold); }
+  .sim-tile:not(.coming-soon):hover .tile-arrow { opacity: 1; transform: translateX(2px); }
+
+  .tile-thumb { width: 100%; aspect-ratio: 4/3; background: #030810; display: block; flex-shrink: 0; }
+  .tile-info { padding: 14px 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .tile-name { font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--text); }
+  .tile-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 8px; align-self: flex-start; margin-top: auto;
+  }
+  .g7 .tile-tag { background: rgba(56,189,248,.12); color: var(--accent); }
+  .g8 .tile-tag { background: rgba(129,140,248,.12); color: var(--accent2); }
+  .g9 .tile-tag { background: rgba(244,114,182,.12); color: var(--accent3); }
+  .g10 .tile-tag { background: rgba(251,191,36,.12); color: var(--gold); }
+
+  /* SEPARATOR */
+  .grade-separator {
+    max-width: 1200px; margin: 0 auto;
+    height: 1px; background: var(--border);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px 24px; border-top: 1px solid var(--border);
+    text-align: center; background: var(--bg); color: var(--text2); font-size: 14px;
+  }
+  footer span { color: var(--accent); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s, transform 0.65s; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-row { opacity: 0; transform: translateY(20px); transition: opacity 0.5s, transform 0.5s; }
+  .reveal-row.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="index.html">Главная</a>
+    <a href="#" class="active">Симуляции</a>
+    <a href="index.html#classes">Классы</a>
+  </div>
+</nav>
+
+<section id="page-hero">
+  <canvas id="mini-stars"></canvas>
+  <div class="page-hero-inner">
+    <p class="page-eyebrow">Интерактивный каталог</p>
+    <h1 class="page-title">Все симуляции</h1>
+    <p class="page-sub">Физические явления от механики до квантовой физики — живые, интерактивные, наглядные.</p>
+    <div class="page-stats">
+      <div class="stat"><div class="stat-num">40</div><div class="stat-label">Симуляций</div></div>
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">Класса</div></div>
+      <div class="stat"><div class="stat-num">605</div><div class="stat-label">Задач</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 CLASS -->
+<section class="grade-section g7">
+  <div class="grade-inner">
+    <div class="grade-heading reveal">
+      <div class="grade-num-badge">7</div>
+      <div class="grade-divider-line"></div>
+      <div class="grade-info">
+        <div class="grade-title-text">класс</div>
+        <div class="grade-subtitle">Механика · Давление · Простые машины</div>
+      </div>
+    </div>
+    <div class="sim-cards-grid" id="grid7"></div>
+  </div>
+</section>
+
+<!-- 8 CLASS -->
+<section class="grade-section g8">
+  <div class="grade-inner">
+    <div class="grade-heading reveal">
+      <div class="grade-num-badge">8</div>
+      <div class="grade-divider-line"></div>
+      <div class="grade-info">
+        <div class="grade-title-text">класс</div>
+        <div class="grade-subtitle">Тепло · Электричество · Оптика</div>
+      </div>
+    </div>
+    <div class="sim-cards-grid" id="grid8"></div>
+  </div>
+</section>
+
+<!-- 9 CLASS -->
+<section class="grade-section g9">
+  <div class="grade-inner">
+    <div class="grade-heading reveal">
+      <div class="grade-num-badge">9</div>
+      <div class="grade-divider-line"></div>
+      <div class="grade-info">
+        <div class="grade-title-text">класс</div>
+        <div class="grade-subtitle">Законы Ньютона · Волны · Ядерная физика</div>
+      </div>
+    </div>
+    <div class="sim-cards-grid" id="grid9"></div>
+  </div>
+</section>
+
+<!-- 10-11 CLASS -->
+<section class="grade-section g10">
+  <div class="grade-inner">
+    <div class="grade-heading reveal">
+      <div class="grade-num-badge">10–11</div>
+      <div class="grade-divider-line"></div>
+      <div class="grade-info">
+        <div class="grade-title-text">класс</div>
+        <div class="grade-subtitle">Электродинамика · Оптика · Квантовая физика</div>
+      </div>
+    </div>
+    <div class="sim-cards-grid" id="grid10"></div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p>
+</footer>
+
+<script>
+/* ─── DATA ─── */
+const grades = [
+  {
+    id: 'grid7', tag: '7 класс', color: '#38bdf8', color2: '#0ea5e9',
+    sims: [
+      { name: 'Равномерное движение',    draw: drawMotion,     url: null },
+      { name: 'Сложение скоростей',      draw: drawVectors,    url: null },
+      { name: 'Инерция',                 draw: drawInertia,    url: null },
+      { name: 'Свободное падение',       draw: drawFall,       url: 'simulations/free_fall.html' },
+      { name: 'Закон Гука',              draw: drawSpring,     url: null },
+      { name: 'Сила трения',             draw: drawFriction,   url: null },
+      { name: 'Равнодействующая сил',    draw: drawResultant,  url: null },
+      { name: 'Давление в жидкостях',    draw: drawPressure,   url: null },
+      { name: 'Архимедова сила',         draw: drawArchimedes, url: null },
+      { name: 'Рычаг и блок',            draw: drawLever,      url: null },
+    ]
+  },
+  {
+    id: 'grid8', tag: '8 класс', color: '#818cf8', color2: '#6366f1',
+    sims: [
+      { name: 'Диффузия',                draw: drawDiffusion,  url: null },
+      { name: 'Агрегатные состояния',    draw: drawStates,     url: null },
+      { name: 'График нагревания',       draw: drawHeating,    url: null },
+      { name: 'Конвекция и теплообмен',  draw: drawConvection, url: null },
+      { name: 'Закон Кулона',            draw: drawCoulomb,    url: null },
+      { name: 'Электрическое поле',      draw: drawEfield,     url: null },
+      { name: 'Цепи постоянного тока',   draw: drawCircuit,    url: null },
+      { name: 'Закон Ома',               draw: drawOhm,        url: null },
+      { name: 'Отражение света',         draw: drawReflection, url: null },
+      { name: 'Линзы',                   draw: drawLens,       url: null },
+    ]
+  },
+  {
+    id: 'grid9', tag: '9 класс', color: '#f472b6', color2: '#ec4899',
+    sims: [
+      { name: 'Законы Ньютона',          draw: drawNewton,     url: null },
+      { name: 'Закон тяготения',         draw: drawGravity,    url: null },
+      { name: 'Движение по окружности',  draw: drawCircular,   url: null },
+      { name: 'Сохранение импульса',     draw: drawMomentum,   url: null },
+      { name: 'Сохранение энергии',      draw: drawEnergy,     url: null },
+      { name: 'Пружинный маятник',       draw: drawSpringPend, url: null },
+      { name: 'Математический маятник',  draw: drawPendulum,   url: null },
+      { name: 'Резонанс',                draw: drawResonance,  url: null },
+      { name: 'Стоячие волны',           draw: drawWave,       url: null },
+      { name: 'Радиоактивный распад',    draw: drawDecay,      url: null },
+    ]
+  },
+  {
+    id: 'grid10', tag: '10–11 класс', color: '#fbbf24', color2: '#f59e0b',
+    sims: [
+      { name: 'Поле системы зарядов',    draw: drawChargeField,  url: null },
+      { name: 'Конденсатор',             draw: drawCapacitor,    url: null },
+      { name: 'Магнитное поле',          draw: drawMagnetic,     url: null },
+      { name: 'Сила Лоренца',            draw: drawLorentz,      url: null },
+      { name: 'Индукция Фарадея',        draw: drawInduction,    url: null },
+      { name: 'Колебательный контур',    draw: drawLC,           url: null },
+      { name: 'Дисперсия света',         draw: drawDispersion,   url: null },
+      { name: 'Интерференция',           draw: drawInterference, url: null },
+      { name: 'Фотоэффект',              draw: drawPhotoeffect,  url: null },
+      { name: 'Модель атома Бора',       draw: drawBohr,         url: null },
+    ]
+  }
+];
+
+/* ─── BUILD TILES ─── */
+const THUMB_W = 320, THUMB_H = 200;
+
+function buildGrid(gradeData) {
+  const container = document.getElementById(gradeData.id);
+  gradeData.sims.forEach((sim, i) => {
+    const isReady = !!sim.url;
+
+    // Use <a> for ready sims, <div> for coming-soon
+    const tile = document.createElement(isReady ? 'a' : 'div');
+    tile.className = 'sim-tile reveal-row' + (isReady ? '' : ' coming-soon');
+    tile.style.transitionDelay = (i % 5) * 0.07 + 's';
+    if (isReady) {
+      tile.href = sim.url;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'tile-thumb';
+    canvas.width = THUMB_W; canvas.height = THUMB_H;
+
+    const info = document.createElement('div');
+    info.className = 'tile-info';
+    info.innerHTML = `<div class="tile-name">${sim.name}</div><div class="tile-tag">${gradeData.tag}</div>`;
+
+    if (isReady) {
+      const arrow = document.createElement('div');
+      arrow.className = 'tile-arrow';
+      arrow.textContent = '→';
+      tile.appendChild(arrow);
+    } else {
+      const badge = document.createElement('div');
+      badge.className = 'coming-badge';
+      badge.textContent = 'Скоро';
+      tile.appendChild(badge);
+    }
+
+    tile.appendChild(canvas);
+    tile.appendChild(info);
+    container.appendChild(tile);
+
+    sim.draw(canvas, gradeData.color, gradeData.color2);
+  });
+}
+
+grades.forEach(buildGrid);
+
+/* ─── THUMBNAIL DRAW FUNCTIONS ─── */
+function bg(ctx, W, H, c1, c2) {
+  ctx.fillStyle = '#030a14';
+  ctx.fillRect(0,0,W,H);
+  const g = ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0, c1+'18');
+  g.addColorStop(1, c2+'08');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+}
+function hex2rgba(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* 1 — Равномерное движение */
+function drawMotion(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // road
+  ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fillRect(0,H*0.55,W,H*0.3);
+  // dashes
+  for(let x=20;x<W;x+=40){ ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(x,H*0.68,22,3); }
+  // car
+  const cx=W*0.55, cy=H*0.6;
+  ctx.fillStyle=hex2rgba(col,0.8); roundRect(ctx,cx,cy,70,24,6); ctx.fill();
+  ctx.fillStyle=hex2rgba(col,0.5); roundRect(ctx,cx+10,cy-14,46,18,4); ctx.fill();
+  // wheels
+  [cx+10, cx+52].forEach(wx=>{ ctx.beginPath(); ctx.arc(wx,cy+24,9,0,Math.PI*2); ctx.fillStyle='#1e293b'; ctx.fill(); ctx.strokeStyle=hex2rgba(col,0.6); ctx.lineWidth=2; ctx.stroke(); });
+  // speed arrow
+  ctx.strokeStyle=hex2rgba(col,0.9); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(cx+80,cy+12); ctx.lineTo(cx+110,cy+12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+105,cy+7); ctx.lineTo(cx+110,cy+12); ctx.lineTo(ctx+105,cy+17); ctx.stroke();
+  // v label
+  ctx.fillStyle=hex2rgba(col,0.9); ctx.font='bold 13px Raleway,sans-serif';
+  ctx.fillText('v = const', 30, H*0.4);
+}
+
+/* 2 — Сложение скоростей */
+function drawVectors(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const ox=W/2, oy=H/2;
+  // River bg
+  ctx.fillStyle='rgba(56,189,248,0.06)'; ctx.fillRect(0,H*0.3,W,H*0.4);
+  // v1 (downstream)
+  arrow(ctx, ox-60, oy, ox+10, oy, col, 2.5, 'v₁');
+  // v2 (across)
+  arrow(ctx, ox-60, oy, ox-60, oy-60, '#f472b6', 2.5, 'v₂');
+  // resultant
+  arrow(ctx, ox-60, oy, ox+10, oy-60, '#fbbf24', 2, 'v');
+  ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px Raleway,sans-serif';
+}
+
+/* 3 — Инерция */
+function drawInertia(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // Table
+  ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fillRect(30,H*0.6,W*0.5,8);
+  ctx.fillRect(30,H*0.67,12,H*0.25);
+  ctx.fillRect(30+W*0.5-12,H*0.67,12,H*0.25);
+  // Block on table
+  ctx.fillStyle=hex2rgba(col,0.7); roundRect(ctx,60,H*0.5,60,H*0.1+2,4); ctx.fill();
+  // Flying block (inertia)
+  ctx.fillStyle=hex2rgba(col,0.4); roundRect(ctx,W*0.65,H*0.35,60,H*0.1+2,4); ctx.fill();
+  // Arrow
+  arrow(ctx,W*0.58,H*0.55,W*0.68,H*0.42,'#fbbf24',1.5,'');
+  ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='12px Raleway,sans-serif';
+  ctx.fillText('инерция', W*0.62, H*0.32);
+}
+
+/* 4 — Свободное падение */
+function drawFall(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2;
+  // dotted trail
+  const positions=[0.12,0.22,0.36,0.54,0.76];
+  positions.forEach((t,i)=>{
+    const r=6+i*2.5, alpha=0.3+i*0.14;
+    ctx.beginPath(); ctx.arc(cx, H*t, r, 0,Math.PI*2);
+    ctx.fillStyle=hex2rgba(col,alpha); ctx.fill();
+  });
+  // main ball
+  ctx.beginPath(); ctx.arc(cx, H*0.82, 18, 0, Math.PI*2);
+  const g2=ctx.createRadialGradient(cx-5,H*0.82-5,2,cx,H*0.82,18);
+  g2.addColorStop(0,'#fff'); g2.addColorStop(1,col+'cc');
+  ctx.fillStyle=g2; ctx.fill();
+  // g arrow
+  arrow(ctx,cx+30,H*0.35,cx+30,H*0.65,col,1.5,'g');
+  // formula
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 14px Raleway,sans-serif';
+  ctx.fillText('h = gt²/2', 20,H*0.92);
+}
+
+/* 5 — Закон Гука */
+function drawSpring(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const sx=W/2;
+  // ceiling
+  ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fillRect(sx-30,15,60,8);
+  // spring coils
+  ctx.strokeStyle=hex2rgba(col,0.8); ctx.lineWidth=2; ctx.beginPath();
+  const coils=8, top=23, bot=H*0.6;
+  ctx.moveTo(sx,top);
+  for(let i=0;i<coils;i++){
+    const y=top+(bot-top)*(i/coils);
+    const ny=top+(bot-top)*((i+1)/coils);
+    ctx.quadraticCurveTo(sx+(i%2===0?20:-20),(y+ny)/2,sx,ny);
+  }
+  ctx.stroke();
+  // weight
+  ctx.fillStyle=hex2rgba(col,0.75); roundRect(ctx,sx-22,H*0.6,44,30,5); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('m',sx,H*0.6+20);
+  // force arrow
+  arrow(ctx,sx+35,H*0.5,sx+35,H*0.72,col,1.5,'F');
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='left';
+  ctx.fillText('F = kx', 20, H*0.9);
+}
+
+/* 6 — Сила трения */
+function drawFriction(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // surface texture
+  for(let x=0;x<W;x+=12){ ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(x,H*0.62,6,H*0.38); }
+  ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(0,H*0.62,W,3);
+  // block
+  ctx.fillStyle=hex2rgba(col,0.7); roundRect(ctx,W*0.3,H*0.47,80,H*0.15,5); ctx.fill();
+  // push arrow
+  arrow(ctx,W*0.18,H*0.56,W*0.3,H*0.56,'#fbbf24',2,'F');
+  // friction arrow (opposite)
+  arrow(ctx,W*0.55,H*0.63,W*0.42,H*0.63,col,2,'Fтр');
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='11px Raleway,sans-serif';
+}
+
+/* 7 — Равнодействующая */
+function drawResultant(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const ox=W/2, oy=H/2;
+  arrow(ctx,ox,oy,ox+70,oy-40,col,2.5,'F₁');
+  arrow(ctx,ox,oy,ox-20,oy+60,'#818cf8',2.5,'F₂');
+  arrow(ctx,ox,oy,ox+30,oy+10,'#fbbf24',2,'F');
+  // parallelogram dashes
+  ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(ox+70,oy-40); ctx.lineTo(ox+50,oy+20); ctx.lineTo(ox-20,oy+60); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(ox,oy,5,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+}
+
+/* 8 — Давление в жидкостях */
+function drawPressure(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // vessel
+  ctx.strokeStyle=hex2rgba(col,0.4); ctx.lineWidth=2;
+  ctx.strokeRect(W*0.25,H*0.15,W*0.5,H*0.65);
+  // water
+  const wg=ctx.createLinearGradient(0,H*0.3,0,H*0.8);
+  wg.addColorStop(0,hex2rgba(col,0.15)); wg.addColorStop(1,hex2rgba(col,0.35));
+  ctx.fillStyle=wg; ctx.fillRect(W*0.25+2,H*0.3,W*0.5-4,H*0.5);
+  // pressure lines (horizontal)
+  [0.4,0.52,0.64,0.76].forEach((yf,i)=>{
+    const alpha=0.2+i*0.1;
+    ctx.strokeStyle=hex2rgba(col,alpha); ctx.lineWidth=1+i*0.4; ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(W*0.27,H*yf); ctx.lineTo(W*0.73,H*yf); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('P = ρgh', W/2, H*0.93);
+}
+
+/* 9 — Архимедова сила */
+function drawArchimedes(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // water
+  const wg=ctx.createLinearGradient(0,H*0.4,0,H);
+  wg.addColorStop(0,hex2rgba(col,0.12)); wg.addColorStop(1,hex2rgba(col,0.28));
+  ctx.fillStyle=wg; ctx.fillRect(W*0.1,H*0.45,W*0.8,H*0.5);
+  ctx.strokeStyle=hex2rgba(col,0.3); ctx.lineWidth=1; ctx.strokeRect(W*0.1,H*0.45,W*0.8,H*0.5);
+  // surface ripple
+  ctx.strokeStyle=hex2rgba(col,0.4); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(W*0.1,H*0.45);
+  for(let x=W*0.1;x<=W*0.9;x+=8){ ctx.lineTo(x, H*0.45+Math.sin((x-W*0.1)*0.15)*4); }
+  ctx.stroke();
+  // submerged block
+  ctx.fillStyle=hex2rgba(col,0.6); roundRect(ctx,W*0.38,H*0.5,W*0.24,H*0.2,4); ctx.fill();
+  // arrows
+  arrow(ctx,W/2,H*0.5,W/2,H*0.45-30,col,2,'Fа');
+  arrow(ctx,W/2,H*0.7,W/2,H*0.7+28,'#f472b6',2,'mg');
+}
+
+/* 10 — Рычаг */
+function drawLever(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const py=H*0.55;
+  // beam
+  ctx.strokeStyle=hex2rgba(col,0.7); ctx.lineWidth=4; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(W*0.12,py-20); ctx.lineTo(W*0.88,py+15); ctx.stroke();
+  // fulcrum
+  ctx.fillStyle=hex2rgba(col,0.5);
+  ctx.beginPath(); ctx.moveTo(W*0.45,py+3); ctx.lineTo(W*0.45-16,py+30); ctx.lineTo(W*0.45+16,py+30); ctx.closePath(); ctx.fill();
+  // weights
+  [W*0.18,W*0.75].forEach((wx,i)=>{
+    const wy=i===0?py-16:py+12;
+    ctx.fillStyle=i===0?hex2rgba(col,0.8):'#818cf8cc';
+    roundRect(ctx,wx-16,wy-16,32,22,4); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(i===0?'F₁':'F₂',wx,wy-2);
+  });
+  // rule label
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('F₁·l₁ = F₂·l₂', W/2, H*0.92);
+}
+
+/* 11 — Диффузия */
+function drawDiffusion(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H/2;
+  const pts=[...Array(30)].map((_,i)=>({
+    x: cx+(Math.cos(i*137.5*Math.PI/180)*((i/30)*W*0.4)),
+    y: cy+(Math.sin(i*137.5*Math.PI/180)*((i/30)*H*0.38)),
+    r: 3+Math.random()*3
+  }));
+  pts.forEach((p,i)=>{
+    const a=0.15+i/30*0.7;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=i%2===0?hex2rgba(col,a):hex2rgba('#f472b6',a);
+    ctx.fill();
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('диффузия', W/2, H*0.92);
+}
+
+/* 12 — Агрегатные состояния */
+function drawStates(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const labels=['тв.','жидк.','газ'], x=[W*0.2,W/2,W*0.8];
+  const spreads=[8,18,38];
+  labels.forEach((l,i)=>{
+    const cx=x[i], cy=H*0.5, s=spreads[i];
+    const grid=i===0?[[-1,-1],[-1,0],[-1,1],[0,-1],[0,0],[0,1],[1,-1],[1,0],[1,1]]:
+      [...Array(9)].map((_,k)=>[(Math.random()-0.5)*2,(Math.random()-0.5)*2]);
+    grid.forEach(([dx,dy])=>{
+      ctx.beginPath(); ctx.arc(cx+dx*s,cy+dy*s*0.8,4,0,Math.PI*2);
+      ctx.fillStyle=hex2rgba(col,0.6+i*0.1); ctx.fill();
+    });
+    ctx.fillStyle=hex2rgba(col,0.8); ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(l,cx,H*0.85);
+  });
+}
+
+/* 13 — График нагревания */
+function drawHeating(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const px=30, py=20, pw=W-50, ph=H-50;
+  // axes
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,py+ph); ctx.lineTo(px+pw,py+ph); ctx.stroke();
+  // graph path
+  ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  ctx.beginPath();
+  const pts=[[0,0.9],[0.2,0.4],[0.3,0.4],[0.5,0.4],[0.6,0.15],[0.85,0.05],[1,0.05]];
+  pts.forEach(([x,y],i)=>{ const gx=px+x*pw, gy=py+y*ph; i===0?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy); });
+  ctx.stroke();
+  // plateau label
+  ctx.fillStyle=hex2rgba(col,0.6); ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('плавление',px+pw*0.4,py+H*0.37);
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.textAlign='right';
+  ctx.fillText('T',px-4,py+ph);
+  ctx.fillText('t',px+pw,py+ph+14);
+}
+
+/* 14 — Конвекция */
+function drawConvection(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, r=H*0.3;
+  // circular arrows (convection loop)
+  for(let i=0;i<2;i++){
+    ctx.beginPath();
+    ctx.arc(cx+(i===0?-1:1)*W*0.18, H/2, r*0.75, i===0?Math.PI*1.1:Math.PI*0.1, i===0?Math.PI*0.1:Math.PI*1.1, i===0);
+    ctx.strokeStyle=i===0?hex2rgba(col,0.7):hex2rgba('#f472b6',0.7);
+    ctx.lineWidth=2; ctx.stroke();
+  }
+  // heat source
+  ctx.fillStyle='rgba(251,191,36,0.4)'; ctx.fillRect(W*0.25,H*0.82,W*0.5,8);
+  ctx.fillStyle='rgba(251,191,36,0.8)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('🔥 нагреватель', W/2, H*0.96);
+}
+
+/* 15 — Закон Кулона */
+function drawCoulomb(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cy=H/2;
+  [[W*0.25,'+'],[W*0.75,'-']].forEach(([cx,sign])=>{
+    ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2);
+    const g=ctx.createRadialGradient(cx-5,cy-5,2,cx,cy,20);
+    const c1=sign==='+'?'#f87171':'#60a5fa';
+    g.addColorStop(0,'#fff'); g.addColorStop(1,c1); ctx.fillStyle=g; ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 16px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(sign,cx,cy+6);
+  });
+  // field lines
+  for(let i=0;i<5;i++){
+    const y=cy-30+i*15;
+    ctx.strokeStyle=hex2rgba(col,0.25); ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(W*0.25+22,y); ctx.lineTo(W*0.75-22,y); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  arrow(ctx,W*0.25+24,cy,W*0.4,cy,col,1.5,'');
+  arrow(ctx,W*0.75-24,cy,W*0.6,cy,'#f87171',1.5,'');
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('F = k·q₁q₂/r²', W/2, H*0.92);
+}
+
+/* 16 — Электрическое поле */
+function drawEfield(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H/2;
+  const lines=8;
+  for(let i=0;i<lines;i++){
+    const angle=(i/lines)*Math.PI*2;
+    const x1=cx+Math.cos(angle)*15, y1=cy+Math.sin(angle)*15;
+    const x2=cx+Math.cos(angle)*W*0.4, y2=cy+Math.sin(angle)*H*0.4;
+    const alpha=0.15+0.3*Math.abs(Math.cos(angle*2));
+    ctx.strokeStyle=hex2rgba(col,alpha); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    // arrow mid
+    const mx=cx+Math.cos(angle)*W*0.22, my=cy+Math.sin(angle)*H*0.22;
+    ctx.fillStyle=hex2rgba(col,alpha+0.1);
+    ctx.beginPath();
+    ctx.translate(mx,my); ctx.rotate(angle);
+    ctx.moveTo(0,-4); ctx.lineTo(7,0); ctx.lineTo(0,4); ctx.closePath(); ctx.fill();
+    ctx.setTransform(1,0,0,1,0,0);
+  }
+  ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2);
+  const g=ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,14);
+  g.addColorStop(0,'#fff'); g.addColorStop(1,col); ctx.fillStyle=g; ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 13px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('+',cx,cy+5);
+}
+
+/* 17 — Цепи тока */
+function drawCircuit(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const ox=W*0.12, oy=H*0.2, ow=W*0.76, oh=H*0.55;
+  ctx.strokeStyle=hex2rgba(col,0.6); ctx.lineWidth=2.5; ctx.lineJoin='round';
+  ctx.strokeRect(ox,oy,ow,oh);
+  // battery (left)
+  const bx=ox, by=oy+oh*0.35;
+  ctx.strokeStyle=col; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(bx-1,by); ctx.lineTo(bx-1,by+oh*0.3); ctx.stroke();
+  ctx.lineWidth=1.5;
+  [0,10,20].forEach(k=>{ ctx.beginPath(); ctx.moveTo(bx-8,by+k+2); ctx.lineTo(bx+8,by+k+2); ctx.stroke(); });
+  // resistor (top)
+  const rx=ox+ow*0.35, ry=oy;
+  ctx.strokeStyle=col; ctx.lineWidth=2;
+  ctx.strokeRect(rx,ry-10,ow*0.3,20);
+  // bulb (bottom)
+  const lx=ox+ow*0.45, ly=oy+oh;
+  ctx.beginPath(); ctx.arc(lx,ly,12,0,Math.PI*2); ctx.strokeStyle=hex2rgba(col,0.7); ctx.lineWidth=1.5; ctx.stroke();
+  ctx.strokeStyle='rgba(251,191,36,0.7)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(lx-5,ly-4); ctx.lineTo(lx,ly+4); ctx.lineTo(lx+5,ly-4); ctx.stroke();
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('I, U, R', W/2, H*0.92);
+}
+
+/* 18 — Закон Ома */
+function drawOhm(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const px=35, py=20, pw=W-55, ph=H-50;
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,py+ph); ctx.lineTo(px+pw,py+ph); ctx.stroke();
+  // I–U line
+  ctx.strokeStyle=col; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(px,py+ph); ctx.lineTo(px+pw*0.8,py+ph*0.05); ctx.stroke();
+  // second line (higher R)
+  ctx.strokeStyle=hex2rgba('#818cf8',0.7); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(px,py+ph); ctx.lineTo(px+pw*0.8,py+ph*0.35); ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px Raleway,sans-serif';
+  ctx.textAlign='left'; ctx.fillText('U',px+4,py+14); ctx.fillText('I',px+pw,py+ph+14);
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 14px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('I = U/R', W/2, H*0.92);
+}
+
+/* 19 — Отражение */
+function drawReflection(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const mx=W/2, my=H*0.55;
+  ctx.fillStyle=hex2rgba(col,0.25); ctx.fillRect(0,my,W,H-my);
+  ctx.strokeStyle=hex2rgba(col,0.5); ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,my); ctx.lineTo(W,my); ctx.stroke();
+  // normal
+  ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(mx,H*0.05); ctx.lineTo(mx,my); ctx.stroke(); ctx.setLineDash([]);
+  // incident ray
+  ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(W*0.2,H*0.1); ctx.lineTo(mx,my); ctx.stroke();
+  arrowHead(ctx,W*0.2+(mx-W*0.2)*0.6, H*0.1+(my-H*0.1)*0.6, Math.atan2(my-H*0.1,mx-W*0.2),'#fbbf24');
+  // reflected ray
+  ctx.strokeStyle=col; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(W*0.8,H*0.1); ctx.stroke();
+  arrowHead(ctx,mx+(W*0.8-mx)*0.5,my+(H*0.1-my)*0.5,Math.atan2(H*0.1-my,W*0.8-mx),col);
+  // angle labels
+  ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('α',mx-22,my-22); ctx.fillText('α',mx+22,my-22);
+}
+
+/* 20 — Линзы */
+function drawLens(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const lx=W/2, cy=H/2;
+  // lens shape
+  ctx.strokeStyle=hex2rgba(col,0.8); ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(lx,cy-H*0.35); ctx.quadraticCurveTo(lx+30,cy,lx,cy+H*0.35); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lx,cy-H*0.35); ctx.quadraticCurveTo(lx-30,cy,lx,cy+H*0.35); ctx.stroke();
+  // optical axis
+  ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke(); ctx.setLineDash([]);
+  // object arrow
+  ctx.fillStyle='#fbbf24'; ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(W*0.15,cy); ctx.lineTo(W*0.15,cy-H*0.28); ctx.stroke();
+  arrowHead(ctx,W*0.15,cy-H*0.28,-Math.PI/2,'#fbbf24');
+  // image arrow (inverted, smaller)
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(W*0.78,cy); ctx.lineTo(W*0.78,cy+H*0.18); ctx.stroke();
+  arrowHead(ctx,W*0.78,cy+H*0.18,Math.PI/2,col);
+  // rays
+  ctx.strokeStyle=hex2rgba(col,0.3); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W*0.15,cy-H*0.28); ctx.lineTo(lx,cy-H*0.28); ctx.lineTo(W*0.78,cy+H*0.18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W*0.15,cy-H*0.28); ctx.lineTo(lx,cy); ctx.lineTo(W*0.78,cy+H*0.18); ctx.stroke();
+}
+
+/* 21 — Законы Ньютона */
+function drawNewton(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const bx=W*0.35, by=H*0.45, bw=70, bh=45;
+  ctx.fillStyle=hex2rgba(col,0.6); roundRect(ctx,bx,by,bw,bh,6); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('m',bx+bw/2,by+bh/2+5);
+  arrow(ctx,bx-50,by+bh/2,bx,by+bh/2,'#fbbf24',2.5,'F');
+  arrow(ctx,bx+bw,by+bh/2,bx+bw+60,by+bh/2,col,2,'a');
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 14px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('F = ma', W/2, H*0.92);
+}
+
+/* 22 — Тяготение */
+function drawGravity(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H/2;
+  // planet
+  const pg=ctx.createRadialGradient(cx-10,cy-10,5,cx,cy,35);
+  pg.addColorStop(0,hex2rgba(col,0.9)); pg.addColorStop(1,hex2rgba(col,0.3));
+  ctx.beginPath(); ctx.arc(cx,cy,35,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
+  // orbit
+  ctx.setLineDash([3,5]); ctx.strokeStyle=hex2rgba(col,0.25); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.ellipse(cx,cy,W*0.38,H*0.35,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+  // satellite
+  const sx=cx+W*0.35, sy=cy-5;
+  ctx.beginPath(); ctx.arc(sx,sy,8,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+  arrow(ctx,sx,sy,sx,sy-30,col,1.5,'v');
+  arrow(ctx,sx,sy,cx+(sx-cx)*0.7,cy+(sy-cy)*0.7,'#f472b6',1.5,'F');
+}
+
+/* 23 — По окружности */
+function drawCircular(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H/2, r=H*0.3;
+  ctx.setLineDash([3,4]); ctx.strokeStyle=hex2rgba(col,0.3); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+  const angle=-Math.PI*0.25;
+  const bx=cx+Math.cos(angle)*r, by=cy+Math.sin(angle)*r;
+  ctx.beginPath(); ctx.arc(bx,by,12,0,Math.PI*2);
+  const bg2=ctx.createRadialGradient(bx-3,by-3,2,bx,by,12);
+  bg2.addColorStop(0,'#fff'); bg2.addColorStop(1,col); ctx.fillStyle=bg2; ctx.fill();
+  // v tangential
+  const vangle=angle+Math.PI/2;
+  arrow(ctx,bx,by,bx+Math.cos(vangle)*45,by+Math.sin(vangle)*45,col,2,'v');
+  // centripetal
+  arrow(ctx,bx,by,cx+(bx-cx)*0.45,cy+(by-cy)*0.45,'#f472b6',2,'aц');
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('aц = v²/R', W/2, H*0.93);
+}
+
+/* 24 — Импульс */
+function drawMomentum(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // before
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.beginPath(); ctx.arc(W*0.22,H*0.4,16,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=hex2rgba('#818cf8',0.8); ctx.beginPath(); ctx.arc(W*0.48,H*0.4,22,0,Math.PI*2); ctx.fill();
+  arrow(ctx,W*0.22+18,H*0.4,W*0.36,H*0.4,col,2,'');
+  // after
+  ctx.fillStyle=hex2rgba(col,0.5); ctx.beginPath(); ctx.arc(W*0.68,H*0.65,16,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=hex2rgba('#818cf8',0.5); ctx.beginPath(); ctx.arc(W*0.8,H*0.65,22,0,Math.PI*2); ctx.fill();
+  arrow(ctx,W*0.55,H*0.65,W*0.65,H*0.65,col,2,'');
+  arrow(ctx,W*0.72,H*0.65,W*0.82,H*0.65,'#818cf8',2,'');
+  ctx.setLineDash([2,4]); ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W/2,H*0.1); ctx.lineTo(W/2,H*0.9); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('до',W*0.25,H*0.22); ctx.fillText('после',W*0.75,H*0.22);
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif';
+  ctx.fillText('p₁+p₂ = const', W/2, H*0.93);
+}
+
+/* 25 — Энергия */
+function drawEnergy(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // hill shape
+  ctx.fillStyle=hex2rgba(col,0.1);
+  ctx.beginPath(); ctx.moveTo(0,H*0.85); ctx.quadraticCurveTo(W/2,H*0.1,W,H*0.85); ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle=hex2rgba(col,0.4); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,H*0.85); ctx.quadraticCurveTo(W/2,H*0.1,W,H*0.85); ctx.stroke();
+  // ball at top
+  ctx.beginPath(); ctx.arc(W/2,H*0.18,12,0,Math.PI*2);
+  const g=ctx.createRadialGradient(W/2-3,H*0.18-3,2,W/2,H*0.18,12);
+  g.addColorStop(0,'#fff'); g.addColorStop(1,col); ctx.fillStyle=g; ctx.fill();
+  // ball at bottom
+  ctx.beginPath(); ctx.arc(W*0.85,H*0.78,8,0,Math.PI*2); ctx.fillStyle=hex2rgba(col,0.5); ctx.fill();
+  // Ep & Ek labels
+  ctx.fillStyle=col; ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Ep max',W/2,H*0.08);
+  ctx.fillStyle=hex2rgba('#fbbf24',0.8); ctx.fillText('Ek max',W*0.85,H*0.92);
+  ctx.fillStyle=hex2rgba(col,0.6); ctx.fillText('E = const', W/2, H*0.97);
+}
+
+/* 26 — Пружинный маятник */
+function drawSpringPend(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // wall
+  ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fillRect(0,0,16,H);
+  // spring
+  ctx.strokeStyle=hex2rgba(col,0.7); ctx.lineWidth=2;
+  const coils=6, sy=H/2, sx1=16, sx2=W*0.55;
+  ctx.beginPath(); ctx.moveTo(sx1,sy);
+  for(let i=0;i<coils;i++){
+    const x=sx1+(sx2-sx1)*(i/coils), nx=sx1+(sx2-sx1)*((i+1)/coils);
+    ctx.quadraticCurveTo((x+nx)/2,sy+(i%2===0?16:-16),nx,sy);
+  }
+  ctx.stroke();
+  // block
+  ctx.fillStyle=hex2rgba(col,0.7); roundRect(ctx,sx2,sy-20,45,40,5); ctx.fill();
+  // equilibrium
+  ctx.setLineDash([3,4]); ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(sx2,H*0.1); ctx.lineTo(sx2,H*0.9); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('T = 2π√(m/k)', W/2, H*0.92);
+}
+
+/* 27 — Маятник */
+function drawPendulum(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const ox=W/2, oy=20, L=H*0.6;
+  // trail arcs
+  for(let a=-0.35;a<=0.36;a+=0.12){
+    const bx=ox+Math.sin(a)*L, by=oy+Math.cos(a)*L;
+    ctx.setLineDash([2,3]); ctx.strokeStyle=hex2rgba(col,0.15); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(bx,by); ctx.stroke(); ctx.setLineDash([]);
+  }
+  const angle=-0.32, bx=ox+Math.sin(angle)*L, by=oy+Math.cos(angle)*L;
+  ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(bx,by);
+  ctx.strokeStyle=hex2rgba(col,0.6); ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(ox,oy,5,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+  const bg2=ctx.createRadialGradient(bx-4,by-4,2,bx,by,16);
+  bg2.addColorStop(0,'#fff'); bg2.addColorStop(1,col+'bb');
+  ctx.beginPath(); ctx.arc(bx,by,16,0,Math.PI*2); ctx.fillStyle=bg2; ctx.fill();
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('T = 2π√(L/g)', W/2, H*0.95);
+}
+
+/* 28 — Резонанс */
+function drawResonance(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const px=30, py=15, pw=W-50, ph=H-40;
+  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,py+ph); ctx.lineTo(px+pw,py+ph); ctx.stroke();
+  // resonance curve
+  ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let i=0;i<=pw;i++){
+    const x=px+i, f=i/pw, f0=0.52;
+    const amp=0.08/((f-f0)**2+0.004);
+    const y=py+ph-Math.min(amp*ph*0.003+ph*0.08,ph*0.9);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  const rx=px+pw*0.52, ry=py+ph*0.06;
+  ctx.beginPath(); ctx.arc(rx,ry,4,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+  ctx.setLineDash([3,4]); ctx.strokeStyle=hex2rgba(col,0.3); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx,py+ph); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('f₀',rx,py+ph+12); ctx.fillText('A',px-8,py+ph*0.06+4);
+}
+
+/* 29 — Стоячие волны */
+function drawWave(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cy=H/2;
+  ctx.setLineDash([3,5]); ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke(); ctx.setLineDash([]);
+  // wave 1
+  ctx.strokeStyle=hex2rgba(col,0.45); ctx.lineWidth=1.5; ctx.beginPath();
+  for(let x=0;x<=W;x+=2){ const y=cy+40*Math.sin(2*Math.PI*2*(x/W)); x===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+  ctx.stroke();
+  // wave 2
+  ctx.strokeStyle=hex2rgba('#818cf8',0.45); ctx.lineWidth=1.5; ctx.beginPath();
+  for(let x=0;x<=W;x+=2){ const y=cy-40*Math.sin(2*Math.PI*2*(x/W)); x===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+  ctx.stroke();
+  // standing
+  ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let x=0;x<=W;x+=1){ const y=cy+70*Math.sin(2*Math.PI*2*(x/W))*Math.cos(0.8); x===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+  ctx.stroke();
+  // nodes
+  [0,W/2,W].forEach(nx=>{ ctx.beginPath(); ctx.arc(nx,cy,5,0,Math.PI*2); ctx.fillStyle='#f472b6'; ctx.fill(); });
+}
+
+/* 30 — Распад */
+function drawDecay(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const px=30, py=15, pw=W-50, ph=H-40;
+  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,py+ph); ctx.lineTo(px+pw,py+ph); ctx.stroke();
+  // decay curve
+  ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.beginPath();
+  for(let i=0;i<=pw;i++){
+    const x=px+i, t=i/pw;
+    const y=py+ph-(Math.exp(-3.5*t))*ph*0.85;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  // T½ marker
+  const hx=px+pw*0.198;
+  ctx.setLineDash([3,4]); ctx.strokeStyle=hex2rgba(col,0.35); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(hx,py); ctx.lineTo(hx,py+ph); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('T½',hx,py+ph+12);
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 12px Raleway,sans-serif';
+  ctx.fillText('N = N₀·e^(−λt)', W/2, H*0.94);
+}
+
+/* 31 — Поле зарядов */
+function drawChargeField(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const charges=[{x:W*0.32,y:H*0.45,q:1},{x:W*0.68,y:H*0.55,q:-1}];
+  for(let i=0;i<12;i++){
+    const angle=(i/12)*Math.PI*2;
+    const x1=charges[0].x+Math.cos(angle)*14, y1=charges[0].y+Math.sin(angle)*14;
+    const x2=charges[1].x+Math.cos(angle)*14, y2=charges[1].y+Math.sin(angle)*14;
+    ctx.strokeStyle=hex2rgba(col,0.2); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x1,y1);
+    ctx.bezierCurveTo(charges[0].x+Math.cos(angle)*50,charges[0].y+Math.sin(angle)*50,
+      charges[1].x-Math.cos(angle)*50,charges[1].y-Math.sin(angle)*50,x2,y2);
+    ctx.stroke();
+  }
+  charges.forEach(ch=>{
+    ctx.beginPath(); ctx.arc(ch.x,ch.y,14,0,Math.PI*2);
+    const g=ctx.createRadialGradient(ch.x-3,ch.y-3,2,ch.x,ch.y,14);
+    g.addColorStop(0,'#fff'); g.addColorStop(1,ch.q>0?'#f87171':'#60a5fa');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 14px Raleway,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(ch.q>0?'+':'−',ch.x,ch.y+5);
+  });
+}
+
+/* 32 — Конденсатор */
+function drawCapacitor(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const lx=W*0.35, rx=W*0.65, y1=H*0.2, y2=H*0.8;
+  ctx.strokeStyle=hex2rgba(col,0.8); ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(lx,y1); ctx.lineTo(lx,y2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rx,y1); ctx.lineTo(rx,y2); ctx.stroke();
+  // field lines
+  for(let y=H*0.3;y<=H*0.7;y+=14){
+    ctx.strokeStyle=hex2rgba(col,0.3); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(lx+4,y); ctx.lineTo(rx-4,y); ctx.stroke();
+    const mx=(lx+rx)/2;
+    ctx.fillStyle=hex2rgba(col,0.4);
+    ctx.beginPath(); ctx.moveTo(mx-4,y-3); ctx.lineTo(mx+4,y); ctx.lineTo(mx-4,y+3); ctx.closePath(); ctx.fill();
+  }
+  // +/- labels
+  ctx.fillStyle='#f87171'; ctx.font='bold 14px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('+',lx-18,H/2+5);
+  ctx.fillStyle='#60a5fa'; ctx.fillText('−',rx+18,H/2+5);
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif';
+  ctx.fillText('C = Q/U', W/2, H*0.93);
+}
+
+/* 33 — Магнитное поле */
+function drawMagnetic(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H/2;
+  // wire
+  ctx.strokeStyle=hex2rgba(col,0.9); ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(cx,H*0.05); ctx.lineTo(cx,H*0.95); ctx.stroke();
+  ctx.fillStyle=col; ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('I ↑',cx+14,H*0.5);
+  // field circles
+  [30,60,90,120].forEach(r=>{
+    const alpha=0.5-r/140;
+    ctx.strokeStyle=hex2rgba(col,alpha); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.ellipse(cx,cy,r,r*0.4,0,0,Math.PI*2); ctx.stroke();
+    // arrow on circle
+    const ax=cx+r, ay=cy;
+    ctx.fillStyle=hex2rgba(col,alpha+0.1);
+    ctx.save(); ctx.translate(ax,ay); ctx.rotate(-Math.PI/2);
+    ctx.beginPath(); ctx.moveTo(0,-5); ctx.lineTo(5,0); ctx.lineTo(0,5); ctx.fill();
+    ctx.restore();
+  });
+}
+
+/* 34 — Сила Лоренца */
+function drawLorentz(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // B field dots (into screen)
+  for(let x=30;x<W;x+=35) for(let y=25;y<H-20;y+=30){
+    ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.fillStyle=hex2rgba(col,0.2); ctx.fill();
+  }
+  // curved trajectory
+  ctx.strokeStyle=col; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let t=0;t<=Math.PI*1.1;t+=0.05){
+    const r=H*0.3, x=W*0.2+r+Math.cos(t)*r, y=H*0.65+Math.sin(t)*r;
+    t===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  // particle
+  ctx.beginPath(); ctx.arc(W*0.2+H*0.3,H*0.65,8,0,Math.PI*2);
+  ctx.fillStyle=col; ctx.fill();
+  arrow(ctx,W*0.2+H*0.3,H*0.65,W*0.2+H*0.3+30,H*0.65-30,col,1.5,'v');
+  arrow(ctx,W*0.2+H*0.3,H*0.65,W*0.2+H*0.3-30,H*0.65-20,'#f472b6',1.5,'F');
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('F = qvB', W*0.75, H*0.5);
+}
+
+/* 35 — Индукция */
+function drawInduction(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H*0.45;
+  // coil
+  ctx.strokeStyle=hex2rgba(col,0.7); ctx.lineWidth=2;
+  for(let i=0;i<5;i++){
+    ctx.beginPath(); ctx.ellipse(cx,cy-20+i*12,W*0.28,12,0,0,Math.PI*2); ctx.stroke();
+  }
+  // magnet moving
+  const mx=W*0.15, mh=H*0.5;
+  ctx.fillStyle='#f87171'; roundRect(ctx,mx,H*0.2,28,mh*0.5,4); ctx.fill();
+  ctx.fillStyle='#60a5fa'; roundRect(ctx,mx,H*0.2+mh*0.5,28,mh*0.5,4); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.8)'; ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('N',mx+14,H*0.38); ctx.fillText('S',mx+14,H*0.62);
+  arrow(ctx,mx+30,H/2,mx+50,H/2,col,1.5,'');
+  // EMF arrow in coil
+  arrow(ctx,cx+W*0.15,cy+10,cx+W*0.25,cy-10,'#fbbf24',1.5,'ε');
+  ctx.fillStyle=hex2rgba(col,0.7); ctx.font='bold 12px Raleway,sans-serif';
+  ctx.fillText('ε = −ΔΦ/Δt', W*0.62, H*0.9);
+}
+
+/* 36 — LC контур */
+function drawLC(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const px=W*0.15, py=H*0.15, pw=W*0.7, ph=H*0.55;
+  ctx.strokeStyle=hex2rgba(col,0.55); ctx.lineWidth=2; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(px,py+ph/2);
+  ctx.lineTo(px,py); ctx.lineTo(px+pw,py); ctx.lineTo(px+pw,py+ph/2);
+  ctx.moveTo(px,py+ph/2); ctx.lineTo(px,py+ph); ctx.lineTo(px+pw,py+ph); ctx.lineTo(px+pw,py+ph/2);
+  ctx.stroke();
+  // capacitor plates
+  const cx2=px+pw*0.35;
+  ctx.strokeStyle=col; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(cx2,py+ph*0.3); ctx.lineTo(cx2,py+ph*0.7); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx2+12,py+ph*0.3); ctx.lineTo(cx2+12,py+ph*0.7); ctx.stroke();
+  // inductor coils
+  const lx=px+pw*0.65;
+  ctx.strokeStyle=col; ctx.lineWidth=2;
+  for(let i=0;i<4;i++){
+    ctx.beginPath(); ctx.ellipse(lx+i*10,py+ph/2,5,H*0.06,0,0,Math.PI*2); ctx.stroke();
+  }
+  // oscillation graph
+  const gx=W*0.12, gy=H*0.83;
+  ctx.strokeStyle=hex2rgba(col,0.6); ctx.lineWidth=1.5; ctx.beginPath();
+  for(let t=0;t<=W*0.76;t+=2){
+    const y=gy-18*Math.sin(t*0.12)*Math.exp(-t*0.005);
+    t===0?ctx.moveTo(gx+t,y):ctx.lineTo(gx+t,y);
+  }
+  ctx.stroke();
+}
+
+/* 37 — Дисперсия */
+function drawDispersion(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // prism
+  ctx.fillStyle='rgba(255,255,255,0.06)';
+  ctx.beginPath(); ctx.moveTo(W*0.35,H*0.1); ctx.lineTo(W*0.6,H*0.88); ctx.lineTo(W*0.1,H*0.88); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle=hex2rgba(col,0.3); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(W*0.35,H*0.1); ctx.lineTo(W*0.6,H*0.88); ctx.lineTo(W*0.1,H*0.88); ctx.closePath(); ctx.stroke();
+  // input ray
+  ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(W*0.05,H*0.4); ctx.lineTo(W*0.27,H*0.55); ctx.stroke();
+  // spectrum
+  const colors=['#f87171','#fb923c','#facc15','#4ade80','#38bdf8','#818cf8','#e879f9'];
+  colors.forEach((cl,i)=>{
+    const spread=(i-3)*0.04;
+    ctx.strokeStyle=cl; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.moveTo(W*0.27,H*0.55); ctx.lineTo(W*0.95,H*(0.32+spread*3+i*0.04)); ctx.stroke();
+  });
+}
+
+/* 38 — Интерференция */
+function drawInterference(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const s1={x:W*0.22,y:H*0.35}, s2={x:W*0.22,y:H*0.65};
+  [s1,s2].forEach(s=>{
+    ctx.beginPath(); ctx.arc(s.x,s.y,4,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+    for(let r=20;r<W;r+=25){
+      ctx.beginPath(); ctx.arc(s.x,s.y,r,0,Math.PI*2);
+      ctx.strokeStyle=hex2rgba(col,Math.max(0.05,0.25-r/W)); ctx.lineWidth=1; ctx.stroke();
+    }
+  });
+  // screen
+  ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(W*0.85,H*0.05,12,H*0.9);
+  // fringes on screen
+  const sc=W*0.86;
+  for(let y=H*0.1;y<H*0.9;y+=4){
+    const dy1=Math.abs(y-s1.y), dy2=Math.abs(y-s2.y);
+    const path1=Math.sqrt((sc-s1.x)**2+dy1**2), path2=Math.sqrt((sc-s2.x)**2+dy2**2);
+    const diff=path1-path2, lambda=25;
+    const intensity=(1+Math.cos(2*Math.PI*diff/lambda))/2;
+    ctx.fillStyle=hex2rgba(col,intensity*0.8);
+    ctx.fillRect(sc,y,8,4);
+  }
+}
+
+/* 39 — Фотоэффект */
+function drawPhotoeffect(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  // metal plate
+  ctx.fillStyle=hex2rgba(col,0.2); roundRect(ctx,W*0.05,H*0.35,W*0.35,H*0.4,6); ctx.fill();
+  ctx.strokeStyle=hex2rgba(col,0.5); ctx.lineWidth=1.5; roundRect(ctx,W*0.05,H*0.35,W*0.35,H*0.4,6); ctx.stroke();
+  ctx.fillStyle=hex2rgba(col,0.6); ctx.font='11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('металл',W*0.225,H*0.55);
+  // photons
+  [[W*0.55,H*0.3,H*0.38],[W*0.6,H*0.5,H*0.52],[W*0.52,H*0.68,H*0.62]].forEach(([sx,sy,ty])=>{
+    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(W*0.4,ty); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#fbbf24'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('hν',sx,sy-4);
+  });
+  // electrons flying out
+  [[W*0.05,H*0.4,-0.7],[W*0.1,H*0.55,-0.3],[W*0.08,H*0.7,-0.5]].forEach(([ox,oy,ang])=>{
+    const ex=ox+Math.cos(ang)*55, ey=oy+Math.sin(ang)*55;
+    ctx.strokeStyle=col; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ex,ey); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ex,ey,4,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+    ctx.fillStyle=hex2rgba(col,0.7); ctx.font='10px Raleway,sans-serif';
+    ctx.fillText('e⁻',ex-6,ey-7);
+  });
+  ctx.fillStyle=hex2rgba(col,0.8); ctx.font='bold 11px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Ek = hν − A', W/2, H*0.94);
+}
+
+/* 40 — Бор */
+function drawBohr(c, col) {
+  const ctx=c.getContext('2d'), W=c.width, H=c.height; bg(ctx,W,H,col,col);
+  const cx=W/2, cy=H/2;
+  // nucleus
+  const ng=ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,14);
+  ng.addColorStop(0,'#fff'); ng.addColorStop(1,'#f87171cc');
+  ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2); ctx.fillStyle=ng; ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='10px Raleway,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('+',cx,cy+4);
+  // orbits
+  [H*0.2,H*0.33,H*0.42].forEach((r,i)=>{
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle=hex2rgba(col,0.3+i*0.1); ctx.lineWidth=1; ctx.stroke();
+    const angle=-Math.PI*0.25*(i+1);
+    ctx.beginPath(); ctx.arc(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r,5,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    // energy level label
+    ctx.fillStyle=hex2rgba(col,0.5); ctx.font='10px Raleway,sans-serif';
+    ctx.fillText(`n=${i+1}`,cx+r+6,cy+3);
+  });
+  // photon emission
+  ctx.strokeStyle='#fbbf24'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(cx+H*0.2+5,cy); ctx.lineTo(cx+H*0.42+30,cy); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#fbbf24'; ctx.font='10px Raleway,sans-serif';
+  ctx.fillText('hν',cx+H*0.33+10,cy-8);
+}
+
+/* ─── HELPERS ─── */
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+function arrowHead(ctx,x,y,angle,color){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(angle);
+  ctx.fillStyle=color; ctx.beginPath();
+  ctx.moveTo(0,-4); ctx.lineTo(9,0); ctx.lineTo(0,4); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function arrow(ctx,x1,y1,x2,y2,color,lw,label){
+  ctx.strokeStyle=color; ctx.lineWidth=lw||1.5;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const angle=Math.atan2(y2-y1,x2-x1);
+  ctx.save(); ctx.translate(x2,y2); ctx.rotate(angle);
+  ctx.fillStyle=color; ctx.beginPath();
+  ctx.moveTo(0,-3.5); ctx.lineTo(9,0); ctx.lineTo(0,3.5); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  if(label){
+    ctx.fillStyle=color; ctx.font=`bold 12px Raleway,sans-serif`;
+    const lx=(x1+x2)/2-6, ly=(y1+y2)/2-7;
+    ctx.fillText(label,lx,ly);
+  }
+}
+
+/* ─── MINI STARFIELD ─── */
+(function(){
+  const c=document.getElementById('mini-stars'), ctx=c.getContext('2d');
+  let W,H,stars=[];
+  function init(){
+    W=c.width=c.parentElement.offsetWidth;
+    H=c.height=c.parentElement.offsetHeight;
+    stars=Array.from({length:100},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.3,a:Math.random()}));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#050c1a'; ctx.fillRect(0,0,W,H);
+    stars.forEach(s=>{ s.a+=0.004; const al=(Math.sin(s.a)+1)/2*0.7+0.1; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(200,220,255,${al})`; ctx.fill(); });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',init); init(); draw();
+})();
+
+/* ─── SCROLL REVEAL ─── */
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const obs2=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.05});
+document.querySelectorAll('.reveal-row').forEach(el=>obs2.observe(el));
+</script>
+</body>
+</html>

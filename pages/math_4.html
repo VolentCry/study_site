@@ -9,7 +9,7 @@
         </title>
 
         <link rel="stylesheet" href="../style.css">
-        <link rel="stylesheet" href="assets/fonts/minecraft-font.css">
+        <link rel="stylesheet" href="../assets/fonts/minecraft-font.css">
 
         <style>
             @import url('https://fonts.cdnfonts.com/css/minecraft-3');
@@ -44,11 +44,11 @@
             .trainers-list {
                 display: flex;
                 flex-direction: column;
-                gap: 16px;
-                max-width: 400px;
+                gap: 14px;
+                max-width: 700px;
             }
             .trainers-list .minecraft-button {
-                width: 100%;
+                width: 80%;
                 text-align: center;
                 text-decoration: none;
                 color: white;
@@ -70,7 +70,7 @@
                     <h1 class="welcome-title">Рады тебя видеть, юный строитель!</h1>
                     <p class="welcome-text">Давай решим несколько интересных математических задач из мира Minecraft!</p>
                     <a href="../tasks/tasks.html" class="minecraft-button pulsating-button welcome-button">Задачки</a>
-                    <button class="minecraft-button mode-button" onclick="switchPage('trainers')">Тренажёр по умножению</button>
+                    <button class="minecraft-button mode-button" onclick="switchPage('trainers')">Тренажёры</button>
                 </div>
             </div>
         </div>
@@ -78,13 +78,15 @@
         <!-- Страница выбора тренажёров -->
         <div id="page-trainers" class="page">
             <div class="welcome-card">
-                <h1 class="welcome-title">Тренажёр по умножению</h1>
+                <h1 class="welcome-title">Тренажёры</h1>
                 <p class="welcome-text">Выбери тренажёр:</p>
                 <div class="trainers-list">
-                    <a href="../math_moduls/multiplication_trainer.html" class="minecraft-button mode-button">Тренажёр №1</a>
-                    <a href="../math_moduls/multiplication_trainer_medium_level.html" class="minecraft-button mode-button">Тренажёр №2</a>
-                    <a href="../math_moduls/multiplication_trainer_hard_level.html" class="minecraft-button mode-button">Тренажёр №3</a>
-                    <a href="../math_moduls/decimal_fraction_trainer.html" class="minecraft-button mode-button">Тренажёр №4</a>
+                    <a href="../math_moduls/multiplication_trainer.html" class="minecraft-button mode-button">Тренажёр №1 - Умножение. Уровень: Лёгкий</a>
+                    <a href="../math_moduls/multiplication_trainer_medium_level.html" class="minecraft-button mode-button">Тренажёр №2 - Умножение. Уровень: Средний</a>
+                    <a href="../math_moduls/multiplication_trainer_hard_level.html" class="minecraft-button mode-button">Тренажёр №3 - Умножение. Уровень: Сложный</a>
+                    <a href="../math_moduls/decimal_fraction_trainer.html" class="minecraft-button mode-button">Тренажёр №4 - Операции с десятичными дробями</a>
+                    <a href="../math_moduls/equations_trainer_easy.html" class="minecraft-button mode-button">Тренажёр №5 - Уравнения. Уровень: Лёгкий</a>
+                    <a href="../math_moduls/equations_trainer_medium.html" class="minecraft-button mode-button">Тренажёр №6 - Уравнения. Уровень: Средний</a>
                 </div>
                 <button class="minecraft-button mode-button" onclick="switchPage('main')" style="margin-top: 20px;">← Назад</button>
             </div>

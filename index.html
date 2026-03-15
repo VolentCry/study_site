@@ -1,148 +1,292 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        html { 
-            scroll-behavior: smooth; 
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Знания — Образовательная платформа</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream:  #f7efe3;
+      --sand:   #ecdcc6;
+      --tan:    #c8956c;
+      --amber:  #d47c3a;
+      --orange: #e07c2a;
+      --brown:  #4a2e14;
+      --brown2: #6b4226;
+      --card:   #fffcf7;
+      --r:      16px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Nunito', sans-serif; background: var(--cream); color: var(--brown); overflow-x: hidden; }
 
-        body {
-            background: var(--void);
-            color: var(--text);
-            font-family: 'Jost', sans-serif;
-            font-weight: 200;
-            overflow-x: hidden;
-        }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:none; } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .reveal { opacity:0; transform:translateY(30px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+    .reveal.d1.visible { transition-delay:.1s; }
+    .reveal.d2.visible { transition-delay:.2s; }
+    .reveal.d3.visible { transition-delay:.3s; }
 
-        gretting-case {
-            border: 10mm;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0;
-        }
+    /* NAV */
+    nav {
+      position:sticky; top:0; z-index:200;
+      background:rgba(247,239,227,.95); backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--sand);
+      display:flex; align-items:center; padding:0 6%; height:70px; gap:2rem;
+    }
+    .logo { display:flex; align-items:center; gap:10px; font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:var(--brown); text-decoration:none; }
+    .logo-icon { width:36px; height:36px; background:var(--amber); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.1rem; box-shadow:0 3px 10px rgba(212,124,58,.35); }
+    .nav-links { display:flex; gap:1.8rem; list-style:none; flex:1; margin-left:.5rem; }
+    .nav-links a { text-decoration:none; font-weight:600; font-size:.93rem; color:var(--brown2); opacity:.75; transition:opacity .2s; position:relative; padding-bottom:3px; }
+    .nav-links a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:2px; background:var(--amber); border-radius:2px; transition:width .3s; }
+    .nav-links a:hover, .nav-links a.active { opacity:1; }
+    .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
 
-            /* --- БОКОВОЕ МЕНЮ ДЛЯ КАЖДОЙ СТРАНИЦЫ --- */
-        .menu-container { 
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
-            z-index: 200;
-            height: 100vh;
-        }
+    .btn { display:inline-flex; align-items:center; gap:.5rem; background:var(--orange); color:#fff; border:none; border-radius:50px; padding:.65rem 1.5rem; font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:700; cursor:pointer; text-decoration:none; white-space:nowrap; transition:background .25s, transform .2s, box-shadow .25s; box-shadow:0 4px 18px rgba(224,124,42,.28); }
+    .btn:hover { background:var(--amber); transform:translateY(-2px); box-shadow:0 8px 24px rgba(212,124,58,.38); }
+    .btn-outline { background:transparent; color:var(--brown); border:2px solid var(--tan); box-shadow:none; }
+    .btn-outline:hover { background:var(--sand); transform:translateY(-2px); box-shadow:none; }
 
-        .hamburger-icon { 
-            width: 40px; 
-            height: 35px; 
-            cursor: pointer; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            padding-bottom: 10px; 
-        }
+    /* HERO */
+    .hero { display:grid; grid-template-columns:1fr 1fr; min-height:540px; overflow:hidden; }
+    .hero-left { display:flex; flex-direction:column; justify-content:center; padding:5rem 4% 5rem 6%; }
+    .hero-badge { display:inline-flex; align-items:center; gap:.5rem; background:rgba(212,124,58,.12); color:var(--amber); border-radius:50px; padding:.35rem 1rem; font-size:.82rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-bottom:1.4rem; animation:fadeUp .5s ease both; }
+    .hero-left h1 { font-family:'Playfair Display',serif; font-size:clamp(2.1rem,4vw,3.1rem); font-weight:800; line-height:1.18; color:var(--brown); animation:fadeUp .6s .1s ease both; }
+    .hero-left h1 em { font-style:italic; color:var(--amber); }
+    .hero-left p { margin-top:1.2rem; font-size:1.05rem; color:var(--brown2); line-height:1.75; opacity:.85; max-width:420px; animation:fadeUp .6s .2s ease both; }
+    .hero-actions { display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
+    .hero-stats { display:flex; gap:2rem; margin-top:2.8rem; animation:fadeUp .6s .4s ease both; }
+    .stat-val { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--brown); }
+    .stat-lbl { font-size:.8rem; color:var(--tan); font-weight:600; margin-top:.1rem; }
 
-        .line { 
-            width: 100%; 
-            height: 6px; 
-            background-color: white; 
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.5); 
-            transition: 0.3s; }
+    .hero-right { position:relative; overflow:hidden; }
+    .hero-img-main { width:100%; height:100%; object-fit:cover; display:block; animation:fadeIn .9s .15s ease both; }
+    .hero-right::before { content:''; position:absolute; inset:0; background:linear-gradient(to right, var(--cream) 0%, transparent 28%); z-index:1; }
+    .hero-card { position:absolute; bottom:2rem; right:1.5rem; z-index:2; background:rgba(255,252,247,.92); backdrop-filter:blur(8px); border-radius:14px; padding:1rem 1.2rem; box-shadow:0 8px 32px rgba(90,56,32,.18); display:flex; align-items:center; gap:.9rem; max-width:220px; animation:fadeUp .7s .5s ease both; }
+    .hero-card-icon { width:42px; height:42px; border-radius:10px; background:var(--amber); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.2rem; flex-shrink:0; }
+    .hct-label { font-size:.72rem; color:var(--tan); font-weight:600; }
+    .hct-val   { font-size:.92rem; font-weight:700; color:var(--brown); }
 
-        .sidebar {
-            position: fixed; 
-            top: 0; 
-            left: -280px;
-            width: 280px; 
-            height: 100vh; /* На весь экран */
-            background: var(--frame-bg); 
-            border-right: 4px solid var(--color-light);
-            transition: 0.4s ease; 
-            padding-top: 100px; 
-            z-index: 1000;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-        }
+    /* GENERIC SECTION */
+    section { padding:5rem 6%; }
+    .section-head { margin-bottom:2.8rem; }
+    .section-head h2 { font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3vw,2.2rem); font-weight:700; color:var(--brown); line-height:1.2; }
+    .section-head p { margin-top:.7rem; font-size:1rem; color:var(--brown2); opacity:.7; max-width:520px; line-height:1.7; }
+    .row { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
 
-        .menu-container:hover .sidebar { 
-            left: 0; 
-        }
+    /* CATEGORIES */
+    .categories { background:var(--sand); }
+    .cat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(148px, 1fr)); gap:1rem; }
+    .cat-card { background:var(--card); border-radius:var(--r); padding:1.4rem 1rem; text-align:center; cursor:pointer; transition:transform .3s, box-shadow .3s; border:1.5px solid transparent; box-shadow:0 2px 12px rgba(90,56,32,.07); }
+    .cat-card:hover { transform:translateY(-5px); box-shadow:0 10px 28px rgba(90,56,32,.14); border-color:var(--tan); }
+    .cat-emoji { font-size:1.8rem; margin-bottom:.7rem; }
+    .cat-card h3 { font-size:.9rem; font-weight:700; color:var(--brown); }
+    .cat-card span { font-size:.78rem; color:var(--tan); display:block; margin-top:.25rem; }
 
-        .menu-container:hover .line {
-            background-color: var(--color-sand); 
-        }
+    /* COURSES */
+    .course-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:1.6rem; }
+    .course-card { background:var(--card); border-radius:var(--r); overflow:hidden; box-shadow:0 2px 16px rgba(90,56,32,.08); transition:transform .3s, box-shadow .3s; }
+    .course-card:hover { transform:translateY(-6px); box-shadow:0 14px 36px rgba(90,56,32,.16); }
+    .course-img { width:100%; height:180px; object-fit:cover; display:block; }
+    .course-body { padding:1.2rem 1.4rem 1.4rem; }
+    .tag { display:inline-block; background:rgba(212,124,58,.12); color:var(--amber); border-radius:50px; padding:.2rem .75rem; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:.7rem; }
+    .course-body h3 { font-size:1rem; font-weight:700; color:var(--brown); line-height:1.4; margin-bottom:.5rem; }
+    .course-meta { display:flex; align-items:center; gap:1rem; font-size:.8rem; color:var(--tan); flex-wrap:wrap; }
+    .stars { color:var(--orange); }
 
-        .menu-item {
-            position: relative;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-        }
+    /* HOW */
+    .how { background:var(--sand); }
+    .how-inner { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+    .how-img-wrap { position:relative; border-radius:20px; overflow:hidden; }
+    .how-img { width:100%; height:420px; object-fit:cover; display:block; border-radius:20px; }
+    .how-badge { position:absolute; top:1.2rem; left:1.2rem; background:var(--card); border-radius:12px; padding:.8rem 1rem; box-shadow:0 4px 20px rgba(90,56,32,.18); display:flex; align-items:center; gap:.7rem; }
+    .how-badge .big { font-size:1.5rem; }
+    .how-badge .lbl { font-size:.78rem; color:var(--tan); font-weight:600; }
+    .how-badge .val { font-size:1rem; font-weight:800; color:var(--brown); }
+    .how-steps { display:flex; flex-direction:column; gap:1.4rem; }
+    .step { display:flex; gap:1.2rem; align-items:flex-start; background:var(--card); border-radius:14px; padding:1.2rem 1.4rem; box-shadow:0 2px 12px rgba(90,56,32,.07); transition:transform .3s; }
+    .step:hover { transform:translateX(6px); }
+    .step-num { width:42px; height:42px; border-radius:12px; background:var(--amber); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; flex-shrink:0; }
+    .step h4 { font-size:.97rem; font-weight:700; color:var(--brown); margin-bottom:.3rem; }
+    .step p  { font-size:.85rem; color:var(--brown2); opacity:.75; line-height:1.6; }
 
-        .menu-title {
-            padding: 15px 25px; font-size: 11px;
-            color: var(--text-color); display: block;
-            cursor: pointer; transition: 0.2s;
-            line-height: 1.4;
-        }
+    /* ARTICLES */
+    .articles-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; }
+    .art-big { grid-row:span 2; }
+    .art-card { background:var(--card); border-radius:var(--r); overflow:hidden; display:flex; flex-direction:column; box-shadow:0 2px 14px rgba(90,56,32,.08); transition:transform .3s, box-shadow .3s; }
+    .art-card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(90,56,32,.15); }
+    .art-img { width:100%; object-fit:cover; display:block; }
+    .art-big .art-img { height:300px; }
+    .art-sm  .art-img { height:155px; }
+    .art-body { padding:1.2rem 1.4rem 1.5rem; flex:1; }
+    .art-body h3 { font-family:'Playfair Display',serif; font-size:1.08rem; font-weight:700; color:var(--brown); line-height:1.35; margin:.55rem 0 .45rem; }
+    .art-big .art-body h3 { font-size:1.3rem; }
+    .art-body p { font-size:.85rem; color:var(--brown2); opacity:.7; line-height:1.6; }
+    .art-meta { font-size:.78rem; color:var(--tan); margin-top:.75rem; }
 
-        .menu-item:hover .menu-title {
-            background: rgba(0,0,0,0.3); color: var(--color-sand);
-        }
+    /* TESTIMONIALS */
+    .testi { background:var(--amber); }
+    .testi .section-head h2 { color:#fff; }
+    .testi .section-head p  { color:rgba(255,255,255,.8); }
+    .test-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.4rem; margin-top:2.5rem; }
+    .test-card { background:rgba(255,255,255,.16); backdrop-filter:blur(6px); border-radius:var(--r); padding:1.6rem; border:1px solid rgba(255,255,255,.2); transition:background .3s, transform .3s; }
+    .test-card:hover { background:rgba(255,255,255,.24); transform:translateY(-4px); }
+    .test-stars { color:#ffe8a0; font-size:.85rem; margin-bottom:.6rem; }
+    .test-card q { font-size:.9rem; color:rgba(255,255,255,.92); line-height:1.7; font-style:italic; display:block; }
+    .test-author { display:flex; align-items:center; gap:.9rem; margin-top:1.1rem; }
+    .test-avatar { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.45); flex-shrink:0; }
+    .test-name { font-weight:700; color:#fff; font-size:.92rem; }
+    .test-role { font-size:.76rem; color:rgba(255,255,255,.7); }
 
-        /* Выпадающее подменю */
-        .submenu {
-            max-height: 0;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.4);
-            transition: max-height 0.3s ease-in-out;
-        }
+    /* CTA */
+    .cta-strip { background:var(--brown); text-align:center; padding:5rem 6%; }
+    .cta-strip h2 { font-family:'Playfair Display',serif; font-size:2rem; color:#fff; margin-bottom:.8rem; }
+    .cta-strip p  { color:rgba(255,255,255,.6); font-size:1rem; margin-bottom:2rem; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.7; }
+    .cta-strip .btn { font-size:1rem; padding:.85rem 2.2rem; }
 
-        .menu-item:hover .submenu {
-            max-height: 200px;
-        }
+    /* FOOTER */
+    footer { background:var(--brown); border-top:1px solid rgba(255,255,255,.08); padding:1.8rem 6%; display:flex; align-items:center; flex-wrap:wrap; gap:1.5rem; }
+    .footer-copy { font-size:.83rem; color:rgba(255,255,255,.4); margin-right:auto; }
+    .social-links { display:flex; gap:.7rem; }
+    .social-links a { width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.6); text-decoration:none; font-size:.9rem; transition:all .2s; }
+    .social-links a:hover { border-color:#fff; color:#fff; }
+    .footer-nav { display:flex; gap:1.5rem; }
+    .footer-nav a { font-size:.82rem; color:rgba(255,255,255,.4); text-decoration:none; transition:color .2s; }
+    .footer-nav a:hover { color:rgba(255,255,255,.85); }
 
-        .submenu a {
-            padding: 12px 25px 12px 40px; 
-            text-decoration: none; 
-            font-size: 10px;
-            color: var(--color-light); 
-            display: block; 
-            transition: 0.2s;
-        }
+    @media (max-width:900px) {
+      .hero { grid-template-columns:1fr; }
+      .hero-right { height:280px; }
+      .hero-right::before { background:linear-gradient(to bottom, var(--cream) 0%, transparent 40%); }
+      .how-inner { grid-template-columns:1fr; }
+      .articles-grid { grid-template-columns:1fr; }
+      .art-big { grid-row:span 1; }
+    }
+    @media (max-width:640px) {
+      .nav-links { display:none; }
+      section { padding:3.5rem 4%; }
+      nav { padding:0 4%; }
+    }
 
-        .submenu a:hover {
-            color: var(--correct); 
-            background: rgba(255,255,255,0.05);
-        }
+    /* Боковое меню */
+    .menu-container { 
+        position: absolute; 
+        top: 20px; 
+        left: 20px; 
+        z-index: 200;
+        height: 100vh;
+    }
 
-        .menu-profile-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            display: inline-block;
-            text-decoration: none;
-            color: var(--text-color);
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid var(--color-sand);
-            padding: 10px 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
+    .hamburger-icon { 
+        width: 40px; 
+        height: 35px; 
+        cursor: pointer; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between; 
+        padding-bottom: 10px; 
+    }
 
-        .menu-profile-btn:hover {
-            background: var(--color-sand);
-            color: #000;
-        }
-    </style>
+    .line { 
+        width: 100%; 
+        height: 6px; 
+        background-color: white; 
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.5); 
+        transition: 0.3s; }
+
+    .sidebar {
+        position: fixed; 
+        top: 0; 
+        left: -280px;
+        width: 280px; 
+        height: 100vh; /* На весь экран */
+        background: var(--frame-bg); 
+        border-right: 4px solid var(--color-light);
+        transition: 0.4s ease; 
+        padding-top: 100px; 
+        z-index: 1000;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menu-container:hover .sidebar { 
+        left: 0; 
+    }
+
+    .menu-container:hover .line {
+        background-color: var(--color-sand); 
+    }
+
+    .menu-item {
+        position: relative;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .menu-title {
+        padding: 15px 25px; font-size: 11px;
+        color: var(--text-color); display: block;
+        cursor: pointer; transition: 0.2s;
+        line-height: 1.4;
+    }
+
+    .menu-item:hover .menu-title {
+        background: rgba(0,0,0,0.3); color: var(--color-sand);
+    }
+
+    /* Выпадающее подменю */
+    .submenu {
+        max-height: 0;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .menu-item:hover .submenu {
+        max-height: 200px;
+    }
+
+    .submenu a {
+        padding: 12px 25px 12px 40px; 
+        text-decoration: none; 
+        font-size: 10px;
+        color: var(--color-light); 
+        display: block; 
+        transition: 0.2s;
+    }
+
+    .submenu a:hover {
+        color: var(--correct); 
+        background: rgba(255,255,255,0.05);
+    }
+
+    .menu-profile-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        display: inline-block;
+        text-decoration: none;
+        color: var(--text-color);
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid var(--color-sand);
+        padding: 10px 15px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .menu-profile-btn:hover {
+        background: var(--color-sand);
+        color: #000;
+    }
+  </style>
 </head>
+<body>
 
-<body class="main-page">
     <div class="menu-container">
         <div class="hamburger-icon">
             <div class="line"></div><div class="line"></div><div class="line"></div>
@@ -150,13 +294,13 @@
 
         <div class="sidebar" id="sidebar">
             <div class="menu-item">
-                <span class="menu-title"><a href="index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
+                <span class="menu-title"><a href="../index.html" style="text-decoration: none; color: var(--color-light);">Главная</a></span>
             </div>
 
             <div class="menu-item">
                 <span class="menu-title">Английский язык</span>
                 <div class="submenu">
-                    <a href="pages/english_4.html">4 класс</a>
+                    <a href="english_4.html">4 класс</a>
                     <a href="#">5 класс</a>
                 </div>
             </div>
@@ -164,60 +308,235 @@
             <div class="menu-item">
                 <span class="menu-title">Математика</span>
                 <div class="submenu">
-                    <a href="pages/math_4.html">4 класс</a>
-                    <a href="pages/math_5.html">5 класс</a>
+                    <a href="math_4.html">4 класс</a>
+                    <a href="math_5.html">5 класс</a>
                 </div>
             </div>
 
             <div class="menu-item">
                 <span class="menu-title">Физика</span>
                 <div class="submenu">
-                    <a href="pages/physics_7.html">7 класс</a>
-                    <a href="pages/physics_8.html">8 класс</a>
+                    <a href="physics_7.html">7 класс</a>
+                    <a href="physics_8.html">8 класс</a>
                 </div>
             </div>
 
             <div class="menu-item">
-                <span class="menu-title"><a href="pages/chemistry.html" style="text-decoration: none; color: var(--color-light);">Химия</a></span>
+                <span class="menu-title"><a href="chemistry.html" style="text-decoration: none; color: var(--color-light);">Химия</a></span>
             </div>
 
             <div class="menu-item">
-                <span class="menu-title"><a href="pages/astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
+                <span class="menu-title"><a href="astronomy.html" style="text-decoration: none; color: var(--color-light);">Астрономия</a></span>
             </div>
 
             <div class="menu-item">
-                <span class="menu-title"><a href="pages/quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
+                <span class="menu-title"><a href="quantum_physics.html" style="text-decoration: none; color: var(--color-light);">Квантовая физика</a></span>
             </div>
 
             <div class="menu-item">
-                <span class="menu-title"><a href="pages/informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
+                <span class="menu-title"><a href="informatics.html" style="text-decoration: none; color: var(--color-light);">Информатика</a></span>
             </div>
 
             <div class="menu-item">
-                <span class="menu-title"><a href="pages/teacher_materials.html" style="text-decoration: none; color: var(--color-light);">Материалы для учителей</a></span>
+                <span class="menu-title"><a href="teacher_materials.html" style="text-decoration: none; color: var(--color-light);">Материалы для учителей</a></span>
             </div>
             
-            <a href="profile.html" class="menu-profile-btn">Профиль</a>
+            <a href="../profile.html" class="menu-profile-btn">Профиль</a>
         </div>
     </div>
 
-    <div class="welcome-container">
-        <div class="welcome-card">
-        <h1 class="welcome-title">Рады тебя видеть, юный первооткрыватель!</h1>
-        <p class="welcome-text">Удачи тебе в обучении!</p>
-        </div>
 
-        <div class="gretting-case">
-            Приветствую тебя, ученик, студент, учитель или просто любознательный человек! 
-            Меня зовут Семён и это мой личный сатй на котором я собираю всё, чем интересуюсь, все возможные интересные ресурсы, задания и тому подобное.
-            Тут я стараюсь объяснять всё, что смог постичь, простым языком, чтобы даже одну из сложнейших наук, квантовую физику, мог понять и первоклашка. 
-        </div>
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">📚</div>
+    Простая идея
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">О нас</a></li>
+    <li><a href="#categories">Направления</a></li>
+    <li><a href="#how">Как учиться</a></li>
+    <li><a href="#articles">Статьи</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section style="padding:0" class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">✦ Образовательная платформа</div>
+    <h1>Учись новому —<br>расти <em>каждый день</em></h1>
+    <p>???</p>
+    <div class="hero-actions">
+      <a href="#categories" class="btn">Перейти к направлениям</a>
     </div>
+    <div class="hero-stats">
+      <div><div class="stat-val">150+</div><div class="stat-lbl">Материалов</div></div>
+      <div><div class="stat-val">12</div><div class="stat-lbl">Направлений</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <!-- Unsplash: group of students studying together -->
+    <img class="hero-img-main"
+      src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&auto=format&fit=crop&q=80"
+      alt="Студенты учатся вместе" />
+  </div>
+</section>
 
-    <script>
+<!-- CATEGORIES -->
+<section class="categories" id="categories">
+  <div class="section-head reveal">
+    <h2>Что мы предлагаем</h2>
+    <p>Выбери направление и найди материалы именно для тебя</p>
+  </div>
+  <div class="cat-grid">
+    <a href="pages/informatics.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">💻</div><h3>Информатика</h3><span>1 материалов</span></div></a>
+    <a href="pages/physics.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🚀</div><h3>Физика</h3><span>24 материала</span></div></a>
+    <a href="pages/chemistry.html" style="text-decoration:none;"><div class="cat-card reveal d3"><div class="cat-emoji">⚗️</div><h3>Химия</h3><span>21 материал</span></div></a>
+    <a href="pages/math_4.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">🧠</div><h3>Математика</h3><span>17 материалов</span></div></a>
+    <a href="pages/biology.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🌿</div><h3>Биология</h3><span>14 материалов</span></div></a>
+    <a href="pages/quantum_physics.html" style="text-decoration:none;"><div class="cat-card reveal d3"><div class="cat-emoji">⚛️</div><h3>Квантовая физика</h3><span>12 материалов</span></div></a>
+    <a href="pages/english_4.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">✍️</div><h3>Английский</h3><span>19 материалов</span></div></a>
+    <a href="pages/astronomy.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🌌</div><h3>Астрономия</h3><span>22 материала</span></div></a>
+  </div>
+</section>
 
-    </script>
+<!-- COURSES -->
+<section id="courses">
+  <div class="section-head row">
+    <div class="reveal">
+        <h2>Это тебя заинтересует!</h2>
+        <p>Мы подготовили большое количество разных интерактивных инструментов, чтобы вам было интереснее познавать мир!</p>
+    </div>
+    <a href="pages/all_tools.html" class="btn reveal">Все наши плюшки</a>
+  </div>
+  <div class="course-grid">
+    <a href="pages/astronomy/solar_system_3D_model.html" style="text-decoration:none;"><div class="course-card reveal d1">
+      <img class="course-img"
+        src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80"
+        alt="UX-дизайн" />
+      <div class="course-body">
+        <span class="tag">Астрономия</span>
+        <h3>Симуляция солнечной системы</h3>
+      </div>
+    </div></a>
+    <a href="#" style="text-decoration:none;"><div class="course-card reveal d2">
+      <img class="course-img"
+        src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80"
+        alt="Python курс" />
+      <div class="course-body">
+        <span class="tag">Физика</span>
+        <h3>Изучаем атом изнутри - Симуляция любого атома!</h3>
+      </div>
+    </div></a>
+    <a href="#" style="text-decoration:none;"><div class="course-card reveal d3">
+      <img class="course-img"
+        src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80"
+        alt="Продуктивность" />
+      <div class="course-body">
+        <span class="tag">Химия</span>
+        <h3>Интерактивная таблица Менделеева</h3>
+      </div>
+    </div></a>
+    <a href="#" style="text-decoration:none;"><div class="course-card reveal d3">
+      <img class="course-img"
+        src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80"
+        alt="Продуктивность" />
+      <div class="course-body">
+        <span class="tag">Квантовая физика</span>
+        <h3>Волновая функция своими руками!</h3>
+      </div>
+    </div></a>
+  </div>
+</section>
 
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="how-img-wrap reveal">
+      <!-- Unsplash: focused student -->
+      <img class="how-img"
+        src="https://images.unsplash.com/photo-1529390079861-591de354faf5?w=700&auto=format&fit=crop&q=80"
+        alt="Студент за учёбой" />
+    </div>
+    <div>
+      <div class="section-head reveal" style="margin-bottom:2rem;">
+        <h2>Кто мы?</h2>
+        <p>Мы собрали всё в одном месте — учись в своём темпе, без спешки</p>
+      </div>
+      <div class="how-steps">
+        <div class="step reveal d1">
+          <div class="step-num">1</div>
+          <div><h4>Выбери направление</h4><p>Определись с темой и найди подходящий курс или статью из нашей библиотеки материалов.</p></div>
+        </div>
+        <div class="step reveal d2">
+          <div class="step-num">2</div>
+          <div><h4>Изучи материалы</h4><p>Читай, смотри, практикуйся — всё структурировано и подаётся понятно, без лишней воды.</p></div>
+        </div>
+        <div class="step reveal d3">
+          <div class="step-num">3</div>
+          <div><h4>Закрепи и применяй</h4><p>Решай задачи, проходи тесты и применяй полученные знания в реальных ситуациях.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- TESTIMONIALS -->
+<!-- <section class="testi" id="reviews">
+  <div class="section-head reveal" style="text-align:center;">
+    <h2>Что говорят ученики</h2>
+    <p style="margin:.7rem auto 0; max-width:480px;">Реальные отзывы людей, которые уже учатся на платформе</p>
+  </div>
+  <div class="test-grid">
+    <div class="test-card reveal d1">
+      <div class="test-stars">★★★★★</div>
+      <q>Нашла здесь всё что искала по UX-дизайну. Материалы структурированы отлично, каждая статья ведёт к следующей логично.</q>
+      <div class="test-author">
+        <img class="test-avatar"
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&auto=format&fit=crop&q=80"
+          alt="Ольга" />
+        <div><div class="test-name">Ольга М.</div><div class="test-role">Начинающий дизайнер</div></div>
+      </div>
+    </div>
+    <div class="test-card reveal d2">
+      <div class="test-stars">★★★★★</div>
+      <q>Курс по Python помог мне разобраться в программировании за два месяца. Объяснения простые, примеры реальные.</q>
+      <div class="test-author">
+        <img class="test-avatar"
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&auto=format&fit=crop&q=80"
+          alt="Дмитрий" />
+        <div><div class="test-name">Дмитрий К.</div><div class="test-role">Студент, IT-специальность</div></div>
+      </div>
+    </div>
+    <div class="test-card reveal d3">
+      <div class="test-stars">★★★★☆</div>
+      <q>Библиотека статей просто огромная. Захожу каждое утро как на чашку кофе — что-то новое всегда найдётся.</q>
+      <div class="test-author">
+        <img class="test-avatar"
+          src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=96&auto=format&fit=crop&q=80"
+          alt="Алина" />
+        <div><div class="test-name">Алина Р.</div><div class="test-role">Маркетолог, фриланс</div></div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- CTA -->
+<section class="cta-strip">
+  <h2 class="reveal">Готов окунуться в мир науки?</h2>
+  <p class="reveal d1">Все собранные мною  материалы бесплатны. Зарегистрируйся — и начни уже прямо сейчас.</p>
+  <a href="#" class="btn reveal d2" style="font-size:1rem;padding:.85rem 2.2rem;">Пора учиться!</a>
+</section>
+
+<script>
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
 </body>
-
 </html>

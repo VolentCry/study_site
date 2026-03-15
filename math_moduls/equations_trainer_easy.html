@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр Уравнений - Математика в Minecraft</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body.trainer-page {
+            background-image: url('../assets/bg/multiplication_trainer_background_.jpg') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            min-height: 100vh !important;
+        }
+    </style>
+</head>
+<body class="trainer-page">
+    <a href="../pages/math_4.html" class="back-button">&#x2190;</a>
+    <h1 class="trainer-title">Тренажёр Уравнений</h1>
+
+    <div class="problem-container">
+        <span id="num1" class="number-display">?</span>
+        <span id="operator-display" class="operator-display"> &#x00D7; </span>
+        <span id="num2" class="number-display">?</span>
+        <span class="operator-display"> = </span>
+        <span id="result" class="number-display">?</span>
+    </div>
+
+    <!-- Поле ввода вынесено отдельно для ясности -->
+    <div class="problem-container" style="margin-top: 0; padding-top: 0;">
+        <span class="operator-display">x = </span>
+        <input type="number" id="trainer-answer-input" placeholder="Ответ" style="margin-top: 15px;">
+    </div>
+
+    <div class="trainer-controls">
+        <button id="trainer-check-button" class="minecraft-button-variant-two">Проверить</button>
+    </div>
+
+    <div id="trainer-feedback" class="feedback"></div>
+
+    <div class="decoration">
+        <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon">
+    </div>
+
+    <script>
+        // Типы уравнений:
+        // 1) x * b = c  → x = c / b
+        // 2) a * x = c  → x = c / a
+        // 3) x + b = c  → x = c - b
+        // 4) a + x = c  → x = c - a
+        // 5) x - b = c  → x = c + b
+        // 6) a - x = c  → x = a - c
+
+        const OPERATORS = [
+            { symbol: '×', html: '&#x00D7;' },
+            { symbol: '+', html: '+' },
+            { symbol: '−', html: '&#x2212;' },
+        ];
+
+        let currentAnswer = null;
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateEquation() {
+            const opIndex = getRandomInt(0, 2);
+            const op = OPERATORS[opIndex];
+
+            let a, b, c, x, xPosition;
+
+            if (op.symbol === '×') {
+                // x × b = c  или  a × x = c
+                a = getRandomInt(2, 9);
+                b = getRandomInt(2, 9);
+                c = a * b;
+                xPosition = Math.random() < 0.5 ? 'left' : 'right';
+                x = xPosition === 'left' ? a : b;
+                return {
+                    left:  xPosition === 'left' ? 'x' : String(a),
+                    op:    op.html,
+                    right: xPosition === 'right' ? 'x' : String(b),
+                    result: String(c),
+                    answer: x
+                };
+            } else if (op.symbol === '+') {
+                // x + b = c  или  a + x = c
+                a = getRandomInt(1, 20);
+                b = getRandomInt(1, 20);
+                c = a + b;
+                xPosition = Math.random() < 0.5 ? 'left' : 'right';
+                x = xPosition === 'left' ? a : b;
+                return {
+                    left:  xPosition === 'left' ? 'x' : String(a),
+                    op:    op.html,
+                    right: xPosition === 'right' ? 'x' : String(b),
+                    result: String(c),
+                    answer: x
+                };
+            } else {
+                // Тип: a − x = c  (x = a − c)
+                // Или:  x − b = c  (x = c + b)
+                a = getRandomInt(5, 20);
+                b = getRandomInt(1, a - 1);
+                c = a - b;
+                xPosition = Math.random() < 0.5 ? 'left' : 'right';
+                if (xPosition === 'left') {
+                    // x − b = c, x = c + b = a
+                    return {
+                        left:  'x',
+                        op:    op.html,
+                        right: String(b),
+                        result: String(c),
+                        answer: a
+                    };
+                } else {
+                    // a − x = c, x = a − c = b
+                    return {
+                        left:  String(a),
+                        op:    op.html,
+                        right: 'x',
+                        result: String(c),
+                        answer: b
+                    };
+                }
+            }
+        }
+
+        function loadNewEquation() {
+            const eq = generateEquation();
+            currentAnswer = eq.answer;
+
+            document.getElementById('num1').innerHTML = eq.left;
+            document.getElementById('operator-display').innerHTML = ' ' + eq.op + ' ';
+            document.getElementById('num2').innerHTML = eq.right;
+            document.getElementById('result').innerHTML = eq.result;
+
+            document.getElementById('trainer-answer-input').value = '';
+            document.getElementById('trainer-feedback').textContent = '';
+            document.getElementById('trainer-feedback').className = 'feedback';
+            document.getElementById('trainer-answer-input').focus();
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('trainer-answer-input');
+            const feedback = document.getElementById('trainer-feedback');
+            const userAnswer = parseInt(input.value, 10);
+
+            if (isNaN(userAnswer)) {
+                feedback.textContent = 'Введи число!';
+                feedback.className = 'feedback feedback-wrong';
+                return;
+            }
+
+            if (userAnswer === currentAnswer) {
+                feedback.textContent = '✔ Правильно! Молодец!';
+                feedback.className = 'feedback feedback-correct';
+                setTimeout(loadNewEquation, 1200);
+            } else {
+                feedback.textContent = '✘ Неверно, попробуй ещё раз!';
+                feedback.className = 'feedback feedback-wrong';
+            }
+        }
+
+        document.getElementById('trainer-check-button').addEventListener('click', checkAnswer);
+        document.getElementById('trainer-answer-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        // Запуск
+        loadNewEquation();
+    </script>
+</body>
+</html>

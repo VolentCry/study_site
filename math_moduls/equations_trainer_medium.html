@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр Уравнений (Сложный) - Математика в Minecraft</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body.trainer-page {
+            background-image: url('../assets/bg/multiplication_trainer_background_.jpg') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            min-height: 100vh !important;
+        }
+    </style>
+</head>
+<body class="trainer-page">
+    <a href="../pages/math_4.html" class="back-button">&#x2190;</a>
+    <h1 class="trainer-title">Тренажёр Уравнений</h1>
+
+    <div class="problem-container">
+        <span id="equation-display" class="number-display" style="font-size: 2.2rem; letter-spacing: 0.05em;">?</span>
+    </div>
+
+    <div class="problem-container" style="margin-top: 0; padding-top: 0;">
+        <span class="operator-display" style="margin-top: 10px;">x = </span>
+        <input type="number" id="trainer-answer-input" placeholder="Ответ" step="any"  style="margin-top: 15px;">
+    </div>
+
+    <div class="trainer-controls">
+        <button id="trainer-check-button" class="minecraft-button-variant-two">Проверить</button>
+    </div>
+
+    <div id="trainer-feedback" class="feedback"></div>
+
+    <div class="decoration">
+        <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon">
+    </div>
+
+    <script>
+        /*
+            Типы уравнений (x всегда целое, от 1 до 15):
+
+            Лёгкие:
+              1)  ax = c              →  x = c/a
+              2)  x + b = c          →  x = c - b
+              3)  x - b = c          →  x = c + b
+              4)  a - x = c          →  x = a - c
+
+            Средние:
+              5)  ax + b = c         →  x = (c - b) / a
+              6)  ax - b = c         →  x = (c + b) / a
+              7)  a - bx = c         →  x = (a - c) / b
+
+            Сложные:
+              8)  ax + b = cx + d    →  x = (d - b) / (a - c)
+              9)  ax - b = cx + d    →  x = (d + b) / (a - c)
+             10)  a(x + b) = c       →  x = c/a - b
+             11)  a(x - b) = c       →  x = c/a + b
+        */
+
+        let currentAnswer = null;
+
+        function rnd(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Форматирует коэффициент перед x: "2x", "x" (если 1), "-x" (если -1)
+        function fmtCoef(a) {
+            if (a === 1)  return 'x';
+            if (a === -1) return '-x';
+            return a + 'x';
+        }
+
+        // Форматирует слагаемое: "+5", "-3", не показывает 0
+        function fmtTerm(b) {
+            if (b === 0) return '';
+            return b > 0 ? ' + ' + b : ' - ' + Math.abs(b);
+        }
+
+        const generators = [
+            // 1) ax = c
+            () => {
+                const x = rnd(1, 15);
+                const a = rnd(2, 9);
+                const c = a * x;
+                return { eq: `${fmtCoef(a)} = ${c}`, answer: x };
+            },
+            // 2) x + b = c
+            () => {
+                const x = rnd(1, 15);
+                const b = rnd(1, 15);
+                const c = x + b;
+                return { eq: `x${fmtTerm(b)} = ${c}`, answer: x };
+            },
+            // 3) x - b = c
+            () => {
+                const x = rnd(2, 15);
+                const b = rnd(1, x - 1);
+                const c = x - b;
+                return { eq: `x${fmtTerm(-b)} = ${c}`, answer: x };
+            },
+            // 4) a - x = c
+            () => {
+                const x = rnd(1, 14);
+                const c = rnd(1, 10);
+                const a = x + c;
+                return { eq: `${a} - x = ${c}`, answer: x };
+            },
+            // 5) ax + b = c
+            () => {
+                const x = rnd(1, 10);
+                const a = rnd(2, 9);
+                const b = rnd(1, 15);
+                const c = a * x + b;
+                return { eq: `${fmtCoef(a)}${fmtTerm(b)} = ${c}`, answer: x };
+            },
+            // 6) ax - b = c
+            () => {
+                const x = rnd(2, 10);
+                const a = rnd(2, 9);
+                const b = rnd(1, 15);
+                const c = a * x - b;
+                if (c <= 0) return generators[5](); // перегенерируем если c <= 0
+                return { eq: `${fmtCoef(a)}${fmtTerm(-b)} = ${c}`, answer: x };
+            },
+            // 7) a - bx = c
+            () => {
+                const x = rnd(1, 8);
+                const b = rnd(2, 6);
+                const c = rnd(1, 10);
+                const a = b * x + c;
+                return { eq: `${a} - ${fmtCoef(b)} = ${c}`, answer: x };
+            },
+            // 8) ax + b = cx + d
+            () => {
+                const x = rnd(1, 10);
+                const a = rnd(3, 9);
+                const c = rnd(1, a - 1); // a > c чтобы коэффициент при x был >0
+                const b = rnd(1, 10);
+                const d = (a - c) * x + b;
+                return { eq: `${fmtCoef(a)}${fmtTerm(b)} = ${fmtCoef(c)}${fmtTerm(d)}`, answer: x };
+            },
+            // 9) ax - b = cx + d
+            () => {
+                const x = rnd(1, 10);
+                const a = rnd(3, 9);
+                const c = rnd(1, a - 1);
+                const d = rnd(1, 10);
+                const b = (a - c) * x - d;
+                if (b <= 0) return generators[8]();
+                return { eq: `${fmtCoef(a)}${fmtTerm(-b)} = ${fmtCoef(c)}${fmtTerm(d)}`, answer: x };
+            },
+            // 10) a(x + b) = c
+            () => {
+                const x = rnd(1, 10);
+                const a = rnd(2, 6);
+                const b = rnd(1, 10);
+                const c = a * (x + b);
+                return { eq: `${a}(x + ${b}) = ${c}`, answer: x };
+            },
+            // 11) a(x - b) = c
+            () => {
+                const x = rnd(2, 12);
+                const a = rnd(2, 6);
+                const b = rnd(1, x - 1);
+                const c = a * (x - b);
+                return { eq: `${a}(x - ${b}) = ${c}`, answer: x };
+            },
+        ];
+
+        function loadNewEquation() {
+            // Случайный тип из всех
+            let result;
+            let attempts = 0;
+            do {
+                const gen = generators[rnd(0, generators.length - 1)];
+                result = gen();
+                attempts++;
+            } while ((!result || result.answer <= 0) && attempts < 20);
+
+            currentAnswer = result.answer;
+
+            document.getElementById('equation-display').textContent = result.eq;
+            document.getElementById('trainer-answer-input').value = '';
+            document.getElementById('trainer-feedback').textContent = '';
+            document.getElementById('trainer-feedback').className = 'feedback';
+            document.getElementById('trainer-answer-input').focus();
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('trainer-answer-input');
+            const feedback = document.getElementById('trainer-feedback');
+            const userAnswer = parseFloat(input.value);
+
+            if (isNaN(userAnswer)) {
+                feedback.textContent = 'Введи число!';
+                feedback.className = 'feedback feedback-wrong';
+                return;
+            }
+
+            if (userAnswer === currentAnswer) {
+                feedback.textContent = '✔ Правильно! Молодец!';
+                feedback.className = 'feedback feedback-correct';
+                setTimeout(loadNewEquation, 1200);
+            } else {
+                feedback.textContent = `✘ Неверно, попробуй ещё раз!`;
+                feedback.className = 'feedback feedback-wrong';
+            }
+        }
+
+        document.getElementById('trainer-check-button').addEventListener('click', checkAnswer);
+        document.getElementById('trainer-answer-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        loadNewEquation();
+    </script>
+</body>
+</html>

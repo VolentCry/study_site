@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Симулятор волновых функций</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void: #000000;
+      --deep: #050508;
+      --nebula: #0a0a14;
+      --glow: #c8a96e;
+      --glow-soft: rgba(200,169,110,0.15);
+      --glow-ring: rgba(200,169,110,0.6);
+      --text: #e8e0d0;
+      --text-dim: rgba(232,224,208,0.45);
+      --accent: #f0e4c8;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 56px;
+      background: rgba(5,5,8,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,169,110,0.1);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .back-link:hover { color: var(--glow); }
+    .back-link svg { width: 13px; }
+
+    .topbar-sep {
+      width: 1px;
+      height: 18px;
+      background: rgba(200,169,110,0.2);
+    }
+
+    .topbar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+
+    .topbar-tag {
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.6;
+    }
+
+    /* ─── LAYOUT ─── */
+    .app {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      grid-template-rows: 100vh;
+      padding-top: 56px;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .panel {
+      background: var(--deep);
+      border-right: 1px solid rgba(200,169,110,0.1);
+      padding: 2rem 1.8rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .panel::-webkit-scrollbar { width: 4px; }
+    .panel::-webkit-scrollbar-track { background: transparent; }
+    .panel::-webkit-scrollbar-thumb { background: rgba(200,169,110,0.15); border-radius: 2px; }
+
+    .panel-section { display: flex; flex-direction: column; gap: 1rem; }
+
+    .panel-label {
+      font-size: 0.52rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.7;
+    }
+
+    /* Quantum number selectors */
+    .qn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .qn-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .qn-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+
+    .qn-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--glow);
+      min-width: 24px;
+      text-align: right;
+    }
+
+    .qn-track {
+      position: relative;
+      height: 2px;
+      background: rgba(200,169,110,0.12);
+      border-radius: 1px;
+      cursor: pointer;
+    }
+
+    .qn-fill {
+      position: absolute;
+      top: 0; left: 0; height: 100%;
+      background: linear-gradient(90deg, rgba(200,169,110,0.4), var(--glow));
+      border-radius: 1px;
+      transition: width 0.2s ease;
+    }
+
+    .qn-thumb {
+      position: absolute;
+      top: 50%;
+      width: 10px; height: 10px;
+      background: var(--glow);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px rgba(200,169,110,0.5);
+      transition: left 0.2s ease;
+    }
+
+    .qn-ticks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .qn-tick {
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 2px 0;
+    }
+    .qn-tick:hover, .qn-tick.active { color: var(--glow); }
+
+    /* Divider */
+    .panel-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,169,110,0.15), transparent);
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5px;
+    }
+
+    .mode-btn {
+      padding: 0.7rem 0.5rem;
+      background: var(--nebula);
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .mode-btn:hover { color: var(--glow); border-color: rgba(200,169,110,0.2); }
+    .mode-btn.active {
+      background: rgba(200,169,110,0.08);
+      border-color: rgba(200,169,110,0.3);
+      color: var(--glow);
+    }
+
+    /* Info card */
+    .info-card {
+      background: var(--nebula);
+      border: 1px solid rgba(200,169,110,0.1);
+      border-left: 2px solid rgba(200,169,110,0.4);
+      padding: 1.2rem 1.2rem;
+    }
+
+    .info-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .info-card-body {
+      font-size: 0.72rem;
+      line-height: 1.75;
+      color: var(--text-dim);
+      font-weight: 200;
+    }
+
+    .info-card-formula {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--glow);
+      opacity: 0.8;
+      margin-top: 0.6rem;
+    }
+
+    /* Controls */
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ctrl-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+    }
+
+    .ctrl-toggle {
+      position: relative;
+      width: 32px; height: 16px;
+      cursor: pointer;
+    }
+
+    .ctrl-toggle input { display: none; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(200,169,110,0.1);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 10px; height: 10px;
+      background: var(--text-dim);
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .ctrl-toggle input:checked + .toggle-track { background: rgba(200,169,110,0.2); border-color: var(--glow); }
+    .ctrl-toggle input:checked ~ .toggle-thumb, 
+    .ctrl-toggle input:checked + .toggle-track + .toggle-thumb { left: 18px; background: var(--glow); }
+
+    /* Speed control */
+    input[type=range] {
+      /* -webkit-appearance: none; */
+      width: 80px;
+      height: 2px;
+      background: rgba(200,169,110,0.15);
+      outline: none;
+      border-radius: 1px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px;
+      background: var(--glow);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(200,169,110,0.4);
+    }
+
+    /* ─── VIEWPORT ─── */
+    .viewport {
+      position: relative;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #simCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Overlay labels */
+    .viewport-label {
+      position: absolute;
+      top: 1.5rem; right: 1.8rem;
+      text-align: right;
+    }
+
+    .vl-orbital {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 2rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 30px rgba(200,169,110,0.4);
+      line-height: 1;
+    }
+
+    .vl-sub {
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 0.3rem;
+    }
+
+    /* Axes overlay */
+    .axes-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.48rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      opacity: 0.5;
+    }
+
+    /* ─── PROBABILITY CROSS-SECTION (bottom strip) ─── */
+    .cross-section {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 90px;
+      border-top: 1px solid rgba(200,169,110,0.08);
+    }
+
+    .cs-label {
+      position: absolute;
+      top: 8px; left: 16px;
+      font-size: 0.48rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--glow);
+      opacity: 0.5;
+    }
+
+    #csCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ─── TOOLTIP ─── */
+    .tooltip {
+      position: absolute;
+      padding: 0.5rem 0.8rem;
+      background: rgba(5,5,8,0.9);
+      border: 1px solid rgba(200,169,110,0.2);
+      font-size: 0.6rem;
+      color: var(--glow);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; grid-template-rows: auto 60vh; }
+      .panel { padding: 1.2rem; gap: 1.2rem; max-height: 40vh; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="wave_function.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Волновая функция
+    </a>
+    <div class="topbar-sep"></div>
+    <div class="topbar-title">Симулятор орбиталей</div>
+  </div>
+  <div class="topbar-tag">Квантовая физика · Интерактив</div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- CONTROL PANEL -->
+  <div class="panel">
+
+    <!-- Quantum numbers -->
+    <div class="panel-section">
+      <div class="panel-label">Квантовые числа</div>
+
+      <!-- n -->
+      <div class="qn-row">
+        <div class="qn-label">
+          <span class="qn-name">Главное <em style="font-style:italic;color:var(--glow);">n</em></span>
+          <span class="qn-val" id="n-val">1</span>
+        </div>
+        <div class="qn-track" id="n-track">
+          <div class="qn-fill" id="n-fill" style="width:0%"></div>
+          <div class="qn-thumb" id="n-thumb" style="left:0%"></div>
+        </div>
+        <div class="qn-ticks" id="n-ticks"></div>
+      </div>
+
+      <!-- l -->
+      <div class="qn-row">
+        <div class="qn-label">
+          <span class="qn-name">Орбитальное <em style="font-style:italic;color:var(--glow);">ℓ</em></span>
+          <span class="qn-val" id="l-val">0</span>
+        </div>
+        <div class="qn-track" id="l-track">
+          <div class="qn-fill" id="l-fill" style="width:0%"></div>
+          <div class="qn-thumb" id="l-thumb" style="left:0%"></div>
+        </div>
+        <div class="qn-ticks" id="l-ticks"></div>
+      </div>
+
+      <!-- m -->
+      <div class="qn-row">
+        <div class="qn-label">
+          <span class="qn-name">Магнитное <em style="font-style:italic;color:var(--glow);">m</em></span>
+          <span class="qn-val" id="m-val">0</span>
+        </div>
+        <div class="qn-track" id="m-track">
+          <div class="qn-fill" id="m-fill" style="width:50%"></div>
+          <div class="qn-thumb" id="m-thumb" style="left:50%"></div>
+        </div>
+        <div class="qn-ticks" id="m-ticks"></div>
+      </div>
+    </div>
+
+    <div class="panel-divider"></div>
+
+    <!-- Orbital info -->
+    <div class="panel-section">
+      <div class="panel-label">Состояние</div>
+      <div class="info-card" id="orbital-info">
+        <div class="info-card-title" id="info-title">1s — Основное состояние</div>
+        <div class="info-card-body" id="info-body">
+          Сферически симметричная орбиталь. Электрон с наибольшей вероятностью находится вблизи ядра. Это основное состояние атома водорода.
+        </div>
+        <div class="info-card-formula" id="info-formula">ψ<sub>100</sub> ~ e<sup>−r/a₀</sup></div>
+      </div>
+    </div>
+
+    <div class="panel-divider"></div>
+
+    <!-- View mode -->
+    <div class="panel-section">
+      <div class="panel-label">Режим отображения</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-cloud" onclick="setMode('cloud')">Облако</button>
+        <button class="mode-btn" id="mode-surface" onclick="setMode('surface')">Сечение</button>
+        <button class="mode-btn" id="mode-radial" onclick="setMode('radial')">Радиальный</button>
+        <button class="mode-btn" id="mode-phase" onclick="setMode('phase')">Фаза</button>
+      </div>
+    </div>
+
+    <div class="panel-divider"></div>
+
+    <!-- Extra controls -->
+    <div class="panel-section">
+      <div class="panel-label">Параметры</div>
+
+      <div class="ctrl-row">
+        <span class="ctrl-label">Вращение</span>
+        <label class="ctrl-toggle">
+          <input type="checkbox" id="toggle-rotate" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+
+      <div class="ctrl-row">
+        <span class="ctrl-label">Оси координат</span>
+        <label class="ctrl-toggle">
+          <input type="checkbox" id="toggle-axes" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+
+      <div class="ctrl-row">
+        <span class="ctrl-label">Скорость</span>
+        <input type="range" id="speed-range" min="0" max="100" value="40">
+      </div>
+
+      <div class="ctrl-row">
+        <span class="ctrl-label">Точек</span>
+        <input type="range" id="density-range" min="0" max="100" value="60">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VIEWPORT -->
+  <div class="viewport" id="viewport">
+    <canvas id="simCanvas"></canvas>
+
+    <!-- Cross-section strip -->
+    <div class="cross-section">
+      <div class="cs-label">Радиальная плотность вероятности P(r) = r² |ψ|²</div>
+      <canvas id="csCanvas"></canvas>
+    </div>
+
+    <!-- Orbital label -->
+    <div class="viewport-label">
+      <div class="vl-orbital" id="vp-orbital">1s</div>
+      <div class="vl-sub" id="vp-sub">n=1, ℓ=0, m=0</div>
+    </div>
+
+    <div class="axes-hint" id="axes-hint">Перетащите для вращения · Колёсико для масштаба</div>
+
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  QUANTUM STATE
+// ═══════════════════════════════════════════════
+const state = { n:1, l:0, m:0, mode:'cloud' };
+let rotX = 0.35, rotY = 0.6, zoom = 1.0;
+let dragging = false, lastMX = 0, lastMY = 0;
+let animFrame = 0;
+let points = [];
+let rotSpeed = 0.004;
+let pointCount = 1800;
+
+const ORBITAL_NAMES = ['s','p','d','f','g','h'];
+
+const ORBITAL_INFO = {
+  '100': { name:'1s — Основное состояние', body:'Сферически симметричная орбиталь. Наибольшая плотность вблизи ядра. Основное состояние атома водорода.', formula:'ψ ~ e<sup>−r/a₀</sup>' },
+  '200': { name:'2s — Первое возбуждённое', body:'Сферическая орбиталь с одним узловым сферическим слоем. Электрон вероятнее находится дальше от ядра, чем в 1s.', formula:'ψ ~ (2−r/a₀) e<sup>−r/2a₀</sup>' },
+  '210': { name:'2p₀ — Гантелеобразная', body:'Орбиталь с осевой симметрией вдоль оси z. Два лепестка с узловой плоскостью xy.', formula:'ψ ~ r·e<sup>−r/2a₀</sup>·cos θ' },
+  '211': { name:'2p±₁ — Вращение', body:'Орбиталь с ненулевой проекцией орбитального момента на ось z. Тороидальная форма плотности.', formula:'ψ ~ r·e<sup>−r/2a₀</sup>·sin θ·e<sup>±iφ</sup>' },
+  '300': { name:'3s — Сферическая', body:'Две узловые сферы. Три максимума радиальной плотности вероятности.', formula:'ψ ~ (27−18r+2r²) e<sup>−r/3a₀</sup>' },
+  '310': { name:'3p₀', body:'Орбиталь с двумя гантелями и одной узловой сферой. Более сложное пространственное распределение.', formula:'ψ ~ r(6−r)·e<sup>−r/3a₀</sup>·cos θ' },
+  '320': { name:'3d₀ — Двойная гантель', body:'Орбиталь в форме двух гантелей с тороидальным поясом. Нет s-характера, узловые конусы.', formula:'ψ ~ r²·e<sup>−r/3a₀</sup>·(3cos²θ−1)' },
+  '321': { name:'3d±₁', body:'d-орбиталь с четырьмя лепестками, ориентированными в пространстве под углом к оси z.', formula:'ψ ~ r²·e<sup>−r/3a₀</sup>·sin θ cos θ·e<sup>±iφ</sup>' },
+  '322': { name:'3d±₂', body:'d-орбиталь с четырьмя лепестками в плоскости xy. Узловые конусы совпадают с осью z.', formula:'ψ ~ r²·e<sup>−r/3a₀</sup>·sin²θ·e<sup>±2iφ</sup>' },
+};
+
+function getInfo(n,l,m) {
+  const key = `${n}${l}${Math.abs(m)}`;
+  return ORBITAL_INFO[key] || {
+    name: `${n}${ORBITAL_NAMES[l]}` + (m!==0?`${m>0?'+':''}${m}`:'') + ' — Орбиталь',
+    body: `Водородоподобная орбиталь с квантовыми числами n=${n}, ℓ=${l}, m=${m}. Сложная угловая зависимость.`,
+    formula: `ψ<sub>${n}${l}${m}</sub>`
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  MATH — Hydrogen-like wavefunctions
+// ═══════════════════════════════════════════════
+function factorial(n) {
+  if(n<=1) return 1;
+  let r=1; for(let i=2;i<=n;i++) r*=i; return r;
+}
+
+function assocLaguerre(n,k,x) {
+  // L^k_n(x) via recurrence
+  if(n===0) return 1;
+  if(n===1) return 1+k-x;
+  let L0=1, L1=1+k-x, L2=0;
+  for(let i=2;i<=n;i++){
+    L2=((2*i-1+k-x)*L1-(i-1+k)*L0)/i;
+    L0=L1; L1=L2;
+  }
+  return L2;
+}
+
+function assocLegendre(l,m_abs,x) {
+  // P^m_l(x) for x=cos(theta)
+  let pmm=1;
+  if(m_abs>0){
+    let fact=1, sqf=Math.sqrt(1-x*x);
+    for(let i=1;i<=m_abs;i++){ fact*=(1-2*i); pmm*=fact*sqf; pmm=Math.abs(pmm); }
+    // sign correction
+    if(m_abs%2===1) pmm=-pmm;
+  }
+  if(l===m_abs) return pmm;
+  let pmm1=(2*m_abs+1)*x*pmm, pll=0;
+  if(l===m_abs+1) return pmm1;
+  for(let ll=m_abs+2;ll<=l;ll++){
+    pll=((2*ll-1)*x*pmm1-(ll+m_abs-1)*pmm)/(ll-m_abs);
+    pmm=pmm1; pmm1=pll;
+  }
+  return pll;
+}
+
+function radialWF(n,l,r) {
+  // Unnormalized radial part for hydrogen (a0=1)
+  const rho = 2*r/n;
+  const L = assocLaguerre(n-l-1, 2*l+1, rho);
+  return Math.exp(-rho/2) * Math.pow(rho, l) * L;
+}
+
+function angularWF(l, m_abs, theta, phi, realPart) {
+  const P = assocLegendre(l, m_abs, Math.cos(theta));
+  if(m_abs===0) return P;
+  if(realPart) return P * Math.cos(m_abs * phi) * Math.SQRT2;
+  return P * Math.sin(m_abs * phi) * Math.SQRT2;
+}
+
+function psi2(n, l, m, r, theta, phi) {
+  const R = radialWF(n, l, r);
+  const m_abs = Math.abs(m);
+  const Y_re = angularWF(l, m_abs, theta, phi, true);
+  const Y_im = m!==0 ? angularWF(l, m_abs, theta, phi, false) : 0;
+  return R*R * (Y_re*Y_re + Y_im*Y_im);
+}
+
+function psiPhase(n, l, m, r, theta, phi) {
+  const R = radialWF(n, l, r);
+  const m_abs = Math.abs(m);
+  const Y_re = angularWF(l, m_abs, theta, phi, true);
+  const Y_im = m!==0 ? angularWF(l, m_abs, theta, phi, false) : 0;
+  const amp = Math.sqrt(R*R*(Y_re*Y_re + Y_im*Y_im));
+  const phase = Math.atan2(Y_im*R, Y_re*R);
+  return { amp, phase };
+}
+
+// ═══════════════════════════════════════════════
+//  POINT CLOUD GENERATION (Monte Carlo sampling)
+// ═══════════════════════════════════════════════
+function generatePoints() {
+  const {n,l,m} = state;
+  const scale = n * n * 2.5;  // scale by Bohr radius
+  points = [];
+
+  // Normalise: find rough max for rejection sampling
+  let maxP = 0;
+  for(let i=0;i<400;i++){
+    const r = Math.random()*scale*1.5;
+    const theta = Math.acos(2*Math.random()-1);
+    const phi   = Math.random()*2*Math.PI;
+    const p = psi2(n,l,m,r,theta,phi)*r*r;
+    if(p>maxP) maxP=p;
+  }
+  if(maxP===0) maxP=1;
+
+  let attempts=0;
+  while(points.length < pointCount && attempts < pointCount*80) {
+    attempts++;
+    const r     = Math.random()*scale*1.6;
+    const theta = Math.acos(2*Math.random()-1);
+    const phi   = Math.random()*2*Math.PI;
+    const p     = psi2(n,l,m,r,theta,phi)*r*r;
+    if(Math.random() < p/maxP*0.98) {
+      const sinT = Math.sin(theta);
+      const x = r*sinT*Math.cos(phi);
+      const y = r*sinT*Math.sin(phi);
+      const z = r*Math.cos(theta);
+      const intensity = Math.min(1, p/maxP);
+      const {phase} = psiPhase(n,l,m,r,theta,phi);
+      points.push({x,y,z,r,intensity,phase});
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  3D PROJECTION
+// ═══════════════════════════════════════════════
+function project3D(x,y,z, cx,cy, scale) {
+  // rotate Y
+  const cosY=Math.cos(rotY), sinY=Math.sin(rotY);
+  const x1 = x*cosY - z*sinY;
+  const z1 = x*sinY + z*cosY;
+  // rotate X
+  const cosX=Math.cos(rotX), sinX=Math.sin(rotX);
+  const y2 = y*cosX - z1*sinX;
+  const z2 = y*sinX + z1*cosX;
+  // perspective
+  const fov = 600;
+  const depth = fov / (fov + z2*scale*0.15);
+  return {
+    sx: cx + x1*scale*zoom*depth,
+    sy: cy + y2*scale*zoom*depth,
+    depth: z2
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  CANVAS SETUP
+// ═══════════════════════════════════════════════
+const canvas  = document.getElementById('simCanvas');
+const ctx     = canvas.getContext('2d');
+const csCanvas = document.getElementById('csCanvas');
+const csCtx   = csCanvas.getContext('2d');
+const vp      = document.getElementById('viewport');
+
+function resize() {
+  const rect = vp.getBoundingClientRect();
+  canvas.width  = rect.width  * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+  canvas.style.width  = rect.width+'px';
+  canvas.style.height = rect.height+'px';
+
+  const csRect = document.querySelector('.cross-section').getBoundingClientRect();
+  csCanvas.width  = csRect.width  * devicePixelRatio;
+  csCanvas.height = csRect.height * devicePixelRatio;
+  csCanvas.style.width  = csRect.width+'px';
+  csCanvas.style.height = csRect.height+'px';
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ═══════════════════════════════════════════════
+//  RENDERING MODES
+// ═══════════════════════════════════════════════
+function hslToRgb(h,s,l) {
+  s/=100; l/=100;
+  const k=n=>{ const x=(n+h/30)%12; return l-s*Math.min(l,1-l)*Math.max(-1,Math.min(k-3,9-k,1)); };
+  return [Math.round(k(0)*255),Math.round(k(8)*255),Math.round(k(4)*255)];
+}
+
+function phaseToColor(phase, alpha) {
+  // map phase −π..π to hue 0..360
+  const h = ((phase+Math.PI)/(2*Math.PI)*360)|0;
+  const [r,g,b] = hslToRgb(h,70,60);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function drawCloud(W, H, cx, cy, scale) {
+  const sorted = [...points].sort((a,b)=>b.depth-a.depth);
+  for(const p of sorted){
+    const {sx,sy} = project3D(p.x,p.y,p.z,cx,cy,scale);
+    const alpha = p.intensity * 0.55;
+    const r = Math.max(1, 1.8*p.intensity);
+    ctx.beginPath();
+    ctx.arc(sx,sy,r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(200,169,110,${alpha})`;
+    ctx.fill();
+  }
+}
+
+function drawPhase(W, H, cx, cy, scale) {
+  const sorted = [...points].sort((a,b)=>b.depth-a.depth);
+  for(const p of sorted){
+    const {sx,sy} = project3D(p.x,p.y,p.z,cx,cy,scale);
+    const alpha = p.intensity * 0.6;
+    const r = Math.max(1, 2*p.intensity);
+    ctx.beginPath();
+    ctx.arc(sx,sy,r,0,Math.PI*2);
+    ctx.fillStyle = phaseToColor(p.phase, alpha);
+    ctx.fill();
+  }
+}
+
+function drawSection(W, H, cx, cy, scale) {
+  // 2D cross-section in XZ plane
+  const {n,l,m} = state;
+  const gridN = 160;
+  const range = n*n*2.8;
+  const step  = W/gridN*devicePixelRatio;
+
+  for(let ix=0;ix<gridN;ix++){
+    for(let iy=0;iy<gridN;iy++){
+      const x = (ix/gridN*2-1)*range;
+      const z = (iy/gridN*2-1)*range;
+      const r = Math.sqrt(x*x+z*z);
+      if(r<0.01) continue;
+      const theta = Math.acos(z/r);
+      const phi   = Math.atan2(0, x);
+      const p     = psi2(n,l,m,r,theta,phi);
+      const normP = Math.min(1, p * n*n*n*n * 4);
+
+      const px = ix/gridN * W;
+      const py = iy/gridN * H;
+      const a  = normP * 0.85;
+      ctx.fillStyle = `rgba(200,169,110,${a})`;
+      ctx.fillRect(px,py,step+1,step+1);
+    }
+  }
+}
+
+function drawRadial(W, H, cx, cy, scale) {
+  // Show angular probability cloud but color by radial distance
+  const {n} = state;
+  const sorted = [...points].sort((a,b)=>b.depth-a.depth);
+  const maxR = n*n*2.5;
+  for(const p of sorted){
+    const {sx,sy} = project3D(p.x,p.y,p.z,cx,cy,scale);
+    const t = Math.min(1, p.r/maxR);
+    // cold blue → warm gold gradient by radius
+    const R = Math.round(50  + t*150);
+    const G = Math.round(80  + t*89);
+    const B = Math.round(180 - t*70);
+    const alpha = p.intensity * 0.6;
+    const r = Math.max(1, 1.8*p.intensity);
+    ctx.beginPath();
+    ctx.arc(sx,sy,r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${R},${G},${B},${alpha})`;
+    ctx.fill();
+  }
+}
+
+function drawAxes(W, H, cx, cy, scale) {
+  if(!document.getElementById('toggle-axes').checked) return;
+  const axLen = 40 * zoom;
+  const axes = [[axLen,0,0,'x'],[0,axLen,0,'y'],[0,0,axLen,'z']];
+  const colors = ['rgba(200,80,80,0.5)','rgba(80,200,80,0.5)','rgba(80,120,200,0.5)'];
+  axes.forEach(([ax,ay,az,lbl],i)=>{
+    const {sx:ex, sy:ey} = project3D(ax,ay,az,cx,cy,scale);
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(ex,ey);
+    ctx.strokeStyle=colors[i];
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle=colors[i];
+    ctx.font=`${11*devicePixelRatio}px Jost`;
+    ctx.fillText(lbl, ex+4, ey+4);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  CROSS SECTION STRIP — Radial distribution
+// ═══════════════════════════════════════════════
+function drawCrossSection() {
+  const W  = csCanvas.width, H = csCanvas.height;
+  const dpr = devicePixelRatio;
+  csCtx.clearRect(0,0,W,H);
+
+  const {n,l,m} = state;
+  const maxR  = n*n*4.5;
+  const steps = 300;
+  const base  = H - 18*dpr;
+  const top   = 28*dpr;
+  const plotH = base - top;
+  const plotW = W - 30*dpr;
+
+  // Compute radial distribution P(r) = r² |R(r)|²
+  let vals = [];
+  let maxV = 0;
+  for(let i=0;i<=steps;i++){
+    const r = (i/steps)*maxR;
+    const R = radialWF(n,l,r);
+    const v = r*r*R*R;
+    vals.push(v);
+    if(v>maxV) maxV=v;
+  }
+
+  // Gradient fill
+  const grad = csCtx.createLinearGradient(0, top, 0, base);
+  grad.addColorStop(0, 'rgba(200,169,110,0.3)');
+  grad.addColorStop(1, 'rgba(200,169,110,0.0)');
+
+  csCtx.beginPath();
+  for(let i=0;i<=steps;i++){
+    const x = 15*dpr + (i/steps)*plotW;
+    const y = base - (vals[i]/maxV)*plotH*0.88;
+    i===0 ? csCtx.moveTo(x,y) : csCtx.lineTo(x,y);
+  }
+  csCtx.strokeStyle='rgba(200,169,110,0.65)';
+  csCtx.lineWidth=1.5;
+  csCtx.stroke();
+  csCtx.lineTo(15*dpr+plotW, base);
+  csCtx.lineTo(15*dpr, base);
+  csCtx.closePath();
+  csCtx.fillStyle=grad;
+  csCtx.fill();
+
+  // Baseline
+  csCtx.beginPath();
+  csCtx.strokeStyle='rgba(200,169,110,0.1)';
+  csCtx.lineWidth=1;
+  csCtx.moveTo(15*dpr,base); csCtx.lineTo(15*dpr+plotW,base);
+  csCtx.stroke();
+
+  // Bohr radius labels
+  for(let k=1;k<=n;k++){
+    const rBohr = k*k; // in units of a0*n
+    const x = 15*dpr + (rBohr/maxR)*plotW;
+    if(x>15*dpr && x<15*dpr+plotW){
+      csCtx.beginPath();
+      csCtx.strokeStyle='rgba(200,169,110,0.15)';
+      csCtx.setLineDash([3,5]);
+      csCtx.moveTo(x,top); csCtx.lineTo(x,base);
+      csCtx.stroke();
+      csCtx.setLineDash([]);
+      csCtx.font=`${8.5*dpr}px Jost`;
+      csCtx.fillStyle='rgba(200,169,110,0.35)';
+      csCtx.fillText(`a${k}`, x+2, base-4*dpr);
+    }
+  }
+
+  // X label
+  csCtx.font=`${8*dpr}px Jost`;
+  csCtx.fillStyle='rgba(200,169,110,0.3)';
+  csCtx.fillText('r / a₀', 15*dpr+plotW-20*dpr, base-3*dpr);
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN DRAW
+// ═══════════════════════════════════════════════
+function draw() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Subtle background radial
+  const grad = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.5);
+  grad.addColorStop(0,'rgba(10,10,20,0.4)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,W,H);
+
+  const cx = W/2, cy = (H - 90*devicePixelRatio)/2;
+  const scale = Math.min(W,H) * 0.012 / state.n;
+
+  if(state.mode==='surface'){
+    drawSection(W, H-90*devicePixelRatio, cx, cy, scale);
+  } else if(state.mode==='phase'){
+    drawPhase(W, H, cx, cy, scale);
+    drawAxes(W,H,cx,cy,scale);
+  } else if(state.mode==='radial'){
+    drawRadial(W,H,cx,cy,scale);
+    drawAxes(W,H,cx,cy,scale);
+  } else {
+    drawCloud(W,H,cx,cy,scale);
+    drawAxes(W,H,cx,cy,scale);
+  }
+
+  drawCrossSection();
+}
+
+// ═══════════════════════════════════════════════
+//  ANIMATION LOOP
+// ═══════════════════════════════════════════════
+let lastTime = 0;
+function loop(ts) {
+  const dt = ts - lastTime; lastTime = ts;
+  if(document.getElementById('toggle-rotate').checked && state.mode!=='surface'){
+    const sp = document.getElementById('speed-range').value / 100;
+    rotY += sp * 0.018;
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ═══════════════════════════════════════════════
+//  QUANTUM NUMBER UI
+// ═══════════════════════════════════════════════
+function buildSlider(id, min, max, val, onChange) {
+  const track = document.getElementById(`${id}-track`);
+  const fill  = document.getElementById(`${id}-fill`);
+  const thumb = document.getElementById(`${id}-thumb`);
+  const valEl = document.getElementById(`${id}-val`);
+  const ticks = document.getElementById(`${id}-ticks`);
+
+  function render(v) {
+    const pct = max===min ? 0 : (v-min)/(max-min)*100;
+    fill.style.width  = pct+'%';
+    thumb.style.left  = pct+'%';
+    valEl.textContent = v;
+    ticks.querySelectorAll('.qn-tick').forEach(t=>{
+      t.classList.toggle('active', parseInt(t.dataset.v)===v);
+    });
+  }
+
+  function setVal(v) {
+    v = Math.max(min, Math.min(max, v));
+    render(v);
+    onChange(v);
+  }
+
+  function buildTicks() {
+    ticks.innerHTML='';
+    for(let v=min;v<=max;v++){
+      const t = document.createElement('span');
+      t.className='qn-tick';
+      t.dataset.v=v;
+      t.textContent=v;
+      t.addEventListener('click',()=>setVal(v));
+      ticks.appendChild(t);
+    }
+  }
+  buildTicks();
+  render(val);
+
+  // Drag on track
+  let dragging=false;
+  function getValFromX(e) {
+    const rect = track.getBoundingClientRect();
+    const x = (e.touches?e.touches[0].clientX:e.clientX) - rect.left;
+    const t = Math.max(0, Math.min(1, x/rect.width));
+    return Math.round(min + t*(max-min));
+  }
+  track.addEventListener('mousedown', e=>{ dragging=true; setVal(getValFromX(e)); });
+  window.addEventListener('mousemove', e=>{ if(dragging) setVal(getValFromX(e)); });
+  window.addEventListener('mouseup',  ()=>{ dragging=false; });
+  track.addEventListener('touchstart',e=>{ dragging=true; setVal(getValFromX(e)); },{passive:true});
+  window.addEventListener('touchmove', e=>{ if(dragging) setVal(getValFromX(e)); },{passive:true});
+  window.addEventListener('touchend', ()=>{ dragging=false; });
+
+  return { render, buildTicks, setVal };
+}
+
+// Sliders
+const nSlider = buildSlider('n', 1, 4, 1, v=>{
+  state.n = v;
+  // clamp l
+  if(state.l >= state.n){ state.l = state.n-1; lSlider.setVal(state.l); }
+  lSlider.buildTicks_n(state.n);
+  // clamp m
+  if(Math.abs(state.m) > state.l){ state.m=0; mSlider.setVal(0); }
+  mSlider.buildTicks_l(state.l);
+  refresh();
+});
+
+// l slider — dynamic range
+let lSliderEl = buildSlider('l', 0, 0, 0, v=>{
+  state.l = v;
+  if(Math.abs(state.m) > state.l){ state.m=0; mSlider.setVal(0); }
+  mSlider.buildTicks_l(v);
+  refresh();
+});
+
+function buildDynSlider(id, getMin, getMax, val, onChange) {
+  const track = document.getElementById(`${id}-track`);
+  const fill  = document.getElementById(`${id}-fill`);
+  const thumb = document.getElementById(`${id}-thumb`);
+  const valEl = document.getElementById(`${id}-val`);
+  const ticks = document.getElementById(`${id}-ticks`);
+
+  let curMin=getMin(), curMax=getMax(), curVal=val;
+
+  function render(v) {
+    const mn=getMin(), mx=getMax();
+    const pct = mx===mn ? 50 : (v-mn)/(mx-mn)*100;
+    fill.style.width  = Math.max(0,pct)+'%';
+    thumb.style.left  = Math.max(0,Math.min(100,pct))+'%';
+    valEl.textContent = v;
+    ticks.querySelectorAll('.qn-tick').forEach(t=>{
+      t.classList.toggle('active', parseInt(t.dataset.v)===v);
+    });
+  }
+
+  function setVal(v) {
+    v = Math.max(getMin(), Math.min(getMax(), v));
+    curVal=v; render(v); onChange(v);
+  }
+
+  function buildTicks() {
+    ticks.innerHTML='';
+    const mn=getMin(), mx=getMax();
+    for(let v=mn;v<=mx;v++){
+      const t=document.createElement('span');
+      t.className='qn-tick'; t.dataset.v=v;
+      t.textContent=v;
+      t.addEventListener('click',()=>setVal(v));
+      ticks.appendChild(t);
+    }
+    if(curVal<mn||curVal>mx) setVal(mn);
+    else render(curVal);
+  }
+
+  function getValFromX(e) {
+    const rect=track.getBoundingClientRect();
+    const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+    const tt=Math.max(0,Math.min(1,x/rect.width));
+    return Math.round(getMin()+tt*(getMax()-getMin()));
+  }
+  let dr=false;
+  track.addEventListener('mousedown',e=>{dr=true;setVal(getValFromX(e));});
+  window.addEventListener('mousemove',e=>{if(dr)setVal(getValFromX(e));});
+  window.addEventListener('mouseup',()=>{dr=false;});
+  track.addEventListener('touchstart',e=>{dr=true;setVal(getValFromX(e));},{passive:true});
+  window.addEventListener('touchmove',e=>{if(dr)setVal(getValFromX(e));},{passive:true});
+  window.addEventListener('touchend',()=>{dr=false;});
+
+  return { setVal, buildTicks };
+}
+
+const lSlider = buildDynSlider('l',
+  ()=>0, ()=>state.n-1, 0,
+  v=>{ state.l=v; if(Math.abs(state.m)>v){state.m=0;mSlider.setVal(0);} mSlider.buildTicks(); refresh(); }
+);
+lSlider.buildTicks_n = ()=>lSlider.buildTicks();
+
+const mSlider = buildDynSlider('m',
+  ()=>-state.l, ()=>state.l, 0,
+  v=>{ state.m=v; refresh(); }
+);
+mSlider.buildTicks_l = ()=>mSlider.buildTicks();
+
+// Initial build
+lSlider.buildTicks();
+mSlider.buildTicks();
+
+function refresh() {
+  const {n,l,m}=state;
+  const lbl = `${n}${ORBITAL_NAMES[l]}`;
+  document.getElementById('vp-orbital').textContent = lbl;
+  document.getElementById('vp-sub').textContent = `n=${n}, ℓ=${l}, m=${m}`;
+  const info = getInfo(n,l,m);
+  document.getElementById('info-title').textContent = info.name;
+  document.getElementById('info-body').textContent  = info.body;
+  document.getElementById('info-formula').innerHTML = info.formula;
+  // regen points
+  const density = document.getElementById('density-range').value;
+  pointCount = Math.round(500 + density/100*2500);
+  generatePoints();
+}
+
+document.getElementById('density-range').addEventListener('input', ()=>{ refresh(); });
+
+// n slider rebuild (special case)
+{
+  const track=document.getElementById('n-track');
+  const fill =document.getElementById('n-fill');
+  const thumb=document.getElementById('n-thumb');
+  const valEl=document.getElementById('n-val');
+  const ticks=document.getElementById('n-ticks');
+
+  function renderN(v){
+    const pct=(v-1)/3*100;
+    fill.style.width=pct+'%'; thumb.style.left=pct+'%';
+    valEl.textContent=v;
+    ticks.querySelectorAll('.qn-tick').forEach(t=>t.classList.toggle('active',parseInt(t.dataset.v)===v));
+  }
+  function setN(v){
+    v=Math.max(1,Math.min(4,v));
+    state.n=v; renderN(v);
+    if(state.l>=v){state.l=v-1;}
+    lSlider.buildTicks(); lSlider.setVal(state.l);
+    if(Math.abs(state.m)>state.l){state.m=0;} mSlider.buildTicks(); mSlider.setVal(state.m);
+    refresh();
+  }
+  // build ticks
+  ticks.innerHTML='';
+  for(let v=1;v<=4;v++){
+    const t=document.createElement('span'); t.className='qn-tick'; t.dataset.v=v; t.textContent=v;
+    t.addEventListener('click',()=>setN(v)); ticks.appendChild(t);
+  }
+  renderN(1);
+  function getPctX(e){
+    const rect=track.getBoundingClientRect();
+    const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+    return Math.round(1+(x/rect.width)*3);
+  }
+  let dr=false;
+  track.addEventListener('mousedown',e=>{dr=true;setN(getPctX(e));});
+  window.addEventListener('mousemove',e=>{if(dr)setN(getPctX(e));});
+  window.addEventListener('mouseup',()=>{dr=false;});
+}
+
+// ═══════════════════════════════════════════════
+//  MODE
+// ═══════════════════════════════════════════════
+function setMode(m) {
+  state.mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>{
+    b.classList.toggle('active', b.id===`mode-${m}`);
+  });
+  document.getElementById('toggle-rotate').disabled = (m==='surface');
+}
+
+// ═══════════════════════════════════════════════
+//  MOUSE DRAG TO ROTATE
+// ═══════════════════════════════════════════════
+const vp2 = document.getElementById('viewport');
+
+vp2.addEventListener('mousedown',e=>{
+  if(state.mode==='surface') return;
+  dragging=true; lastMX=e.clientX; lastMY=e.clientY;
+});
+window.addEventListener('mouseup',()=>{ dragging=false; });
+window.addEventListener('mousemove',e=>{
+  if(!dragging||state.mode==='surface') return;
+  rotY += (e.clientX-lastMX)*0.008;
+  rotX += (e.clientY-lastMY)*0.008;
+  lastMX=e.clientX; lastMY=e.clientY;
+});
+
+vp2.addEventListener('touchstart',e=>{
+  if(state.mode==='surface') return;
+  dragging=true;
+  lastMX=e.touches[0].clientX; lastMY=e.touches[0].clientY;
+},{passive:true});
+window.addEventListener('touchend',()=>{ dragging=false; });
+window.addEventListener('touchmove',e=>{
+  if(!dragging||state.mode==='surface') return;
+  rotY+=(e.touches[0].clientX-lastMX)*0.008;
+  rotX+=(e.touches[0].clientY-lastMY)*0.008;
+  lastMX=e.touches[0].clientX; lastMY=e.touches[0].clientY;
+},{passive:true});
+
+vp2.addEventListener('wheel',e=>{
+  zoom *= e.deltaY>0 ? 0.92 : 1.09;
+  zoom = Math.max(0.3, Math.min(3.5, zoom));
+  e.preventDefault();
+},{passive:false});
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+generatePoints();
+</script>
+</body>
+</html>

@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Типы частиц</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050510;
+    --card-bg: rgba(240,240,255,0.06);
+    --card-hover: rgba(240,240,255,0.12);
+    --text: #e8eaf6;
+    --text-dim: #9fa8da;
+
+    /* gradient pairs per group */
+    --g1-a: #2E1065; --g1-b: #A78BFA;
+    --g2-a: #064E3B; --g2-b: #6EE7B7;
+    --g3-a: #78350F; --g3-b: #FCD34D;
+    --g4-a: #1E3A8A; --g4-b: #93C5FD;
+    --g5-a: #4C0519; --g5-b: #FDA4AF;
+    --g6-a: #1A2E05; --g6-b: #BEF264;
+    --g7-a: #450A0A; --g7-b: #F97316;
+    --g8-a: #1E1B4B; --g8-b: #F472B6;
+    --g9-a: #0C4A6E; --g9-b: #7DD3FC;
+    --g10-a:#1E1B4B; --g10-b:#C084FC;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    cursor: grab;
+    user-select: none;
+  }
+
+  body.dragging { cursor: grabbing; }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(2.5px 2.5px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 90% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 20% 90%, rgba(167,139,250,0.3) 0%, transparent 100%),
+      radial-gradient(2px 2px at 80% 15%, rgba(110,231,183,0.3) 0%, transparent 100%),
+      radial-gradient(3px 3px at 45% 55%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(5px 5px at 65% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2.5px 2.5px at 55% 75%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 65%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(3px 3px at 25% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(2.5px 2.5px at 75% 50%, rgba(255,255,255,0.3) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* SVG canvas for edges */
+  #edges-svg {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  /* Canvas container (pannable) */
+  #canvas {
+    position: absolute;
+    transform-origin: 0 0;
+    z-index: 2;
+  }
+
+  /* ---- CARDS ---- */
+  /* .node is the gradient-background wrapper (acts as border) */
+  .node {
+    position: absolute;
+    border-radius: 12px;
+    padding: 6.5px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: stretch;
+    z-index: 2;
+    background: linear-gradient(180deg, #334155, #94a3b8);
+  }
+
+  /* White inner layer */
+  .node-inner {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px 10px;
+    color: #240d35;
+    border-radius: 9px;
+    background: #d3d5dc94;
+  }
+
+  .node:hover {
+    transform: translateY(-6px) scale(1.04);
+    z-index: 10;
+  }
+
+  /* Group gradient backgrounds (visible as the border) */
+  .node.g1  { background: linear-gradient(135deg, var(--g1-a),  var(--g1-b)); }
+  .node.g2  { background: linear-gradient(135deg, var(--g2-a),  var(--g2-b)); }
+  .node.g3  { background: linear-gradient(135deg, var(--g3-a),  var(--g3-b)); }
+  .node.g4  { background: linear-gradient(135deg, var(--g4-a),  var(--g4-b)); }
+  .node.g5  { background: linear-gradient(135deg, var(--g5-a),  var(--g5-b)); }
+  .node.g6  { background: linear-gradient(135deg, var(--g6-a),  var(--g6-b)); }
+  .node.g7  { background: linear-gradient(135deg, var(--g7-a),  var(--g7-b)); }
+  .node.g8  { background: linear-gradient(135deg, var(--g8-a),  var(--g8-b)); }
+  .node.g9  { background: linear-gradient(135deg, var(--g9-a),  var(--g9-b)); }
+  .node.g10 { background: linear-gradient(135deg, var(--g10-a), var(--g10-b)); }
+
+  /* Node type variants */
+  .node.header .node-inner {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .node.title-main .node-inner {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .node.note .node-inner {
+    font-size: 11px;
+    text-align: left;
+    line-height: 1.5;
+    color: #2d2d4e;
+  }
+
+  .node.note:hover { 
+    transform: none; 
+  }
+
+  /* Glow effect per group */
+  .node.g1:hover { box-shadow: 0 10px 20px rgba(167,139,250,0.5); }
+  .node.g2:hover { box-shadow: 0 10px 20px rgba(110,231,183,0.5); }
+  .node.g3:hover { box-shadow: 0 10px 20px rgba(252,211,77,0.5); }
+  .node.g4:hover { box-shadow: 0 10px 20px rgba(147,197,253,0.5); }
+  .node.g5:hover { box-shadow: 0 10px 20px rgba(253,164,175,0.5); }
+  .node.g6:hover { box-shadow: 0 10px 20px rgba(190,242,100,0.5); }
+  .node.g7:hover { box-shadow: 0 10px 20px rgba(249,115,22,0.5); }
+  .node.g8:hover { box-shadow: 0 10px 20px rgba(244,114,182,0.5); }
+  .node.g9:hover { box-shadow: 0 10px 20px rgba(125,211,252,0.5); }
+  .node.g10:hover { box-shadow: 0 10px 20px rgba(192,132,252,0.5); }
+
+  /* ---- BACK BUTTON ---- */
+  #back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 100;
+    background: rgba(15,15,40,0.9);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #A78BFA;
+    cursor: pointer;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+    position: fixed;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: inset 0 0 0 2px #A78BFA, 0 4px 20px rgba(167,139,250,0.3);
+  }
+
+  #back-btn:hover {
+    background: rgba(167,139,250,0.15);
+    box-shadow: inset 0 0 0 2px #A78BFA, 0 8px 30px rgba(167,139,250,0.5);
+    transform: translateX(-2px);
+  }
+
+  #back-btn svg { width:14px; height:14px; }
+
+  /* ---- INFO MODAL ---- */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,5,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #modal-overlay.active { display: flex; }
+
+  #modal {
+    background: rgba(8,8,25,0.97);
+    border-radius: 16px;
+    padding: 36px 40px;
+    max-width: 480px;
+    width: 90%;
+    position: relative;
+    animation: modalIn 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes modalIn {
+    from { opacity:0; transform: scale(0.85) translateY(20px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+
+  #modal::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 18px;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--modal-ca, #2E1065), var(--modal-cb, #A78BFA));
+  }
+
+  #modal-close {
+    position: absolute;
+    top: 14px; right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 22px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  #modal-close:hover { color: #fff; }
+
+  #modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, var(--modal-ca, #2E1065), var(--modal-cb, #A78BFA));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  #modal-type {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  #modal-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #c5cae9;
+  }
+
+  #modal-body .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin: 2px 3px 2px 0;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  /* hint */
+  #hint {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 1px;
+    pointer-events: none;
+    text-align: right;
+    z-index: 50;
+  }
+</style>
+</head>
+<body>
+
+<a id="back-btn" href="javascript:history.back()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  Назад
+</a>
+
+<div id="hint">Зажмите и тяните для навигации<br>Нажмите на карточку для информации</div>
+
+<svg id="edges-svg"></svg>
+<div id="canvas"></div>
+
+<!-- Modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close">✕</button>
+    <div id="modal-title"></div>
+    <div id="modal-type"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const SCALE = 0.65; // scale canvas coords to px (canvas is big)
+const OFFSET_X = 800;
+const OFFSET_Y = 2000;
+
+// Group color definitions
+const GROUP_COLORS = {
+  g1:  { a:'#2E1065', b:'#A78BFA' },
+  g2:  { a:'#064E3B', b:'#6EE7B7' },
+  g3:  { a:'#78350F', b:'#FCD34D' },
+  g4:  { a:'#1E3A8A', b:'#93C5FD' },
+  g5:  { a:'#4C0519', b:'#FDA4AF' },
+  g6:  { a:'#1A2E05', b:'#BEF264' },
+  g7:  { a:'#450A0A', b:'#F97316' },
+  g8:  { a:'#1E1B4B', b:'#F472B6' },
+  g9:  { a:'#0C4A6E', b:'#7DD3FC' },
+  g10: { a:'#1E1B4B', b:'#C084FC' },
+};
+
+// Canvas color index → group class
+// Obsidian canvas colors: 1=red,2=orange,3=yellow,4=green,5=cyan,6=purple
+const COLOR_MAP = {
+  '1': 'g5',  // red family → pink gradient
+  '2': 'g3',  // orange family → amber gradient
+  '3': 'g3',  // yellow family → amber gradient (different shade)
+  '4': 'g2',  // green family → emerald gradient
+  '5': 'g9',  // cyan family → sky gradient
+  '6': 'g10', // purple family → purple gradient
+};
+
+// Particle info database
+const PARTICLE_INFO = {
+  'Фермион': {
+    type: 'Класс частиц',
+    group: 'g5',
+    desc: 'Частицы с <b>полуцелым спином</b> (½, 3/2, …). Подчиняются статистике Ферми–Дирака и принципу запрета Паули — два тождественных фермиона не могут находиться в одном квантовом состоянии.',
+    tags: ['Спин: 1/2', 'Статистика Ферми–Дирака', 'Принцип Паули']
+  },
+  'Бозон': {
+    type: 'Класс частиц',
+    group: 'g8',
+    desc: 'Частицы с <b>целым спином</b> (0, 1, 2, …). Подчиняются статистике Бозе–Эйнштейна. Не подчиняются принципу запрета Паули — любое число тождественных бозонов может занимать одно квантовое состояние.',
+    tags: ['Спин: 0, 1, 2…', 'Статистика Бозе–Эйнштейна', 'Переносчики взаимодействий']
+  },
+  'Лептон': {
+    type: 'Фермион',
+    group: 'g2',
+    desc: 'Элементарные частицы, не участвующие в <b>сильном</b> взаимодействии. Делятся на три поколения. Каждому лептону соответствует нейтрино.',
+    tags: ['Спин: 1/2', 'Электромагн. взаимодействие', 'Слабое взаимодействие']
+  },
+  'Кварк': {
+    type: 'Фермион',
+    group: 'g10',
+    desc: 'Элементарные частицы, имеющие <b>дробный электрический заряд</b> (+2/3 или −1/3) и несущие цветовой заряд. Существуют только в составе адронов — не наблюдаются в свободном виде (конфайнмент).',
+    tags: ['Спин: 1/2', 'Все 4 взаимодействия', 'Цветовой заряд', 'Конфайнмент']
+  },
+  'Верхний (u-кварк)': {
+    type: 'Кварк / I поколение',
+    group: 'g10',
+    desc: 'Лёгкий кварк первого поколения. Заряд <b>+2/3e</b>. Масса ≈ 2,2 МэВ/c². Входит в состав протона (uud) и нейтрона (udd).',
+    tags: ['Заряд: +2/3', 'Масса: ~2,2 МэВ', 'I поколение']
+  },
+  'Нижний (d-кварк)': {
+    type: 'Кварк / I поколение',
+    group: 'g10',
+    desc: 'Лёгкий кварк первого поколения. Заряд <b>−1/3e</b>. Масса ≈ 4,7 МэВ/c². Входит в состав протона (uud) и нейтрона (udd).',
+    tags: ['Заряд: −1/3', 'Масса: ~4,7 МэВ', 'I поколение']
+  },
+  'Очарованный (с-кварк)': {
+    type: 'Кварк / II поколение',
+    group: 'g10',
+    desc: 'Кварк второго поколения. Заряд <b>+2/3e</b>. Масса ≈ 1,28 ГэВ/c². Открыт в 1974 году («Ноябрьская революция»). Содержится в D-мезонах.',
+    tags: ['Заряд: +2/3', 'Масса: ~1,28 ГэВ', 'II поколение']
+  },
+  'Странный (s-кварк)': {
+    type: 'Кварк / II поколение',
+    group: 'g10',
+    desc: 'Кварк второго поколения. Заряд <b>−1/3e</b>. Масса ≈ 95 МэВ/c². Несёт квантовое число «странность». Входит в состав каонов и гиперонов.',
+    tags: ['Заряд: −1/3', 'Масса: ~95 МэВ', 'Странность: −1']
+  },
+  'Истинный (t-кварк)': {
+    type: 'Кварк / III поколение',
+    group: 'g10',
+    desc: 'Самый тяжёлый из известных элементарных частиц. Заряд <b>+2/3e</b>. Масса ≈ 173 ГэВ/c² — почти как атом золота! Открыт в 1995 году на Тэватроне.',
+    tags: ['Заряд: +2/3', 'Масса: ~173 ГэВ', 'III поколение', 'Самый тяжёлый кварк']
+  },
+  'Прелестный (b-кварк)': {
+    type: 'Кварк / III поколение',
+    group: 'g10',
+    desc: 'Кварк третьего поколения. Заряд <b>−1/3e</b>. Масса ≈ 4,18 ГэВ/c². Несёт квантовое число «прелесть» (beauty/bottom). Входит в состав B-мезонов.',
+    tags: ['Заряд: −1/3', 'Масса: ~4,18 ГэВ', 'III поколение']
+  },
+  'Электрон (e)': {
+    type: 'Лептон / I поколение',
+    group: 'g2',
+    desc: 'Стабильная элементарная частица с зарядом <b>−1e</b>. Масса ≈ 0,511 МэВ/c². Открыта Дж. Дж. Томсоном в 1897 году. Образует электронные оболочки атомов.',
+    tags: ['Заряд: −1e', 'Масса: 0,511 МэВ', 'Стабильна', 'I поколение']
+  },
+  'Мюон': {
+    type: 'Лептон / II поколение',
+    group: 'g2',
+    desc: 'Нестабильный лептон, «тяжёлый брат» электрона. Масса ≈ 105,7 МэВ/c². Время жизни ≈ 2,2 мкс. Образуется при распаде пионов в космических лучах.',
+    tags: ['Заряд: −1e', 'Масса: ~106 МэВ', 'τ ≈ 2,2 мкс', 'II поколение']
+  },
+  'Тау-лептон': {
+    type: 'Лептон / III поколение',
+    group: 'g2',
+    desc: 'Самый тяжёлый лептон. Масса ≈ 1776,86 МэВ/c². Время жизни ≈ 2,9 × 10⁻¹³ с. Открыт в 1975 году Мартином Перлом.',
+    tags: ['Заряд: −1e', 'Масса: ~1777 МэВ', 'III поколение']
+  },
+  'Электронное нейтрино': {
+    type: 'Лептон / I поколение',
+    group: 'g2',
+    desc: 'Нейтральный лептон первого поколения. Практически без массы, взаимодействует только слабо. Образуется при β-распаде и термоядерных реакциях в Солнце.',
+    tags: ['Заряд: 0', 'Масса: < 2 эВ', 'Слабое взаимодействие']
+  },
+  'Мюонное нейтрино': {
+    type: 'Лептон / II поколение',
+    group: 'g2',
+    desc: 'Нейтральный лептон второго поколения. Рождается совместно с мюоном при слабых распадах. Впервые обнаружено в 1962 году — за это присуждена Нобелевская премия.',
+    tags: ['Заряд: 0', 'Масса: < 0,17 МэВ', 'II поколение']
+  },
+  'Тау-нейтрино': {
+    type: 'Лептон / III поколение',
+    group: 'g2',
+    desc: 'Нейтральный лептон третьего поколения. Экспериментально подтверждено лишь в 2000 году (эксперимент DONUT). Образуется при распадах тау-лептона.',
+    tags: ['Заряд: 0', 'III поколение', 'Открыто в 2000 г.']
+  },
+  'Скалярный бозон': {
+    type: 'Бозон',
+    group: 'g5',
+    desc: 'Бозон со спином 0. Квантовое поле такого бозона является скалярным полем — оно одинаково во всех системах отсчёта.',
+    tags: ['Спин: 0', 'Скалярное поле']
+  },
+  'Бозон Хиггса': {
+    type: 'Скалярный бозон',
+    group: 'g5',
+    desc: 'Квант поля Хиггса, отвечающего за механизм придания масс другим элементарным частицам. Масса ≈ 125,09 ГэВ/c². Открыт в 2012 году на БАК (CERN). Нобелевская премия 2013 года.',
+    tags: ['Спин: 0', 'Масса: ~125 ГэВ', 'Открыт в 2012 г.', 'Поле Хиггса']
+  },
+  'Калибровочный бозон': {
+    type: 'Бозон / Переносчик взаимодействий',
+    group: 'g3',
+    desc: 'Бозоны со спином 1, являющиеся квантами полей фундаментальных взаимодействий. Передают три из четырёх известных фундаментальных сил.',
+    tags: ['Спин: 1', 'Переносчики сил', 'Калибровочная симметрия']
+  },
+  'Фотоны': {
+    type: 'Калибровочный бозон',
+    group: 'g3',
+    desc: 'Квант электромагнитного поля. Масса покоя равна нулю. Скорость в вакууме — c ≈ 3×10⁸ м/с. Переносчик электромагнитного взаимодействия.',
+    tags: ['Спин: 1', 'Масса: 0', 'Электромагн. взаимодействие', 'Стабилен']
+  },
+  'W-бозоны': {
+    type: 'Калибровочный бозон',
+    group: 'g3',
+    desc: 'Переносчики слабого взаимодействия. Существуют в двух видах: W⁺ и W⁻. Масса ≈ 80,4 ГэВ/c². Участвуют в β-распаде.',
+    tags: ['Спин: 1', 'Масса: ~80 ГэВ', 'Слабое взаимодействие', 'Заряженный']
+  },
+  'W⁻-бозоны': {
+    type: 'Калибровочный бозон / W-бозон',
+    group: 'g3',
+    desc: 'Заряженный переносчик слабого взаимодействия с зарядом <b>−1e</b>. Участвует в β⁻-распаде: d → u + W⁻, затем W⁻ → e⁻ + ν̄ₑ.',
+    tags: ['Заряд: −1e', 'Масса: ~80 ГэВ', 'β-распад']
+  },
+  'W⁺-бозоны': {
+    type: 'Калибровочный бозон / W-бозон',
+    group: 'g3',
+    desc: 'Заряженный переносчик слабого взаимодействия с зарядом <b>+1e</b>. Античастица W⁻-бозона. Участвует в β⁺-распаде.',
+    tags: ['Заряд: +1e', 'Масса: ~80 ГэВ', 'β⁺-распад']
+  },
+  'Z⁰-бозоны': {
+    type: 'Калибровочный бозон',
+    group: 'g3',
+    desc: 'Нейтральный переносчик слабого взаимодействия. Масса ≈ 91,2 ГэВ/c². Обнаружен в 1983 году в ЦЕРНе (Нобелевская премия 1984 г.). Отвечает за нейтральные токи.',
+    tags: ['Заряд: 0', 'Масса: ~91 ГэВ', 'Нейтральные токи']
+  },
+  'Глюоны': {
+    type: 'Калибровочный бозон',
+    group: 'g3',
+    desc: 'Переносчики <b>сильного взаимодействия</b> между кварками. Существует <b>8 типов</b> глюонов, различающихся комбинациями цвет–антицвет. Масса равна нулю, но не наблюдаются в свободном виде.',
+    tags: ['Спин: 1', 'Масса: 0', 'Сильное взаимодействие', '8 типов', 'Цветовой заряд']
+  },
+  'Гравитон': {
+    type: 'Калибровочный бозон (гипотетический)',
+    group: 'g3',
+    desc: 'Гипотетический квант гравитационного поля со спином 2. Экспериментально не обнаружен. Входит в рамки квантовой гравитации, которая пока не создана.',
+    tags: ['Спин: 2', 'Масса: 0 (предп.)', 'Гравитация', 'Гипотетический']
+  },
+  'Адроны': {
+    type: 'Составные частицы',
+    group: 'g7',
+    desc: 'Составные частицы, образованные кварками, удерживаемыми глюонами через сильное взаимодействие. Делятся на барионы (нечётное число кварков) и мезоны (кварк + антикварк).',
+    tags: ['Составные', 'Сильное взаимодействие', 'Барионы + Мезоны']
+  },
+  'Барионы (3 кварка)': {
+    type: 'Адроны',
+    group: 'g5',
+    desc: 'Адроны, состоящие из трёх кварков (или трёх антикварков — антибарионы). Имеют полуцелый спин → являются фермионами. Примеры: протон, нейтрон.',
+    tags: ['3 кварка', 'Фермионы', 'Спин: 1/2, 3/2…']
+  },
+  'Мезоны (кварк + антикварк)': {
+    type: 'Адроны',
+    group: 'g8',
+    desc: 'Адроны, состоящие из кварка и антикварка. Имеют целый спин → являются бозонами. Нестабильны. Примеры: пионы, каоны, D-мезоны.',
+    tags: ['Кварк + антикварк', 'Бозоны', 'Нестабильны']
+  },
+  'Нуклон': {
+    type: 'Барион',
+    group: 'g9',
+    desc: 'Общее название для протона и нейтрона — частиц, образующих атомные ядра. Оба удерживаются в ядре остаточным сильным взаимодействием (обменом пионами).',
+    tags: ['Протон + Нейтрон', 'Ядро атома', 'Остаточное сильное взаим.']
+  },
+  'Протон': {
+    type: 'Нуклон / Барион',
+    group: 'g9',
+    desc: 'Стабильный барион с зарядом <b>+1e</b>. Состав: два u-кварка и один d-кварк (uud). Масса ≈ 938,3 МэВ/c². Образует ядра всех химических элементов.',
+    tags: ['Заряд: +1e', 'Состав: uud', 'Масса: ~938 МэВ', 'Стабилен']
+  },
+  'Нейтрон': {
+    type: 'Нуклон / Барион',
+    group: 'g9',
+    desc: 'Барион без электрического заряда. Состав: два d-кварка и один u-кварк (udd). Масса ≈ 939,6 МэВ/c². Свободный нейтрон нестабилен (τ ≈ 15 мин).',
+    tags: ['Заряд: 0', 'Состав: udd', 'Масса: ~940 МэВ', 'τ ≈ 15 мин']
+  },
+  'Гипероны': {
+    type: 'Барион',
+    group: 'g9',
+    desc: 'Барионы, содержащие хотя бы один <b>странный кварк</b>. Нестабильны. Распадаются через слабое взаимодействие. Примеры: Λ, Σ, Ξ, Ω.',
+    tags: ['Содержит s-кварк', 'Нестабильны', 'Слабый распад']
+  },
+  'Ω-гиперон': {
+    type: 'Гиперон / Барион',
+    group: 'g9',
+    desc: 'Барион, состоящий из трёх странных кварков (sss). Спин 3/2. Открыт в 1964 году. Его существование было предсказано Гелл-Манном по «восьмеричному пути».',
+    tags: ['Состав: sss', 'Спин: 3/2', 'Открыт в 1964 г.']
+  },
+  'Пионы (π-мезоны)': {
+    type: 'Мезон',
+    group: 'g8',
+    desc: 'Лёгчайшие мезоны. Существуют три разновидности: π⁺, π⁻, π⁰. Переносят остаточное ядерное взаимодействие между нуклонами. Время жизни ≈ 26 нс (заряженные).',
+    tags: ['π⁺, π⁻, π⁰', 'Масса: ~140 МэВ', 'Ядерная сила (остат.)']
+  },
+  'Ипсилон-мезон': {
+    type: 'Мезон',
+    group: 'g8',
+    desc: 'Тяжёлый мезон, состоящий из b-кварка и антиb-кварка (bb̄). Масса ≈ 9,46 ГэВ/c². Открыт в 1977 году на Тэватроне — первое свидетельство существования b-кварка.',
+    tags: ['Состав: bb̄', 'Масса: ~9,5 ГэВ', 'Открыт в 1977 г.']
+  },
+  'Каоны (K-мезоны)': {
+    type: 'Мезон',
+    group: 'g8',
+    desc: 'Мезоны, содержащие странный кварк. Первые обнаруженные странные частицы. Нарушение CP-симметрии впервые наблюдалось именно в распадах K⁰.',
+    tags: ['Содержит s-кварк', 'CP-нарушение', 'Открыты в 1947 г.']
+  },
+  'η-мезоны': {
+    type: 'Мезон',
+    group: 'g8',
+    desc: 'Нейтральный псевдоскалярный мезон. Масса η ≈ 548 МэВ/c². Изоскалярная частица — квантовое число изоспина равно 0. Распадается преимущественно на фотоны и пионы.',
+    tags: ['Заряд: 0', 'Спин: 0', 'Масса: ~548 МэВ', 'Изоспин: 0']
+  },
+  'Атомное ядро': {
+    type: 'Составная частица',
+    group: 'g6',
+    desc: 'Центральная часть атома, содержащая протоны и нейтроны. Диаметр ≈ 10⁻¹⁵ м. Удерживается сильным ядерным взаимодействием через обмен пионами.',
+    tags: ['Протоны + Нейтроны', 'Размер: ~фм', 'Ядерная сила']
+  },
+  'Электрон': {
+    type: 'Лептон / Составная часть атома',
+    group: 'g2',
+    desc: 'Образует электронные оболочки атомов. Определяет химические свойства элементов. Отрицательный заряд <b>−1e</b> компенсирует заряд ядра.',
+    tags: ['Заряд: −1e', 'Электронная оболочка', 'Химические свойства']
+  },
+  'Атомы': {
+    type: 'Составная структура',
+    group: 'g6',
+    desc: 'Наименьшая частица химического элемента, сохраняющая его свойства. Состоит из ядра (протоны + нейтроны) и электронных оболочек. Размер ≈ 10⁻¹⁰ м.',
+    tags: ['Ядро + Электроны', 'Размер: ~Å', 'Химический элемент']
+  },
+  'Молекулы': {
+    type: 'Составная структура',
+    group: 'g6',
+    desc: 'Наименьшая частица вещества, сохраняющая его химические свойства. Состоит из атомов, связанных химическими связями. Основа всей химии и биологии.',
+    tags: ['Из атомов', 'Химические связи', 'Молекулярная физика']
+  },
+  'Фундаментальные частицы': {
+    type: 'Раздел физики',
+    group: 'g2',
+    desc: 'Частицы, не имеющие внутренней структуры согласно Стандартной модели. Включают 6 кварков, 6 лептонов и 4 типа переносчиков взаимодействий + бозон Хиггса.',
+    tags: ['Стандартная модель', '17 фундаментальных частиц', 'Без внутренней структуры']
+  },
+  'Составные частицы': {
+    type: 'Раздел физики',
+    group: 'g7',
+    desc: 'Частицы, состоящие из более фундаментальных составляющих. Адроны — самые известные составные частицы, образованные из кварков.',
+    tags: ['Из более мелких частиц', 'Адроны', 'Кварковая модель']
+  },
+  '"Красный" глюон': {
+    type: 'Глюон (цветовой тип)',
+    group: 'g7',
+    desc: 'Глюон, несущий красный цветовой заряд. Цвет глюонов — условное обозначение. Глюоны всегда несут пару «цвет–антицвет».',
+    tags: ['Цветовой заряд', 'Сильное взаимодействие']
+  },
+  '"Зелёный" глюон': {
+    type: 'Глюон (цветовой тип)',
+    group: 'g2',
+    desc: 'Глюон, несущий зелёный цветовой заряд. Один из 8 независимых цветовых состояний глюонов в квантовой хромодинамике (КХД).',
+    tags: ['Цветовой заряд', 'КХД', '8 глюонных состояний']
+  },
+  '"Синий" глюон': {
+    type: 'Глюон (цветовой тип)',
+    group: 'g9',
+    desc: 'Глюон, несущий синий цветовой заряд. В КХД цвета красный, зелёный и синий — аналог трёх зарядов сильного взаимодействия.',
+    tags: ['Цветовой заряд', 'КХД', 'Аналог RGB']
+  },
+};
+
+// Clean text from HTML/markdown for lookup
+function cleanText(raw) {
+  return raw
+    .replace(/<[^>]+>/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/#+ /g, '')
+    .replace(/<center>|<\/center>/gi, '')
+    .replace(/\$\\[A-Za-z]+\$/g, '')
+    .replace(/\\\(/g,'').replace(/\\\)/g,'')
+    .trim();
+}
+
+// Parse canvas nodes
+const rawNodes = [
+  {"id":"9d5b4ab9f9ba8500","type":"text","text":"Фермион","x":240,"y":-242,"width":250,"height":132,"color":"1","isHeader":true},
+  {"id":"aa4994a6331d18e2","type":"text","text":"Лептон","x":409,"y":24,"width":250,"height":60,"color":"4","isHeader":true},
+  {"id":"9d93c14fc76a3d67","type":"text","text":"Верхний (u-кварк)","x":-400,"y":-170,"width":250,"height":60,"color":"6"},
+  {"id":"3621faa406f857eb","type":"text","text":"Истинный (t-кварк)","x":-400,"y":206,"width":250,"height":57,"color":"6"},
+  {"id":"8ab1380da09a34ef","type":"text","text":"Нижний (d-кварк)","x":-400,"y":-95,"width":250,"height":60,"color":"6"},
+  {"id":"dc14cc46d9c53ed0","type":"text","text":"Очарованный (с-кварк)","x":-400,"y":-20,"width":250,"height":60,"color":"6"},
+  {"id":"2dde09e316c8b1c7","type":"text","text":"Странный (s-кварк)","x":-400,"y":55,"width":250,"height":60,"color":"6"},
+  {"id":"aacf17013ba13f6b","type":"text","text":"Прелестный (b-кварк)","x":-400,"y":130,"width":250,"height":60,"color":"6"},
+  {"id":"7d74c22f92be017f","type":"text","text":"Кварк","x":74,"y":24,"width":250,"height":60,"color":"6","isHeader":true},
+  {"id":"b846f779317ca876","type":"text","text":"Электрон (e)","x":-264,"y":400,"width":250,"height":60,"color":"4"},
+  {"id":"4f3ab2b03f747a80","type":"text","text":"Мюон","x":5,"y":400,"width":250,"height":60,"color":"4"},
+  {"id":"d0b22cb1ff1a7c91","type":"text","text":"Тау-лептон","x":274,"y":400,"width":250,"height":60,"color":"4"},
+  {"id":"f4ae1993dea7184c","type":"text","text":"Тау-нейтрино","x":543,"y":400,"width":250,"height":60,"color":"4"},
+  {"id":"17eea52e5c21e749","type":"text","text":"Мюонное нейтрино","x":812,"y":400,"width":250,"height":60,"color":"4"},
+  {"id":"0411ab27e63f2167","type":"text","text":"Электронное нейтрино","x":1080,"y":400,"width":250,"height":60,"color":"4"},
+  {"id":"b162862dcefe8105","type":"text","text":"Бозон","x":1261,"y":-242,"width":215,"height":182,"color":"1","isHeader":true},
+  {"id":"c86d313229bcb3a3","type":"text","text":"Скалярный бозон","x":830,"y":24,"width":250,"height":60,"color":"5","isHeader":true},
+  {"id":"4da080bdbf24e2b5","type":"text","text":"Бозон Хиггса","x":830,"y":140,"width":250,"height":60,"color":"5"},
+  {"id":"5b342141eea03572","type":"text","text":"Калибровочный бозон","x":1764,"y":24,"width":250,"height":60,"color":"3","isHeader":true},
+  {"id":"3e95735dab42b9e2","type":"text","text":"Z⁰-бозоны","x":1764,"y":300,"width":250,"height":60,"color":"3"},
+  {"id":"aebc680f1e01cfc3","type":"text","text":"Глюоны","x":2024,"y":300,"width":250,"height":60,"color":"3"},
+  {"id":"b6fa645026008be3","type":"text","text":"Гравитон","x":2284,"y":300,"width":250,"height":60,"color":"3"},
+  {"id":"31399a1e28d845f4","type":"text","text":"Фотоны","x":1244,"y":300,"width":250,"height":58,"color":"3"},
+  {"id":"134a5ba1b908b509","type":"text","text":"W-бозоны","x":1504,"y":300,"width":250,"height":60,"color":"3"},
+  {"id":"22431a074b7504cf","type":"text","text":"W⁻-бозоны","x":1351,"y":560,"width":250,"height":60,"color":"3"},
+  {"id":"bf55b1a1e83eb10c","type":"text","text":"W⁺-бозоны","x":1660,"y":560,"width":250,"height":60,"color":"3"},
+  {"id":"dce64cfaa2978e34","type":"text","text":"Фундаментальные частицы","x":668,"y":-460,"width":400,"height":120,"isHeader":true,"isTitle":true},
+  {"id":"54e4adcf0c78041d","type":"text","text":"Барионы (3 кварка)","x":301,"y":-885,"width":250,"height":60,"color":"1"},
+  {"id":"e2a649010e3dfdb4","type":"text","text":"Мезоны (кварк + антикварк)","x":1617,"y":-885,"width":250,"height":60,"color":"1"},
+  {"id":"5815082933b11fbe","type":"text","text":"Атомное ядро","x":-471,"y":-1342,"width":250,"height":60,"color":"5"},
+  {"id":"b9aae83535738d67","type":"text","text":"Электрон","x":-185,"y":-1342,"width":250,"height":60,"color":"5"},
+  {"id":"ca90ee0c4e22a669","type":"text","text":"Нуклон","x":-479,"y":-1060,"width":250,"height":111,"color":"5"},
+  {"id":"2abbe72af4b80c00","type":"text","text":"Протон","x":-640,"y":-1200,"width":250,"height":60,"color":"5"},
+  {"id":"5afa27231f90a9b6","type":"text","text":"Атомы","x":-471,"y":-1500,"width":250,"height":60,"color":"6"},
+  {"id":"c7553a4903aac95d","type":"text","text":"Молекулы","x":-471,"y":-1620,"width":250,"height":60,"color":"6"},
+  {"id":"8f8abd861bcf2deb","type":"text","text":"Глюоны (8 типов)","x":2024,"y":440,"width":250,"height":156,"color":"2","isNote":true},
+  {"id":"f38622a0836bea2d","type":"text","text":"\"Зелёный\" глюон","x":2014,"y":1042,"width":250,"height":60,"color":"4"},
+  {"id":"21dc95dd22c6e9d6","type":"text","text":"\"Красный\" глюон","x":1754,"y":1042,"width":250,"height":60,"color":"1"},
+  {"id":"c9267c95d11e7cdc","type":"text","text":"\"Синий\" глюон","x":2274,"y":1042,"width":250,"height":60,"color":"5"},
+  {"id":"f7c496abd98d3f73","type":"text","text":"\"Красный\"-\"Антизелёный\" глюон","x":1560,"y":940,"width":250,"height":60,"color":"6"},
+  {"id":"2227a5188e0f8fd5","type":"text","text":"\"Красный\"-\"Антисиний\" глюон","x":1420,"y":840,"width":250,"height":60,"color":"6"},
+  {"id":"2bf556f521e83519","type":"text","text":"\"Синий\"-\"Антизелёный\" глюон","x":1280,"y":740,"width":250,"height":60,"color":"6"},
+  {"id":"6f4dc64a35e023be","type":"text","text":"\"Зелёный\"-\"Антисиний\" глюон","x":2435,"y":940,"width":250,"height":60,"color":"6"},
+  {"id":"c023e0f64d524f11","type":"text","text":"\"Зелёный\"-\"Антикрасный\" глюон","x":2580,"y":840,"width":250,"height":60,"color":"6"},
+  {"id":"a8b88eb2b29decf3","type":"text","text":"\"Синий\"-\"Антикрасный\" глюон","x":2720,"y":740,"width":250,"height":60,"color":"6"},
+  {"id":"781abc17978295e5","type":"text","text":"Составные частицы","x":682,"y":-600,"width":373,"height":120,"isHeader":true,"isTitle":true},
+  {"id":"517f0bc779f75e31","type":"text","text":"Ω-гиперон","x":820,"y":-1240,"width":260,"height":60,"color":"6"},
+  {"id":"9f5cc162ea5d97fe","type":"text","text":"Гипероны","x":500,"y":-1060,"width":250,"height":111,"color":"5"},
+  {"id":"c88d8bb0bf3da9a0","type":"text","text":"Нейтрон","x":-318,"y":-1200,"width":250,"height":60,"color":"5"},
+  {"id":"585eef4f51d0b2c6","type":"text","text":"Адроны","x":744,"y":-700,"width":250,"height":60,"color":"1","isHeader":true},
+  {"id":"abeb19c5a2fe2127","type":"text","text":"Пионы (π-мезоны)","x":1420,"y":-1145,"width":250,"height":60,"color":"2"},
+  {"id":"157d0bb6cc5d55ad","type":"text","text":"Каоны (K-мезоны)","x":1820,"y":-1145,"width":250,"height":60,"color":"2"},
+  {"id":"d9f6aef570d818f6","type":"text","text":"η-мезоны","x":2070,"y":-1060,"width":250,"height":60,"color":"2"},
+  {"id":"a6e7aa47e46e6479","type":"text","text":"Ипсилон-мезон","x":1160,"y":-1060,"width":260,"height":60,"color":"2"},
+];
+
+// Edges
+const rawEdges = [
+  {from:"9d5b4ab9f9ba8500",to:"aa4994a6331d18e2",color:"4"},
+  {from:"9d5b4ab9f9ba8500",to:"7d74c22f92be017f",color:"6"},
+  {from:"dce64cfaa2978e34",to:"9d5b4ab9f9ba8500",color:"2"},
+  {from:"dce64cfaa2978e34",to:"b162862dcefe8105",color:"2"},
+  {from:"7d74c22f92be017f",to:"9d93c14fc76a3d67",color:"6"},
+  {from:"7d74c22f92be017f",to:"8ab1380da09a34ef",color:"6"},
+  {from:"7d74c22f92be017f",to:"dc14cc46d9c53ed0",color:"6"},
+  {from:"7d74c22f92be017f",to:"2dde09e316c8b1c7",color:"6"},
+  {from:"7d74c22f92be017f",to:"aacf17013ba13f6b",color:"6"},
+  {from:"7d74c22f92be017f",to:"3621faa406f857eb",color:"6"},
+  {from:"aa4994a6331d18e2",to:"4f3ab2b03f747a80",color:"4"},
+  {from:"aa4994a6331d18e2",to:"d0b22cb1ff1a7c91",color:"4"},
+  {from:"aa4994a6331d18e2",to:"f4ae1993dea7184c",color:"4"},
+  {from:"aa4994a6331d18e2",to:"17eea52e5c21e749",color:"4"},
+  {from:"aa4994a6331d18e2",to:"0411ab27e63f2167",color:"4"},
+  {from:"aa4994a6331d18e2",to:"b846f779317ca876",color:"4"},
+  {from:"c86d313229bcb3a3",to:"4da080bdbf24e2b5",color:"5"},
+  {from:"b162862dcefe8105",to:"c86d313229bcb3a3",color:"5"},
+  {from:"5b342141eea03572",to:"134a5ba1b908b509",color:"3"},
+  {from:"5b342141eea03572",to:"3e95735dab42b9e2",color:"3"},
+  {from:"5b342141eea03572",to:"aebc680f1e01cfc3",color:"3"},
+  {from:"5b342141eea03572",to:"b6fa645026008be3",color:"3"},
+  {from:"5b342141eea03572",to:"31399a1e28d845f4",color:"3"},
+  {from:"b162862dcefe8105",to:"5b342141eea03572",color:"3"},
+  {from:"134a5ba1b908b509",to:"22431a074b7504cf",color:"3"},
+  {from:"134a5ba1b908b509",to:"bf55b1a1e83eb10c",color:"3"},
+  {from:"781abc17978295e5",to:"585eef4f51d0b2c6",color:"1"},
+  {from:"585eef4f51d0b2c6",to:"e2a649010e3dfdb4",color:"1"},
+  {from:"585eef4f51d0b2c6",to:"54e4adcf0c78041d",color:"1"},
+  {from:"2abbe72af4b80c00",to:"5815082933b11fbe",color:"5"},
+  {from:"5815082933b11fbe",to:"5afa27231f90a9b6",color:"6"},
+  {from:"5afa27231f90a9b6",to:"c7553a4903aac95d",color:"6"},
+  {from:"c88d8bb0bf3da9a0",to:"5815082933b11fbe",color:"5"},
+  {from:"b9aae83535738d67",to:"5afa27231f90a9b6",color:"6"},
+  {from:"54e4adcf0c78041d",to:"ca90ee0c4e22a669",color:"5"},
+  {from:"ca90ee0c4e22a669",to:"2abbe72af4b80c00",color:"5"},
+  {from:"ca90ee0c4e22a669",to:"c88d8bb0bf3da9a0",color:"5"},
+  {from:"aebc680f1e01cfc3",to:"8f8abd861bcf2deb",color:"3"},
+  {from:"8f8abd861bcf2deb",to:"21dc95dd22c6e9d6",color:"1"},
+  {from:"8f8abd861bcf2deb",to:"f38622a0836bea2d",color:"4"},
+  {from:"8f8abd861bcf2deb",to:"c9267c95d11e7cdc",color:"5"},
+  {from:"8f8abd861bcf2deb",to:"f7c496abd98d3f73",color:"6"},
+  {from:"8f8abd861bcf2deb",to:"2227a5188e0f8fd5",color:"6"},
+  {from:"8f8abd861bcf2deb",to:"2bf556f521e83519",color:"6"},
+  {from:"8f8abd861bcf2deb",to:"6f4dc64a35e023be",color:"6"},
+  {from:"8f8abd861bcf2deb",to:"c023e0f64d524f11",color:"6"},
+  {from:"8f8abd861bcf2deb",to:"a8b88eb2b29decf3",color:"6"},
+  {from:"9f5cc162ea5d97fe",to:"517f0bc779f75e31",color:"6"},
+  {from:"e2a649010e3dfdb4",to:"abeb19c5a2fe2127",color:"1"},
+  {from:"e2a649010e3dfdb4",to:"157d0bb6cc5d55ad",color:"1"},
+  {from:"e2a649010e3dfdb4",to:"d9f6aef570d818f6",color:"1"},
+  {from:"e2a649010e3dfdb4",to:"a6e7aa47e46e6479",color:"1"},
+  {from:"54e4adcf0c78041d",to:"9f5cc162ea5d97fe",color:"5"},
+];
+
+// Edge color map
+const edgeColorMap = {
+  '1': '#FDA4AF',
+  '2': '#FCD34D',
+  '3': '#FCD34D',
+  '4': '#6EE7B7',
+  '5': '#7DD3FC',
+  '6': '#C084FC',
+};
+
+// ============================================================
+// BUILD DOM
+// ============================================================
+const canvas = document.getElementById('canvas');
+const svg = document.getElementById('edges-svg');
+
+// Build node map for edge rendering
+const nodeMap = {};
+rawNodes.forEach(n => { nodeMap[n.id] = n; });
+
+// Create node elements
+rawNodes.forEach(n => {
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.dataset.id = n.id;
+
+  const group = COLOR_MAP[n.color] || 'g4';
+  el.classList.add(group);
+
+  if (n.isTitle) el.classList.add('title-main');
+  else if (n.isHeader) el.classList.add('header');
+  else if (n.isNote) { el.classList.add('note'); }
+
+  el.style.left = ((n.x + OFFSET_X) * SCALE) + 'px';
+  el.style.top  = ((n.y + OFFSET_Y) * SCALE) + 'px';
+  el.style.width  = (n.width * SCALE) + 'px';
+  el.style.minHeight = (n.height * SCALE) + 'px';
+
+  el.innerHTML = `<div class="node-inner">${n.text}</div>`;
+  canvas.appendChild(el);
+  n._el = el;
+  n._group = group;
+
+  // Click handler
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openModal(n.text, n._group);
+  });
+});
+
+// Draw edges
+function drawEdges() {
+  svg.innerHTML = '';
+  rawEdges.forEach(edge => {
+    const from = nodeMap[edge.from];
+    const to = nodeMap[edge.to];
+    if (!from || !to) return;
+
+    const fx = (from.x + OFFSET_X + from.width/2) * SCALE + panX;
+    const fy = (from.y + OFFSET_Y + from.height/2) * SCALE + panY;
+    const tx = (to.x + OFFSET_X + to.width/2) * SCALE + panX;
+    const ty = (to.y + OFFSET_Y + to.height/2) * SCALE + panY;
+
+    const color = edgeColorMap[edge.color] || '#A78BFA';
+
+    // Bezier curve
+    const dx = tx - fx, dy = ty - fy;
+    const cx1 = fx + dx * 0.25;
+    const cy1 = fy + dy * 0.1;
+    const cx2 = fx + dx * 0.75;
+    const cy2 = ty - dy * 0.1;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', `M${fx},${fy} C${cx1},${cy1} ${cx2},${cy2} ${tx},${ty}`);
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', '0.35');
+    svg.appendChild(path);
+  });
+}
+
+// ============================================================
+// PANNING
+// ============================================================
+let panX = 0, panY = 0;
+let startX, startY, isPanning = false;
+
+// Initial center
+panX = window.innerWidth * 0.5 - (668 + OFFSET_X) * SCALE;
+panY = window.innerHeight * 0.5 - (-460 + OFFSET_Y) * SCALE;
+
+function applyPan() {
+  canvas.style.transform = `translate(${panX}px, ${panY}px)`;
+  svg.style.transform = `translate(0,0)`;
+  drawEdges();
+}
+
+document.addEventListener('mousedown', e => {
+  if (e.target.closest('#modal-overlay') || e.target.closest('#back-btn')) return;
+  isPanning = true;
+  startX = e.clientX - panX;
+  startY = e.clientY - panY;
+  document.body.classList.add('dragging');
+});
+
+document.addEventListener('mousemove', e => {
+  if (!isPanning) return;
+  panX = e.clientX - startX;
+  panY = e.clientY - startY;
+  applyPan();
+});
+
+document.addEventListener('mouseup', () => {
+  isPanning = false;
+  document.body.classList.remove('dragging');
+});
+
+// ============================================================
+// MODAL
+// ============================================================
+const overlay = document.getElementById('modal-overlay');
+const modalTitle = document.getElementById('modal-title');
+const modalType = document.getElementById('modal-type');
+const modalBody = document.getElementById('modal-body');
+const modal = document.getElementById('modal');
+
+function openModal(rawText, group) {
+  const text = rawText;
+  const info = PARTICLE_INFO[text];
+
+  // Set gradient vars
+  const gc = GROUP_COLORS[group] || GROUP_COLORS.g1;
+  modal.style.setProperty('--modal-ca', gc.a);
+  modal.style.setProperty('--modal-cb', gc.b);
+
+  modalTitle.textContent = text;
+  if (info) {
+    modalType.textContent = info.type;
+    let html = `<p>${info.desc}</p>`;
+    if (info.tags?.length) {
+      html += '<div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:4px;">';
+      info.tags.forEach(t => { html += `<span class="tag">${t}</span>`; });
+      html += '</div>';
+    }
+    modalBody.innerHTML = html;
+  } else {
+    modalType.textContent = 'Физическая частица';
+    modalBody.innerHTML = '<p>Информация об этой частице скоро будет добавлена.</p>';
+  }
+  overlay.classList.add('active');
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  overlay.classList.remove('active');
+});
+overlay.addEventListener('click', e => {
+  if (e.target === overlay) overlay.classList.remove('active');
+});
+
+// Init
+applyPan();
+</script>
+</body>
+</html>
