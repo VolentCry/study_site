@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Агрегатные состояния — ФизикаПро</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #050c1a; --bg2: #071222; --panel: rgba(14,28,54,.88);
+      --accent: #3b82f6; --accent2: #38bdf8; --warm: #f472b6;
+      --text: #e2e8f0; --muted: #94a3b8; --border: rgba(59,130,246,.22);
+    }
+    body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: Raleway, sans-serif; }
+    nav { position: sticky; top: 0; z-index: 2; min-height: 64px; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; background: rgba(5,12,26,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-logo { color: var(--accent2); font: 700 20px 'Playfair Display', serif; text-decoration: none; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--muted); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .nav-links a:hover, .nav-links a:focus-visible { color: var(--accent2); }
+    main { width: min(1200px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 80px; }
+    .page-heading { margin-bottom: 32px; }
+    .eyebrow { color: var(--accent2); font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1 { margin-top: 10px; font: 900 clamp(34px, 6vw, 58px)/1.08 'Playfair Display', serif; }
+    .intro { max-width: 720px; margin-top: 12px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 20px; align-items: start; }
+    .simulation, .control-panel, .theory { border: 1px solid var(--border); background: var(--panel); }
+    .simulation { min-width: 0; overflow: hidden; border-radius: 12px; }
+    .simulation-head { min-height: 58px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .simulation-title { font-size: 14px; font-weight: 700; }
+    .state-label { color: var(--accent2); font-size: 12px; font-weight: 700; }
+    .phase-picker { display: grid; grid-template-columns: repeat(3, 1fr); padding: 12px; gap: 8px; border-bottom: 1px solid var(--border); }
+    .phase-button { min-height: 42px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--muted); font: 700 13px Raleway, sans-serif; cursor: pointer; }
+    .phase-button[aria-pressed="true"] { border-color: var(--accent); background: rgba(59,130,246,.16); color: #bfdbfe; }
+    .phase-button:hover { color: var(--text); }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--accent2); outline-offset: 3px; }
+    #particleCanvas { display: block; width: 100%; height: clamp(280px, 48vw, 440px); background: #030810; }
+    .meters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); }
+    .meter { min-width: 0; padding: 14px 10px; background: var(--bg2); text-align: center; }
+    .meter-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .meter-value { margin-top: 5px; color: var(--accent2); font: 700 19px 'Playfair Display', serif; }
+    .meter-unit { margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .side-panel { display: grid; gap: 16px; }
+    .control-panel, .theory { overflow: hidden; border-radius: 10px; }
+    .panel-title { padding: 16px 18px; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .panel-body { padding: 18px; }
+    .control-row { display: grid; gap: 12px; }
+    .control-label { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 13px; font-weight: 700; }
+    .temperature-value { color: var(--accent2); font: 700 19px 'Playfair Display', serif; white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+    .button-row { display: flex; gap: 8px; margin-top: 22px; }
+    .action-button { flex: 1; min-height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: 7px; background: transparent; color: var(--text); font: 700 12px Raleway, sans-serif; cursor: pointer; }
+    .action-button.primary { border-color: var(--accent); background: var(--accent); color: white; }
+    .action-button:hover { filter: brightness(1.12); }
+    .theory p { padding: 16px 18px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .theory strong { color: var(--text); }
+    footer { padding: 24px; border-top: 1px solid var(--border); color: var(--muted); text-align: center; font-size: 12px; }
+    @media (max-width: 820px) { .workspace { grid-template-columns: 1fr; } .side-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { nav { padding: 0 18px; } .nav-links { gap: 14px; } .nav-links a { font-size: 11px; } main { width: calc(100% - 28px); padding-top: 38px; } .side-panel { grid-template-columns: 1fr; } .phase-button { font-size: 11px; } .simulation-head { padding: 0 14px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+    <div class="nav-links">
+      <a href="../../all_simulations.html">Все симуляции</a>
+      <a href="../../../physics.html#classes">Классы</a>
+    </div>
+  </nav>
+  <main>
+    <header class="page-heading">
+      <p class="eyebrow">Симуляции · 8 класс · Молекулярная физика</p>
+      <h1>Агрегатные состояния</h1>
+      <p class="intro">Сравните расположение и тепловое движение частиц в твёрдом теле, жидкости и газе.</p>
+    </header>
+    <div class="workspace">
+      <section class="simulation" aria-label="Модель движения частиц">
+        <div class="simulation-head">
+          <span class="simulation-title">Модель вещества</span>
+          <span class="state-label" id="stateLabel">Твёрдое тело</span>
+        </div>
+        <div class="phase-picker" role="group" aria-label="Агрегатное состояние">
+          <button class="phase-button" type="button" data-phase="solid" aria-pressed="true">Твёрдое</button>
+          <button class="phase-button" type="button" data-phase="liquid" aria-pressed="false">Жидкость</button>
+          <button class="phase-button" type="button" data-phase="gas" aria-pressed="false">Газ</button>
+        </div>
+        <canvas id="particleCanvas" aria-label="Анимация расположения и движения частиц"></canvas>
+        <div class="meters">
+          <div class="meter"><div class="meter-label">Состояние</div><div class="meter-value" id="meterPhase">Твёрдое</div><div class="meter-unit">вещества</div></div>
+          <div class="meter"><div class="meter-label">Температура</div><div class="meter-value" id="meterTemp">180</div><div class="meter-unit">К</div></div>
+          <div class="meter"><div class="meter-label">Движение частиц</div><div class="meter-value" id="meterMotion">Низкое</div><div class="meter-unit">тепловое</div></div>
+        </div>
+      </section>
+      <aside class="side-panel">
+        <section class="control-panel">
+          <h2 class="panel-title">Параметры</h2>
+          <div class="panel-body">
+            <div class="control-row">
+              <label class="control-label" for="temperature">
+                <span>Температура</span><output class="temperature-value" id="temperatureValue" for="temperature">180 К</output>
+              </label>
+              <input id="temperature" type="range" min="80" max="700" step="10" value="180">
+              <div class="range-ends"><span>80 К</span><span>700 К</span></div>
+            </div>
+            <div class="button-row">
+              <button class="action-button primary" id="runButton" type="button">Запустить</button>
+              <button class="action-button" id="resetButton" type="button">Сбросить</button>
+            </div>
+          </div>
+        </section>
+        <section class="theory">
+          <h2 class="panel-title">Модель частиц</h2>
+          <p><strong>Твёрдое тело:</strong> частицы колеблются около устойчивых положений.</p>
+          <p><strong>Жидкость:</strong> частицы расположены близко и могут перемещаться.</p>
+          <p><strong>Газ:</strong> частицы далеко друг от друга и движутся свободно.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <footer>ФизикаПро · Молекулярная физика</footer>
+  <script>
+    const canvas = document.getElementById('particleCanvas');
+    const context = canvas.getContext('2d');
+    const temperatureSlider = document.getElementById('temperature');
+    const presets = { solid: 180, liquid: 300, gas: 500 };
+    const labels = { solid: 'Твёрдое тело', liquid: 'Жидкость', gas: 'Газ' };
+    let phase = 'solid';
+    let temperature = presets.solid;
+    let particles = [];
+    let running = false;
+    let animationFrame = 0;
+    let lastFrame = 0;
+    let elapsed = 0;
+    let width = 0;
+    let height = 0;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const scale = Math.min(window.devicePixelRatio || 1, 2);
+      width = rect.width;
+      height = rect.height;
+      canvas.width = Math.round(width * scale);
+      canvas.height = Math.round(height * scale);
+      context.setTransform(scale, 0, 0, scale, 0, 0);
+      if (!particles.length) makeParticles();
+      draw();
+    }
+
+    function makeParticles() {
+      const liquidCols = Math.max(10, Math.floor(width * 0.72 / 12));
+      const liquidRows = Math.max(6, Math.floor(height * 0.4 / 12));
+      const liquidCount = Math.min(640, liquidCols * liquidRows);
+      const count = phase === 'liquid' ? liquidCount : 72;
+      const cols = phase === 'solid' ? 9 : liquidCols;
+      const rows = phase === 'solid' ? 8 : Math.ceil(count / cols);
+      const left = width * 0.2;
+      const top = height * 0.18;
+      const gapX = (width * 0.6) / (cols - 1);
+      const gapY = (height * 0.6) / (rows - 1);
+      particles = Array.from({ length: count }, (_, index) => {
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        let x;
+        let y;
+        if (phase === 'solid') {
+          x = left + col * gapX;
+          y = top + row * gapY;
+        } else if (phase === 'liquid') {
+          const spacing = Math.min(12, width * 0.72 / (liquidCols - 1));
+          x = width * 0.14 + col * spacing + (row % 2) * spacing / 2 + (Math.random() - 0.5) * 2;
+          y = height * 0.49 + row * spacing + (Math.random() - 0.5) * 2;
+        } else {
+          x = width * 0.08 + Math.random() * width * 0.84;
+          y = height * 0.08 + Math.random() * height * 0.84;
+        }
+        const angle = Math.random() * Math.PI * 2;
+        const speed = phase === 'gas' ? 70 : phase === 'liquid' ? 12 : 10;
+        return {
+          x, y, homeX: x, homeY: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: 3 + Math.random() * 2,
+          offset: Math.random() * Math.PI * 2,
+        };
+      });
+    }
+
+    function updateMeters() {
+      const motion = temperature < 250 ? 'Низкое' : temperature < 480 ? 'Среднее' : 'Высокое';
+      document.getElementById('stateLabel').textContent = labels[phase];
+      document.getElementById('meterPhase').textContent = phase === 'solid' ? 'Твёрдое' : phase === 'liquid' ? 'Жидкость' : 'Газ';
+      document.getElementById('meterTemp').textContent = temperature;
+      document.getElementById('meterMotion').textContent = motion;
+      document.getElementById('temperatureValue').textContent = `${temperature} К`;
+    }
+
+    function draw() {
+      if (!width || !height) return;
+      context.clearRect(0, 0, width, height);
+      const background = context.createLinearGradient(0, 0, 0, height);
+      background.addColorStop(0, '#050d1c');
+      background.addColorStop(1, '#09182b');
+      context.fillStyle = background;
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = 'rgba(148,163,184,.24)';
+      context.lineWidth = 1;
+      context.strokeRect(18, 18, width - 36, height - 36);
+
+      if (phase === 'liquid') {
+        const surfaceY = height * 0.48 + Math.sin(elapsed * 1.4) * 2;
+        const water = context.createLinearGradient(0, surfaceY, 0, height);
+        water.addColorStop(0, 'rgba(14,165,233,.12)');
+        water.addColorStop(1, 'rgba(37,99,235,.3)');
+        context.beginPath();
+        context.moveTo(19, surfaceY);
+        for (let x = 19; x <= width - 19; x += 8) {
+          context.lineTo(x, surfaceY + Math.sin(x * 0.035 + elapsed * 1.4) * 2);
+        }
+        context.lineTo(width - 19, height - 19);
+        context.lineTo(19, height - 19);
+        context.closePath();
+        context.fillStyle = water;
+        context.fill();
+        context.beginPath();
+        for (let x = 19; x <= width - 19; x += 8) {
+          const y = surfaceY + Math.sin(x * 0.035 + elapsed * 1.4) * 2;
+          if (x === 19) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+        context.strokeStyle = 'rgba(56,189,248,.72)';
+        context.lineWidth = 2;
+        context.stroke();
+      }
+
+      if (phase === 'solid') {
+        context.strokeStyle = 'rgba(59,130,246,.13)';
+        context.lineWidth = 1;
+        for (let row = 0; row < 8; row++) {
+          context.beginPath();
+          for (let col = 0; col < 9; col++) {
+            const particle = particles[row * 9 + col];
+            if (!particle) continue;
+            const amplitude = 1.5 + temperature / 120;
+            const x = particle.homeX + Math.sin(elapsed * 3 + particle.offset) * amplitude;
+            const y = particle.homeY + Math.cos(elapsed * 3 + particle.offset) * amplitude;
+            if (!col) context.moveTo(x, y);
+            else context.lineTo(x, y);
+          }
+          context.stroke();
+        }
+        for (let col = 0; col < 9; col++) {
+          context.beginPath();
+          for (let row = 0; row < 8; row++) {
+            const particle = particles[row * 9 + col];
+            if (!particle) continue;
+            const amplitude = 1.5 + temperature / 120;
+            const x = particle.homeX + Math.sin(elapsed * 3 + particle.offset) * amplitude;
+            const y = particle.homeY + Math.cos(elapsed * 3 + particle.offset) * amplitude;
+            if (!row) context.moveTo(x, y);
+            else context.lineTo(x, y);
+          }
+          context.stroke();
+        }
+      }
+
+      particles.forEach((particle, index) => {
+        let x = particle.x;
+        let y = particle.y;
+        if (phase === 'solid') {
+          const amplitude = 1.5 + temperature / 120;
+          x = particle.homeX + Math.sin(elapsed * 3 + particle.offset) * amplitude;
+          y = particle.homeY + Math.cos(elapsed * 3 + particle.offset) * amplitude;
+        }
+        const hue = phase === 'gas' ? 193 + (index % 2) * 17 : phase === 'liquid' ? 190 + (index % 2) * 12 : 207 + (index % 2) * 18;
+        context.beginPath();
+        context.arc(x, y, particle.radius + (phase === 'solid' ? temperature / 420 : 0), 0, Math.PI * 2);
+        context.fillStyle = `hsla(${hue}, 90%, 65%, .9)`;
+        context.shadowColor = `hsla(${hue}, 90%, 60%, .55)`;
+        context.shadowBlur = phase === 'gas' ? 12 : 7;
+        context.fill();
+        context.shadowBlur = 0;
+      });
+    }
+
+    function step(timestamp) {
+      if (!running) return;
+      if (!lastFrame) lastFrame = timestamp;
+      const delta = Math.min((timestamp - lastFrame) / 1000, 0.04);
+      lastFrame = timestamp;
+      elapsed += delta;
+      const speedScale = Math.sqrt(temperature / presets[phase]);
+      particles.forEach(particle => {
+        if (phase === 'solid') return;
+        const speedLimit = (phase === 'gas' ? 120 : phase === 'liquid' ? 24 : 38) * speedScale;
+        particle.x += particle.vx * speedScale * delta;
+        particle.y += particle.vy * speedScale * delta;
+        const minX = phase === 'liquid' ? width * 0.12 : 24;
+        const maxX = phase === 'liquid' ? width * 0.88 : width - 24;
+        const minY = phase === 'liquid' ? height * 0.48 : 24;
+        if (particle.x < minX || particle.x > maxX) particle.vx *= -1;
+        if (particle.y < minY || particle.y > height - 24) particle.vy *= -1;
+        particle.x = Math.max(minX, Math.min(maxX, particle.x));
+        particle.y = Math.max(minY, Math.min(height - 24, particle.y));
+        const speed = Math.hypot(particle.vx, particle.vy);
+        if (speed > speedLimit) {
+          particle.vx *= speedLimit / speed;
+          particle.vy *= speedLimit / speed;
+        }
+      });
+      draw();
+      animationFrame = requestAnimationFrame(step);
+    }
+
+    function setPhase(nextPhase) {
+      phase = nextPhase;
+      temperature = presets[phase];
+      temperatureSlider.value = temperature;
+      document.querySelectorAll('.phase-button').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.phase === phase));
+      });
+      makeParticles();
+      updateMeters();
+      draw();
+    }
+
+    document.querySelectorAll('.phase-button').forEach(button => {
+      button.addEventListener('click', () => setPhase(button.dataset.phase));
+    });
+    temperatureSlider.addEventListener('input', () => {
+      temperature = Number(temperatureSlider.value);
+      updateMeters();
+      draw();
+    });
+    document.getElementById('runButton').addEventListener('click', event => {
+      running = !running;
+      event.currentTarget.textContent = running ? 'Пауза' : 'Продолжить';
+      if (running) {
+        lastFrame = 0;
+        animationFrame = requestAnimationFrame(step);
+      } else {
+        cancelAnimationFrame(animationFrame);
+      }
+    });
+    document.getElementById('resetButton').addEventListener('click', () => {
+      running = false;
+      cancelAnimationFrame(animationFrame);
+      document.getElementById('runButton').textContent = 'Запустить';
+      elapsed = 0;
+      makeParticles();
+      updateMeters();
+      draw();
+    });
+
+    new ResizeObserver(resizeCanvas).observe(canvas);
+    window.addEventListener('resize', resizeCanvas);
+    updateMeters();
+    resizeCanvas();
+  </script>
+</body>
+</html>

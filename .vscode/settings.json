@@ -1,3 +1,4 @@
 {
-    "commentTranslate.targetLanguage": "ru"
+    "commentTranslate.targetLanguage": "ru",
+    "liveServer.settings.port": 5502
 }

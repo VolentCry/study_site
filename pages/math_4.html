@@ -1,114 +1,237 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f2eb">
+    <title>Математика · 4 класс</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Zen+Old+Mincho:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            --paper: #f5f2eb;
+            --paper-light: #fbf9f4;
+            --ink: #202a3a;
+            --muted: #697383;
+            --indigo: #263f61;
+            --indigo-soft: #e5e9ee;
+            --vermilion: #b7464e;
+            --sakura: #e5b5b8;
+            --line: rgba(38,63,97,.2);
+        }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'DM Sans', sans-serif; }
+        a { color: inherit; }
+        a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 
-        <title>
-            Математика в Minecraft. 4 класс
-        </title>
+        .site-nav {
+            position: sticky; top: 0; z-index: 20; min-height: 68px; padding: 0 5vw;
+            display: flex; align-items: center; justify-content: space-between; gap: 24px;
+            background: rgba(251,249,244,.96); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+        }
+        .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; white-space: nowrap; }
+        .brand-mark {
+            width: 34px; height: 34px; display: grid; place-items: center;
+            border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+        }
+        .brand-name { color: var(--indigo); font: 700 19px 'Zen Old Mincho', serif; }
+        .brand-class { margin-left: 2px; color: var(--muted); font-size: 11px; font-weight: 600; }
+        .nav-links { display: flex; align-items: center; gap: 28px; }
+        .nav-links a { color: var(--muted); font-size: 12px; font-weight: 700; text-decoration: none; transition: color .2s; }
+        .nav-links a:hover { color: var(--vermilion); }
 
-        <link rel="stylesheet" href="../style.css">
-        <link rel="stylesheet" href="../assets/fonts/minecraft-font.css">
+        .hero {
+            min-height: 510px; height: min(66svh, 680px); position: relative; isolation: isolate;
+            display: flex; align-items: center; overflow: hidden; color: #fff;
+            background: #26354b;
+        }
+        .hero-image { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: center 43%; }
+        .hero::after {
+            content: ''; position: absolute; inset: 0; z-index: -1;
+            background: linear-gradient(90deg, rgba(19,30,48,.82) 0%, rgba(22,36,55,.62) 43%, rgba(26,40,58,.12) 100%), linear-gradient(0deg, rgba(17,28,45,.28), transparent 48%);
+        }
+        .hero-inner { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 64px 0 78px; }
+        .hero-kicker { margin: 0 0 18px; color: #f4d5d4; font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; animation: rise .7s both; }
+        .hero h1 { max-width: 620px; margin: 0; font: 700 68px/1.08 'Zen Old Mincho', serif; animation: rise .7s .08s both; }
+        .hero-copy { max-width: 465px; margin: 18px 0 0; color: rgba(255,255,255,.84); font-size: 16px; line-height: 1.75; animation: rise .7s .16s both; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; animation: rise .7s .24s both; }
+        .hero-action {
+            min-height: 46px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,.65); color: #fff; font-size: 13px; font-weight: 700;
+            text-decoration: none; transition: background .2s, color .2s, border-color .2s;
+        }
+        .hero-action.primary { border-color: #c45b61; background: #b7464e; }
+        .hero-action:hover { border-color: #fff; background: #fff; color: var(--indigo); }
+        .hero-caption { position: absolute; right: 5vw; bottom: 22px; color: rgba(255,255,255,.72); font-size: 10px; letter-spacing: .08em; }
 
-        <style>
-            @import url('https://fonts.cdnfonts.com/css/minecraft-3');
-            
-            * {
-                font-family: 'Minecraft', 'Minecraft 3', sans-serif !important;
-            }
-            .welcome-card {
-                background: rgba(34, 34, 34, 0.85);
-                border-radius: 24px;
-                box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-                padding: 40px 32px 32px 32px;
-                max-width: 480px;
-                margin: 0 auto;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 24px;
-            }
+        .routes { padding: 58px 24px 64px; background: var(--paper-light); }
+        .section-inner { width: min(1080px, 100%); margin: 0 auto; }
+        .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+        .eyebrow { margin: 0 0 8px; color: var(--vermilion); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+        .section-heading h2 { margin: 0; color: var(--indigo); font: 600 32px/1.2 'Zen Old Mincho', serif; }
+        .section-note { max-width: 360px; margin: 0 0 2px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+        .route-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); border-top: 1px solid var(--line); }
+        .route-link {
+            min-height: 122px; padding: 22px 20px; display: grid; grid-template-columns: 38px 1fr 20px;
+            align-items: center; gap: 16px; border-bottom: 1px solid var(--line); text-decoration: none;
+            transition: background .2s;
+        }
+        .route-link + .route-link { border-left: 1px solid var(--line); }
+        .route-link:hover { background: #f1e8e4; }
+        .route-index { color: var(--vermilion); font: 600 18px 'Zen Old Mincho', serif; }
+        .route-title { display: block; color: var(--indigo); font: 600 20px 'Zen Old Mincho', serif; }
+        .route-copy { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+        .route-arrow { color: var(--vermilion); font-size: 19px; transition: transform .2s; }
+        .route-link:hover .route-arrow { transform: translateX(4px); }
 
-            .page {
-                display: none;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                min-height: 100vh;
-                padding: 20px;
-            }
-            .page.active {
-                display: flex;
-            }
-            .trainers-list {
-                display: flex;
-                flex-direction: column;
-                gap: 14px;
-                max-width: 700px;
-            }
-            .trainers-list .minecraft-button {
-                width: 80%;
-                text-align: center;
-                text-decoration: none;
-                color: white;
-            }
-            .page-trainers .welcome-card {
-                max-width: 500px;
-            }
+        .trainers { padding: 64px 24px 76px; background: #e9edf0; scroll-margin-top: 76px; }
+        .trainer-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); border-top: 1px solid rgba(38,63,97,.22); }
+        .trainer-link {
+            min-height: 96px; padding: 17px 16px; display: grid; grid-template-columns: 42px 1fr 20px;
+            align-items: center; gap: 14px; border-bottom: 1px solid rgba(38,63,97,.22); text-decoration: none;
+            transition: background .2s;
+        }
+        .trainer-link:nth-child(even) { border-left: 1px solid rgba(38,63,97,.22); }
+        .trainer-link:hover { background: rgba(255,255,255,.52); }
+        .trainer-number { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion); color: var(--vermilion); font: 600 14px 'Zen Old Mincho', serif; }
+        .trainer-name { color: var(--indigo); font-size: 13px; font-weight: 700; line-height: 1.5; }
+        .trainer-level { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 500; }
+        .trainer-arrow { color: var(--vermilion); font-size: 18px; }
+        .page-footer { padding: 22px 24px; display: flex; justify-content: space-between; gap: 16px; background: #1e3049; color: rgba(255,255,255,.72); font-size: 11px; }
+        .page-footer a { color: #f0c2c2; text-decoration: none; }
+        @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 720px) {
+            .site-nav { min-height: 62px; padding: 0 20px; gap: 12px; }
+            .brand { gap: 8px; }
+            .brand-name { font-size: 16px; }
+            .brand-mark { width: 30px; height: 30px; }
+            .brand-class { display: none; }
+            .nav-links { gap: 15px; }
+            .nav-links a { font-size: 11px; }
+            .hero { min-height: 490px; height: 64svh; }
+            .hero-image { object-position: 59% center; }
+            .hero::after { background: linear-gradient(90deg, rgba(19,30,48,.78), rgba(22,36,55,.4)), linear-gradient(0deg, rgba(17,28,45,.34), transparent 55%); }
+            .hero-inner { width: calc(100% - 40px); padding: 54px 0 72px; }
+            .hero h1 { max-width: 480px; font-size: 48px; }
+            .hero-copy { max-width: 410px; font-size: 14px; }
+            .routes { padding: 44px 20px 48px; }
+            .section-heading { display: block; }
+            .section-heading h2 { font-size: 28px; }
+            .section-note { margin-top: 10px; }
+            .route-link { min-height: 112px; padding: 16px 12px; grid-template-columns: 28px 1fr 16px; gap: 10px; }
+            .route-title { font-size: 17px; }
+            .route-copy { font-size: 11px; }
+            .trainers { padding: 48px 20px 56px; }
+        }
+        @media (max-width: 480px) {
+            .site-nav { flex-wrap: wrap; padding: 10px 16px; }
+            .brand { margin-right: auto; }
+            .nav-links { width: 100%; justify-content: flex-end; gap: 20px; padding: 0 2px 2px; }
+            .hero { min-height: 480px; height: 62svh; }
+            .hero h1 { font-size: 32px; }
+            .hero-copy { max-width: 340px; }
+            .hero-caption { right: 16px; bottom: 14px; font-size: 9px; }
+            .route-list, .trainer-grid { grid-template-columns: 1fr; }
+            .route-link + .route-link, .trainer-link:nth-child(even) { border-left: 0; }
+            .route-link { min-height: 96px; }
+            .trainer-link { min-height: 84px; }
+            .page-footer { flex-direction: column; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="site-nav" aria-label="Главная навигация">
+        <a class="brand" href="../index.html" aria-label="На главную платформы">
+            <span class="brand-mark" aria-hidden="true">数</span>
+            <span class="brand-name">Математика</span>
+            <span class="brand-class">4 класс</span>
+        </a>
+        <div class="nav-links">
+            <a href="../tasks/tasks.html">Задачи</a>
+            <a href="#trainers">Тренажёры</a>
+        </div>
+    </nav>
 
-        </style>
-    </head>
-
-    <body class="welcome-page">
-        <div id="menu-placeholder"></div>
-
-        <!-- Главная страница -->
-        <div id="page-main" class="page active">
-            <div class="welcome-container">
-                <div class="welcome-card">
-                    <h1 class="welcome-title">Рады тебя видеть, юный строитель!</h1>
-                    <p class="welcome-text">Давай решим несколько интересных математических задач из мира Minecraft!</p>
-                    <a href="../tasks/tasks.html" class="minecraft-button pulsating-button welcome-button">Задачки</a>
-                    <button class="minecraft-button mode-button" onclick="switchPage('trainers')">Тренажёры</button>
+    <main>
+        <section class="hero" aria-labelledby="hero-title">
+            <img class="hero-image" src="../assets/images/sakura_math_hero.jpg" alt="Цветущие ветви сакуры весной" fetchpriority="high">
+            <div class="hero-inner">
+                <p class="hero-kicker">Учебная мастерская · четвёртый класс</p>
+                <h1 id="hero-title">Математика</h1>
+                <p class="hero-copy">Считай, замечай закономерности и пробуй снова. Здесь задачи и тренажёры помогают уверенно освоить математику шаг за шагом.</p>
+                <div class="hero-actions">
+                    <a class="hero-action primary" href="../tasks/tasks.html">Перейти к задачам</a>
+                    <a class="hero-action" href="#trainers">Выбрать тренажёр</a>
                 </div>
             </div>
-        </div>
+            <span class="hero-caption">春 · Весна — время новых открытий</span>
+        </section>
 
-        <!-- Страница выбора тренажёров -->
-        <div id="page-trainers" class="page">
-            <div class="welcome-card">
-                <h1 class="welcome-title">Тренажёры</h1>
-                <p class="welcome-text">Выбери тренажёр:</p>
-                <div class="trainers-list">
-                    <a href="../math_moduls/multiplication_trainer.html" class="minecraft-button mode-button">Тренажёр №1 - Умножение. Уровень: Лёгкий</a>
-                    <a href="../math_moduls/multiplication_trainer_medium_level.html" class="minecraft-button mode-button">Тренажёр №2 - Умножение. Уровень: Средний</a>
-                    <a href="../math_moduls/multiplication_trainer_hard_level.html" class="minecraft-button mode-button">Тренажёр №3 - Умножение. Уровень: Сложный</a>
-                    <a href="../math_moduls/decimal_fraction_trainer.html" class="minecraft-button mode-button">Тренажёр №4 - Операции с десятичными дробями</a>
-                    <a href="../math_moduls/equations_trainer_easy.html" class="minecraft-button mode-button">Тренажёр №5 - Уравнения. Уровень: Лёгкий</a>
-                    <a href="../math_moduls/equations_trainer_medium.html" class="minecraft-button mode-button">Тренажёр №6 - Уравнения. Уровень: Средний</a>
+        <section class="routes" aria-labelledby="routes-title">
+            <div class="section-inner">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Начни с интересного</p>
+                        <h2 id="routes-title">Выбери маршрут</h2>
+                    </div>
+                    <p class="section-note">Можно решить задачи по темам или сразу перейти к тренировке навыков.</p>
                 </div>
-                <button class="minecraft-button mode-button" onclick="switchPage('main')" style="margin-top: 20px;">← Назад</button>
+                <div class="route-list">
+                    <a class="route-link" href="../tasks/tasks.html">
+                        <span class="route-index">01</span>
+                        <span><span class="route-title">Задачи</span><span class="route-copy">Текстовые задачи и задания по темам</span></span>
+                        <span class="route-arrow" aria-hidden="true">→</span>
+                    </a>
+                    <a class="route-link" href="#trainers">
+                        <span class="route-index">02</span>
+                        <span><span class="route-title">Тренажёры</span><span class="route-copy">Умножение, дроби и уравнения</span></span>
+                        <span class="route-arrow" aria-hidden="true">→</span>
+                    </a>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <script>
-            function switchPage(pageId) {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                const target = document.getElementById('page-' + pageId);
-                if (target) {
-                    target.classList.add('active');
-                    if (target.scrollTop !== undefined) target.scrollTop = 0;
-                }
-            }
+        <section class="trainers" id="trainers" aria-labelledby="trainers-title">
+            <div class="section-inner">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Практика каждый день</p>
+                        <h2 id="trainers-title">Тренажёры</h2>
+                    </div>
+                    <p class="section-note">Выбери тему и подходящий уровень. Можно возвращаться к упражнениям сколько угодно раз.</p>
+                </div>
+                <div class="trainer-grid">
+                    <a class="trainer-link" href="../math_moduls/multiplication_trainer.html">
+                        <span class="trainer-number">01</span><span class="trainer-name">Умножение<span class="trainer-level">Лёгкий уровень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="trainer-link" href="../math_moduls/multiplication_trainer_medium_level.html">
+                        <span class="trainer-number">02</span><span class="trainer-name">Умножение<span class="trainer-level">Средний уровень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="trainer-link" href="../math_moduls/multiplication_trainer_hard_level.html">
+                        <span class="trainer-number">03</span><span class="trainer-name">Умножение<span class="trainer-level">Сложный уровень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="trainer-link" href="../math_moduls/decimal_fraction_trainer.html">
+                        <span class="trainer-number">04</span><span class="trainer-name">Десятичные дроби<span class="trainer-level">Операции с дробями</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="trainer-link" href="../math_moduls/equations_trainer_easy.html">
+                        <span class="trainer-number">05</span><span class="trainer-name">Уравнения<span class="trainer-level">Лёгкий уровень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="trainer-link" href="../math_moduls/equations_trainer_medium.html">
+                        <span class="trainer-number">06</span><span class="trainer-name">Уравнения<span class="trainer-level">Средний уровень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
 
-            fetch('../menu.html')
-                .then(r => r.text())
-                .then(html => {
-                    document.getElementById('menu-placeholder').innerHTML = html;
-                })
-                .catch(err => console.error('Ошибка загрузки меню', err));
-        </script>
-
-    </body>
+    <footer class="page-footer">
+        <span>Математика · 4 класс</span>
+        <a href="../index.html">На главную платформы</a>
+    </footer>
+</body>
 </html>

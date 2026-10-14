@@ -116,6 +116,21 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 20px;
   }
+  .grade-tasks-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 28px; padding: 13px 28px; border: 1px solid var(--border);
+    border-radius: 999px; color: var(--text); text-decoration: none;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.04em;
+    transition: transform 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .grade-tasks-link:hover, .grade-tasks-link:focus-visible {
+    transform: translateY(-2px); color: var(--accent);
+    border-color: var(--accent); box-shadow: 0 8px 24px rgba(56,189,248,0.12);
+  }
+  .grade-tasks-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .g8 .grade-tasks-link:hover, .g8 .grade-tasks-link:focus-visible { color: var(--accent2); border-color: var(--accent2); }
+  .g9 .grade-tasks-link:hover, .g9 .grade-tasks-link:focus-visible { color: var(--accent3); border-color: var(--accent3); }
+  .g10 .grade-tasks-link:hover, .g10 .grade-tasks-link:focus-visible { color: var(--gold); border-color: var(--gold); }
   @media (max-width: 1100px) { .sim-cards-grid { grid-template-columns: repeat(4,1fr); } }
   @media (max-width: 860px)  { .sim-cards-grid { grid-template-columns: repeat(3,1fr); } }
   @media (max-width: 600px)  { .sim-cards-grid { grid-template-columns: repeat(2,1fr); } }
@@ -201,11 +216,11 @@
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo">⚛ ФизикаПро</a>
+  <a href="../physics.html" class="nav-logo">⚛ ФизикаПро</a>
   <div class="nav-links">
-    <a href="index.html">Главная</a>
+    <a href="../physics.html">Главная</a>
     <a href="#" class="active">Симуляции</a>
-    <a href="index.html#classes">Классы</a>
+    <a href="../physics.html#classes">Классы</a>
   </div>
 </nav>
 
@@ -235,6 +250,7 @@
       </div>
     </div>
     <div class="sim-cards-grid" id="grid7"></div>
+    <a class="grade-tasks-link" href="tasks/index.html?grade=7">К задачам</a>
   </div>
 </section>
 
@@ -250,6 +266,7 @@
       </div>
     </div>
     <div class="sim-cards-grid" id="grid8"></div>
+    <a class="grade-tasks-link" href="tasks/index.html?grade=8">К задачам</a>
   </div>
 </section>
 
@@ -265,6 +282,7 @@
       </div>
     </div>
     <div class="sim-cards-grid" id="grid9"></div>
+    <a class="grade-tasks-link" href="tasks/index.html?grade=9">К задачам</a>
   </div>
 </section>
 
@@ -280,6 +298,7 @@
       </div>
     </div>
     <div class="sim-cards-grid" id="grid10"></div>
+    <a class="grade-tasks-link" href="tasks/index.html?grade=10-11">К задачам</a>
   </div>
 </section>
 
@@ -304,9 +323,9 @@ const grades = [
   {
     id: 'grid8', tag: '8 класс', color: '#818cf8', color2: '#6366f1',
     sims: [
-      { name: 'Диффузия',                draw: drawDiffusion,  url: 'simulations/eight_grade/Diffusion.html' },
-      { name: 'Агрегатные состояния',    draw: drawStates,     url: null },
-      { name: 'График нагревания',       draw: drawHeating,    url: null },
+      { name: 'Диффузия',                draw: drawDiffusion,  url: 'simulations/eight_grade.html/Diffusion.html' },
+      { name: 'Агрегатные состояния',    draw: drawStates,     url: 'simulations/eight_grade.html/States.html' },
+      { name: 'График нагревания',       draw: drawHeating,    url: 'simulations/eight_grade.html/Heating.html' },
       { name: 'Конвекция и теплообмен',  draw: drawConvection, url: null },
       { name: 'Закон Кулона',            draw: drawCoulomb,    url: null },
       { name: 'Электрическое поле',      draw: drawEfield,     url: null },

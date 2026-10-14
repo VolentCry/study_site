@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>График нагревания — ФизикаПро</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #050c1a; --bg2: #071222; --panel: rgba(14,28,54,.88);
+      --accent: #3b82f6; --cyan: #38bdf8; --warm: #f59e0b;
+      --text: #e2e8f0; --muted: #94a3b8; --border: rgba(59,130,246,.22);
+    }
+    body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: Raleway, sans-serif; }
+    nav { position: sticky; top: 0; z-index: 2; min-height: 64px; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; background: rgba(5,12,26,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-logo { color: var(--cyan); font: 700 20px 'Playfair Display', serif; text-decoration: none; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--muted); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .nav-links a:hover, .nav-links a:focus-visible { color: var(--cyan); }
+    main { width: min(1200px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 80px; }
+    .page-heading { margin-bottom: 32px; }
+    .eyebrow { color: var(--cyan); font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1 { margin-top: 10px; font: 900 clamp(34px, 6vw, 58px)/1.08 'Playfair Display', serif; }
+    .intro { max-width: 720px; margin-top: 12px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 20px; align-items: start; }
+    .graph-panel, .control-panel, .theory { border: 1px solid var(--border); background: var(--panel); }
+    .graph-panel { min-width: 0; overflow: hidden; border-radius: 12px; }
+    .graph-head { min-height: 58px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .graph-title { font-size: 14px; font-weight: 700; }
+    .phase-label { color: var(--cyan); font-size: 12px; font-weight: 700; }
+    .chart-wrap { padding: 14px 14px 0; background: #030810; }
+    #heatingCanvas { display: block; width: 100%; height: clamp(300px, 48vw, 440px); }
+    .phase-legend { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 14px; background: #030810; }
+    .phase-chip { min-height: 38px; display: grid; place-items: center; padding: 6px 4px; border: 1px solid transparent; border-radius: 6px; color: var(--muted); font-size: 10px; font-weight: 700; text-align: center; }
+    .phase-chip.active { border-color: rgba(56,189,248,.35); background: rgba(56,189,248,.1); color: #bae6fd; }
+    .meters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); }
+    .meter { min-width: 0; padding: 14px 10px; background: var(--bg2); text-align: center; }
+    .meter-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .meter-value { margin-top: 5px; color: var(--cyan); font: 700 19px 'Playfair Display', serif; }
+    .meter-unit { margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .side-panel { display: grid; gap: 16px; }
+    .control-panel, .theory { overflow: hidden; border-radius: 10px; }
+    .panel-title { padding: 16px 18px; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .panel-body { padding: 18px; }
+    .control-row { display: grid; gap: 12px; }
+    .control-label { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-size: 13px; font-weight: 700; }
+    .control-value { color: var(--cyan); font: 700 19px 'Playfair Display', serif; white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+    .button-row { display: flex; gap: 8px; margin-top: 22px; }
+    .action-button { flex: 1; min-height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: 7px; background: transparent; color: var(--text); font: 700 12px Raleway, sans-serif; cursor: pointer; }
+    .action-button.primary { border-color: var(--accent); background: var(--accent); color: white; }
+    .action-button:hover { filter: brightness(1.12); }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+    .theory p { padding: 16px 18px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .theory strong { color: var(--text); }
+    .formula { display: block; margin-top: 8px; color: #bfdbfe; font: 700 15px 'Playfair Display', serif; }
+    footer { padding: 24px; border-top: 1px solid var(--border); color: var(--muted); text-align: center; font-size: 12px; }
+    @media (max-width: 820px) { .workspace { grid-template-columns: 1fr; } .side-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { nav { padding: 0 18px; } .nav-links { gap: 14px; } .nav-links a { font-size: 11px; } main { width: calc(100% - 28px); padding-top: 38px; } .side-panel { grid-template-columns: 1fr; } .graph-head { padding: 0 14px; } .phase-legend { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+    <div class="nav-links">
+      <a href="../../all_simulations.html">Все симуляции</a>
+      <a href="../../../physics.html#classes">Классы</a>
+    </div>
+  </nav>
+  <main>
+    <header class="page-heading">
+      <p class="eyebrow">Симуляции · 8 класс · Тепловые явления</p>
+      <h1>График нагревания</h1>
+      <p class="intro">Наблюдайте, как меняется температура вещества при передаче энергии. На горизонтальных участках тепло расходуется на изменение агрегатного состояния.</p>
+    </header>
+    <div class="workspace">
+      <section class="graph-panel" aria-label="График зависимости температуры от количества теплоты">
+        <div class="graph-head">
+          <span class="graph-title">Температура вещества</span>
+          <span class="phase-label" id="phaseLabel">Нагревание льда</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="heatingCanvas" aria-label="График зависимости температуры от количества переданного тепла"></canvas>
+        </div>
+        <div class="phase-legend" aria-label="Этапы нагревания">
+          <div class="phase-chip active" data-stage="ice">Лёд</div>
+          <div class="phase-chip" data-stage="melt">Плавление</div>
+          <div class="phase-chip" data-stage="water">Вода</div>
+          <div class="phase-chip" data-stage="boil">Кипение</div>
+          <div class="phase-chip" data-stage="steam">Пар</div>
+        </div>
+        <div class="meters">
+          <div class="meter"><div class="meter-label">Передано тепла</div><div class="meter-value" id="meterHeat">0</div><div class="meter-unit">усл. ед.</div></div>
+          <div class="meter"><div class="meter-label">Температура</div><div class="meter-value" id="meterTemp">−20</div><div class="meter-unit">°C</div></div>
+          <div class="meter"><div class="meter-label">Состояние</div><div class="meter-value" id="meterState">Лёд</div><div class="meter-unit">вещества</div></div>
+        </div>
+      </section>
+      <aside class="side-panel">
+        <section class="control-panel">
+          <h2 class="panel-title">Подвод тепла</h2>
+          <div class="panel-body">
+            <div class="control-row">
+              <label class="control-label" for="heatInput">
+                <span>Количество теплоты</span><output class="control-value" id="heatValue" for="heatInput">0%</output>
+              </label>
+              <input id="heatInput" type="range" min="0" max="100" step="1" value="0">
+              <div class="range-ends"><span>Начало</span><span>Конец нагревания</span></div>
+            </div>
+            <div class="button-row">
+              <button class="action-button primary" id="runButton" type="button">Запустить</button>
+              <button class="action-button" id="resetButton" type="button">Сбросить</button>
+            </div>
+          </div>
+        </section>
+        <section class="theory">
+          <h2 class="panel-title">Как читать график</h2>
+          <p>На наклонных участках энергия повышает температуру вещества.<span class="formula">Q = cmΔT</span></p>
+          <p>На горизонтальных участках температура не меняется: энергия идёт на фазовый переход.<span class="formula">Q = λm — плавление</span><span class="formula">Q = Lm — парообразование</span></p>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <footer>ФизикаПро · Тепловые явления</footer>
+  <script>
+    const canvas = document.getElementById('heatingCanvas');
+    const context = canvas.getContext('2d');
+    const heatInput = document.getElementById('heatInput');
+    const chart = [
+      { energy: 0, temperature: -20 },
+      { energy: 20, temperature: 0 },
+      { energy: 40, temperature: 0 },
+      { energy: 65, temperature: 100 },
+      { energy: 85, temperature: 100 },
+      { energy: 100, temperature: 130 },
+    ];
+    const stages = [
+      { id: 'ice', label: 'Нагревание льда', name: 'Лёд', start: 0, end: 20 },
+      { id: 'melt', label: 'Плавление льда', name: 'Лёд + вода', start: 20, end: 40 },
+      { id: 'water', label: 'Нагревание воды', name: 'Вода', start: 40, end: 65 },
+      { id: 'boil', label: 'Кипение воды', name: 'Вода + пар', start: 65, end: 85 },
+      { id: 'steam', label: 'Нагревание пара', name: 'Пар', start: 85, end: 100 },
+    ];
+    let heat = 0;
+    let running = false;
+    let frameId = 0;
+    let lastFrame = 0;
+    let width = 0;
+    let height = 0;
+
+    function temperatureAt(value) {
+      if (value <= 20) return -20 + value;
+      if (value <= 40) return 0;
+      if (value <= 65) return (value - 40) * 4;
+      if (value <= 85) return 100;
+      return 100 + (value - 85) * 2;
+    }
+
+    function currentStage() {
+      return stages.find((stage, index) => heat < stage.end || index === stages.length - 1) || stages[0];
+    }
+
+    function updateReadout() {
+      const stage = currentStage();
+      const temperature = Math.round(temperatureAt(heat));
+      document.getElementById('heatValue').textContent = `${Math.round(heat)}%`;
+      document.getElementById('meterHeat').textContent = Math.round(heat);
+      document.getElementById('meterTemp').textContent = temperature < 0 ? `−${Math.abs(temperature)}` : temperature;
+      document.getElementById('meterState').textContent = stage.name;
+      document.getElementById('phaseLabel').textContent = stage.label;
+      document.querySelectorAll('.phase-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.stage === stage.id);
+      });
+      heatInput.value = Math.round(heat);
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const scale = Math.min(window.devicePixelRatio || 1, 2);
+      width = rect.width;
+      height = rect.height;
+      canvas.width = Math.round(width * scale);
+      canvas.height = Math.round(height * scale);
+      context.setTransform(scale, 0, 0, scale, 0, 0);
+      draw();
+    }
+
+    function pointFor(item) {
+      const left = 52;
+      const right = width - 24;
+      const top = 24;
+      const bottom = height - 48;
+      return {
+        x: left + item.energy / 100 * (right - left),
+        y: bottom - (item.temperature + 30) / 170 * (bottom - top),
+      };
+    }
+
+    function draw() {
+      if (!width || !height) return;
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = '#030810';
+      context.fillRect(0, 0, width, height);
+
+      const left = 52;
+      const right = width - 24;
+      const top = 24;
+      const bottom = height - 48;
+      context.font = '11px Raleway, sans-serif';
+      context.textAlign = 'right';
+      context.textBaseline = 'middle';
+      [-20, 0, 40, 80, 100, 130].forEach(value => {
+        const y = bottom - (value + 30) / 170 * (bottom - top);
+        context.strokeStyle = value === 0 || value === 100 ? 'rgba(56,189,248,.16)' : 'rgba(148,163,184,.1)';
+        context.beginPath();
+        context.moveTo(left, y);
+        context.lineTo(right, y);
+        context.stroke();
+        context.fillStyle = 'rgba(148,163,184,.7)';
+        context.fillText(`${value}°`, left - 9, y);
+      });
+      [0, 20, 40, 60, 80, 100].forEach(value => {
+        const x = left + value / 100 * (right - left);
+        context.strokeStyle = 'rgba(148,163,184,.08)';
+        context.beginPath();
+        context.moveTo(x, top);
+        context.lineTo(x, bottom);
+        context.stroke();
+      });
+
+      context.strokeStyle = 'rgba(226,232,240,.55)';
+      context.lineWidth = 1.5;
+      context.beginPath();
+      context.moveTo(left, top);
+      context.lineTo(left, bottom);
+      context.lineTo(right, bottom);
+      context.stroke();
+      context.fillStyle = 'rgba(148,163,184,.82)';
+      context.textAlign = 'left';
+      context.textBaseline = 'alphabetic';
+      context.fillText('T, °C', left, top - 8);
+      context.textAlign = 'right';
+      context.fillText('Q, усл. ед.', right, bottom + 32);
+
+      context.beginPath();
+      chart.forEach((item, index) => {
+        const point = pointFor(item);
+        if (!index) context.moveTo(point.x, point.y);
+        else context.lineTo(point.x, point.y);
+      });
+      context.strokeStyle = 'rgba(148,163,184,.28)';
+      context.lineWidth = 3;
+      context.lineJoin = 'round';
+      context.stroke();
+
+      let remaining = heat;
+      context.lineWidth = 4;
+      context.lineJoin = 'round';
+      chart.slice(1).forEach((item, index) => {
+        const start = chart[index];
+        const segmentLength = item.energy - start.energy;
+        if (remaining <= 0) return;
+        const portion = Math.min(remaining, segmentLength) / segmentLength;
+        const startPoint = pointFor(start);
+        const endPoint = pointFor({
+          energy: start.energy + segmentLength * portion,
+          temperature: start.temperature + (item.temperature - start.temperature) * portion,
+        });
+        context.beginPath();
+        context.moveTo(startPoint.x, startPoint.y);
+        context.lineTo(endPoint.x, endPoint.y);
+        context.strokeStyle = index === 1 || index === 3 ? '#f59e0b' : '#38bdf8';
+        context.stroke();
+        remaining -= segmentLength;
+      });
+
+      const cursor = pointFor({ energy: heat, temperature: temperatureAt(heat) });
+      context.beginPath();
+      context.arc(cursor.x, cursor.y, 7, 0, Math.PI * 2);
+      context.fillStyle = '#f8fafc';
+      context.shadowColor = '#38bdf8';
+      context.shadowBlur = 16;
+      context.fill();
+      context.shadowBlur = 0;
+    }
+
+    function animate(timestamp) {
+      if (!running) return;
+      if (!lastFrame) lastFrame = timestamp;
+      const delta = Math.min((timestamp - lastFrame) / 1000, 0.05);
+      lastFrame = timestamp;
+      heat = Math.min(100, heat + delta * 5);
+      updateReadout();
+      draw();
+      if (heat >= 100) {
+        running = false;
+        document.getElementById('runButton').textContent = 'Повторить';
+        return;
+      }
+      frameId = requestAnimationFrame(animate);
+    }
+
+    heatInput.addEventListener('input', () => {
+      heat = Number(heatInput.value);
+      updateReadout();
+      draw();
+    });
+    document.getElementById('runButton').addEventListener('click', event => {
+      if (heat >= 100) heat = 0;
+      running = !running;
+      event.currentTarget.textContent = running ? 'Пауза' : 'Продолжить';
+      if (running) {
+        lastFrame = 0;
+        frameId = requestAnimationFrame(animate);
+      } else {
+        cancelAnimationFrame(frameId);
+      }
+    });
+    document.getElementById('resetButton').addEventListener('click', () => {
+      running = false;
+      cancelAnimationFrame(frameId);
+      heat = 0;
+      lastFrame = 0;
+      document.getElementById('runButton').textContent = 'Запустить';
+      updateReadout();
+      draw();
+    });
+
+    new ResizeObserver(resizeCanvas).observe(canvas);
+    window.addEventListener('resize', resizeCanvas);
+    updateReadout();
+    resizeCanvas();
+  </script>
+</body>
+</html>
