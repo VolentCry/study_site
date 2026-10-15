@@ -41,6 +41,13 @@
         .nav-links { display: flex; align-items: center; gap: 28px; }
         .nav-links a { color: var(--muted); font-size: 12px; font-weight: 700; text-decoration: none; transition: color .2s; }
         .nav-links a:hover { color: var(--vermilion); }
+        .lobby-link {
+            min-height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid var(--vermilion); color: var(--vermilion); font-size: 11px; font-weight: 700;
+            text-decoration: none; white-space: nowrap; transition: background .2s, color .2s;
+        }
+        .lobby-link:hover, .lobby-link:focus-visible { background: var(--vermilion); color: #fff; }
+        .lobby-link:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 3px; }
 
         .hero {
             min-height: 510px; height: min(66svh, 680px); position: relative; isolation: isolate;
@@ -155,6 +162,7 @@
             <a href="../tasks/tasks.html">Задачи</a>
             <a href="#trainers">Тренажёры</a>
         </div>
+        <a class="lobby-link" href="../index.html">← Вернуться в лобби</a>
     </nav>
 
     <main>

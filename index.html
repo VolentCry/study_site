@@ -46,6 +46,7 @@
 
       .btn { display:inline-flex; align-items:center; gap:.5rem; background:var(--orange); color:#fff; border:none; border-radius:50px; padding:.65rem 1.5rem; font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:700; cursor:pointer; text-decoration:none; white-space:nowrap; transition:background .25s, transform .2s, box-shadow .25s; box-shadow:0 4px 18px rgba(224,124,42,.28); }
       .btn:hover { background:var(--amber); transform:translateY(-2px); box-shadow:0 8px 24px rgba(212,124,58,.38); }
+      .nav-profile { margin-left:auto; }
       .btn-outline { background:transparent; color:var(--brown); border:2px solid var(--tan); box-shadow:none; }
       .btn-outline:hover { background:var(--sand); transform:translateY(-2px); box-shadow:none; }
 
@@ -178,6 +179,7 @@
         .nav-links { display:none; }
         section { padding:3.5rem 4%; }
         nav { padding:0 4%; }
+        .nav-profile { padding:.55rem .9rem; font-size:.82rem; }
       }
     </style>
   </head>
@@ -189,14 +191,9 @@
   <nav>
     <a href="#" class="logo">
       <div class="logo-icon">📚</div>
-      Простая идея
+      НЕШкола
     </a>
-    <ul class="nav-links">
-      <li><a href="#" class="active">О нас</a></li>
-      <li><a href="#categories">Направления</a></li>
-      <li><a href="#courses">Это интересно</a></li>
-      <li><a href="#how">О нас</a></li>
-    </ul>
+    <a href="profile.html" class="btn nav-profile">Мой профиль</a>
   </nav>
 
   <!-- HERO -->
@@ -204,7 +201,6 @@
     <div class="hero-left">
       <div class="hero-badge">✦ Образовательная платформа</div>
       <h1>Учись новому —<br>расти <em>каждый день</em></h1>
-      <p>???</p>
       <div class="hero-actions">
         <a href="#categories" class="btn">Перейти к направлениям</a>
       </div>
@@ -253,7 +249,14 @@
       <a href="pages/physics.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🚀</div><h3>Физика</h3><span>24 материала</span></div></a>
       <a href="pages/chemistry.html" style="text-decoration:none;"><div class="cat-card reveal d3"><div class="cat-emoji">⚗️</div><h3>Химия</h3><span>21 материал</span></div></a>
       <a href="pages/math_4.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">🧠</div><h3>Математика</h3><span>17 материалов</span></div></a>
-      <a href="pages/biology.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🌿</div><h3>Биология</h3><span>14 материалов</span></div></a>
+      <a href="#" style="text-decoration:none;">
+      <!-- <a href="pages/biology.html" style="text-decoration:none;"> -->
+        <div class="cat-card reveal d2">
+          <div class="cat-emoji">🌿</div>
+          <h3>Биология</h3>
+          <span>В разработке...</span>
+        </div>
+      </a>
       <a href="pages/quantum_physics.html" style="text-decoration:none;"><div class="cat-card reveal d3"><div class="cat-emoji">⚛️</div><h3>Квантовая физика</h3><span>12 материалов</span></div></a>
       <a href="pages/english_4.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">✍️</div><h3>Английский</h3><span>19 материалов</span></div></a>
       <a href="pages/astronomy.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🌌</div><h3>Астрономия</h3><span>22 материала</span></div></a>
@@ -311,55 +314,6 @@
         </div>
       </div></a>
     </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="how" id="how">
-    <div class="how-inner">
-      <div class="how-img-wrap reveal">
-        <!-- Unsplash: focused student -->
-        <img class="how-img"
-          src="assets/images/main_page/block_3.jpg"
-          alt="Студент за учёбой" />
-      </div>
-      <div>
-        <div class="section-head reveal" style="margin-bottom:2rem;">
-          <h2>Кто мы?</h2>
-          <p>Если вдруг ты оказался на этом сацйте, то я рад тебя приветсвовать здесь! Давай познакомимся чуть поближе.</p>
-        </div>
-        <div class="how-steps">
-          <div class="step reveal d1">
-            <div class="step-num">1</div>
-            <div>
-                <h4>Кто я?</h4>
-                <p>Если быть предельно кратким, то я обычный студент, который собирает в одном месте множество материалов.</p>
-            </div>
-          </div>
-          <div class="step reveal d2">
-            <div class="step-num">2</div>
-            <div>
-                <h4>Зачем это?</h4>
-                <p>Я преследую лишь цель просветления молодого поколения, хочется привить любовь к науке у детей ещё со школы!</p>
-            </div>
-          </div>
-          <div class="step reveal d3">
-            <div class="step-num">3</div>
-            <div>
-                <h4>Перспективы проекта?</h4>
-                <p>Я очень надеюссь, что в будущем я буду активно развивать данный проект и дополнять его множествами материалов.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- CTA -->
-  <section class="cta-strip">
-    <h2 class="reveal">Готов окунуться в мир науки?</h2>
-    <p class="reveal d1">Все собранные мною  материалы бесплатны. Зарегистрируйся — и начни уже прямо сейчас.</p>
-    <a href="#" class="btn reveal d2" style="font-size:1rem;padding:.85rem 2.2rem;">Пора учиться!</a>
   </section>
 
   <script>

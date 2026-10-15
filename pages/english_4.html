@@ -155,11 +155,23 @@
             .bubble { position: absolute; background-color: rgba(255, 255, 255, 0.4); display: block; pointer-events: none; z-index: 1; }
             .bubble-square { width: 20px; height: 20px; animation: rise 8s infinite linear; }
             @keyframes rise { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(90deg); opacity: 0; } }
+            .lobby-link {
+                position: fixed; top: 16px; right: 20px; z-index: 1100;
+                display: inline-flex; align-items: center; padding: 10px 12px;
+                border: 2px solid var(--color-light); color: var(--text-color);
+                background: rgba(62, 78, 110, 0.9); font-family: 'Press Start 2P', cursive;
+                font-size: 9px; text-decoration: none; white-space: nowrap; transition: .2s ease;
+            }
+            .lobby-link:hover, .lobby-link:focus-visible { background: var(--color-light); color: #25334c; }
+            .lobby-link:focus-visible { outline: 2px solid var(--color-sand); outline-offset: 3px; }
+            @media (max-width: 480px) {
+                .lobby-link { top: 10px; right: 10px; padding: 8px; font-size: 7px; }
+            }
 
         </style>
     </head>
     <body>
-        <div id="menu-placeholder"></div>
+        <a class="lobby-link" href="../index.html">← Вернуться в лобби</a>
 
         <!-- 1. ГЛАВНАЯ АНГЛИЙСКИЙ -->
         <div id="page-english" class="page active">
@@ -1343,13 +1355,6 @@
                 createBubbles();
                 initLessons();
             };
-
-            fetch('../menu.html')
-                .then(r => r.text())
-                .then(html => {
-                    document.getElementById('menu-placeholder').innerHTML = html;
-                })
-                .catch(err => console.error('Ошибка загрузки меню', err));
 
         </script>
     </body>

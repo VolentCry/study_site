@@ -32,6 +32,15 @@
     overflow-x: hidden;
     min-height: 100vh;
   }
+  .lobby-link {
+    position: fixed; top: 18px; right: 24px; z-index: 10;
+    display: inline-flex; align-items: center; padding: 9px 14px;
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    background: rgba(11,15,30,.9); font-size: 12px; font-weight: 600;
+    text-decoration: none; white-space: nowrap; transition: border-color .2s, color .2s;
+  }
+  .lobby-link:hover, .lobby-link:focus-visible { border-color: var(--teal); color: var(--teal); }
+  .lobby-link:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
 
   /* ── STARFIELD ── */
   #starfield {
@@ -359,6 +368,7 @@
 
 <!-- STARFIELD -->
 <div id="starfield"></div>
+<a class="lobby-link" href="../index.html">← Вернуться в лобби</a>
 
 <div class="page">
 
