@@ -1,7 +1,7 @@
 /* Подключение шрифта (пример) */
 @font-face {
     font-family: 'MinecraftFont';
-    src: url('../assets/fonts/minecraftia.ttf') format('truetype'); /* Укажи путь к файлу шрифта */
+    src: url('assets/fonts/minecraftia.ttf') format('truetype');
 }
 
 /* Стили для главной страницы */
@@ -85,6 +85,7 @@ body {
     display: inline-block;
     padding: 15px 30px;
     background-color: rgb(70, 190, 68); /* Зеленый цвет */
+    font-family: 'MinecraftFont', sans-serif;
     color: white;
     text-decoration: none;
     border: 3px solid rgb(41, 167, 39); /* Темная рамка */

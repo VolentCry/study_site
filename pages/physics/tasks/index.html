@@ -389,7 +389,7 @@ if (catalog) {
     <nav class="grade-picker" aria-label="Выбрать класс">${gradeLinks}</nav>
     <section class="topic-list" aria-label="Темы и задачи">
       ${catalog.topics.map(([topic, tasks], topicIndex) => `
-        <article class="topic-card">
+        <article class="topic-card" data-topic-index="${topicIndex}">
           <h2>${topic}</h2>
           <ul class="task-list">
             <li><button class="task-link theory-button" type="button" data-theory-index="${topicIndex}">Теория</button></li>
@@ -422,6 +422,47 @@ const answerForm = document.getElementById('answer-form');
 const answerInput = document.getElementById('task-answer');
 const answerFeedback = document.getElementById('answer-feedback');
 let activeTask = null;
+let activeTaskId = null;
+let activeTaskSkill = null;
+
+function getPhysicsSkill(topic) {
+  const normalizedTopic = topic.toLocaleLowerCase('ru-RU');
+  if (/атомн|ядерн|квант|фотоэффект|радиоактив/.test(normalizedTopic)) return 'modernPhysics';
+  if (/тепл|внутренн|плавлен|испар|агрегат/.test(normalizedTopic)) return 'thermal';
+  if (/магнит|индукц/.test(normalizedTopic)) return 'magnetism';
+  if (/электр|электростат|конденсатор|сила тока/.test(normalizedTopic)) return 'electricity';
+  if (/колеб|волн|звук/.test(normalizedTopic)) return 'waves';
+  if (/оптик|свет|линз/.test(normalizedTopic)) return 'optics';
+  if (/величин|измерен/.test(normalizedTopic)) return 'measurement';
+  if (/механ|кинемат|динамик|движен|ньютон|сил|давлен|рычаг|импульс|гравитац|тяготен|сохранен|трени|гука|архимед/.test(normalizedTopic)) return 'mechanics';
+  return 'generalPhysics';
+}
+
+function recordPhysicsAttempt(isCorrect) {
+  const storageKey = 'studyMetrics';
+  let attempts;
+  try {
+    const storedAttempts = localStorage.getItem(storageKey);
+    attempts = storedAttempts ? JSON.parse(storedAttempts) : [];
+    if (!Array.isArray(attempts)) throw new TypeError('Ожидался список попыток.');
+  } catch (error) {
+    console.error('Не удалось прочитать статистику учебных задач.', error);
+    return;
+  }
+
+  attempts.push({
+    timestamp: new Date().toISOString(),
+    subject: 'Физика',
+    taskId: activeTaskId,
+    skill: activeTaskSkill,
+    correct: isCorrect
+  });
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(attempts));
+  } catch (error) {
+    console.error('Не удалось сохранить статистику учебных задач.', error);
+  }
+}
 
 main.addEventListener('click', event => {
   const button = event.target.closest('[data-theory-index]');
@@ -448,6 +489,10 @@ main.addEventListener('click', event => {
   if (!button) return;
 
   activeTask = getInteractiveTask(Number(button.dataset.taskIndex));
+  const topicCard = button.closest('.topic-card');
+  const topicIndex = Number(topicCard.dataset.topicIndex);
+  activeTaskId = `physics-${grade}-topic-${topicIndex}-task-${button.dataset.taskIndex}`;
+  activeTaskSkill = getPhysicsSkill(topicCard.querySelector('h2').textContent);
   document.getElementById('task-dialog-title').textContent = button.textContent;
   document.getElementById('task-condition').textContent = activeTask.condition;
   document.getElementById('answer-unit').textContent = activeTask.unit || '';
@@ -474,6 +519,7 @@ answerForm.addEventListener('submit', event => {
     isCorrect = activeTask.acceptedAnswers.some(answer => normalize(answer) === normalize(answerInput.value));
   }
 
+  recordPhysicsAttempt(isCorrect);
   answerFeedback.textContent = isCorrect ? 'Верно! Отличная работа.' : 'Пока неверно. Проверьте решение и попробуйте ещё раз.';
   answerFeedback.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
 });
@@ -487,6 +533,8 @@ document.getElementById('cancel-task').addEventListener('click', closeTaskDialog
 document.getElementById('close-theory-dialog').addEventListener('click', () => theoryDialog.close());
 taskDialog.addEventListener('close', () => {
   activeTask = null;
+  activeTaskId = null;
+  activeTaskSkill = null;
   answerForm.reset();
   answerFeedback.textContent = '';
 });

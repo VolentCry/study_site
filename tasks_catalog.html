@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#dceee5" />
+  <title>Каталог заданий — НЕшкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --forest: #214a40;
+      --forest-dark: #183a34;
+      --cream: #fffaf0;
+      --gold: #e6ad42;
+      --paper: #f4f0df;
+      --ink: #203b34;
+      --muted: #698078;
+      --line: rgba(33, 74, 64, .16);
+      font-family: 'Nunito', sans-serif;
+      color: var(--ink);
+      background: #dceee5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { min-width: 320px; min-height: 100%; background: #dceee5; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; background: linear-gradient(180deg, #dceee5 0, #f3f1df 390px, #f3f1df 100%); }
+    a { color: inherit; }
+
+    .topbar {
+      display: flex;
+      min-height: 76px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px max(6%, calc((100vw - 1180px) / 2));
+      border-bottom: 1px solid rgba(33, 74, 64, .12);
+      background: rgba(220, 238, 229, .76);
+    }
+
+    .brand, .back-link { display: inline-flex; align-items: center; text-decoration: none; }
+    .brand { gap: 10px; color: var(--forest); font: 700 18px 'Playfair Display', Georgia, serif; }
+    .brand-mark { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 50%; font: 700 17px 'Nunito', sans-serif; }
+    .back-link { gap: 9px; color: #45685d; font-size: 14px; font-weight: 800; }
+    .back-link:hover { color: #a75a31; }
+
+    main { width: min(1120px, calc(100% - 64px)); margin: 0 auto; padding: 62px 0 80px; }
+    .page-intro { margin-bottom: 30px; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; color: #638075; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .eyebrow::before { width: 25px; height: 2px; background: #c37b3e; content: ''; }
+    h1 { margin: 12px 0 8px; color: var(--forest-dark); font: 800 clamp(38px, 5.5vw, 62px)/1.08 'Playfair Display', Georgia, serif; }
+    .intro-copy { max-width: 570px; margin: 0; color: #58736a; font-size: 16px; line-height: 1.65; }
+
+    .search-toolbar { display: flex; align-items: stretch; gap: 10px; }
+    .search-box { position: relative; display: flex; min-width: 0; flex: 1; align-items: center; }
+    .search-mark { position: absolute; left: 17px; width: 16px; height: 16px; border: 2px solid #789187; border-radius: 50%; pointer-events: none; }
+    .search-mark::after { position: absolute; right: -6px; bottom: -4px; width: 7px; height: 2px; background: #789187; content: ''; transform: rotate(45deg); transform-origin: left center; }
+    #task-search { width: 100%; min-height: 54px; padding: 0 18px 0 48px; border: 1px solid var(--line); border-radius: 4px; outline: none; background: var(--cream); color: var(--ink); font: 600 15px 'Nunito', sans-serif; box-shadow: 0 3px 12px rgba(33, 74, 64, .04); }
+    #task-search::placeholder { color: #80928b; }
+    #task-search:focus { border-color: #648878; box-shadow: 0 0 0 3px rgba(100, 136, 120, .15); }
+
+    .filter-toggle { display: inline-flex; min-width: 142px; min-height: 54px; align-items: center; justify-content: center; gap: 11px; padding: 0 17px; border: 1px solid var(--forest); border-radius: 4px; background: var(--forest); color: var(--cream); font: 800 14px 'Nunito', sans-serif; cursor: pointer; transition: background .2s ease, transform .2s ease; }
+    .filter-toggle:hover { transform: translateY(-1px); background: #326253; }
+    .filter-toggle:focus-visible, .reset-button:focus-visible, select:focus-visible, .task-link:focus-visible { outline: 3px solid rgba(230, 173, 66, .8); outline-offset: 3px; }
+    .filter-icon { display: grid; width: 18px; gap: 4px; }
+    .filter-icon i { display: block; height: 1px; background: currentColor; }
+    .filter-icon i:nth-child(2) { width: 13px; margin-left: 3px; }
+    .filter-icon i:nth-child(3) { width: 7px; margin-left: 6px; }
+
+    .filter-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 16px; margin-top: 12px; padding: 19px; border: 1px solid var(--line); border-radius: 4px; background: rgba(255, 250, 240, .94); box-shadow: 0 10px 28px rgba(33, 74, 64, .08); }
+    .filter-field { display: grid; min-width: 0; gap: 7px; }
+    .filter-field label { color: #58736a; font-size: 12px; font-weight: 800; }
+    .filter-field select { width: 100%; min-height: 42px; padding: 0 35px 0 12px; border: 1px solid var(--line); border-radius: 3px; background: #fffdf7; color: var(--ink); font: 700 13px 'Nunito', sans-serif; }
+    .filter-actions { display: flex; grid-column: 1 / -1; align-items: center; justify-content: flex-end; gap: 10px; }
+    .apply-button { min-height: 42px; padding: 0 17px; border: 1px solid var(--forest); border-radius: 3px; background: var(--forest); color: var(--cream); font: 800 13px 'Nunito', sans-serif; cursor: pointer; transition: background .2s ease; }
+    .apply-button:hover { background: #326253; }
+    .reset-button { min-height: 42px; padding: 0 12px; border: 0; background: transparent; color: #58736a; font: 800 12px 'Nunito', sans-serif; cursor: pointer; white-space: nowrap; }
+    .reset-button:hover { color: #a75a31; }
+
+    .results-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 31px 0 14px; }
+    .results-bar h2 { margin: 0; color: var(--forest-dark); font: 700 21px 'Playfair Display', Georgia, serif; }
+    #results-count { color: #71847d; font-size: 13px; font-weight: 700; }
+    .task-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+
+    .task-card { display: flex; min-width: 0; min-height: 224px; flex-direction: column; padding: 19px; border: 1px solid rgba(33, 74, 64, .14); border-radius: 4px; background: rgba(255, 250, 240, .85); box-shadow: 0 4px 15px rgba(33, 74, 64, .04); transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+    .task-card:hover { transform: translateY(-3px); border-color: rgba(33, 74, 64, .38); box-shadow: 0 10px 24px rgba(33, 74, 64, .1); }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #698078; font-size: 11px; font-weight: 800; }
+    .subject-label { display: inline-flex; align-items: center; gap: 7px; color: var(--forest); }
+    .subject-label::before { width: 7px; height: 7px; border-radius: 50%; background: #c89138; content: ''; }
+    .difficulty { padding: 4px 8px; border-radius: 2px; background: #edf0dd; color: #526d5c; white-space: nowrap; }
+    .difficulty[data-level="medium"] { background: #f5e8c5; color: #775d2d; }
+    .difficulty[data-level="hard"] { background: #f2ddd0; color: #8b503d; }
+    .task-card h3 { margin: 17px 0 7px; color: var(--forest-dark); font: 700 19px/1.25 'Playfair Display', Georgia, serif; }
+    .task-card p { margin: 0; color: #687d75; font-size: 13px; line-height: 1.55; }
+    .card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 18px; }
+    .class-label { color: #80918a; font-size: 11px; font-weight: 800; }
+    .task-link { display: inline-flex; min-height: 34px; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--forest); font: 800 12px 'Nunito', sans-serif; text-decoration: none; cursor: pointer; }
+    .task-link:hover { color: #a75a31; }
+    .task-link span { font-size: 16px; }
+
+    .empty-state { padding: 48px 20px; border: 1px dashed rgba(33, 74, 64, .28); color: #71847d; text-align: center; }
+    .empty-state strong { display: block; margin-bottom: 7px; color: var(--forest); font: 700 20px 'Playfair Display', Georgia, serif; }
+    .page-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); color: #6a8077; font-size: 12px; }
+    .page-footer a { color: var(--forest); font-weight: 800; text-decoration: none; }
+    .page-footer a:hover { color: #a75a31; }
+
+    @media (max-width: 850px) {
+      main { width: min(100% - 40px, 700px); padding-top: 48px; }
+      .task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .topbar { min-height: 66px; padding: 12px 20px; }
+      .brand { gap: 7px; font-size: 15px; }
+      .brand-mark { width: 32px; height: 32px; }
+      .back-link { font-size: 12px; }
+      main { width: calc(100% - 32px); padding: 38px 0 56px; }
+      .page-intro { margin-bottom: 23px; }
+      .intro-copy { font-size: 14px; }
+      .search-toolbar { gap: 8px; }
+      #task-search { min-height: 50px; padding-left: 40px; font-size: 13px; }
+      .search-mark { left: 14px; width: 14px; height: 14px; }
+      .filter-toggle { min-width: 50px; width: 50px; min-height: 50px; padding: 0; font-size: 0; }
+      .filter-icon { font-size: initial; }
+      .filter-panel { grid-template-columns: 1fr; gap: 12px; padding: 15px; }
+      .filter-field select { min-height: 44px; }
+      .results-bar { align-items: flex-start; flex-direction: column; gap: 5px; margin-top: 25px; }
+      .task-grid { grid-template-columns: 1fr; }
+      .task-card { min-height: 190px; }
+      .page-footer { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">Н</span> НЕшкола</a>
+    <a class="back-link" href="bank_tasks.html"><span aria-hidden="true">←</span> Банк задач</a>
+  </header>
+
+  <main>
+    <header class="page-intro">
+      <div class="eyebrow">Тренируйся в своём темпе</div>
+      <h1>Каталог заданий</h1>
+      <p class="intro-copy">Найди нужную тему по названию или настрой фильтры по сложности, классу и предмету.</p>
+    </header>
+
+    <section aria-label="Поиск и фильтры заданий">
+      <div class="search-toolbar">
+        <label class="search-box">
+          <span class="search-mark" aria-hidden="true"></span>
+          <input id="task-search" type="search" placeholder="Поиск по теме или классу" autocomplete="off" />
+        </label>
+        <button class="filter-toggle" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel">
+          <span class="filter-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+          Фильтры
+        </button>
+      </div>
+
+      <div class="filter-panel" id="filter-panel" hidden>
+        <div class="filter-field">
+          <label for="difficulty-filter">Уровень сложности</label>
+          <select id="difficulty-filter">
+            <option value="">Любой уровень</option>
+            <option value="easy">Лёгкие</option>
+            <option value="medium">Средние</option>
+            <option value="hard">Сложные</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="class-filter">Класс</label>
+          <select id="class-filter">
+            <option value="">Любой класс</option>
+            <option value="4">4 класс</option>
+            <option value="7">7 класс</option>
+            <option value="8">8 класс</option>
+            <option value="9">9 класс</option>
+            <option value="10-11">10–11 класс</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="subject-filter">Предмет</label>
+          <select id="subject-filter">
+            <option value="">Все предметы</option>
+            <option value="math">Математика</option>
+            <option value="english">Английский</option>
+            <option value="physics">Физика</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button class="reset-button" id="reset-filters" type="button">Сбросить</button>
+          <button class="apply-button" id="apply-filters" type="button">Применить фильтр</button>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="results-heading">
+      <div class="results-bar">
+        <h2 id="results-heading">Задания</h2>
+        <span id="results-count" aria-live="polite"></span>
+      </div>
+      <div class="task-grid" id="task-grid"></div>
+      <div class="empty-state" id="empty-state" hidden>
+        <strong>Ничего не нашлось</strong>
+        Измени запрос или сбрось фильтры.
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Задания для 4 и 7–11 классов</span>
+      <a href="bank_tasks.html">← Вернуться в банк задач</a>
+    </footer>
+  </main>
+
+  <script>
+    const tasks = [
+      { subject: 'math', title: 'Задачи на умножение', class: '4', level: 'easy', description: 'Текстовые задачи на умножение и вычисления.', href: 'tasks/tasks.html#multiplication-section' },
+      { subject: 'math', title: 'Задачи на формулу пути', class: '4', level: 'easy', description: 'Находи путь, скорость и время движения.', href: 'tasks/tasks.html#way-section' },
+      { subject: 'math', title: 'Задачи на формулу стоимости', class: '4', level: 'medium', description: 'Рассчитывай стоимость, цену и количество.', href: 'tasks/tasks.html#cost-section' },
+      { subject: 'math', title: 'Доли и проценты', class: '4', level: 'medium', description: 'Задачи на доли, проценты и их сравнение.', href: 'tasks/tasks.html#shares-and-percentages' },
+      { subject: 'math', title: 'Решение выражений', class: '4', level: 'hard', description: 'Практика вычислений и порядка действий.', href: 'tasks/tasks.html#expressions-section' },
+      { subject: 'math', title: 'Десятичные дроби', class: '4', level: 'medium', description: 'Интерактивный тренажёр для практики с дробями.', href: 'math_moduls/decimal_fraction_trainer.html' },
+      { subject: 'math', title: 'Уравнения', class: '4', level: 'medium', description: 'Тренажёр уравнений с подбором уровня.', href: 'math_moduls/equations_trainer_easy.html' },
+      { subject: 'english', title: 'Повторение времён', class: '4', level: 'medium', description: 'Десять интерактивных заданий по английской грамматике.', href: 'pages/english_lessons/lesson_1.html' },
+      { subject: 'english', title: 'Units of Measurement', class: '4', level: 'medium', description: 'Урок с упражнениями на английские названия единиц измерения.', href: 'pages/english_lessons/lesson_2.html' },
+      { subject: 'physics', title: 'Физические величины и измерения', class: '7', level: 'easy', description: 'Измерения, единицы величин и работа со шкалами приборов.' },
+      { subject: 'physics', title: 'Механическое движение', class: '7', level: 'easy', description: 'Путь, время и траектория движения тел.' },
+      { subject: 'physics', title: 'Скорость и равномерное движение', class: '7', level: 'medium', description: 'Расчёт скорости и задачи на движение.' },
+      { subject: 'physics', title: 'Силы и закон Гука', class: '7', level: 'medium', description: 'Сила упругости, трение и сила тяжести.' },
+      { subject: 'physics', title: 'Давление и сила Архимеда', class: '7', level: 'hard', description: 'Давление в жидкостях и условия плавания тел.' },
+      { subject: 'physics', title: 'Тепловое движение и внутренняя энергия', class: '8', level: 'easy', description: 'Нагревание, теплопередача и изменение внутренней энергии.' },
+      { subject: 'physics', title: 'Количество теплоты и теплоёмкость', class: '8', level: 'medium', description: 'Расчёты нагревания и смешивания веществ.' },
+      { subject: 'physics', title: 'Электрический ток и закон Ома', class: '8', level: 'medium', description: 'Сила тока, напряжение и сопротивление.' },
+      { subject: 'physics', title: 'Электрические цепи и работа тока', class: '8', level: 'hard', description: 'Соединение резисторов и расчёт электроэнергии.' },
+      { subject: 'physics', title: 'Равноускоренное движение', class: '9', level: 'easy', description: 'Ускорение и путь тела за заданное время.' },
+      { subject: 'physics', title: 'Законы Ньютона', class: '9', level: 'medium', description: 'Равнодействующая сил и движение тел.' },
+      { subject: 'physics', title: 'Импульс и закон его сохранения', class: '9', level: 'hard', description: 'Импульс тела и взаимодействие в замкнутой системе.' },
+      { subject: 'physics', title: 'Механическая энергия', class: '9', level: 'hard', description: 'Кинетическая и потенциальная энергия.' },
+      { subject: 'physics', title: 'Кинематика и динамика', class: '10-11', level: 'medium', description: 'Движение тела и ускорение под действием сил.' },
+      { subject: 'physics', title: 'Законы сохранения в механике', class: '10-11', level: 'hard', description: 'Импульс и механическая энергия системы.' },
+      { subject: 'physics', title: 'Электростатическое поле', class: '10-11', level: 'hard', description: 'Напряжённость поля и потенциальная энергия зарядов.' },
+      { subject: 'physics', title: 'Колебания и электромагнитные волны', class: '10-11', level: 'medium', description: 'Колебательный контур, период и длина волны.' },
+      { subject: 'physics', title: 'Квантовая физика', class: '10-11', level: 'hard', description: 'Фотоэффект, энергия фотона и строение ядра.' },
+    ];
+
+    const difficultyLabels = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
+    const subjectLabels = { math: 'Математика', english: 'Английский', physics: 'Физика' };
+    const taskGrid = document.getElementById('task-grid');
+    const taskSearch = document.getElementById('task-search');
+    const difficultyFilter = document.getElementById('difficulty-filter');
+    const classFilter = document.getElementById('class-filter');
+    const subjectFilter = document.getElementById('subject-filter');
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterPanel = document.getElementById('filter-panel');
+    const resultsCount = document.getElementById('results-count');
+    const emptyState = document.getElementById('empty-state');
+    const appliedFilters = { difficulty: '', class: '', subject: '' };
+
+    function normalize(value) {
+      return value.toLocaleLowerCase('ru').replaceAll('ё', 'е').trim();
+    }
+
+    function renderTasks() {
+      const query = normalize(taskSearch.value);
+      const visibleTasks = tasks.filter(task => {
+        const matchesSearch = normalize(`${task.title} ${task.description} ${task.class} ${subjectLabels[task.subject]}`).includes(query);
+        return matchesSearch
+          && (!appliedFilters.difficulty || task.level === appliedFilters.difficulty)
+          && (!appliedFilters.class || task.class === appliedFilters.class)
+          && (!appliedFilters.subject || task.subject === appliedFilters.subject);
+      });
+
+      taskGrid.innerHTML = visibleTasks.map(task => `
+        <article class="task-card">
+          <div class="card-meta">
+            <span class="subject-label">${subjectLabels[task.subject]}</span>
+            <span class="difficulty" data-level="${task.level}">${difficultyLabels[task.level]}</span>
+          </div>
+          <h3>${task.title}</h3>
+          <p>${task.description}</p>
+          <div class="card-bottom">
+            <span class="class-label">${task.class === '10-11' ? '10–11' : task.class} класс</span>
+            <a class="task-link" href="${task.href || `pages/physics/tasks/index.html?grade=${task.class}`}">Открыть задания <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>`).join('');
+
+      resultsCount.textContent = `Найдено: ${visibleTasks.length}`;
+      emptyState.hidden = visibleTasks.length !== 0;
+      taskGrid.hidden = visibleTasks.length === 0;
+    }
+
+    filterToggle.addEventListener('click', () => {
+      const isExpanded = filterToggle.getAttribute('aria-expanded') === 'true';
+      filterToggle.setAttribute('aria-expanded', String(!isExpanded));
+      filterPanel.hidden = isExpanded;
+    });
+
+    taskSearch.addEventListener('input', renderTasks);
+
+    document.getElementById('apply-filters').addEventListener('click', () => {
+      appliedFilters.difficulty = difficultyFilter.value;
+      appliedFilters.class = classFilter.value;
+      appliedFilters.subject = subjectFilter.value;
+      renderTasks();
+    });
+
+    document.getElementById('reset-filters').addEventListener('click', () => {
+      taskSearch.value = '';
+      difficultyFilter.value = '';
+      classFilter.value = '';
+      subjectFilter.value = '';
+      appliedFilters.difficulty = '';
+      appliedFilters.class = '';
+      appliedFilters.subject = '';
+      renderTasks();
+      taskSearch.focus();
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>

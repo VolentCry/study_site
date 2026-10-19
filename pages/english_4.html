@@ -733,6 +733,40 @@
             
             let t1Scored = false; let t2Scored = false; let t3Scored = false; let t4Scored = false; let t6Scored = false;
 
+            function recordStudyAttempt(taskId, isCorrect) {
+                const storageKey = 'studyMetrics';
+                let attempts;
+                try {
+                    const storedAttempts = localStorage.getItem(storageKey);
+                    attempts = storedAttempts ? JSON.parse(storedAttempts) : [];
+                    if (!Array.isArray(attempts)) throw new TypeError('Ожидался список попыток.');
+                } catch (error) {
+                    console.error('Не удалось прочитать статистику учебных задач.', error);
+                    return;
+                }
+
+                attempts.push({
+                    timestamp: new Date().toISOString(),
+                    subject: 'Английский',
+                    taskId,
+                    skill: taskId.startsWith('english-weather-')
+                        ? 'weather'
+                        : ({
+                            'english-task-1': 'prepositions',
+                            'english-task-2': 'emotions',
+                            'english-task-3': 'food',
+                            'english-task-4': 'tenses',
+                            'english-task-6': 'pronouns'
+                        }[taskId.split('-').slice(0, 3).join('-')] || 'generalVocabulary'),
+                    correct: isCorrect
+                });
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(attempts));
+                } catch (error) {
+                    console.error('Не удалось сохранить статистику учебных задач.', error);
+                }
+            }
+
             // --- NAVIGATION ---
             function switchPage(pageId) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1069,9 +1103,18 @@
                     }
                 });
 
-                if (taskNum === 1 && !t1Scored) { globalCorrect += score; globalWrong += wrong; t1Scored = true; }
-                if (taskNum === 2 && !t2Scored) { globalCorrect += score; globalWrong += wrong; t2Scored = true; }
-                if (taskNum === 3 && !t3Scored) { globalCorrect += score; globalWrong += wrong; t3Scored = true; }
+                if (taskNum === 1 && !t1Scored) {
+                    globalCorrect += score; globalWrong += wrong; t1Scored = true;
+                    inputs.forEach((input, index) => recordStudyAttempt(`english-task-${taskNum}-${index + 1}`, input.classList.contains('correct')));
+                }
+                if (taskNum === 2 && !t2Scored) {
+                    globalCorrect += score; globalWrong += wrong; t2Scored = true;
+                    inputs.forEach((input, index) => recordStudyAttempt(`english-task-${taskNum}-${index + 1}`, input.classList.contains('correct')));
+                }
+                if (taskNum === 3 && !t3Scored) {
+                    globalCorrect += score; globalWrong += wrong; t3Scored = true;
+                    inputs.forEach((input, index) => recordStudyAttempt(`english-task-${taskNum}-${index + 1}`, input.classList.contains('correct')));
+                }
 
                 const res = document.getElementById(`result-task-${taskNum}`);
                 res.innerText = `Result: ${score}/${inputs.length}`;
@@ -1164,6 +1207,10 @@
                         globalCorrect += correct;
                         globalWrong += (totalSlots - correct);
                         t4Scored = true;
+                        slots.forEach((slot, index) => recordStudyAttempt(
+                            `english-task-4-${index + 1}`,
+                            slot.children[0].dataset.type === slot.dataset.expect
+                        ));
                     }
 
                     res.innerText = `Правильно: ${correct}/${totalSlots}`;
@@ -1243,6 +1290,7 @@
                     btn.classList.add('wrong-choice');
                     btns.forEach(b => { if(b.innerText === correct) b.classList.add('correct-choice'); });
                 }
+                recordStudyAttempt(`english-weather-${weatherRounds + 1}`, selected === correct);
                 
                 weatherRounds++;
                 document.getElementById('weather-score').innerText = weatherScore;
@@ -1303,6 +1351,10 @@
                         globalCorrect += correct;
                         globalWrong += (6 - correct);
                         t6Scored = true;
+                        slots.forEach((slot, index) => recordStudyAttempt(
+                            `english-task-6-${index + 1}`,
+                            slot.children[0].dataset.type === slot.dataset.expect
+                        ));
                     }
 
                     res.innerText = `Результат: ${correct}/6`;

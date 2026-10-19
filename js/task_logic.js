@@ -13,6 +13,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // Теперь получаем correctAnswer как строку, так как ожидаем текстовый ответ
     const correctAnswer = taskBody.dataset.correctAnswer; 
 
+    function getMathSkill() {
+        const path = window.location.pathname.toLowerCase();
+        if (path.includes('/multiplication_tasks/')) return 'multiplication';
+        if (path.includes('/equations_tasks/')) return 'equations';
+        if (path.includes('/expressions_tasks/')) return 'expressions';
+        if (path.includes('/inequalities_tasks/')) return 'inequalities';
+        if (path.includes('/logics_tasks/')) return 'logic';
+        if (path.includes('/shares_and_percentages/')) return 'fractionsPercentages';
+        if (path.includes('/reduction_of_fractions/')) return 'fractionsPercentages';
+        if (path.includes('/cost_tasks/')) return 'practicalMath';
+        if (path.includes('/sales_tasks/')) return 'practicalMath';
+        if (path.includes('/complex_conditions_tasks/')) return 'multistep';
+        if (path.includes('/way_tasks/')) return 'wordProblems';
+        return 'general';
+    }
+
+    function recordStudyAttempt(isCorrect) {
+        const storageKey = 'studyMetrics';
+        let attempts;
+        try {
+            const storedAttempts = localStorage.getItem(storageKey);
+            attempts = storedAttempts ? JSON.parse(storedAttempts) : [];
+            if (!Array.isArray(attempts)) throw new TypeError('Ожидался список попыток.');
+        } catch (error) {
+            console.error('Не удалось прочитать статистику учебных задач.', error);
+            return;
+        }
+
+        attempts.push({
+            timestamp: new Date().toISOString(),
+            subject: 'Математика',
+            taskId: window.location.pathname,
+            skill: getMathSkill(),
+            correct: isCorrect
+        });
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(attempts));
+        } catch (error) {
+            console.error('Не удалось сохранить статистику учебных задач.', error);
+        }
+    }
+
     // --- Логика проверки ответа ---
     if (checkButton) {
         checkButton.addEventListener('click', () => {
@@ -76,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isOk = Number.isFinite(correctNumeric)
                         ? Math.abs(userValue - correctNumeric) < 1e-9
                         : `${num}/${den}`.toLowerCase() === (correctAnswer || '').toLowerCase();
+                    recordStudyAttempt(isOk);
                     if (isOk) {
                         if (numeratorInput) numeratorInput.classList.add('correct');
                         if (denominatorInput) denominatorInput.classList.add('correct');
@@ -97,7 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cn = correctFrac.a / g2;
                 const cd = correctFrac.b / g2;
 
-                if (rn === cn && rd === cd) {
+                const isOk = rn === cn && rd === cd;
+                recordStudyAttempt(isOk);
+                if (isOk) {
                     if (numeratorInput) numeratorInput.classList.add('correct');
                     if (denominatorInput) denominatorInput.classList.add('correct');
                     feedbackMessage.textContent = 'Всё правильно! Ты молодец!';
@@ -123,7 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                const isOk = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+                recordStudyAttempt(isOk);
+                if (isOk) {
                     answerInput.classList.add('correct');
                     feedbackMessage.textContent = 'Всё правильно! Ты молодец!';
                     feedbackMessage.style.color = 'green';

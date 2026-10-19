@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
         num1 = randomDecimal();
         num2 = useInt ? randomInt() : randomDecimal();
 
+        if (op === '-' && num1 < num2) {
+            [num1, num2] = [num2, num1];
+        }
+
         if (op === '+') correctAnswer = num1 + num2;
         else if (op === '-') correctAnswer = num1 - num2;
         else correctAnswer = num1 * num2;

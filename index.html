@@ -157,6 +157,19 @@
       .cta-strip p  { color:rgba(255,255,255,.6); font-size:1rem; margin-bottom:2rem; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.7; }
       .cta-strip .btn { font-size:1rem; padding:.85rem 2.2rem; }
 
+      /* TASK BANK */
+      .bank-teaser { position:relative; display:grid; grid-template-columns:1fr auto; align-items:center; gap:2rem; overflow:hidden; padding:4rem 8%; background:#214a40; color:#fff7e8; }
+      .bank-teaser-copy { position:relative; z-index:1; max-width:620px; }
+      .bank-teaser h2 { font-family:'Playfair Display',serif; font-size:2.2rem; color:#fff7e8; line-height:1.2; }
+      .bank-teaser p { max-width:540px; margin-top:.7rem; color:rgba(255,247,232,.72); font-size:1rem; line-height:1.7; }
+      .bank-teaser .btn { margin-top:1.1rem; background:#e6ad42; color:#203b34; box-shadow:none; }
+      .bank-teaser .btn:hover { background:#f5cf72; }
+      .bank-emblem { position:relative; width:190px; height:150px; margin-right:4vw; }
+      .bank-emblem::before, .bank-emblem::after { position:absolute; bottom:12px; width:142px; height:66px; border:2px solid #edc45e; border-radius:50%; background:repeating-linear-gradient(0deg,#c9973e 0 9px,#f2ce70 10px 13px,#d7a843 14px 19px); content:''; }
+      .bank-emblem::before { left:5px; transform:rotate(-12deg); }
+      .bank-emblem::after { right:0; bottom:48px; transform:rotate(13deg); }
+      .bank-teaser::after { position:absolute; right:3%; bottom:-85px; width:330px; height:180px; border:1px solid rgba(245,207,114,.18); border-radius:50%; content:''; }
+
       /* FOOTER */
       footer { background:var(--brown); border-top:1px solid rgba(255,255,255,.08); padding:1.8rem 6%; display:flex; align-items:center; flex-wrap:wrap; gap:1.5rem; }
       .footer-copy { font-size:.83rem; color:rgba(255,255,255,.4); margin-right:auto; }
@@ -180,6 +193,9 @@
         section { padding:3.5rem 4%; }
         nav { padding:0 4%; }
         .nav-profile { padding:.55rem .9rem; font-size:.82rem; }
+        .bank-teaser { grid-template-columns:1fr; gap:1rem; padding:3.5rem 6%; }
+        .bank-teaser h2 { font-size:1.8rem; }
+        .bank-emblem { position:absolute; right:-55px; bottom:-8px; width:150px; height:115px; opacity:.55; }
       }
     </style>
   </head>
@@ -314,6 +330,15 @@
         </div>
       </div></a>
     </div>
+  </section>
+
+  <section class="bank-teaser" aria-labelledby="bank-teaser-title">
+    <div class="bank-teaser-copy reveal">
+      <h2 id="bank-teaser-title">Банк задач</h2>
+      <p>Задачи собраны в одном месте: выбирай тему, решай и пополняй свою копилку знаний.</p>
+      <a href="bank_tasks.html" class="btn">Открыть банк <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="bank-emblem" aria-hidden="true"></div>
   </section>
 
   <script>

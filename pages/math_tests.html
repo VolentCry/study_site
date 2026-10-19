@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#5a8c3d">
+    <title>Тестирование по математике</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body.exam-page {
+            display: block;
+            min-height: 100vh;
+            padding: 0;
+            background: linear-gradient(rgba(20, 30, 18, .56), rgba(20, 30, 18, .76)), url('../assets/bg/multiplication_trainer_background_.jpg') center / cover fixed;
+            color: #fff;
+        }
+        .exam-header {
+            min-height: 64px;
+            padding: 12px clamp(16px, 5vw, 64px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: #353535;
+            border-bottom: 4px solid #222;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, .35);
+        }
+        .exam-header a { color: #fff; text-decoration: none; }
+        .exam-brand { font-size: 16px; }
+        .exam-back { color: #d5d5d5 !important; font-size: 13px; }
+        .exam-main { width: min(960px, calc(100% - 32px)); margin: 42px auto 64px; }
+        .exam-panel {
+            padding: clamp(20px, 4vw, 38px);
+            background: rgba(38, 38, 38, .95);
+            border: 4px solid #171717;
+            box-shadow: 0 7px 0 #111, inset 0 0 0 3px #585858;
+        }
+        .exam-kicker { margin: 0 0 10px; color: #a9d878; font-size: 12px; text-transform: uppercase; }
+        .exam-title { margin: 0; color: #fff; font-size: clamp(23px, 4vw, 34px); line-height: 1.5; text-shadow: 3px 3px #333; }
+        .exam-description { max-width: 680px; margin: 14px 0 28px; color: #dedede; font-size: 13px; line-height: 1.9; }
+        .exam-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .exam-card {
+            min-height: 210px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            color: #fff;
+            background: #526f36;
+            border: 3px solid #263719;
+            box-shadow: inset -4px -4px rgba(0, 0, 0, .22), 4px 4px #161616;
+            font: inherit;
+            cursor: pointer;
+        }
+        .exam-card:hover, .exam-card:focus-visible { background: #648744; transform: translateY(-2px); }
+        .exam-card:focus-visible, .exam-button:focus-visible, .exam-input:focus-visible { outline: 3px solid #ffe36a; outline-offset: 3px; }
+        .card-icon { margin-bottom: 14px; font-size: 24px; }
+        .card-title { font-size: 14px; line-height: 1.8; }
+        .card-meta { margin-top: auto; padding-top: 16px; color: #e7f2d9; font-size: 10px; }
+        .test-topline { display: flex; justify-content: space-between; gap: 12px; color: #c9e4a8; font-size: 12px; }
+        .progress-track { height: 14px; margin: 14px 0 28px; background: #171717; border: 2px solid #111; }
+        .progress-bar { width: 0; height: 100%; background: #84b94f; transition: width .2s; }
+        .question-card { padding: clamp(20px, 5vw, 42px); background: #3d3d3d; border: 3px solid #1d1d1d; box-shadow: inset 0 0 0 2px #666; }
+        .question-label { margin: 0 0 16px; color: #b7d991; font-size: 12px; }
+        .question-text { margin: 0; font-size: clamp(18px, 4vw, 28px); line-height: 1.8; }
+        .answer-row { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+        .exam-input { width: min(260px, 100%); min-height: 48px; padding: 10px 12px; color: #222; background: #e8e8e8; border: 3px solid #222; font: inherit; }
+        .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+        .choice-button { min-height: 50px; padding: 10px 14px; color: #fff; background: #526f36; border: 3px solid #263719; box-shadow: 3px 3px #171717; font: inherit; cursor: pointer; }
+        .choice-button:hover, .choice-button:focus-visible { background: #648744; }
+        .exam-button { min-height: 46px; padding: 10px 16px; color: #fff; background: #648c3f; border: 3px solid #2e461f; box-shadow: 3px 3px #171717; font: inherit; cursor: pointer; }
+        .exam-button:hover { filter: brightness(1.12); }
+        .exam-button.secondary { background: #696969; border-color: #383838; }
+        .exam-feedback { min-height: 24px; margin: 16px 0 0; color: #ffe36a; font-size: 12px; line-height: 1.8; }
+        .hint-controls { margin-top: 18px; }
+        .hint-button { min-height: 42px; padding: 8px 14px; color: #fff; background: #67592d; border: 3px solid #3c3218; box-shadow: 3px 3px #171717; font: inherit; }
+        .hint-button:not(:disabled) { cursor: pointer; }
+        .hint-button:not(:disabled):hover { filter: brightness(1.15); }
+        .hint-button:disabled { opacity: .65; }
+        .hint-text { margin: 14px 0 0; padding: 12px; color: #fff1ad; background: rgba(0, 0, 0, .28); border-left: 4px solid #ffe36a; font-size: 12px; line-height: 1.8; }
+        .hidden { display: none !important; }
+        .exam-dialog {
+            width: min(780px, calc(100% - 24px));
+            max-height: min(88vh, 900px);
+            padding: clamp(16px, 4vw, 30px);
+            color: #fff;
+            background: #303030;
+            border: 4px solid #161616;
+            box-shadow: inset 0 0 0 3px #5a5a5a, 0 8px 0 #111;
+            font-family: 'MinecraftFont', sans-serif;
+        }
+        .exam-dialog::backdrop { background: rgba(0, 0, 0, .78); }
+        .result-title { margin: 0; color: #ffe36a; font-size: clamp(18px, 4vw, 26px); line-height: 1.7; text-align: center; }
+        .result-score { margin: 10px 0 24px; font-size: 15px; text-align: center; }
+        .table-wrap { max-height: 48vh; overflow: auto; border: 2px solid #171717; }
+        .result-table { width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.7; }
+        .result-table th, .result-table td { padding: 10px 8px; border: 1px solid #555; text-align: left; vertical-align: top; }
+        .result-table th { position: sticky; top: 0; background: #4b4b4b; }
+        .result-table tr.is-correct td:last-child { color: #a9e47a; }
+        .result-table tr.is-incorrect td:last-child { color: #ff9c8e; }
+        .dialog-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 22px; }
+        @media (max-width: 720px) {
+            .exam-grid { grid-template-columns: 1fr; }
+            .exam-card { min-height: 150px; }
+            .exam-main { margin-top: 24px; }
+        }
+    </style>
+</head>
+<body class="exam-page">
+    <header class="exam-header">
+        <a class="exam-brand" href="math_4.html">⛏ Математика · Испытания</a>
+        <a class="exam-back" href="math_4.html">← На главную математики</a>
+    </header>
+    <main class="exam-main">
+        <section id="test-picker" class="exam-panel" aria-labelledby="page-title">
+            <p class="exam-kicker">Математическая шахта · проверка знаний</p>
+            <h1 id="page-title" class="exam-title">Выбери испытание</h1>
+            <p class="exam-description">В каждом тесте 15 вопросов, расположенных от простого к сложному. Отвечай самостоятельно: после последнего вопроса увидишь оценку и разбор всех ответов.</p>
+            <div class="exam-grid">
+                <button class="exam-card" type="button" data-test="arithmetic">
+                    <span class="card-icon" aria-hidden="true">🪓</span>
+                    <span class="card-title">Арифметические операции с натуральными числами</span>
+                    <span class="card-meta">15 вопросов · от счёта до выражений</span>
+                </button>
+                <button class="exam-card" type="button" data-test="equations">
+                    <span class="card-icon" aria-hidden="true">📜</span>
+                    <span class="card-title">Уравнения с натуральными числами</span>
+                    <span class="card-meta">15 вопросов · найди значение x</span>
+                </button>
+                <button class="exam-card" type="button" data-test="geometry">
+                    <span class="card-icon" aria-hidden="true">🧱</span>
+                    <span class="card-title">Расчёты площадей и объёмов</span>
+                    <span class="card-meta">15 вопросов · площадь и объём фигур</span>
+                </button>
+                <button class="exam-card" type="button" data-test="rounding">
+                    <span class="card-icon" aria-hidden="true">🔢</span>
+                    <span class="card-title">Округление десятичных дробей</span>
+                    <span class="card-meta">15 вопросов · до единиц, десятых и сотых</span>
+                </button>
+                <button class="exam-card" type="button" data-test="primes">
+                    <span class="card-icon" aria-hidden="true">💎</span>
+                    <span class="card-title">Найди простое число</span>
+                    <span class="card-meta">15 вопросов · выбери один вариант</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="active-test" class="exam-panel hidden" aria-labelledby="test-title">
+            <div class="test-topline"><span id="test-name"></span><span id="question-count"></span></div>
+            <div class="progress-track" role="progressbar" aria-label="Прогресс теста" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <div class="question-card">
+                <p id="question-label" class="question-label"></p>
+                <h1 id="test-title" class="question-text"></h1>
+                <form id="answer-form">
+                    <div class="answer-row">
+                        <label class="hidden" for="exam-answer">Твой ответ</label>
+                        <input id="exam-answer" class="exam-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Введи ответ" required>
+                        <button id="answer-button" class="exam-button" type="submit">Проверить</button>
+                        <button id="skip-button" class="exam-button secondary" type="button">Пропустить</button>
+                        <button id="next-button" class="exam-button hidden" type="button">Следующий вопрос →</button>
+                    </div>
+                </form>
+                <div id="choice-grid" class="choice-grid hidden" role="group" aria-label="Варианты ответа"></div>
+                <p id="exam-feedback" class="exam-feedback" aria-live="polite"></p>
+                <div class="hint-controls">
+                    <button id="hint-button" class="hint-button" type="button" disabled>Подсказка доступна через 45 секунд</button>
+                    <p id="hint-text" class="hint-text hidden" aria-live="polite"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="result-dialog" class="exam-dialog" aria-labelledby="result-title">
+        <h2 id="result-title" class="result-title">Испытание завершено!</h2>
+        <p id="result-score" class="result-score"></p>
+        <div class="table-wrap">
+            <table class="result-table">
+                <thead><tr><th>№</th><th>Вопрос</th><th>Твой ответ</th><th>Правильный ответ</th><th>Время</th><th>Результат</th></tr></thead>
+                <tbody id="result-rows"></tbody>
+            </table>
+        </div>
+        <div class="dialog-actions">
+            <button id="retry-button" class="exam-button" type="button">Пройти ещё раз</button>
+            <button id="picker-button" class="exam-button secondary" type="button">К выбору тестов</button>
+        </div>
+    </dialog>
+    <script src="../js/math_tests.js"></script>
+</body>
+</html>

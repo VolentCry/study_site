@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#dceee5" />
+  <title>Банк задач — НЕшкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --forest: #214a40;
+      --forest-dark: #183a34;
+      --cream: #fff7e8;
+      --gold: #e6ad42;
+      --gold-light: #f5cf72;
+      --ink: #203b34;
+      --muted: #58736a;
+      font-family: 'Nunito', sans-serif;
+      color: var(--ink);
+      background: #dceee5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { min-height: 100vh; margin: 0; overflow-x: hidden; }
+    a { color: inherit; }
+
+    .bank-hero {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      min-height: max(740px, 100svh);
+      flex-direction: column;
+      overflow: hidden;
+      background: linear-gradient(180deg, #dceee5 0%, #e9f0d9 59%, #f3d58d 100%);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 26px 7.5%;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--forest);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgba(33, 74, 64, .25);
+      border-radius: 50%;
+      color: var(--forest);
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+    }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 0;
+      color: var(--forest);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .home-link:hover { color: #a75a31; }
+    .home-link span { font-size: 18px; }
+
+    .hero-copy {
+      position: relative;
+      z-index: 3;
+      width: min(650px, 84%);
+      margin: clamp(48px, 9vh, 100px) 0 0 11%;
+      padding-bottom: 340px;
+      animation: arrive .8s ease both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #52776a;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 27px;
+      height: 2px;
+      background: #c37b3e;
+      content: '';
+    }
+
+    h1 {
+      max-width: 650px;
+      margin: 15px 0 14px;
+      color: var(--forest-dark);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 76px;
+      font-weight: 800;
+      line-height: 1.03;
+    }
+
+    .hero-copy p {
+      max-width: 440px;
+      margin: 0;
+      color: #48675d;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .hero-actions { display: flex; align-items: center; gap: 22px; margin-top: 30px; }
+
+    .primary-link {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 0 23px;
+      border: 1px solid var(--forest);
+      border-radius: 3px;
+      background: var(--forest);
+      color: #fffaf0;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .primary-link:hover { transform: translateY(-2px); background: #326253; }
+    .primary-link span { font-size: 19px; }
+
+    .action-note { color: #58736a; font-size: 13px; }
+
+    .sun {
+      position: absolute;
+      z-index: 0;
+      top: 19%;
+      right: 17%;
+      width: 142px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #f2c766;
+      box-shadow: 0 0 0 22px rgba(242, 199, 102, .12), 0 0 0 46px rgba(242, 199, 102, .08);
+    }
+
+    .landscape { position: absolute; z-index: 1; right: 0; bottom: 0; left: 0; height: 49%; overflow: hidden; }
+
+    .ridge {
+      position: absolute;
+      right: -4%;
+      bottom: -1px;
+      left: -4%;
+      height: 100%;
+      clip-path: polygon(0 76%, 13% 58%, 23% 67%, 35% 30%, 47% 55%, 59% 19%, 72% 54%, 83% 32%, 100% 65%, 100% 100%, 0 100%);
+    }
+
+    .ridge-far { background: #b8c79d; transform: translateY(-29%); opacity: .8; }
+    .ridge-back { background: #8ea777; transform: translateY(-17%); }
+    .ridge-mid { background: #c99843; }
+    .ridge-front { height: 75%; background: #d6a74c; clip-path: polygon(0 61%, 15% 41%, 28% 62%, 43% 28%, 58% 59%, 73% 35%, 87% 56%, 100% 31%, 100% 100%, 0 100%); }
+
+    .facet {
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(0 76%, 13% 58%, 23% 67%, 35% 30%, 47% 55%, 59% 19%, 72% 54%, 83% 32%, 100% 65%, 100% 100%, 0 100%);
+    }
+
+    .facet-one { background: rgba(255, 219, 128, .35); clip-path: polygon(0 76%, 35% 30%, 47% 55%, 100% 65%, 100% 100%, 0 100%); }
+    .facet-two { background: rgba(130, 78, 37, .13); clip-path: polygon(35% 30%, 59% 19%, 72% 54%, 47% 55%); }
+    .facet-three { background: rgba(255, 237, 175, .27); clip-path: polygon(59% 19%, 83% 32%, 100% 65%, 72% 54%); }
+
+    .coin-lines {
+      position: absolute;
+      right: -3%;
+      bottom: 0;
+      left: -3%;
+      height: 45%;
+      background: repeating-linear-gradient(0deg, transparent 0 17px, rgba(120, 75, 30, .24) 18px 20px, rgba(255, 226, 148, .55) 21px 23px, transparent 24px 34px);
+      clip-path: polygon(0 51%, 16% 29%, 29% 56%, 43% 17%, 58% 48%, 73% 22%, 89% 49%, 100% 13%, 100% 100%, 0 100%);
+      opacity: .68;
+    }
+
+    .bill {
+      position: absolute;
+      z-index: 2;
+      top: -100px;
+      left: var(--left);
+      width: 66px;
+      height: 34px;
+      border: 1px solid rgba(34, 90, 66, .75);
+      border-radius: 3px;
+      background: #a9c38d;
+      box-shadow: inset 0 0 0 3px rgba(243, 236, 183, .58);
+      opacity: .84;
+      transform: rotate(var(--tilt));
+      animation: falling var(--duration) var(--delay) linear infinite;
+      pointer-events: none;
+    }
+
+    .bill::before {
+      position: absolute;
+      inset: 7px 23px;
+      border: 1px solid rgba(34, 90, 66, .55);
+      border-radius: 50%;
+      content: '';
+    }
+
+    .bill::after {
+      position: absolute;
+      top: 6px;
+      left: 7px;
+      width: 8px;
+      height: 8px;
+      border: 1px solid rgba(34, 90, 66, .52);
+      border-radius: 50%;
+      content: '';
+    }
+
+    .bill:nth-of-type(2n) { background: #c5d3a2; }
+    .bill:nth-of-type(3n) { background: #d8b978; }
+
+    .scene-caption {
+      position: absolute;
+      z-index: 3;
+      right: 7.5%;
+      bottom: 30px;
+      color: rgba(62, 70, 48, .72);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .bank-bottom {
+      display: flex;
+      min-height: 112px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 25px 7.5%;
+      background: var(--forest-dark);
+      color: #f8f0dd;
+    }
+
+    .bank-bottom p { margin: 0; color: rgba(248, 240, 221, .78); font-size: 14px; }
+    .bottom-link { display: inline-flex; align-items: center; gap: 10px; color: #f4cd72; font-size: 14px; font-weight: 800; text-decoration: none; }
+    .bottom-link:hover { color: #fff1c8; }
+    .bottom-link span { font-size: 18px; }
+
+    @keyframes falling {
+      0% { translate: 0 -10vh; rotate: 0deg; }
+      50% { translate: 34px 55vh; rotate: 120deg; }
+      100% { translate: -18px 112vh; rotate: 290deg; }
+    }
+
+    @keyframes arrive {
+      from { opacity: 0; translate: 0 18px; }
+      to { opacity: 1; translate: 0 0; }
+    }
+
+    @media (max-width: 700px) {
+      .bank-hero { min-height: max(760px, 100svh); }
+      .topbar { padding: 19px 6%; }
+      .brand { font-size: 16px; }
+      .brand-mark { width: 34px; height: 34px; }
+      .home-link { font-size: 13px; }
+      .hero-copy { width: 88%; margin: 72px auto 0; padding-bottom: 370px; }
+      h1 { max-width: 440px; font-size: 52px; }
+      .hero-copy p { max-width: 370px; font-size: 16px; }
+      .hero-actions { align-items: flex-start; flex-direction: column; gap: 12px; }
+      .sun { top: 32%; right: 8%; width: 86px; }
+      .landscape { height: 43%; }
+      .ridge { right: -24%; left: -20%; }
+      .ridge-front { height: 83%; }
+      .scene-caption { right: 6%; bottom: 18px; font-size: 9px; }
+      .bank-bottom { align-items: flex-start; flex-direction: column; gap: 14px; padding: 23px 6%; }
+    }
+
+    @media (max-width: 390px) {
+      .topbar { gap: 8px; padding-right: 4%; padding-left: 4%; }
+      .brand { gap: 6px; font-size: 14px; }
+      .brand-mark { width: 30px; height: 30px; }
+      .home-link { gap: 5px; font-size: 11px; }
+      h1 { font-size: 44px; }
+      .hero-copy { margin-top: 58px; }
+      .action-note { max-width: 230px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="bank-hero" aria-labelledby="bank-title">
+      <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">Н</span> НЕшкола</a>
+        <a class="home-link" href="index.html"><span aria-hidden="true">←</span> На главную</a>
+      </header>
+
+      <div class="hero-copy">
+        <div class="eyebrow">Место, где копятся знания</div>
+        <h1 id="bank-title">Банк задач</h1>
+        <p>Целая гора задач для тех, кто любит докапываться до сути. Выбирай тему и пополняй свой запас знаний.</p>
+        <div class="hero-actions">
+          <a class="primary-link" href="tasks_catalog.html">Открыть задания <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+
+      <div class="sun" aria-hidden="true"></div>
+      <span class="bill" style="--left: 15%; --tilt: -16deg; --duration: 24s; --delay: -12s" aria-hidden="true"></span>
+      <span class="bill" style="--left: 34%; --tilt: 12deg; --duration: 29s; --delay: -21s" aria-hidden="true"></span>
+      <span class="bill" style="--left: 54%; --tilt: -8deg; --duration: 27s; --delay: -8s" aria-hidden="true"></span>
+      <span class="bill" style="--left: 73%; --tilt: 20deg; --duration: 32s; --delay: -25s" aria-hidden="true"></span>
+      <span class="bill" style="--left: 91%; --tilt: -20deg; --duration: 25s; --delay: -17s" aria-hidden="true"></span>
+      <div class="landscape" aria-hidden="true">
+        <div class="ridge ridge-far"></div>
+        <div class="ridge ridge-back"></div>
+        <div class="ridge ridge-mid"><div class="facet facet-one"></div><div class="facet facet-two"></div><div class="facet facet-three"></div></div>
+        <div class="ridge ridge-front"></div>
+        <div class="coin-lines"></div>
+      </div>
+      <div class="scene-caption" aria-hidden="true">Сокровищница знаний</div>
+    </section>
+
+    <footer class="bank-bottom">
+      <p>Каждая решённая задача — ещё одна монета в копилке.</p>
+    </footer>
+  </main>
+</body>
+</html>

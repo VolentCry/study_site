@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль - Minecraft Underwater School</title>
-    
-    <!-- Подключаем тот же пиксельный шрифт -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>Профиль пользователя</title>
 
     <style>
         /* --- ПЕРЕМЕННЫЕ ЦВЕТОВ (как на главной) --- */
@@ -235,13 +232,472 @@
             to { transform: translateY(-120vh) rotate(360deg); }
         }
     </style>
+    <style>
+        :root {
+            color-scheme: light;
+            --profile-ink: #202a3a;
+            --profile-muted: #697383;
+            --profile-primary: #263f61;
+            --profile-accent: #b7464e;
+            --profile-paper: #f5f2eb;
+            --profile-card: #fff;
+            --profile-line: #e4e8ee;
+            --profile-subtle: #f8f9fb;
+            --profile-input: #fff;
+            --profile-input-border: #cfd6df;
+            --profile-button-hover: #f3f5f8;
+        }
+        :root[data-theme="dark"] {
+            color-scheme: dark;
+            --profile-ink: #edf1f7;
+            --profile-muted: #a7b1c0;
+            --profile-primary: #c2d5f0;
+            --profile-accent: #f08a91;
+            --profile-paper: #171d27;
+            --profile-card: #222b38;
+            --profile-line: #3a4657;
+            --profile-subtle: #1c2532;
+            --profile-input: #18212d;
+            --profile-input-border: #536174;
+            --profile-button-hover: #303b4b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            height: auto;
+            overflow: auto;
+            display: block;
+            overflow-x: hidden;
+            background: #202a3a;
+            color: var(--profile-ink);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .profile-page-sheet {
+            min-height: 100vh;
+            background: var(--profile-paper);
+            transform-origin: top center;
+            animation: profile-curtain-drop 850ms cubic-bezier(.2, .75, .25, 1) both;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, .22);
+        }
+        @keyframes profile-curtain-drop {
+            from { transform: translateY(-105%); }
+            to { transform: translateY(0); }
+        }
+        .profile-nav {
+            min-height: 68px;
+            padding: 12px clamp(18px, 5vw, 72px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: var(--profile-card);
+            border-bottom: 1px solid var(--profile-line);
+        }
+        .profile-brand {
+            color: var(--profile-primary);
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .profile-nav-link {
+            color: var(--profile-muted);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .profile-nav-link:hover, .auth-switch a:hover { color: var(--profile-accent); }
+        .profile-nav-actions { display: flex; align-items: center; gap: 20px; }
+        .theme-toggle {
+            min-height: 38px;
+            padding: 8px 12px;
+            color: var(--profile-primary);
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .theme-toggle:hover { background: var(--profile-button-hover); }
+        .theme-toggle:focus-visible { outline: 3px solid var(--profile-accent); outline-offset: 3px; }
+        .profile-main {
+            width: min(1240px, calc(100% - 32px));
+            margin: 54px auto;
+        }
+        .profile-dashboard {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(390px, .92fr);
+            align-items: start;
+            gap: 20px;
+        }
+        .profile-card {
+            max-width: none;
+            width: 100%;
+            padding: clamp(22px, 5vw, 48px);
+            text-align: left;
+            color: var(--profile-ink);
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 18px;
+            box-shadow: 0 16px 48px rgba(32, 42, 58, .08);
+        }
+        .auth-section { width: min(480px, 100%); margin: 0 auto; }
+        .auth-section h2 {
+            margin-bottom: 10px;
+            color: var(--profile-primary);
+            font-size: 26px;
+            font-weight: 700;
+            text-align: left;
+        }
+        .auth-intro { margin-bottom: 28px; color: var(--profile-muted); font-size: 14px; line-height: 1.6; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            margin-bottom: 8px;
+            color: var(--profile-ink);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .form-group input {
+            min-height: 48px;
+            padding: 12px 14px;
+            color: var(--profile-ink);
+            background: var(--profile-input);
+            border: 1px solid var(--profile-input-border);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 15px;
+        }
+        .form-group input::placeholder { color: var(--profile-muted); }
+        .form-group input:focus {
+            outline: 3px solid rgba(38, 63, 97, .14);
+            border-color: var(--profile-primary);
+        }
+        .auth-btn {
+            min-height: 48px;
+            margin-top: 6px;
+            padding: 12px 18px;
+            color: #fff;
+            background: var(--profile-primary);
+            border: 0;
+            border-radius: 8px;
+            font: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+        .auth-btn:hover { background: #34567f; transform: translateY(-1px); }
+        .auth-section .auth-btn { width: 100%; }
+        .auth-switch { margin-top: 22px; color: var(--profile-muted); font-size: 13px; }
+        .auth-switch a { color: var(--profile-primary); font-weight: 600; }
+        .registration-disabled { display: none !important; }
+        .auth-error { color: #b42318; font-size: 13px; }
+        .auth-success { color: #25804a; font-size: 13px; }
+        .profile-heading {
+            margin: 0 0 8px;
+            color: var(--profile-primary);
+            font-size: clamp(24px, 4vw, 32px);
+            line-height: 1.25;
+        }
+        .profile-subtitle { margin-bottom: 30px; color: var(--profile-muted); font-size: 14px; }
+        .profile-identity {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 22px;
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+        }
+        .avatar-container {
+            width: 72px;
+            height: 72px;
+            flex: 0 0 72px;
+            margin: 0;
+            color: #fff;
+            background: #dce4ed;
+            border: 0;
+            box-shadow: none;
+        }
+        .avatar-placeholder { color: var(--profile-primary); font: 700 28px/1 'Segoe UI', Arial, sans-serif; }
+        .nickname { margin: 0; color: var(--profile-ink); font-size: 20px; font-weight: 700; text-shadow: none; overflow-wrap: anywhere; }
+        .profile-label { margin-top: 6px; color: var(--profile-muted); font-size: 13px; }
+        .stats {
+            margin: 22px 0 0;
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            color: var(--profile-ink);
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .stats span { margin: 0; color: var(--profile-primary); font-size: 28px; text-shadow: none; }
+        .experience-card {
+            margin-top: 14px;
+            padding: 20px 22px;
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+        }
+        .experience-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .experience-level { color: var(--profile-primary); font-size: 16px; font-weight: 700; }
+        .experience-total { color: var(--profile-muted); font-size: 13px; font-weight: 600; }
+        .experience-bar {
+            height: 12px;
+            margin-top: 14px;
+            overflow: hidden;
+            background: var(--profile-line);
+            border-radius: 999px;
+        }
+        .experience-progress {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--profile-accent), #e9af55);
+            border-radius: inherit;
+            transition: width .5s ease;
+        }
+        .experience-detail { margin-top: 8px; color: var(--profile-muted); font-size: 12px; line-height: 1.5; }
+        .metrics-section { margin-top: 34px; }
+        .skills-card { position: sticky; top: 24px; }
+        .skills-header { margin-bottom: 20px; }
+        .metrics-heading { margin: 0 0 8px; color: var(--profile-primary); font-size: 22px; }
+        .metrics-note { margin: 0 0 18px; color: var(--profile-muted); font-size: 13px; line-height: 1.6; }
+        .skills-select-label { display: block; margin: 18px 0 8px; color: var(--profile-muted); font-size: 12px; font-weight: 600; }
+        .skills-select {
+            width: 100%;
+            min-height: 44px;
+            padding: 9px 12px;
+            color: var(--profile-ink);
+            background: var(--profile-input);
+            border: 1px solid var(--profile-input-border);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 14px;
+        }
+        .skills-select:focus-visible { outline: 3px solid var(--profile-accent); outline-offset: 2px; }
+        .skills-chart-wrap { width: 100%; margin: 10px auto 0; }
+        .skills-radar { display: block; width: 100%; height: auto; overflow: visible; }
+        .skills-grid-line { fill: none; stroke: var(--profile-line); stroke-width: 1; }
+        .skills-axis { stroke: var(--profile-line); stroke-width: 1; }
+        .skills-area { fill: rgba(183, 70, 78, .24); stroke: var(--profile-accent); stroke-width: 2.5; stroke-linejoin: round; }
+        .skills-area.no-data { fill: rgba(105, 115, 131, .08); stroke: var(--profile-muted); stroke-dasharray: 5 5; }
+        .skills-point { fill: var(--profile-accent); stroke: var(--profile-card); stroke-width: 2; }
+        .skills-label { fill: var(--profile-ink); font: 12px 'Segoe UI', Arial, sans-serif; }
+        .skills-value { fill: var(--profile-muted); font: 10px 'Segoe UI', Arial, sans-serif; }
+        .skills-summary {
+            padding: 12px 14px;
+            color: var(--profile-muted);
+            background: var(--profile-subtle);
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .achievements-dialog {
+            position: fixed;
+            inset: 0 0 auto;
+            width: min(760px, calc(100% - 28px));
+            max-width: none;
+            max-height: min(82vh, 760px);
+            margin: 0 auto;
+            padding: 0;
+            overflow: auto;
+            color: var(--profile-ink);
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 24px 70px rgba(20, 30, 45, .28);
+        }
+        .achievements-dialog[open] { animation: achievements-drop 420ms cubic-bezier(.2, .75, .25, 1) both; }
+        .achievements-dialog::backdrop { background: rgba(15, 24, 38, .56); }
+        @keyframes achievements-drop {
+            from { opacity: 0; transform: translateY(-35px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .achievements-content { padding: clamp(20px, 5vw, 34px); }
+        .achievements-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+        .achievements-heading { margin: 0 0 8px; color: var(--profile-primary); font-size: 24px; }
+        .achievements-note { color: var(--profile-muted); font-size: 13px; line-height: 1.6; }
+        .achievements-close {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            color: var(--profile-muted);
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 50%;
+            font: inherit;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .achievements-close:hover { color: var(--profile-ink); background: var(--profile-button-hover); }
+        .achievements-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            padding: 0;
+            list-style: none;
+        }
+        .achievement {
+            min-height: 126px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+        }
+        .achievement-medal {
+            width: 54px;
+            height: 54px;
+            flex: 0 0 54px;
+            display: grid;
+            place-items: center;
+            border: 2px solid #b8bec7;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #e5e8ec, #aeb5bf);
+            filter: grayscale(1);
+            opacity: .46;
+            font-size: 27px;
+            transition: filter .25s, opacity .25s, box-shadow .25s, transform .25s;
+        }
+        .achievement.is-earned .achievement-medal {
+            border-color: #e4ad40;
+            background: radial-gradient(circle at 35% 28%, #fff5b8, #f6c74e 52%, #d78a20);
+            filter: none;
+            opacity: 1;
+            box-shadow: 0 0 0 4px rgba(236, 184, 65, .16), 0 0 20px rgba(255, 198, 62, .62);
+            animation: medal-shimmer 2.4s ease-in-out infinite;
+        }
+        .achievement.is-earned:hover .achievement-medal { transform: scale(1.08) rotate(-7deg); }
+        @keyframes medal-shimmer {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(236, 184, 65, .12), 0 0 12px rgba(255, 198, 62, .38); }
+            50% { box-shadow: 0 0 0 5px rgba(236, 184, 65, .22), 0 0 24px rgba(255, 226, 111, .85); }
+        }
+        .achievement-name { color: var(--profile-ink); font-size: 14px; font-weight: 700; line-height: 1.4; }
+        .achievement-description { margin-top: 5px; color: var(--profile-muted); font-size: 12px; line-height: 1.5; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+        .metric-card {
+            min-height: 126px;
+            padding: 18px;
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+        }
+        .metric-label { color: var(--profile-muted); font-size: 12px; line-height: 1.5; }
+        .metric-value { margin-top: 12px; color: var(--profile-primary); font-size: 28px; font-weight: 700; }
+        .metric-detail { margin-top: 8px; color: var(--profile-muted); font-size: 11px; line-height: 1.5; }
+        .metric-value.neutral { font-size: 16px; }
+        .chart-card {
+            margin-top: 16px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: minmax(150px, 220px) 1fr;
+            align-items: center;
+            gap: 26px;
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+        }
+        .subject-chart {
+            width: min(220px, 100%);
+            aspect-ratio: 1;
+            margin: auto;
+            border-radius: 50%;
+            background: conic-gradient(#d5dce5 0% 100%);
+            position: relative;
+        }
+        .subject-chart::after {
+            content: '';
+            position: absolute;
+            inset: 24%;
+            border-radius: 50%;
+            background: var(--profile-subtle);
+        }
+        .chart-legend { display: grid; gap: 12px; }
+        .legend-item { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 10px; color: var(--profile-ink); font-size: 13px; }
+        .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+        .legend-count { color: var(--profile-muted); font-size: 12px; }
+        .chart-empty { color: var(--profile-muted); font-size: 13px; line-height: 1.6; }
+        .profile-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; }
+        .back-btn {
+            min-height: 44px;
+            padding: 12px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--profile-primary);
+            background: var(--profile-card);
+            border: 1px solid var(--profile-input-border);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .2s, border-color .2s;
+        }
+        .back-btn:hover { background: var(--profile-button-hover); border-color: var(--profile-input-border); }
+        .logout-btn { margin: 0; }
+        .bubble { display: none; }
+        @media (max-width: 520px) {
+            .profile-main { margin: 28px auto; }
+            .profile-nav { min-height: 60px; }
+            .profile-brand { font-size: 16px; }
+            .profile-nav-link { font-size: 12px; }
+            .profile-nav-actions { gap: 10px; }
+            .theme-toggle { padding: 7px 9px; font-size: 12px; }
+            .profile-identity { padding: 16px; }
+            .stats { padding: 18px; }
+            .experience-card { padding: 18px; }
+            .experience-header { align-items: flex-start; flex-direction: column; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .metric-card { min-height: 0; }
+            .chart-card { grid-template-columns: minmax(120px, 180px) 1fr; gap: 16px; padding: 16px; }
+            .achievements-list { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 900px) {
+            .profile-dashboard { grid-template-columns: minmax(0, 1fr); }
+            .skills-card { position: static; }
+        }
+        @media (max-width: 380px) {
+            .chart-card { grid-template-columns: 1fr; }
+            .subject-chart { width: 150px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .profile-page-sheet { animation: none; }
+            .achievements-dialog[open], .achievement.is-earned .achievement-medal { animation: none; }
+        }
+    </style>
 </head>
 <body>
+    <div class="profile-page-sheet">
+    <header class="profile-nav">
+        <a class="profile-brand" href="index.html">Учебная платформа</a>
+        <div class="profile-nav-actions">
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Тёмная тема</button>
+            <a class="profile-nav-link" href="index.html">На главную</a>
+        </div>
+    </header>
+    <main class="profile-main">
 
-    <!-- Форма входа -->
+    <!-- Авторизация временно отключена, форма сохранена.
     <div id="auth-container" class="profile-card auth-section">
         <div id="login-form">
             <h2>Вход в аккаунт</h2>
+            <p class="auth-intro">Войди, чтобы посмотреть свой профиль и учебную статистику.</p>
             <form id="login-submit">
                 <div class="form-group">
                     <label for="login-name">Имя (логин)</label>
@@ -254,7 +710,7 @@
                 <button type="submit" class="auth-btn">Войти</button>
                 <div id="login-error" class="auth-error hidden"></div>
             </form>
-            <div class="auth-switch">
+            <div class="auth-switch registration-disabled">
                 Нет аккаунта? <a id="show-register">Регистрация</a>
             </div>
         </div>
@@ -282,28 +738,144 @@
             </div>
         </div>
     </div>
+    -->
 
-    <!-- Профиль (показывается после входа) -->
-    <div id="profile-container" class="profile-card hidden">
-        <div class="nickname" id="profile-nickname">Игрок_Стив</div>
-        
-        <div class="avatar-container">
-            <div class="avatar-placeholder">?</div>
+    <!-- Профиль открыт без авторизации. -->
+    <div id="profile-container" class="profile-dashboard">
+      <section class="profile-card profile-overview" aria-labelledby="profile-heading">
+        <h1 id="profile-heading" class="profile-heading">Мой профиль</h1>
+        <p class="profile-subtitle">Твои данные и результаты обучения</p>
+        <div class="profile-identity">
+            <div class="avatar-container" aria-hidden="true">
+                <div class="avatar-placeholder" id="profile-avatar">У</div>
+            </div>
+            <div>
+                <div class="nickname" id="profile-nickname">Ученик</div>
+                <div class="profile-label">Ученический профиль</div>
+            </div>
         </div>
-        
         <div class="stats">
-            Всего решено задач:<br>
+            <div>Решено задач</div>
             <span id="tasks-count">0</span>
         </div>
-        
-        <a href="index.html" class="back-btn">< Назад к урокам</a>
-        <button type="button" class="back-btn logout-btn" id="logout-btn">Выйти</button>
+        <section class="experience-card" aria-labelledby="experience-heading">
+            <div class="experience-header">
+                <h2 id="experience-heading" class="experience-level">Уровень 1 · Новичок</h2>
+                <span id="experience-total" class="experience-total">0 XP</span>
+            </div>
+            <div
+                id="experience-progressbar"
+                class="experience-bar"
+                role="progressbar"
+                aria-label="Опыт до следующего уровня"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0">
+                <div id="experience-progress" class="experience-progress"></div>
+            </div>
+            <p id="experience-detail" class="experience-detail">До следующего уровня: 100 XP. Верный ответ приносит 10 XP, попытка — 2 XP.</p>
+        </section>
+        <section class="metrics-section" aria-labelledby="metrics-heading">
+            <h2 id="metrics-heading" class="metrics-heading">Учебная статистика</h2>
+            <p class="metrics-note">История собирается с момента включения статистики на этом устройстве.</p>
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <div class="metric-label">Решено за текущую неделю</div>
+                    <div id="weekly-solved" class="metric-value">0</div>
+                    <div id="weekly-range" class="metric-detail"></div>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-label">Ошибки за текущую неделю</div>
+                    <div id="current-error-rate" class="metric-value neutral">Недостаточно данных</div>
+                    <div id="current-error-detail" class="metric-detail"></div>
+                </article>
+                <article class="metric-card">
+                    <div id="error-week-label" class="metric-label">Ошибки за прошлую неделю</div>
+                    <div id="error-week-rate" class="metric-value neutral">Недостаточно данных</div>
+                    <div id="error-week-detail" class="metric-detail"></div>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-label">Изменение ошибок к предыдущей неделе</div>
+                    <div id="error-week-change" class="metric-value neutral">Недостаточно данных</div>
+                    <div id="error-week-change-detail" class="metric-detail"></div>
+                </article>
+            </div>
+            <div class="chart-card">
+                <div id="subject-chart" class="subject-chart" role="img" aria-label="Круговая диаграмма решённых задач по предметам"></div>
+                <div>
+                    <h3 class="metrics-heading" style="font-size:17px">Решено по предметам</h3>
+                    <p id="chart-period" class="metric-detail"></p>
+                    <div id="chart-legend" class="chart-legend"></div>
+                    <p id="chart-empty" class="chart-empty hidden">Пока нет решённых задач за эту неделю.</p>
+                </div>
+            </div>
+        </section>
+        <div class="profile-actions">
+            <a href="index.html" class="back-btn">На главную</a>
+            <button type="button" class="back-btn" id="achievements-open">Достижения</button>
+            <!-- Авторизация отключена, кнопка выхода сохранена.
+            <button type="button" class="back-btn logout-btn" id="logout-btn">Выйти из аккаунта</button>
+            -->
+        </div>
+      </section>
+      <section class="profile-card skills-card" aria-labelledby="skills-heading">
+        <div class="skills-header">
+            <h2 id="skills-heading" class="metrics-heading">Карта навыков</h2>
+            <p class="metrics-note">Навыки развиваются по мере решения задач. Значение показывает долю правильных ответов.</p>
+            <label class="skills-select-label" for="skills-subject">Предмет</label>
+            <select id="skills-subject" class="skills-select">
+                <option value="Математика">Математика</option>
+                <option value="Английский">Английский язык</option>
+                <option value="Физика">Физика</option>
+            </select>
+        </div>
+        <div class="skills-chart-wrap">
+            <svg id="skills-radar" class="skills-radar" viewBox="0 0 460 420" role="img" aria-label="Карта навыков по математике"></svg>
+        </div>
+        <p id="skills-summary" class="skills-summary" aria-live="polite"></p>
+      </section>
+    </div>
+    <dialog id="achievements-dialog" class="achievements-dialog" aria-labelledby="achievements-heading">
+        <div class="achievements-content">
+            <div class="achievements-header">
+                <div>
+                    <h2 id="achievements-heading" class="achievements-heading">Достижения</h2>
+                    <p class="achievements-note">Продолжай учиться, чтобы зажечь новые медали!</p>
+                </div>
+                <button type="button" class="achievements-close" id="achievements-close" aria-label="Закрыть достижения">×</button>
+            </div>
+            <ul id="achievements-list" class="achievements-list"></ul>
+        </div>
+    </dialog>
+    </main>
     </div>
 
+    <script src="js/profile_metrics.js"></script>
     <script>
+        /*
+        Авторизация временно отключена. Код входа, регистрации и выхода
+        сохранён ниже для возможного повторного включения.
         const AUTH_STUB = { name: 'Roma', password: '12345' };
         const STORAGE_KEY = 'loggedInUser';
+        */
+        const THEME_STORAGE_KEY = 'profileTheme';
 
+        function setTheme(theme) {
+            document.documentElement.dataset.theme = theme;
+            const isDark = theme === 'dark';
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+        }
+
+        setTheme(localStorage.getItem(THEME_STORAGE_KEY) === 'dark' ? 'dark' : 'light');
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+            setTheme(nextTheme);
+        });
+
+        /*
         function showAuth() {
             document.getElementById('auth-container').classList.remove('hidden');
             document.getElementById('profile-container').classList.add('hidden');
@@ -313,6 +885,7 @@
             document.getElementById('auth-container').classList.add('hidden');
             document.getElementById('profile-container').classList.remove('hidden');
             document.getElementById('profile-nickname').innerText = userName;
+            document.getElementById('profile-avatar').innerText = userName.trim().charAt(0).toLocaleUpperCase('ru-RU');
         }
 
         function logout() {
@@ -325,14 +898,7 @@
             document.getElementById('register-form').classList.add('hidden');
         }
 
-        // Инициализация при загрузке страницы
         window.onload = () => {
-            const tasksCountElement = document.getElementById('tasks-count');
-            const savedTasks = localStorage.getItem('totalSolvedTasks');
-            if (savedTasks !== null) {
-                tasksCountElement.innerText = savedTasks;
-            }
-
             const savedUser = localStorage.getItem(STORAGE_KEY);
             if (savedUser) {
                 showProfile(savedUser);
@@ -380,6 +946,9 @@
 
             document.getElementById('logout-btn').addEventListener('click', logout);
         };
+        */
+
+        createBubbles();
 
         function createBubbles() {
             const body = document.body;

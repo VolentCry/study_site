@@ -127,6 +127,8 @@
             .section-heading { display: block; }
             .section-heading h2 { font-size: 28px; }
             .section-note { margin-top: 10px; }
+            .route-list { grid-template-columns: 1fr; }
+            .route-link + .route-link { border-left: 0; }
             .route-link { min-height: 112px; padding: 16px 12px; grid-template-columns: 28px 1fr 16px; gap: 10px; }
             .route-title { font-size: 17px; }
             .route-copy { font-size: 11px; }
@@ -175,6 +177,7 @@
                 <div class="hero-actions">
                     <a class="hero-action primary" href="../tasks/tasks.html">Перейти к задачам</a>
                     <a class="hero-action" href="#trainers">Выбрать тренажёр</a>
+                    <a class="hero-action" href="math_tests.html">Тестирование</a>
                 </div>
             </div>
             <span class="hero-caption">春 · Весна — время новых открытий</span>
@@ -198,6 +201,11 @@
                     <a class="route-link" href="#trainers">
                         <span class="route-index">02</span>
                         <span><span class="route-title">Тренажёры</span><span class="route-copy">Умножение, дроби и уравнения</span></span>
+                        <span class="route-arrow" aria-hidden="true">→</span>
+                    </a>
+                    <a class="route-link" href="math_tests.html">
+                        <span class="route-index">03</span>
+                        <span><span class="route-title">Тестирование</span><span class="route-copy">Проверь знания в трёх тематических тестах</span></span>
                         <span class="route-arrow" aria-hidden="true">→</span>
                     </a>
                 </div>
