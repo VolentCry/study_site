@@ -1,7 +1,15 @@
 /**
  * Тренажёр обыкновенных дробей
- * Включает сложение, вычитание, умножение, деление, сокращение и сравнение дробей.
- * Содержит пошаговые подсказки, визуальные модели дробей и звуковую обратную связь.
+ * Включает:
+ *  - Сложение и вычитание с одинаковыми знаменателями
+ *  - Сложение и вычитание с разными знаменателями
+ *  - Сокращение дробей
+ *  - Выделение целой части из неправильной дроби
+ *  - Перевод обыкновенной дроби в десятичную
+ *  - Умножение и деление дробей
+ *  - Сравнение дробей
+ *  - Случайный микс
+ * Содержит пошаговые подсказки, наглядные графические схемы и звуковую обратную связь.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeButtons = document.querySelectorAll('.mode-tab');
 
     // Состояние тренажёра
-    let currentMode = 'same_denom'; // 'same_denom' | 'diff_denom' | 'reduce' | 'mul_div' | 'compare' | 'mixed'
+    let currentMode = 'same_denom';
     let currentProblem = null;
     let isChecked = false;
     let visualVisible = true;
@@ -62,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = ctx.currentTime;
 
             if (type === 'correct') {
-                // Мажорное восходящее трезвучие
                 const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
                 freqs.forEach((f, idx) => {
                     const osc = ctx.createOscillator();
@@ -77,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     osc.stop(now + idx * 0.07 + 0.3);
                 });
             } else if (type === 'streak') {
-                // Праздничный аккорд
                 const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
                 freqs.forEach((f, idx) => {
                     const osc = ctx.createOscillator();
@@ -105,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 osc.stop(now + 0.22);
             }
         } catch (e) {
-            // Аудио не поддерживается или заблокировано
+            // Аудио заблокировано браузером
         }
     }
 
@@ -124,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Математические функции ---
+    // --- Математические утилиты ---
     function gcd(a, b) {
         a = Math.abs(a);
         b = Math.abs(b);
@@ -152,22 +158,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateRank() {
         const s = stats.streak;
         let title = 'Ученик';
-        if (s >= 20) title = 'Магистр дробей 👑';
-        else if (s >= 15) title = 'Архимаг математики 🧙';
-        else if (s >= 10) title = 'Мастер дробей 💎';
-        else if (s >= 7) title = 'Знаток дробей 🥇';
-        else if (s >= 4) title = 'Подмастерье 🥈';
+        if (s >= 25) title = 'Магистр дробей 👑';
+        else if (s >= 18) title = 'Архимаг математики 🧙';
+        else if (s >= 12) title = 'Мастер дробей 💎';
+        else if (s >= 8) title = 'Знаток дробей 🥇';
+        else if (s >= 5) title = 'Подмастерье 🥈';
         else if (s >= 2) title = 'Начинающий 🥉';
 
         if (rankTitleEl) rankTitleEl.textContent = title;
         if (scoreCorrectEl) scoreCorrectEl.textContent = stats.correct;
         if (scoreTotalEl) scoreTotalEl.textContent = stats.total;
         if (streakEl) streakEl.textContent = stats.streak;
+
+        if (window.TrainerTracker) {
+            window.TrainerTracker.setSessionStreak('common_fractions', stats.streak);
+        }
     }
 
     // --- Генераторы задач для каждого режима ---
 
-    // 1. Одинаковые знаменатели (сложение и вычитание)
+    // 1. Одинаковые знаменатели
     function generateSameDenomProblem() {
         const op = pickRandom(['+', '-']);
         const den = getRandomInt(3, 12);
@@ -188,17 +198,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const reducedD = den / g;
 
         let stepsHtml = `
-            <p><strong>Шаг 1:</strong> Знаменатели у дробей одинаковые (<code>${den}</code>), поэтому знаменатель остаётся тем же.</p>
+            <p><strong>Шаг 1:</strong> Знаменатели у дробей одинаковые (<code>${den}</code>), поэтому знаменатель результата остаётся <code>${den}</code>.</p>
             <p><strong>Шаг 2:</strong> Выполняем действие только в числителях: <code>${n1} ${op} ${n2} = ${resN}</code>.</p>
             <p><strong>Шаг 3:</strong> Получаем дробь: <code>${resN}/${den}</code>.</p>
         `;
 
         if (g > 1) {
             stepsHtml += `
-                <p><strong>Шаг 4:</strong> Сокращаем дробь на наибольший общий делитель НОД(${resN}, ${den}) = ${g}:<br>
+                <p><strong>Шаг 4:</strong> Сокращаем дробь на НОД(${resN}, ${den}) = ${g}:<br>
                 <code>${resN} : ${g} = ${reducedN}</code><br>
                 <code>${den} : ${g} = ${reducedD}</code><br>
-                Ответ в несократимом виде: <strong>${reducedN}/${reducedD}</strong>${reducedD === 1 ? ` (или просто целое число <strong>${reducedN}</strong>)` : ''}.</p>
+                Ответ в несократимом виде: <strong>${reducedN}/${reducedD}</strong>${reducedD === 1 ? ` (или целое число <strong>${reducedN}</strong>)` : ''}.</p>
             `;
         } else {
             stepsHtml += `<p><strong>Результат:</strong> Дробь <strong>${resN}/${den}</strong> уже несократима.</p>`;
@@ -224,10 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 2. Разные знаменатели (сложение и вычитание)
+    // 2. Разные знаменатели
     function generateDiffDenomProblem() {
         const op = pickRandom(['+', '-']);
-        // Подбираем удобные пары знаменателей с НОК <= 36
         const denPairs = [
             [2, 3], [2, 4], [2, 5], [3, 4], [3, 6],
             [4, 6], [2, 7], [3, 5], [4, 5], [5, 6],
@@ -237,10 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let n1 = getRandomInt(1, d1 - 1);
         let n2 = getRandomInt(1, d2 - 1);
 
-        // Для вычитания убедимся, что n1/d1 > n2/d2
         if (op === '-') {
             if (n1 * d2 <= n2 * d1) {
-                // Если первая дробь меньше или равна, меняем их местами или корректируем числители
                 n1 = d1 - 1;
                 n2 = 1;
                 if (n1 * d2 <= n2 * d1) {
@@ -302,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Сокращение дробей
     function generateReduceProblem() {
-        // Базовая несократимая дробь
         let baseD = getRandomInt(2, 9);
         let baseN = getRandomInt(1, baseD - 1);
         while (gcd(baseN, baseD) !== 1) {
@@ -310,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
             baseN = getRandomInt(1, baseD - 1);
         }
 
-        // Множитель сокращения
         const factor = getRandomInt(2, 6);
         const origN = baseN * factor;
         const origD = baseD * factor;
@@ -341,7 +346,125 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 4. Умножение и деление дробей
+    // 4. Выделение целой части
+    function generateExtractWholeProblem() {
+        const den = getRandomInt(2, 9);
+        const whole = getRandomInt(1, 4);
+        // 20% шанс деления нацело, 80% с остатком
+        const hasRemainder = Math.random() > 0.2;
+        const rem = hasRemainder ? getRandomInt(1, den - 1) : 0;
+        const num = whole * den + rem;
+
+        let stepsHtml = `
+            <p><strong>Шаг 1:</strong> Разделим числитель на знаменатель с остатком:<br>
+            <code>${num} : ${den} = ${whole}</code> (остаток <code>${rem}</code>).</p>
+            <p><strong>Шаг 2:</strong> Неполное частное <strong>${whole}</strong> становится целой частью смешанного числа.</p>
+        `;
+
+        if (rem > 0) {
+            stepsHtml += `
+                <p><strong>Шаг 3:</strong> Остаток <strong>${rem}</strong> записываем в числитель дробной части, а знаменатель <strong>${den}</strong> оставляем без изменений.</p>
+                <p><strong>Ответ:</strong> <strong>${whole} ${rem}/${den}</strong>.</p>
+            `;
+        } else {
+            stepsHtml += `
+                <p><strong>Шаг 3:</strong> Так как остаток равен <code>0</code>, дробь делится нацело.</p>
+                <p><strong>Ответ:</strong> целое число <strong>${whole}</strong>.</p>
+            `;
+        }
+
+        return {
+            type: 'extract_whole',
+            category: 'extract_whole',
+            promptText: rem === 0 
+                ? 'Раздели числитель на знаменатель (дробь делится нацело):' 
+                : 'Выдели целую часть из неправильной дроби:',
+            frac1: { n: num, d: den },
+            targetWhole: whole,
+            targetRem: rem,
+            targetDen: den,
+            solution: stepsHtml,
+            visualData: {
+                type: 'bar_extract_whole',
+                den: den,
+                whole: whole,
+                rem: rem,
+                num: num
+            }
+        };
+    }
+
+    // 5. Перевод в десятичную дробь
+    function generateToDecimalProblem() {
+        const decimalConfigs = [
+            { d: 2, nums: [1] },
+            { d: 4, nums: [1, 3] },
+            { d: 5, nums: [1, 2, 3, 4] },
+            { d: 8, nums: [1, 3, 5, 7] },
+            { d: 10, nums: [1, 3, 7, 9] },
+            { d: 20, nums: [1, 3, 7, 9, 11, 13, 17, 19] },
+            { d: 25, nums: [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19] },
+            { d: 50, nums: [1, 3, 7, 9, 11, 13, 17, 21, 23, 27, 31, 33, 37, 41, 43, 47] }
+        ];
+
+        const cfg = pickRandom(decimalConfigs);
+        const n = pickRandom(cfg.nums);
+        const d = cfg.d;
+        
+        // В 25% случаев даём смешанное число (например, 1 1/2 = 1.5, 2 3/4 = 2.75)
+        const isMixed = Math.random() < 0.25 && d <= 10;
+        const whole = isMixed ? getRandomInt(1, 3) : 0;
+
+        const decimalValue = Math.round((whole + n / d) * 10000) / 10000;
+
+        let roundTarget = 10;
+        if (d === 4 || d === 20 || d === 25 || d === 50) roundTarget = 100;
+        else if (d === 8) roundTarget = 1000;
+        const multiplier = roundTarget / d;
+        const expandedN = n * multiplier;
+
+        let stepsHtml = '';
+        if (isMixed) {
+            stepsHtml = `
+                <p><strong>Шаг 1:</strong> Целая часть <strong>${whole}</strong> остаётся целой: <code>${whole},...</code></p>
+                <p><strong>Шаг 2:</strong> Переводим дробную часть <code>${n}/${d}</code> в десятичную дробь.<br>
+                Домножим числитель и знаменатель на <code>${multiplier}</code>, чтобы знаменатель стал равен <code>${roundTarget}</code>:<br>
+                <code>(${n} × ${multiplier}) / (${d} × ${multiplier}) = ${expandedN}/${roundTarget} = ${(n/d).toString().replace('.', ',')}</code>.</p>
+                <p><strong>Шаг 3:</strong> Складываем целую часть и дробную:<br>
+                <code>${whole} + ${(n/d).toString().replace('.', ',')} = ${decimalValue.toString().replace('.', ',')}</code>.</p>
+                <p><strong>Ответ:</strong> <strong>${decimalValue.toString().replace('.', ',')}</strong>.</p>
+            `;
+        } else {
+            stepsHtml = `
+                <p><strong>Способ 1 (приведение к знаменателю ${roundTarget}):</strong><br>
+                Домножим числитель и знаменатель на <code>${multiplier}</code>:<br>
+                <code>(${n} × ${multiplier}) / (${d} × ${multiplier}) = ${expandedN}/${roundTarget} = ${decimalValue.toString().replace('.', ',')}</code>.</p>
+                <p><strong>Способ 2 (деление в столбик):</strong><br>
+                Разделим числитель на знаменатель: <code>${n} : ${d} = ${decimalValue.toString().replace('.', ',')}</code>.</p>
+                <p><strong>Ответ:</strong> <strong>${decimalValue.toString().replace('.', ',')}</strong>.</p>
+            `;
+        }
+
+        return {
+            type: 'to_decimal',
+            category: 'to_decimal',
+            promptText: isMixed ? 'Переведи смешанное число в десятичную дробь:' : 'Переведи обыкновенную дробь в десятичную:',
+            frac1: { n: n, d: d },
+            whole: whole,
+            isMixed: isMixed,
+            targetDecimal: decimalValue,
+            solution: stepsHtml,
+            visualData: {
+                type: 'bar_to_decimal',
+                d: d,
+                n: n,
+                whole: whole,
+                decVal: decimalValue
+            }
+        };
+    }
+
+    // 6. Умножение и деление дробей
     function generateMulDivProblem() {
         const op = pickRandom(['×', '÷']);
         const d1 = getRandomInt(2, 7);
@@ -356,13 +479,12 @@ document.addEventListener('DOMContentLoaded', () => {
             resN = n1 * n2;
             resD = d1 * d2;
             stepsHtml = `
-                <p><strong>Шаг 1:</strong> Чтобы умножить обыкновенные дроби, перемножаем числители и перемножаем знаменатели:<br>
+                <p><strong>Шаг 1:</strong> Чтобы умножить обыкновенные дроби, перемножаем числители и знаменатели:<br>
                 Числитель: <code>${n1} × ${n2} = ${resN}</code><br>
                 Знаменатель: <code>${d1} × ${d2} = ${resD}</code>.</p>
                 <p><strong>Шаг 2:</strong> Получаем дробь: <code>${resN}/${resD}</code>.</p>
             `;
         } else {
-            // Деление: переворачиваем вторую дробь
             resN = n1 * d2;
             resD = d1 * n2;
             stepsHtml = `
@@ -407,14 +529,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 5. Сравнение дробей
+    // 7. Сравнение дробей
     function generateCompareProblem() {
         const d1 = getRandomInt(2, 9);
         const d2 = getRandomInt(2, 9);
         let n1 = getRandomInt(1, d1 - 1);
         let n2 = getRandomInt(1, d2 - 1);
 
-        // Иногда генерируем эквивалентные дроби для знака "="
         if (Math.random() < 0.25) {
             const baseD = getRandomInt(2, 4);
             const baseN = getRandomInt(1, baseD - 1);
@@ -480,7 +601,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let mode = currentMode;
         if (mode === 'mixed') {
-            const pool = ['same_denom', 'diff_denom', 'reduce', 'mul_div', 'compare'];
+            const pool = [
+                'same_denom',
+                'diff_denom',
+                'reduce',
+                'extract_whole',
+                'to_decimal',
+                'mul_div',
+                'compare'
+            ];
             mode = pickRandom(pool);
         }
 
@@ -493,6 +622,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'reduce':
                 currentProblem = generateReduceProblem();
+                break;
+            case 'extract_whole':
+                currentProblem = generateExtractWholeProblem();
+                break;
+            case 'to_decimal':
+                currentProblem = generateToDecimalProblem();
                 break;
             case 'mul_div':
                 currentProblem = generateMulDivProblem();
@@ -514,47 +649,63 @@ document.addEventListener('DOMContentLoaded', () => {
         problemContainerEl.innerHTML = '';
 
         if (prob.type === 'calc') {
-            // Дробь 1
             problemContainerEl.appendChild(createFractionNode(prob.frac1.n, prob.frac1.d));
 
-            // Знак операции
             const opSpan = document.createElement('span');
             opSpan.className = 'operator-sign';
             opSpan.textContent = prob.op === '×' ? '×' : (prob.op === '÷' ? '÷' : prob.op);
             problemContainerEl.appendChild(opSpan);
 
-            // Дробь 2
             problemContainerEl.appendChild(createFractionNode(prob.frac2.n, prob.frac2.d));
 
-            // Знак равно
             const eqSpan = document.createElement('span');
             eqSpan.className = 'operator-sign';
             eqSpan.textContent = '=';
             problemContainerEl.appendChild(eqSpan);
 
-            // Блок ввода ответа
             problemContainerEl.appendChild(createFractionInputBlock());
-
             setupFractionInputListeners();
         } else if (prob.type === 'reduce') {
-            // Исходная дробь
             problemContainerEl.appendChild(createFractionNode(prob.frac1.n, prob.frac1.d));
 
-            // Знак стрелки или равно
             const arrowSpan = document.createElement('span');
             arrowSpan.className = 'operator-sign';
             arrowSpan.textContent = '=';
             problemContainerEl.appendChild(arrowSpan);
 
-            // Блок ввода ответа
             problemContainerEl.appendChild(createFractionInputBlock());
-
             setupFractionInputListeners();
-        } else if (prob.type === 'compare') {
-            // Дробь 1
+        } else if (prob.type === 'extract_whole') {
+            // Отображаем неправильную дробь
             problemContainerEl.appendChild(createFractionNode(prob.frac1.n, prob.frac1.d));
 
-            // Кнопки выбора знака
+            const eqSpan = document.createElement('span');
+            eqSpan.className = 'operator-sign';
+            eqSpan.textContent = '=';
+            problemContainerEl.appendChild(eqSpan);
+
+            // Блок ввода целой части и дроби
+            problemContainerEl.appendChild(createMixedInputBlock());
+            setupMixedInputListeners();
+        } else if (prob.type === 'to_decimal') {
+            // Отображаем исходную дробь или смешанное число
+            if (prob.isMixed) {
+                problemContainerEl.appendChild(createMixedNode(prob.whole, prob.frac1.n, prob.frac1.d));
+            } else {
+                problemContainerEl.appendChild(createFractionNode(prob.frac1.n, prob.frac1.d));
+            }
+
+            const eqSpan = document.createElement('span');
+            eqSpan.className = 'operator-sign';
+            eqSpan.textContent = '=';
+            problemContainerEl.appendChild(eqSpan);
+
+            // Поле для ввода десятичной дроби
+            problemContainerEl.appendChild(createDecimalInputBlock());
+            setupDecimalInputListeners();
+        } else if (prob.type === 'compare') {
+            problemContainerEl.appendChild(createFractionNode(prob.frac1.n, prob.frac1.d));
+
             const compareBox = document.createElement('div');
             compareBox.className = 'compare-selector-box';
             compareBox.innerHTML = `
@@ -564,9 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             problemContainerEl.appendChild(compareBox);
 
-            // Дробь 2
             problemContainerEl.appendChild(createFractionNode(prob.frac2.n, prob.frac2.d));
-
             setupCompareListeners();
         }
     }
@@ -582,13 +731,50 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrap;
     }
 
+    function createMixedNode(whole, n, d) {
+        const wrap = document.createElement('div');
+        wrap.className = 'math-mixed-view';
+        wrap.innerHTML = `
+            <span class="math-whole">${whole}</span>
+            <div class="math-fraction-view">
+                <span class="math-num">${n}</span>
+                <span class="math-bar"></span>
+                <span class="math-den">${d}</span>
+            </div>
+        `;
+        return wrap;
+    }
+
     function createFractionInputBlock() {
         const wrap = document.createElement('div');
         wrap.className = 'fraction-answer-inputs';
         wrap.innerHTML = `
-            <input type="number" id="input-numerator" class="fraction-input-num" placeholder="число" autocomplete="off" step="1">
+            <input type="number" id="input-numerator" class="fraction-input-num" placeholder="Ч" autocomplete="off" step="1">
             <span class="fraction-input-divider"></span>
-            <input type="number" id="input-denominator" class="fraction-input-den" placeholder="знаменатель" autocomplete="off" step="1">
+            <input type="number" id="input-denominator" class="fraction-input-den" placeholder="З" autocomplete="off" step="1">
+        `;
+        return wrap;
+    }
+
+    function createMixedInputBlock() {
+        const wrap = document.createElement('div');
+        wrap.className = 'mixed-answer-inputs';
+        wrap.innerHTML = `
+            <input type="number" id="input-whole" class="fraction-input-whole" placeholder="Целая" autocomplete="off" step="1" title="Целая часть">
+            <div class="fraction-answer-inputs">
+                <input type="number" id="input-numerator" class="fraction-input-num" placeholder="Ч" autocomplete="off" step="1" title="Остаток (числитель)">
+                <span class="fraction-input-divider"></span>
+                <input type="number" id="input-denominator" class="fraction-input-den" placeholder="З" autocomplete="off" step="1" title="Знаменатель">
+            </div>
+        `;
+        return wrap;
+    }
+
+    function createDecimalInputBlock() {
+        const wrap = document.createElement('div');
+        wrap.className = 'decimal-answer-inputs';
+        wrap.innerHTML = `
+            <input type="text" inputmode="decimal" id="input-decimal" class="decimal-input-box" placeholder="Напр. 0,75" autocomplete="off">
         `;
         return wrap;
     }
@@ -622,6 +808,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function setupMixedInputListeners() {
+        const wholeInput = document.getElementById('input-whole');
+        const numInput = document.getElementById('input-numerator');
+        const denInput = document.getElementById('input-denominator');
+
+        if (wholeInput) {
+            wholeInput.focus();
+
+            wholeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Если делится нацело, сразу проверяем
+                    if (currentProblem && currentProblem.targetRem === 0) {
+                        checkAnswer();
+                    } else if (numInput) {
+                        numInput.focus();
+                        numInput.select();
+                    }
+                } else if (e.key === '/' || e.key === 'ArrowRight') {
+                    if (numInput) {
+                        e.preventDefault();
+                        numInput.focus();
+                        numInput.select();
+                    }
+                }
+            });
+
+            wholeInput.addEventListener('input', clearHighlight);
+        }
+
+        if (numInput && denInput) {
+            numInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === '/' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    denInput.focus();
+                    denInput.select();
+                } else if (e.key === 'ArrowLeft' || (e.key === 'Backspace' && numInput.value === '')) {
+                    if (wholeInput) wholeInput.focus();
+                }
+            });
+
+            denInput.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowUp') {
+                    numInput.focus();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            numInput.addEventListener('input', clearHighlight);
+            denInput.addEventListener('input', clearHighlight);
+        }
+    }
+
+    function setupDecimalInputListeners() {
+        const decInput = document.getElementById('input-decimal');
+        if (decInput) {
+            decInput.focus();
+            decInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+            decInput.addEventListener('input', clearHighlight);
+        }
+    }
+
     function setupCompareListeners() {
         const btns = document.querySelectorAll('.compare-choice-btn');
         btns.forEach(btn => {
@@ -634,15 +889,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function clearHighlight() {
+        const wholeInput = document.getElementById('input-whole');
         const numInput = document.getElementById('input-numerator');
         const denInput = document.getElementById('input-denominator');
-        if (numInput) numInput.classList.remove('correct-val', 'incorrect-val');
-        if (denInput) denInput.classList.remove('correct-val', 'incorrect-val');
+        const decInput = document.getElementById('input-decimal');
+
+        if (wholeInput) wholeInput.classList.remove('correct-val', 'incorrect-val', 'warning-val');
+        if (numInput) numInput.classList.remove('correct-val', 'incorrect-val', 'warning-val');
+        if (denInput) denInput.classList.remove('correct-val', 'incorrect-val', 'warning-val');
+        if (decInput) decInput.classList.remove('correct-val', 'incorrect-val', 'warning-val');
+
         feedbackEl.textContent = '';
         feedbackEl.className = 'trainer-feedback';
     }
 
-    // --- Отрисовка визуальной модели (SVG полоски дробей) ---
+    // --- Отрисовка визуальной модели (SVG) ---
     function renderVisualModel(vData) {
         if (!visualContainerEl) return;
         if (!visualVisible) {
@@ -700,6 +961,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
+        } else if (vData.type === 'bar_extract_whole') {
+            let wholeStrips = '';
+            for (let i = 0; i < vData.whole; i++) {
+                wholeStrips += `
+                    <div class="visual-strip-row">
+                        <span class="visual-strip-tag">Целая ${i + 1} (${vData.den}/${vData.den}):</span>
+                        ${createSvgFractionStrip(vData.den, vData.den, '#10b981')}
+                    </div>
+                `;
+            }
+            if (vData.rem > 0) {
+                wholeStrips += `
+                    <div class="visual-strip-row">
+                        <span class="visual-strip-tag">Остаток (${vData.rem}/${vData.den}):</span>
+                        ${createSvgFractionStrip(vData.den, vData.rem, '#f59e0b')}
+                    </div>
+                `;
+            }
+            html = `
+                <div class="visual-card">
+                    <div class="visual-label">Состав неправильной дроби ${vData.num}/${vData.den}:</div>
+                    ${wholeStrips}
+                    <div style="font-size: 0.9rem; color: #93c5fd; margin-top: 4px;">
+                        Итого: <strong>${vData.whole}</strong> цел. ${vData.rem > 0 ? `+ <strong>${vData.rem}/${vData.den}</strong>` : ''}
+                    </div>
+                </div>
+            `;
+        } else if (vData.type === 'bar_to_decimal') {
+            html = `
+                <div class="visual-card">
+                    <div class="visual-label">Наглядный перевод в десятичную дробь:</div>
+                    <div class="visual-strip-row">
+                        <span class="visual-strip-tag">Доля (${vData.n}/${vData.d}):</span>
+                        ${createSvgFractionStrip(vData.d, vData.n, '#06b6d4')}
+                    </div>
+                    <div class="visual-strip-row" style="margin-top: 4px;">
+                        <span class="visual-strip-tag">На шкале 0..1:</span>
+                        ${createSvgDecimalRuler(vData.n / vData.d)}
+                    </div>
+                </div>
+            `;
         } else if (vData.type === 'bar_compare') {
             html = `
                 <div class="visual-card">
@@ -742,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < total; i++) {
             const x = i * partW;
             const isFilled = i < filled;
-            const fillCol = isFilled ? color : '#e2e8f0';
+            const fillCol = isFilled ? color : '#1e293b';
             rects += `<rect x="${x + 0.5}" y="1" width="${partW - 1}" height="${svgH - 2}" rx="3" fill="${fillCol}" stroke="#475569" stroke-width="1.2" />`;
         }
 
@@ -753,7 +1055,24 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // Переключатель показа визуальной схемы
+    function createSvgDecimalRuler(ratio) {
+        const svgW = 260;
+        const svgH = 28;
+        const clamped = Math.max(0, Math.min(1, ratio));
+        const px = clamped * svgW;
+
+        return `
+            <svg class="fraction-strip-svg" viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}">
+                <rect x="0" y="8" width="${svgW}" height="10" rx="3" fill="#1e293b" stroke="#475569" stroke-width="1" />
+                <rect x="0" y="8" width="${px}" height="10" rx="3" fill="#06b6d4" />
+                <circle cx="${px}" cy="13" r="5" fill="#fde047" stroke="#1e293b" stroke-width="1.5" />
+                <text x="4" y="26" font-size="9" fill="#94a3b8" font-family="sans-serif">0</text>
+                <text x="${svgW / 2 - 8}" y="26" font-size="9" fill="#94a3b8" font-family="sans-serif">0.5</text>
+                <text x="${svgW - 10}" y="26" font-size="9" fill="#94a3b8" font-family="sans-serif">1</text>
+            </svg>
+        `;
+    }
+
     if (toggleVisualBtn) {
         toggleVisualBtn.addEventListener('click', () => {
             visualVisible = !visualVisible;
@@ -767,22 +1086,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentProblem || isChecked) return;
 
         if (currentProblem.type === 'compare') {
-            // Проверка для режима сравнения происходит по клику на кнопку знака
             feedbackEl.textContent = 'Выбери один из знаков: <, = или > выше!';
             feedbackEl.className = 'trainer-feedback warning';
             return;
         }
 
+        if (currentProblem.type === 'to_decimal') {
+            checkDecimalAnswer();
+            return;
+        }
+
+        if (currentProblem.type === 'extract_whole') {
+            checkExtractWholeAnswer();
+            return;
+        }
+
+        checkFractionCalculationAnswer();
+    }
+
+    // 1. Проверка обычной дроби (+, -, *, /, reduce)
+    function checkFractionCalculationAnswer() {
         const numInput = document.getElementById('input-numerator');
         const denInput = document.getElementById('input-denominator');
-
         if (!numInput || !denInput) return;
 
         const numVal = parseInt(numInput.value.trim(), 10);
         const denRaw = denInput.value.trim();
         let denVal = parseInt(denRaw, 10);
 
-        // Если знаменатель пустой, но числитель введен, и правильный ответ - целое число
         if (isNaN(denVal) && !isNaN(numVal)) {
             if (currentProblem.reducedTarget.d === 1) {
                 denVal = 1;
@@ -806,7 +1137,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Проверяем математическое равенство
         const userG = gcd(numVal, denVal);
         const userRedN = numVal / userG;
         const userRedD = denVal / userG;
@@ -817,11 +1147,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMathEqual = (userRedN === targetRedN) && (userRedD === targetRedD);
 
         if (isMathEqual) {
-            // Проверяем, сокращена ли дробь до конца
             const isFullyReduced = (numVal === targetRedN) && (denVal === targetRedD);
 
             if (currentProblem.type === 'reduce' && !isFullyReduced) {
-                // В режиме сокращения требуется полностью несократимый вид
                 feedbackEl.textContent = `Дробь ${numVal}/${denVal} верна по значению, но её можно сократить ещё! Раздели дальше.`;
                 feedbackEl.className = 'trainer-feedback warning';
                 numInput.classList.add('warning-val');
@@ -830,13 +1158,132 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Успех!
             handleSuccess(isFullyReduced, numVal, denVal, targetRedN, targetRedD);
         } else {
             handleFailure();
         }
     }
 
+    // 2. Проверка выделения целой части
+    function checkExtractWholeAnswer() {
+        const wholeInput = document.getElementById('input-whole');
+        const numInput = document.getElementById('input-numerator');
+        const denInput = document.getElementById('input-denominator');
+        if (!wholeInput) return;
+
+        const wholeRaw = wholeInput.value.trim();
+        const numRaw = numInput ? numInput.value.trim() : '';
+        const denRaw = denInput ? denInput.value.trim() : '';
+
+        const targetWhole = currentProblem.targetWhole;
+        const targetRem = currentProblem.targetRem;
+        const targetDen = currentProblem.targetDen;
+
+        const wholeVal = parseInt(wholeRaw, 10);
+        const numVal = numRaw === '' ? 0 : parseInt(numRaw, 10);
+        let denVal = denRaw === '' ? targetDen : parseInt(denRaw, 10);
+
+        // Если делится нацело (остаток 0)
+        if (targetRem === 0) {
+            if (isNaN(wholeVal)) {
+                feedbackEl.textContent = 'Введи целое число!';
+                feedbackEl.className = 'trainer-feedback warning';
+                wholeInput.classList.add('incorrect-val');
+                playSound('incorrect');
+                return;
+            }
+            if (wholeVal === targetWhole && numVal === 0) {
+                wholeInput.classList.add('correct-val');
+                handleSuccess(true);
+            } else {
+                wholeInput.classList.add('incorrect-val');
+                handleFailure();
+            }
+            return;
+        }
+
+        // Если есть остаток
+        if (isNaN(wholeVal)) {
+            feedbackEl.textContent = 'Пожалуйста, укажи целую часть!';
+            feedbackEl.className = 'trainer-feedback warning';
+            wholeInput.classList.add('incorrect-val');
+            playSound('incorrect');
+            return;
+        }
+
+        if (isNaN(numVal) || isNaN(denVal) || numRaw === '' || denRaw === '') {
+            feedbackEl.textContent = 'Укажи дробную часть (числитель и знаменатель)!';
+            feedbackEl.className = 'trainer-feedback warning';
+            if (numInput) numInput.classList.add('incorrect-val');
+            if (denInput) denInput.classList.add('incorrect-val');
+            playSound('incorrect');
+            return;
+        }
+
+        if (denVal === 0) {
+            feedbackEl.textContent = 'Знаменатель не может быть равен нулю!';
+            feedbackEl.className = 'trainer-feedback warning';
+            denInput.classList.add('incorrect-val');
+            playSound('incorrect');
+            return;
+        }
+
+        // Проверяем, не осталась ли неправильная дробь в остатке
+        if (numVal >= denVal) {
+            feedbackEl.textContent = `В дробной части ${numVal}/${denVal} всё ещё осталась целая часть! Выдели её до конца.`;
+            feedbackEl.className = 'trainer-feedback warning';
+            numInput.classList.add('warning-val');
+            wholeInput.classList.add('warning-val');
+            playSound('incorrect');
+            return;
+        }
+
+        // Проверяем точное совпадение
+        const isExactMatch = (wholeVal === targetWhole && numVal === targetRem && denVal === targetDen);
+        // Или эквивалентная дробь (например сокращённый остаток)
+        const isEquiv = (wholeVal === targetWhole) && (numVal * targetDen === targetRem * denVal);
+
+        if (isExactMatch || isEquiv) {
+            wholeInput.classList.add('correct-val');
+            if (numInput) numInput.classList.add('correct-val');
+            if (denInput) denInput.classList.add('correct-val');
+            handleSuccess(true);
+        } else {
+            wholeInput.classList.add('incorrect-val');
+            if (numInput) numInput.classList.add('incorrect-val');
+            if (denInput) denInput.classList.add('incorrect-val');
+            handleFailure();
+        }
+    }
+
+    // 3. Проверка перевода в десятичную дробь
+    function checkDecimalAnswer() {
+        const decInput = document.getElementById('input-decimal');
+        if (!decInput) return;
+
+        const raw = decInput.value.trim().replace(',', '.');
+        const userVal = parseFloat(raw);
+
+        if (raw === '' || isNaN(userVal)) {
+            feedbackEl.textContent = 'Введи десятичную дробь (например, 0,75 или 1,5)!';
+            feedbackEl.className = 'trainer-feedback warning';
+            decInput.classList.add('incorrect-val');
+            playSound('incorrect');
+            return;
+        }
+
+        const isCorrect = Math.abs(userVal - currentProblem.targetDecimal) < 0.0001;
+
+        if (isCorrect) {
+            decInput.classList.add('correct-val');
+            handleSuccess(true);
+        } else {
+            decInput.classList.add('incorrect-val');
+            handleFailure();
+        }
+    }
+
+    // 4. Проверка сравнения
     function checkCompareAnswer(chosenSign) {
         if (!currentProblem || isChecked || currentProblem.type !== 'compare') return;
 
@@ -856,6 +1303,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stats.streak > stats.maxStreak) stats.maxStreak = stats.streak;
 
         updateRank();
+        if (window.TrainerTracker) {
+            window.TrainerTracker.recordAttempt('common_fractions', true);
+        }
         recordStudyAttempt(true);
 
         const numInput = document.getElementById('input-numerator');
@@ -883,7 +1333,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         feedbackEl.className = 'trainer-feedback success';
 
-        // Автопереход через 1.4 секунды
         setTimeout(() => {
             if (isChecked) {
                 generateProblem();
@@ -895,25 +1344,36 @@ document.addEventListener('DOMContentLoaded', () => {
         stats.total++;
         stats.streak = 0;
         updateRank();
+        if (window.TrainerTracker) {
+            window.TrainerTracker.recordAttempt('common_fractions', false);
+        }
         recordStudyAttempt(false);
 
+        const wholeInput = document.getElementById('input-whole');
         const numInput = document.getElementById('input-numerator');
         const denInput = document.getElementById('input-denominator');
-        if (numInput) {
+        const decInput = document.getElementById('input-decimal');
+
+        if (decInput) {
+            decInput.classList.add('incorrect-val');
+            decInput.focus();
+            decInput.select();
+        } else if (wholeInput) {
+            wholeInput.classList.add('incorrect-val');
+            wholeInput.focus();
+            wholeInput.select();
+        } else if (numInput) {
             numInput.classList.add('incorrect-val');
             numInput.focus();
             numInput.select();
         }
-        if (denInput) {
-            denInput.classList.add('incorrect-val');
-        }
+        if (denInput) denInput.classList.add('incorrect-val');
 
         playSound('incorrect');
         feedbackEl.textContent = 'Пока неверно! Попробуй ещё раз или нажми «💡 Подсказка».';
         feedbackEl.className = 'trainer-feedback error';
     }
 
-    // Подсказка / пошаговое решение
     function showHint() {
         if (!currentProblem) return;
         solutionContentEl.innerHTML = currentProblem.solution;
@@ -921,7 +1381,6 @@ document.addEventListener('DOMContentLoaded', () => {
         solutionCardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // Сохранение попытки в общий прогресс сайта
     function recordStudyAttempt(isCorrect) {
         const storageKey = 'studyMetrics';
         let attempts = [];
@@ -944,7 +1403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             localStorage.setItem(storageKey, JSON.stringify(attempts));
         } catch (e) {
-            // LocalStorage переполнен или заблокирован
+            // LocalStorage полон или отключен
         }
     }
 
@@ -962,12 +1421,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nextButton) nextButton.addEventListener('click', generateProblem);
     if (hintButton) hintButton.addEventListener('click', showHint);
 
-    // Клавиатурные горячие клавиши
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             solutionCardEl.classList.add('hidden');
         }
-        // Для сравнения можно нажимать прямо клавиши <, >, =
         if (currentProblem && currentProblem.type === 'compare' && !isChecked) {
             if (e.key === '<' || e.key === ',' || e.key === 'б' || e.key === 'Б') {
                 checkCompareAnswer('<');
@@ -979,7 +1436,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Старт
     updateRank();
     generateProblem();
 });

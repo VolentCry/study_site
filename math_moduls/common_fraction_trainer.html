@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -27,7 +27,7 @@
         }
 
         .trainer-header-container {
-            width: min(860px, 100%);
+            width: min(880px, 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -47,7 +47,7 @@
 
         /* Верхняя панель со статистикой и рангом */
         .stats-dashboard {
-            width: min(860px, 100%);
+            width: min(880px, 100%);
             background: rgba(22, 28, 38, 0.88);
             border: 3px solid #505050;
             box-shadow: 4px 4px 0 #111, inset 0 0 12px rgba(0,0,0,0.4);
@@ -118,7 +118,7 @@
 
         /* Переключатель режимов */
         .mode-tabs-container {
-            width: min(860px, 100%);
+            width: min(880px, 100%);
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
@@ -130,9 +130,9 @@
             background: rgba(30, 41, 59, 0.9);
             border: 2px solid #4b5563;
             color: #d1d5db;
-            padding: 9px 14px;
+            padding: 9px 13px;
             border-radius: 6px;
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             cursor: pointer;
             transition: all 0.2s;
             font-family: 'Nunito', sans-serif;
@@ -156,9 +156,9 @@
             transform: translateY(-1px);
         }
 
-        /* Главная карточка тренажёра */
+        /* Главная карточка верстака тренажёра */
         .workbench-card {
-            width: min(860px, 100%);
+            width: min(880px, 100%);
             background: rgba(17, 24, 39, 0.92);
             border: 4px solid #6b7280;
             box-shadow: 6px 6px 0 #0f172a, inset 0 0 20px rgba(0,0,0,0.6);
@@ -206,7 +206,7 @@
             font-weight: bold;
             color: #f8fafc;
             text-shadow: 2px 2px 0 #000;
-            min-width: 50px;
+            min-width: 48px;
             user-select: none;
         }
 
@@ -224,6 +224,24 @@
 
         .math-den {
             padding: 2px 6px;
+        }
+
+        /* Смешанное число в условии */
+        .math-mixed-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #f8fafc;
+            text-shadow: 2px 2px 0 #000;
+            user-select: none;
+        }
+
+        .math-whole {
+            font-size: 2.6rem;
+            color: #fcd34d;
+            padding-right: 2px;
         }
 
         /* Знаки операций (+, -, ×, ÷, =) */
@@ -246,7 +264,7 @@
         }
 
         .fraction-input-num, .fraction-input-den {
-            width: 85px;
+            width: 82px;
             height: 46px;
             font-family: 'MinecraftFont', sans-serif;
             font-size: 1.8rem;
@@ -286,10 +304,99 @@
         }
 
         .fraction-input-divider {
-            width: 85px;
+            width: 82px;
             height: 4px;
             background-color: #f8fafc;
             border-radius: 2px;
+        }
+
+        /* Блок ввода смешанного числа (выделение целой части) */
+        .mixed-answer-inputs {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 6px;
+        }
+
+        .fraction-input-whole {
+            width: 82px;
+            height: 52px;
+            font-family: 'MinecraftFont', sans-serif;
+            font-size: 1.8rem;
+            text-align: center;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            border: 3px solid #475569;
+            border-radius: 4px;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: inset 2px 2px 0 #94a3b8;
+        }
+
+        .fraction-input-whole:focus {
+            background-color: #ffffff;
+            border-color: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+
+        .fraction-input-whole.correct-val {
+            background-color: #86efac !important;
+            border-color: #16a34a !important;
+            color: #064e3b !important;
+        }
+
+        .fraction-input-whole.incorrect-val {
+            background-color: #fca5a5 !important;
+            border-color: #dc2626 !important;
+            color: #7f1d1d !important;
+            animation: shake 0.35s ease;
+        }
+
+        .fraction-input-whole.warning-val {
+            background-color: #fde68a !important;
+            border-color: #d97706 !important;
+            color: #78350f !important;
+        }
+
+        /* Блок ввода десятичной дроби */
+        .decimal-answer-inputs {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+        }
+
+        .decimal-input-box {
+            width: 150px;
+            height: 50px;
+            font-family: 'MinecraftFont', sans-serif;
+            font-size: 1.8rem;
+            text-align: center;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            border: 3px solid #475569;
+            border-radius: 4px;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: inset 2px 2px 0 #94a3b8;
+        }
+
+        .decimal-input-box:focus {
+            background-color: #ffffff;
+            border-color: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+
+        .decimal-input-box.correct-val {
+            background-color: #86efac !important;
+            border-color: #16a34a !important;
+            color: #064e3b !important;
+        }
+
+        .decimal-input-box.incorrect-val {
+            background-color: #fca5a5 !important;
+            border-color: #dc2626 !important;
+            color: #7f1d1d !important;
+            animation: shake 0.35s ease;
         }
 
         /* Выбор знака в режиме сравнения */
@@ -434,7 +541,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Визуальная модель (SVG полоски) */
+        /* Визуальная модель (SVG) */
         .fraction-visual-container {
             width: 100%;
             margin-top: 10px;
@@ -468,7 +575,7 @@
         .visual-strip-tag {
             font-size: 0.88rem;
             color: #94a3b8;
-            min-width: 150px;
+            min-width: 160px;
             font-family: 'Nunito', sans-serif;
             font-weight: 600;
         }
@@ -565,7 +672,7 @@
                 gap: 10px;
             }
             .mode-tab {
-                font-size: 0.8rem;
+                font-size: 0.78rem;
                 padding: 7px 10px;
             }
             .workbench-card {
@@ -575,19 +682,27 @@
                 gap: 10px;
                 padding: 12px 10px;
             }
-            .math-fraction-view {
-                font-size: 1.7rem;
+            .math-fraction-view, .math-mixed-view {
+                font-size: 1.6rem;
+            }
+            .math-whole {
+                font-size: 2rem;
             }
             .operator-sign {
-                font-size: 1.9rem;
+                font-size: 1.8rem;
             }
-            .fraction-input-num, .fraction-input-den {
-                width: 68px;
+            .fraction-input-num, .fraction-input-den, .fraction-input-whole {
+                width: 64px;
                 height: 40px;
                 font-size: 1.4rem;
             }
+            .decimal-input-box {
+                width: 120px;
+                height: 42px;
+                font-size: 1.4rem;
+            }
             .fraction-input-divider {
-                width: 68px;
+                width: 64px;
             }
             .compare-choice-btn {
                 width: 40px;
@@ -633,6 +748,8 @@
         <button type="button" class="mode-tab active" data-mode="same_denom">➕ Одинаковые знам.</button>
         <button type="button" class="mode-tab" data-mode="diff_denom">⚡ Разные знам.</button>
         <button type="button" class="mode-tab" data-mode="reduce">🎯 Сокращение</button>
+        <button type="button" class="mode-tab" data-mode="extract_whole">🍰 Выделение целой части</button>
+        <button type="button" class="mode-tab" data-mode="to_decimal">🔢 В десятичную дробь</button>
         <button type="button" class="mode-tab" data-mode="mul_div">✖️ Умножение и деление</button>
         <button type="button" class="mode-tab" data-mode="compare">⚖️ Сравнение</button>
         <button type="button" class="mode-tab" data-mode="mixed">🎲 Микс</button>
@@ -672,6 +789,7 @@
         <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon" title="Верстак знаний">
     </div>
 
+    <script src="../js/trainer_rank_tracker.js"></script>
     <script src="../js/common_fraction_trainer.js"></script>
 </body>
 </html>

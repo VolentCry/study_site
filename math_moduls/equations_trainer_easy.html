@@ -43,6 +43,7 @@
         <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon">
     </div>
 
+    <script src="../js/trainer_rank_tracker.js"></script>
     <script>
         // Типы уравнений:
         // 1) x * b = c  → x = c / b
@@ -154,10 +155,12 @@
             }
 
             if (userAnswer === currentAnswer) {
+                if (window.TrainerTracker) TrainerTracker.recordAttempt("equations_easy", true);
                 feedback.textContent = '✔ Правильно! Молодец!';
                 feedback.className = 'feedback feedback-correct';
                 setTimeout(loadNewEquation, 1200);
             } else {
+                if (window.TrainerTracker) TrainerTracker.recordAttempt("equations_easy", false);
                 feedback.textContent = '✘ Неверно, попробуй ещё раз!';
                 feedback.className = 'feedback feedback-wrong';
             }

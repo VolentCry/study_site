@@ -72,12 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const isCorrect = Math.abs(rounded - correctAnswer) < 0.001;
 
         if (isCorrect) {
+            if (window.TrainerTracker) TrainerTracker.recordAttempt("decimal_fractions", true);
             feedbackElement.textContent = 'Правильно! Молодец!';
             feedbackElement.style.color = '#7FFF7F';
             answerInput.classList.add('correct');
             checkButton.disabled = true;
             setTimeout(() => generateProblem(), 1500);
         } else {
+            if (window.TrainerTracker) TrainerTracker.recordAttempt("decimal_fractions", false);
             feedbackElement.textContent = 'Неправильно, попробуй еще раз!';
             feedbackElement.style.color = '#FF7F7F';
             answerInput.classList.add('incorrect');

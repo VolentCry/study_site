@@ -110,6 +110,22 @@
     text-decoration: none;
   }
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(56,189,248,0.5); }
+  .btn-tasks {
+    padding: 14px 36px; border-radius: 50px;
+    background: linear-gradient(135deg, #0284c7, #4f46e5);
+    color: #fff; font-family: 'Raleway', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    border: 1px solid rgba(129, 140, 248, 0.4);
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 0 26px rgba(79, 70, 229, 0.35);
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-tasks:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 36px rgba(79, 70, 229, 0.6);
+    border-color: var(--accent);
+  }
   .btn-outline {
     padding: 14px 36px; border-radius: 50px;
     background: transparent; border: 1.5px solid var(--border);
@@ -353,6 +369,7 @@
   <div class="nav-links">
     <a href="#classes">Классы</a>
     <a href="#sim-grid">Симуляции</a>
+    <a href="physics/tasks/index.html">К задачам</a>
   </div>
 </nav>
 
@@ -367,6 +384,7 @@
     </p>
     <div class="hero-cta">
       <a href="#classes" class="btn-primary">Начать учиться</a>
+      <a href="physics/tasks/index.html" class="btn-tasks">К задачам</a>
       <a href="#sim-demo" class="btn-outline">Посмотреть симуляции</a>
     </div>
   </div>

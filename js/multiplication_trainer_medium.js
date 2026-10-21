@@ -45,12 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (userAnswer === correctAnswer) {
+            if (window.TrainerTracker) TrainerTracker.recordAttempt("multiplication_medium", true);
             feedbackElement.textContent = 'Правильно! Молодец!';
             feedbackElement.style.color = '#7FFF7F';
             answerInput.classList.add('correct');
             checkButton.disabled = true;
             setTimeout(() => generateProblem(), 1500);
         } else {
+            if (window.TrainerTracker) TrainerTracker.recordAttempt("multiplication_medium", false);
             feedbackElement.textContent = 'Неправильно, попробуй еще раз!';
             feedbackElement.style.color = '#FF7F7F';
             answerInput.classList.add('incorrect');

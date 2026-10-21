@@ -50,6 +50,96 @@
             text-shadow: 2px 2px 0 #000;
             color: var(--color-sand);
         }
+        .profile-identity-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .nickname-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .nickname {
+            margin: 0;
+            color: var(--profile-ink);
+            font-size: 20px;
+            font-weight: 700;
+            text-shadow: none;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+        }
+        .nickname:hover {
+            color: var(--profile-primary);
+        }
+        .nickname-edit-btn {
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--profile-muted);
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nickname-edit-btn:hover {
+            border-color: var(--profile-primary);
+            color: var(--profile-ink);
+            transform: translateY(-1px);
+        }
+        .name-edit-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .name-input {
+            font: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--profile-ink);
+            background: var(--profile-card);
+            border: 2px solid var(--profile-primary);
+            border-radius: 8px;
+            padding: 6px 12px;
+            max-width: 220px;
+            outline: none;
+        }
+        .name-input:focus {
+            box-shadow: 0 0 0 3px rgba(38, 63, 97, 0.2);
+        }
+        .name-save-btn, .name-cancel-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .name-save-btn {
+            background: #10b981;
+            color: #fff;
+            border: 1px solid #059669;
+        }
+        .name-save-btn:hover {
+            background: #059669;
+        }
+        .name-cancel-btn {
+            background: var(--profile-card);
+            color: var(--profile-muted);
+            border: 1px solid var(--profile-line);
+        }
+        .name-cancel-btn:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #dc2626;
+        }
 
         /* --- КРУГЛАЯ РАМКА ДЛЯ ФОТО --- */
         .avatar-container {
@@ -680,6 +770,275 @@
             .profile-page-sheet { animation: none; }
             .achievements-dialog[open], .achievement.is-earned .achievement-medal { animation: none; }
         }
+    
+        /* --- ВКЛАДКИ ПРОФИЛЯ --- */
+        .profile-tabs-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--profile-line);
+            padding-bottom: 4px;
+        }
+        .profile-tab-btn {
+            min-height: 44px;
+            padding: 10px 20px;
+            color: var(--profile-muted);
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+            position: relative;
+        }
+        .profile-tab-btn:hover {
+            color: var(--profile-ink);
+            background: var(--profile-subtle);
+        }
+        .profile-tab-btn.active {
+            color: var(--profile-primary);
+            background: var(--profile-card);
+            border-color: var(--profile-line);
+            box-shadow: 0 4px 12px rgba(32, 42, 58, .04);
+        }
+        .profile-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 14px;
+            right: 14px;
+            height: 3px;
+            background: var(--profile-accent);
+            border-radius: 3px 3px 0 0;
+        }
+        .profile-tab-content.hidden {
+            display: none !important;
+        }
+
+        /* --- СЕРИИ И ЗВАНИЯ В ТРЕНАЖЁРАХ --- */
+        .trainer-ranks-card {
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 18px;
+            padding: clamp(22px, 5vw, 40px);
+            box-shadow: 0 16px 48px rgba(32, 42, 58, .08);
+        }
+        .trainer-ranks-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin: 22px 0 32px;
+        }
+        .trainer-summary-item {
+            padding: 18px 20px;
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 14px;
+        }
+        .trainer-summary-label {
+            color: var(--profile-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .trainer-summary-val {
+            margin-top: 8px;
+            color: var(--profile-primary);
+            font-size: 26px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .trainer-grid-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .trainer-item-card {
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 14px;
+            padding: 22px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+        }
+        .trainer-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(32, 42, 58, .08);
+            border-color: var(--profile-primary);
+        }
+        .trainer-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .trainer-card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .trainer-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,.03);
+        }
+        .trainer-card-name {
+            margin: 0;
+            color: var(--profile-ink);
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .trainer-card-badge {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--profile-muted);
+        }
+        .trainer-card-desc {
+            color: var(--profile-muted);
+            font-size: 13px;
+            line-height: 1.55;
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+        .trainer-stats-row {
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .trainer-stat-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .trainer-stat-title {
+            font-size: 11px;
+            color: var(--profile-muted);
+            font-weight: 600;
+        }
+        .trainer-stat-value {
+            margin-top: 4px;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--profile-ink);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .trainer-stat-value.streak-highlight {
+            color: #ea580c;
+        }
+        .trainer-stat-value.streak-muted {
+            color: var(--profile-muted);
+        }
+        .trainer-stat-value.solved-highlight {
+            color: #10b981;
+        }
+        .trainer-stat-col.full-width {
+            grid-column: 1 / -1;
+            padding-top: 10px;
+            margin-top: 2px;
+            border-top: 1px dashed var(--profile-line);
+        }
+        .trainer-progress-bar {
+            width: 100%;
+            height: 7px;
+            background: var(--profile-line);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .trainer-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #eab308);
+            border-radius: inherit;
+            transition: width .4s ease;
+        }
+        .trainer-next-target {
+            font-size: 11px;
+            color: var(--profile-muted);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+        .trainer-card-action {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 16px;
+            background: var(--profile-card);
+            border: 1.5px solid var(--profile-input-border);
+            border-radius: 10px;
+            color: var(--profile-primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color .35s ease, border-color .35s ease, box-shadow .35s ease, transform .2s ease;
+        }
+        .trainer-card-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #059669 0%, #10b981 45%, #84cc16 100%);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform .4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .trainer-card-action:hover::before,
+        .trainer-card-action:focus-visible::before {
+            transform: scaleX(1);
+        }
+        .trainer-card-action:hover,
+        .trainer-card-action:focus-visible {
+            color: #ffffff;
+            border-color: #10b981;
+            box-shadow: 0 6px 22px rgba(16, 185, 129, 0.35);
+            transform: translateY(-2px);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            outline: none;
+        }
+        .trainer-card-action span:last-child {
+            display: inline-block;
+            transition: transform .3s ease;
+        }
+        .trainer-card-action:hover span:last-child,
+        .trainer-card-action:focus-visible span:last-child {
+            transform: translateX(5px);
+        }
+
     </style>
 </head>
 <body>
@@ -692,6 +1051,18 @@
         </div>
     </header>
     <main class="profile-main">
+        <div class="profile-tabs-nav" role="tablist" aria-label="Вкладки профиля">
+            <button type="button" class="profile-tab-btn active" id="tab-btn-overview" role="tab" aria-selected="true" aria-controls="tab-content-overview">
+                <span class="tab-icon">📊</span>
+                <span>Обзор и навыки</span>
+            </button>
+            <button type="button" class="profile-tab-btn" id="tab-btn-ranks" role="tab" aria-selected="false" aria-controls="tab-content-ranks">
+                <span class="tab-icon">🔥</span>
+                <span>Серии и звания</span>
+            </button>
+        </div>
+
+        <div id="tab-content-overview" class="profile-tab-content">
 
     <!-- Авторизация временно отключена, форма сохранена.
     <div id="auth-container" class="profile-card auth-section">
@@ -749,8 +1120,18 @@
             <div class="avatar-container" aria-hidden="true">
                 <div class="avatar-placeholder" id="profile-avatar">У</div>
             </div>
-            <div>
-                <div class="nickname" id="profile-nickname">Ученик</div>
+            <div class="profile-identity-info">
+                <div id="nickname-display-wrap" class="nickname-group">
+                    <span class="nickname" id="profile-nickname" title="Нажми, чтобы изменить имя">Ученик</span>
+                    <button type="button" class="nickname-edit-btn" id="edit-name-btn" title="Изменить имя">
+                        <span>✏️</span> <span>Изменить</span>
+                    </button>
+                </div>
+                <form id="nickname-edit-form" class="name-edit-form hidden">
+                    <input type="text" id="nickname-input" class="name-input" maxlength="25" placeholder="Введи имя" autocomplete="off" required>
+                    <button type="submit" class="name-save-btn" title="Сохранить">✓ Сохранить</button>
+                    <button type="button" id="cancel-name-btn" class="name-cancel-btn" title="Отмена">✕</button>
+                </form>
                 <div class="profile-label">Ученический профиль</div>
             </div>
         </div>
@@ -812,7 +1193,9 @@
         </section>
         <div class="profile-actions">
             <a href="index.html" class="back-btn">На главную</a>
+            <button type="button" class="back-btn" id="edit-name-action-btn">✏️ Сменить имя</button>
             <button type="button" class="back-btn" id="achievements-open">Достижения</button>
+            <button type="button" class="back-btn" id="ranks-open-btn">🔥 Серии и звания</button>
             <!-- Авторизация отключена, кнопка выхода сохранена.
             <button type="button" class="back-btn logout-btn" id="logout-btn">Выйти из аккаунта</button>
             -->
@@ -835,7 +1218,13 @@
         <p id="skills-summary" class="skills-summary" aria-live="polite"></p>
       </section>
     </div>
-    <dialog id="achievements-dialog" class="achievements-dialog" aria-labelledby="achievements-heading">
+    </div>
+
+        <div id="tab-content-ranks" class="profile-tab-content hidden">
+            <div id="trainer-ranks-container"></div>
+        </div>
+
+        <dialog id="achievements-dialog" class="achievements-dialog" aria-labelledby="achievements-heading">
         <div class="achievements-content">
             <div class="achievements-header">
                 <div>
@@ -850,7 +1239,66 @@
     </main>
     </div>
 
+    <script src="js/trainer_rank_tracker.js"></script>
     <script src="js/profile_metrics.js"></script>
+    <script>
+        // Переключение вкладок в профиле
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabBtnOverview = document.getElementById('tab-btn-overview');
+            const tabBtnRanks = document.getElementById('tab-btn-ranks');
+            const tabContentOverview = document.getElementById('tab-content-overview');
+            const tabContentRanks = document.getElementById('tab-content-ranks');
+            const trainerRanksContainer = document.getElementById('trainer-ranks-container');
+            const ranksOpenBtn = document.getElementById('ranks-open-btn');
+
+            function switchTab(tabName) {
+                if (tabName === 'ranks') {
+                    if (tabBtnOverview) {
+                        tabBtnOverview.classList.remove('active');
+                        tabBtnOverview.setAttribute('aria-selected', 'false');
+                    }
+                    if (tabBtnRanks) {
+                        tabBtnRanks.classList.add('active');
+                        tabBtnRanks.setAttribute('aria-selected', 'true');
+                    }
+                    if (tabContentOverview) tabContentOverview.classList.add('hidden');
+                    if (tabContentRanks) tabContentRanks.classList.remove('hidden');
+
+                    if (window.TrainerTracker && trainerRanksContainer) {
+                        window.TrainerTracker.renderRanksSection(trainerRanksContainer);
+                    }
+                    try {
+                        sessionStorage.setItem('profileActiveTab', 'ranks');
+                    } catch (e) {}
+                } else {
+                    if (tabBtnRanks) {
+                        tabBtnRanks.classList.remove('active');
+                        tabBtnRanks.setAttribute('aria-selected', 'false');
+                    }
+                    if (tabBtnOverview) {
+                        tabBtnOverview.classList.add('active');
+                        tabBtnOverview.setAttribute('aria-selected', 'true');
+                    }
+                    if (tabContentRanks) tabContentRanks.classList.add('hidden');
+                    if (tabContentOverview) tabContentOverview.classList.remove('hidden');
+
+                    try {
+                        sessionStorage.setItem('profileActiveTab', 'overview');
+                    } catch (e) {}
+                }
+            }
+
+            if (tabBtnOverview) tabBtnOverview.addEventListener('click', () => switchTab('overview'));
+            if (tabBtnRanks) tabBtnRanks.addEventListener('click', () => switchTab('ranks'));
+            if (ranksOpenBtn) ranksOpenBtn.addEventListener('click', () => switchTab('ranks'));
+
+            // Восстановление активной вкладки
+            const initialTab = window.location.hash === '#ranks' || sessionStorage.getItem('profileActiveTab') === 'ranks' 
+                ? 'ranks' 
+                : 'overview';
+            switchTab(initialTab);
+        });
+    </script>
     <script>
         /*
         Авторизация временно отключена. Код входа, регистрации и выхода
@@ -874,6 +1322,87 @@
             localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
             setTheme(nextTheme);
         });
+
+        // Управление именем пользователя
+        const USERNAME_KEY = 'studyUserName';
+        const LEGACY_STORAGE_KEY = 'loggedInUser';
+
+        function getStoredUserName() {
+            try {
+                return localStorage.getItem(USERNAME_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY) || 'Ученик';
+            } catch (e) {
+                return 'Ученик';
+            }
+        }
+
+        function updateProfileIdentity(name) {
+            const nicknameEl = document.getElementById('profile-nickname');
+            const avatarEl = document.getElementById('profile-avatar');
+            const trimmed = (name || '').trim() || 'Ученик';
+
+            if (nicknameEl) nicknameEl.textContent = trimmed;
+            if (avatarEl) avatarEl.textContent = trimmed.charAt(0).toLocaleUpperCase('ru-RU');
+        }
+
+        function initUserNameEditor() {
+            const displayWrap = document.getElementById('nickname-display-wrap');
+            const editForm = document.getElementById('nickname-edit-form');
+            const inputEl = document.getElementById('nickname-input');
+            const editBtn = document.getElementById('edit-name-btn');
+            const cancelBtn = document.getElementById('cancel-name-btn');
+            const actionBtn = document.getElementById('edit-name-action-btn');
+            const nicknameEl = document.getElementById('profile-nickname');
+
+            updateProfileIdentity(getStoredUserName());
+
+            function startEditing() {
+                if (!editForm || !displayWrap || !inputEl) return;
+                const currentName = getStoredUserName();
+                inputEl.value = currentName === 'Ученик' ? '' : currentName;
+                displayWrap.classList.add('hidden');
+                editForm.classList.remove('hidden');
+                inputEl.focus();
+                inputEl.select();
+            }
+
+            function stopEditing() {
+                if (!editForm || !displayWrap) return;
+                editForm.classList.add('hidden');
+                displayWrap.classList.remove('hidden');
+            }
+
+            if (editBtn) editBtn.addEventListener('click', startEditing);
+            if (nicknameEl) nicknameEl.addEventListener('click', startEditing);
+            if (actionBtn) actionBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                startEditing();
+            });
+            if (cancelBtn) cancelBtn.addEventListener('click', stopEditing);
+
+            if (editForm) {
+                editForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newName = (inputEl.value || '').trim();
+                    if (newName) {
+                        try {
+                            localStorage.setItem(USERNAME_KEY, newName);
+                            localStorage.setItem(LEGACY_STORAGE_KEY, newName);
+                        } catch (err) {}
+                        updateProfileIdentity(newName);
+                    }
+                    stopEditing();
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && editForm && !editForm.classList.contains('hidden')) {
+                    stopEditing();
+                }
+            });
+        }
+
+        initUserNameEditor();
 
         /*
         function showAuth() {

@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Сравнение ответа
         if (userAnswer === correctAnswer) {
+            if (window.TrainerTracker) TrainerTracker.recordAttempt("multiplication_easy", true);
             feedbackElement.textContent = "Правильно! Молодец!";
             feedbackElement.style.color = '#7FFF7F'; // Зеленый цвет
             answerInput.classList.add('correct');
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // playSound('correct');
 
         } else {
+            if (window.TrainerTracker) TrainerTracker.recordAttempt("multiplication_easy", false);
             feedbackElement.textContent = "Неправильно, попробуй еще раз!";
             feedbackElement.style.color = '#FF7F7F'; // Красный цвет
             answerInput.classList.add('incorrect');

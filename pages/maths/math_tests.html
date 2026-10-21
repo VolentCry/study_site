@@ -59,7 +59,44 @@
         .card-icon { margin-bottom: 14px; font-size: 24px; }
         .card-title { font-size: 14px; line-height: 1.8; }
         .card-meta { margin-top: auto; padding-top: 16px; color: #e7f2d9; font-size: 10px; }
-        .test-topline { display: flex; justify-content: space-between; gap: 12px; color: #c9e4a8; font-size: 12px; }
+        .test-topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #c9e4a8; font-size: 12px; }
+        .test-topline-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .test-exit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            color: #fff;
+            background: #4a4a4a;
+            border: 2px solid #222;
+            box-shadow: 2px 2px #161616;
+            font: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background .15s, transform .1s;
+        }
+        .test-exit-btn:hover, .test-exit-btn:focus-visible {
+            background: #a93226;
+            outline: none;
+            transform: translateY(-1px);
+        }
+        .confirm-dialog {
+            max-width: 480px;
+            text-align: center;
+        }
+        .confirm-dialog-text {
+            margin: 18px 0 24px;
+            color: #f0f0f0;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .danger-btn {
+            background: #a93226 !important;
+            border-color: #5c1d16 !important;
+        }
+        .danger-btn:hover {
+            background: #c0392b !important;
+        }
         .progress-track { height: 14px; margin: 14px 0 28px; background: #171717; border: 2px solid #111; }
         .progress-bar { width: 0; height: 100%; background: #84b94f; transition: width .2s; }
         .question-card { padding: clamp(20px, 5vw, 42px); background: #3d3d3d; border: 3px solid #1d1d1d; box-shadow: inset 0 0 0 2px #666; }
@@ -110,14 +147,14 @@
 </head>
 <body class="exam-page">
     <header class="exam-header">
-        <a class="exam-brand" href="math_4.html">⛏ Математика · Испытания</a>
+        <a class="exam-brand" href="../math_4.html">⛏ Математика · Испытания</a>
         <a class="exam-back" href="../math_4.html">← На главную математики</a>
     </header>
     <main class="exam-main">
         <section id="test-picker" class="exam-panel" aria-labelledby="page-title">
             <p class="exam-kicker">Математическая шахта · проверка знаний</p>
             <h1 id="page-title" class="exam-title">Выбери испытание</h1>
-            <p class="exam-description">В каждом тесте 15 вопросов, расположенных от простого к сложному. Отвечай самостоятельно: после последнего вопроса увидишь оценку и разбор всех ответов.</p>
+            <p class="exam-description">В каждом тесте от 15 до 25 вопросов, расположенных от простого к сложному. Отвечай самостоятельно: после последнего вопроса увидишь оценку и разбор всех ответов.</p>
             <div class="exam-grid">
                 <button class="exam-card" type="button" data-test="arithmetic">
                     <span class="card-icon" aria-hidden="true">🪓</span>
@@ -132,7 +169,7 @@
                 <button class="exam-card" type="button" data-test="geometry">
                     <span class="card-icon" aria-hidden="true">🧱</span>
                     <span class="card-title">Расчёты площадей и объёмов</span>
-                    <span class="card-meta">15 вопросов · площадь и объём фигур</span>
+                    <span class="card-meta">20 вопросов · площадь и объём фигур</span>
                 </button>
                 <button class="exam-card" type="button" data-test="rounding">
                     <span class="card-icon" aria-hidden="true">🔢</span>
@@ -144,11 +181,22 @@
                     <span class="card-title">Найди простое число</span>
                     <span class="card-meta">15 вопросов · выбери один вариант</span>
                 </button>
+                <button class="exam-card" type="button" data-test="fractions">
+                    <span class="card-icon" aria-hidden="true">🍰</span>
+                    <span class="card-title">Обыкновенные и неправильные дроби</span>
+                    <span class="card-meta">25 вопросов · все действия, целая часть и перевод</span>
+                </button>
             </div>
         </section>
 
         <section id="active-test" class="exam-panel hidden" aria-labelledby="test-title">
-            <div class="test-topline"><span id="test-name"></span><span id="question-count"></span></div>
+            <div class="test-topline">
+                <div class="test-topline-left">
+                    <button type="button" id="exit-test-button" class="test-exit-btn" title="Выйти из текущего тестирования">← Выйти из теста</button>
+                    <span id="test-name"></span>
+                </div>
+                <span id="question-count"></span>
+            </div>
             <div class="progress-track" role="progressbar" aria-label="Прогресс теста" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0">
                 <div id="progress-bar" class="progress-bar"></div>
             </div>
@@ -188,6 +236,15 @@
             <button id="picker-button" class="exam-button secondary" type="button">К выбору тестов</button>
         </div>
     </dialog>
-    <script src="../js/math_tests.js"></script>
+
+    <dialog id="confirm-exit-dialog" class="exam-dialog confirm-dialog" aria-labelledby="confirm-exit-title">
+        <h2 id="confirm-exit-title" class="result-title">Выход из тестирования</h2>
+        <p class="confirm-dialog-text">Вы уверены, что хотите выйти? При выходе прогресс сбросится.</p>
+        <div class="dialog-actions">
+            <button id="confirm-stay-button" class="exam-button" type="button">Остаться</button>
+            <button id="confirm-exit-button" class="exam-button danger-btn" type="button">Выйти</button>
+        </div>
+    </dialog>
+    <script src="../../js/math_tests.js"></script>
 </body>
 </html>
