@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (path.includes('/expressions_tasks/')) return 'expressions';
         if (path.includes('/inequalities_tasks/')) return 'inequalities';
         if (path.includes('/logics_tasks/')) return 'logic';
-        if (path.includes('/shares_and_percentages/') || path.includes('/reduction_of_fractions/')) return 'fractionsPercentages';
+        if (path.includes('/shares_and_percentages/') || path.includes('/reduction_of_fractions/') || path.includes('fraction')) return 'fractionsPercentages';
         if (path.includes('/cost_tasks/') || path.includes('/sales_tasks/')) return 'practicalMath';
         if (path.includes('/complex_conditions_tasks/')) return 'multistep';
         if (path.includes('/way_tasks/')) return 'wordProblems';

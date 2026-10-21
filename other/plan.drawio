@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="XHMPukqygFsvo-gVphPt" name="Page-1">
-        <mxGraphModel dx="812" dy="753" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1173" dy="1140" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -46,11 +46,23 @@
                         <mxPoint x="590" y="210" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-8" edge="1" parent="1" source="FWmUmsi4SAYuzkEy-wvM-5" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;curveGeometry=1;" target="qHCJREI3eOgxEzzWJa4x-7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
                 <mxCell id="FWmUmsi4SAYuzkEy-wvM-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Физика" vertex="1">
                     <mxGeometry height="60" width="120" x="360" y="320" as="geometry"/>
                 </mxCell>
                 <mxCell id="FWmUmsi4SAYuzkEy-wvM-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Химия" vertex="1">
                     <mxGeometry height="60" width="120" x="360" y="430" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-4" edge="1" parent="1" source="FWmUmsi4SAYuzkEy-wvM-11" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;curveGeometry=1;" target="qHCJREI3eOgxEzzWJa4x-1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-5" edge="1" parent="1" source="FWmUmsi4SAYuzkEy-wvM-11" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;curveGeometry=1;" target="qHCJREI3eOgxEzzWJa4x-2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-6" edge="1" parent="1" source="FWmUmsi4SAYuzkEy-wvM-11" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;curveGeometry=1;" target="qHCJREI3eOgxEzzWJa4x-3">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="FWmUmsi4SAYuzkEy-wvM-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Математика" vertex="1">
                     <mxGeometry height="60" width="120" x="360" y="500" as="geometry"/>
@@ -65,10 +77,22 @@
                     <mxGeometry height="60" width="120" x="360" y="710" as="geometry"/>
                 </mxCell>
                 <mxCell id="B-yyi3pL6CrKB8ExYg_m-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Разные&lt;div&gt;физические&lt;/div&gt;&lt;div&gt;симуляции&lt;/div&gt;" vertex="1">
-                    <mxGeometry height="60" width="120" x="610" y="210" as="geometry"/>
+                    <mxGeometry height="60" width="120" x="630" y="250" as="geometry"/>
                 </mxCell>
                 <mxCell id="B-yyi3pL6CrKB8ExYg_m-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Банк задач" vertex="1">
-                    <mxGeometry height="60" width="120" x="360" y="800" as="geometry"/>
+                    <mxGeometry height="60" width="120" x="360" y="860" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Задачи" vertex="1">
+                    <mxGeometry height="50" width="100" x="640" y="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Тренажёры" vertex="1">
+                    <mxGeometry height="50" width="100" x="640" y="505" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Тестирования" vertex="1">
+                    <mxGeometry height="50" width="100" x="640" y="560" as="geometry"/>
+                </mxCell>
+                <mxCell id="qHCJREI3eOgxEzzWJa4x-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Задачи (8-11 класс)" vertex="1">
+                    <mxGeometry height="60" width="120" x="630" y="320" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
