@@ -321,6 +321,214 @@
         @keyframes floatUp {
             to { transform: translateY(-120vh) rotate(360deg); }
         }
+    
+        /* --- ОКНО НАСТРОЕК И ПЕРЕНОСА ПРОФИЛЯ --- */
+        .settings-dialog {
+            position: fixed;
+            inset: 0 0 auto;
+            width: min(720px, calc(100% - 28px));
+            max-width: none;
+            max-height: min(88vh, 840px);
+            margin: 0 auto;
+            padding: 0;
+            overflow: auto;
+            color: var(--profile-ink);
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 24px 70px rgba(20, 30, 45, .28);
+        }
+        .settings-dialog[open] { animation: achievements-drop 420ms cubic-bezier(.2, .75, .25, 1) both; }
+        .settings-dialog::backdrop { background: rgba(15, 24, 38, .56); }
+
+        .settings-content { padding: clamp(20px, 5vw, 34px); }
+        .settings-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--profile-line);
+            padding-bottom: 16px;
+        }
+        .settings-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .settings-header-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+        .settings-heading { margin: 0 0 4px; color: var(--profile-primary); font-size: 22px; font-weight: 700; }
+        .settings-note { margin: 0; color: var(--profile-muted); font-size: 13px; line-height: 1.5; }
+        .settings-close {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            color: var(--profile-muted);
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 50%;
+            font: inherit;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .settings-close:hover { color: var(--profile-ink); background: var(--profile-button-hover); }
+
+        .settings-section {
+            background: var(--profile-subtle);
+            border: 1px solid var(--profile-line);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .settings-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .settings-section-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--profile-ink);
+        }
+        .settings-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--profile-card);
+            border: 1px solid var(--profile-line);
+            color: var(--profile-muted);
+        }
+        .settings-section-desc {
+            color: var(--profile-muted);
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0 0 14px;
+        }
+        .profile-code-textarea {
+            width: 100%;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 12px;
+            background: var(--profile-card);
+            border: 1.5px solid var(--profile-input-border);
+            border-radius: 8px;
+            color: var(--profile-ink);
+            resize: vertical;
+            word-break: break-all;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .profile-code-textarea:focus {
+            border-color: var(--profile-primary);
+            box-shadow: 0 0 0 3px rgba(38, 63, 97, 0.15);
+        }
+        .code-box-actions, .import-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .settings-btn {
+            min-height: 40px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+            border: 1px solid transparent;
+        }
+        .settings-btn-primary {
+            background: #10b981;
+            color: #fff;
+            border-color: #059669;
+        }
+        .settings-btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .settings-btn-accent {
+            background: var(--profile-primary);
+            color: #fff;
+            border-color: var(--profile-primary);
+        }
+        .settings-btn-accent:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+        .settings-btn-secondary {
+            background: var(--profile-card);
+            color: var(--profile-muted);
+            border-color: var(--profile-line);
+        }
+        .settings-btn-secondary:hover {
+            background: var(--profile-button-hover);
+            color: var(--profile-ink);
+        }
+        .settings-btn-danger {
+            background: transparent;
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        .settings-btn-danger:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #dc2626;
+        }
+        .copy-status-msg {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--profile-muted);
+            transition: color .2s;
+        }
+        .copy-status-msg.success {
+            color: #10b981;
+        }
+        .import-status-msg {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .import-status-msg.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .import-status-msg.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .settings-divider {
+            height: 1px;
+            background: var(--profile-line);
+            margin: 20px 0;
+        }
+        .settings-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
     </style>
     <style>
         :root {
@@ -1046,6 +1254,7 @@
     <header class="profile-nav">
         <a class="profile-brand" href="index.html">Учебная платформа</a>
         <div class="profile-nav-actions">
+            <button id="settings-toggle-btn" class="theme-toggle" type="button" title="Настройки профиля и перенос данных">⚙️ Настройки</button>
             <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Тёмная тема</button>
             <a class="profile-nav-link" href="index.html">На главную</a>
         </div>
@@ -1196,6 +1405,7 @@
             <button type="button" class="back-btn" id="edit-name-action-btn">✏️ Сменить имя</button>
             <button type="button" class="back-btn" id="achievements-open">Достижения</button>
             <button type="button" class="back-btn" id="ranks-open-btn">🔥 Серии и звания</button>
+            <button type="button" class="back-btn" id="settings-open-btn">⚙️ Настройки</button>
             <!-- Авторизация отключена, кнопка выхода сохранена.
             <button type="button" class="back-btn logout-btn" id="logout-btn">Выйти из аккаунта</button>
             -->
@@ -1236,6 +1446,91 @@
             <ul id="achievements-list" class="achievements-list"></ul>
         </div>
     </dialog>
+
+    <!-- ДИАЛОГ НАСТРОЕК И ПЕРЕНОСА ПРОФИЛЯ -->
+    <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-heading">
+        <div class="settings-content">
+            <div class="settings-header">
+                <div class="settings-title-group">
+                    <span class="settings-header-icon" aria-hidden="true">⚙️</span>
+                    <div>
+                        <h2 id="settings-heading" class="settings-heading">Настройки профиля и перенос данных</h2>
+                        <p class="settings-note">Сохрани свой прогресс или перенеси его на другое устройство</p>
+                    </div>
+                </div>
+                <button type="button" class="settings-close" id="settings-close-btn" aria-label="Закрыть настройки">×</button>
+            </div>
+
+            <div class="settings-body">
+                <!-- Секция 1: Экспорт кода -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">📤 Твой код сохранения</h3>
+                        <span class="settings-badge">Код профиля</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        В этом коде зашифрованы твоё имя, решённые задачи, серии, звания во всех тренажёрах и вся статистика. Скопируй его и сохрани в надёжном месте.
+                    </p>
+                    <div class="code-box-wrapper">
+                        <textarea id="profile-code-output" class="profile-code-textarea" readonly rows="4" spellcheck="false" placeholder="Генерация кода профиля..."></textarea>
+                        <div class="code-box-actions">
+                            <button type="button" id="copy-code-btn" class="settings-btn settings-btn-primary">
+                                <span id="copy-btn-icon">📋</span>
+                                <span id="copy-btn-text">Скопировать код</span>
+                            </button>
+                            <span id="copy-status" class="copy-status-msg" aria-live="polite"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <!-- Секция 2: Импорт кода -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">📥 Восстановление / перенос профиля</h3>
+                        <span class="settings-badge">Загрузка</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        Вставь скопированный ранее код профиля, чтобы автоматически загрузить все свои данные на этом устройстве:
+                    </p>
+                    <div class="import-box-wrapper">
+                        <textarea id="profile-code-input" class="profile-code-textarea" rows="3" spellcheck="false" placeholder="Вставь сюда код профиля (начинается с STUDY-)..."></textarea>
+                        <div class="import-actions">
+                            <button type="button" id="apply-code-btn" class="settings-btn settings-btn-accent">
+                                <span>📥</span>
+                                <span>Применить код и восстановить профиль</span>
+                            </button>
+                            <button type="button" id="clear-input-btn" class="settings-btn settings-btn-secondary">
+                                <span>Очистить</span>
+                            </button>
+                        </div>
+                        <div id="import-status-msg" class="import-status-msg hidden" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <!-- Секция 3: Сброс данных -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title" style="color: #ef4444;">🗑️ Очистка локальных данных</h3>
+                    </div>
+                    <p class="settings-section-desc">
+                        Сбросить статистику, серии и рекорды на этом устройстве. Рекомендуется сначала скопировать код сохранения выше.
+                    </p>
+                    <button type="button" id="reset-data-btn" class="settings-btn settings-btn-danger">
+                        <span>Сбросить данные на этом устройстве</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="settings-footer">
+                <button type="button" class="back-btn" id="settings-close-bottom-btn">Закрыть</button>
+            </div>
+        </div>
+    </dialog>
+
     </main>
     </div>
 
@@ -1403,6 +1698,263 @@
         }
 
         initUserNameEditor();
+
+        // --- СИСТЕМА ЭКСПОРТА И ИМПОРТА ПРОФИЛЯ (СИНХРОНИЗАЦИЯ БЕЗ БЭКЕНДА) ---
+        function generateProfileExportCode() {
+            const userName = localStorage.getItem('studyUserName') || localStorage.getItem('loggedInUser') || 'Ученик';
+            
+            let metrics = [];
+            try {
+                const raw = localStorage.getItem('studyMetrics');
+                metrics = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(metrics)) metrics = [];
+            } catch (e) {
+                metrics = [];
+            }
+
+            let trainerRecords = {};
+            try {
+                if (typeof window !== 'undefined' && window.TrainerTracker && typeof window.TrainerTracker.getTrainerRecords === 'function') {
+                    trainerRecords = window.TrainerTracker.getTrainerRecords();
+                } else {
+                    const raw = localStorage.getItem('studyTrainerRecords');
+                    trainerRecords = raw ? JSON.parse(raw) : {};
+                }
+            } catch (e) {
+                trainerRecords = {};
+            }
+
+            let totalSolvedTasks = 0;
+            try {
+                totalSolvedTasks = parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0;
+            } catch (e) {}
+
+            const theme = localStorage.getItem('profileTheme') || 'light';
+
+            const payload = {
+                v: 1,
+                app: 'study_site',
+                type: 'profile_export',
+                exportedAt: new Date().toISOString(),
+                userName: userName,
+                theme: theme,
+                metrics: metrics,
+                trainerRecords: trainerRecords,
+                totalSolvedTasks: totalSolvedTasks
+            };
+
+            const jsonStr = JSON.stringify(payload);
+            const utf8Bytes = new TextEncoder().encode(jsonStr);
+            let binary = '';
+            const len = utf8Bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(utf8Bytes[i]);
+            }
+            return 'STUDY-' + btoa(binary);
+        }
+
+        function restoreProfileFromCode(codeStr) {
+            if (!codeStr || typeof codeStr !== 'string') {
+                throw new Error('Код пуст. Вставьте строку с кодом.');
+            }
+            let clean = codeStr.trim();
+            if (clean.startsWith('STUDY-')) {
+                clean = clean.slice(6);
+            }
+            
+            let binary;
+            try {
+                binary = atob(clean);
+            } catch (e) {
+                throw new Error('Неверный формат кода (ошибка Base64). Проверьте, что код скопирован целиком.');
+            }
+
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+
+            let jsonStr;
+            try {
+                jsonStr = new TextDecoder().decode(bytes);
+            } catch (e) {
+                throw new Error('Ошибка расшифровки текста кода.');
+            }
+
+            let data;
+            try {
+                data = JSON.parse(jsonStr);
+            } catch (e) {
+                throw new Error('Код не содержит корректных данных профиля.');
+            }
+
+            if (!data || typeof data !== 'object') {
+                throw new Error('Некорректная структура данных.');
+            }
+
+            if (data.userName && typeof data.userName === 'string') {
+                localStorage.setItem('studyUserName', data.userName.trim());
+                localStorage.setItem('loggedInUser', data.userName.trim());
+            }
+
+            if (Array.isArray(data.metrics)) {
+                localStorage.setItem('studyMetrics', JSON.stringify(data.metrics));
+            }
+
+            if (data.trainerRecords && typeof data.trainerRecords === 'object') {
+                localStorage.setItem('studyTrainerRecords', JSON.stringify(data.trainerRecords));
+            }
+
+            if (data.totalSolvedTasks !== undefined) {
+                localStorage.setItem('totalSolvedTasks', String(data.totalSolvedTasks));
+            }
+
+            if (data.theme === 'dark' || data.theme === 'light') {
+                localStorage.setItem('profileTheme', data.theme);
+            }
+
+            return data;
+        }
+
+        function initSettingsModal() {
+            const settingsDialog = document.getElementById('settings-dialog');
+            const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+            const settingsOpenBtn = document.getElementById('settings-open-btn');
+            const settingsCloseBtn = document.getElementById('settings-close-btn');
+            const settingsCloseBottomBtn = document.getElementById('settings-close-bottom-btn');
+            const profileCodeOutput = document.getElementById('profile-code-output');
+            const profileCodeInput = document.getElementById('profile-code-input');
+            const copyCodeBtn = document.getElementById('copy-code-btn');
+            const copyBtnText = document.getElementById('copy-btn-text');
+            const copyStatus = document.getElementById('copy-status');
+            const applyCodeBtn = document.getElementById('apply-code-btn');
+            const clearInputBtn = document.getElementById('clear-input-btn');
+            const importStatusMsg = document.getElementById('import-status-msg');
+            const resetDataBtn = document.getElementById('reset-data-btn');
+
+            function openSettings() {
+                if (!settingsDialog) return;
+                // Генерируем актуальный код профиля
+                profileCodeOutput.value = generateProfileExportCode();
+                if (importStatusMsg) {
+                    importStatusMsg.textContent = '';
+                    importStatusMsg.className = 'import-status-msg hidden';
+                }
+                if (copyStatus) copyStatus.textContent = '';
+                if (copyBtnText) copyBtnText.textContent = 'Скопировать код';
+                settingsDialog.showModal();
+            }
+
+            function closeSettings() {
+                if (settingsDialog && settingsDialog.open) {
+                    settingsDialog.close();
+                }
+            }
+
+            if (settingsToggleBtn) settingsToggleBtn.addEventListener('click', openSettings);
+            if (settingsOpenBtn) settingsOpenBtn.addEventListener('click', openSettings);
+            if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettings);
+            if (settingsCloseBottomBtn) settingsCloseBottomBtn.addEventListener('click', closeSettings);
+
+            // Быстрое копирование кода
+            if (copyCodeBtn && profileCodeOutput) {
+                copyCodeBtn.addEventListener('click', async () => {
+                    const code = profileCodeOutput.value;
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(code);
+                        } else {
+                            profileCodeOutput.select();
+                            document.execCommand('copy');
+                        }
+                        if (copyStatus) {
+                            copyStatus.textContent = 'Скопировано в буфер! ✔';
+                            copyStatus.className = 'copy-status-msg success';
+                        }
+                        if (copyBtnText) copyBtnText.textContent = 'Скопировано! ✔';
+                        setTimeout(() => {
+                            if (copyStatus) copyStatus.textContent = '';
+                            if (copyBtnText) copyBtnText.textContent = 'Скопировать код';
+                        }, 2500);
+                    } catch (err) {
+                        profileCodeOutput.select();
+                        if (copyStatus) {
+                            copyStatus.textContent = 'Нажмите Ctrl+C для копирования';
+                            copyStatus.className = 'copy-status-msg';
+                        }
+                    }
+                });
+            }
+
+            // Очистка поля ввода
+            if (clearInputBtn && profileCodeInput) {
+                clearInputBtn.addEventListener('click', () => {
+                    profileCodeInput.value = '';
+                    if (importStatusMsg) {
+                        importStatusMsg.textContent = '';
+                        importStatusMsg.className = 'import-status-msg hidden';
+                    }
+                    profileCodeInput.focus();
+                });
+            }
+
+            // Применение кода (восстановление)
+            if (applyCodeBtn && profileCodeInput) {
+                applyCodeBtn.addEventListener('click', () => {
+                    const code = profileCodeInput.value.trim();
+                    if (!code) {
+                        if (importStatusMsg) {
+                            importStatusMsg.textContent = 'Вставьте код сохранения в текстовое поле выше.';
+                            importStatusMsg.className = 'import-status-msg error';
+                            importStatusMsg.classList.remove('hidden');
+                        }
+                        profileCodeInput.focus();
+                        return;
+                    }
+
+                    try {
+                        const restored = restoreProfileFromCode(code);
+                        const restoredName = restored.userName || 'Ученик';
+                        if (importStatusMsg) {
+                            importStatusMsg.textContent = '✔ Профиль «' + restoredName + '» успешно восстановлен! Обновляем страницу...';
+                            importStatusMsg.className = 'import-status-msg success';
+                            importStatusMsg.classList.remove('hidden');
+                        }
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1100);
+                    } catch (err) {
+                        if (importStatusMsg) {
+                            importStatusMsg.textContent = 'Ошибка: ' + (err.message || 'Не удалось применить код.');
+                            importStatusMsg.className = 'import-status-msg error';
+                            importStatusMsg.classList.remove('hidden');
+                        }
+                    }
+                });
+            }
+
+            // Сброс данных с подтверждением
+            if (resetDataBtn) {
+                resetDataBtn.addEventListener('click', () => {
+                    const ok = confirm('Вы уверены, что хотите сбросить ВСЕ данные профиля (имя, решённые задачи, серии и звания) на этом устройстве?\n\nЕсли хотите сохранить прогресс, сначала скопируйте код сохранения выше!');
+                    if (!ok) return;
+
+                    try {
+                        localStorage.removeItem('studyUserName');
+                        localStorage.removeItem('loggedInUser');
+                        localStorage.removeItem('studyMetrics');
+                        localStorage.removeItem('studyTrainerRecords');
+                        localStorage.removeItem('totalSolvedTasks');
+                    } catch (e) {}
+
+                    window.location.reload();
+                });
+            }
+        }
+
+        initSettingsModal();
+
 
         /*
         function showAuth() {
