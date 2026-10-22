@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkButton = document.getElementById('trainer-check-button');
     const nextButton = document.getElementById('trainer-next-button');
     const feedbackEl = document.getElementById('trainer-feedback');
+    const skipButton = document.getElementById('trainer-skip-button');
+    const skipDialog = document.getElementById('confirm-skip-dialog');
+    const skipCancelBtn = document.getElementById('skip-dialog-cancel');
+    const skipConfirmBtn = document.getElementById('skip-dialog-confirm');
     const solutionCardEl = document.getElementById('solution-card');
     const solutionContentEl = document.getElementById('solution-content');
 
@@ -1417,8 +1421,71 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Логика перехода и пропуска ---
+    function handleNext() {
+        if (!isChecked) {
+            feedbackEl.textContent = 'Решите сначала этот пример!';
+            feedbackEl.className = 'trainer-feedback warning';
+            playSound('incorrect');
+
+            if (problemContainerEl) {
+                problemContainerEl.classList.remove('shake-anim');
+                void problemContainerEl.offsetWidth;
+                problemContainerEl.classList.add('shake-anim');
+            }
+
+            const decInput = document.getElementById('input-decimal');
+            const wholeInput = document.getElementById('input-whole');
+            const numInput = document.getElementById('input-numerator');
+            if (decInput) { decInput.focus(); }
+            else if (wholeInput) { wholeInput.focus(); }
+            else if (numInput) { numInput.focus(); }
+            return;
+        }
+        generateProblem();
+    }
+
+    function handleSkip() {
+        if (isChecked) {
+            generateProblem();
+            return;
+        }
+        if (skipDialog) {
+            skipDialog.showModal();
+        } else if (confirm('Вы уверены, что хотите пропустить задание? В таком случае ваша серия и звание сбросятся.')) {
+            executeSkip();
+        }
+    }
+
+    function executeSkip() {
+        if (skipDialog && skipDialog.open) {
+            skipDialog.close();
+        }
+        stats.total++;
+        stats.streak = 0;
+        updateRank();
+        if (window.TrainerTracker) {
+            window.TrainerTracker.recordAttempt('common_fractions', false);
+        }
+        recordStudyAttempt(false);
+        playSound('incorrect');
+
+        generateProblem();
+        feedbackEl.textContent = 'Задание пропущено. Серия сброшена.';
+        feedbackEl.className = 'trainer-feedback error';
+    }
+
     if (checkButton) checkButton.addEventListener('click', checkAnswer);
-    if (nextButton) nextButton.addEventListener('click', generateProblem);
+    if (nextButton) nextButton.addEventListener('click', handleNext);
+    if (skipButton) skipButton.addEventListener('click', handleSkip);
+    if (skipCancelBtn) {
+        skipCancelBtn.addEventListener('click', () => {
+            if (skipDialog) skipDialog.close();
+        });
+    }
+    if (skipConfirmBtn) {
+        skipConfirmBtn.addEventListener('click', executeSkip);
+    }
     if (hintButton) hintButton.addEventListener('click', showHint);
 
     document.addEventListener('keydown', (e) => {
