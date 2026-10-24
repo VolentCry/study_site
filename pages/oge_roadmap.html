@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f2eb">
+    <title>Роадмап подготовки к ОГЭ по математике · 9 класс</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --paper: #f5f2eb;
+            --paper-light: #fbf9f4;
+            --paper-card: #ffffff;
+            --ink: #202a3a;
+            --muted: #697383;
+            --indigo: #263f61;
+            --indigo-soft: #e5e9ee;
+            --indigo-dark: #19273c;
+            --vermilion: #b7464e;
+            --vermilion-light: #fbf0f1;
+            --vermilion-border: rgba(183,70,78,.25);
+            --gold: #c8956c;
+            --gold-light: #fdf6ec;
+            --sakura: #e5b5b8;
+            --green: #2e7d32;
+            --green-light: #e8f5e9;
+            --line: rgba(38,63,97,.18);
+            --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+            --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+            --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+            --r-md: 14px;
+            --r-lg: 20px;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--paper);
+            color: var(--ink);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+                radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+        }
+
+        a { color: inherit; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+        /* NAV */
+        .site-nav {
+            position: sticky; top: 0; z-index: 50; min-height: 68px; padding: 0 5vw;
+            display: flex; align-items: center; justify-content: space-between; gap: 20px;
+            background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+        }
+        .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+        .brand-mark {
+            width: 36px; height: 36px; display: grid; place-items: center;
+            border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 18px 'Zen Old Mincho', serif;
+            background: var(--paper-light); border-radius: 6px;
+        }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-name { color: var(--indigo); font: 700 18px 'Zen Old Mincho', serif; line-height: 1.1; }
+        .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+
+        .class-switcher {
+            display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+            border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+        }
+        .class-pill {
+            padding: 5px 13px; border-radius: 999px; font-size: 12px; font-weight: 700;
+            text-decoration: none; color: var(--muted); transition: all .2s ease;
+        }
+        .class-pill:hover { color: var(--vermilion); }
+        .class-pill.active {
+            background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+        }
+
+        .nav-actions { display: flex; align-items: center; gap: 14px; }
+        .back-link {
+            min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+            border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+            text-decoration: none; border-radius: 6px; background: var(--paper-light);
+            transition: all .2s;
+        }
+        .back-link:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+        /* ROADMAP HEADER */
+        .roadmap-hero {
+            padding: 46px 5vw 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .badge-kicker {
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+            background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+            color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+            text-transform: uppercase; border-radius: 999px; margin-bottom: 14px;
+        }
+        .roadmap-hero h1 {
+            font: 900 clamp(32px, 5vw, 48px)/1.15 'Zen Old Mincho', serif;
+            color: var(--indigo-dark); margin-bottom: 12px;
+        }
+        .roadmap-hero p {
+            max-width: 760px; color: var(--muted); font-size: 15px; line-height: 1.65;
+            margin-bottom: 24px;
+        }
+
+        /* STRATEGY STATS BAR */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+            padding: 16px 20px;
+            background: var(--paper-light);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-item { display: flex; align-items: center; gap: 12px; }
+        .stat-icon {
+            width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
+            background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+        }
+        .stat-item.important .stat-icon {
+            background: var(--vermilion-light); color: var(--vermilion);
+        }
+        .stat-content { display: flex; flex-direction: column; }
+        .stat-val { font: 700 15px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+        .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+        /* CONTROLS & FILTER BAR */
+        .controls-wrap {
+            max-width: 1200px; margin: 0 auto; width: 100%; padding: 0 5vw 20px;
+        }
+        .filter-bar {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px solid var(--line);
+        }
+        .filter-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 7px 15px; border-radius: 999px; font-size: 12px; font-weight: 700;
+            background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+            transition: all .2s ease;
+        }
+        .filter-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+        .filter-btn.active {
+            background: var(--indigo); color: #fff; border-color: var(--indigo);
+        }
+
+        .view-toggle-wrap {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .view-pill-group {
+            display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+            border-radius: 999px; padding: 2px; gap: 2px; border: 1px solid var(--line);
+        }
+        .view-pill-btn {
+            padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
+            color: var(--muted); transition: all .2s ease;
+        }
+        .view-pill-btn.active {
+            background: #fff; color: var(--indigo); box-shadow: 0 1px 4px rgba(38,63,97,.12);
+        }
+        .progress-pill {
+            background: #fff; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
+            font-size: 11px; color: var(--vermilion); font-weight: 800;
+        }
+
+        /* ROADMAP MAP CONTAINER */
+        .roadmap-container {
+            max-width: 1200px; margin: 0 auto; width: 100%; padding: 10px 5vw 80px; flex: 1;
+        }
+
+        /* SECTION HEADERS */
+        .trail-section {
+            margin-bottom: 42px; position: relative;
+        }
+        .section-trail-title {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 22px;
+        }
+        .section-tag-badge {
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+            padding: 4px 10px; border-radius: 6px;
+        }
+        .section-tag-badge.algebra { background: #e3edf7; color: #1c4b79; }
+        .section-tag-badge.geometry { background: #feebe8; color: #b7464e; }
+        .section-tag-badge.part2 { background: #fdf3e7; color: #a45a16; }
+        .section-tag-badge.locked { background: #eceff1; color: #607d8b; }
+
+        .section-trail-title h2 {
+            font: 700 21px 'Zen Old Mincho', serif; color: var(--indigo);
+        }
+        .section-trail-title .line-sep {
+            flex: 1; height: 1px; background: var(--line);
+        }
+
+        /* TRAIL VIEW STYLING */
+        .trail-view .points-grid {
+            display: flex; flex-direction: column; gap: 16px; position: relative;
+        }
+        .trail-view .points-grid::before {
+            content: ''; position: absolute; left: 32px; top: 20px; bottom: 20px; width: 3px;
+            background: repeating-linear-gradient(180deg, var(--line) 0, var(--line) 8px, transparent 8px, transparent 16px);
+            z-index: 1;
+        }
+
+        .trail-view .map-point {
+            margin-left: 0; padding-left: 20px;
+            display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 20px;
+            position: relative; z-index: 2;
+        }
+        .trail-view .point-head {
+            margin: 0; display: flex; align-items: center; justify-content: center;
+        }
+        .trail-view .point-footer {
+            border: none; padding: 0; margin: 0;
+        }
+
+        /* GRID VIEW STYLING */
+        .grid-view .points-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .grid-view .map-point {
+            display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+        }
+        .grid-view .point-head {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+        }
+        .grid-view .point-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-top: 10px; border-top: 1px solid rgba(38,63,97,.08); margin-top: auto;
+        }
+
+        /* COMMON MAP POINT CARD */
+        .map-point {
+            background: var(--paper-card);
+            border-radius: var(--r-md);
+            border: 1.5px solid var(--line);
+            padding: 18px 20px;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: all .25s cubic-bezier(.16, 1, .3, 1);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .map-point:not(.disabled):hover {
+            transform: translateY(-3px);
+            border-color: var(--vermilion);
+            box-shadow: var(--shadow-md);
+        }
+
+        .map-point.completed {
+            border-color: rgba(46,125,50,.35);
+            background: linear-gradient(180deg, #fff 0%, #f9fdfa 100%);
+        }
+
+        .map-point.disabled {
+            background: rgba(240,240,240,.7);
+            border-style: dashed;
+            cursor: not-allowed;
+            opacity: .8;
+        }
+
+        .point-num-badge {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--paper-light); border: 1.5px solid var(--line);
+            color: var(--indigo); display: grid; place-items: center;
+            font: 700 17px 'Zen Old Mincho', serif; flex-shrink: 0;
+            transition: all .25s ease;
+        }
+        .map-point:not(.disabled):hover .point-num-badge {
+            background: var(--vermilion); color: #fff; border-color: var(--vermilion);
+        }
+        .map-point.completed .point-num-badge {
+            background: var(--green); color: #fff; border-color: var(--green);
+        }
+        .map-point.disabled .point-num-badge {
+            background: #e2e8f0; color: #718096; border-color: #cbd5e1;
+        }
+
+        .point-meta-badges {
+            display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+        }
+        .point-score-tag {
+            font-size: 11px; font-weight: 700; color: var(--muted);
+            background: rgba(38,63,97,.06); padding: 2px 8px; border-radius: 4px;
+        }
+        .point-status-tag {
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+        }
+        .status-ready { color: var(--vermilion); }
+        .status-done { color: var(--green); }
+        .status-locked { color: #8c9ba5; }
+
+        .point-info h3 {
+            font: 700 16px/1.3 'Zen Old Mincho', serif; color: var(--indigo-dark);
+            margin-bottom: 4px;
+        }
+        .point-info p {
+            font-size: 12px; color: var(--muted); line-height: 1.5;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .point-action-btn {
+            font-size: 12px; font-weight: 700; color: var(--vermilion);
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: transform .2s ease;
+        }
+        .map-point:not(.disabled):hover .point-action-btn {
+            transform: translateX(3px);
+        }
+        .point-disabled-msg {
+            font-size: 11px; color: #78909c; font-style: italic;
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(22,34,51,.68); backdrop-filter: blur(8px);
+            display: grid; place-items: center; padding: 20px;
+            opacity: 0; pointer-events: none; transition: opacity .25s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .modal-window {
+            background: var(--paper-light);
+            border-radius: var(--r-lg);
+            width: min(840px, 100%);
+            max-height: min(90vh, 880px);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-lg);
+            transform: scale(.96) translateY(12px);
+            transition: transform .3s cubic-bezier(.16, 1, .3, 1);
+            overflow: hidden;
+        }
+        .modal-overlay.active .modal-window {
+            transform: scale(1) translateY(0);
+        }
+
+        /* MODAL HEADER */
+        .modal-header {
+            padding: 22px 28px 18px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+        }
+        .modal-header-left { flex: 1; }
+        .modal-kicker-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+        }
+        .modal-badge-part {
+            font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+            background: var(--indigo-soft); color: var(--indigo); text-transform: uppercase; letter-spacing: .06em;
+        }
+        .modal-badge-score {
+            font-size: 11px; font-weight: 700; color: var(--vermilion);
+            background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+            padding: 3px 9px; border-radius: 999px;
+        }
+        .modal-title {
+            font: 700 24px/1.2 'Zen Old Mincho', serif; color: var(--indigo-dark); margin-bottom: 4px;
+        }
+        .modal-subtitle {
+            font-size: 14px; color: var(--muted); font-weight: 500;
+        }
+        .modal-close-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--paper-light); border: 1px solid var(--line);
+            display: grid; place-items: center; font-size: 20px; color: var(--muted);
+            transition: all .2s ease;
+        }
+        .modal-close-btn:hover {
+            background: var(--vermilion); color: #fff; border-color: var(--vermilion);
+        }
+
+        /* MODAL BODY */
+        .modal-body {
+            padding: 22px 28px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex; flex-direction: column; gap: 18px;
+        }
+
+        /* TESTED TOPICS BOX */
+        .tested-topics-box {
+            background: rgba(38,63,97,.05);
+            border-left: 3px solid var(--indigo);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--indigo-dark);
+        }
+        .tested-topics-box strong { color: var(--indigo); font-weight: 700; }
+
+        /* SPOILERS TOOLBAR */
+        .spoilers-toolbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            flex-wrap: wrap; padding-bottom: 2px;
+        }
+        .spoilers-counter {
+            font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+        }
+        .spoilers-actions { display: flex; gap: 8px; }
+        .action-small-btn {
+            padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 6px;
+            border: 1px solid var(--line); background: #fff; color: var(--indigo);
+            transition: all .2s;
+        }
+        .action-small-btn:hover {
+            border-color: var(--vermilion); color: var(--vermilion);
+        }
+
+        /* SPOILER CARD */
+        .spoiler-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(38,63,97,.05);
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .spoiler-card:hover {
+            border-color: rgba(183,70,78,.35);
+        }
+        .spoiler-card.open {
+            border-color: var(--vermilion);
+            box-shadow: 0 4px 14px rgba(183,70,78,.08);
+        }
+
+        .spoiler-header {
+            padding: 14px 18px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            cursor: pointer; user-select: none;
+            background: #fff;
+            transition: background .2s ease;
+        }
+        .spoiler-header:hover { background: #faf8f5; }
+        .spoiler-card.open .spoiler-header {
+            background: var(--vermilion-light);
+            border-bottom: 1px solid var(--vermilion-border);
+        }
+
+        .spoiler-title-wrap {
+            display: flex; align-items: center; gap: 10px; flex: 1;
+        }
+        .spoiler-badge-type {
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
+            padding: 2px 7px; border-radius: 4px; background: rgba(38,63,97,.08); color: var(--indigo);
+        }
+        .spoiler-title {
+            font: 700 15px 'Zen Old Mincho', serif; color: var(--indigo-dark);
+        }
+
+        .spoiler-btn {
+            font-size: 11px; font-weight: 700; color: var(--vermilion);
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(183,70,78,.08); padding: 4px 10px; border-radius: 999px;
+            transition: all .2s; pointer-events: none;
+        }
+        .spoiler-card.open .spoiler-btn {
+            background: var(--vermilion); color: #fff;
+        }
+        .spoiler-btn .arrow-icon {
+            font-size: 12px; transition: transform .25s ease;
+        }
+        .spoiler-card.open .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .spoiler-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s cubic-bezier(.16, 1, .3, 1);
+            background: #fff;
+        }
+        .spoiler-card.open .spoiler-body {
+            max-height: 900px;
+        }
+        .spoiler-inner {
+            padding: 16px 20px 18px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        /* FORMULA MATH STYLING */
+        .math-expr {
+            background: var(--paper-light);
+            border: 1px solid rgba(38,63,97,.12);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--indigo-dark);
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            overflow-x: auto;
+        }
+        .math-expr strong { color: var(--vermilion); }
+        .math-note {
+            display: block; font-size: 13px; color: var(--muted); margin-top: 6px;
+        }
+        .math-cond {
+            font-size: 13px; color: var(--muted); font-style: italic; margin-left: 8px;
+        }
+
+        /* FRACTION COMPONENT */
+        .fraction {
+            display: inline-flex; flex-direction: column; vertical-align: middle;
+            text-align: center; padding: 0 4px; font-size: 0.9em; line-height: 1.1;
+        }
+        .fraction .num {
+            border-bottom: 1.5px solid currentColor; padding-bottom: 2px;
+        }
+        .fraction .den {
+            padding-top: 2px;
+        }
+
+        .spoiler-desc {
+            font-size: 13px; color: var(--muted); line-height: 1.6;
+        }
+
+        /* MODAL FOOTER */
+        .modal-footer {
+            padding: 14px 28px;
+            background: #fff;
+            border-top: 1px solid var(--line);
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .check-studied-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700;
+            border: 1.5px solid var(--line); color: var(--indigo); background: var(--paper-light);
+            transition: all .2s;
+        }
+        .check-studied-btn:hover { border-color: var(--green); color: var(--green); }
+        .check-studied-btn.active {
+            background: var(--green-light); border-color: var(--green); color: var(--green);
+        }
+        .modal-nav-btns { display: flex; align-items: center; gap: 8px; }
+        .modal-prev-btn, .modal-next-btn {
+            padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
+            border: 1px solid var(--line); background: #fff; color: var(--indigo);
+            transition: all .2s;
+        }
+        .modal-prev-btn:hover, .modal-next-btn:hover {
+            background: var(--indigo); color: #fff; border-color: var(--indigo);
+        }
+
+        /* PAGE FOOTER */
+        .page-footer {
+            margin-top: auto;
+            padding: 24px 5vw;
+            background: var(--indigo-dark);
+            color: rgba(255,255,255,.7);
+            font-size: 12px;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+        }
+        .page-footer a { color: #f4d5d4; text-decoration: none; }
+        .page-footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .site-nav { padding: 0 16px; }
+            .roadmap-hero { padding: 32px 16px 20px; }
+            .controls-wrap, .roadmap-container { padding-left: 16px; padding-right: 16px; }
+            .trail-view .points-grid::before { left: 24px; }
+            .trail-view .map-point { grid-template-columns: 48px 1fr; gap: 12px; padding: 14px; }
+            .trail-view .point-footer { grid-column: span 2; padding-top: 8px; border-top: 1px solid var(--line); }
+            .modal-window { width: 100%; height: 96vh; max-height: 96vh; border-radius: 14px; }
+            .modal-header { padding: 16px 18px 12px; }
+            .modal-body { padding: 16px 18px; }
+            .modal-footer { padding: 12px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="site-nav" aria-label="Главная навигация">
+        <a class="brand" href="math_9.html" aria-label="К разделу 9 класс">
+            <span class="brand-mark" aria-hidden="true">数</span>
+            <div class="brand-text">
+                <span class="brand-name">Математика</span>
+                <span class="brand-sub">9 класс · ОГЭ</span>
+            </div>
+        </a>
+
+        <!-- CLASS SWITCHER -->
+        <div class="class-switcher" role="group" aria-label="Выбор класса">
+            <a href="math_4.html" class="class-pill">4 класс</a>
+            <span class="class-pill active" aria-current="page">9 класс</span>
+        </div>
+
+        <div class="nav-actions">
+            <a href="math_9.html" class="back-link">
+                <span>←</span>
+                <span>В раздел 9 класса</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- HEADER / HERO -->
+    <header class="roadmap-hero">
+        <div class="badge-kicker">✦ Карта подготовки к ОГЭ по математике</div>
+        <h1>Интерактивный Роадмап ОГЭ</h1>
+        <p>
+            Полный систематизированный справочник заданий №1–25: формулы, алгоритмы и проверяемые темы по материалам ФИПИ.
+            Нажимай на контрольные точки, чтобы открыть теоретический блок с задачами.
+            Все ключевые понятия и формулы закрыты отдельными спойлерами для активной тренировки памяти.
+        </p>
+
+        <!-- STATS & RULES BAR -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon">🗺️</div>
+                <div class="stat-content">
+                    <span class="stat-val">20+ заданий</span>
+                    <span class="stat-lbl">Контрольных точек на карте</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-content">
+                    <span class="stat-val">31 балл</span>
+                    <span class="stat-lbl">Максимум на экзамене</span>
+                </div>
+            </div>
+            <div class="stat-item important">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-content">
+                    <span class="stat-val">Мин. 2 балла</span>
+                    <span class="stat-lbl">Обязательно по геометрии!</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">👁️</div>
+                <div class="stat-content">
+                    <span class="stat-val">Формулы-спойлеры</span>
+                    <span class="stat-lbl">Кликни, чтобы раскрыть</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- FILTER / CONTROLS -->
+    <div class="controls-wrap">
+        <div class="filter-bar">
+            <div class="filter-chips" role="group" aria-label="Фильтры модулей">
+                <button class="filter-btn active" data-filter="all" onclick="filterPoints('all', this)">Все задания (1–25)</button>
+                <button class="filter-btn" data-filter="algebra-1" onclick="filterPoints('algebra-1', this)">Алгебра · Часть 1 (6–14)</button>
+                <button class="filter-btn" data-filter="geometry-1" onclick="filterPoints('geometry-1', this)">Геометрия · Часть 1 (15–19)</button>
+                <button class="filter-btn" data-filter="part-2" onclick="filterPoints('part-2', this)">Часть 2 (20–25)</button>
+            </div>
+            <div class="view-toggle-wrap">
+                <div class="view-pill-group">
+                    <button class="view-pill-btn active" id="btn-view-trail" onclick="setViewMode('trail')">📍 Карта пути</button>
+                    <button class="view-pill-btn" id="btn-view-grid" onclick="setViewMode('grid')">⊞ Сетка</button>
+                </div>
+                <span class="progress-pill" id="progress-counter">0 / 20</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN ROADMAP CONTAINER -->
+    <main class="roadmap-container trail-view" id="main-roadmap-view">
+
+        <!-- СЕКЦИЯ: ПРАКТИЧЕСКИЙ БЛОК (№1-5) -->
+        <section class="trail-section" data-section="intro">
+            <div class="section-trail-title">
+                <span class="section-tag-badge locked">Блок 0 · Старт</span>
+                <h2>Практико-ориентированные задачи (№ 1–5)</h2>
+                <div class="line-sep"></div>
+            </div>
+            <div class="points-grid">
+                <!-- ТОЧКА 1: Задания 1-5 (Нефункциональная) -->
+                <div class="map-point disabled" aria-disabled="true" title="Задания №1-5 пока в разработке">
+                    <div class="point-head">
+                        <div class="point-num-badge">1–5</div>
+                    </div>
+                    <div class="point-info">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span class="point-score-tag">5 баллов</span>
+                            <span class="point-status-tag status-locked">🔒 Скоро</span>
+                        </div>
+                        <h3>Задания № 1–5</h3>
+                        <p>Практические сюжетные задачи: план участка, квартиры, теплицы, шины, печи, тарифы и план местности.</p>
+                    </div>
+                    <div class="point-footer">
+                        <span class="point-disabled-msg">Точка не активна (в разработке)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ: ЧАСТЬ 1 · АЛГЕБРА (№6-14) -->
+        <section class="trail-section" data-section="algebra-1">
+            <div class="section-trail-title">
+                <span class="section-tag-badge algebra">Часть 1 · Алгебра</span>
+                <h2>Модуль «Алгебра» (Задания № 6 – № 14)</h2>
+                <div class="line-sep"></div>
+            </div>
+            <div class="points-grid" id="grid-algebra-1">
+                <!-- Точки 6 - 14 -->
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ: ЧАСТЬ 1 · ГЕОМЕТРИЯ (№15-19) -->
+        <section class="trail-section" data-section="geometry-1">
+            <div class="section-trail-title">
+                <span class="section-tag-badge geometry">Часть 1 · Геометрия</span>
+                <h2>Модуль «Геометрия» (Задания № 15 – № 19)</h2>
+                <div class="line-sep"></div>
+            </div>
+            <div class="points-grid" id="grid-geometry-1">
+                <!-- Точки 15 - 19 -->
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ: ЧАСТЬ 2 · РАЗВЕРНУТЫЕ ЗАДАНИЯ (№20-25) -->
+        <section class="trail-section" data-section="part-2">
+            <div class="section-trail-title">
+                <span class="section-tag-badge part2">Часть 2 · Повышенный уровень</span>
+                <h2>Задания с развёрнутым ответом (Задания № 20 – № 25)</h2>
+                <div class="line-sep"></div>
+            </div>
+            <div class="points-grid" id="grid-part-2">
+                <!-- Точки 20 - 25 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL WINDOW FOR THEORY -->
+    <div class="modal-overlay" id="theory-modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-kicker-row">
+                        <span class="modal-badge-part" id="modal-part-badge">Часть 1</span>
+                        <span class="modal-badge-score" id="modal-score-badge">1 балл</span>
+                    </div>
+                    <h2 class="modal-title" id="modal-task-title">Задание № 6</h2>
+                    <p class="modal-subtitle" id="modal-task-subtitle">Числа, вычисления и действия с дробями</p>
+                </div>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Закрыть модальное окно">×</button>
+            </div>
+
+            <div class="modal-body" id="modal-body-content">
+                <!-- Topics summary -->
+                <div class="tested-topics-box" id="modal-tested-box">
+                    <strong>Проверяемые темы:</strong> <span id="modal-tested-text"></span>
+                </div>
+
+                <!-- Spoilers Toolbar -->
+                <div class="spoilers-toolbar">
+                    <span class="spoilers-counter" id="modal-spoilers-count">Формулы и правила (спойлеры):</span>
+                    <div class="spoilers-actions">
+                        <button class="action-small-btn" onclick="expandAllCurrentSpoilers()">Раскрыть все</button>
+                        <button class="action-small-btn" onclick="collapseAllCurrentSpoilers()">Скрыть все</button>
+                    </div>
+                </div>
+
+                <!-- Spoilers list container -->
+                <div id="modal-spoilers-container" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="check-studied-btn" id="modal-studied-toggle" onclick="toggleTaskStudied()">
+                    <span class="check-icon">✓</span>
+                    <span id="studied-label">Отметить как изученное</span>
+                </button>
+                <div class="modal-nav-btns">
+                    <button class="modal-prev-btn" id="modal-prev-btn" onclick="navigateModal(-1)">← Назад</button>
+                    <button class="modal-next-btn" id="modal-next-btn" onclick="navigateModal(1)">Вперёд →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE FOOTER -->
+    <footer class="page-footer">
+        <span>Математика · 9 класс · Подготовка к ОГЭ по материалам ФИПИ</span>
+        <div>
+            <a href="math_9.html">В раздел 9 класса</a> &ensp;·&ensp;
+            <a href="math_4.html">4 класс</a> &ensp;·&ensp;
+            <a href="../index.html">На главную</a>
+        </div>
+    </footer>
+
+    <!-- THEORY DATA SCRIPT -->
+    <script src="../js/oge_theory_data.js"></script>
+
+    <!-- INTERACTION LOGIC SCRIPT -->
+    <script>
+        // State
+        let currentTaskId = 6;
+        const taskOrder = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+        let studiedTasks = new Set();
+
+        // Load studied state from localStorage
+        try {
+            const saved = localStorage.getItem('oge_math_studied_tasks');
+            if (saved) {
+                studiedTasks = new Set(JSON.parse(saved));
+            }
+        } catch (e) {
+            console.warn('Storage not available', e);
+        }
+
+        // Toggle View Mode (Trail vs Grid)
+        function setViewMode(mode) {
+            const container = document.getElementById('main-roadmap-view');
+            const btnTrail = document.getElementById('btn-view-trail');
+            const btnGrid = document.getElementById('btn-view-grid');
+
+            if (mode === 'grid') {
+                container.classList.remove('trail-view');
+                container.classList.add('grid-view');
+                btnGrid.classList.add('active');
+                btnTrail.classList.remove('active');
+            } else {
+                container.classList.remove('grid-view');
+                container.classList.add('trail-view');
+                btnTrail.classList.add('active');
+                btnGrid.classList.remove('active');
+            }
+        }
+
+        // Render point cards into their respective sections
+        function renderRoadmapCards() {
+            const gridAlgebra1 = document.getElementById('grid-algebra-1');
+            const gridGeometry1 = document.getElementById('grid-geometry-1');
+            const gridPart2 = document.getElementById('grid-part-2');
+
+            gridAlgebra1.innerHTML = '';
+            gridGeometry1.innerHTML = '';
+            gridPart2.innerHTML = '';
+
+            taskOrder.forEach(id => {
+                const data = OGE_THEORY_DATA[id];
+                if (!data) return;
+
+                const isStudied = studiedTasks.has(id);
+                const card = document.createElement('div');
+                card.className = `map-point ${isStudied ? 'completed' : ''}`;
+                card.setAttribute('data-id', id);
+                card.setAttribute('data-category', data.category);
+                card.onclick = () => openTheoryModal(id);
+
+                card.innerHTML = `
+                    <div class="point-head">
+                        <div class="point-num-badge">${data.num}</div>
+                    </div>
+                    <div class="point-info">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span class="point-score-tag">${data.score}</span>
+                            <span class="point-status-tag ${isStudied ? 'status-done' : 'status-ready'}">
+                                ${isStudied ? '✓ Изучено' : '📖 Теория'}
+                            </span>
+                        </div>
+                        <h3>${data.name}</h3>
+                        <p>${data.tested}</p>
+                    </div>
+                    <div class="point-footer">
+                        <span class="point-action-btn">
+                            Открыть теорию <span>→</span>
+                        </span>
+                    </div>
+                `;
+
+                if (id <= 14) {
+                    gridAlgebra1.appendChild(card);
+                } else if (id <= 19) {
+                    gridGeometry1.appendChild(card);
+                } else {
+                    gridPart2.appendChild(card);
+                }
+            });
+
+            updateProgressDisplay();
+        }
+
+        // Update progress counter
+        function updateProgressDisplay() {
+            const counter = document.getElementById('progress-counter');
+            if (counter) {
+                counter.textContent = `${studiedTasks.size} / 20`;
+            }
+        }
+
+        // Open modal for a task
+        function openTheoryModal(taskId) {
+            const data = OGE_THEORY_DATA[taskId];
+            if (!data) return;
+
+            currentTaskId = taskId;
+            const modal = document.getElementById('theory-modal');
+
+            // Populate header
+            document.getElementById('modal-part-badge').textContent = data.part;
+            document.getElementById('modal-score-badge').textContent = data.score;
+            document.getElementById('modal-task-title').textContent = data.title;
+            document.getElementById('modal-task-subtitle').textContent = data.name;
+            document.getElementById('modal-tested-text').textContent = data.tested;
+
+            // Spoilers container
+            const container = document.getElementById('modal-spoilers-container');
+            container.innerHTML = '';
+
+            data.spoilers.forEach((sp, idx) => {
+                const card = document.createElement('div');
+                card.className = 'spoiler-card';
+                card.id = `sp-${taskId}-${idx}`;
+
+                card.innerHTML = `
+                    <div class="spoiler-header" onclick="toggleIndividualSpoiler(this)">
+                        <div class="spoiler-title-wrap">
+                            <span class="spoiler-badge-type">${sp.badge || 'Формула'}</span>
+                            <span class="spoiler-title">${sp.title}</span>
+                        </div>
+                        <button class="spoiler-btn" type="button" aria-expanded="false">
+                            <span class="btn-text">Показать формулу</span>
+                            <span class="arrow-icon">▾</span>
+                        </button>
+                    </div>
+                    <div class="spoiler-body">
+                        <div class="spoiler-inner">
+                            ${sp.formula}
+                            ${sp.desc ? `<p class="spoiler-desc">💡 ${sp.desc}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Update studied button state
+            updateStudiedButtonUI();
+
+            // Nav buttons disabled state
+            const currentIndex = taskOrder.indexOf(taskId);
+            document.getElementById('modal-prev-btn').disabled = (currentIndex <= 0);
+            document.getElementById('modal-next-btn').disabled = (currentIndex >= taskOrder.length - 1);
+
+            // Show modal
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Toggle individual spoiler independently
+        function toggleIndividualSpoiler(headerElement) {
+            const card = headerElement.closest('.spoiler-card');
+            if (!card) return;
+
+            const isOpen = card.classList.contains('open');
+            const btnText = card.querySelector('.btn-text');
+            const btn = card.querySelector('.spoiler-btn');
+
+            if (isOpen) {
+                card.classList.remove('open');
+                if (btnText) btnText.textContent = 'Показать формулу';
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            } else {
+                card.classList.add('open');
+                if (btnText) btnText.textContent = 'Скрыть формулу';
+                if (btn) btn.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        // Expand all spoilers in current modal
+        function expandAllCurrentSpoilers() {
+            const cards = document.querySelectorAll('#modal-spoilers-container .spoiler-card');
+            cards.forEach(card => {
+                card.classList.add('open');
+                const btnText = card.querySelector('.btn-text');
+                const btn = card.querySelector('.spoiler-btn');
+                if (btnText) btnText.textContent = 'Скрыть формулу';
+                if (btn) btn.setAttribute('aria-expanded', 'true');
+            });
+        }
+
+        // Collapse all spoilers in current modal
+        function collapseAllCurrentSpoilers() {
+            const cards = document.querySelectorAll('#modal-spoilers-container .spoiler-card');
+            cards.forEach(card => {
+                card.classList.remove('open');
+                const btnText = card.querySelector('.btn-text');
+                const btn = card.querySelector('.spoiler-btn');
+                if (btnText) btnText.textContent = 'Показать формулу';
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('theory-modal');
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        // Navigate between tasks inside modal
+        function navigateModal(direction) {
+            const currentIndex = taskOrder.indexOf(currentTaskId);
+            const targetIndex = currentIndex + direction;
+            if (targetIndex >= 0 && targetIndex < taskOrder.length) {
+                openTheoryModal(taskOrder[targetIndex]);
+            }
+        }
+
+        // Mark task as studied
+        function toggleTaskStudied() {
+            if (studiedTasks.has(currentTaskId)) {
+                studiedTasks.delete(currentTaskId);
+            } else {
+                studiedTasks.add(currentTaskId);
+            }
+
+            try {
+                localStorage.setItem('oge_math_studied_tasks', JSON.stringify([...studiedTasks]));
+            } catch (e) {
+                console.warn(e);
+            }
+
+            updateStudiedButtonUI();
+            renderRoadmapCards();
+        }
+
+        function updateStudiedButtonUI() {
+            const btn = document.getElementById('modal-studied-toggle');
+            const lbl = document.getElementById('studied-label');
+            const isStudied = studiedTasks.has(currentTaskId);
+
+            if (isStudied) {
+                btn.classList.add('active');
+                lbl.textContent = 'Тема изучена ✓';
+            } else {
+                btn.classList.remove('active');
+                lbl.textContent = 'Отметить как изученное';
+            }
+        }
+
+        // Filter cards
+        function filterPoints(category, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+
+            const sections = document.querySelectorAll('.trail-section');
+            sections.forEach(sec => {
+                const secType = sec.getAttribute('data-section');
+                if (category === 'all') {
+                    sec.style.display = 'block';
+                } else if (category === secType) {
+                    sec.style.display = 'block';
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+        }
+
+        // Close on escape & backdrop click
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.getElementById('theory-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'theory-modal') closeModal();
+        });
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderRoadmapCards();
+        });
+    </script>
+</body>
+</html>

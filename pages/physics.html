@@ -57,6 +57,17 @@
     color: var(--accent); border-color: var(--accent); background: rgba(56,189,248,.06);
   }
   .nav-lobby:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .nav-profile-btn {
+    display: inline-flex; align-items: center; padding: 8px 16px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 8px; color: #050c1a;
+    font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .nav-profile-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(56,189,248,.35);
+  }
   .nav-links { display: flex; gap: 32px; }
   .nav-links a {
     font-size: 14px; font-weight: 600; color: var(--text2);
@@ -371,6 +382,7 @@
     <a href="#sim-grid">Симуляции</a>
     <a href="physics/tasks/index.html">К задачам</a>
   </div>
+  <a class="nav-profile-btn" href="../profile.html">Мой профиль</a>
 </nav>
 
 <!-- HERO -->

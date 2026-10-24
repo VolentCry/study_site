@@ -142,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const taskXp = attempt.correct ? 10 : 2;
             xpByTask.set(taskKey, Math.max(xpByTask.get(taskKey) || 0, taskXp));
         });
-        const earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0);
+        const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+        const earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0) + bonusXp;
         const level = Math.floor(earnedXp / xpPerLevel) + 1;
         const currentLevelXp = earnedXp % xpPerLevel;
         const levelNames = ['Новичок', 'Ученик', 'Исследователь', 'Знаток', 'Мастер', 'Эксперт'];
@@ -463,4 +464,18 @@ document.addEventListener('DOMContentLoaded', () => {
         achievementsDialog.showModal();
     });
     document.getElementById('achievements-close').addEventListener('click', () => achievementsDialog.close());
+
+    // Глобальное обновление опыта при получении подарков или наград
+    window.refreshProfileExperience = function() {
+        const currentAttempts = loadAttempts();
+        updateExperience(currentAttempts);
+    };
+
+    window.addProfileBonusXp = function(amount) {
+        const cur = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+        const updated = cur + amount;
+        localStorage.setItem('studyBonusXp', String(updated));
+        window.refreshProfileExperience();
+        return updated;
+    };
 });

@@ -335,6 +335,30 @@
         saveTrainerRecord(trainerId, streak, false);
     }
 
+    // Вспомогательная функция для всплывающего уведомления о подарке
+    function showGiftToast(message, type) {
+        let toast = document.getElementById('trainer-gift-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'trainer-gift-toast';
+            toast.className = 'trainer-gift-toast';
+            document.body.appendChild(toast);
+        }
+
+        toast.className = `trainer-gift-toast show ${type || 'info'}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <span class="toast-icon">${type === 'success' ? '🎁' : (type === 'locked' ? '🔒' : 'ℹ️')}</span>
+                <span class="toast-text">${message}</span>
+            </div>
+        `;
+
+        clearTimeout(window.__giftToastTimer);
+        window.__giftToastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4500);
+    }
+
     // Рендер вкладки «Серии и звания» в профиле
     function renderRanksSection(containerEl) {
         if (!containerEl) return;
@@ -359,12 +383,35 @@
             totalSolvedAll += (rec.totalSolved || 0);
         });
 
+        const claimedGifts = JSON.parse(localStorage.getItem('studyClaimedTrainerGifts') || '{}');
+
         // Карточки тренажёров
         const trainerCardsHtml = trainers.map(t => {
             const rec = records[t.id] || { maxStreak: 0, maxRank: 'Не начат', totalSolved: 0 };
             const streak = rec.maxStreak || 0;
             const rank = rec.maxRank && rec.maxRank !== 'Не начат' ? rec.maxRank : (streak > 0 ? getRankForStreak(t.id, streak) : 'Не начат');
             const nextTier = getNextTier(t.id, streak);
+
+            // Состояние подарка (серия >= 50)
+            const isClaimed = !!claimedGifts[t.id];
+            const isUnlocked = streak >= 50 && !isClaimed;
+            const isLocked = streak < 50 && !isClaimed;
+
+            let giftClass = 'locked';
+            let giftTitle = `Подарок заблокирован. Достигните серии = 50 (сейчас: ${streak}/50)`;
+            if (isClaimed) {
+                giftClass = 'claimed';
+                giftTitle = 'Подарок уже получен (+500 XP)!';
+            } else if (isUnlocked) {
+                giftClass = 'unlocked';
+                giftTitle = 'Подарок разблокирован! Нажмите, чтобы забрать +500 XP! 🎁';
+            }
+
+            const giftBtnHtml = `
+                <button type="button" class="trainer-gift-btn ${giftClass}" data-trainer-id="${t.id}" data-trainer-name="${t.name}" data-streak="${streak}" title="${giftTitle}" aria-label="Подарок за серию 50 в тренажёре ${t.name}">
+                    <span class="gift-icon">🎁</span>
+                </button>
+            `;
 
             let progressHtml = '';
             if (nextTier) {
@@ -412,7 +459,10 @@
                         <div class="trainer-card-title-group">
                             <span class="trainer-card-icon" aria-hidden="true">${t.icon}</span>
                             <div>
-                                <h3 class="trainer-card-name">${t.name}</h3>
+                                <div class="trainer-name-row">
+                                    <h3 class="trainer-card-name">${t.name}</h3>
+                                    ${giftBtnHtml}
+                                </div>
                                 <span class="trainer-card-badge">${t.category} · ${t.classNum}</span>
                             </div>
                         </div>
@@ -499,6 +549,57 @@
                 </div>
             </div>
         `;
+
+        // Обработка кликов по кнопкам подарков
+        containerEl.querySelectorAll('.trainer-gift-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const trainerId = btn.getAttribute('data-trainer-id');
+                const trainerName = btn.getAttribute('data-trainer-name') || 'Тренажёр';
+                const streakVal = parseInt(btn.getAttribute('data-streak') || '0', 10);
+                const currentClaimed = JSON.parse(localStorage.getItem('studyClaimedTrainerGifts') || '{}');
+
+                if (currentClaimed[trainerId]) {
+                    showGiftToast(`✓ Награда (+500 XP) за серию 50 в тренажёре «${trainerName}» уже получена!`, 'info');
+                    return;
+                }
+
+                if (streakVal < 50) {
+                    showGiftToast(`🔒 Подарок заблокирован. Достигните серии = 50 в тренажёре «${trainerName}» (текущая серия: ${streakVal}/50 🔥).`, 'locked');
+                    return;
+                }
+
+                // Серия >= 50: выдаём +500 XP!
+                currentClaimed[trainerId] = true;
+                localStorage.setItem('studyClaimedTrainerGifts', JSON.stringify(currentClaimed));
+
+                if (typeof window.addProfileBonusXp === 'function') {
+                    window.addProfileBonusXp(500);
+                } else {
+                    const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+                    localStorage.setItem('studyBonusXp', String(curBonus + 500));
+                    if (typeof window.refreshProfileExperience === 'function') {
+                        window.refreshProfileExperience();
+                    } else {
+                        const expTotal = document.getElementById('experience-total');
+                        if (expTotal) {
+                            const curText = expTotal.textContent || '0';
+                            const curNum = parseInt(curText.replace(/\D/g, '') || '0', 10);
+                            expTotal.textContent = `${curNum + 500} XP`;
+                        }
+                    }
+                }
+
+                // Обновляем визуальное состояние кнопки
+                btn.classList.remove('unlocked');
+                btn.classList.add('claimed');
+                btn.title = 'Подарок уже получен (+500 XP)!';
+
+                showGiftToast(`🎉 Поздравляем! Вы получили +500 XP за серию 50 в тренажёре «${trainerName}»!`, 'success');
+            });
+        });
     }
 
     return {

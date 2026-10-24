@@ -38,6 +38,18 @@
         }
         .brand-name { color: var(--indigo); font: 700 19px 'Zen Old Mincho', serif; }
         .brand-class { margin-left: 2px; color: var(--muted); font-size: 11px; font-weight: 600; }
+        .class-switcher {
+            display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+            border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+        }
+        .class-pill {
+            padding: 5px 13px; border-radius: 999px; font-size: 12px; font-weight: 700;
+            text-decoration: none; color: var(--muted); transition: all .2s ease;
+        }
+        .class-pill:hover { color: var(--vermilion); }
+        .class-pill.active {
+            background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+        }
         .nav-links { display: flex; align-items: center; gap: 28px; }
         .nav-links a { color: var(--muted); font-size: 12px; font-weight: 700; text-decoration: none; transition: color .2s; }
         .nav-links a:hover { color: var(--vermilion); }
@@ -48,6 +60,13 @@
         }
         .lobby-link:hover, .lobby-link:focus-visible { background: var(--vermilion); color: #fff; }
         .lobby-link:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 3px; }
+        .profile-link {
+            min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center;
+            background: var(--vermilion); color: #fff; font-size: 11px; font-weight: 700;
+            border-radius: 4px; text-decoration: none; white-space: nowrap; transition: background .2s, transform .2s;
+        }
+        .profile-link:hover { background: #9c363d; transform: translateY(-1px); }
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
 
         .hero {
             min-height: 510px; height: min(66svh, 680px); position: relative; isolation: isolate;
@@ -160,12 +179,19 @@
             <span class="brand-name">Математика</span>
             <span class="brand-class">4 класс</span>
         </a>
+        <div class="class-switcher" role="group" aria-label="Выбор класса">
+            <span class="class-pill active" aria-current="page">4 класс</span>
+            <a href="math_9.html" class="class-pill">9 класс</a>
+        </div>
         <div class="nav-links">
             <a href="../tasks/tasks.html">Задачи</a>
             <a href="#trainers">Тренажёры</a>
             <a href="maths/math_tests.html">Тестирования</a>
         </div>
-        <a class="lobby-link" href="../index.html">← Вернуться в лобби</a>
+        <div class="nav-actions">
+            <a class="profile-link" href="../profile.html">Мой профиль</a>
+            <a class="lobby-link" href="../index.html">← Вернуться в лобби</a>
+        </div>
     </nav>
 
     <main>
