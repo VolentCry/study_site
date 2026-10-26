@@ -756,6 +756,13 @@
             </div>
 
             <div class="modal-body" id="modal-body-content">
+                <!-- Interactive Trainer Quick Launcher -->
+                <div id="modal-trainer-launch-wrap" style="display: none;">
+                    <a href="#" id="modal-trainer-link" class="modal-trainer-btn">
+                        <span id="modal-trainer-label">🎯 Перейти в тренажёр</span>
+                        <span>→</span>
+                    </a>
+                </div>
                 <!-- Topics summary -->
                 <div class="tested-topics-box" id="modal-tested-box">
                     <strong>Проверяемые темы:</strong> <span id="modal-tested-text"></span>
@@ -863,7 +870,7 @@
                     </div>
                     <div class="point-info">
                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                            <span class="point-score-tag">${data.score}</span>
+                            <span class="point-score-tag">${data.score}</span>${(id === 6 || id === 8) ? '<span class="point-score-tag" style="background:#e8f5e9; color:#2e7d32; border-color:rgba(46,125,50,.3);">🎯 Тренажёр</span>' : ''}
                             <span class="point-status-tag ${isStudied ? 'status-done' : 'status-ready'}">
                                 ${isStudied ? '✓ Изучено' : '📖 Теория'}
                             </span>
@@ -912,6 +919,22 @@
             document.getElementById('modal-task-title').textContent = data.title;
             document.getElementById('modal-task-subtitle').textContent = data.name;
             document.getElementById('modal-tested-text').textContent = data.tested;
+
+            // Interactive Trainer Button for Task 6 and Task 8
+            const trainerWrap = document.getElementById('modal-trainer-launch-wrap');
+            const trainerLink = document.getElementById('modal-trainer-link');
+            const trainerLabel = document.getElementById('modal-trainer-label');
+            if (taskId === 6) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_6_trainer.html';
+                trainerLabel.innerHTML = '🎯 Открыть интерактивный тренажёр Задания №6 (Дроби)';
+            } else if (taskId === 8) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_8_trainer.html';
+                trainerLabel.innerHTML = '⚡ Открыть интерактивный тренажёр Задания №8 (Степени и корни)';
+            } else {
+                trainerWrap.style.display = 'none';
+            }
 
             // Spoilers container
             const container = document.getElementById('modal-spoilers-container');

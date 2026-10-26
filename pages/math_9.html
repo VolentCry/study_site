@@ -124,6 +124,56 @@
             font-size: 11px; letter-spacing: .08em;
         }
 
+        /* OGE TRAINERS SHOWCASE */
+        .trainers-section {
+            padding: 56px 24px 64px; background: var(--paper-light); border-bottom: 1px solid var(--line);
+        }
+        .trainers-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 28px;
+        }
+        .trainer-card {
+            background: #fff; border-radius: 14px; padding: 28px 26px;
+            border: 1px solid var(--line); box-shadow: 0 4px 16px rgba(38,63,97,.06);
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: all .25s ease; position: relative; overflow: hidden;
+        }
+        .trainer-card:hover {
+            transform: translateY(-3px); border-color: var(--vermilion);
+            box-shadow: 0 10px 28px rgba(183,70,78,.15);
+        }
+        .trainer-card-top {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+        }
+        .trainer-badge {
+            font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+            padding: 4px 12px; border-radius: 999px; background: var(--vermilion-light); color: var(--vermilion);
+        }
+        .trainer-icon {
+            width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center;
+            background: rgba(38,63,97,.08); color: var(--indigo); font-size: 20px;
+        }
+        .trainer-card h3 {
+            font: 700 22px 'Zen Old Mincho', serif; color: var(--indigo); margin-bottom: 10px;
+        }
+        .trainer-card p {
+            font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; flex-grow: 1;
+        }
+        .trainer-tags {
+            display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .trainer-tag-chip {
+            font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f0f4f8; color: var(--indigo);
+            font-weight: 600;
+        }
+        .trainer-btn {
+            min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: var(--indigo); color: #fff; font-size: 13px; font-weight: 700;
+            text-decoration: none; border-radius: 8px; transition: all .2s;
+        }
+        .trainer-btn:hover {
+            background: var(--vermilion); box-shadow: 0 4px 14px rgba(183,70,78,.35);
+        }
+
         /* EXAM STRATEGY BANNER */
         .exam-strategy {
             padding: 56px 24px 60px; background: #eef2f5; border-bottom: 1px solid var(--line);
@@ -255,6 +305,7 @@
 
         <div class="nav-links">
             <a href="oge_roadmap.html" class="highlight">Роадмап ОГЭ</a>
+            <a href="#trainers">Тренажёры ОГЭ</a>
             <a href="#strategy">Критерии ОГЭ</a>
             <a href="#routes">Маршруты</a>
             <a href="maths/math_tests.html">Тестирования</a>
@@ -284,6 +335,65 @@
                 </div>
             </div>
             <span class="hero-caption">寺 · Путь мастерства — шаг за шагом</span>
+        </section>
+
+        <!-- OGE INTERACTIVE TRAINERS -->
+        <section class="trainers-section" id="trainers" aria-labelledby="trainers-title">
+            <div class="section-inner">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Практика ОГЭ · Интерактивные модули</p>
+                        <h2 id="trainers-title">Тренажёры заданий ОГЭ</h2>
+                    </div>
+                    <p class="section-note">Решай прототипы ФИПИ и СдамГИА, держи непрерывную серию правильных ответов и получай опыт XP.</p>
+                </div>
+
+                <div class="trainers-grid">
+                    <!-- TRAINER 6 -->
+                    <div class="trainer-card">
+                        <div>
+                            <div class="trainer-card-top">
+                                <span class="trainer-badge">Задание №6 · Алгебра</span>
+                                <div class="trainer-icon">➗</div>
+                            </div>
+                            <h3>Числа и вычисления</h3>
+                            <p>Все типы действий с обыкновенными дробями, составные многоэтажные дроби, десятичные числа и степени 10. Моментальная проверка и пошаговые разборы.</p>
+                            <div class="trainer-tags">
+                                <span class="trainer-tag-chip">ФИПИ 2026</span>
+                                <span class="trainer-tag-chip">Обыкновенные дроби</span>
+                                <span class="trainer-tag-chip">Многоэтажные</span>
+                                <span class="trainer-tag-chip">СдамГИА</span>
+                            </div>
+                        </div>
+                        <a href="../math_moduls/oge_task_6_trainer.html" class="trainer-btn">
+                            <span>Запустить тренажёр №6</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+
+                    <!-- TRAINER 8 -->
+                    <div class="trainer-card">
+                        <div>
+                            <div class="trainer-card-top">
+                                <span class="trainer-badge">Задание №8 · Алгебра</span>
+                                <div class="trainer-icon">⚡</div>
+                            </div>
+                            <h3>Степени и корни</h3>
+                            <p>Свойства степеней с целыми показателями, вычисления с арифметическими квадратными корнями, формулы сокращённого умножения (ФСУ) и буквенные выражения.</p>
+                            <div class="trainer-tags">
+                                <span class="trainer-tag-chip">ФИПИ 2026</span>
+                                <span class="trainer-tag-chip">Свойства степеней</span>
+                                <span class="trainer-tag-chip">Квадратные корни</span>
+                                <span class="trainer-tag-chip">ФСУ</span>
+                            </div>
+                        </div>
+                        <a href="../math_moduls/oge_task_8_trainer.html" class="trainer-btn">
+                            <span>Запустить тренажёр №8</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- EXAM STRATEGY / CRITERIA (FROM PDF) -->

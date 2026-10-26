@@ -3,351 +3,2122 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Знания — Образовательная платформа</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <title>НЕШкола: Интерактивная обсерватория знаний</title>
+    <meta name="description" content="НЕШкола - интерактивная платформа по физике, химии, математике (4 и 9 классы, ОГЭ), квантовой механике и астрономии с 3D-симуляциями." />
+    <link rel="canonical" href="http://127.0.0.1:4400/" />
+    
+    <!-- Open Graph / Meta -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="НЕШкола: Интерактивная обсерватория знаний" />
+    <meta property="og:description" content="Учись через осязаемые эксперименты, симуляции и роадмап подготовки к ОГЭ. Физика, квантовая механика, химия, математика и астрономия." />
+    <meta property="og:image" content="assets/images/main_page/block_1.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="НЕШкола: Интерактивная обсерватория знаний" />
+    <meta name="twitter:description" content="Образовательный полигон нового поколения с живыми физическими моделями и роадмапом ОГЭ." />
+    <meta name="twitter:image" content="assets/images/main_page/block_1.jpg" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22 fill=%22none%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7728%22/><circle cx=%2216%22 cy=%2216%22 r=%226%22 fill=%22%23ffffff%22/><ellipse cx=%2216%22 cy=%2216%22 rx=%2211%22 ry=%224%22 transform=%22rotate(-25 16 16)%22 stroke=%22%23ffffff%22 stroke-width=%221.8%22/></svg>" />
+
+    <!-- Pure WOFF2 Subsets (Zero TTF, Zero Bloat) -->
+    <link rel="stylesheet" href="assets/fonts/fonts.css" />
+
     <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      /* --- DESIGN TOKENS & RESET --- */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
       :root {
-        --cream:  #f7efe3;
-        --sand:   #ecdcc6;
-        --tan:    #c8956c;
-        --amber:  #d47c3a;
-        --orange: #e07c2a;
-        --brown:  #6b4a2b;
-        --brown2: #a46942;
-        --card:   #fffcf7;
-        --r:      16px;
+        --ground: #090c13;
+        --surface: #101522;
+        --surface-hover: #171f30;
+        --surface-glass: rgba(16, 21, 34, 0.88);
+        --ink: #f8fafc;
+        --muted: #b0bfd4; /* Super high contrast, passes strict WCAG AAA */
+        --muted-bright: #e2e8f0;
+        --line: rgba(255, 255, 255, 0.12);
+        --line-active: rgba(255, 255, 255, 0.25);
+        --accent: #ff7728;
+        --accent-glow: rgba(255, 119, 40, 0.28);
+        --accent-cyan: #2ce6d6;
+        --accent-cyan-glow: rgba(44, 230, 214, 0.22);
+        --curtain: #07090c;
+
+        --f-display: 'Unbounded', system-ui, sans-serif;
+        --f-body: 'Onest', system-ui, sans-serif;
+        --f-mono: 'JetBrains Mono', monospace;
+
+        --r-sm: 8px;
+        --r: 16px;
+        --r-lg: 24px;
+        --r-pill: 9999px;
+
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       }
-      html { scroll-behavior: smooth; }
-      body { font-family: 'Nunito', sans-serif; background: var(--cream); color: var(--brown); overflow-x: hidden; }
 
-      @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:none; } }
-      @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-      .reveal { opacity:0; transform:translateY(30px); transition: opacity .6s ease, transform .6s ease; }
-      .reveal.visible { opacity:1; transform:none; }
-      .reveal.d1.visible { transition-delay:.1s; }
-      .reveal.d2.visible { transition-delay:.2s; }
-      .reveal.d3.visible { transition-delay:.3s; }
-
-      /* NAV */
-      nav {
-        position:sticky; top:0; z-index:200;
-        background:rgba(247,239,227,.95); backdrop-filter:blur(12px);
-        border-bottom:1px solid var(--sand);
-        display:flex; align-items:center; padding:0 6%; height:70px; gap:2rem;
+      html {
+        background-color: var(--ground);
+        color: var(--ink);
+        font-family: var(--f-body);
+        font-size: 16px;
+        line-height: 1.55;
+        overflow-x: hidden;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
       }
-      .logo { display:flex; align-items:center; gap:10px; font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:var(--brown); text-decoration:none; }
-      .logo-icon { width:36px; height:36px; background:var(--amber); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.1rem; box-shadow:0 3px 10px rgba(212,124,58,.35); }
-      .nav-links { display:flex; gap:1.8rem; list-style:none; flex:1; margin-left:.5rem; }
-      .nav-links a { text-decoration:none; font-weight:600; font-size:.93rem; color:var(--brown2); opacity:.75; transition:opacity .2s; position:relative; padding-bottom:3px; }
-      .nav-links a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:2px; background:var(--amber); border-radius:2px; transition:width .3s; }
-      .nav-links a:hover, .nav-links a.active { opacity:1; }
-      .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
 
-      .btn { display:inline-flex; align-items:center; gap:.5rem; background:var(--orange); color:#fff; border:none; border-radius:50px; padding:.65rem 1.5rem; font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:700; cursor:pointer; text-decoration:none; white-space:nowrap; transition:background .25s, transform .2s, box-shadow .25s; box-shadow:0 4px 18px rgba(224,124,42,.28); }
-      .btn:hover { background:var(--amber); transform:translateY(-2px); box-shadow:0 8px 24px rgba(212,124,58,.38); }
-      .nav-profile { margin-left:auto; }
-      .btn-outline { background:transparent; color:var(--brown); border:2px solid var(--tan); box-shadow:none; }
-      .btn-outline:hover { background:var(--sand); transform:translateY(-2px); box-shadow:none; }
+      body {
+        background-color: var(--ground);
+        color: var(--ink);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
 
-      /* HERO */
-      .hero { display:grid; grid-template-columns:1fr 1fr; min-height:540px; overflow:hidden; }
-      .hero-left { display:flex; flex-direction:column; justify-content:center; padding:5rem 4% 5rem 6%; }
-      .hero-badge { display:inline-flex; align-items:center; gap:.5rem; background:rgba(212,124,58,.12); color:var(--amber); border-radius:50px; padding:.35rem 1rem; font-size:.82rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-bottom:1.4rem; animation:fadeUp .5s ease both; }
-      .hero-left h1 { font-family:'Playfair Display',serif; font-size:clamp(2.1rem,4vw,3.1rem); font-weight:800; line-height:1.18; color:var(--brown); animation:fadeUp .6s .1s ease both; }
-      .hero-left h1 em { font-style:italic; color:var(--amber); }
-      .hero-left p { margin-top:1.2rem; font-size:1.05rem; color:var(--brown2); line-height:1.75; opacity:.85; max-width:420px; animation:fadeUp .6s .2s ease both; }
-      .hero-actions { display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
-      .hero-stats { display:flex; gap:2rem; margin-top:2.8rem; animation:fadeUp .6s .4s ease both; }
-      .stat-val { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--brown); }
-      .stat-lbl { font-size:.8rem; color:var(--tan); font-weight:600; margin-top:.1rem; }
+      /* Focus styles for keyboard accessibility */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+      }
 
-      .hero-right { position:relative; overflow:hidden; }
-      .hero-img-main { width:100%; height:100%; object-fit:cover; display:block; animation:fadeIn .9s .15s ease both; }
-      .hero-right::before { content:''; position:absolute; inset:0; background:linear-gradient(to right, var(--cream) 0%, transparent 28%); z-index:1; }
-      .hero-card { position:absolute; bottom:2rem; right:1.5rem; z-index:2; background:rgba(255,252,247,.92); backdrop-filter:blur(8px); border-radius:14px; padding:1rem 1.2rem; box-shadow:0 8px 32px rgba(90,56,32,.18); display:flex; align-items:center; gap:.9rem; max-width:220px; animation:fadeUp .7s .5s ease both; }
-      .hero-card-icon { width:42px; height:42px; border-radius:10px; background:var(--amber); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.2rem; flex-shrink:0; }
-      .hct-label { font-size:.72rem; color:var(--tan); font-weight:600; }
-      .hct-val   { font-size:.92rem; font-weight:700; color:var(--brown); }
+      /* Skip link */
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        left: 20px;
+        z-index: 9999;
+        background: var(--accent);
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--r-sm);
+        font-weight: 700;
+        text-decoration: none;
+        transition: top 0.2s var(--ease-out);
+      }
+      .skip-link:focus {
+        top: 20px;
+      }
 
-      /* GENERIC SECTION */
-      section { padding:5rem 6%; }
-      .section-head { margin-bottom:2.8rem; }
-      .section-head h2 { font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3vw,2.2rem); font-weight:700; color:var(--brown); line-height:1.2; }
-      .section-head p { margin-top:.7rem; font-size:1rem; color:var(--brown2); opacity:.7; max-width:520px; line-height:1.7; }
-      .row { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+      /* Noise / Ambient Overlay */
+      .ambient-grid {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background-image: 
+          radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 119, 40, 0.12), transparent);
+        background-size: 32px 32px, 100% 100%;
+        opacity: 0.85;
+      }
 
-      /* CATEGORIES */
-      .categories { background:var(--sand); }
-      .cat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(148px, 1fr)); gap:1rem; }
-      .cat-card { background:var(--card); border-radius:var(--r); padding:1.4rem 1rem; text-align:center; cursor:pointer; transition:transform .3s, box-shadow .3s; border:1.5px solid transparent; box-shadow:0 2px 12px rgba(90,56,32,.07); }
-      .cat-card:hover { transform:translateY(-5px); box-shadow:0 10px 28px rgba(90,56,32,.14); border-color:var(--tan); }
-      .cat-emoji { font-size:1.8rem; margin-bottom:.7rem; }
-      .cat-card h3 { font-size:.9rem; font-weight:700; color:var(--brown); }
-      .cat-card span { font-size:.78rem; color:var(--tan); display:block; margin-top:.25rem; }
+      /* Layout Containers */
+      .shell {
+        max-width: 1340px;
+        margin: 0 auto;
+        padding: 0 clamp(1.25rem, 3.5vw, 3rem);
+        position: relative;
+        z-index: 2;
+      }
 
-      /* COURSES */
-      .course-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:1.6rem; }
+      /* --- NAVIGATION HEADER --- */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 500;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        background: var(--surface-glass);
+        border-bottom: 1px solid var(--line);
+        transition: border-color 0.3s;
+      }
 
-        .course-card { 
-            background: var(--card); 
-            border-radius: var(--r); 
-            overflow: hidden; 
-            box-shadow:0 2px 16px rgba(90,56,32,.08); 
-            transition:transform .3s, box-shadow .3s; 
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 74px;
+        gap: 1.5rem;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: var(--ink);
+        font-family: var(--f-display);
+        font-size: 1.125rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-beacon {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--r-sm);
+        background: linear-gradient(135deg, var(--accent), #ff4800);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px var(--accent-glow);
+        position: relative;
+        color: #ffffff;
+      }
+
+      .brand-beacon svg {
+        width: 20px;
+        height: 20px;
+        stroke: #ffffff;
+        display: block;
+      }
+
+      .brand-beacon::after {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 10px;
+        border: 1px solid var(--accent);
+        opacity: 0.5;
+        animation: pulseBeacon 2.5s infinite var(--ease-out);
+      }
+
+      @keyframes pulseBeacon {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.15); opacity: 0; }
+        100% { transform: scale(0.95); opacity: 0; }
+      }
+
+      .brand-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-family: var(--f-mono);
+        font-size: 0.68rem;
+        color: var(--accent-cyan);
+        background: rgba(44, 230, 214, 0.1);
+        padding: 0.15rem 0.55rem;
+        border-radius: var(--r-pill);
+        border: 1px solid rgba(44, 230, 214, 0.3);
+        font-weight: 600;
+      }
+
+      .status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 8px var(--accent-cyan);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+      }
+
+      .nav-item a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: var(--r-pill);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s, background 0.2s, transform 0.2s;
+        border: 1px solid transparent;
+      }
+
+      .nav-item a:hover {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--line);
+        transform: translateY(-1px);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+      }
+
+      .profile-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        background: linear-gradient(135deg, var(--surface), #181d2a);
+        border: 1px solid var(--line-active);
+        color: var(--ink);
+        padding: 0.55rem 1.15rem;
+        border-radius: var(--r-pill);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.25s var(--ease-out);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      }
+
+      .profile-cta-inner {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+
+      .profile-cta-icon {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        flex-shrink: 0;
+      }
+
+      .profile-cta:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px var(--accent-glow);
+      }
+
+      .xp-badge {
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        background: rgba(255, 119, 40, 0.18);
+        color: var(--accent);
+        padding: 0.15rem 0.5rem;
+        border-radius: var(--r-pill);
+        font-weight: 700;
+      }
+
+      /* Mobile Navigation Floating Dock */
+      .mobile-nav-dock {
+        display: none;
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 600;
+        background: rgba(16, 21, 34, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--line-active);
+        border-radius: var(--r-pill);
+        padding: 0.4rem 0.6rem;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+        gap: 0.35rem;
+      }
+
+      .mobile-dock-item {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.45rem 0.85rem;
+        border-radius: var(--r-pill);
+        text-decoration: none;
+        color: var(--muted-bright);
+        font-size: 0.72rem;
+        font-weight: 600;
+        font-family: var(--f-body);
+        gap: 0.25rem;
+        transition: background 0.2s, color 0.2s;
+      }
+
+      .mobile-dock-icon {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        fill: none;
+        display: block;
+        transition: transform 0.2s, stroke 0.2s;
+      }
+
+      .mobile-dock-item:hover, .mobile-dock-item:active {
+        background: rgba(255, 119, 40, 0.18);
+        color: #fff;
+      }
+
+      .mobile-dock-item:hover .mobile-dock-icon {
+        transform: translateY(-2px);
+        stroke: var(--accent);
+      }
+
+      /* --- BUTTONS --- */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        padding: 0.85rem 1.75rem;
+        border-radius: var(--r-pill);
+        font-family: var(--f-body);
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background-color 0.25s, border-color 0.25s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary {
+        background-color: #ff5c16;
+        background-image: linear-gradient(135deg, #ff833b 0%, #ff5c16 100%);
+        color: #ffffff;
+        border: 1px solid #ff7728;
+        box-shadow: 0 4px 20px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transform: translate(0, 0);
+      }
+
+      .btn-primary:hover {
+        background-color: #ff6b2b;
+        background-image: linear-gradient(135deg, #ff9557 0%, #ff6b2b 100%);
+        border-color: #ff9557;
+        transform: translate(0, -3px);
+        box-shadow: 0 8px 30px rgba(255, 119, 40, 0.45);
+      }
+
+      .btn-primary .btn-arrow {
+        transition: transform 0.25s var(--ease-out);
+      }
+
+      .btn-primary:hover .btn-arrow {
+        transform: translateX(4px);
+      }
+
+      .btn-secondary {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--ink);
+        border: 1px solid var(--line-active);
+        backdrop-filter: blur(8px);
+        transform: translate(0, 0);
+      }
+
+      .btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.35);
+        transform: translate(0, -2px);
+      }
+
+      /* --- HERO SECTION --- */
+      .hero-section {
+        position: relative;
+        min-height: calc(100vh - 74px);
+        display: flex;
+        align-items: center;
+        padding: clamp(3rem, 7vw, 6rem) 0 clamp(4rem, 8vw, 7rem);
+        overflow: hidden;
+      }
+
+      /* Interactive 3D Canvas Stage */
+      .canvas-container {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: auto;
+      }
+
+      #cosmic-stage {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 860px;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--line-active);
+        border-radius: var(--r-pill);
+        padding: 0.4rem 1.1rem;
+        font-family: var(--f-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 1.75rem;
+        backdrop-filter: blur(10px);
+        font-weight: 600;
+      }
+
+      .hero-title {
+        font-family: var(--f-display);
+        font-size: clamp(2.2rem, 5.2vw, 4.4rem);
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.035em;
+        color: var(--ink);
+        margin-bottom: 1.5rem;
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+
+      .hero-title .title-gradient {
+        background: linear-gradient(135deg, #ffffff 30%, #ff9557 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-lead {
+        font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+        line-height: 1.7;
+        color: var(--muted);
+        max-width: 680px;
+        margin-bottom: 2.5rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        margin-bottom: 3.5rem;
+      }
+
+      .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 1.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--line);
+        max-width: 680px;
+      }
+
+      .metric-value {
+        font-family: var(--f-display);
+        font-size: 1.85rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+      }
+
+      .metric-value span {
+        color: var(--accent);
+      }
+
+      .metric-label {
+        font-family: var(--f-mono);
+        font-size: 0.76rem;
+        color: var(--muted-bright);
+        margin-top: 0.2rem;
+        letter-spacing: 0.02em;
+        font-weight: 500;
+      }
+
+      /* --- KINETIC TICKER --- */
+      .ticker-ribbon {
+        background: #0c1018;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 0.85rem 0;
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+        z-index: 10;
+      }
+
+      .ticker-track {
+        display: inline-flex;
+        gap: 2.5rem;
+        animation: marqueeScroll 35s linear infinite;
+        will-change: transform;
+      }
+
+      .ticker-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-family: var(--f-mono);
+        font-size: 0.82rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .ticker-item strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .ticker-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      @keyframes marqueeScroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      /* --- SECTION COMMON --- */
+      .section-wrap {
+        padding: clamp(5rem, 9vw, 8.5rem) 0;
+        position: relative;
+        z-index: 5;
+      }
+
+      .section-header {
+        margin-bottom: clamp(2.5rem, 5vw, 4rem);
+      }
+
+      .section-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--f-mono);
+        font-size: 0.78rem;
+        color: var(--accent-cyan);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.8rem;
+        font-weight: 600;
+      }
+
+      .section-title {
+        font-family: var(--f-display);
+        font-size: clamp(1.85rem, 3.4vw, 2.75rem);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        max-width: 740px;
+      }
+
+      .section-desc {
+        margin-top: 1rem;
+        font-size: 1.05rem;
+        color: var(--muted);
+        max-width: 600px;
+        line-height: 1.7;
+      }
+
+      /* --- SUBJECTS ORBITAL GRID --- */
+      .subjects-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.5rem;
+      }
+
+      .subject-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: clamp(1.5rem, 2.8vw, 2.2rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        text-decoration: none;
+        overflow: hidden;
+        transition: transform 0.35s var(--ease-out), border-color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+      }
+
+      .subject-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 119, 40, 0.12), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.35s;
+        pointer-events: none;
+      }
+
+      .subject-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 119, 40, 0.4);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      .subject-card:hover::before {
+        opacity: 1;
+      }
+
+      /* Hero Subject: Math (Takes 8 cols) */
+      .card-math-hero {
+        grid-column: span 8;
+        background: linear-gradient(135deg, #171d2b 0%, #10141f 100%);
+        border: 1px solid rgba(255, 119, 40, 0.28);
+      }
+
+      .card-physics { grid-column: span 4; }
+      .card-astronomy { grid-column: span 4; }
+      .card-quantum { grid-column: span 4; }
+      .card-chemistry { grid-column: span 4; }
+      .card-english { grid-column: span 4; }
+      .card-informatics { grid-column: span 4; }
+      .card-biology { grid-column: span 4; }
+
+      .card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+      }
+
+      .subject-tag {
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        color: #f1f5f9;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.25rem 0.65rem;
+        border-radius: var(--r-pill);
+        border: 1px solid var(--line-active);
+        font-weight: 600;
+      }
+
+      .subject-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink);
+        transition: transform 0.3s var(--ease-spring), background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+      }
+
+      .subject-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        fill: none;
+        display: block;
+        transition: stroke 0.25s, transform 0.3s var(--ease-spring);
+      }
+
+      .subject-card:hover .subject-icon {
+        transform: scale(1.1) rotate(-3deg);
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+        box-shadow: 0 0 20px var(--accent-glow);
+      }
+
+      .subject-card:hover .subject-icon svg {
+        stroke: #ffffff;
+      }
+
+      .card-disabled:hover .subject-icon {
+        transform: none;
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--line);
+        color: var(--muted);
+        box-shadow: none;
+      }
+
+      .card-arrow svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        display: block;
+      }
+
+      .subject-body h3 {
+        font-family: var(--f-display);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.25;
+        margin-bottom: 0.6rem;
+      }
+
+      .card-math-hero .subject-body h3 {
+        font-size: clamp(1.5rem, 2.2vw, 1.95rem);
+      }
+
+      .subject-body p {
+        font-size: 0.94rem;
+        color: var(--muted);
+        line-height: 1.65;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-math-hero .sub-routes {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+
+      .sub-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.95rem;
+        border-radius: var(--r-pill);
+        font-family: var(--f-mono);
+        font-size: 0.76rem;
+        font-weight: 600;
+        background-color: rgba(255, 119, 40, 0.14);
+        color: #ffaa75;
+        border: 1px solid rgba(255, 119, 40, 0.3);
+        transform: translate(0, 0);
+        transition: transform 0.2s var(--ease-out), background-color 0.2s, color 0.2s, border-color 0.2s;
+        text-decoration: none;
+      }
+
+      .sub-badge:hover {
+        background-color: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+        transform: translate(0, -2px);
+      }
+
+      /* Editorial Roadmap Interactive Mini-Track inside Math Card */
+      .oge-mini-track {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .oge-step-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        padding: 0.3rem 0.65rem;
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        color: var(--muted-bright);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+
+      .oge-step-pill:hover {
+        background: rgba(44, 230, 214, 0.14);
+        border-color: var(--accent-cyan);
+        color: #fff;
+        transform: translateY(-1px);
+      }
+
+      .card-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--line);
+      }
+
+      .card-meta {
+        font-family: var(--f-mono);
+        font-size: 0.76rem;
+        color: var(--muted-bright);
+        font-weight: 500;
+      }
+
+      .card-arrow {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink);
+        font-size: 0.85rem;
+        transition: transform 0.25s var(--ease-out), background 0.25s;
+        text-decoration: none;
+      }
+
+      .subject-card:hover .card-arrow {
+        transform: translateX(4px);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      /* Card in development */
+      .card-disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+      .card-disabled:hover {
+        transform: none;
+        border-color: var(--line);
+        box-shadow: none;
+      }
+      .card-disabled:hover .subject-icon {
+        transform: none;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* --- PROVING GROUND / SIMULATION SHOWCASE --- */
+      .lab-section {
+        background: linear-gradient(180deg, var(--ground) 0%, #0d121c 50%, var(--ground) 100%);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .sim-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .sim-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.35s var(--ease-out), border-color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+      }
+
+      .sim-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(44, 230, 214, 0.45);
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+      }
+
+      .sim-media {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: #080a0f;
+      }
+
+      /* Holographic duotone overlay */
+      .sim-media::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(10, 13, 20, 0.15) 0%, rgba(10, 13, 20, 0.8) 100%),
+                    radial-gradient(circle at 80% 20%, rgba(44, 230, 214, 0.12), transparent 60%);
+        pointer-events: none;
+      }
+
+      .sim-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s var(--ease-out), filter 0.6s;
+        filter: brightness(0.9) contrast(1.05);
+      }
+
+      .sim-card:hover .sim-img {
+        transform: scale(1.06);
+        filter: brightness(1.05) contrast(1.1);
+      }
+
+      .sim-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        z-index: 2;
+        background: rgba(10, 13, 20, 0.88);
+        backdrop-filter: blur(8px);
+        font-family: var(--f-mono);
+        font-size: 0.7rem;
+        color: var(--accent-cyan);
+        padding: 0.25rem 0.65rem;
+        border-radius: var(--r-pill);
+        border: 1px solid rgba(44, 230, 214, 0.35);
+        font-weight: 600;
+      }
+
+      .sim-body {
+        padding: 1.4rem 1.6rem 1.6rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        justify-content: space-between;
+      }
+
+      .sim-title {
+        font-family: var(--f-display);
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.35;
+        margin-bottom: 0.6rem;
+      }
+
+      .sim-desc {
+        font-size: 0.88rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 1.2rem;
+      }
+
+      .sim-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: var(--f-mono);
+        font-size: 0.74rem;
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .sim-foot .sim-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .sim-card:hover .sim-action {
+        text-decoration: underline;
+      }
+
+      /* --- METHODOLOGY / COMPARISON --- */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+      }
+
+      .compare-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: 2rem;
+        position: relative;
+      }
+
+      .compare-num {
+        font-family: var(--f-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        margin-bottom: 1.2rem;
+        display: inline-block;
+        font-weight: 700;
+      }
+
+      .compare-card h3 {
+        font-family: var(--f-display);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 0.8rem;
+        line-height: 1.3;
+      }
+
+      .compare-card p {
+        font-size: 0.94rem;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      /* --- TASK BANK PROMO VAULT --- */
+      .vault-banner {
+        background: linear-gradient(135deg, #12211c 0%, #0d1714 60%, #151c28 100%);
+        border: 1px solid rgba(44, 230, 214, 0.25);
+        border-radius: var(--r-lg);
+        padding: clamp(2.5rem, 5vw, 4rem);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .vault-banner::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(44, 230, 214, 0.12) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .vault-content {
+        position: relative;
+        z-index: 2;
+        max-width: 640px;
+      }
+
+      .vault-tag {
+        font-family: var(--f-mono);
+        font-size: 0.75rem;
+        color: var(--accent-cyan);
+        background: rgba(44, 230, 214, 0.12);
+        padding: 0.3rem 0.8rem;
+        border-radius: var(--r-pill);
+        display: inline-block;
+        margin-bottom: 1.2rem;
+        border: 1px solid rgba(44, 230, 214, 0.3);
+        font-weight: 600;
+      }
+
+      .vault-title {
+        font-family: var(--f-display);
+        font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.2;
+        margin-bottom: 1rem;
+      }
+
+      .vault-desc {
+        font-size: 1.02rem;
+        color: rgba(248, 250, 252, 0.85);
+        line-height: 1.7;
+        margin-bottom: 2rem;
+      }
+
+      /* --- FOOTER AS GRAND FINALE --- */
+      .site-footer {
+        background: #07090d;
+        border-top: 1px solid var(--line);
+        padding: clamp(4rem, 8vw, 6rem) 0 2.5rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      .footer-top {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 4rem;
+      }
+
+      .footer-brand h2 {
+        font-family: var(--f-display);
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        margin-bottom: 1rem;
+        color: var(--ink);
+      }
+
+      .footer-brand p {
+        font-size: 0.95rem;
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 380px;
+      }
+
+      .footer-col h3 {
+        font-family: var(--f-mono);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+        margin-bottom: 1.25rem;
+      }
+
+      .footer-col ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .footer-col a {
+        font-size: 0.88rem;
+        color: var(--muted-bright);
+        text-decoration: none;
+        transition: color 0.2s, transform 0.2s;
+        display: inline-block;
+        padding: 0.35rem 0;
+        line-height: 1.3;
+      }
+
+      .footer-col a:hover {
+        color: var(--accent);
+        transform: translateX(3px);
+      }
+
+      .footer-bottom {
+        padding-top: 2rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        font-family: var(--f-mono);
+        font-size: 0.76rem;
+        color: var(--muted-bright);
+      }
+
+      .back-to-top {
+        background: transparent;
+        border: 1px solid var(--line-active);
+        color: var(--muted-bright);
+        padding: 0.5rem 1rem;
+        border-radius: var(--r-pill);
+        font-family: var(--f-mono);
+        font-size: 0.76rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .back-to-top:hover {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+
+      /* --- RESPONSIVE BREAKPOINTS --- */
+      @media (max-width: 1024px) {
+        .card-math-hero { grid-column: span 12; }
+        .card-physics, .card-astronomy, .card-quantum, .card-chemistry, .card-english, .card-informatics, .card-biology {
+          grid-column: span 6;
         }
-      .course-card:hover { 
-        transform: translateY(-6px); 
-        box-shadow:0 14px 36px rgba(90,56,32,.16); 
-    }
-      .course-img { width:100%; height:180px; object-fit:cover; display:block; }
-      .course-body { padding:1.2rem 1.4rem 1.4rem; }
-      .tag { display:inline-block; background:rgba(212,124,58,.12); color:var(--amber); border-radius:50px; padding:.2rem .75rem; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:.7rem; }
-      .course-body h3 { font-size:1rem; font-weight:700; color:var(--brown); line-height:1.4; margin-bottom:.5rem; }
-      .course-meta { display:flex; align-items:center; gap:1rem; font-size:.8rem; color:var(--tan); flex-wrap:wrap; }
-      .stars { color:var(--orange); }
-
-      /* HOW */
-      .how { background:var(--sand); }
-      .how-inner { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
-      .how-img-wrap { position:relative; border-radius:20px; overflow:hidden; }
-      .how-img { width:100%; height:420px; object-fit:cover; display:block; border-radius:20px; }
-      .how-badge { position:absolute; top:1.2rem; left:1.2rem; background:var(--card); border-radius:12px; padding:.8rem 1rem; box-shadow:0 4px 20px rgba(90,56,32,.18); display:flex; align-items:center; gap:.7rem; }
-      .how-badge .big { font-size:1.5rem; }
-      .how-badge .lbl { font-size:.78rem; color:var(--tan); font-weight:600; }
-      .how-badge .val { font-size:1rem; font-weight:800; color:var(--brown); }
-      .how-steps { display:flex; flex-direction:column; gap:1.4rem; }
-      .step { display:flex; gap:1.2rem; align-items:flex-start; background:var(--card); border-radius:14px; padding:1.2rem 1.4rem; box-shadow:0 2px 12px rgba(90,56,32,.07); transition:transform .3s; }
-      .step:hover { transform:translateX(6px); }
-      .step-num { width:42px; height:42px; border-radius:12px; background:var(--amber); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; flex-shrink:0; }
-      .step h4 { font-size:.97rem; font-weight:700; color:var(--brown); margin-bottom:.3rem; }
-      .step p  { font-size:.85rem; color:var(--brown2); opacity:.75; line-height:1.6; }
-
-      /* ARTICLES */
-      .articles-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; }
-      .art-big { grid-row:span 2; }
-      .art-card { background:var(--card); border-radius:var(--r); overflow:hidden; display:flex; flex-direction:column; box-shadow:0 2px 14px rgba(90,56,32,.08); transition:transform .3s, box-shadow .3s; }
-      .art-card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(90,56,32,.15); }
-      .art-img { width:100%; object-fit:cover; display:block; }
-      .art-big .art-img { height:300px; }
-      .art-sm  .art-img { height:155px; }
-      .art-body { padding:1.2rem 1.4rem 1.5rem; flex:1; }
-      .art-body h3 { font-family:'Playfair Display',serif; font-size:1.08rem; font-weight:700; color:var(--brown); line-height:1.35; margin:.55rem 0 .45rem; }
-      .art-big .art-body h3 { font-size:1.3rem; }
-      .art-body p { font-size:.85rem; color:var(--brown2); opacity:.7; line-height:1.6; }
-      .art-meta { font-size:.78rem; color:var(--tan); margin-top:.75rem; }
-
-      /* TESTIMONIALS */
-      .testi { background:var(--amber); }
-      .testi .section-head h2 { color:#fff; }
-      .testi .section-head p  { color:rgba(255,255,255,.8); }
-      .test-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.4rem; margin-top:2.5rem; }
-      .test-card { background:rgba(255,255,255,.16); backdrop-filter:blur(6px); border-radius:var(--r); padding:1.6rem; border:1px solid rgba(255,255,255,.2); transition:background .3s, transform .3s; }
-      .test-card:hover { background:rgba(255,255,255,.24); transform:translateY(-4px); }
-      .test-stars { color:#ffe8a0; font-size:.85rem; margin-bottom:.6rem; }
-      .test-card q { font-size:.9rem; color:rgba(255,255,255,.92); line-height:1.7; font-style:italic; display:block; }
-      .test-author { display:flex; align-items:center; gap:.9rem; margin-top:1.1rem; }
-      .test-avatar { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.45); flex-shrink:0; }
-      .test-name { font-weight:700; color:#fff; font-size:.92rem; }
-      .test-role { font-size:.76rem; color:rgba(255,255,255,.7); }
-
-      /* CTA */
-      .cta-strip { background:var(--brown); text-align:center; padding:5rem 6%; }
-      .cta-strip h2 { font-family:'Playfair Display',serif; font-size:2rem; color:#fff; margin-bottom:.8rem; }
-      .cta-strip p  { color:rgba(255,255,255,.6); font-size:1rem; margin-bottom:2rem; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.7; }
-      .cta-strip .btn { font-size:1rem; padding:.85rem 2.2rem; }
-
-      /* TASK BANK */
-      .bank-teaser { position:relative; display:grid; grid-template-columns:1fr auto; align-items:center; gap:2rem; overflow:hidden; padding:4rem 8%; background:#214a40; color:#fff7e8; }
-      .bank-teaser-copy { position:relative; z-index:1; max-width:620px; }
-      .bank-teaser h2 { font-family:'Playfair Display',serif; font-size:2.2rem; color:#fff7e8; line-height:1.2; }
-      .bank-teaser p { max-width:540px; margin-top:.7rem; color:rgba(255,247,232,.72); font-size:1rem; line-height:1.7; }
-      .bank-teaser .btn { margin-top:1.1rem; background:#e6ad42; color:#203b34; box-shadow:none; }
-      .bank-teaser .btn:hover { background:#f5cf72; }
-      .bank-emblem { position:relative; width:190px; height:150px; margin-right:4vw; }
-      .bank-emblem::before, .bank-emblem::after { position:absolute; bottom:12px; width:142px; height:66px; border:2px solid #edc45e; border-radius:50%; background:repeating-linear-gradient(0deg,#c9973e 0 9px,#f2ce70 10px 13px,#d7a843 14px 19px); content:''; }
-      .bank-emblem::before { left:5px; transform:rotate(-12deg); }
-      .bank-emblem::after { right:0; bottom:48px; transform:rotate(13deg); }
-      .bank-teaser::after { position:absolute; right:3%; bottom:-85px; width:330px; height:180px; border:1px solid rgba(245,207,114,.18); border-radius:50%; content:''; }
-
-      /* FOOTER */
-      footer { background:var(--brown); border-top:1px solid rgba(255,255,255,.08); padding:1.8rem 6%; display:flex; align-items:center; flex-wrap:wrap; gap:1.5rem; }
-      .footer-copy { font-size:.83rem; color:rgba(255,255,255,.4); margin-right:auto; }
-      .social-links { display:flex; gap:.7rem; }
-      .social-links a { width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.6); text-decoration:none; font-size:.9rem; transition:all .2s; }
-      .social-links a:hover { border-color:#fff; color:#fff; }
-      .footer-nav { display:flex; gap:1.5rem; }
-      .footer-nav a { font-size:.82rem; color:rgba(255,255,255,.4); text-decoration:none; transition:color .2s; }
-      .footer-nav a:hover { color:rgba(255,255,255,.85); }
-
-      @media (max-width:900px) {
-        .hero { grid-template-columns:1fr; }
-        .hero-right { height:280px; }
-        .hero-right::before { background:linear-gradient(to bottom, var(--cream) 0%, transparent 40%); }
-        .how-inner { grid-template-columns:1fr; }
-        .articles-grid { grid-template-columns:1fr; }
-        .art-big { grid-row:span 1; }
+        .compare-grid { grid-template-columns: 1fr; }
+        .footer-top { grid-template-columns: 1fr 1fr; }
       }
-      @media (max-width:640px) {
-        .nav-links { display:none; }
-        section { padding:3.5rem 4%; }
-        nav { padding:0 4%; }
-        .nav-profile { padding:.55rem .9rem; font-size:.82rem; }
-        .bank-teaser { grid-template-columns:1fr; gap:1rem; padding:3.5rem 6%; }
-        .bank-teaser h2 { font-size:1.8rem; }
-        .bank-emblem { position:absolute; right:-55px; bottom:-8px; width:150px; height:115px; opacity:.55; }
+
+      /* MOBILE RESTRUCTURE (390px & SMALL SCREENS) */
+      @media (max-width: 768px) {
+        .nav-links { display: none; }
+        .mobile-nav-dock { display: flex; }
+        .shell { padding: 0 1.25rem; }
+        .hero-section { min-height: auto; padding: 2.75rem 0 3.75rem; }
+        
+        .hero-title {
+          font-size: clamp(2rem, 9vw, 2.75rem);
+          line-height: 1.12;
+          word-break: normal;
+          overflow-wrap: break-word;
+        }
+
+        .hero-actions {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.85rem;
+        }
+        .hero-actions .btn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .hero-metrics {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.25rem 1rem;
+          width: 100%;
+        }
+
+        /* SINGLE-COLUMN FLOW PREVENTS SQUISHED SQUEEZE */
+        .subjects-grid {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 1.25rem !important;
+          width: 100% !important;
+        }
+
+        .subject-card,
+        .card-math-hero,
+        .card-physics,
+        .card-astronomy,
+        .card-quantum,
+        .card-chemistry,
+        .card-english,
+        .card-informatics,
+        .card-biology {
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
+
+        .sim-grid { grid-template-columns: 1fr; }
+        .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+        .footer-bottom { 
+          flex-direction: column; 
+          align-items: flex-start; 
+          gap: 1rem;
+          padding-bottom: 4rem; /* Safe padding above mobile nav dock */
+        }
+      }
+
+      /* PREFERS-REDUCED-MOTION */
+      @media (prefers-reduced-motion: reduce) {
+        .ticker-track { animation: none; }
+        .brand-beacon::after { animation: none; }
+        .subject-card, .btn, .sim-card, .sim-img { transition: none !important; }
       }
     </style>
   </head>
 
   <body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main" class="skip-link">Skip to main content // Перейти к содержанию</a>
 
+    <!-- Subtle ambient grid backdrop -->
+    <div class="ambient-grid" aria-hidden="true"></div>
 
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="logo">
-      <div class="logo-icon">📚</div>
-      НЕШкола
-    </a>
-    <a href="profile.html" class="btn nav-profile">Мой профиль</a>
-  </nav>
-
-  <!-- HERO -->
-  <section style="padding:0" class="hero">
-    <div class="hero-left">
-      <div class="hero-badge">✦ Образовательная платформа</div>
-      <h1>Учись новому —<br>расти <em>каждый день</em></h1>
-      <div class="hero-actions">
-        <a href="#categories" class="btn">Перейти к направлениям</a>
-      </div>
-      <div class="hero-stats">
-        <div>
-            <div class="stat-val">
-                150+
-            </div>
-            <div class="stat-lbl">
-                Материалов
-            </div>
-        </div>
-        <div>
-            <div class="stat-val">
-                8
-            </div>
-            <div class="stat-lbl">
-                Направлений
-            </div>
-        </div>
-      </div>
-    </div>
-    <div class="hero-right">
-      <!-- Unsplash: group of students studying together -->
-      <img class="hero-img-main"
-        src="assets/images/main_page/block_1.jpg"
-        alt="Студенты учатся вместе" />
-    </div>
-  </section>
-
-  <!-- CATEGORIES -->
-  <section class="categories" id="categories">
-    <div class="section-head reveal">
-      <h2>Что мы предлагаем</h2>
-      <p>Выбери направление именно для тебя!</p>
-    </div>
-    <div class="cat-grid">
-        <a href="#" style="text-decoration:none;">
-        <!-- <a href="pages/informatics.html" style="text-decoration:none;"> -->
-            <div class="cat-card reveal d1">
-                <div class="cat-emoji">💻</div>
-                <h3>Информатика</h3>
-                <span>В разработке...</span>
-            </div>
+    <!-- SITE NAVIGATION HEADER -->
+    <header class="site-header" role="banner">
+      <div class="shell header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-beacon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.2)"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-25 12 12)"/>
+            </svg>
+          </div>
+          <span>НЕШКОЛА</span>
+          <span class="brand-status">
+            <span class="status-dot"></span>
+            LIVE
+          </span>
         </a>
-      <a href="pages/physics.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🚀</div><h3>Физика</h3><span>24 материала</span></div></a>
-      <a href="pages/chemistry.html" style="text-decoration:none;"><div class="cat-card reveal d3"><div class="cat-emoji">⚗️</div><h3>Химия</h3><span>21 материал</span></div></a>
-      <a href="pages/math_4.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">🧠</div><h3>Математика</h3><span>4 и 9 классы · ОГЭ</span></div></a>
-      <a href="#" style="text-decoration:none;">
-      <!-- <a href="pages/biology.html" style="text-decoration:none;"> -->
-        <div class="cat-card reveal d2">
-          <div class="cat-emoji">🌿</div>
-          <h3>Биология</h3>
-          <span>В разработке...</span>
+
+        <nav class="site-nav" aria-label="Основная навигация">
+          <ul class="nav-links">
+            <li class="nav-item"><a href="#subjects">Дисциплины</a></li>
+            <li class="nav-item"><a href="#lab">Лаборатория</a></li>
+            <li class="nav-item"><a href="#methodology">Подход</a></li>
+            <li class="nav-item"><a href="bank_tasks.html">Банк задач</a></li>
+          </ul>
+        </nav>
+
+        <div class="nav-actions">
+          <a href="profile.html" class="profile-cta" id="header-profile-link">
+            <span class="profile-cta-inner">
+              <svg class="profile-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Мой профиль
+            </span>
+            <span class="xp-badge" id="header-xp-badge">XP +0</span>
+          </a>
         </div>
+      </div>
+    </header>
+
+    <!-- FLOATING DOCK FOR MOBILE VISITORS -->
+    <nav class="mobile-nav-dock" aria-label="Мобильная навигация">
+      <a href="#subjects" class="mobile-dock-item">
+        <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" fill-opacity="0.2"/>
+        </svg>
+        <span>Дисциплины</span>
       </a>
-      <a href="pages/quantum_physics.html" style="text-decoration:none;"><div class="cat-card reveal d3"><div class="cat-emoji">⚛️</div><h3>Квантовая физика</h3><span>12 материалов</span></div></a>
-      <a href="pages/english_4.html" style="text-decoration:none;"><div class="cat-card reveal d1"><div class="cat-emoji">✍️</div><h3>Английский</h3><span>19 материалов</span></div></a>
-      <a href="pages/astronomy.html" style="text-decoration:none;"><div class="cat-card reveal d2"><div class="cat-emoji">🌌</div><h3>Астрономия</h3><span>22 материала</span></div></a>
-    </div>
-  </section>
+      <a href="#lab" class="mobile-dock-item">
+        <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 2v6L4.5 17.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2"/>
+          <line x1="8" y1="2" x2="16" y2="2"/>
+          <line x1="6.8" y1="14" x2="17.2" y2="14"/>
+        </svg>
+        <span>Лаборатория</span>
+      </a>
+      <a href="bank_tasks.html" class="mobile-dock-item">
+        <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        </svg>
+        <span>Банк</span>
+      </a>
+      <a href="profile.html" class="mobile-dock-item">
+        <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Профиль</span>
+      </a>
+    </nav>
 
-  <!-- COURSES -->
-  <section id="courses">
-    <div class="section-head row">
-      <div class="reveal">
-          <h2>Это тебя заинтересует!</h2>
-          <p>Мы подготовили большое количество разных интерактивных инструментов, чтобы вам было интереснее познавать мир!</p>
-      </div>
-      <a href="pages/all_tools.html" class="btn reveal">Все наши плюшки</a>
-    </div>
+    <!-- MAIN LANDMARK -->
+    <main id="main">
+      <!-- HERO POSTER SECTION -->
+      <section class="hero-section" aria-labelledby="hero-heading">
+        <!-- Interactive 3D Depth Canvas Stage for Orbital Physics -->
+        <div class="canvas-container" aria-hidden="true">
+          <canvas id="cosmic-stage" width="1200" height="700"></canvas>
+        </div>
 
-    <div class="course-grid">
-        <a href="pages/astronomy/solar_system_3D_model.html" style="text-decoration:none;">
-            <div class="course-card reveal d1">
-                <img class="course-img"
-                src="assets/images/main_page/solar_system_model.jpg"
-                alt="UX-дизайн" />
-                <div class="course-body">
-                <span class="tag">Астрономия</span>
-                <h3>Симуляция солнечной системы</h3>
-                </div>
+        <div class="shell">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span>✦</span> Образовательный полигон нового поколения
             </div>
-        </a>
 
-      <a href="#" style="text-decoration:none;"><div class="course-card reveal d2">
-        <img class="course-img"
-          src="assets/images/main_page/atoms.jpg"
-          alt="Python курс" />
-        <div class="course-body">
-          <span class="tag">Физика</span>
-          <h3>Изучаем атом изнутри - Симуляция любого атома!</h3>
-        </div>
-      </div></a>
-      <a href="#" style="text-decoration:none;"><div class="course-card reveal d3">
-        <img class="course-img"
-          src="assets/images/main_page/chemistry.jpg"
-          alt="Продуктивность" />
-        <div class="course-body">
-          <span class="tag">Химия</span>
-          <h3>Интерактивная таблица Менделеева</h3>
-        </div>
-      </div></a>
-      <a href="#" style="text-decoration:none;"><div class="course-card reveal d3">
-        <img class="course-img"
-          src="assets/images/main_page/math.jpg"
-          alt="Продуктивность" />
-        <div class="course-body">
-          <span class="tag">Квантовая физика</span>
-          <h3>Волновая функция своими руками!</h3>
-        </div>
-      </div></a>
-    </div>
-  </section>
+            <h1 id="hero-heading" class="hero-title">
+              НЕШкола : <br />
+              <span class="title-gradient">знания в движении</span>
+            </h1>
 
-  <section class="bank-teaser" aria-labelledby="bank-teaser-title">
-    <div class="bank-teaser-copy reveal">
-      <h2 id="bank-teaser-title">Банк задач</h2>
-      <p>Задачи собраны в одном месте: выбирай тему, решай и пополняй свою копилку знаний.</p>
-      <a href="bank_tasks.html" class="btn">Открыть банк <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="bank-emblem" aria-hidden="true"></div>
-  </section>
+            <p class="hero-lead">
+              Мы превратили школьную программу в интерактивную обсерваторию. 
+              Исследуй физику через квантовые симуляторы, готовься к ОГЭ по математике с пошаговым роадмапом и решай задачи без скучной зубрежки.
+            </p>
 
-  <script>
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-  </script>
+            <div class="hero-actions">
+              <a href="#subjects" class="btn btn-primary">
+                <span>Исследовать дисциплины</span>
+                <span class="btn-arrow" aria-hidden="true">↓</span>
+              </a>
+              <a href="#lab" class="btn btn-secondary">
+                <span>3D-Симуляторы</span>
+                <span aria-hidden="true">✦</span>
+              </a>
+            </div>
+
+            <div class="hero-metrics">
+              <div class="metric-item">
+                <div class="metric-value">150<span>+</span></div>
+                <div class="metric-label">Интерактивных материалов</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-value">8</div>
+                <div class="metric-label">Научных направлений</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-value">20</div>
+                <div class="metric-label">Тем роадмапа ОГЭ 2026</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-value">100<span>%</span></div>
+                <div class="metric-label">Практика и наглядность</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- KINETIC TICKER RIBBON -->
+      <div class="ticker-ribbon" aria-hidden="true">
+        <div class="ticker-track">
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>ОГЭ Математика 9 класс</strong> // 20 тем роадмапа со спойлерами теории</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Астрономия</strong> // 3D-модель солнечной системы</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Квантовая физика</strong> // Симуляция волновой функции</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Физика частиц</strong> // Строение любого атома изнутри</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Химия</strong> // Интерактивная таблица Менделеева</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Математика 4 класс</strong> // Дроби и логические тренажеры</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Банк задач</strong> // Прокачка ранга и серии дней</div>
+          <!-- Loop duplicate for seamless marquee -->
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>ОГЭ Математика 9 класс</strong> // 20 тем роадмапа со спойлерами теории</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Астрономия</strong> // 3D-модель солнечной системы</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Квантовая физика</strong> // Симуляция волновой функции</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Физика частиц</strong> // Строение любого атома изнутри</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Химия</strong> // Интерактивная таблица Менделеева</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Математика 4 класс</strong> // Дроби и логические тренажеры</div>
+          <div class="ticker-item"><span class="ticker-dot"></span> <strong>Банк задач</strong> // Прокачка ранга и серии дней</div>
+        </div>
+      </div>
+
+      <!-- SUBJECTS ORBITAL GRID -->
+      <section id="subjects" class="section-wrap" aria-labelledby="subjects-title">
+        <div class="shell">
+          <div class="section-header">
+            <div class="section-eyebrow">01 // Дисциплины</div>
+            <h2 id="subjects-title" class="section-title">Карта направлений: выбери свою орбиту</h2>
+            <p class="section-desc">
+              Каждый раздел содержит не просто параграфы из учебников, а интерактивные тренажеры, разборы задач и пошаговые роадмапы.
+            </p>
+          </div>
+
+          <div class="subjects-grid">
+            <!-- HERO CARD: MATHEMATICS (4 & 9 GRADE + OGE ROADMAP) -->
+            <article class="subject-card card-math-hero">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">Ключевое направление</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M19 5H5l7 7-7 7h14"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Математика // 4 и 9 классы</h3>
+                  <p>
+                    Два полноценных уровня: наглядные тренажеры дробей для 4 класса и интерактивный роадмап подготовки к ОГЭ для 9 класса с 20 практическими заданиями и спойлерами формул.
+                  </p>
+
+                  <!-- Editorial Interactive Roadmap Mini-Cluster -->
+                  <div class="oge-mini-track" aria-label="Ключевые блоки роадмапа ОГЭ">
+                    <a href="pages/oge_roadmap.html" class="oge-step-pill"><span>01-05</span> Практика расчетов</a>
+                    <a href="pages/oge_roadmap.html" class="oge-step-pill"><span>06-14</span> Алгебра и графики</a>
+                    <a href="pages/oge_roadmap.html" class="oge-step-pill"><span>15-19</span> Геометрия ОГЭ</a>
+                    <a href="pages/oge_roadmap.html" class="oge-step-pill"><span>20-25</span> Сложная часть</a>
+                  </div>
+
+                  <div class="sub-routes">
+                    <a href="pages/math_4.html" class="sub-badge">4 класс · Тренажеры →</a>
+                    <a href="pages/math_9.html" class="sub-badge">9 класс · Роадмап ОГЭ →</a>
+                    <a href="math_moduls/oge_task_6_trainer.html" class="sub-badge">Тренажёр №6 ➗</a>
+                    <a href="math_moduls/oge_task_8_trainer.html" class="sub-badge">Тренажёр №8 ⚡</a>
+                  </div>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">2 уровня · 20 заданий ОГЭ</span>
+                <a href="pages/math_9.html" class="card-arrow" aria-label="Перейти в раздел Математика">→</a>
+              </div>
+            </article>
+
+            <!-- PHYSICS -->
+            <a href="pages/physics.html" class="subject-card card-physics">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">Естествознание</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                      <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Физика</h3>
+                  <p>24 материала: механика, динамика, оптика и термодинамика. Реальные физические процессы в действии.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">24 материала</span>
+                <span class="card-arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- ASTRONOMY -->
+            <a href="pages/astronomy.html" class="subject-card card-astronomy">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">Космос</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="6"/>
+                      <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/>
+                      <path d="M19 5h.01M5 19h.01M18 18h.01"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Астрономия</h3>
+                  <p>22 материала: планеты Солнечной системы, звездная эволюция и интерактивная 3D-модель орбит.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">22 материала · 3D</span>
+                <span class="card-arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- QUANTUM PHYSICS -->
+            <a href="pages/quantum_physics.html" class="subject-card card-quantum">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">Микромир</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                      <ellipse cx="12" cy="12" rx="10" ry="4.5"/>
+                      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(60 12 12)"/>
+                      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(120 12 12)"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Квантовая физика</h3>
+                  <p>12 материалов: корпускулярно-волновой дуализм, волновая функция и поведение субатомных частиц.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">12 материалов</span>
+                <span class="card-arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- CHEMISTRY -->
+            <a href="pages/chemistry.html" class="subject-card card-chemistry">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">Вещество</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 2v6L4.5 17.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2"/>
+                      <line x1="8" y1="2" x2="16" y2="2"/>
+                      <line x1="6.8" y1="14" x2="17.2" y2="14"/>
+                      <circle cx="10" cy="17" r="1" fill="currentColor"/>
+                      <circle cx="13" cy="18" r="1" fill="currentColor"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Химия</h3>
+                  <p>21 материал: интерактивная таблица Менделеева, реакции, электронные оболочки и формулы соединений.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">21 материал</span>
+                <span class="card-arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+                <span class="card-arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- ENGLISH -->
+            <a href="pages/english_4.html" class="subject-card card-english">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">Языки</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                      <path d="M8 7h8M8 11h6"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Английский язык</h3>
+                  <p>19 интерактивных упражнений для начальной школы: предлоги, лексика, грамматика в игровой форме.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">19 материалов · 4 класс</span>
+                <span class="card-arrow" aria-hidden="true">→</span>
+              </div>
+            </a>
+
+            <!-- INFORMATICS (IN DEV) -->
+            <div class="subject-card card-informatics card-disabled">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">В лаборатории</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="16 18 22 12 16 6"/>
+                      <polyline points="8 6 2 12 8 18"/>
+                      <line x1="14" y1="4" x2="10" y2="20"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Информатика</h3>
+                  <p>Алгоритмы, логика, основы Python и подготовка к экзаменам. Модуль находится в стадии сборки.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">Скоро запуск</span>
+                <span class="card-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- BIOLOGY (IN DEV) -->
+            <div class="subject-card card-biology card-disabled">
+              <div>
+                <div class="card-top">
+                  <span class="subject-tag">В лаборатории</span>
+                  <div class="subject-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 20A7 7 0 0 1 4 13c0-4 3-7.5 7-8 4 .5 7 4 7 8a7 7 0 0 1-7 7z"/>
+                      <path d="M11 20v-9"/>
+                      <path d="M11 15c2-1 3.5-3 3.5-3"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="subject-body">
+                  <h3>Биология</h3>
+                  <p>Клеточное строение, фотосинтез, генетика и анатомия. Модуль находится в стадии сборки.</p>
+                </div>
+              </div>
+              <div class="card-foot">
+                <span class="card-meta">Скоро запуск</span>
+                <span class="card-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROVING GROUND / SIMULATORS SHOWCASE -->
+      <section id="lab" class="section-wrap lab-section" aria-labelledby="lab-title">
+        <div class="shell">
+          <div class="section-header">
+            <div class="section-eyebrow">02 // Интерактивная лаборатория</div>
+            <h2 id="lab-title" class="section-title">Потрогай законы природы своими руками</h2>
+            <p class="section-desc">
+              Вместо заучивания формул из учебника - живые физические и математические песочницы. Меняй параметры и наблюдай за реакцией.
+            </p>
+          </div>
+
+          <div class="sim-grid">
+            <!-- 3D SOLAR SYSTEM -->
+            <a href="pages/astronomy/solar_system_3D_model.html" class="sim-card">
+              <div class="sim-media">
+                <span class="sim-badge">3D WebGL</span>
+                <img src="assets/images/main_page/solar_system_model.jpg" alt="3D модель солнечной системы" class="sim-img" width="600" height="400" loading="lazy" />
+              </div>
+              <div class="sim-body">
+                <div>
+                  <h3 class="sim-title">3D-модель Солнечной системы</h3>
+                  <p class="sim-desc">Полноценная пространственная симуляция: реальные масштабы, орбиты планет и гравитационная механика.</p>
+                </div>
+                <div class="sim-foot">
+                  <span>Астрономия</span>
+                  <span class="sim-action">Запустить симуляцию →</span>
+                </div>
+              </div>
+            </a>
+
+            <!-- ATOM SIMULATOR -->
+            <a href="pages/physics.html" class="sim-card">
+              <div class="sim-media">
+                <span class="sim-badge">Физика</span>
+                <img src="assets/images/main_page/atoms.jpg" alt="Строение атома изнутри" class="sim-img" width="600" height="400" loading="lazy" />
+              </div>
+              <div class="sim-body">
+                <div>
+                  <h3 class="sim-title">Строение атома изнутри</h3>
+                  <p class="sim-desc">Изучай электроны, протоны и нейтроны. Собери атом любого химического элемента своими руками.</p>
+                </div>
+                <div class="sim-foot">
+                  <span>Физика частиц</span>
+                  <span class="sim-action">Исследовать →</span>
+                </div>
+              </div>
+            </a>
+
+            <!-- PERIODIC TABLE -->
+            <a href="pages/chemistry.html" class="sim-card">
+              <div class="sim-media">
+                <span class="sim-badge">Химия</span>
+                <img src="assets/images/main_page/chemistry.jpg" alt="Интерактивная таблица Менделеева" class="sim-img" width="600" height="400" loading="lazy" />
+              </div>
+              <div class="sim-body">
+                <div>
+                  <h3 class="sim-title">Интерактивная таблица Менделеева</h3>
+                  <p class="sim-desc">Свойства элементов, атомные радиусы, валентности и электронные конфигурации в наглядном интерфейсе.</p>
+                </div>
+                <div class="sim-foot">
+                  <span>Химия</span>
+                  <span class="sim-action">Открыть таблицу →</span>
+                </div>
+              </div>
+            </a>
+
+            <!-- WAVE FUNCTION -->
+            <a href="pages/quantum_physics.html" class="sim-card">
+              <div class="sim-media">
+                <span class="sim-badge">Кванты</span>
+                <img src="assets/images/main_page/math.jpg" alt="Волновая функция квантовых систем" class="sim-img" width="600" height="400" loading="lazy" />
+              </div>
+              <div class="sim-body">
+                <div>
+                  <h3 class="sim-title">Волновая функция квантовых систем</h3>
+                  <p class="sim-desc">Почувствуй вероятностную природу микромира: уравнение Шрёдингера, дифракция и суперпозиция.</p>
+                </div>
+                <div class="sim-foot">
+                  <span>Микромир</span>
+                  <span class="sim-action">Войти в лабораторию →</span>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div style="text-align: center;">
+            <a href="pages/all_tools.html" class="btn btn-secondary">
+              <span>Все интерактивные инструменты и плюшки</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- METHODOLOGY & APPROACH -->
+      <section id="methodology" class="section-wrap" aria-labelledby="methodology-title">
+        <div class="shell">
+          <div class="section-header">
+            <div class="section-eyebrow">03 // Философия обучения</div>
+            <h2 id="methodology-title" class="section-title">Почему НЕШкола работает иначе</h2>
+            <p class="section-desc">
+              Мы создали платформу, свободную от скучной школьной бюрократии. Знания должны вызывать любопытство, а не зевоту.
+            </p>
+          </div>
+
+          <div class="compare-grid">
+            <div class="compare-card">
+              <span class="compare-num">01 / ЭКСПЕРИМЕНТ</span>
+              <h3>От заучивания к пониманию</h3>
+              <p>В обычной школе формулу требуют вызубрить к контрольной. В НЕШколе ты двигаешь физические ползунки параметров и сам видишь, почему формула работает именно так.</p>
+            </div>
+
+            <div class="compare-card">
+              <span class="compare-num">02 / РОАДМАПЫ</span>
+              <h3>Пошаговая структура без хаоса</h3>
+              <p>Каждая сложная тема разбита на логическую карту шагов. Например, роадмап ОГЭ 9 класса содержит 20 отдельных заданий со скрытыми спойлерами для честной самопроверки.</p>
+            </div>
+
+            <div class="compare-card">
+              <span class="compare-num">03 / ГЕЙМИФИКАЦИЯ</span>
+              <h3>Прогресс, серии и награды</h3>
+              <p>За решение задач в тренажерах начисляется опыт (XP), а серии ежедневных занятий открывают уникальные награды и подарки в профиле на 50-й день серии.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TASK BANK & GAMIFICATION PROMO -->
+      <section class="section-wrap" style="padding-top: 0;" aria-label="Банк задач и Профиль">
+        <div class="shell">
+          <div class="vault-banner">
+            <div class="vault-content">
+              <span class="vault-tag">База практики</span>
+              <h2 class="vault-title">Банк задач // Практикуйся в любое время</h2>
+              <p class="vault-desc">
+                Сотни тренировочных заданий с моментальной проверкой. Решай задачи по физике, химии и математике, повышай ранг исследователя и открывай секретные подарки в личном профиле.
+              </p>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="bank_tasks.html" class="btn btn-primary">
+                  <span>Открыть банк задач</span>
+                  <span class="btn-arrow" aria-hidden="true">→</span>
+                </a>
+                <a href="profile.html" class="btn btn-secondary">
+                  <span>Посмотреть свои награды</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER AS GRAND FINALE -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="shell">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <h2>НЕШКОЛА</h2>
+            <p>
+              Интерактивная образовательная платформа. 
+              Наука, физика, химия, астрономия и математика в осязаемом и понятном формате.
+            </p>
+          </div>
+
+          <div class="footer-col">
+            <h3>Дисциплины</h3>
+            <ul>
+              <li><a href="pages/math_4.html">Математика 4 класс</a></li>
+              <li><a href="pages/math_9.html">Математика 9 класс (ОГЭ)</a></li>
+              <li><a href="pages/physics.html">Физика</a></li>
+              <li><a href="pages/chemistry.html">Химия</a></li>
+              <li><a href="pages/astronomy.html">Астрономия</a></li>
+              <li><a href="pages/quantum_physics.html">Квантовая физика</a></li>
+              <li><a href="pages/english_4.html">Английский язык</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h3>Инструменты</h3>
+            <ul>
+              <li><a href="math_moduls/oge_task_6_trainer.html">Тренажёр ОГЭ №6 (Дроби)</a></li>
+              <li><a href="math_moduls/oge_task_8_trainer.html">Тренажёр ОГЭ №8 (Степени)</a></li>
+              <li><a href="pages/all_tools.html">Все симуляторы</a></li>
+              <li><a href="pages/astronomy/solar_system_3D_model.html">3D Солнечная система</a></li>
+              <li><a href="bank_tasks.html">Банк задач</a></li>
+              <li><a href="profile.html">Мой профиль и XP</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h3>Навигация</h3>
+            <ul>
+              <li><a href="#subjects">Карта направлений</a></li>
+              <li><a href="#lab">Лаборатория</a></li>
+              <li><a href="#methodology">Методика обучения</a></li>
+              <li><a href="profile.html">Серии и звания</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div>
+            © 2026 НЕШкола. Сделано для ума и открытий.
+          </div>
+          <div>
+            55°45′N 37°37′E // ОРБИТАЛЬНЫЙ ДВИЖОК // ZERO DRY ROUTINE
+          </div>
+          <button class="back-to-top" id="btn-back-to-top" aria-label="Вернуться наверх">
+            ↑ Наверх
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <!-- INTERACTIVE SCRIPTS & 3D DEPTH CANVAS KINETIC ENGINE -->
+    <script>
+      (function() {
+        // --- 1. USER XP SYNCHRONIZATION ---
+        try {
+          const storedXP = localStorage.getItem('user_xp');
+          const headerBadge = document.getElementById('header-xp-badge');
+          if (storedXP && headerBadge) {
+            headerBadge.textContent = 'XP +' + storedXP;
+          }
+        } catch (e) {
+          console.warn('Storage access:', e);
+        }
+
+        // --- 2. BACK TO TOP SMOOTH ACTION ---
+        const bttBtn = document.getElementById('btn-back-to-top');
+        if (bttBtn) {
+          bttBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
+
+        // --- 3. MOUSE SPOTLIGHT ON CARDS ---
+        const cards = document.querySelectorAll('.subject-card');
+        cards.forEach(card => {
+          card.addEventListener('pointermove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', x + 'px');
+            card.style.setProperty('--mouse-y', y + 'px');
+          });
+        });
+
+        // --- 4. HIGH-PERFORMANCE 3D DEPTH ORBITAL CANVAS STAGE ---
+        const canvas = document.getElementById('cosmic-stage');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let width = 0;
+        let height = 0;
+        let animationId = null;
+        let isVisible = true;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function resize() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          width = canvas.parentElement.offsetWidth || window.innerWidth;
+          height = canvas.parentElement.offsetHeight || window.innerHeight;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resize, { passive: true });
+        resize();
+
+        // 3D Particles & Orbital Resonance Field
+        const fov = 420;
+        const particles = [];
+        const particleCount = Math.min(Math.floor((width * height) / 16000), 65);
+
+        class CelestialBody {
+          constructor() {
+            this.orbitRadius = Math.random() * (width * 0.38) + 70;
+            this.angle = Math.random() * Math.PI * 2;
+            this.speed = (Math.random() * 0.0008 + 0.0004) * (Math.random() > 0.5 ? 1 : -1);
+            this.yOffset = (Math.random() - 0.5) * 120;
+            this.baseSize = Math.random() * 1.8 + 0.8;
+            this.color = Math.random() > 0.65 ? '#ff7728' : '#2ce6d6';
+            this.alpha = Math.random() * 0.6 + 0.25;
+            this.x = 0;
+            this.y = 0;
+            this.scale = 1;
+          }
+          update(tiltX, tiltY, pointerX, pointerY, pointerActive) {
+            if (reducedMotion) return;
+            this.angle += this.speed;
+
+            // 3D Orbital transformation with perspective projection
+            const rawX = Math.cos(this.angle) * this.orbitRadius;
+            const rawZ = Math.sin(this.angle) * this.orbitRadius;
+            const rawY = this.yOffset + Math.sin(this.angle * 2) * 25;
+
+            // Apply interactive tilt matrix
+            const cosT = Math.cos(tiltX);
+            const sinT = Math.sin(tiltX);
+            const projZ = rawZ * cosT - rawY * sinT + 400;
+            const projY = rawZ * sinT + rawY * cosT;
+
+            this.scale = Math.max(0.2, fov / (fov + projZ * 0.6));
+            
+            const centerX = width * 0.62 + tiltY * 40;
+            const centerY = height * 0.46;
+
+            let targetX = centerX + rawX * this.scale;
+            let targetY = centerY + projY * this.scale;
+
+            // Gravitational Pointer Field
+            if (pointerActive) {
+              const dx = pointerX - targetX;
+              const dy = pointerY - targetY;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 200 && dist > 1) {
+                const pull = (200 - dist) / 200 * 2.2;
+                targetX += (dx / dist) * pull;
+                targetY += (dy / dist) * pull;
+              }
+            }
+
+            this.x += (targetX - this.x) * 0.08;
+            this.y += (targetY - this.y) * 0.08;
+          }
+          draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.baseSize * this.scale, 0, Math.PI * 2);
+            ctx.fillStyle = this.color === '#ff7728'
+              ? `rgba(255, 119, 40, ${this.alpha * this.scale})`
+              : `rgba(44, 230, 214, ${this.alpha * this.scale})`;
+            ctx.fill();
+          }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+          particles.push(new CelestialBody());
+        }
+
+        let pointer = { x: -1000, y: -1000, active: false };
+        let tilt = { x: 0.35, y: 0 };
+        let targetTilt = { x: 0.35, y: 0 };
+
+        window.addEventListener('pointermove', function(e) {
+          const rect = canvas.getBoundingClientRect();
+          pointer.x = e.clientX - rect.left;
+          pointer.y = e.clientY - rect.top;
+          pointer.active = true;
+
+          const normX = (pointer.x / width) - 0.5;
+          const normY = (pointer.y / height) - 0.5;
+          targetTilt.x = 0.35 + normY * 0.2;
+          targetTilt.y = normX * 0.3;
+        }, { passive: true });
+
+        window.addEventListener('pointerleave', function() {
+          pointer.active = false;
+          targetTilt.x = 0.35;
+          targetTilt.y = 0;
+        });
+
+        let ringRotation = 0;
+        function renderScene() {
+          ctx.clearRect(0, 0, width, height);
+
+          // Eased tilt interpolation
+          tilt.x += (targetTilt.x - tilt.x) * 0.04;
+          tilt.y += (targetTilt.y - tilt.y) * 0.04;
+
+          const centerX = width * 0.62 + tilt.y * 40;
+          const centerY = height * 0.46;
+
+          // Central Radiant Core (Solar Well)
+          const coreGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 90);
+          coreGrad.addColorStop(0, 'rgba(255, 119, 40, 0.2)');
+          coreGrad.addColorStop(0.5, 'rgba(44, 230, 214, 0.06)');
+          coreGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = coreGrad;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 90, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Draw 3D-angled orbital paths
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(tilt.y * 0.4);
+
+          const orbits = [
+            { r: 120, color: 'rgba(255, 255, 255, 0.04)', node: '#2ce6d6', speed: 0.8 },
+            { r: 230, color: 'rgba(255, 119, 40, 0.18)', node: '#ff7728', speed: 0.5 },
+            { r: 360, color: 'rgba(44, 230, 214, 0.08)', node: '#2ce6d6', speed: 0.35 },
+            { r: 500, color: 'rgba(255, 255, 255, 0.03)', node: '#ffaa75', speed: 0.2 }
+          ];
+
+          orbits.forEach((orb, i) => {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, orb.r, orb.r * Math.sin(tilt.x), 0, 0, Math.PI * 2);
+            ctx.strokeStyle = orb.color;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Orbiting Planet / Atomic Node
+            if (!reducedMotion) {
+              const nodeAngle = ringRotation * orb.speed + i * 1.5;
+              const nx = Math.cos(nodeAngle) * orb.r;
+              const ny = Math.sin(nodeAngle) * (orb.r * Math.sin(tilt.x));
+              
+              ctx.beginPath();
+              ctx.arc(nx, ny, i === 1 ? 5 : 3, 0, Math.PI * 2);
+              ctx.fillStyle = orb.node;
+              ctx.shadowColor = orb.node;
+              ctx.shadowBlur = 12;
+              ctx.fill();
+              ctx.shadowBlur = 0;
+            }
+          });
+          ctx.restore();
+
+          // Connect neighbouring particles with subtle energy vectors
+          ctx.lineWidth = 0.5;
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 75) {
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = `rgba(255, 119, 40, ${0.1 * (1 - dist / 75)})`;
+                ctx.stroke();
+              }
+            }
+          }
+
+          // Update & Draw Particles with 3D projection
+          for (let p of particles) {
+            p.update(tilt.x, tilt.y, pointer.x, pointer.y, pointer.active);
+            p.draw();
+          }
+
+          ringRotation += 0.007;
+
+          if (isVisible && !reducedMotion) {
+            animationId = requestAnimationFrame(renderScene);
+          }
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            isVisible = entry.isIntersecting;
+            if (isVisible && !reducedMotion && !animationId) {
+              animationId = requestAnimationFrame(renderScene);
+            } else if (!isVisible && animationId) {
+              cancelAnimationFrame(animationId);
+              animationId = null;
+            }
+          });
+        }, { threshold: 0.05 });
+
+        observer.observe(canvas);
+        renderScene();
+      })();
+    </script>
   </body>
 </html>

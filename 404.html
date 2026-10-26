@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — Орбита потеряна | НЕШкола</title>
+    <meta name="description" content="Страница не найдена. Координаты выходят за пределы исследованной вселенной НЕШколы." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪐</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;600;700&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      :root {
+        --ground: #0b0d12;
+        --surface: #131722;
+        --ink: #f4f6fa;
+        --muted: #8e98a8;
+        --line: rgba(255, 255, 255, 0.08);
+        --accent: #ff7728;
+        --f-display: 'Unbounded', sans-serif;
+        --f-body: 'Onest', sans-serif;
+        --f-mono: 'JetBrains Mono', monospace;
+      }
+      body {
+        background-color: var(--ground);
+        color: var(--ink);
+        font-family: var(--f-body);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .ambient {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(255, 119, 40, 0.08) 0%, transparent 60%);
+        pointer-events: none;
+      }
+      .code {
+        font-family: var(--f-display);
+        font-size: clamp(5rem, 15vw, 12rem);
+        font-weight: 900;
+        letter-spacing: -0.05em;
+        line-height: 0.9;
+        background: linear-gradient(180deg, #ffffff 30%, rgba(255, 119, 40, 0.6) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+      .tag {
+        font-family: var(--f-mono);
+        font-size: 0.85rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+        display: inline-block;
+      }
+      h1 {
+        font-family: var(--f-display);
+        font-size: clamp(1.4rem, 3vw, 2.2rem);
+        margin-bottom: 1rem;
+      }
+      p {
+        color: var(--muted);
+        max-width: 480px;
+        margin: 0 auto 2.5rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent);
+        color: #fff;
+        padding: 0.85rem 1.8rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 20px rgba(255, 119, 40, 0.35);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(255, 119, 40, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="tag">ERROR 404 // АНОМАЛИЯ КООРДИНАТ</div>
+    <div class="code">404</div>
+    <h1>Траектория потеряна</h1>
+    <p>Кажется, эта страница сошла с орбиты или еще не открыта нашими исследователями. Вернись в центр управления полетами.</p>
+    <a href="index.html" class="btn">Вернуться на главную →</a>
+  </body>
+</html>

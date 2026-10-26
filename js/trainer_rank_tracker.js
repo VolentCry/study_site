@@ -157,6 +157,46 @@
                 { min: 4,  title: 'Логик 🥈' },
                 { min: 1,  title: 'Исследователь 🥉' }
             ]
+        },
+        {
+            id: 'oge_task_6',
+            name: 'ОГЭ №6 · Числа и дроби',
+            shortName: 'ОГЭ Задание 6',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_6_trainer.html',
+            profileUrl: 'math_moduls/oge_task_6_trainer.html',
+            icon: '➗',
+            description: 'Арифметические действия с обыкновенными, смешанными и десятичными дробями, составные дроби.',
+            rankTiers: [
+                { min: 25, title: 'Магистр вычислений ОГЭ 👑' },
+                { min: 18, title: 'Архимаг дробей 🧙' },
+                { min: 12, title: 'Мастер вычислений 💎' },
+                { min: 7,  title: 'Знаток ОГЭ 🥇' },
+                { min: 4,  title: 'Точный практик 🥈' },
+                { min: 1,  title: 'Ученик ОГЭ 🥉' }
+            ]
+        },
+        {
+            id: 'oge_task_8',
+            name: 'ОГЭ №8 · Степени и корни',
+            shortName: 'ОГЭ Задание 8',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_8_trainer.html',
+            profileUrl: 'math_moduls/oge_task_8_trainer.html',
+            icon: '⚡',
+            description: 'Свойства степеней с целыми показателями, действия с квадратными корнями, формулы сокращенного умножения.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель степеней и корней 👑' },
+                { min: 18, title: 'Гроссмейстер алгебры 🧙' },
+                { min: 12, title: 'Мастер радикалов 💎' },
+                { min: 7,  title: 'Знаток степеней 🥇' },
+                { min: 4,  title: 'Алгебраист 🥈' },
+                { min: 1,  title: 'Искатель корней 🥉' }
+            ]
         }
     ];
 

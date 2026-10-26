@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         } catch (error) {
             console.error('Не удалось прочитать статистику учебных задач.', error);
-            document.querySelector('.metrics-note').textContent = 'Не удалось прочитать сохранённую статистику. Проверьте консоль браузера.';
+            const note = document.querySelector('.metrics-note'); if (note) note.textContent = 'Не удалось прочитать сохранённую статистику. Проверьте консоль браузера.';
             return [];
         }
     }
@@ -276,7 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         chart.style.background = total
             ? `conic-gradient(${segments.join(', ')})`
-            : 'conic-gradient(#d5dce5 0% 100%)';
+            : 'conic-gradient(rgba(255, 255, 255, 0.08) 0% 100%)';
+        chart.classList.toggle('empty', total === 0);
         chart.setAttribute('aria-label', total
             ? `Решено за неделю: ${chartSubjects.map(subject => `${subject}: ${totals.get(subject)}`).join(', ')}`
             : 'За эту неделю пока нет решённых задач.');
@@ -467,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Глобальное обновление опыта при получении подарков или наград
     window.refreshProfileExperience = function() {
-        const currentAttempts = loadAttempts();
+        const currentAttempts = readAttempts();
         updateExperience(currentAttempts);
     };
 
