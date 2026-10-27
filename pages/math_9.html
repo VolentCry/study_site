@@ -76,19 +76,86 @@
         .profile-link:hover { background: #9c363d; transform: translateY(-1px); }
         .nav-actions { display: flex; align-items: center; gap: 10px; }
 
-        /* HERO WITH JAPANESE TEMPLE */
+        /* HERO WITH JAPANESE TEMPLE & GAUSSIAN-DIFFUSED FROST DISSIPATION */
         .hero {
             min-height: 540px; height: min(70svh, 720px); position: relative; isolation: isolate;
             display: flex; align-items: center; overflow: hidden; color: #fff;
             background: #1c2838;
+            --reveal-x: 75%;
+            --reveal-y: 40%;
+            --reveal-radius: 340px;
+            cursor: default;
         }
         .hero-image {
-            position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%;
+            position: absolute; inset: 0; z-index: -4; width: 100%; height: 100%;
             object-fit: cover; object-position: center 38%;
+            filter: brightness(1.06) contrast(106%) saturate(112%);
+        }
+        .hero-image-frosted {
+            position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%;
+            object-fit: cover; object-position: center 38%;
+            filter: blur(18px) brightness(0.85) saturate(125%);
+            transform: scale(1.06); /* Prevents blurred boundary artifacts */
+            /* Continuous Gaussian-like bell curve falloff: zero hard circles, seamless natural feathering */
+            mask-image: radial-gradient(
+                circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+                transparent 0%,
+                rgba(0, 0, 0, 0.02) 10%,
+                rgba(0, 0, 0, 0.08) 22%,
+                rgba(0, 0, 0, 0.20) 36%,
+                rgba(0, 0, 0, 0.38) 50%,
+                rgba(0, 0, 0, 0.58) 65%,
+                rgba(0, 0, 0, 0.78) 78%,
+                rgba(0, 0, 0, 0.90) 88%,
+                rgba(0, 0, 0, 0.97) 95%,
+                black 100%
+            );
+            -webkit-mask-image: radial-gradient(
+                circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+                transparent 0%,
+                rgba(0, 0, 0, 0.02) 10%,
+                rgba(0, 0, 0, 0.08) 22%,
+                rgba(0, 0, 0, 0.20) 36%,
+                rgba(0, 0, 0, 0.38) 50%,
+                rgba(0, 0, 0, 0.58) 65%,
+                rgba(0, 0, 0, 0.78) 78%,
+                rgba(0, 0, 0, 0.90) 88%,
+                rgba(0, 0, 0, 0.97) 95%,
+                black 100%
+            );
+            pointer-events: none;
+            will-change: mask-image;
+        }
+        .hero-frosted-tint {
+            position: absolute; inset: 0; z-index: -2;
+            background: linear-gradient(135deg, rgba(16,24,38,0.52) 0%, rgba(20,32,50,0.32) 100%);
+            mask-image: radial-gradient(
+                circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+                transparent 0%,
+                rgba(0, 0, 0, 0.04) 14%,
+                rgba(0, 0, 0, 0.16) 30%,
+                rgba(0, 0, 0, 0.40) 50%,
+                rgba(0, 0, 0, 0.70) 70%,
+                rgba(0, 0, 0, 0.92) 88%,
+                black 100%
+            );
+            -webkit-mask-image: radial-gradient(
+                circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+                transparent 0%,
+                rgba(0, 0, 0, 0.04) 14%,
+                rgba(0, 0, 0, 0.16) 30%,
+                rgba(0, 0, 0, 0.40) 50%,
+                rgba(0, 0, 0, 0.70) 70%,
+                rgba(0, 0, 0, 0.92) 88%,
+                black 100%
+            );
+            pointer-events: none;
+            will-change: mask-image;
         }
         .hero::after {
             content: ''; position: absolute; inset: 0; z-index: -1;
             background: linear-gradient(90deg, rgba(16,24,37,.88) 0%, rgba(20,32,49,.72) 48%, rgba(24,38,58,.25) 100%), linear-gradient(0deg, rgba(14,22,34,.45), transparent 60%);
+            pointer-events: none;
         }
         .hero-inner { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 64px 0 78px; }
         .hero-kicker {
@@ -121,7 +188,7 @@
         }
         .hero-caption {
             position: absolute; right: 5vw; bottom: 22px; color: rgba(255,255,255,.78);
-            font-size: 11px; letter-spacing: .08em;
+            font-size: 11px; letter-spacing: .08em; pointer-events: none;
         }
 
         /* OGE TRAINERS SHOWCASE */
@@ -165,13 +232,33 @@
             font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #f0f4f8; color: var(--indigo);
             font-weight: 600;
         }
+        .trainer-card-actions {
+            display: flex; flex-direction: column; gap: 8px; margin-top: auto;
+        }
         .trainer-btn {
             min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             background: var(--indigo); color: #fff; font-size: 13px; font-weight: 700;
-            text-decoration: none; border-radius: 8px; transition: all .2s;
+            text-decoration: none; border-radius: 8px; transition: all .2s; width: 100%;
         }
         .trainer-btn:hover {
             background: var(--vermilion); box-shadow: 0 4px 14px rgba(183,70,78,.35);
+            transform: translateY(-1px);
+        }
+        .trainer-btn-timed {
+            background: linear-gradient(135deg, #c2410c 0%, #b7464e 100%);
+            border: 1px solid rgba(194, 65, 12, 0.3);
+            box-shadow: 0 2px 8px rgba(194, 65, 12, 0.2);
+            position: relative;
+        }
+        .trainer-btn-timed:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #d3525b 100%);
+            box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35);
+            transform: translateY(-1px);
+        }
+        .trainer-timed-badge {
+            font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.22);
+            color: #fff; margin-left: 2px;
         }
 
         /* EXAM STRATEGY BANNER */
@@ -319,8 +406,12 @@
 
     <main>
         <!-- HERO -->
-        <section class="hero" aria-labelledby="hero-title">
+        <section class="hero" id="hero-temple-section" aria-labelledby="hero-title">
             <img class="hero-image" src="../assets/images/temple_math_hero.jpg" alt="Традиционный японский храм" fetchpriority="high">
+            <!-- Frosted Glass Layer over the Temple with Dynamic Spotlight Mask -->
+            <img class="hero-image-frosted" src="../assets/images/temple_math_hero.jpg" alt="" aria-hidden="true">
+            <div class="hero-frosted-tint" aria-hidden="true"></div>
+            
             <div class="hero-inner">
                 <p class="hero-kicker">Учебная мастерская · девятый класс · ОГЭ</p>
                 <h1 id="hero-title">Математика 9 класс</h1>
@@ -365,10 +456,16 @@
                                 <span class="trainer-tag-chip">СдамГИА</span>
                             </div>
                         </div>
-                        <a href="../math_moduls/oge_task_6_trainer.html" class="trainer-btn">
-                            <span>Запустить тренажёр №6</span>
-                            <span>→</span>
-                        </a>
+                        <div class="trainer-card-actions">
+                            <a href="../math_moduls/oge_task_6_trainer.html" class="trainer-btn">
+                                <span>Запустить тренажёр №6</span>
+                                <span>→</span>
+                            </a>
+                            <a href="../math_moduls/oge_task_6_trainer.html?mode=timed" class="trainer-btn trainer-btn-timed">
+                                <span>⏱️ Сыграть на время!</span>
+                                <span class="trainer-timed-badge">10 мин</span>
+                            </a>
+                        </div>
                     </div>
 
                     <!-- TRAINER 8 -->
@@ -387,10 +484,44 @@
                                 <span class="trainer-tag-chip">ФСУ</span>
                             </div>
                         </div>
-                        <a href="../math_moduls/oge_task_8_trainer.html" class="trainer-btn">
-                            <span>Запустить тренажёр №8</span>
-                            <span>→</span>
-                        </a>
+                        <div class="trainer-card-actions">
+                            <a href="../math_moduls/oge_task_8_trainer.html" class="trainer-btn">
+                                <span>Запустить тренажёр №8</span>
+                                <span>→</span>
+                            </a>
+                            <a href="../math_moduls/oge_task_8_trainer.html?mode=timed" class="trainer-btn trainer-btn-timed">
+                                <span>⏱️ Сыграть на время!</span>
+                                <span class="trainer-timed-badge">10 мин</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- TRAINER 9 -->
+                    <div class="trainer-card">
+                        <div>
+                            <div class="trainer-card-top">
+                                <span class="trainer-badge">Задание №9 · Алгебра</span>
+                                <div class="trainer-icon">⚖️</div>
+                            </div>
+                            <h3>Уравнения и системы</h3>
+                            <p>Линейные, квадратные и дробно-рациональные уравнения, системы двух уравнений с двумя неизвестными. Все ключевые прототипы из открытого банка ФИПИ и Решу ОГЭ.</p>
+                            <div class="trainer-tags">
+                                <span class="trainer-tag-chip">ФИПИ 2026</span>
+                                <span class="trainer-tag-chip">Квадратные уравнения</span>
+                                <span class="trainer-tag-chip">Дробно-рациональные</span>
+                                <span class="trainer-tag-chip">Системы</span>
+                            </div>
+                        </div>
+                        <div class="trainer-card-actions">
+                            <a href="../math_moduls/oge_task_9_trainer.html" class="trainer-btn">
+                                <span>Запустить тренажёр №9</span>
+                                <span>→</span>
+                            </a>
+                            <a href="../math_moduls/oge_task_9_trainer.html?mode=timed" class="trainer-btn trainer-btn-timed">
+                                <span>⏱️ Сыграть на время!</span>
+                                <span class="trainer-timed-badge">10 мин</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -527,5 +658,93 @@
             <a href="../index.html">На главную платформы</a>
         </div>
     </footer>
+
+    <!-- INTERACTIVE GAUSSIAN-DIFFUSED FROST SCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hero = document.getElementById('hero-temple-section');
+            if (!hero) return;
+
+            let rafId = null;
+            let targetX = 0;
+            let targetY = 0;
+            let currentX = 0;
+            let currentY = 0;
+            let isHovered = false;
+
+            function getBaseRadius() {
+                return window.innerWidth <= 768 ? '260px' : '350px';
+            }
+
+            function resetToFocalPoint() {
+                const rect = hero.getBoundingClientRect();
+                targetX = rect.width * 0.74;
+                targetY = rect.height * 0.40;
+                hero.style.setProperty('--reveal-radius', getBaseRadius());
+                if (!isHovered) {
+                    currentX = targetX;
+                    currentY = targetY;
+                    hero.style.setProperty('--reveal-x', currentX.toFixed(1) + 'px');
+                    hero.style.setProperty('--reveal-y', currentY.toFixed(1) + 'px');
+                }
+            }
+
+            resetToFocalPoint();
+            window.addEventListener('resize', resetToFocalPoint);
+
+            function updateLensPosition() {
+                currentX += (targetX - currentX) * 0.16;
+                currentY += (targetY - currentY) * 0.16;
+
+                hero.style.setProperty('--reveal-x', currentX.toFixed(1) + 'px');
+                hero.style.setProperty('--reveal-y', currentY.toFixed(1) + 'px');
+
+                if (Math.abs(targetX - currentX) > 0.3 || Math.abs(targetY - currentY) > 0.3) {
+                    rafId = requestAnimationFrame(updateLensPosition);
+                } else {
+                    rafId = null;
+                }
+            }
+
+            function onPointerMove(e) {
+                const rect = hero.getBoundingClientRect();
+                targetX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+                targetY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+
+                if (!isHovered) {
+                    isHovered = true;
+                    hero.style.setProperty('--reveal-radius', window.innerWidth <= 768 ? '280px' : '380px');
+                }
+
+                if (!rafId) {
+                    rafId = requestAnimationFrame(updateLensPosition);
+                }
+            }
+
+            hero.addEventListener('pointerenter', onPointerMove);
+            hero.addEventListener('pointermove', onPointerMove);
+
+            hero.addEventListener('pointerleave', () => {
+                isHovered = false;
+                const rect = hero.getBoundingClientRect();
+                targetX = rect.width * 0.74;
+                targetY = rect.height * 0.40;
+                hero.style.setProperty('--reveal-radius', getBaseRadius());
+                if (!rafId) {
+                    rafId = requestAnimationFrame(updateLensPosition);
+                }
+            });
+
+            // Touch support for mobile devices
+            hero.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches[0]) {
+                    const rect = hero.getBoundingClientRect();
+                    targetX = e.touches[0].clientX - rect.left;
+                    targetY = e.touches[0].clientY - rect.top;
+                    if (!rafId) rafId = requestAnimationFrame(updateLensPosition);
+                }
+            }, { passive: true });
+        });
+    </script>
 </body>
 </html>

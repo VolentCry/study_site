@@ -983,14 +983,15 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 0.75rem;
+            width: 100%;
         }
 
         .trainer-card-title-group {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.75rem;
             min-width: 0;
-            width: 100%;
+            flex: 1;
         }
 
         .trainer-card-icon {
@@ -1003,6 +1004,15 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .trainer-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            min-width: 0;
+            flex: 1;
         }
 
         .trainer-name-row {
@@ -1011,16 +1021,19 @@
             justify-content: space-between;
             gap: 0.75rem;
             width: 100%;
+            min-width: 0;
         }
 
         .trainer-card-name {
             font-family: var(--f-display);
-            font-size: 1rem;
+            font-size: 0.98rem;
             font-weight: 700;
             color: var(--ink);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.3;
+            margin: 0;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .trainer-card-badge {
@@ -1031,7 +1044,21 @@
             padding: 0.15rem 0.5rem;
             border-radius: var(--r-pill);
             display: inline-block;
-            margin-top: 0.2rem;
+            width: fit-content;
+        }
+
+        .trainer-gift-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: all var(--t-fast);
+            flex-shrink: 0;
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .trainer-card-desc {
@@ -1370,43 +1397,486 @@
             margin: 0.25rem 0;
         }
 
-        /* ACHIEVEMENTS LIST */
-        .achievements-list {
+        /* TAB 3: MEDALS & ACHIEVEMENTS PAGE */
+        .achievements-page-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .achievements-page-header {
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            padding: 1.75rem 2rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .achievements-page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ffd700, #ff9900, var(--accent-cyan));
+        }
+
+        .achievements-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .achievements-filter-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+            margin-top: 0.25rem;
+        }
+
+        .ach-filter-btn {
+            padding: 0.45rem 1.15rem;
+            border-radius: var(--r-pill);
+            font-family: var(--f-body);
+            font-size: 0.82rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+            color: var(--muted-bright);
+            cursor: pointer;
+            transition: all var(--t-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .ach-filter-btn:hover {
+            color: var(--ink);
+            border-color: var(--line-active);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .ach-filter-btn.active {
+            background: var(--accent);
+            color: #090c13 !important;
+            border-color: var(--accent);
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+
+        .ach-filter-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .achievements-full-grid {
             list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.25rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .achievements-empty-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--line);
+            border-radius: var(--r-md);
+        }
+
+        @media (max-width: 992px) {
+            .achievements-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .achievements-summary-grid,
+            .achievements-full-grid {
+                grid-template-columns: 1fr;
+            }
+            .achievements-page-header {
+                padding: 1.25rem 1.4rem;
+            }
+        }
+
+        /* HERO MEDALS BADGE */
+        .role-medals-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: rgba(255, 204, 0, 0.12);
+            border: 1px solid rgba(255, 204, 0, 0.4);
+            color: #ffd700;
+            padding: 0.25rem 0.8rem;
+            border-radius: var(--r-pill);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--t-fast);
+            font-family: var(--f-body);
+        }
+        .role-medals-badge:hover {
+            background: rgba(255, 204, 0, 0.22);
+            border-color: rgba(255, 204, 0, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(255, 204, 0, 0.25);
+        }
+        .role-medals-badge strong {
+            color: #fff;
+            font-family: var(--f-mono);
+        }
+        .role-medals-badge svg {
+            transition: transform var(--t-fast);
+        }
+        .role-medals-badge:hover svg {
+            transform: translateX(2px);
+        }
+        .role-medals-badge:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* OVERVIEW MEDALS SHOWCASE CARD */
+        .overview-medals-showcase {
+            margin-top: 1.5rem;
+        }
+        .overview-medals-card {
+            background: linear-gradient(135deg, rgba(21, 27, 43, 0.95) 0%, rgba(16, 21, 34, 0.9) 100%);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: var(--r-lg);
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        .overview-medals-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ffd700, #ff7728, #2ce6d6);
+        }
+        .overview-medals-left {
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
-            max-height: 400px;
-            overflow-y: auto;
         }
-        .achievement-item {
+        .overview-medals-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: rgba(255, 204, 0, 0.12);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            color: #ffd700;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.25rem 0.65rem;
+            border-radius: var(--r-pill);
+            width: fit-content;
+        }
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffd700;
+            box-shadow: 0 0 6px #ffd700;
+            animation: pulseDot 2s infinite ease-in-out;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+        .overview-medals-title {
+            font-family: var(--f-display);
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.2;
+            margin: 0;
+        }
+        .overview-medals-desc {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin: 0;
+        }
+        .overview-medals-stats-row {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            background: var(--surface);
+            gap: 1.5rem;
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            margin: 0.25rem 0;
+        }
+        .overview-medals-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .overview-medals-stat .stat-label {
+            font-family: var(--f-mono);
+            font-size: 0.68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .overview-medals-stat .stat-num {
+            font-family: var(--f-display);
+            font-size: 1.25rem;
+            color: var(--ink);
+            font-weight: 800;
+        }
+        .overview-medals-stat .stat-tier {
+            font-family: var(--f-body);
+            font-size: 0.95rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+        .btn-goto-medals {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #ff5500 100%);
+            color: #090c13 !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.65rem 1.35rem;
+            border-radius: var(--r-pill);
+            font-family: var(--f-body);
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            width: fit-content;
+            transition: all var(--t-fast);
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+        .btn-goto-medals:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+            filter: brightness(1.08);
+        }
+        .btn-goto-medals:focus-visible {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 2px;
+        }
+        .overview-medals-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.85rem;
+        }
+        .preview-medal-item {
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--line);
-            padding: 0.85rem 1rem;
-            border-radius: var(--r-sm);
-        }
-        .achievement-icon {
-            font-size: 1.6rem;
-            width: 42px;
-            height: 42px;
+            border-radius: var(--r-md);
+            padding: 0.9rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.06);
-            flex-shrink: 0;
+            text-align: center;
+            gap: 0.4rem;
+            transition: all var(--t-fast);
         }
-        .achievement-info h4 {
-            font-size: 0.9rem;
+        .preview-medal-item:hover {
+            border-color: var(--line-active);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .preview-medal-item.is-earned {
+            background: rgba(255, 204, 0, 0.08);
+            border-color: rgba(255, 204, 0, 0.45);
+            box-shadow: 0 0 16px rgba(255, 204, 0, 0.15);
+        }
+        .preview-medal-icon {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+        .preview-medal-name {
+            font-size: 0.72rem;
             font-weight: 700;
             color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
-        .achievement-info p {
-            font-size: 0.75rem;
+        .preview-medal-status {
+            font-size: 0.65rem;
+            font-family: var(--f-mono);
             color: var(--muted);
+        }
+        .preview-medal-item.is-earned .preview-medal-status {
+            color: #2ed573;
+            font-weight: 700;
+        }
+        @media (max-width: 900px) {
+            .overview-medals-card {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+        }
+        @media (max-width: 540px) {
+            .overview-medals-stats-row {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .overview-medals-preview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .btn-goto-medals {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .achievement-item, .achievement {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--line);
+            padding: 1.15rem;
+            border-radius: var(--r-md);
+            transition: all var(--t-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-item:hover, .achievement:hover {
+            border-color: var(--line-active);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .achievement-item.is-earned, .achievement.is-earned {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.08) 0%, rgba(20, 26, 40, 0.95) 100%);
+            border-color: rgba(255, 204, 0, 0.4);
+            box-shadow: 0 4px 20px rgba(255, 204, 0, 0.08);
+        }
+
+        .achievement-item.is-earned::before, .achievement.is-earned::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #ffd700, #ff9900);
+        }
+
+        .achievement-item.is-locked, .achievement:not(.is-earned) {
+            opacity: 0.7;
+        }
+
+        .achievement-icon-wrap, .achievement-medal, .achievement-icon {
+            font-size: 1.6rem;
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+            flex-shrink: 0;
+            transition: transform var(--t-fast);
+        }
+
+        .achievement-item.is-earned .achievement-icon-wrap,
+        .achievement.is-earned .achievement-medal,
+        .achievement.is-earned .achievement-icon {
+            background: rgba(255, 204, 0, 0.16);
+            border-color: rgba(255, 204, 0, 0.5);
+            box-shadow: 0 0 16px rgba(255, 204, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .achievement-details, .achievement-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .achievement-name, .achievement-info h4 {
+            font-family: var(--f-display);
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.25;
+            margin: 0;
+        }
+
+        .achievement-desc, .achievement-description, .achievement-info p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .achievement-badge, .achievement-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: var(--r-pill);
+            width: fit-content;
+            margin-top: 0.25rem;
+            font-family: var(--f-mono);
+            letter-spacing: 0.02em;
+        }
+
+        .achievement-badge.earned, .achievement-status.earned {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.35);
+        }
+
+        .achievement-badge.locked, .achievement-status.locked {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            border: 1px solid var(--line);
+        }
+
+        @media (max-width: 480px) {
+            .profile-tabs-nav {
+                display: flex;
+                width: 100%;
+                overflow-x: auto;
+                justify-content: flex-start;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+            .profile-tabs-nav::-webkit-scrollbar {
+                display: none;
+            }
+            .profile-tab-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                flex-shrink: 0;
+            }
         }
 
         /* UTILITIES */
@@ -1541,13 +2011,13 @@
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
                     <span>Серии и звания</span>
                 </button>
-            </div>
-
-            <div class="header-actions">
-                <button id="achievements-open" class="nav-btn" type="button" title="Достижения и медали">
+                <button type="button" class="profile-tab-btn" id="tab-btn-achievements" role="tab" aria-selected="false" aria-controls="tab-content-achievements">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/></svg>
                     <span>Медали</span>
                 </button>
+            </div>
+
+            <div class="header-actions">
                 <button id="settings-open-btn" class="nav-btn" type="button" title="Настройки и код синхронизации">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     <span>Синхронизация</span>
@@ -1591,9 +2061,10 @@
                     <div class="role-badge-row">
                         <span class="role-tag">Статус: Исследователь</span>
                         <span class="solved-counter-badge">Решено задач: <strong id="tasks-count">0</strong></span>
-                        <button type="button" id="ranks-open-btn" class="nickname-edit-btn" style="border-color: rgba(251, 191, 36, 0.4); color: var(--accent-gold);">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
-                            <span>Серии и звания</span>
+                        <button type="button" class="role-medals-badge" id="hero-medals-btn" title="Перейти ко всем медалям">
+                            <span>🏆 Медали:</span>
+                            <strong id="hero-medals-count">0 / 10</strong>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
                     </div>
                 </div>
@@ -1687,27 +2158,96 @@
                     <p id="skills-summary" class="skills-summary" aria-live="polite">Выбери предмет выше для детализации карты навыков.</p>
                 </div>
             </section>
+
+            <!-- MEDALS PREVIEW SHOWCASE ON OVERVIEW TAB -->
+            <section class="overview-medals-showcase" aria-labelledby="overview-medals-heading">
+                <div class="overview-medals-card">
+                    <div class="overview-medals-left">
+                        <div class="overview-medals-pill">
+                            <span class="pulse-dot"></span>
+                            <span>Зал достижений</span>
+                        </div>
+                        <h3 id="overview-medals-heading" class="overview-medals-title">Коллекция наград и медалей</h3>
+                        <p class="overview-medals-desc">Зарабатывай трофеи за серии верных ответов, безупречную точность и завершение испытаний платформы.</p>
+                        <div class="overview-medals-stats-row">
+                            <div class="overview-medals-stat">
+                                <span class="stat-label">Открыто</span>
+                                <strong id="overview-medals-earned" class="stat-num">0 / 10</strong>
+                            </div>
+                            <div class="overview-medals-stat">
+                                <span class="stat-label">Коллекция</span>
+                                <strong id="overview-medals-pct" class="stat-num">0%</strong>
+                            </div>
+                            <div class="overview-medals-stat">
+                                <span class="stat-label">Ранг</span>
+                                <strong id="overview-medals-tier" class="stat-tier">Новичок 🥉</strong>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-goto-medals" id="overview-goto-medals-btn">
+                            <span>Открыть всю галерею медалей (10 наград)</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </div>
+                    <div class="overview-medals-preview-grid" id="overview-medals-preview-grid" aria-hidden="true">
+                        <!-- Populated dynamically by profile_metrics.js -->
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!-- TAB 2: RANKS & TRAINERS MATRIX -->
         <div id="tab-content-ranks" class="section-wrap hidden">
             <div id="trainer-ranks-container"></div>
         </div>
-    </main>
 
-    <!-- ACHIEVEMENTS MODAL DIALOG -->
-    <dialog id="achievements-dialog" aria-labelledby="achievements-heading">
-        <div class="achievements-content">
-            <div class="achievements-header">
-                <div>
-                    <h2 id="achievements-heading" class="achievements-heading">Медали и достижения</h2>
-                    <p class="achievements-note">Решай задания и тренируйся без ошибок, чтобы зажигать новые награды!</p>
+        <!-- TAB 3: MEDALS & ACHIEVEMENTS -->
+        <div id="tab-content-achievements" class="section-wrap hidden">
+            <div class="achievements-page-card">
+                <div class="achievements-page-header">
+                    <h2 class="profile-heading">Медали и достижения</h2>
+                    <p class="profile-subtitle">Награды за регулярные занятия, безупречную точность и прохождение тестирований платформы.</p>
                 </div>
-                <button type="button" class="achievements-close" id="achievements-close" aria-label="Закрыть достижения">×</button>
+
+                <div class="achievements-summary-grid">
+                    <div class="trainer-summary-item">
+                        <span class="trainer-summary-label">Открыто медалей</span>
+                        <div class="trainer-summary-val">
+                            <span style="color: var(--accent-gold);">🏆</span>
+                            <span id="ach-stat-earned-total">0 / 10</span>
+                        </div>
+                    </div>
+                    <div class="trainer-summary-item">
+                        <span class="trainer-summary-label">Прогресс коллекции</span>
+                        <div class="trainer-summary-val">
+                            <span style="color: var(--accent);">⚡</span>
+                            <span id="ach-stat-percent">0%</span>
+                        </div>
+                    </div>
+                    <div class="trainer-summary-item">
+                        <span class="trainer-summary-label">Задач решено</span>
+                        <div class="trainer-summary-val">
+                            <span style="color: #2ed573;">✅</span>
+                            <span id="ach-stat-solved">0</span>
+                        </div>
+                    </div>
+                    <div class="trainer-summary-item">
+                        <span class="trainer-summary-label">Ранг коллекционера</span>
+                        <div class="trainer-summary-val" style="font-size: 1.15rem;">
+                            <span id="ach-stat-tier">Новичок 🥉</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements-filter-row" role="group" aria-label="Фильтр наград">
+                    <button type="button" class="ach-filter-btn active" data-filter="all" id="ach-filter-all">Все награды (10)</button>
+                    <button type="button" class="ach-filter-btn" data-filter="earned" id="ach-filter-earned">Разблокированные (0)</button>
+                    <button type="button" class="ach-filter-btn" data-filter="locked" id="ach-filter-locked">В процессе (10)</button>
+                </div>
+
+                <ul id="achievements-full-grid" class="achievements-full-grid"></ul>
             </div>
-            <ul id="achievements-list" class="achievements-list"></ul>
         </div>
-    </dialog>
+    </main>
 
     <!-- SETTINGS & DATA TRANSFER MODAL DIALOG -->
     <dialog id="settings-dialog" aria-labelledby="settings-heading">
@@ -1807,29 +2347,41 @@
     </footer>
 
     <!-- SCRIPTS -->
-    <script src="js/trainer_rank_tracker.js"></script>
-    <script src="js/profile_metrics.js"></script>
+    <script src="js/trainer_rank_tracker.js?v=2.2"></script>
+    <script src="js/profile_metrics.js?v=2.2"></script>
     <script>
         // --- 1. TABS SWITCHER ---
         document.addEventListener('DOMContentLoaded', () => {
             const tabBtnOverview = document.getElementById('tab-btn-overview');
             const tabBtnRanks = document.getElementById('tab-btn-ranks');
+            const tabBtnAchievements = document.getElementById('tab-btn-achievements') || document.getElementById('achievements-open');
             const tabContentOverview = document.getElementById('tab-content-overview');
             const tabContentRanks = document.getElementById('tab-content-ranks');
+            const tabContentAchievements = document.getElementById('tab-content-achievements');
             const trainerRanksContainer = document.getElementById('trainer-ranks-container');
             const ranksOpenBtn = document.getElementById('ranks-open-btn');
+            const heroMedalsBtn = document.getElementById('hero-medals-btn');
+            const overviewGotoMedalsBtn = document.getElementById('overview-goto-medals-btn');
 
             function switchTab(tabName) {
-                if (tabName === 'ranks') {
-                    if (tabBtnOverview) {
-                        tabBtnOverview.classList.remove('active');
-                        tabBtnOverview.setAttribute('aria-selected', 'false');
+                const buttons = [tabBtnOverview, tabBtnRanks, tabBtnAchievements];
+                const contents = [tabContentOverview, tabContentRanks, tabContentAchievements];
+
+                buttons.forEach(btn => {
+                    if (btn) {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-selected', 'false');
                     }
+                });
+                contents.forEach(content => {
+                    if (content) content.classList.add('hidden');
+                });
+
+                if (tabName === 'ranks') {
                     if (tabBtnRanks) {
                         tabBtnRanks.classList.add('active');
                         tabBtnRanks.setAttribute('aria-selected', 'true');
                     }
-                    if (tabContentOverview) tabContentOverview.classList.add('hidden');
                     if (tabContentRanks) tabContentRanks.classList.remove('hidden');
 
                     if (window.TrainerTracker && trainerRanksContainer) {
@@ -1837,32 +2389,58 @@
                     }
                     try {
                         sessionStorage.setItem('profileActiveTab', 'ranks');
+                        history.replaceState(null, '', '#ranks');
+                    } catch (e) {}
+                } else if (tabName === 'achievements') {
+                    if (tabBtnAchievements) {
+                        tabBtnAchievements.classList.add('active');
+                        tabBtnAchievements.setAttribute('aria-selected', 'true');
+                    }
+                    if (tabContentAchievements) tabContentAchievements.classList.remove('hidden');
+
+                    if (typeof window.renderProfileAchievementsPage === 'function') {
+                        window.renderProfileAchievementsPage();
+                    }
+                    try {
+                        sessionStorage.setItem('profileActiveTab', 'achievements');
+                        history.replaceState(null, '', '#achievements');
                     } catch (e) {}
                 } else {
-                    if (tabBtnRanks) {
-                        tabBtnRanks.classList.remove('active');
-                        tabBtnRanks.setAttribute('aria-selected', 'false');
-                    }
                     if (tabBtnOverview) {
                         tabBtnOverview.classList.add('active');
                         tabBtnOverview.setAttribute('aria-selected', 'true');
                     }
-                    if (tabContentRanks) tabContentRanks.classList.add('hidden');
                     if (tabContentOverview) tabContentOverview.classList.remove('hidden');
 
                     try {
                         sessionStorage.setItem('profileActiveTab', 'overview');
+                        history.replaceState(null, '', '#overview');
                     } catch (e) {}
                 }
             }
 
+            window.switchProfileTab = switchTab;
+
             if (tabBtnOverview) tabBtnOverview.addEventListener('click', () => switchTab('overview'));
             if (tabBtnRanks) tabBtnRanks.addEventListener('click', () => switchTab('ranks'));
+            if (tabBtnAchievements) tabBtnAchievements.addEventListener('click', () => switchTab('achievements'));
             if (ranksOpenBtn) ranksOpenBtn.addEventListener('click', () => switchTab('ranks'));
+            if (heroMedalsBtn) heroMedalsBtn.addEventListener('click', () => {
+                switchTab('achievements');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            if (overviewGotoMedalsBtn) overviewGotoMedalsBtn.addEventListener('click', () => {
+                switchTab('achievements');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
 
-            const initialTab = window.location.hash === '#ranks' || sessionStorage.getItem('profileActiveTab') === 'ranks' 
+            const storedTab = sessionStorage.getItem('profileActiveTab');
+            const hash = (window.location.hash || '').toLowerCase();
+            const initialTab = (hash === '#ranks' || storedTab === 'ranks') 
                 ? 'ranks' 
-                : 'overview';
+                : (hash.includes('achieve') || hash.includes('medal') || storedTab === 'achievements')
+                    ? 'achievements'
+                    : 'overview';
             switchTab(initialTab);
         });
 

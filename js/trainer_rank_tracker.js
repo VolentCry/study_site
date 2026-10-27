@@ -197,6 +197,26 @@
                 { min: 4,  title: 'Алгебраист 🥈' },
                 { min: 1,  title: 'Искатель корней 🥉' }
             ]
+        },
+        {
+            id: 'oge_task_9',
+            name: 'ОГЭ №9 · Уравнения и системы уравнений',
+            shortName: 'ОГЭ Задание 9',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_9_trainer.html',
+            profileUrl: 'math_moduls/oge_task_9_trainer.html',
+            icon: '⚖️',
+            description: 'Линейные, квадратные и дробно-рациональные уравнения, системы уравнений по банку ФИПИ и Решу ОГЭ.',
+            rankTiers: [
+                { min: 25, title: 'Магистр уравнений 👑' },
+                { min: 18, title: 'Архимаг алгебры 🧙' },
+                { min: 12, title: 'Мастер корней 💎' },
+                { min: 7,  title: 'Знаток систем 🥇' },
+                { min: 4,  title: 'Решатель уравнений 🥈' },
+                { min: 1,  title: 'Ученик алгебры 🥉' }
+            ]
         }
     ];
 
@@ -498,14 +518,12 @@
                     <div class="trainer-card-header">
                         <div class="trainer-card-title-group">
                             <span class="trainer-card-icon" aria-hidden="true">${t.icon}</span>
-                            <div>
-                                <div class="trainer-name-row">
-                                    <h3 class="trainer-card-name">${t.name}</h3>
-                                    ${giftBtnHtml}
-                                </div>
+                            <div class="trainer-title-wrap">
+                                <h3 class="trainer-card-name">${t.name}</h3>
                                 <span class="trainer-card-badge">${t.category} · ${t.classNum}</span>
                             </div>
                         </div>
+                        ${giftBtnHtml}
                     </div>
 
                     <p class="trainer-card-desc">${t.description}</p>

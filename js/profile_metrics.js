@@ -197,30 +197,152 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
     }
 
-    function renderAchievements() {
-        const list = document.getElementById('achievements-list');
-        list.replaceChildren();
-        getAchievements(readAttempts()).forEach(achievement => {
-            const item = document.createElement('li');
-            item.className = `achievement${achievement.earned ? ' is-earned' : ''}`;
-            const medal = document.createElement('span');
-            medal.className = 'achievement-medal';
-            medal.setAttribute('aria-hidden', 'true');
-            medal.textContent = achievement.icon;
-            const details = document.createElement('div');
-            const name = document.createElement('h3');
-            name.className = 'achievement-name';
-            name.textContent = achievement.name;
-            const description = document.createElement('p');
-            description.className = 'achievement-description';
-            description.textContent = achievement.description;
-            const state = document.createElement('p');
-            state.className = 'achievement-description';
-            state.textContent = achievement.earned ? 'Получено' : 'Пока не получено';
-            details.append(name, description, state);
-            item.append(medal, details);
-            list.appendChild(item);
+    let currentAchievementFilter = 'all';
+
+    function renderProfileAchievementsPage(activeFilter) {
+        if (activeFilter) {
+            currentAchievementFilter = activeFilter;
+        }
+        const filter = currentAchievementFilter;
+
+        const attempts = readAttempts();
+        const achievements = getAchievements(attempts);
+        const totalCount = achievements.length;
+        const earnedCount = achievements.filter(a => a.earned).length;
+        const lockedCount = totalCount - earnedCount;
+        const percent = totalCount > 0 ? Math.round((earnedCount / totalCount) * 100) : 0;
+        const solvedCount = countSolvedTasks(attempts);
+
+        // Calculate collector rank tier
+        let tier = 'Новичок 🥉';
+        if (earnedCount === totalCount) {
+            tier = 'Легенда наград 👑';
+        } else if (earnedCount >= 7) {
+            tier = 'Мастер трофеев 🥇';
+        } else if (earnedCount >= 4) {
+            tier = 'Знаток наград 🥈';
+        } else if (earnedCount >= 1) {
+            tier = 'Искатель наград 🥉';
+        }
+
+        // Summary metrics
+        const statEarnedTotal = document.getElementById('ach-stat-earned-total');
+        if (statEarnedTotal) statEarnedTotal.textContent = `${earnedCount} / ${totalCount}`;
+
+        const statPercent = document.getElementById('ach-stat-percent');
+        if (statPercent) statPercent.textContent = `${percent}%`;
+
+        const statSolved = document.getElementById('ach-stat-solved');
+        if (statSolved) statSolved.textContent = String(solvedCount);
+
+        const statTier = document.getElementById('ach-stat-tier');
+        if (statTier) statTier.textContent = tier;
+
+        // Hero badge & Overview showcase sync
+        const heroMedalsCount = document.getElementById('hero-medals-count');
+        if (heroMedalsCount) heroMedalsCount.textContent = `${earnedCount} / ${totalCount}`;
+
+        const ovEarned = document.getElementById('overview-medals-earned');
+        if (ovEarned) ovEarned.textContent = `${earnedCount} / ${totalCount}`;
+
+        const ovPct = document.getElementById('overview-medals-pct');
+        if (ovPct) ovPct.textContent = `${percent}%`;
+
+        const ovTier = document.getElementById('overview-medals-tier');
+        if (ovTier) ovTier.textContent = tier;
+
+        const overviewPreviewGrid = document.getElementById('overview-medals-preview-grid');
+        if (overviewPreviewGrid) {
+            overviewPreviewGrid.replaceChildren();
+            const previewSubset = achievements.slice(0, 6);
+            previewSubset.forEach(ach => {
+                const item = document.createElement('div');
+                item.className = `preview-medal-item ${ach.earned ? 'is-earned' : ''}`;
+                item.innerHTML = `
+                    <span class="preview-medal-icon">${ach.icon}</span>
+                    <span class="preview-medal-name" title="${ach.name}">${ach.name}</span>
+                    <span class="preview-medal-status">${ach.earned ? '✓ Открыто' : '🔒 Закрыто'}</span>
+                `;
+                overviewPreviewGrid.appendChild(item);
+            });
+        }
+
+        // Filter button texts and active states
+        const filterBtns = document.querySelectorAll('.ach-filter-btn');
+        filterBtns.forEach(btn => {
+            const btnFilter = btn.getAttribute('data-filter');
+            if (btnFilter === 'all') {
+                btn.textContent = `Все награды (${totalCount})`;
+            } else if (btnFilter === 'earned') {
+                btn.textContent = `Разблокированные (${earnedCount})`;
+            } else if (btnFilter === 'locked') {
+                btn.textContent = `В процессе (${lockedCount})`;
+            }
+
+            if (btnFilter === filter) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
+            } else {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            }
         });
+
+        // Visible achievements
+        const visibleAchievements = achievements.filter(achievement => {
+            if (filter === 'earned') return achievement.earned;
+            if (filter === 'locked') return !achievement.earned;
+            return true;
+        });
+
+        const grid = document.getElementById('achievements-full-grid') || document.getElementById('achievements-list');
+        if (grid) {
+            grid.replaceChildren();
+
+            if (visibleAchievements.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.className = 'achievements-empty-msg';
+                emptyItem.textContent = filter === 'earned'
+                    ? 'Пока нет разблокированных наград. Решай задания в тестах и тренажёрах!'
+                    : 'Все награды уже разблокированы! Превосходный результат!';
+                grid.appendChild(emptyItem);
+            } else {
+                visibleAchievements.forEach(achievement => {
+                    const item = document.createElement('li');
+                    item.className = `achievement-item ${achievement.earned ? 'is-earned' : 'is-locked'}`;
+
+                    const iconWrap = document.createElement('div');
+                    iconWrap.className = 'achievement-icon-wrap';
+                    iconWrap.setAttribute('aria-hidden', 'true');
+                    iconWrap.textContent = achievement.icon;
+
+                    const details = document.createElement('div');
+                    details.className = 'achievement-details';
+
+                    const name = document.createElement('h3');
+                    name.className = 'achievement-name';
+                    name.textContent = achievement.name;
+
+                    const description = document.createElement('p');
+                    description.className = 'achievement-desc';
+                    description.textContent = achievement.description;
+
+                    const badge = document.createElement('span');
+                    badge.className = `achievement-badge ${achievement.earned ? 'earned' : 'locked'}`;
+                    badge.innerHTML = achievement.earned 
+                        ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Разблокировано'
+                        : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Заблокировано';
+
+                    details.append(name, description, badge);
+                    item.append(iconWrap, details);
+                    grid.appendChild(item);
+                });
+            }
+        }
+    }
+
+    function renderAchievements() {
+        renderProfileAchievementsPage();
     }
 
     function errorRate(attempts) {
@@ -459,12 +581,31 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSkillsChart(attempts, skillsSelect.value);
     skillsSelect.addEventListener('change', () => updateSkillsChart(attempts, skillsSelect.value));
 
-    const achievementsDialog = document.getElementById('achievements-dialog');
-    document.getElementById('achievements-open').addEventListener('click', () => {
-        renderAchievements();
-        achievementsDialog.showModal();
+    // Medals page filters setup & initial render
+    const achFilterBtns = document.querySelectorAll('.ach-filter-btn');
+    achFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const f = btn.getAttribute('data-filter');
+            renderProfileAchievementsPage(f);
+        });
     });
-    document.getElementById('achievements-close').addEventListener('click', () => achievementsDialog.close());
+
+    // Make global for tab switcher and external updates
+    window.renderProfileAchievementsPage = renderProfileAchievementsPage;
+    window.renderAchievements = renderProfileAchievementsPage;
+    renderProfileAchievementsPage('all');
+
+    // Backwards compatibility for old dialog if ever invoked
+    const achievementsDialog = document.getElementById('achievements-dialog');
+    const oldAchOpen = document.getElementById('achievements-open');
+    if (achievementsDialog && oldAchOpen) {
+        oldAchOpen.addEventListener('click', () => {
+            renderAchievements();
+            achievementsDialog.showModal();
+        });
+        const oldAchClose = document.getElementById('achievements-close');
+        if (oldAchClose) oldAchClose.addEventListener('click', () => achievementsDialog.close());
+    }
 
     // Глобальное обновление опыта при получении подарков или наград
     window.refreshProfileExperience = function() {
