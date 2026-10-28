@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f5f2eb" />
-  <title>Тренажёр ОГЭ №6 · Числа и вычисления — НЕШкола</title>
+  <title>Тренажёр ОГЭ №6 · Числа и вычисления · НЕШкола</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
@@ -208,8 +208,12 @@
       font-family: 'DM Sans', monospace; text-align: center;
       transition: all .2s ease;
     }
-    .answer-input:focus {
-      outline: none; border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    .answer-input:focus,
+    .answer-input:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 1px;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
     }
     .answer-input.correct {
       border-color: var(--green); background: var(--green-light); color: var(--green);
@@ -218,20 +222,64 @@
       border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
     }
 
-    .btn-check {
-      height: 52px; padding: 0 28px; border-radius: 10px;
-      background: var(--vermilion); color: #fff; font-size: 14px; font-weight: 700;
-      box-shadow: 0 4px 14px rgba(183,70,78,.35); transition: all .2s;
+    .btn-check,
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      padding: 0 28px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
       white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
+      transition: all .2s ease;
     }
-    .btn-check:hover { background: #d3525b; transform: translateY(-1px); }
+    .btn-check:focus-visible,
+    .btn-next:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 2px;
+    }
+    .btn-check {
+      background: var(--vermilion);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover {
+      background: #d3525b;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .btn-check:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(183,70,78,.3);
+    }
+    .btn-check:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+      transform: none;
+    }
 
     .btn-next {
-      height: 52px; padding: 0 24px; border-radius: 10px;
-      background: var(--indigo); color: #fff; font-size: 14px; font-weight: 700;
-      transition: all .2s; white-space: nowrap;
+      background: var(--indigo);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(38,63,97,.25);
     }
-    .btn-next:hover { background: #19273c; transform: translateY(-1px); }
+    .btn-next:hover {
+      background: #19273c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+    .btn-next:active {
+      transform: translateY(0);
+    }
 
     /* FEEDBACK MESSAGE */
     .feedback-banner {
@@ -296,8 +344,15 @@
     @media (max-width: 768px) {
       .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
       .problem-card { padding: 24px 18px; }
-      .answer-row { flex-direction: column; }
+      .answer-row { flex-direction: column; width: 100%; }
+      .answer-input-wrap { width: 100%; min-width: 0; }
       .btn-check, .btn-next { width: 100%; }
+    }
+
+    @media (max-width: 540px) {
+      .problem-card { padding-top: 50px; }
+      .card-top-tag { top: 14px; left: 16px; font-size: 10px; max-width: 52%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .card-help-badge { top: 14px; right: 16px; font-size: 10px; }
     }
   </style>
 </head>

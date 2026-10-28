@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Задачи по физике — ФизикаПро</title>
+<title>Задачи по физике · ФизикаПро</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,6 +19,17 @@
     justify-content: space-between; min-height: 64px; padding: 0 48px;
     background: rgba(5,12,26,0.92); backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 16px; }
+  .nav-lobby {
+    display: inline-flex; align-items: center; padding: 7px 14px;
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text2);
+    font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap;
+    transition: color .2s, border-color .2s, background .2s, transform .15s;
+  }
+  .nav-lobby:hover, .nav-lobby:focus-visible {
+    color: var(--accent); border-color: var(--accent); background: rgba(56,189,248,.08);
+    transform: translateY(-1px);
   }
   .nav-logo {
     color: var(--accent); font: 700 20px 'Playfair Display', serif;
@@ -48,14 +59,45 @@
   .topic-card h2 { margin-bottom: 18px; color: var(--grade-color, var(--accent)); font: 700 21px 'Playfair Display', serif; }
   .task-list { display: grid; gap: 10px; list-style: none; }
   .task-list .task-link {
-    display: block; padding: 12px 14px; border: 1px solid rgba(148,163,184,.12);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; border: 1px solid rgba(148,163,184,.12);
     border-radius: 10px; color: var(--text); font: 400 14px/1.5 Raleway, sans-serif;
-    text-align: left; transition: border-color .2s, background .2s;
+    text-align: left; transition: border-color .2s, background .2s, box-shadow .2s;
   }
   .task-list button.task-link { width: 100%; background: transparent; cursor: pointer; }
-  .task-list button.task-link::after { content: '↗'; float: right; margin-left: 10px; color: var(--grade-color, var(--accent)); }
+  .task-list button.task-link:not([data-task-index])::after { content: '↗'; margin-left: 10px; color: var(--grade-color, var(--accent)); flex-shrink: 0; }
+  .task-list button.task-link[data-task-index]::after { display: none; }
   .task-list button.task-link:hover, .task-list button.task-link:focus-visible {
     border-color: var(--grade-color, var(--accent)); background: rgba(56,189,248,.06);
+  }
+  .task-list button.task-link .task-title {
+    flex: 1; min-width: 0; text-align: left;
+  }
+  .task-list button.task-link .task-arrow {
+    color: var(--grade-color, var(--accent)); font-size: 15px; font-weight: 700;
+    flex-shrink: 0; transition: transform .2s ease;
+  }
+  .task-list button.task-link:hover .task-arrow {
+    transform: translate(2px, -2px);
+  }
+  .task-list button.task-link.is-solved {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(34, 197, 94, 0.05);
+  }
+  .task-list button.task-link.is-solved:hover,
+  .task-list button.task-link.is-solved:focus-visible {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.18);
+  }
+  .task-check {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: #22c55e;
+    animation: checkPopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes checkPopIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
   }
   .task-list button.theory-button {
     border-color: var(--grade-color); background: var(--grade-color); color: #071222; font-weight: 700;
@@ -73,7 +115,7 @@
     border-color: var(--grade-color); background: radial-gradient(ellipse at center, #0c1b30 0%, var(--grade-color) 135%); filter: brightness(1.12);
   }
   .task-list .unavailable { color: var(--text2); opacity: .68; }
-  .task-list .unavailable::after { content: 'Скоро'; float: right; margin-left: 10px; color: var(--text2); font-size: 11px; }
+  .task-list .unavailable::after { content: 'Скоро'; margin-left: 10px; color: var(--text2); font-size: 11px; flex-shrink: 0; }
   .task-list button.task-link:focus-visible, .grade-picker a:focus-visible, .nav-links a:focus-visible {
     outline: 2px solid var(--grade-color, var(--accent)); outline-offset: 3px;
   }
@@ -154,10 +196,15 @@
 </head>
 <body>
 <nav>
-  <a class="nav-logo" href="../../physics.html">⚛ ФизикаПро</a>
+  <div class="nav-brand">
+    <a class="nav-lobby" href="../../../index.html">← В лобби</a>
+    <a class="nav-logo" href="../../physics.html">⚛ ФизикаПро</a>
+  </div>
   <div class="nav-links">
     <a href="../../physics.html">Главная</a>
     <a href="../all_simulations.html">Симуляции</a>
+    <a href="../games/memo.html">Игры</a>
+    <a href="../../../profile.html" style="color: var(--gold); font-weight: 700;">Профиль 👤</a>
   </div>
 </nav>
 <main id="main-content"></main>
@@ -195,7 +242,7 @@
         <p>Мощность теплопередачи пропорциональна площади поверхности теплообмена и разности температур поверхности тела и окружающей среды. Тепло передаётся от более нагретой поверхности к более холодной среде.</p>
       </section>
       <div class="richman-equation">Q̇ = αS(T<sub>пов</sub> − T<sub>ср</sub>)</div>
-      <p class="richman-definitions">Здесь <strong>Q̇</strong> — мощность теплового потока (Вт), <strong>S</strong> — площадь поверхности теплообмена (м²), <strong>α</strong> — коэффициент теплоотдачи (Вт/(м²·°C)), <strong>T<sub>пов</sub></strong> — температура поверхности, <strong>T<sub>ср</sub></strong> — температура среды.</p>
+      <p class="richman-definitions">Здесь <strong>Q̇</strong>: мощность теплового потока (Вт), <strong>S</strong>: площадь поверхности теплообмена (м²), <strong>α</strong>: коэффициент теплоотдачи (Вт/(м²·°C)), <strong>T<sub>пов</sub></strong>: температура поверхности, <strong>T<sub>ср</sub></strong>: температура среды.</p>
       <section class="richman-section">
         <h3>Формула через плотность теплового потока</h3>
         <div class="richman-equation">q = Q̇ / S = α(T<sub>пов</sub> − T<sub>ср</sub>)</div>
@@ -216,7 +263,7 @@
       </section>
       <section class="richman-section">
         <h3>Простая аналогия</h3>
-        <p><strong>Плотность потока</strong> похожа на количество дождя, падающего на каждый квадратный метр за секунду. <strong>Полная мощность потока</strong> — сколько дождя соберёт вся поверхность: чем она больше, тем больше общий поток.</p>
+        <p><strong>Плотность потока</strong> похожа на количество дождя, падающего на каждый квадратный метр за секунду. <strong>Полная мощность потока</strong> показывает, сколько дождя соберёт вся поверхность: чем она больше, тем больше общий поток.</p>
       </section>
       <section class="richman-section">
         <h3>Применение в жизни</h3>
@@ -292,9 +339,9 @@ const gradeCatalogs = {
 const topicTheories = {
   '7': [
     { description: 'Физические величины описывают свойства тел и явлений. Результат измерения сравнивают с единицей измерения; цену деления шкалы находят, разделив разность соседних подписанных отметок на число промежутков.', formula: 'V = abc; цена деления = разность отметок / число делений' },
-    { description: 'Механическое движение — изменение положения тела относительно выбранного тела отсчёта с течением времени. Траектория — линия движения, а путь — её длина.', formula: 'Путь s измеряется в метрах (м)' },
+    { description: 'Механическое движение: изменение положения тела относительно выбранного тела отсчёта с течением времени. Траектория: линия движения, а путь: её длина.', formula: 'Путь s измеряется в метрах (м)' },
     { description: 'При равномерном движении тело за равные промежутки времени проходит одинаковые пути. Скорость показывает, какой путь пройден за единицу времени.', formula: 'v = s / t; s = vt' },
-    { description: 'Инерция — явление сохранения телом покоя или равномерного прямолинейного движения, если действия других тел скомпенсированы. Изменить скорость можно только взаимодействием.', formula: 'Если равнодействующая сил равна нулю, скорость не меняется' },
+    { description: 'Инерция: явление сохранения телом покоя или равномерного прямолинейного движения, если действия других тел скомпенсированы. Изменить скорость можно только взаимодействием.', formula: 'Если равнодействующая сил равна нулю, скорость не меняется' },
     { description: 'При растяжении или сжатии пружины возникает сила упругости, направленная против деформации. В пределах упругой деформации её модуль пропорционален удлинению.', formula: 'F<sub>упр</sub> = kx' },
     { description: 'Сила трения препятствует относительному движению соприкасающихся поверхностей. Сила тяжести притягивает тело к Земле.', formula: 'F<sub>тр</sub> = μN; F<sub>тяж</sub> = mg' },
     { description: 'Давление показывает, какая сила приходится на единицу площади опоры. Простые механизмы позволяют получить выигрыш в силе, но не в работе.', formula: 'p = F / S; F<sub>1</sub>l<sub>1</sub> = F<sub>2</sub>l<sub>2</sub>' },
@@ -305,7 +352,7 @@ const topicTheories = {
     { description: 'Количество теплоты зависит от массы тела, вещества и изменения температуры. Удельная теплоёмкость показывает, сколько энергии нужно для нагрева 1 кг вещества на 1 °C.', formula: 'Q = cmΔT' },
     { description: 'Закон Ньютона–Рихмана описывает теплообмен тела со средой: мощность теплоотдачи пропорциональна площади поверхности и разности температур.', formula: 'Q̇ = αS(T<sub>пов</sub> − T<sub>ср</sub>)', richman: true },
     { description: 'Во время плавления температура чистого кристаллического вещества остаётся постоянной. Полученная энергия идёт на разрушение кристаллической решётки.', formula: 'Q = λm' },
-    { description: 'Испарение происходит с поверхности жидкости при любой температуре, а кипение — по всему объёму при температуре кипения. При конденсации пар отдаёт энергию.', formula: 'Q = Lm' },
+    { description: 'Испарение происходит с поверхности жидкости при любой температуре, а кипение: по всему объёму при температуре кипения. При конденсации пар отдаёт энергию.', formula: 'Q = Lm' },
     { description: 'Одноимённые электрические заряды отталкиваются, разноимённые притягиваются. Сила взаимодействия зависит от зарядов и расстояния между ними.', formula: 'F = k|q<sub>1</sub>q<sub>2</sub>| / r²' },
     { description: 'Сила тока равна заряду, проходящему через поперечное сечение проводника за единицу времени. Для участка цепи ток пропорционален напряжению и обратно пропорционален сопротивлению.', formula: 'I = q / t; I = U / R' },
     { description: 'При последовательном соединении сила тока одинакова во всех элементах, а напряжения складываются. Работа тока зависит от напряжения, силы тока и времени.', formula: 'A = UIt; P = UI' },
@@ -316,9 +363,9 @@ const topicTheories = {
     { description: 'Первый закон Ньютона описывает движение при нулевой равнодействующей сил. Второй связывает ускорение с силой и массой, третий описывает силы взаимодействия двух тел.', formula: 'ΣF = ma' },
     { description: 'Любые два тела притягиваются друг к другу. При движении по окружности скорость меняет направление, поэтому возникает центростремительное ускорение.', formula: 'F = Gm<sub>1</sub>m<sub>2</sub> / r²; a<sub>ц</sub> = v² / r' },
     { description: 'Импульс тела равен произведению массы на скорость. В замкнутой системе суммарный импульс до взаимодействия равен суммарному импульсу после него.', formula: 'p = mv; Σp<sub>до</sub> = Σp<sub>после</sub>' },
-    { description: 'Кинетическая энергия связана с движением, потенциальная — с положением тел или их взаимодействием. При отсутствии потерь их сумма сохраняется.', formula: 'E = E<sub>к</sub> + E<sub>п</sub> = const' },
-    { description: 'Период колебаний — время одного полного колебания. Для идеального пружинного маятника он зависит от массы груза и жёсткости пружины.', formula: 'T = 2π√(m / k)' },
-    { description: 'Механическая волна переносит энергию без переноса вещества. Длина волны — расстояние, которое волна проходит за один период; эхо возникает при отражении звука.', formula: 'v = λν; расстояние до преграды = vt / 2' },
+    { description: 'Кинетическая энергия связана с движением, потенциальная: с положением тел или их взаимодействием. При отсутствии потерь их сумма сохраняется.', formula: 'E = E<sub>к</sub> + E<sub>п</sub> = const' },
+    { description: 'Период колебаний: время одного полного колебания. Для идеального пружинного маятника он зависит от массы груза и жёсткости пружины.', formula: 'T = 2π√(m / k)' },
+    { description: 'Механическая волна переносит энергию без переноса вещества. Длина волны: расстояние, которое волна проходит за один период; эхо возникает при отражении звука.', formula: 'v = λν; расстояние до преграды = vt / 2' },
     { description: 'Радиоактивный распад происходит самопроизвольно. За каждый период полураспада число нераспавшихся ядер уменьшается вдвое.', formula: 'N = N<sub>0</sub> · 2^(−t / T<sub>1/2</sub>)' },
   ],
   '10-11': [
@@ -330,7 +377,7 @@ const topicTheories = {
     { description: 'Изменение магнитного потока через замкнутый контур вызывает индукционный ток. Его направление противодействует причине, вызвавшей индукцию.', formula: 'ε = −ΔΦ / Δt' },
     { description: 'В колебательном контуре энергия периодически переходит из электрической в магнитную. Электромагнитная волна распространяется в вакууме со скоростью света.', formula: 'T = 2π√(LC); c = λν' },
     { description: 'Собирающая линза может создавать действительное или мнимое изображение. Положение изображения находят из формулы тонкой линзы.', formula: '1 / F = 1 / d + 1 / f' },
-    { description: 'Фотоэффект — вырывание электронов веществом под действием света. Энергия фотона расходуется на выход электрона и его кинетическую энергию.', formula: 'hν = A<sub>вых</sub> + E<sub>к</sub>' },
+    { description: 'Фотоэффект: вырывание электронов веществом под действием света. Энергия фотона расходуется на выход электрона и его кинетическую энергию.', formula: 'hν = A<sub>вых</sub> + E<sub>к</sub>' },
     { description: 'Масса связанного ядра меньше суммарной массы свободных нуклонов. Дефект массы соответствует энергии связи ядра.', formula: 'E<sub>св</sub> = Δmc²' },
   ],
 };
@@ -345,7 +392,7 @@ const interactiveTasks = {
   '8': [
     { condition: 'При нагревании телу передали 12 кДж теплоты. Совершения работы нет. На сколько увеличилась внутренняя энергия тела?', answer: 12, unit: 'кДж' },
     { condition: 'Горячую металлическую ложку опустили в холодную воду. В каком направлении передаётся теплота?', acceptedAnswers: ['от горячего тела к холодному', 'от нагретого тела к холодному', 'от более горячего тела к более холодному'] },
-    { condition: 'Какое количество теплоты нужно, чтобы нагреть 0,5 кг воды от 20 °C до 24 °C? Удельная теплоёмкость воды — 4200 Дж/(кг·°C).', answer: 8400, unit: 'Дж' },
+    { condition: 'Какое количество теплоты нужно, чтобы нагреть 0,5 кг воды от 20 °C до 24 °C? Удельная теплоёмкость воды равна 4200 Дж/(кг·°C).', answer: 8400, unit: 'Дж' },
     { condition: 'Смешали равные массы воды при температурах 20 °C и 60 °C. Потерь теплоты нет. Какова установившаяся температура смеси?', answer: 40, unit: '°C' },
   ],
   '9': [
@@ -364,8 +411,8 @@ const interactiveTasks = {
 
 const additionalInteractiveTasks = {
   '8': {
-    4: { condition: 'По закону Ньютона–Рихмана мощность теплоотдачи P = αS(Tт − Tср). Площадь поверхности тела 0,05 м², коэффициент теплоотдачи α = 12 Вт/(м²·°C), температура тела 60 °C, воздуха — 20 °C. Найдите мощность теплоотдачи.', answer: 24, unit: 'Вт' },
-    5: { condition: 'Мощность теплоотдачи тела равна 6 Вт. Площадь его поверхности 0,02 м², коэффициент теплоотдачи α = 10 Вт/(м²·°C), температура воздуха — 20 °C. Используя закон Ньютона–Рихмана P = αS(Tт − Tср), найдите температуру тела.', answer: 50, unit: '°C' },
+    4: { condition: 'По закону Ньютона–Рихмана мощность теплоотдачи P = αS(Tт − Tср). Площадь поверхности тела 0,05 м², коэффициент теплоотдачи α = 12 Вт/(м²·°C), температура тела 60 °C, воздуха: 20 °C. Найдите мощность теплоотдачи.', answer: 24, unit: 'Вт' },
+    5: { condition: 'Мощность теплоотдачи тела равна 6 Вт. Площадь его поверхности 0,02 м², коэффициент теплоотдачи α = 10 Вт/(м²·°C), температура воздуха: 20 °C. Используя закон Ньютона–Рихмана P = αS(Tт − Tср), найдите температуру тела.', answer: 50, unit: '°C' },
   },
 };
 
@@ -377,8 +424,35 @@ const gradeLinks = Object.entries(gradeCatalogs).map(([id, item]) =>
   `<a href="?grade=${id}"${grade === id ? ' aria-current="page"' : ''} style="--grade-color:${item.color}">${item.label}</a>`
 ).join('');
 
+const CHECKMARK_ICON_HTML = `
+  <span class="task-check" title="Задание полностью выполнено" aria-label="Задание полностью выполнено">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="#22c55e" stroke-width="2" fill="rgba(34, 197, 94, 0.16)"/>
+      <path d="m8 12 3 3 5-6"/>
+    </svg>
+  </span>`;
+
+function getSolvedPhysicsTaskIds() {
+  const solved = new Set();
+  try {
+    const raw = localStorage.getItem('studyMetrics');
+    if (raw) {
+      const attempts = JSON.parse(raw);
+      if (Array.isArray(attempts)) {
+        attempts.forEach(att => {
+          if (att && att.correct && att.taskId) {
+            solved.add(att.taskId);
+          }
+        });
+      }
+    }
+  } catch (e) {}
+  return solved;
+}
+
 if (catalog) {
   let taskIndex = 0;
+  const solvedSet = getSolvedPhysicsTaskIds();
   document.documentElement.style.setProperty('--grade-color', catalog.color);
   main.innerHTML = `
     <header class="page-heading">
@@ -395,15 +469,20 @@ if (catalog) {
             <li><button class="task-link theory-button" type="button" data-theory-index="${topicIndex}">Теория</button></li>
             ${tasks.map(task => {
             const index = taskIndex++;
+            const taskId = `physics-${grade}-topic-${topicIndex}-task-${index}`;
+            const isSolved = solvedSet.has(taskId);
             return getInteractiveTask(index)
-              ? `<li><button class="task-link" type="button" data-task-index="${index}">${task}</button></li>`
+              ? `<li><button class="task-link${isSolved ? ' is-solved' : ''}" type="button" data-task-index="${index}" data-task-id="${taskId}"><span class="task-title">${task}</span>${isSolved ? CHECKMARK_ICON_HTML : '<span class="task-arrow" aria-hidden="true">↗</span>'}</button></li>`
               : `<li><span class="task-link unavailable" aria-disabled="true">${task}</span></li>`;
           }).join('')}
             <li><button class="task-link test-button" type="button">Пройти тестирование</button></li>
           </ul>
         </article>`).join('')}
     </section>
-    <a class="back-link" href="../all_simulations.html">← Вернуться к симуляциям</a>`;
+    <div style="display: flex; gap: 24px; align-items: center; margin-top: 34px; flex-wrap: wrap;">
+      <a class="back-link" style="margin-top:0;" href="../all_simulations.html">← Вернуться к симуляциям</a>
+      <a class="back-link" style="margin-top:0; color: var(--accent);" href="../../../index.html">← В главное лобби</a>
+    </div>`;
 } else {
   main.innerHTML = `
     <header class="page-heading">
@@ -413,7 +492,10 @@ if (catalog) {
     </header>
     <nav class="grade-picker" aria-label="Выбрать класс">${gradeLinks}</nav>
     <p class="empty-state">Чтобы открыть каталог задач, выберите класс.</p>
-    <a class="back-link" href="../all_simulations.html">← Вернуться к симуляциям</a>`;
+    <div style="display: flex; gap: 24px; align-items: center; margin-top: 34px; flex-wrap: wrap;">
+      <a class="back-link" style="margin-top:0;" href="../all_simulations.html">← Вернуться к симуляциям</a>
+      <a class="back-link" style="margin-top:0; color: var(--accent);" href="../../../index.html">← В главное лобби</a>
+    </div>`;
 }
 
 const taskDialog = document.getElementById('task-dialog');
@@ -491,9 +573,11 @@ main.addEventListener('click', event => {
   activeTask = getInteractiveTask(Number(button.dataset.taskIndex));
   const topicCard = button.closest('.topic-card');
   const topicIndex = Number(topicCard.dataset.topicIndex);
-  activeTaskId = `physics-${grade}-topic-${topicIndex}-task-${button.dataset.taskIndex}`;
+  activeTaskId = button.dataset.taskId || `physics-${grade}-topic-${topicIndex}-task-${button.dataset.taskIndex}`;
   activeTaskSkill = getPhysicsSkill(topicCard.querySelector('h2').textContent);
-  document.getElementById('task-dialog-title').textContent = button.textContent;
+  
+  const titleEl = button.querySelector('.task-title');
+  document.getElementById('task-dialog-title').textContent = titleEl ? titleEl.textContent : button.textContent;
   document.getElementById('task-condition').textContent = activeTask.condition;
   document.getElementById('answer-unit').textContent = activeTask.unit || '';
   document.getElementById('answer-hint').textContent = activeTask.unit
@@ -520,8 +604,33 @@ answerForm.addEventListener('submit', event => {
   }
 
   recordPhysicsAttempt(isCorrect);
-  answerFeedback.textContent = isCorrect ? 'Верно! Отличная работа.' : 'Пока неверно. Проверьте решение и попробуйте ещё раз.';
-  answerFeedback.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+  if (isCorrect) {
+    answerFeedback.innerHTML = `
+      <span style="display:inline-flex; align-items:center; gap:6px; color:#34d399; font-weight:700;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="#22c55e" stroke-width="2" fill="rgba(34, 197, 94, 0.16)"/>
+          <path d="m8 12 3 3 5-6"/>
+        </svg>
+        Верно! Задание полностью выполнено.
+      </span>`;
+    answerFeedback.className = 'answer-feedback correct';
+
+    // Instantly update task button on the page with green checkmark
+    if (activeTaskId) {
+      const taskBtn = document.querySelector(`[data-task-id="${activeTaskId}"]`);
+      if (taskBtn) {
+        taskBtn.classList.add('is-solved');
+        const arrow = taskBtn.querySelector('.task-arrow');
+        if (arrow) arrow.remove();
+        if (!taskBtn.querySelector('.task-check')) {
+          taskBtn.insertAdjacentHTML('beforeend', CHECKMARK_ICON_HTML);
+        }
+      }
+    }
+  } else {
+    answerFeedback.textContent = 'Пока неверно. Проверьте решение и попробуйте ещё раз.';
+    answerFeedback.className = 'answer-feedback incorrect';
+  }
 });
 
 function closeTaskDialog() {

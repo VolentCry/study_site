@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Игры по физике — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050c1a; --bg2: #071222; --accent: #38bdf8; --accent2: #818cf8;
+    --accent3: #f472b6; --gold: #fbbf24; --green: #22c55e;
+    --text: #e2e8f0; --text2: #94a3b8; --border: rgba(56, 189, 248, 0.22);
+  }
+  body {
+    min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'Raleway', sans-serif;
+    display: flex; flex-direction: column; overflow-x: hidden;
+  }
+  .ambient-backdrop {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: 
+      radial-gradient(1.5px 1.5px at 30px 40px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 120px 180px, rgba(56,189,248,0.4), transparent),
+      radial-gradient(ellipse 70% 50% at 50% -10%, rgba(56, 189, 248, 0.12), transparent);
+    background-size: 260px 260px, 340px 340px, 100% 100%;
+  }
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center;
+    justify-content: space-between; min-height: 64px; padding: 0 clamp(16px, 4vw, 48px);
+    background: rgba(5, 12, 26, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 16px; }
+  .nav-logo { color: var(--accent); font: 700 20px 'Playfair Display', serif; text-decoration: none; }
+  .nav-lobby {
+    display: inline-flex; align-items: center; padding: 7px 14px;
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text2);
+    font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap;
+    transition: all .2s;
+  }
+  .nav-lobby:hover { color: var(--accent); border-color: var(--accent); background: rgba(56,189,248,.08); }
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text2); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--accent); }
+
+  main {
+    flex: 1; width: min(1100px, calc(100% - 32px)); margin: 0 auto;
+    padding: 48px 0 80px; position: relative; z-index: 2;
+  }
+  .page-header { text-align: center; max-width: 680px; margin: 0 auto 40px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px;
+    background: rgba(56, 189, 248, 0.12); border: 1px solid var(--border);
+    border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px;
+  }
+  h1 {
+    font: 900 clamp(32px, 5vw, 54px)/1.15 'Playfair Display', serif;
+    background: linear-gradient(135deg, #ffffff 40%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .intro { margin-top: 14px; color: var(--text2); font-size: 16px; line-height: 1.6; }
+
+  .games-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+  }
+  .game-card {
+    padding: 28px; border: 1px solid var(--border); border-radius: 20px;
+    background: linear-gradient(160deg, rgba(14, 28, 54, 0.9) 0%, rgba(7, 18, 34, 0.95) 100%);
+    display: flex; flex-direction: column; gap: 16px; text-decoration: none;
+    color: var(--text); transition: all .3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative; overflow: hidden;
+  }
+  .game-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent), var(--accent2));
+    opacity: 0; transition: opacity .3s;
+  }
+  .game-card:hover {
+    transform: translateY(-4px); border-color: var(--accent);
+    box-shadow: 0 16px 40px rgba(56, 189, 248, 0.18);
+  }
+  .game-card:hover::before { opacity: 1; }
+
+  .game-badge {
+    align-self: flex-start; padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+    background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); color: var(--gold);
+  }
+  .game-badge.coming-soon {
+    background: rgba(148, 163, 184, 0.12); border-color: rgba(148, 163, 184, 0.25); color: var(--text2);
+  }
+  .game-icon { font-size: 40px; line-height: 1; }
+  .game-title { font: 700 24px 'Playfair Display', serif; color: #ffffff; }
+  .game-desc { font-size: 14px; color: var(--text2); line-height: 1.6; flex: 1; }
+  .game-features {
+    display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text);
+  }
+  .game-features span { display: inline-flex; align-items: center; gap: 8px; }
+  .game-btn {
+    display: inline-flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; border-radius: 10px; background: rgba(56, 189, 248, 0.12);
+    border: 1px solid var(--border); color: var(--accent); font-weight: 700; font-size: 14px;
+    margin-top: 8px; transition: all .2s;
+  }
+  .game-card:hover .game-btn {
+    background: var(--accent); color: #050c1a; border-color: var(--accent);
+  }
+  .back-row { margin-top: 36px; display: flex; gap: 20px; }
+  .back-link { color: var(--text2); font-size: 14px; text-decoration: none; }
+  .back-link:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="ambient-backdrop"></div>
+<nav>
+  <div class="nav-brand">
+    <a class="nav-lobby" href="../../../index.html">← В лобби</a>
+    <a class="nav-logo" href="../../physics.html">⚛ ФизикаПро</a>
+  </div>
+  <div class="nav-links">
+    <a href="../../physics.html">Главная</a>
+    <a href="../tasks/index.html">Задачи</a>
+    <a href="../all_simulations.html">Симуляции</a>
+    <a href="../../../profile.html" style="color: var(--gold); font-weight: 700;">Профиль 👤</a>
+  </div>
+</nav>
+
+<main>
+  <header class="page-header">
+    <div class="eyebrow">Физика • Игровой модуль</div>
+    <h1>Игры по физике</h1>
+    <p class="intro">Закрепляй теорию и формулы играючи: развивай зрительную память, скорость реакции и получай бонусные очки XP в свой профиль.</p>
+  </header>
+
+  <div class="games-grid">
+    <!-- MEMO GAME -->
+    <a class="game-card" href="memo.html">
+      <div class="game-badge">Хит • Новинка</div>
+      <div class="game-icon">🧠 ⚡</div>
+      <h2 class="game-title">МЕМО: Формулы физики</h2>
+      <p class="game-desc">
+        Интерактивная игра на память и знание законов. Выбирай пройденные темы (7–11 классы), настраивай размер стола (от 12 до 24 карточек) и соединяй формулы с их физическими названиями!
+      </p>
+      <div class="game-features">
+        <span>🃏 <strong>Стол:</strong> от 6 до 12 пар формул</span>
+        <span>⏱️ <strong>Режимы:</strong> таймер, комбо-серии и подсчёт ходов</span>
+        <span>🏆 <strong>Награда:</strong> до +50 XP в профиль платформы</span>
+      </div>
+      <div class="game-btn">
+        <span>Играть в МЕМО</span>
+        <span>→</span>
+      </div>
+    </a>
+
+    <!-- COMING SOON CARD -->
+    <div class="game-card" style="opacity: 0.75; cursor: default;">
+      <div class="game-badge coming-soon">В разработке</div>
+      <div class="game-icon">🎯 ⏱️</div>
+      <h2 class="game-title">Спринт формул (Блиц)</h2>
+      <p class="game-desc">
+        Скоростной раунд на 60 секунд: успей верно сопоставить величины с единицами измерения и базовыми формулами до того, как истечёт время.
+      </p>
+      <div class="game-features">
+        <span>⏱️ <strong>Таймер:</strong> 60 секунд + бонус за серию</span>
+        <span>📊 <strong>Множитель:</strong> x2, x3 за комбо</span>
+      </div>
+      <div class="game-btn" style="pointer-events: none; opacity: 0.6;">
+        <span>Скоро</span>
+        <span>🔒</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-row">
+    <a class="back-link" href="../../physics.html">← Вернуться на главную страницу физики</a>
+    <a class="back-link" href="../../../index.html" style="color: var(--accent);">← В главное лобби</a>
+  </div>
+</main>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Физика — королева наук</title>
+<title>Физика: королева наук</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -136,6 +136,22 @@
     transform: translateY(-2px);
     box-shadow: 0 0 36px rgba(79, 70, 229, 0.6);
     border-color: var(--accent);
+  }
+  .btn-games {
+    padding: 14px 36px; border-radius: 50px;
+    background: linear-gradient(135deg, #d97706, #ea580c);
+    color: #fff; font-family: 'Raleway', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 0 26px rgba(234, 88, 12, 0.35);
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-games:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 36px rgba(234, 88, 12, 0.6);
+    border-color: var(--gold);
   }
   .btn-outline {
     padding: 14px 36px; border-radius: 50px;
@@ -270,6 +286,10 @@
     -webkit-appearance: none; height: 4px; border-radius: 4px;
     background: rgba(56,189,248,.2); outline: none; width: 120px;
   }
+  .sim-controls input[type=range]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
   .sim-controls input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
     background: var(--accent); cursor: pointer;
@@ -344,6 +364,53 @@
   .btn-all-arrow { font-size: 18px; transition: transform 0.2s; }
   .btn-all:hover .btn-all-arrow { transform: translateX(4px); }
 
+  /* ─── GAMES SHOWCASE ─── */
+  .game-showcase-card {
+    padding: 32px 28px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: linear-gradient(160deg, rgba(14, 28, 54, 0.85) 0%, rgba(7, 18, 34, 0.95) 100%);
+    display: flex; flex-direction: column; gap: 16px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative; overflow: hidden;
+  }
+  .game-showcase-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent), var(--accent2));
+    opacity: 0; transition: opacity .3s;
+  }
+  .game-showcase-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold);
+    box-shadow: 0 16px 40px rgba(251, 191, 36, 0.15);
+  }
+  .game-showcase-card:hover::before { opacity: 1; }
+  .game-card-badge {
+    align-self: flex-start; padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+    background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); color: var(--gold);
+  }
+  .game-showcase-icon { font-size: 38px; line-height: 1; }
+  .game-showcase-title { font: 700 22px 'Playfair Display', serif; color: #ffffff; }
+  .game-showcase-desc { font-size: 14px; color: var(--text2); line-height: 1.6; flex: 1; }
+  .game-showcase-tags {
+    display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--text2);
+  }
+  .game-showcase-tags span {
+    padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .game-showcase-btn {
+    display: inline-flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; border-radius: 10px; background: rgba(251, 191, 36, 0.12);
+    border: 1px solid rgba(251, 191, 36, 0.3); color: var(--gold); font-weight: 700; font-size: 14px;
+    margin-top: 6px; transition: all .2s;
+  }
+  .game-showcase-card:hover .game-showcase-btn {
+    background: var(--gold); color: #050c1a;
+  }
+
   /* ─── FOOTER ─── */
   footer {
     padding: 48px 24px;
@@ -381,6 +448,7 @@
     <a href="#classes">Классы</a>
     <a href="#sim-grid">Симуляции</a>
     <a href="physics/tasks/index.html">К задачам</a>
+    <a href="#games">Игры</a>
   </div>
   <a class="nav-profile-btn" href="../profile.html">Мой профиль</a>
 </nav>
@@ -389,7 +457,7 @@
 <section id="hero">
   <canvas id="starfield"></canvas>
   <div class="hero-content">
-    <h1 class="hero-title">Физика&thinsp;—<br>королева наук!</h1>
+    <h1 class="hero-title">Физика:<br>королева наук!</h1>
     <p class="hero-sub">
       Интерактивные уроки, живые симуляции и задачи для 7–11 классов.
       Погружайся в мир физики прямо сейчас.
@@ -397,6 +465,7 @@
     <div class="hero-cta">
       <a href="#classes" class="btn-primary">Начать учиться</a>
       <a href="physics/tasks/index.html" class="btn-tasks">К задачам</a>
+      <a href="physics/games/memo.html" class="btn-games">МЕМО: Формулы 🎮</a>
       <a href="#sim-demo" class="btn-outline">Посмотреть симуляции</a>
     </div>
   </div>
@@ -412,7 +481,7 @@
     <div class="classes-header reveal">
       <p class="section-label">Программа обучения</p>
       <h2 class="section-title">Выберите свой класс</h2>
-      <p class="section-desc">От механики до квантовой физики — полная школьная программа с объяснениями, задачами и симуляциями.</p>
+      <p class="section-desc">От механики до квантовой физики: полная школьная программа с объяснениями, задачами и симуляциями.</p>
     </div>
     <div class="classes-grid">
       <a class="class-card reveal" href="physics/all_simulations.html#grid7" aria-label="Открыть симуляции для 7 класса">
@@ -469,7 +538,7 @@
     <div class="sim-demo-header reveal">
       <p class="section-label">Интерактивные симуляции</p>
       <h2 class="section-title">Физика в действии</h2>
-      <p class="section-desc">Управляйте параметрами и наблюдайте за изменениями в реальном времени — без формул, только интуиция.</p>
+      <p class="section-desc">Управляйте параметрами и наблюдайте за изменениями в реальном времени: без формул, только интуиция.</p>
     </div>
     <div class="sim-demos-row reveal">
       <!-- Pendulum -->
@@ -612,9 +681,56 @@
   </div>
 </section>
 
+<!-- GAMES SECTION -->
+<section id="games" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);">
+  <div class="games-inner" style="max-width: 1200px; margin: 0 auto;">
+    <div class="games-header reveal" style="text-align: center; max-width: 640px; margin: 0 auto 56px;">
+      <p class="section-label" style="color: var(--gold);">Игровой модуль</p>
+      <h2 class="section-title">Игры по физике</h2>
+      <p class="section-desc">Тренируй зрительную память, скорость мышления и закрепляй ключевые формулы в увлекательных игровых режимах.</p>
+    </div>
+
+    <div class="games-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+      <!-- MEMO GAME CARD -->
+      <a class="game-showcase-card reveal" href="physics/games/memo.html" aria-label="Открыть игру МЕМО: Формулы физики">
+        <div class="game-card-badge">Хит • Новинка</div>
+        <div class="game-showcase-icon">🧠 ⚛️</div>
+        <h3 class="game-showcase-title">МЕМО: Формулы физики</h3>
+        <p class="game-showcase-desc">Выбирай темы, которые уже прошёл (7–11 классы), настраивай размер стола (от 12 до 24 карт) и собирай пары «закон + формула» на время и комбо!</p>
+        <div class="game-showcase-tags">
+          <span>🃏 6–12 пар карт</span>
+          <span>⏱️ Таймер и серии</span>
+          <span>🏆 До +50 XP в профиль</span>
+        </div>
+        <div class="game-showcase-btn">
+          <span>Играть в МЕМО</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- ALL GAMES HUB -->
+      <a class="game-showcase-card reveal" href="physics/games/index.html" aria-label="Открыть каталог всех игр">
+        <div class="game-card-badge" style="background: rgba(56,189,248,0.12); color: var(--accent); border-color: rgba(56,189,248,0.3);">Каталог игр</div>
+        <div class="game-showcase-icon">🎮 ⚡</div>
+        <h3 class="game-showcase-title">Все игры модуля</h3>
+        <p class="game-showcase-desc">Полный каталог физических мини-игр, режимов блиц-спринта и интерактивных викторин для прокачки навыков.</p>
+        <div class="game-showcase-tags">
+          <span>🎯 Блиц-спринт</span>
+          <span>🧠 Тренажёр формул</span>
+          <span>⭐ Рейтинги</span>
+        </div>
+        <div class="game-showcase-btn" style="background: rgba(56,189,248,0.12); color: var(--accent); border-color: rgba(56,189,248,0.3);">
+          <span>Все игры</span>
+          <span>→</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
-  <p>© 2025 <span>ФизикаПро</span> — Физика просто и наглядно для каждого школьника</p>
+  <p>© 2025 <span>ФизикаПро</span> · Физика просто и наглядно для каждого школьника</p>
 </footer>
 
 <script>

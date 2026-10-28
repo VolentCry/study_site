@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChemGenius — Химия</title>
+<title>ChemGenius · Химия</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -551,8 +551,8 @@
   <div class="hero-particles" id="particles"></div>
   
   <div class="hero-content animate-up">
-    <h1>Химия — <em>наука о превращениях</em></h1>
-    <p>Открой мир атомов, молекул и реакций. От школьной программы до олимпиадных задач — всё в одном месте.</p>
+    <h1>Химия: <em>наука о превращениях</em></h1>
+    <p>Открой мир атомов, молекул и реакций. От школьной программы до олимпиадных задач: всё в одном месте.</p>
   </div>
 
   <div class="hero-visual animate-up delay-2">
@@ -1002,16 +1002,16 @@ loadQuestion();
 
 // REACTION BUILDER
 const reactions = {
-  'H₂+O₂': {prod:'2H₂O', info:'💧 Образуется вода — реакция горения водорода'},
-  'H₂+Cl₂': {prod:'2HCl', info:'💨 Хлороводород — бесцветный газ с резким запахом'},
-  'Na+O₂': {prod:'Na₂O', info:'🔥 Оксид натрия — быстро реагирует с водой'},
+  'H₂+O₂': {prod:'2H₂O', info:'💧 Образуется вода: реакция горения водорода'},
+  'H₂+Cl₂': {prod:'2HCl', info:'💨 Хлороводород: бесцветный газ с резким запахом'},
+  'Na+O₂': {prod:'Na₂O', info:'🔥 Оксид натрия: быстро реагирует с водой'},
   'Na+H₂O': {prod:'NaOH + H₂↑', info:'⚡ Бурная реакция с выделением водорода!'},
-  'Na+Cl₂': {prod:'NaCl', info:'🧂 Поваренная соль — всем знакомое вещество'},
-  'Fe+O₂': {prod:'Fe₂O₃', info:'🟫 Ржавчина — оксид железа(III)'},
-  'Fe+Cl₂': {prod:'FeCl₃', info:'🟠 Хлорид железа(III) — жёлто-коричневые кристаллы'},
+  'Na+Cl₂': {prod:'NaCl', info:'🧂 Поваренная соль: всем знакомое вещество'},
+  'Fe+O₂': {prod:'Fe₂O₃', info:'🟫 Ржавчина: оксид железа(III)'},
+  'Fe+Cl₂': {prod:'FeCl₃', info:'🟠 Хлорид железа(III): жёлто-коричневые кристаллы'},
   'Fe+HCl': {prod:'FeCl₂ + H₂↑', info:'🫧 Железо растворяется в соляной кислоте'},
-  'C+O₂': {prod:'CO₂', info:'🌫️ Углекислый газ — продукт горения угля'},
-  'C+H₂': {prod:'CH₄', info:'🔥 Метан — самый простой углеводород'},
+  'C+O₂': {prod:'CO₂', info:'🌫️ Углекислый газ: продукт горения угля'},
+  'C+H₂': {prod:'CH₄', info:'🔥 Метан: самый простой углеводород'},
 };
 let selA=null, selB=null;
 function selectReagent(side, val) {
@@ -1038,7 +1038,7 @@ function checkReaction() {
     res.className='reaction-result show ok';
     res.innerHTML=rxn.info;
   } else {
-    prod.textContent='—';
+    prod.textContent='-';
     res.className='reaction-result show fail';
     res.textContent='🔬 Эти реагенты не реагируют при обычных условиях';
   }

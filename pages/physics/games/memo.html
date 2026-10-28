@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МЕМО: Формулы физики · Игра для тренировки памяти</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Raleway:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050c1a;
+    --bg2: #071222;
+    --bg3: #0a1830;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #f472b6;
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --border: rgba(56, 189, 248, 0.22);
+    --border-active: rgba(56, 189, 248, 0.6);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Raleway', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Ambient star backdrop */
+  .ambient-backdrop {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: 
+      radial-gradient(1.5px 1.5px at 20px 30px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 90px 140px, rgba(56,189,248,0.5), transparent),
+      radial-gradient(2px 2px at 220px 70px, rgba(129,140,248,0.4), transparent),
+      radial-gradient(ellipse 70% 50% at 50% -10%, rgba(56, 189, 248, 0.12), transparent);
+    background-size: 260px 260px, 320px 320px, 380px 380px, 100% 100%;
+  }
+
+  /* Navigation Header */
+  nav {
+    position: sticky; top: 0; z-index: 50; display: flex; align-items: center;
+    justify-content: space-between; min-height: 64px; padding: 0 clamp(16px, 4vw, 48px);
+    background: rgba(5, 12, 26, 0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 16px; }
+  .nav-logo {
+    color: var(--accent); font: 700 20px 'Playfair Display', serif;
+    text-decoration: none; display: flex; align-items: center; gap: 8px;
+  }
+  .nav-lobby {
+    display: inline-flex; align-items: center; padding: 7px 14px;
+    border: 1px solid var(--border); border-radius: 8px; color: var(--text2);
+    font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap;
+    transition: all .2s;
+  }
+  .nav-lobby:hover, .nav-lobby:focus-visible {
+    color: var(--accent); border-color: var(--accent); background: rgba(56,189,248,.08);
+    transform: translateY(-1px);
+  }
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text2); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* Main Container */
+  main {
+    flex: 1; width: min(1140px, calc(100% - 32px)); margin: 0 auto;
+    padding: 36px 0 64px; position: relative; z-index: 2;
+  }
+
+  /* VIEW 1: TOPIC & TABLE SETUP */
+  .setup-view {
+    display: flex; flex-direction: column; gap: 28px;
+  }
+  .setup-header { text-align: center; max-width: 760px; margin: 0 auto; }
+  .setup-badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px;
+    background: rgba(56, 189, 248, 0.12); border: 1px solid var(--border);
+    border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px;
+  }
+  .setup-title {
+    font: 900 clamp(32px, 5vw, 52px)/1.15 'Playfair Display', serif;
+    background: linear-gradient(135deg, #ffffff 40%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .setup-subtitle {
+    margin-top: 14px; color: var(--text2); font-size: clamp(14px, 2vw, 16px);
+    line-height: 1.6;
+  }
+
+  /* Preset Selector Buttons */
+  .preset-bar {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;
+  }
+  .preset-btn {
+    padding: 8px 16px; border: 1px solid var(--border); border-radius: 999px;
+    background: rgba(14, 28, 54, 0.6); color: var(--text2); font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+  }
+  .preset-btn:hover, .preset-btn.active {
+    border-color: var(--accent); color: var(--accent); background: rgba(56, 189, 248, 0.12);
+  }
+
+  /* Topics Grid */
+  .topics-container {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  .grade-box {
+    padding: 20px; border: 1px solid var(--border); border-radius: 16px;
+    background: linear-gradient(160deg, rgba(14, 28, 54, 0.8), rgba(7, 18, 34, 0.9));
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .grade-box-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .grade-title {
+    font: 700 17px 'Playfair Display', serif; color: var(--accent);
+  }
+  .grade-select-all {
+    font-size: 11px; font-weight: 700; color: var(--text2); background: transparent;
+    border: none; cursor: pointer; text-decoration: underline;
+  }
+  .grade-select-all:hover { color: var(--accent); }
+
+  .topic-label {
+    display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px;
+    border-radius: 8px; cursor: pointer; transition: background .15s;
+    user-select: none;
+  }
+  .topic-label:hover { background: rgba(56, 189, 248, 0.08); }
+  .topic-checkbox {
+    margin-top: 3px; width: 16px; height: 16px; accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .topic-info { flex: 1; }
+  .topic-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .topic-count { font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+
+  /* Board Size / Card Limit Selector */
+  .size-section {
+    padding: 24px; border: 1px solid var(--border); border-radius: 16px;
+    background: rgba(14, 28, 54, 0.6); display: flex; flex-direction: column; gap: 16px;
+  }
+  .size-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .size-title { font: 700 18px 'Playfair Display', serif; color: var(--gold); }
+  .size-pool-status {
+    font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--text2);
+  }
+  .size-pool-status strong { color: var(--accent); }
+
+  .size-cards-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .size-option {
+    display: flex; flex-direction: column; gap: 6px; padding: 16px;
+    border: 1px solid var(--border); border-radius: 12px;
+    background: rgba(7, 18, 34, 0.8); cursor: pointer; transition: all .2s;
+    text-align: left; position: relative;
+  }
+  .size-option:hover {
+    border-color: var(--accent); transform: translateY(-2px);
+  }
+  .size-option.active {
+    border-color: var(--gold); background: rgba(251, 191, 36, 0.08);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+  }
+  .size-option-tag {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    color: var(--text2); letter-spacing: 0.05em;
+  }
+  .size-option.active .size-option-tag { color: var(--gold); }
+  .size-option-name { font: 700 16px 'Playfair Display', serif; color: var(--text); }
+  .size-option-desc { font-size: 12px; color: var(--text2); }
+
+  /* Launch Button */
+  .launch-bar {
+    display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 8px;
+  }
+  .btn-start-game {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 16px 42px; border-radius: 50px; font-size: 16px; font-weight: 800;
+    color: #050c1a; background: linear-gradient(135deg, var(--gold) 0%, #f59e0b 50%, var(--accent) 100%);
+    border: none; cursor: pointer; transition: all .25s;
+    box-shadow: 0 6px 24px rgba(251, 191, 36, 0.35); text-decoration: none;
+  }
+  .btn-start-game:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 32px rgba(251, 191, 36, 0.5);
+  }
+  .btn-start-game:disabled {
+    opacity: 0.45; cursor: not-allowed; filter: grayscale(0.8);
+  }
+  .launch-hint { font-size: 12px; color: var(--text2); }
+
+  /* VIEW 2: GAMEPLAY */
+  .game-view { display: none; flex-direction: column; gap: 20px; }
+  .game-view.active { display: flex; }
+
+  /* Game HUD */
+  .game-hud {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px; padding: 14px 20px; border: 1px solid var(--border);
+    border-radius: 14px; background: rgba(14, 28, 54, 0.85);
+  }
+  .hud-group { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .hud-item {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .hud-label {
+    font-size: 11px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+    color: var(--text2); letter-spacing: 0.05em;
+  }
+  .hud-val {
+    font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+  }
+  .hud-val.gold { color: var(--gold); }
+  .hud-val.combo { color: var(--accent3); animation: pulseCombo 1s infinite alternate; }
+  @keyframes pulseCombo {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); text-shadow: 0 0 10px var(--accent3); }
+  }
+
+  .hud-actions { display: flex; align-items: center; gap: 10px; }
+  .hud-btn {
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: rgba(7, 18, 34, 0.8); color: var(--text); font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .hud-btn:hover {
+    border-color: var(--accent); color: var(--accent);
+  }
+
+  /* Board Grid */
+  .board-container {
+    perspective: 1200px;
+    width: 100%;
+    margin: 10px 0;
+  }
+  .cards-board {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+  }
+
+  /* Responsive column variants */
+  .cards-board.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .cards-board.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .cards-board.cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .cards-board.cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+  @media (max-width: 768px) {
+    .cards-board.cols-4, .cards-board.cols-5, .cards-board.cols-6 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .cards-board.cols-3, .cards-board.cols-4, .cards-board.cols-5, .cards-board.cols-6 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Card Item */
+  .memo-card {
+    position: relative;
+    aspect-ratio: 1 / 1.15;
+    min-height: 120px;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+    cursor: pointer;
+    border-radius: 14px;
+    outline: none;
+  }
+  .memo-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--accent);
+  }
+  .memo-card.is-flipped {
+    transform: rotateY(180deg);
+  }
+  .memo-card.is-matched {
+    transform: rotateY(180deg);
+    cursor: default;
+  }
+  .memo-card.is-matched .card-back {
+    border-color: rgba(34, 197, 94, 0.7);
+    background: linear-gradient(145deg, rgba(34, 197, 94, 0.15) 0%, rgba(7, 18, 34, 0.95) 100%);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
+  }
+  .memo-card.is-wrong {
+    animation: wrongShake 0.4s ease;
+  }
+  @keyframes wrongShake {
+    0%, 100% { transform: rotateY(180deg) translateX(0); }
+    20%, 60% { transform: rotateY(180deg) translateX(-6px); }
+    40%, 80% { transform: rotateY(180deg) translateX(6px); }
+  }
+
+  /* Card Faces */
+  .card-face {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    border-radius: 14px; backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 14px; text-align: center;
+    border: 1px solid var(--border);
+    transition: border-color .2s;
+  }
+
+  /* Card Front (Face down initially) */
+  .card-front {
+    background: linear-gradient(135deg, rgba(14, 28, 54, 0.95) 0%, rgba(7, 18, 34, 0.98) 100%);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  }
+  .memo-card:hover:not(.is-matched):not(.is-flipped) .card-front {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(56, 189, 248, 0.2);
+  }
+  .card-pattern {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(56, 189, 248, 0.08); border: 1px solid var(--border);
+    display: grid; place-items: center; font-size: 20px; color: var(--accent);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.15);
+  }
+
+  /* Card Back (Face up revealed) */
+  .card-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(145deg, rgba(14, 28, 54, 0.96) 0%, rgba(7, 18, 34, 0.98) 100%);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .card-back-tag {
+    font-size: 10px; font-weight: 800; text-transform: uppercase;
+    padding: 2px 8px; border-radius: var(--border);
+    border-radius: 999px; letter-spacing: 0.05em;
+  }
+  .card-back.tag-formula .card-back-tag {
+    background: rgba(251, 191, 36, 0.15); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+  .card-back.tag-name .card-back-tag {
+    background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+
+  .card-content-wrap {
+    flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;
+  }
+  .card-formula {
+    font-family: 'JetBrains Mono', monospace; font-size: clamp(14px, 2.2vw, 19px);
+    font-weight: 700; color: #ffffff; line-height: 1.35;
+    text-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+  }
+  .card-name {
+    font-size: clamp(12px, 1.8vw, 15px); font-weight: 700; color: var(--text);
+    line-height: 1.3;
+  }
+  .card-match-indicator {
+    display: none; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; color: var(--green);
+  }
+  .memo-card.is-matched .card-match-indicator { display: inline-flex; }
+
+  /* VICTORY MODAL */
+  dialog#victory-dialog {
+    width: min(540px, calc(100% - 32px));
+    margin: auto; padding: 0; border: 1px solid var(--border); border-radius: 20px;
+    background: var(--bg2); color: var(--text); box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  dialog#victory-dialog::backdrop {
+    background: rgba(2, 6, 15, 0.85); backdrop-filter: blur(8px);
+  }
+  .victory-body {
+    padding: 36px 28px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;
+    position: relative;
+  }
+  .victory-stars { font-size: 38px; letter-spacing: 6px; }
+  .victory-title {
+    font: 900 28px/1.2 'Playfair Display', serif; color: var(--gold);
+  }
+  .victory-desc { font-size: 14px; color: var(--text2); line-height: 1.6; max-width: 420px; }
+  
+  .victory-stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin: 8px 0;
+  }
+  .vstat-card {
+    padding: 12px 8px; border: 1px solid var(--border); border-radius: 12px;
+    background: rgba(14, 28, 54, 0.6);
+  }
+  .vstat-label { font-size: 11px; text-transform: uppercase; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+  .vstat-val { font-size: 18px; font-weight: 800; color: var(--text); margin-top: 4px; }
+  
+  .victory-reward {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px;
+    border-radius: 999px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4);
+    color: var(--green); font-weight: 800; font-size: 14px;
+  }
+
+  .victory-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 8px; }
+  .btn-vaction {
+    padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s;
+    text-decoration: none;
+  }
+  .btn-vprimary {
+    background: linear-gradient(135deg, var(--gold), #f59e0b); color: #050c1a; border: none; font-weight: 800;
+  }
+  .btn-vprimary:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4); }
+  .btn-vsecondary {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+  }
+  .btn-vsecondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  canvas#confetti-canvas {
+    position: absolute; inset: 0; pointer-events: none; z-index: 10; width: 100%; height: 100%;
+  }
+</style>
+</head>
+<body>
+<div class="ambient-backdrop"></div>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-brand">
+    <a class="nav-lobby" href="../../../index.html">← В лобби</a>
+    <a class="nav-logo" href="../../physics.html">
+      <span>⚛</span>
+      <span>ФизикаПро</span>
+    </a>
+  </div>
+  <div class="nav-links">
+    <a href="../../physics.html">Главная</a>
+    <a href="../tasks/index.html">Задачи</a>
+    <a href="../all_simulations.html">Симуляции</a>
+    <a href="../../../profile.html" style="color: var(--gold); font-weight: 700;">Профиль 👤</a>
+  </div>
+</nav>
+
+<main>
+  <!-- 1. SETUP VIEW: TOPIC PICKER & BOARD SIZE -->
+  <section class="setup-view" id="setup-view">
+    <div class="setup-header">
+      <div class="setup-badge">🎮 Игры по физике • Новинка</div>
+      <h1 class="setup-title">МЕМО: Формулы физики</h1>
+      <p class="setup-subtitle">
+        Выбирай темы, которые уже прошёл на уроках, настраивай размер игрового стола и соединяй пары: физический закон и его точную математическую формулу!
+      </p>
+
+      <div class="preset-bar">
+        <button type="button" class="preset-btn active" data-preset="all">Все темы</button>
+        <button type="button" class="preset-btn" data-preset="7">7 класс (Основы)</button>
+        <button type="button" class="preset-btn" data-preset="8">8 класс (Теплота & Ток)</button>
+        <button type="button" class="preset-btn" data-preset="9">9 класс (Механика)</button>
+        <button type="button" class="preset-btn" data-preset="10-11">10–11 класс (Про)</button>
+        <button type="button" class="preset-btn" data-preset="clear">Сбросить</button>
+      </div>
+    </div>
+
+    <!-- Topics Selection Grid -->
+    <div class="topics-container" id="topics-container">
+      <!-- Injected by JavaScript -->
+    </div>
+
+    <!-- Table Size Limits (Min 6 pairs / Max 12 pairs) -->
+    <div class="size-section">
+      <div class="size-header">
+        <h2 class="size-title">Количество карточек на столе</h2>
+        <div class="size-pool-status" id="pool-status">
+          Формул в пуле: <strong id="pool-count">0</strong>
+        </div>
+      </div>
+      <div class="size-cards-grid">
+        <button type="button" class="size-option" data-pairs="6">
+          <span class="size-option-tag">Минимальная грань</span>
+          <span class="size-option-name">6 пар (12 карточек)</span>
+          <span class="size-option-desc">Быстрый раунд на 1–2 минуты для 1–2 тем</span>
+        </button>
+        <button type="button" class="size-option active" data-pairs="8">
+          <span class="size-option-tag">Стандартный стол</span>
+          <span class="size-option-name">8 пар (16 карточек)</span>
+          <span class="size-option-desc">Сбалансированная тренировка памяти</span>
+        </button>
+        <button type="button" class="size-option" data-pairs="10">
+          <span class="size-option-tag">Продвинутый уровень</span>
+          <span class="size-option-name">10 пар (20 карточек)</span>
+          <span class="size-option-desc">Отличный вызов для нескольких разделов</span>
+        </button>
+        <button type="button" class="size-option" data-pairs="12">
+          <span class="size-option-tag">Максимальная грань</span>
+          <span class="size-option-name">12 пар (24 карточки)</span>
+          <span class="size-option-desc">Гранд-турнир по формулам на полный экран</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Launch Action -->
+    <div class="launch-bar">
+      <button type="button" class="btn-start-game" id="start-game-btn">
+        <span>Перейти к столу</span>
+        <span>🚀</span>
+      </button>
+      <p class="launch-hint" id="launch-hint">Выберите темы, чтобы начать игру</p>
+    </div>
+  </section>
+
+  <!-- 2. GAMEPLAY VIEW: MEMO BOARD -->
+  <section class="game-view" id="game-view">
+    <div class="game-hud">
+      <div class="hud-group">
+        <button type="button" class="hud-btn" id="btn-back-setup">← Темы</button>
+        <div class="hud-item">
+          <span class="hud-label">Время</span>
+          <span class="hud-val" id="hud-timer">00:00</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Ходы</span>
+          <span class="hud-val" id="hud-moves">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Пары</span>
+          <span class="hud-val gold" id="hud-pairs">0 / 8</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Комбо</span>
+          <span class="hud-val combo" id="hud-combo">x1</span>
+        </div>
+      </div>
+      <div class="hud-actions">
+        <button type="button" class="hud-btn" id="btn-sound-toggle" title="Включить/выключить звук">🔊</button>
+        <button type="button" class="hud-btn" id="btn-restart">🔄 Заново</button>
+      </div>
+    </div>
+
+    <div class="board-container">
+      <div class="cards-board cols-4" id="cards-board">
+        <!-- Cards generated by JS -->
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- VICTORY MODAL -->
+<dialog id="victory-dialog">
+  <canvas id="confetti-canvas"></canvas>
+  <div class="victory-body">
+    <div class="victory-stars" id="victory-stars">⭐⭐⭐</div>
+    <h2 class="victory-title" id="victory-title">Блестящий результат!</h2>
+    <p class="victory-desc" id="victory-desc">Все формулы успешно найдены. Твоя память на законы физики на высоте!</p>
+
+    <div class="victory-stats-grid">
+      <div class="vstat-card">
+        <div class="vstat-label">Время</div>
+        <div class="vstat-val" id="vstat-time">00:45</div>
+      </div>
+      <div class="vstat-card">
+        <div class="vstat-label">Ходы</div>
+        <div class="vstat-val" id="vstat-moves">14</div>
+      </div>
+      <div class="vstat-card">
+        <div class="vstat-label">Точность</div>
+        <div class="vstat-val" id="vstat-accuracy">85%</div>
+      </div>
+    </div>
+
+    <div class="victory-reward" id="victory-reward">
+      <span>⚡</span>
+      <span id="victory-xp-text">+40 XP начислено в профиль</span>
+    </div>
+
+    <div class="victory-actions">
+      <button type="button" class="btn-vaction btn-vprimary" id="btn-play-again">Сыграть ещё раз</button>
+      <button type="button" class="btn-vaction btn-vsecondary" id="btn-change-topics">Сменить темы</button>
+      <a class="btn-vaction btn-vsecondary" href="../../physics.html">В раздел физики</a>
+    </div>
+  </div>
+</dialog>
+
+<script>
+// --- 1. COMPREHENSIVE PHYSICS FORMULA DATABASE (40+ Pairs) ---
+const PHYSICS_FORMULAS = [
+  // 7 КЛАСС
+  { id: 'p7-1', grade: '7', topic: 'Плотность и масса', name: 'Плотность вещества', formula: 'ρ = m / V' },
+  { id: 'p7-2', grade: '7', topic: 'Равномерное движение', name: 'Скорость движения', formula: 'v = s / t' },
+  { id: 'p7-3', grade: '7', topic: 'Силы в природе', name: 'Сила тяжести', formula: 'F = m · g' },
+  { id: 'p7-4', grade: '7', topic: 'Силы в природе', name: 'Закон Гука (сила упругости)', formula: 'F = k · Δl' },
+  { id: 'p7-5', grade: '7', topic: 'Силы в природе', name: 'Сила трения скольжения', formula: 'Fтр = μ · N' },
+  { id: 'p7-6', grade: '7', topic: 'Давление', name: 'Давление на опору', formula: 'p = F / S' },
+  { id: 'p7-7', grade: '7', topic: 'Давление в жидкостях', name: 'Гидростатическое давление', formula: 'p = ρ · g · h' },
+  { id: 'p7-8', grade: '7', topic: 'Давление в жидкостях', name: 'Сила Архимеда', formula: 'FА = ρж · g · Vпогр' },
+  { id: 'p7-9', grade: '7', topic: 'Работа и мощность', name: 'Механическая работа', formula: 'A = F · s' },
+  { id: 'p7-10', grade: '7', topic: 'Работа и мощность', name: 'Мощность', formula: 'N = A / t' },
+
+  // 8 КЛАСС
+  { id: 'p8-1', grade: '8', topic: 'Тепловые явления', name: 'Нагревание / охлаждение', formula: 'Q = c · m · ΔT' },
+  { id: 'p8-2', grade: '8', topic: 'Тепловые явления', name: 'Сгорание топлива', formula: 'Q = q · m' },
+  { id: 'p8-3', grade: '8', topic: 'Тепловые явления', name: 'Плавление и кристаллизация', formula: 'Q = λ · m' },
+  { id: 'p8-4', grade: '8', topic: 'Тепловые явления', name: 'Парообразование и конденсация', formula: 'Q = L · m' },
+  { id: 'p8-5', grade: '8', topic: 'Тепловые явления', name: 'Закон Ньютона–Рихмана', formula: 'Q̇ = α · S · ΔT' },
+  { id: 'p8-6', grade: '8', topic: 'Электрический ток', name: 'Закон Ома для участка цепи', formula: 'I = U / R' },
+  { id: 'p8-7', grade: '8', topic: 'Электрический ток', name: 'Сопротивление проводника', formula: 'R = ρ · l / S' },
+  { id: 'p8-8', grade: '8', topic: 'Электрический ток', name: 'Сила тока через заряд', formula: 'I = q / t' },
+  { id: 'p8-9', grade: '8', topic: 'Работа и мощность тока', name: 'Работа электрического тока', formula: 'A = U · I · t' },
+  { id: 'p8-10', grade: '8', topic: 'Работа и мощность тока', name: 'Мощность электрического тока', formula: 'P = U · I' },
+  { id: 'p8-11', grade: '8', topic: 'Работа и мощность тока', name: 'Закон Джоуля–Ленца', formula: 'Q = I² · R · t' },
+
+  // 9 КЛАСС
+  { id: 'p9-1', grade: '9', topic: 'Кинематика', name: 'Скорость при равноускоренном', formula: 'v = v₀ + a · t' },
+  { id: 'p9-2', grade: '9', topic: 'Кинематика', name: 'Путь при равноускоренном', formula: 's = v₀t + (at²)/2' },
+  { id: 'p9-3', grade: '9', topic: 'Динамика Ньютона', name: 'Второй закон Ньютона', formula: 'F = m · a' },
+  { id: 'p9-4', grade: '9', topic: 'Динамика Ньютона', name: 'Гравитационное притяжение', formula: 'F = G · m₁m₂ / r²' },
+  { id: 'p9-5', grade: '9', topic: 'Импульс и энергия', name: 'Импульс тела', formula: 'p = m · v' },
+  { id: 'p9-6', grade: '9', topic: 'Импульс и энергия', name: 'Кинетическая энергия', formula: 'Eк = (m · v²) / 2' },
+  { id: 'p9-7', grade: '9', topic: 'Импульс и энергия', name: 'Потенциальная энергия', formula: 'Eп = m · g · h' },
+  { id: 'p9-8', grade: '9', topic: 'Колебания и волны', name: 'Период нитяного маятника', formula: 'T = 2π · √(l / g)' },
+  { id: 'p9-9', grade: '9', topic: 'Колебания и волны', name: 'Период пружинного маятника', formula: 'T = 2π · √(m / k)' },
+  { id: 'p9-10', grade: '9', topic: 'Колебания и волны', name: 'Связь скорости и длины волны', formula: 'v = λ · ν' },
+
+  // 10–11 КЛАСС
+  { id: 'p10-1', grade: '10-11', topic: 'Электростатика', name: 'Закон Кулона', formula: 'F = k · |q₁q₂| / r²' },
+  { id: 'p10-2', grade: '10-11', topic: 'Электростатика', name: 'Напряжённость поля', formula: 'E = F / q' },
+  { id: 'p10-3', grade: '10-11', topic: 'Конденсаторы', name: 'Электроёмкость', formula: 'C = q / U' },
+  { id: 'p10-4', grade: '10-11', topic: 'Магнитное поле', name: 'Сила Лоренца', formula: 'Fл = q · v · B · sin α' },
+  { id: 'p10-5', grade: '10-11', topic: 'Магнитное поле', name: 'Сила Ампера', formula: 'Fа = I · B · L · sin α' },
+  { id: 'p10-6', grade: '10-11', topic: 'Электромагнетизм', name: 'Закон Фарадея (ЭДС индукции)', formula: 'εi = −ΔΦ / Δt' },
+  { id: 'p10-7', grade: '10-11', topic: 'Колебательный контур', name: 'Формула Томсона', formula: 'T = 2π · √(L · C)' },
+  { id: 'p10-8', grade: '10-11', topic: 'Оптика', name: 'Формула тонкой линзы', formula: '1/F = 1/d + 1/f' },
+  { id: 'p10-9', grade: '10-11', topic: 'Квантовая физика', name: 'Энергия фотона', formula: 'E = h · ν' },
+  { id: 'p10-10', grade: '10-11', topic: 'Квантовая физика', name: 'Уравнение Эйнштейна (фотоэффект)', formula: 'hν = Aвых + Eк,max' }
+];
+
+// --- 2. SOUND SYNTHESIZER (Web Audio API) ---
+class SoundManager {
+  constructor() {
+    this.enabled = true;
+    this.ctx = null;
+  }
+  init() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) this.ctx = new AudioContext();
+    }
+  }
+  playFlip() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(560, this.ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.08);
+  }
+  playMatch() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.07);
+      gain.gain.setValueAtTime(0.15, now + i * 0.07);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.07 + 0.25);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + i * 0.07);
+      osc.stop(now + i * 0.07 + 0.25);
+    });
+  }
+  playMismatch() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    [260, 220].forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now + i * 0.1);
+      gain.gain.setValueAtTime(0.1, now + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.15);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + i * 0.1);
+      osc.stop(now + i * 0.1 + 0.15);
+    });
+  }
+  playVictory() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const notes = [440, 554.37, 659.25, 880];
+    const now = this.ctx.currentTime;
+    notes.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.12);
+      gain.gain.setValueAtTime(0.2, now + i * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.5);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + i * 0.12);
+      osc.stop(now + i * 0.12 + 0.5);
+    });
+  }
+}
+const sound = new SoundManager();
+
+// --- 3. STATE & APP CONTROLLER ---
+const state = {
+  selectedTopicIds: new Set(),
+  targetPairs: 8, // Default standard table
+  cards: [],
+  flippedCards: [],
+  matchedPairsCount: 0,
+  movesCount: 0,
+  comboCount: 1,
+  maxCombo: 1,
+  timerSeconds: 0,
+  timerInterval: null,
+  isLocked: false
+};
+window.state = state;
+
+// Group formulas by grade & topic
+function groupFormulas() {
+  const map = {
+    '7': { title: '7 класс • Основы механики', topics: {} },
+    '8': { title: '8 класс • Теплота и электричество', topics: {} },
+    '9': { title: '9 класс • Динамика и законы сохранения', topics: {} },
+    '10-11': { title: '10–11 класс • Электродинамика и кванты', topics: {} }
+  };
+  PHYSICS_FORMULAS.forEach(item => {
+    if (!map[item.grade].topics[item.topic]) {
+      map[item.grade].topics[item.topic] = [];
+    }
+    map[item.grade].topics[item.topic].push(item);
+  });
+  return map;
+}
+
+// Render setup topics
+function renderTopicsSetup() {
+  const container = document.getElementById('topics-container');
+  const grouped = groupFormulas();
+  container.innerHTML = '';
+
+  Object.entries(grouped).forEach(([gradeKey, gradeData]) => {
+    const box = document.createElement('div');
+    box.className = 'grade-box';
+    box.innerHTML = `
+      <div class="grade-box-header">
+        <span class="grade-title">${gradeData.title}</span>
+        <button type="button" class="grade-select-all" data-grade="${gradeKey}">Выбрать все</button>
+      </div>
+      <div class="grade-topics-list">
+        ${Object.entries(gradeData.topics).map(([topicName, items]) => {
+          const topicId = `${gradeKey}__${topicName}`;
+          return `
+            <label class="topic-label">
+              <input type="checkbox" class="topic-checkbox" data-topic-id="${topicId}" ${state.selectedTopicIds.has(topicId) ? 'checked' : ''}>
+              <div class="topic-info">
+                <div class="topic-name">${topicName}</div>
+                <div class="topic-count">${items.length} формул (${items.map(f => f.formula.split('=')[0].trim()).slice(0, 3).join(', ')}...)</div>
+              </div>
+            </label>
+          `;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(box);
+  });
+
+  updatePoolStatus();
+}
+
+// Get all formulas currently selected by user
+function getSelectedFormulas() {
+  const selected = [];
+  PHYSICS_FORMULAS.forEach(item => {
+    const topicId = `${item.grade}__${item.topic}`;
+    if (state.selectedTopicIds.has(topicId)) {
+      selected.push(item);
+    }
+  });
+  return selected;
+}
+
+function updatePoolStatus() {
+  const pool = getSelectedFormulas();
+  const poolCountEl = document.getElementById('pool-count');
+  const startBtn = document.getElementById('start-game-btn');
+  const launchHint = document.getElementById('launch-hint');
+
+  poolCountEl.textContent = pool.length;
+
+  // Minimum pairs is 6 (12 cards)
+  const minRequired = state.targetPairs;
+
+  if (pool.length === 0) {
+    startBtn.disabled = true;
+    launchHint.textContent = 'Отметь хотя бы один раздел, чтобы собрать формулы';
+    launchHint.style.color = 'var(--text2)';
+  } else if (pool.length < minRequired) {
+    startBtn.disabled = true;
+    launchHint.textContent = `Для стола на ${minRequired} пар нужно минимум ${minRequired} формул (выбрано: ${pool.length}). Добавьте темы или уменьшите размер стола.`;
+    launchHint.style.color = 'var(--gold)';
+  } else {
+    startBtn.disabled = false;
+    launchHint.textContent = `Всё готово! Из ${pool.length} формул случайным образом будут выбраны ${state.targetPairs} пар для стола.`;
+    launchHint.style.color = 'var(--green)';
+  }
+}
+
+// Event Listeners for Setup
+function initSetupListeners() {
+  // Topic Checkboxes
+  document.getElementById('topics-container').addEventListener('change', e => {
+    if (e.target.classList.contains('topic-checkbox')) {
+      const id = e.target.dataset.topicId;
+      if (e.target.checked) state.selectedTopicIds.add(id);
+      else state.selectedTopicIds.delete(id);
+      updatePoolStatus();
+    }
+  });
+
+  // Grade Select All
+  document.getElementById('topics-container').addEventListener('click', e => {
+    if (e.target.classList.contains('grade-select-all')) {
+      const grade = e.target.dataset.grade;
+      const checkboxes = e.target.closest('.grade-box').querySelectorAll('.topic-checkbox');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+        const id = cb.dataset.topicId;
+        if (!allChecked) state.selectedTopicIds.add(id);
+        else state.selectedTopicIds.delete(id);
+      });
+      updatePoolStatus();
+    }
+  });
+
+  // Presets
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const preset = btn.dataset.preset;
+
+      state.selectedTopicIds.clear();
+      if (preset === 'all') {
+        PHYSICS_FORMULAS.forEach(f => state.selectedTopicIds.add(`${f.grade}__${f.topic}`));
+      } else if (preset === 'clear') {
+        // none
+      } else {
+        PHYSICS_FORMULAS.filter(f => f.grade === preset).forEach(f => state.selectedTopicIds.add(`${f.grade}__${f.topic}`));
+      }
+      renderTopicsSetup();
+    });
+  });
+
+  // Table Size Options (6, 8, 10, 12 pairs)
+  document.querySelectorAll('.size-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.size-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      state.targetPairs = Number(opt.dataset.pairs);
+      updatePoolStatus();
+    });
+  });
+
+  // Launch Button
+  document.getElementById('start-game-btn').addEventListener('click', () => {
+    startGame();
+  });
+}
+
+// --- 4. GAMEPLAY MECHANICS ---
+function startGame() {
+  const pool = getSelectedFormulas();
+  if (pool.length < state.targetPairs) return;
+
+  // Shuffle and pick targetPairs
+  const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
+  const selectedSubset = shuffledPool.slice(0, state.targetPairs);
+
+  // Generate 2 cards for each formula: [Name Card, Formula Card]
+  const cards = [];
+  selectedSubset.forEach((item, idx) => {
+    // Card A: Formula
+    cards.push({
+      pairId: item.id,
+      type: 'formula',
+      text: item.formula,
+      label: 'Формула',
+      subText: item.name
+    });
+    // Card B: Name
+    cards.push({
+      pairId: item.id,
+      type: 'name',
+      text: item.name,
+      label: 'Закон / Величина',
+      subText: item.formula
+    });
+  });
+
+  // Shuffle cards on table
+  state.cards = cards.sort(() => Math.random() - 0.5);
+  state.flippedCards = [];
+  state.matchedPairsCount = 0;
+  state.movesCount = 0;
+  state.comboCount = 1;
+  state.maxCombo = 1;
+  state.isLocked = false;
+  state.timerSeconds = 0;
+
+  // Update View
+  document.getElementById('setup-view').style.display = 'none';
+  const gameView = document.getElementById('game-view');
+  gameView.classList.add('active');
+
+  // Set grid layout class based on card count
+  const boardEl = document.getElementById('cards-board');
+  boardEl.className = 'cards-board';
+  if (state.targetPairs === 6) boardEl.classList.add('cols-4');
+  else if (state.targetPairs === 8) boardEl.classList.add('cols-4');
+  else if (state.targetPairs === 10) boardEl.classList.add('cols-5');
+  else if (state.targetPairs === 12) boardEl.classList.add('cols-6');
+
+  renderBoard();
+  startTimer();
+  updateHUD();
+}
+
+function renderBoard() {
+  const boardEl = document.getElementById('cards-board');
+  boardEl.innerHTML = '';
+
+  state.cards.forEach((card, index) => {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'memo-card';
+    cardEl.tabIndex = 0;
+    cardEl.dataset.index = index;
+    cardEl.setAttribute('role', 'button');
+    cardEl.setAttribute('aria-label', `Карточка ${index + 1}`);
+
+    cardEl.innerHTML = `
+      <div class="card-face card-front">
+        <div class="card-pattern">⚛</div>
+      </div>
+      <div class="card-face card-back ${card.type === 'formula' ? 'tag-formula' : 'tag-name'}">
+        <div class="card-back-tag">${card.label}</div>
+        <div class="card-content-wrap">
+          <div class="${card.type === 'formula' ? 'card-formula' : 'card-name'}">${card.text}</div>
+        </div>
+        <div class="card-match-indicator">✓ Найдено</div>
+      </div>
+    `;
+
+    cardEl.addEventListener('click', () => handleCardClick(index));
+    cardEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleCardClick(index);
+      }
+    });
+
+    boardEl.appendChild(cardEl);
+  });
+}
+
+function handleCardClick(index) {
+  if (state.isLocked) return;
+  const cardEl = document.querySelector(`.memo-card[data-index="${index}"]`);
+  if (!cardEl || cardEl.classList.contains('is-flipped') || cardEl.classList.contains('is-matched')) return;
+
+  // Flip card
+  sound.playFlip();
+  cardEl.classList.add('is-flipped');
+  state.flippedCards.push({ index, card: state.cards[index], el: cardEl });
+
+  if (state.flippedCards.length === 2) {
+    state.movesCount++;
+    state.isLocked = true;
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  const [first, second] = state.flippedCards;
+  const isMatch = first.card.pairId === second.card.pairId;
+
+  if (isMatch) {
+    // Matched!
+    setTimeout(() => {
+      sound.playMatch();
+      first.el.classList.add('is-matched');
+      second.el.classList.add('is-matched');
+      state.matchedPairsCount++;
+      state.comboCount++;
+      if (state.comboCount > state.maxCombo) state.maxCombo = state.comboCount;
+
+      state.flippedCards = [];
+      state.isLocked = false;
+      updateHUD();
+
+      // Check victory
+      if (state.matchedPairsCount === state.targetPairs) {
+        handleVictory();
+      }
+    }, 300);
+  } else {
+    // Mismatch
+    state.comboCount = 1;
+    setTimeout(() => {
+      sound.playMismatch();
+      first.el.classList.add('is-wrong');
+      second.el.classList.add('is-wrong');
+    }, 400);
+
+    setTimeout(() => {
+      first.el.classList.remove('is-flipped', 'is-wrong');
+      second.el.classList.remove('is-flipped', 'is-wrong');
+      state.flippedCards = [];
+      state.isLocked = false;
+      updateHUD();
+    }, 900);
+  }
+  updateHUD();
+}
+
+function updateHUD() {
+  document.getElementById('hud-moves').textContent = state.movesCount;
+  document.getElementById('hud-pairs').textContent = `${state.matchedPairsCount} / ${state.targetPairs}`;
+  const comboEl = document.getElementById('hud-combo');
+  comboEl.textContent = `x${state.comboCount}`;
+  if (state.comboCount > 1) comboEl.classList.add('combo');
+  else comboEl.classList.remove('combo');
+}
+
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timerSeconds = 0;
+  const timerEl = document.getElementById('hud-timer');
+  timerEl.textContent = '00:00';
+
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds++;
+    const mins = Math.floor(state.timerSeconds / 60).toString().padStart(2, '0');
+    const secs = (state.timerSeconds % 60).toString().padStart(2, '0');
+    timerEl.textContent = `${mins}:${secs}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(state.timerInterval);
+}
+
+// --- 5. VICTORY & REWARDS ---
+function handleVictory() {
+  stopTimer();
+  sound.playVictory();
+
+  const mins = Math.floor(state.timerSeconds / 60).toString().padStart(2, '0');
+  const secs = (state.timerSeconds % 60).toString().padStart(2, '0');
+  const timeFormatted = `${mins}:${secs}`;
+
+  // Accuracy calculation: min moves = targetPairs.
+  const accuracy = Math.round((state.targetPairs / Math.max(state.movesCount, state.targetPairs)) * 100);
+
+  // Star Rating
+  let stars = '⭐⭐⭐';
+  if (state.movesCount > state.targetPairs * 2.2) stars = '⭐';
+  else if (state.movesCount > state.targetPairs * 1.5) stars = '⭐⭐';
+
+  // XP Bonus: 30 XP base + 10 XP if 8 pairs + 20 XP if 12 pairs
+  let xpBonus = 30;
+  if (state.targetPairs >= 8) xpBonus = 40;
+  if (state.targetPairs >= 12) xpBonus = 50;
+
+  // Record reward to studyMetrics / profile
+  recordGameReward(xpBonus);
+
+  document.getElementById('victory-stars').textContent = stars;
+  document.getElementById('vstat-time').textContent = timeFormatted;
+  document.getElementById('vstat-moves').textContent = state.movesCount;
+  document.getElementById('vstat-accuracy').textContent = `${accuracy}%`;
+  document.getElementById('victory-xp-text').textContent = `+${xpBonus} XP начислено в профиль!`;
+
+  const dialog = document.getElementById('victory-dialog');
+  dialog.showModal();
+  runConfetti();
+}
+
+function recordGameReward(amount) {
+  try {
+    const raw = localStorage.getItem('studyMetrics');
+    const attempts = raw ? JSON.parse(raw) : [];
+    attempts.push({
+      timestamp: new Date().toISOString(),
+      subject: 'Физика',
+      taskId: `physics-game-memo-${state.targetPairs}pairs`,
+      skill: 'generalPhysics',
+      correct: true,
+      rewardXp: amount
+    });
+    localStorage.setItem('studyMetrics', JSON.stringify(attempts));
+
+    const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+    localStorage.setItem('studyBonusXp', String(curBonus + amount));
+  } catch (e) {
+    console.error('Ошибка сохранения XP за игру:', e);
+  }
+}
+
+// Confetti Particle Effect on Canvas
+function runConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+
+  const particles = [];
+  const colors = ['#38bdf8', '#818cf8', '#f472b6', '#fbbf24', '#22c55e', '#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 3,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 1.5) * 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      radius: Math.random() * 4 + 2,
+      alpha: 1
+    });
+  }
+
+  let frames = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.15; // Gravity
+      p.alpha -= 0.012;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.fill();
+    });
+    frames++;
+    if (frames < 90) requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// Nav and HUD listeners
+function initGameHUDListeners() {
+  document.getElementById('btn-back-setup').addEventListener('click', () => {
+    stopTimer();
+    document.getElementById('game-view').classList.remove('active');
+    document.getElementById('setup-view').style.display = 'flex';
+  });
+
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    startGame();
+  });
+
+  const soundBtn = document.getElementById('btn-sound-toggle');
+  soundBtn.addEventListener('click', () => {
+    sound.enabled = !sound.enabled;
+    soundBtn.textContent = sound.enabled ? '🔊' : '🔇';
+  });
+
+  document.getElementById('btn-play-again').addEventListener('click', () => {
+    document.getElementById('victory-dialog').close();
+    startGame();
+  });
+
+  document.getElementById('btn-change-topics').addEventListener('click', () => {
+    document.getElementById('victory-dialog').close();
+    document.getElementById('game-view').classList.remove('active');
+    document.getElementById('setup-view').style.display = 'flex';
+  });
+}
+
+// --- 6. INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-select all 7th & 8th grade topics by default
+  PHYSICS_FORMULAS.filter(f => f.grade === '7' || f.grade === '8').forEach(f => {
+    state.selectedTopicIds.add(`${f.grade}__${f.topic}`);
+  });
+
+  renderTopicsSetup();
+  initSetupListeners();
+  initGameHUDListeners();
+});
+</script>
+</body>
+</html>

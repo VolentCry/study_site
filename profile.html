@@ -58,6 +58,453 @@
             --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        /* LIGHT THEME DESIGN TOKENS */
+        [data-theme="light"] {
+            --ground: #f4f6fa;
+            --surface: #ffffff;
+            --surface-card: #ffffff;
+            --surface-hover: #f1f5f9;
+            --surface-glass: rgba(255, 255, 255, 0.94);
+            --ink: #0f172a;
+            --muted: #475569;
+            --muted-bright: #1e293b;
+            --line: rgba(15, 23, 42, 0.12);
+            --line-active: rgba(15, 23, 42, 0.22);
+            --accent: #ea580c;
+            --accent-glow: rgba(234, 88, 12, 0.22);
+            --accent-cyan: #0284c7;
+            --accent-cyan-glow: rgba(2, 132, 199, 0.18);
+            --accent-gold: #d97706;
+            --accent-emerald: #059669;
+            --danger: #dc2626;
+
+            --profile-muted: #64748b;
+            --profile-primary: #ea580c;
+            --profile-line: rgba(15, 23, 42, 0.12);
+            --profile-subtle: #f8fafc;
+            --profile-card: #ffffff;
+        }
+
+        /* Light theme contextual adaptations */
+        [data-theme="light"] .ambient-grid {
+            background-image: 
+                radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(234, 88, 12, 0.08), transparent);
+            opacity: 0.7;
+        }
+        [data-theme="light"] .hero-hud-card,
+        [data-theme="light"] .profile-card,
+        [data-theme="light"] .trainer-ranks-header,
+        [data-theme="light"] .achievements-page-header,
+        [data-theme="light"] .achievements-summary-card,
+        [data-theme="light"] .trainer-item-card,
+        [data-theme="light"] .medal-card {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        [data-theme="light"] .trainer-ranks-summary {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .trainer-stats-row {
+            background: #f1f5f9;
+        }
+        [data-theme="light"] .trainer-progress-bar {
+            background: #e2e8f0;
+        }
+        [data-theme="light"] .trainer-stat-title {
+            color: #64748b;
+        }
+        [data-theme="light"] .trainer-card-name {
+            color: #0f172a;
+        }
+        [data-theme="light"] .trainer-card-desc {
+            color: #475569;
+        }
+        [data-theme="light"] .trainer-card-badge {
+            background: rgba(2, 132, 199, 0.12);
+            color: #0369a1;
+        }
+        [data-theme="light"] .trainer-card-action {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.18);
+            color: #0f172a;
+        }
+        [data-theme="light"] .skills-grid-line {
+            stroke: rgba(15, 23, 42, 0.15) !important;
+        }
+        [data-theme="light"] .skills-label-text {
+            fill: #475569 !important;
+        }
+        [data-theme="light"] .skills-select {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: rgba(15, 23, 42, 0.16);
+        }
+        [data-theme="light"] .profile-tab-btn {
+            color: #475569;
+            border-color: transparent;
+        }
+        [data-theme="light"] .profile-tab-btn:hover {
+            color: #0f172a;
+            background: rgba(15, 23, 42, 0.05);
+        }
+        [data-theme="light"] .profile-tab-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        [data-theme="light"] .nav-btn {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.14);
+            color: #0f172a;
+        }
+        [data-theme="light"] .nav-btn:hover {
+            background: #f1f5f9;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        [data-theme="light"] dialog {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.16);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+        }
+        [data-theme="light"] dialog::backdrop {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        [data-theme="light"] .settings-close, 
+        [data-theme="light"] .achievements-close {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.14);
+            color: #0f172a;
+        }
+        [data-theme="light"] .profile-code-textarea {
+            background: #f8fafc;
+            color: #0369a1;
+            border-color: rgba(15, 23, 42, 0.16);
+        }
+        [data-theme="light"] .settings-btn-secondary {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid rgba(15, 23, 42, 0.14);
+        }
+        [data-theme="light"] .settings-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        [data-theme="light"] .hero-stat-badge {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .hero-stat-label {
+            color: #64748b;
+        }
+
+        /* LIGHT THEME: HERO TELEMETRY (LEVEL & XP) & BADGES */
+        [data-theme="light"] .hud-telemetry-box {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+        }
+        [data-theme="light"] .hud-telemetry-box:hover {
+            border-color: var(--accent);
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(234, 88, 12, 0.16);
+        }
+        [data-theme="light"] .telemetry-click-hint {
+            color: #0284c7;
+        }
+        [data-theme="light"] .hud-telemetry-box:hover .telemetry-click-hint {
+            color: #ea580c;
+        }
+        [data-theme="light"] .experience-level {
+            color: #0f172a;
+        }
+        [data-theme="light"] .experience-total {
+            color: #ea580c;
+            text-shadow: none;
+        }
+        [data-theme="light"] .experience-bar {
+            background: #e2e8f0;
+        }
+        [data-theme="light"] .experience-detail {
+            color: #475569;
+        }
+        [data-theme="light"] .role-tag {
+            background: rgba(2, 132, 199, 0.1);
+            border-color: rgba(2, 132, 199, 0.25);
+            color: #0284c7;
+        }
+        [data-theme="light"] .solved-counter-badge {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.12);
+            color: #475569;
+        }
+        [data-theme="light"] .solved-counter-badge strong {
+            color: #d97706;
+        }
+        [data-theme="light"] .role-medals-badge {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(217, 119, 6, 0.35);
+            color: #b45309;
+        }
+        [data-theme="light"] .role-medals-badge:hover {
+            background: rgba(245, 158, 11, 0.22);
+            border-color: rgba(217, 119, 6, 0.6);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
+        }
+        [data-theme="light"] .role-medals-badge strong {
+            color: #78350f;
+            font-weight: 800;
+        }
+        [data-theme="light"] .role-medals-badge svg {
+            stroke: #b45309;
+        }
+
+        /* LIGHT THEME: OVERVIEW MEDALS SHOWCASE ("ЗАЛ ДОСТИЖЕНИЙ") */
+        [data-theme="light"] .overview-medals-card {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        [data-theme="light"] .overview-medals-card::before {
+            background: linear-gradient(90deg, #f59e0b, #ea580c, #0284c7);
+        }
+        [data-theme="light"] .overview-medals-pill {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(217, 119, 6, 0.35);
+            color: #b45309;
+        }
+        [data-theme="light"] .pulse-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 6px #f59e0b;
+        }
+        [data-theme="light"] .overview-medals-title {
+            color: #0f172a;
+        }
+        [data-theme="light"] .overview-medals-desc {
+            color: #475569;
+        }
+        [data-theme="light"] .overview-medals-stats-row {
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .overview-medals-stat .stat-label {
+            color: #64748b;
+        }
+        [data-theme="light"] .overview-medals-stat .stat-num {
+            color: #0f172a;
+        }
+        [data-theme="light"] .overview-medals-stat .stat-tier {
+            color: #d97706;
+        }
+        [data-theme="light"] .btn-goto-medals {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            color: #ffffff !important;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3);
+        }
+        [data-theme="light"] .btn-goto-medals:hover {
+            box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
+            filter: brightness(1.05);
+        }
+        [data-theme="light"] .preview-medal-item {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.1);
+        }
+        [data-theme="light"] .preview-medal-item:hover {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.2);
+        }
+        [data-theme="light"] .preview-medal-item.is-earned {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-color: rgba(217, 119, 6, 0.45);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+        }
+        [data-theme="light"] .preview-medal-item.is-earned .preview-medal-status {
+            color: #15803d;
+            font-weight: 700;
+        }
+        [data-theme="light"] .preview-medal-name {
+            color: #0f172a;
+        }
+        [data-theme="light"] .preview-medal-status {
+            color: #64748b;
+        }
+
+        /* LIGHT THEME: TAB 3 (МЕДАЛИ И ДОСТИЖЕНИЯ) */
+        [data-theme="light"] .trainer-summary-item {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+        [data-theme="light"] .trainer-summary-item:hover {
+            border-color: rgba(15, 23, 42, 0.22);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+        [data-theme="light"] .trainer-summary-label {
+            color: #64748b;
+        }
+        [data-theme="light"] .trainer-summary-val {
+            color: #0f172a;
+        }
+        [data-theme="light"] .ach-filter-btn {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.12);
+            color: #475569;
+        }
+        [data-theme="light"] .ach-filter-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+            border-color: rgba(15, 23, 42, 0.2);
+        }
+        [data-theme="light"] .ach-filter-btn.active {
+            background: var(--accent);
+            color: #ffffff !important;
+            border-color: var(--accent);
+            box-shadow: 0 2px 10px rgba(234, 88, 12, 0.3);
+        }
+        [data-theme="light"] .achievement-item,
+        [data-theme="light"] .achievement {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.1);
+        }
+        [data-theme="light"] .achievement-item.is-locked,
+        [data-theme="light"] .achievement:not(.is-earned) {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.1);
+            opacity: 0.85;
+        }
+        [data-theme="light"] .achievement-item:not(.is-earned):hover,
+        [data-theme="light"] .achievement:not(.is-earned):hover {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.22);
+            opacity: 1;
+        }
+        [data-theme="light"] .achievement-item.is-earned,
+        [data-theme="light"] .achievement.is-earned {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 45%, #ffffff 100%);
+            border-color: rgba(217, 119, 6, 0.45);
+            box-shadow: 0 4px 18px rgba(217, 119, 6, 0.12);
+        }
+        [data-theme="light"] .achievement-item.is-earned:hover,
+        [data-theme="light"] .achievement.is-earned:hover {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 45%, #ffffff 100%);
+            border-color: rgba(217, 119, 6, 0.65);
+            box-shadow: 0 6px 22px rgba(217, 119, 6, 0.18);
+        }
+        [data-theme="light"] .achievement-item.is-earned::before,
+        [data-theme="light"] .achievement.is-earned::before {
+            background: linear-gradient(180deg, #f59e0b, #ea580c);
+        }
+        [data-theme="light"] .achievement-item.is-earned .achievement-icon-wrap,
+        [data-theme="light"] .achievement.is-earned .achievement-medal,
+        [data-theme="light"] .achievement.is-earned .achievement-icon {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(217, 119, 6, 0.45);
+            box-shadow: 0 2px 10px rgba(217, 119, 6, 0.18);
+        }
+        [data-theme="light"] .achievement-item.is-earned .achievement-name {
+            color: #0f172a;
+        }
+        [data-theme="light"] .achievement-item.is-earned .achievement-desc {
+            color: #475569;
+        }
+        [data-theme="light"] .achievement-icon-wrap,
+        [data-theme="light"] .achievement-medal,
+        [data-theme="light"] .achievement-icon {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .achievement-badge.earned {
+            background: rgba(22, 163, 74, 0.12);
+            color: #15803d;
+            border-color: rgba(22, 163, 74, 0.3);
+        }
+        [data-theme="light"] .achievement-badge.locked {
+            background: #f1f5f9;
+            color: #64748b;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .achievements-empty-msg {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.14);
+            color: #64748b;
+        }
+
+        /* LIGHT THEME: AVATAR FRAMES */
+        [data-theme="light"] .avatar-wrap[data-frame="solar"] .avatar-placeholder {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border-color: #d97706;
+            color: #92400e;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="solar"] .avatar-ring {
+            border-color: #f59e0b;
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+        }
+
+        [data-theme="light"] .avatar-wrap[data-frame="neon"] .avatar-placeholder {
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            border-color: #9333ea;
+            color: #6b21a8;
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.35);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="neon"] .avatar-ring {
+            border-color: #06b6d4;
+            box-shadow: 0 0 16px rgba(6, 182, 212, 0.4), 0 0 24px rgba(168, 85, 247, 0.3);
+        }
+
+        [data-theme="light"] .avatar-wrap[data-frame="emerald"] .avatar-placeholder {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-color: #059669;
+            color: #065f46;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="emerald"] .avatar-ring {
+            border-color: #10b981;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+        }
+
+        [data-theme="light"] .avatar-wrap[data-frame="cosmic"] .avatar-placeholder {
+            background: linear-gradient(135deg, #fdf2f8, #fae8ff);
+            border-color: #db2777;
+            color: #86198f;
+            box-shadow: 0 0 20px rgba(219, 39, 119, 0.35);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="cosmic"] .avatar-ring {
+            border-color: #ec4899;
+            box-shadow: 0 0 16px rgba(236, 72, 153, 0.4), 0 0 24px rgba(139, 92, 246, 0.3);
+        }
+
+        [data-theme="light"] .avatar-wrap[data-frame="orbit"] .avatar-placeholder {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px rgba(255, 119, 40, 0.25);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="orbit"] .avatar-ring {
+            border-color: #0284c7;
+            box-shadow: 0 0 12px rgba(2, 132, 199, 0.3);
+        }
+
+        /* LIGHT THEME: GARGANTUA BLACK HOLE */
+        [data-theme="light"] .avatar-wrap[data-frame="gargantua"] .avatar-placeholder {
+            background: radial-gradient(circle at 45% 45%, #0a0806 0%, #000000 70%, #000000 100%) !important;
+            border-color: #ffffff;
+            color: #fffbeb;
+            box-shadow: inset 0 0 24px #000000, 0 0 20px rgba(217, 119, 6, 0.8), 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="gargantua"] .avatar-ring {
+            border-color: #f59e0b;
+            box-shadow: 0 0 20px rgba(217, 119, 6, 0.8), 0 0 35px rgba(245, 158, 11, 0.6);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="gargantua"]::before {
+            mix-blend-mode: normal;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.9), 0 0 26px rgba(217, 119, 6, 0.75);
+        }
+        [data-theme="light"] .avatar-wrap[data-frame="gargantua"]::after {
+            box-shadow: 0 0 22px rgba(245, 158, 11, 0.7), 0 0 40px rgba(217, 119, 6, 0.5);
+        }
+
         html {
             background-color: var(--ground);
             color: var(--ink);
@@ -256,7 +703,6 @@
 
         .profile-tab-btn:focus-visible,
         .nav-btn:focus-visible,
-        .nickname-edit-btn:focus-visible,
         .skills-select:focus-visible,
         .settings-btn:focus-visible,
         .achievements-close:focus-visible,
@@ -356,6 +802,8 @@
         }
 
         .avatar-placeholder {
+            position: relative;
+            z-index: 2;
             width: 84px;
             height: 84px;
             border-radius: 50%;
@@ -370,6 +818,202 @@
             align-items: center;
             justify-content: center;
             user-select: none;
+            transition: all 0.3s var(--ease-out);
+        }
+
+        /* ─── 5 AVATAR FRAMES SYSTEM ─── */
+        /* 1. Orbit (Classic) */
+        .avatar-wrap[data-frame="orbit"] .avatar-ring {
+            border: 2px dashed var(--accent-cyan);
+            animation: orbitalSpin 24s linear infinite;
+            box-shadow: 0 0 16px rgba(44, 230, 214, 0.35);
+        }
+        .avatar-wrap[data-frame="orbit"] .avatar-placeholder {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 24px var(--accent-glow);
+        }
+
+        /* 2. Solar Singularity (Gold Legend) */
+        .avatar-wrap[data-frame="solar"] .avatar-ring {
+            border: 2.5px solid #fbbf24;
+            animation: orbitalSpin 8s linear infinite;
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.75), 0 0 45px rgba(245, 158, 11, 0.45), inset 0 0 12px rgba(251, 191, 36, 0.3);
+            opacity: 1;
+        }
+        .avatar-wrap[data-frame="solar"] .avatar-placeholder {
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5), inset 0 0 16px rgba(245, 158, 11, 0.35);
+            background: linear-gradient(135deg, #2a2012, #16120c);
+            color: #fef08a;
+        }
+
+        /* 3. Cyber Quantum (Neon Pulse) */
+        .avatar-wrap[data-frame="neon"] .avatar-ring {
+            border: 2px solid #2ce6d6;
+            animation: orbitalSpin 12s linear infinite, neonPulse 2.5s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px #2ce6d6, 0 0 35px #c084fc;
+            opacity: 1;
+        }
+        .avatar-wrap[data-frame="neon"] .avatar-placeholder {
+            border: 2px solid #c084fc;
+            box-shadow: 0 0 25px rgba(192, 132, 252, 0.6), inset 0 0 15px rgba(44, 230, 214, 0.3);
+            background: linear-gradient(135deg, #1e1338, #0d1326);
+            color: #e9d5ff;
+        }
+
+        /* 4. Emerald Crystal (Alchemy) */
+        .avatar-wrap[data-frame="emerald"] .avatar-ring {
+            border: 3px double #10b981;
+            animation: orbitalSpin 16s linear infinite, emeraldGlow 3s ease-in-out infinite alternate;
+            box-shadow: 0 0 24px rgba(16, 185, 129, 0.7), inset 0 0 12px rgba(52, 211, 153, 0.4);
+            opacity: 1;
+        }
+        .avatar-wrap[data-frame="emerald"] .avatar-placeholder {
+            border: 2px solid #10b981;
+            box-shadow: 0 0 28px rgba(16, 185, 129, 0.55), inset 0 0 14px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #062b1e, #091a14);
+            color: #6ee7b7;
+        }
+
+        /* 5. Cosmic Void (Gravitational Singularity) */
+        .avatar-wrap[data-frame="cosmic"] .avatar-ring {
+            border: 2.5px solid #ec4899;
+            animation: orbitalSpin 6s linear infinite;
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.8), 0 0 45px rgba(139, 92, 246, 0.55), inset 0 0 14px rgba(236, 72, 153, 0.35);
+            opacity: 1;
+        }
+        .avatar-wrap[data-frame="cosmic"] .avatar-placeholder {
+            border: 2px solid #ec4899;
+            box-shadow: 0 0 32px rgba(236, 72, 153, 0.5), inset 0 0 16px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #240b2a, #0d0b1a);
+            color: #fbcfe8;
+        }
+
+        /* 6. Gargantua Singularity (Mythic Black Hole) */
+        .avatar-wrap[data-frame="gargantua"]::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 136%;
+            height: 22%;
+            border-radius: 50%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.98) 0%,
+                rgba(254, 240, 138, 0.95) 20%,
+                rgba(245, 158, 11, 0.9) 55%,
+                rgba(217, 119, 6, 0.75) 80%,
+                rgba(180, 83, 9, 0.3) 100%
+            );
+            transform: translate(-50%, -50%) rotate(-7deg);
+            box-shadow:
+                0 0 14px rgba(255, 240, 150, 0.9),
+                0 0 30px rgba(245, 158, 11, 0.8),
+                0 0 45px rgba(220, 38, 38, 0.45);
+            z-index: 4;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: gargantuaDiskPulse 4s ease-in-out infinite alternate;
+        }
+        .avatar-wrap[data-frame="gargantua"]::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 118%;
+            height: 118%;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            background: conic-gradient(
+                from 210deg,
+                rgba(255, 255, 255, 0.95) 0deg,
+                rgba(254, 240, 138, 0.9) 50deg,
+                rgba(245, 158, 11, 0.8) 120deg,
+                rgba(180, 83, 9, 0.35) 220deg,
+                rgba(255, 250, 200, 0.9) 360deg
+            );
+            box-shadow:
+                0 0 25px rgba(245, 158, 11, 0.7),
+                0 0 50px rgba(217, 119, 6, 0.4);
+            filter: blur(2px);
+            opacity: 0.85;
+            z-index: 1;
+            pointer-events: none;
+            animation: gargantuaHaloSpin 20s linear infinite;
+        }
+        .avatar-wrap[data-frame="gargantua"] .avatar-ring {
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            animation: gargantuaPhotonPulse 3s ease-in-out infinite alternate;
+            box-shadow:
+                0 0 15px rgba(254, 240, 138, 0.95),
+                0 0 30px rgba(245, 158, 11, 0.8),
+                inset 0 0 12px rgba(254, 240, 138, 0.6);
+            opacity: 1;
+            z-index: 2;
+        }
+        .avatar-wrap[data-frame="gargantua"] .avatar-placeholder {
+            border: 2px solid rgba(255, 255, 255, 0.92);
+            box-shadow:
+                inset 0 0 24px #000000,
+                0 0 20px rgba(245, 158, 11, 0.75),
+                0 0 40px rgba(217, 119, 6, 0.4);
+            background: radial-gradient(circle at 45% 45%, #080604 0%, #000000 70%, #000000 100%) !important;
+            color: #fffbeb;
+            text-shadow:
+                0 0 8px rgba(255, 255, 255, 0.95),
+                0 0 20px rgba(251, 191, 36, 0.85),
+                0 0 35px rgba(245, 158, 11, 0.6);
+            z-index: 3;
+        }
+
+        @keyframes gargantuaHaloSpin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes gargantuaDiskPulse {
+            0% {
+                transform: translate(-50%, -50%) rotate(-7deg) scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(-6.5deg) scale(1.02);
+                filter: brightness(1.15);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(-7.5deg) scale(0.99);
+                filter: brightness(0.95);
+            }
+        }
+
+        @keyframes gargantuaPhotonPulse {
+            0% {
+                box-shadow: 0 0 14px rgba(254, 240, 138, 0.9), 0 0 28px rgba(245, 158, 11, 0.75), inset 0 0 10px rgba(254, 240, 138, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 22px rgba(255, 255, 255, 1), 0 0 42px rgba(245, 158, 11, 0.95), inset 0 0 16px rgba(254, 240, 138, 0.8);
+            }
+        }
+
+        @keyframes neonPulse {
+            0% {
+                box-shadow: 0 0 16px #2ce6d6, 0 0 28px #c084fc;
+                border-color: #2ce6d6;
+            }
+            100% {
+                box-shadow: 0 0 28px #c084fc, 0 0 45px #2ce6d6;
+                border-color: #c084fc;
+            }
+        }
+
+        @keyframes emeraldGlow {
+            0% {
+                box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.9);
+            }
         }
 
         /* IDENTITY INFO */
@@ -393,77 +1037,7 @@
             font-weight: 800;
             color: var(--ink);
             line-height: 1.15;
-            cursor: pointer;
-            transition: color 0.2s;
             overflow-wrap: anywhere;
-        }
-        .nickname:hover {
-            color: var(--accent);
-        }
-
-        .nickname-edit-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--line);
-            border-radius: var(--r-sm);
-            padding: 0.35rem 0.75rem;
-            font-family: var(--f-body);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--muted-bright);
-            cursor: pointer;
-            transition: all 0.2s var(--ease-out);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .nickname-edit-btn svg {
-            flex-shrink: 0;
-            display: block;
-        }
-        .nickname-edit-btn:hover {
-            background: var(--accent);
-            color: #090c13 !important;
-            border-color: var(--accent);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px var(--accent-glow);
-        }
-        .nickname-edit-btn:hover svg {
-            stroke: #090c13;
-        }
-
-        .name-edit-form {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .name-input {
-            background: var(--surface);
-            border: 1px solid var(--accent);
-            color: #fff;
-            padding: 0.4rem 0.85rem;
-            border-radius: var(--r-sm);
-            font-family: var(--f-body);
-            font-size: 1.1rem;
-            font-weight: 700;
-            outline: none;
-        }
-        .name-save-btn {
-            background: var(--accent-emerald);
-            color: #fff;
-            border: none;
-            padding: 0.45rem 0.85rem;
-            border-radius: var(--r-sm);
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .name-cancel-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: none;
-            padding: 0.45rem 0.75rem;
-            border-radius: var(--r-sm);
-            cursor: pointer;
         }
 
         .role-badge-row {
@@ -510,6 +1084,45 @@
             display: flex;
             flex-direction: column;
             gap: 0.65rem;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out);
+            position: relative;
+            user-select: none;
+        }
+
+        .hud-telemetry-box:hover {
+            border-color: var(--accent);
+            background: rgba(18, 24, 38, 0.85);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 119, 40, 0.22);
+        }
+
+        .hud-telemetry-box:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .hud-telemetry-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .telemetry-click-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: var(--f-mono);
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            transition: all 0.2s ease;
+            align-self: flex-start;
+        }
+
+        .hud-telemetry-box:hover .telemetry-click-hint {
+            color: var(--accent);
+            transform: translateX(2px);
         }
 
         .hud-telemetry-top {
@@ -1181,26 +1794,64 @@
         }
 
         .trainer-card-action {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            padding: 0.65rem 1rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--line-active);
+            gap: 8px;
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid var(--line-active);
             border-radius: var(--r-sm);
-            color: #fff;
-            font-size: 0.85rem;
+            color: var(--ink);
+            font-size: 0.88rem;
             font-weight: 700;
             text-decoration: none;
-            transition: all 0.25s var(--ease-out);
+            cursor: pointer;
+            transition: color .35s ease, border-color .35s ease, box-shadow .35s ease, transform .2s ease;
             margin-top: 0.25rem;
         }
-        .trainer-card-action:hover {
-            background: var(--accent);
-            border-color: var(--accent);
+        .trainer-card-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #059669 0%, #10b981 45%, #84cc16 100%);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform .4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .trainer-card-action:hover::before,
+        .trainer-card-action:focus-visible::before {
+            transform: scaleX(1);
+        }
+        .trainer-card-action:hover,
+        .trainer-card-action:focus-visible {
+            color: #ffffff;
+            border-color: #10b981;
+            box-shadow: 0 6px 22px rgba(16, 185, 129, 0.35);
             transform: translateY(-2px);
-            box-shadow: 0 4px 14px var(--accent-glow);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        }
+        .trainer-card-action:focus,
+        .trainer-card-action:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .trainer-card-action span:last-child {
+            display: inline-block;
+            transition: transform .3s ease;
+        }
+        .trainer-card-action:hover span:last-child,
+        .trainer-card-action:focus-visible span:last-child {
+            transform: translateX(5px);
         }
 
         /* TOAST NOTIFICATION */
@@ -1249,7 +1900,7 @@
             flex-shrink: 0;
         }
 
-        /* --- MODAL DIALOGS (SETTINGS & ACHIEVEMENTS) --- */
+        /* --- MODAL DIALOGS (SETTINGS & ACHIEVEMENTS & LEVELS) --- */
         dialog {
             margin: auto;
             background: var(--surface-card);
@@ -1259,8 +1910,26 @@
             padding: 0;
             max-width: 640px;
             width: 90%;
+            max-height: 92vh;
+            overflow-y: auto;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
-            outline: none;
+        }
+        dialog::-webkit-scrollbar {
+            width: 6px;
+        }
+        dialog::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        dialog::-webkit-scrollbar-thumb {
+            background: var(--line);
+            border-radius: var(--r-pill);
+        }
+        dialog::-webkit-scrollbar-thumb:hover {
+            background: var(--line-active);
+        }
+        dialog:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
         dialog::backdrop {
             background: rgba(5, 7, 12, 0.85);
@@ -1268,7 +1937,18 @@
             -webkit-backdrop-filter: blur(8px);
         }
 
-        .settings-content, .achievements-content {
+        #settings-dialog {
+            max-width: 700px;
+        }
+
+        .settings-content {
+            padding: 1.25rem 1.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .achievements-content {
             padding: 2rem;
             display: flex;
             flex-direction: column;
@@ -1292,6 +1972,94 @@
             font-size: 0.8rem;
             color: var(--muted);
             margin-top: 0.2rem;
+        }
+
+        /* SETTINGS TABS NAV */
+        .settings-tabs-nav {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: var(--r-pill);
+            border: 1px solid var(--line);
+            gap: 4px;
+        }
+        [data-theme="light"] .settings-tabs-nav {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        .settings-tab-btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: var(--r-pill);
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-family: var(--f-body);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+        }
+        .settings-tab-btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        [data-theme="light"] .settings-tab-btn:hover {
+            background: rgba(15, 23, 42, 0.05);
+            color: #0f172a;
+        }
+        .settings-tab-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, #ff5500 100%);
+            color: #090c13 !important;
+            font-weight: 800;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+        [data-theme="light"] .settings-tab-btn.active {
+            background: linear-gradient(135deg, #ff7728 0%, #ea580c 100%);
+            color: #ffffff !important;
+        }
+        .settings-tab-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .settings-tab-pane.hidden {
+            display: none !important;
+        }
+
+        /* CUSTOM LIVE PREVIEW BOX INSIDE CUSTOMIZER */
+        .custom-live-preview-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.65rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            margin-bottom: 0;
+        }
+        [data-theme="light"] .custom-live-preview-box {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.1);
+        }
+        .custom-preview-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .custom-preview-title {
+            font-family: var(--f-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+        .custom-preview-subtitle {
+            font-size: 0.8rem;
+            color: var(--muted);
         }
         .settings-close, .achievements-close {
             background: rgba(255, 255, 255, 0.08);
@@ -1351,10 +2119,13 @@
             font-size: 0.78rem;
             padding: 0.75rem;
             resize: none;
-            outline: none;
         }
-        .profile-code-textarea:focus {
+        .profile-code-textarea:focus,
+        .profile-code-textarea:focus-visible {
             border-color: var(--accent);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
         .code-box-actions, .import-actions {
@@ -1391,10 +2162,1048 @@
         .copy-status-msg.success, .import-status-msg.success { color: var(--accent-emerald); }
         .import-status-msg.error { color: var(--danger); }
 
+        /* THEME TOGGLE SWITCH COMPONENT */
+        .theme-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: var(--r-sm);
+            border: 1px solid var(--line);
+            margin-top: 0.4rem;
+        }
+        [data-theme="light"] .theme-toggle-row {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        .theme-toggle-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .theme-toggle-label {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .theme-toggle-desc {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 32px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+        .theme-slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid var(--line-active);
+            border-radius: 999px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            box-sizing: border-box;
+        }
+        [data-theme="light"] .theme-slider {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        .theme-slider::after {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 3.5px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+        .theme-switch input:checked + .theme-slider {
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+            border-color: #f59e0b;
+        }
+        .theme-switch input:checked + .theme-slider::after {
+            transform: translateX(28px);
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(234, 88, 12, 0.4);
+        }
+        .theme-switch input:focus-visible + .theme-slider {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .theme-slider-icon {
+            font-size: 13px;
+            line-height: 1;
+            z-index: 1;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* SETTINGS PROFILE NAME ROW */
+        .settings-name-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-top: 0.4rem;
+        }
+        .settings-name-input {
+            flex: 1;
+            height: 42px;
+            padding: 0 0.85rem;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-sm);
+            color: var(--ink);
+            font-family: var(--f-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .settings-name-input:focus,
+        .settings-name-input:focus-visible {
+            border-color: var(--accent);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        [data-theme="light"] .settings-name-input {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: rgba(15, 23, 42, 0.16);
+        }
+
         .settings-divider {
             height: 1px;
             background: var(--line);
             margin: 0.25rem 0;
+        }
+
+        /* SETTINGS FRAMES SELECTOR GRID */
+        .frames-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .frames-selector-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.6rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .frames-selector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .frame-option-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            padding: 0.65rem 0.45rem 0.55rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            transition: all 0.22s var(--ease-out);
+            position: relative;
+            color: var(--ink);
+            width: 100%;
+            min-width: 0;
+            min-height: 130px;
+            box-sizing: border-box;
+        }
+
+        .frame-option-card:hover:not(.is-locked) {
+            border-color: var(--line-active);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .frame-option-card.active {
+            border-color: var(--accent);
+            background: rgba(255, 119, 40, 0.12);
+            box-shadow: 0 0 16px rgba(255, 119, 40, 0.2);
+        }
+
+        .frame-option-card[data-frame-id="gargantua"].active {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.14);
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.3);
+        }
+
+        .frame-option-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* TOP STATUS BADGES */
+        .frame-card-top-badges {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 5;
+        }
+
+        .frame-check-badge {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.6);
+            transition: all 0.2s var(--ease-out);
+        }
+
+        .frame-option-card.active .frame-check-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .frame-lock-badge {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #cbd5e1;
+            font-size: 9px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .frame-option-card.is-locked .frame-lock-badge {
+            display: flex;
+        }
+
+        /* LOCKED CARD STATE */
+        .frame-option-card.is-locked {
+            opacity: 0.72;
+            background: rgba(255, 255, 255, 0.02);
+            border-style: dashed;
+            border-color: rgba(255, 255, 255, 0.14);
+            cursor: not-allowed;
+        }
+
+        .frame-option-card.is-locked:hover {
+            opacity: 0.9;
+            border-color: rgba(245, 158, 11, 0.45);
+            background: rgba(245, 158, 11, 0.04);
+        }
+
+        .frame-option-card.is-locked .frame-preview-box {
+            filter: grayscale(0.4) brightness(0.8);
+            opacity: 0.85;
+        }
+
+        .frame-option-card.shake {
+            animation: frameCardShake 0.4s ease-in-out;
+        }
+
+        @keyframes frameCardShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* CARD META & TITLES */
+        .frame-card-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .frame-option-name {
+            font-family: var(--f-display);
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* CONDITION REQUIREMENT PILL */
+        .frame-req-pill {
+            font-family: var(--f-mono);
+            font-size: 0.65rem;
+            padding: 3px 6px;
+            border-radius: var(--r-pill);
+            line-height: 1.25;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.2s;
+        }
+
+        .frame-option-card.is-unlocked .frame-req-pill {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.28);
+        }
+
+        .frame-option-card.is-locked .frame-req-pill {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* LOCK NOTICE BANNER */
+        .frame-lock-notice {
+            margin-top: 0.65rem;
+            padding: 0.65rem 0.9rem;
+            border-radius: var(--r-sm);
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fef08a;
+            animation: noticeFadeIn 0.25s ease-out;
+        }
+
+        .frame-lock-notice.hidden {
+            display: none;
+        }
+
+        @keyframes noticeFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MINI PREVIEWS INSIDE SETTINGS CARDS */
+        .frame-preview-box {
+            position: relative;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .mini-avatar-ring {
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .mini-avatar-dot {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--f-display);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        /* 1. Orbit */
+        .frame-preview-box[data-frame="orbit"] .mini-avatar-ring {
+            border: 2px dashed var(--accent-cyan);
+            animation: orbitalSpin 24s linear infinite;
+        }
+        .frame-preview-box[data-frame="orbit"] .mini-avatar-dot {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid var(--accent);
+        }
+
+        /* 2. Solar */
+        .frame-preview-box[data-frame="solar"] .mini-avatar-ring {
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
+            animation: orbitalSpin 8s linear infinite;
+        }
+        .frame-preview-box[data-frame="solar"] .mini-avatar-dot {
+            background: linear-gradient(135deg, #2a2012, #16120c);
+            border: 2px solid #fbbf24;
+            color: #fef08a;
+        }
+
+        /* 3. Neon */
+        .frame-preview-box[data-frame="neon"] .mini-avatar-ring {
+            border: 2px solid #2ce6d6;
+            box-shadow: 0 0 10px #2ce6d6, 0 0 16px #c084fc;
+        }
+        .frame-preview-box[data-frame="neon"] .mini-avatar-dot {
+            background: linear-gradient(135deg, #1e1338, #0d1326);
+            border: 2px solid #c084fc;
+            color: #e9d5ff;
+        }
+
+        /* 4. Emerald */
+        .frame-preview-box[data-frame="emerald"] .mini-avatar-ring {
+            border: 2px solid #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
+        }
+        .frame-preview-box[data-frame="emerald"] .mini-avatar-dot {
+            background: linear-gradient(135deg, #062b1e, #091a14);
+            border: 2px solid #10b981;
+            color: #6ee7b7;
+        }
+
+        /* 5. Cosmic */
+        .frame-preview-box[data-frame="cosmic"] .mini-avatar-ring {
+            border: 2px solid #ec4899;
+            box-shadow: 0 0 14px rgba(236, 72, 153, 0.7), 0 0 8px rgba(139, 92, 246, 0.6);
+            animation: orbitalSpin 6s linear infinite;
+        }
+        .frame-preview-box[data-frame="cosmic"] .mini-avatar-dot {
+            background: linear-gradient(135deg, #240b2a, #0d0b1a);
+            border: 2px solid #ec4899;
+            color: #fbcfe8;
+        }
+
+        /* 6. Gargantua Singularity */
+        .frame-preview-box[data-frame="gargantua"] {
+            position: relative;
+        }
+        .frame-preview-box[data-frame="gargantua"] .mini-avatar-ring {
+            border: 1.5px solid rgba(254, 240, 138, 0.95);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.85), 0 0 20px rgba(217, 119, 6, 0.55);
+            animation: gargantuaPhotonPulse 3s ease-in-out infinite alternate;
+        }
+        .frame-preview-box[data-frame="gargantua"] .mini-avatar-dot {
+            background: radial-gradient(circle at 45% 45%, #0d0a07 0%, #000000 80%) !important;
+            border: 1.5px solid #ffffff;
+            box-shadow: inset 0 0 10px #000000, 0 0 10px rgba(245, 158, 11, 0.8);
+            color: #fffbeb;
+            text-shadow: 0 0 6px rgba(254, 240, 138, 0.95);
+            position: relative;
+            z-index: 2;
+        }
+        .frame-preview-box[data-frame="gargantua"]::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 58px;
+            height: 9px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #ffffff 0%, #fef08a 25%, #f59e0b 60%, #b45309 100%);
+            transform: translate(-50%, -50%) rotate(-7deg);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.9), 0 0 14px rgba(220, 38, 38, 0.5);
+            z-index: 3;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .frame-option-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.25;
+        }
+
+        .frame-option-tag {
+            font-family: var(--f-mono);
+            font-size: 0.62rem;
+            padding: 2px 6px;
+            border-radius: var(--r-pill);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--muted);
+        }
+
+        .frame-option-tag.tag-legendary {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-gold);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .frame-option-tag.tag-cyber {
+            background: rgba(44, 230, 214, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(44, 230, 214, 0.3);
+        }
+        .frame-option-tag.tag-emerald {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .frame-option-tag.tag-cosmic {
+            background: rgba(236, 72, 153, 0.15);
+            color: #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .frame-option-tag.tag-mythic {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(220, 38, 38, 0.18));
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Light theme overrides for frame selector */
+        [data-theme="light"] .frame-option-card {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .frame-option-card:hover {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.22);
+        }
+        [data-theme="light"] .frame-option-card.active {
+            background: rgba(234, 88, 12, 0.08);
+            border-color: var(--accent);
+        }
+        [data-theme="light"] .frame-option-card[data-frame-id="gargantua"].active {
+            border-color: #d97706;
+            background: rgba(217, 119, 6, 0.1);
+            box-shadow: 0 0 16px rgba(217, 119, 6, 0.25);
+        }
+        [data-theme="light"] .frame-option-name {
+            color: #0f172a;
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="orbit"] .mini-avatar-dot {
+            background: #ffffff;
+            color: #0284c7;
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="solar"] .mini-avatar-dot {
+            background: #fffbeb;
+            color: #b45309;
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="neon"] .mini-avatar-dot {
+            background: #faf5ff;
+            color: #7e22ce;
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="emerald"] .mini-avatar-dot {
+            background: #ecfdf5;
+            color: #047857;
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="cosmic"] .mini-avatar-dot {
+            background: #fdf2f8;
+            color: #be185d;
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="gargantua"] .mini-avatar-dot {
+            background: #000000 !important;
+            color: #ffffff;
+            border-color: #ffffff;
+            box-shadow: inset 0 0 10px #000000, 0 0 10px rgba(217, 119, 6, 0.8);
+        }
+        [data-theme="light"] .frame-preview-box[data-frame="gargantua"]::before {
+            mix-blend-mode: normal;
+        }
+
+        /* Light theme locked frame cards & badges */
+        [data-theme="light"] .frame-option-card.is-locked {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.18);
+            opacity: 0.75;
+        }
+        [data-theme="light"] .frame-option-card.is-locked:hover {
+            background: #fef3c7;
+            border-color: rgba(217, 119, 6, 0.4);
+        }
+        [data-theme="light"] .frame-option-card.is-locked .frame-req-pill {
+            background: rgba(15, 23, 42, 0.06);
+            color: #64748b;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .frame-option-card.is-unlocked .frame-req-pill {
+            background: #ecfdf5;
+            color: #047857;
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+        [data-theme="light"] .frame-lock-badge {
+            background: #e2e8f0;
+            border-color: rgba(15, 23, 42, 0.18);
+            color: #475569;
+        }
+        [data-theme="light"] .frame-lock-notice {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        /* --- LEVEL PROGRESSION MODAL DIALOG --- */
+        #level-progress-dialog {
+            max-width: 680px;
+        }
+
+        .level-modal-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.35rem;
+        }
+
+        .level-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--line);
+            gap: 1rem;
+        }
+
+        .level-modal-pretitle {
+            font-family: var(--f-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.2rem;
+        }
+
+        .level-modal-heading {
+            font-family: var(--f-display);
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .level-modal-subtitle {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 0.3rem;
+            line-height: 1.45;
+        }
+
+        /* Hero Current Status Card */
+        .level-hero-status-card {
+            background: linear-gradient(135deg, rgba(255, 119, 40, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(255, 119, 40, 0.35);
+            border-radius: var(--r-lg);
+            padding: 1.35rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 0 30px rgba(255, 119, 40, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-hero-status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-gold), var(--accent-cyan));
+        }
+
+        .level-hero-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .level-hero-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .level-current-badge-orb {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2a1508, #180b03);
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .level-current-badge-orb .orb-num {
+            font-family: var(--f-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .level-current-badge-orb .orb-sub {
+            font-family: var(--f-mono);
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .level-hero-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .level-hero-tier-tag {
+            font-family: var(--f-mono);
+            font-size: 0.68rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .level-hero-title {
+            font-family: var(--f-display);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .level-hero-total-xp {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .level-hero-total-xp strong {
+            color: var(--accent);
+            font-family: var(--f-mono);
+            font-size: 1rem;
+        }
+
+        .level-hero-progress-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .level-hero-bar-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .level-hero-bar-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--r-pill);
+            overflow: hidden;
+            border: 1px solid var(--line);
+        }
+
+        .level-hero-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #ff9944 100%);
+            border-radius: var(--r-pill);
+            box-shadow: 0 0 12px var(--accent-glow);
+            transition: width 0.5s var(--ease-out);
+        }
+
+        /* Rules Pills Row */
+        .level-rules-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 580px) {
+            .level-rules-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .level-rule-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            border-radius: var(--r-sm);
+            padding: 0.65rem 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.78rem;
+            color: var(--ink);
+        }
+
+        .level-rule-pill .rule-icon {
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .level-rule-pill strong {
+            color: var(--accent-gold);
+            font-family: var(--f-mono);
+        }
+
+        /* Roadmap List */
+        .level-roadmap-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.25rem;
+        }
+
+        .level-roadmap-title {
+            font-family: var(--f-display);
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0;
+        }
+
+        .level-roadmap-count {
+            font-family: var(--f-mono);
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            background: rgba(44, 230, 214, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--r-pill);
+        }
+
+        .level-roadmap-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .level-item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            padding: 0.85rem 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: all 0.2s var(--ease-out);
+        }
+
+        .level-item-card.is-completed {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .level-item-card.is-current {
+            background: rgba(255, 119, 40, 0.12);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 119, 40, 0.22);
+            transform: scale(1.01);
+        }
+
+        .level-item-card.is-locked {
+            opacity: 0.6;
+        }
+
+        .level-item-left {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            min-width: 0;
+        }
+
+        .level-item-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .level-item-card.is-completed .level-item-icon-box {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .level-item-card.is-current .level-item-icon-box {
+            border-color: var(--accent);
+            background: rgba(255, 119, 40, 0.2);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .level-item-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            min-width: 0;
+        }
+
+        .level-item-head {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .level-item-title {
+            font-family: var(--f-display);
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .level-item-xp-badge {
+            font-family: var(--f-mono);
+            font-size: 0.68rem;
+            color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.12);
+            padding: 1px 6px;
+            border-radius: var(--r-pill);
+        }
+
+        .level-item-desc {
+            font-size: 0.76rem;
+            color: var(--muted);
+            line-height: 1.35;
+            white-space: normal;
+        }
+
+        .level-item-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: var(--f-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.3rem 0.75rem;
+            border-radius: var(--r-pill);
+            flex-shrink: 0;
+        }
+
+        .level-item-status-pill.status-completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .level-item-status-pill.status-current {
+            background: linear-gradient(135deg, var(--accent) 0%, #ff5500 100%);
+            color: #090c13;
+            font-weight: 800;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+
+        .level-item-status-pill.status-locked {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            border: 1px solid var(--line);
+        }
+
+        /* LIGHT THEME FOR LEVEL PROGRESS MODAL */
+        [data-theme="light"] .level-hero-status-card {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-color: rgba(234, 88, 12, 0.3);
+            box-shadow: 0 4px 20px rgba(234, 88, 12, 0.08);
+        }
+        [data-theme="light"] .level-current-badge-orb {
+            background: #ffffff;
+            border-color: #ea580c;
+            box-shadow: 0 2px 10px rgba(234, 88, 12, 0.25);
+        }
+        [data-theme="light"] .level-current-badge-orb .orb-num {
+            color: #c2410c;
+        }
+        [data-theme="light"] .level-current-badge-orb .orb-sub {
+            color: #ea580c;
+        }
+        [data-theme="light"] .level-hero-title {
+            color: #0f172a;
+        }
+        [data-theme="light"] .level-hero-bar-track {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        [data-theme="light"] .level-rule-pill {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.12);
+            color: #1e293b;
+        }
+        [data-theme="light"] .level-item-card {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.1);
+        }
+        [data-theme="light"] .level-item-card.is-completed {
+            background: #ecfdf5;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        [data-theme="light"] .level-item-card.is-current {
+            background: #fff7ed;
+            border-color: #ea580c;
+            box-shadow: 0 4px 16px rgba(234, 88, 12, 0.15);
+        }
+        [data-theme="light"] .level-item-card.is-locked {
+            background: #f8fafc;
+            opacity: 0.7;
+        }
+        [data-theme="light"] .level-item-title {
+            color: #0f172a;
+        }
+        [data-theme="light"] .level-item-desc {
+            color: #475569;
+        }
+        [data-theme="light"] .level-item-icon-box {
+            background: #f1f5f9;
+            border-color: rgba(15, 23, 42, 0.12);
+        }
+        [data-theme="light"] .level-item-status-pill.status-completed {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+        [data-theme="light"] .level-item-status-pill.status-current {
+            background: linear-gradient(135deg, #ff7728 0%, #ea580c 100%);
+            color: #ffffff;
+        }
+        [data-theme="light"] .level-item-status-pill.status-locked {
+            background: #f1f5f9;
+            color: #64748b;
+            border-color: #cbd5e1;
         }
 
         /* TAB 3: MEDALS & ACHIEVEMENTS PAGE */
@@ -1769,9 +3578,9 @@
         }
 
         .achievement-item.is-earned, .achievement.is-earned {
-            background: linear-gradient(135deg, rgba(255, 204, 0, 0.08) 0%, rgba(20, 26, 40, 0.95) 100%);
-            border-color: rgba(255, 204, 0, 0.4);
-            box-shadow: 0 4px 20px rgba(255, 204, 0, 0.08);
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.14) 0%, rgba(32, 28, 20, 0.55) 45%, rgba(18, 22, 34, 0.95) 100%);
+            border-color: rgba(255, 204, 0, 0.45);
+            box-shadow: 0 4px 20px rgba(255, 204, 0, 0.12);
         }
 
         .achievement-item.is-earned::before, .achievement.is-earned::before {
@@ -2018,9 +3827,9 @@
             </div>
 
             <div class="header-actions">
-                <button id="settings-open-btn" class="nav-btn" type="button" title="Настройки и код синхронизации">
+                <button id="settings-open-btn" class="nav-btn" type="button" title="Настройки профиля">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    <span>Синхронизация</span>
+                    <span>Настройки</span>
                 </button>
                 <!-- Hidden compatibility buttons -->
                 <button id="settings-toggle-btn" class="hidden" type="button"></button>
@@ -2036,7 +3845,7 @@
         <section class="profile-hero" aria-label="Карточка исследователя">
             <div class="hero-hud-card">
                 <!-- AVATAR BEACON -->
-                <div class="avatar-wrap">
+                <div class="avatar-wrap" id="avatar-container" data-frame="orbit">
                     <div class="avatar-ring" aria-hidden="true"></div>
                     <div class="avatar-placeholder" id="profile-avatar">У</div>
                 </div>
@@ -2044,18 +3853,7 @@
                 <!-- IDENTITY INFO -->
                 <div class="identity-info">
                     <div class="identity-header">
-                        <div id="nickname-display-wrap" class="identity-header">
-                            <h1 class="nickname" id="profile-nickname" title="Нажми, чтобы изменить имя">Ученик</h1>
-                            <button type="button" class="nickname-edit-btn" id="edit-name-btn" title="Изменить имя">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                <span>Изменить</span>
-                            </button>
-                        </div>
-                        <form id="nickname-edit-form" class="name-edit-form hidden">
-                            <input type="text" id="nickname-input" class="name-input" maxlength="25" placeholder="Введи имя" autocomplete="off" required>
-                            <button type="submit" class="name-save-btn" title="Сохранить">✓</button>
-                            <button type="button" id="cancel-name-btn" class="name-cancel-btn" title="Отмена">✕</button>
-                        </form>
+                        <h1 class="nickname" id="profile-nickname">Ученик</h1>
                     </div>
 
                     <div class="role-badge-row">
@@ -2069,8 +3867,8 @@
                     </div>
                 </div>
 
-                <!-- XP & TELEMETRY PROGRESS -->
-                <div class="hud-telemetry-box" aria-labelledby="experience-heading">
+                <!-- XP & TELEMETRY PROGRESS (CLICKABLE FOR LEVEL ROADMAP MODAL) -->
+                <div class="hud-telemetry-box" id="hero-level-card" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-label="Открыть подробный прогресс по уровням" title="Нажмите, чтобы открыть подробный прогресс по уровням">
                     <div class="hud-telemetry-top">
                         <h2 id="experience-heading" class="experience-level">Уровень 1 · Новичок</h2>
                         <span id="experience-total" class="experience-total">0 XP</span>
@@ -2085,7 +3883,13 @@
                         aria-valuenow="0">
                         <div id="experience-progress" class="experience-progress"></div>
                     </div>
-                    <p id="experience-detail" class="experience-detail">0 из 100 XP до следующего уровня · осталось 100 XP. За задачу: 2 XP за ошибочный ответ или 10 XP за верный; повторные проверки не суммируются.</p>
+                    <div class="hud-telemetry-bottom">
+                        <p id="experience-detail" class="experience-detail">0 из 100 XP до следующего уровня · осталось 100 XP. За задачу: 2 XP за ошибочный ответ или 10 XP за верный; повторные проверки не суммируются.</p>
+                        <span class="telemetry-click-hint">
+                            <span>Подробнее об уровнях</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2254,79 +4058,343 @@
         <div class="settings-content">
             <div class="settings-header">
                 <div>
-                    <h2 id="settings-heading" class="settings-heading">Синхронизация профиля</h2>
-                    <p class="settings-note">Сохрани прогресс или перенеси все серии и звания на другое устройство</p>
+                    <h2 id="settings-heading" class="settings-heading">Настройки профиля</h2>
+                    <p class="settings-note">Кастомизация, оформление и синхронизация прогресса</p>
                 </div>
                 <button type="button" class="settings-close" id="settings-close-btn" aria-label="Закрыть настройки">×</button>
             </div>
 
-            <!-- EXPORT -->
-            <div class="settings-section">
-                <div class="settings-section-head">
-                    <h3 class="settings-section-title">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        <span>Твой код сохранения</span>
-                    </h3>
-                    <span class="settings-badge">Код профиля</span>
-                </div>
-                <p class="settings-section-desc">
-                    В этом коде зашифрованы имя, XP, решённые задачи, серии и звания во всех тренажерах.
-                </p>
-                <textarea id="profile-code-output" class="profile-code-textarea" readonly rows="3" spellcheck="false" placeholder="Генерация кода..."></textarea>
-                <div class="code-box-actions">
-                    <button type="button" id="copy-code-btn" class="settings-btn settings-btn-primary">
-                        <span id="copy-btn-text">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            Скопировать код
-                        </span>
-                    </button>
-                    <span id="copy-status" class="copy-status-msg" aria-live="polite"></span>
-                </div>
-            </div>
-
-            <div class="settings-divider"></div>
-
-            <!-- IMPORT -->
-            <div class="settings-section">
-                <div class="settings-section-head">
-                    <h3 class="settings-section-title">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Восстановление прогресса</span>
-                    </h3>
-                    <span class="settings-badge">Загрузка</span>
-                </div>
-                <p class="settings-section-desc">
-                    Вставь скопированный ранее код профиля (начинается с STUDY-):
-                </p>
-                <textarea id="profile-code-input" class="profile-code-textarea" rows="2" spellcheck="false" placeholder="Вставь сюда код профиля..."></textarea>
-                <div class="import-actions">
-                    <button type="button" id="apply-code-btn" class="settings-btn settings-btn-accent">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Восстановить профиль</span>
-                    </button>
-                    <button type="button" id="clear-input-btn" class="settings-btn settings-btn-secondary">
-                        Очистить
-                    </button>
-                </div>
-                <div id="import-status-msg" class="import-status-msg hidden" aria-live="polite"></div>
-            </div>
-
-            <div class="settings-divider"></div>
-
-            <!-- RESET DANGER ZONE -->
-            <div class="settings-section">
-                <h3 class="settings-section-title" style="color: var(--danger);">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    <span>Сброс данных на этом устройстве</span>
-                </h3>
-                <p class="settings-section-desc">
-                    Удалит локальные рекорды, серии и статистику. Сохрани код профиля выше перед сбросом!
-                </p>
-                <button type="button" id="reset-data-btn" class="settings-btn settings-btn-danger">
-                    Сбросить данные профиля
+            <!-- SETTINGS TABS NAV -->
+            <div class="settings-tabs-nav" role="tablist" aria-label="Разделы настроек">
+                <button type="button" class="settings-tab-btn active" id="settings-tab-btn-custom" role="tab" aria-selected="true" aria-controls="settings-pane-custom">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    <span>Кастомизация</span>
+                </button>
+                <button type="button" class="settings-tab-btn" id="settings-tab-btn-general" role="tab" aria-selected="false" aria-controls="settings-pane-general">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Основные</span>
                 </button>
             </div>
+
+            <!-- TAB PANE 1: КАСТОМИЗАЦИЯ ПРОФИЛЯ -->
+            <div id="settings-pane-custom" class="settings-tab-pane" role="tabpanel" aria-labelledby="settings-tab-btn-custom">
+                <!-- LIVE PREVIEW BANNER -->
+                <div class="custom-live-preview-box">
+                    <div class="avatar-wrap" id="custom-preview-avatar-wrap" data-frame="orbit" style="width: 58px; height: 58px;">
+                        <div class="avatar-ring" aria-hidden="true"></div>
+                        <div class="avatar-placeholder" id="custom-preview-avatar-placeholder" style="width: 48px; height: 48px; font-size: 1.3rem;">У</div>
+                    </div>
+                    <div class="custom-preview-meta">
+                        <div class="custom-preview-title" id="custom-preview-name">Ученик</div>
+                        <div class="custom-preview-subtitle" id="custom-preview-frame-label">Рамка: Классическая орбита</div>
+                    </div>
+                </div>
+
+                <!-- 1. ИМЯ ПРОФИЛЯ -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Имя профиля</span>
+                        </h3>
+                        <span class="settings-badge">Отображение</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        Имя отображается в профиле, на карточках и сохраняется в коде синхронизации:
+                    </p>
+                    <div class="settings-name-row">
+                        <input type="text" id="settings-name-input" class="settings-name-input" maxlength="25" placeholder="Введи своё имя" autocomplete="off" spellcheck="false">
+                        <button type="button" id="settings-name-save-btn" class="settings-btn settings-btn-primary">
+                            <span>Сохранить</span>
+                        </button>
+                    </div>
+                    <div id="settings-name-status" class="copy-status-msg" aria-live="polite"></div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <!-- 2. РАМКА ДЛЯ ПРОФИЛЯ -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>
+                            <span>Рамка профиля</span>
+                        </h3>
+                        <span class="settings-badge" id="frame-active-badge">Классическая орбита</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        Выберите стиль орбитальной рамки для аватарки в профиле:
+                    </p>
+
+                    <div class="frames-selector-grid" role="radiogroup" aria-label="Выбор рамки профиля">
+                        <!-- Frame 1: Orbit -->
+                        <button type="button" class="frame-option-card active" data-frame-id="orbit" role="radio" aria-checked="true" title="Классическая орбита">
+                            <div class="frame-card-top-badges">
+                                <span class="frame-check-badge" aria-hidden="true">✔</span>
+                                <span class="frame-lock-badge" aria-hidden="true">🔒</span>
+                            </div>
+                            <div class="frame-preview-box" data-frame="orbit">
+                                <div class="mini-avatar-ring"></div>
+                                <div class="mini-avatar-dot">У</div>
+                            </div>
+                            <div class="frame-card-meta">
+                                <span class="frame-option-name">Орбита</span>
+                                <span class="frame-option-tag">Базовая</span>
+                            </div>
+                            <div class="frame-req-pill">✓ Открыто</div>
+                        </button>
+
+                        <!-- Frame 2: Neon -->
+                        <button type="button" class="frame-option-card" data-frame-id="neon" role="radio" aria-checked="false" title="Квантовый неон">
+                            <div class="frame-card-top-badges">
+                                <span class="frame-check-badge" aria-hidden="true">✔</span>
+                                <span class="frame-lock-badge" aria-hidden="true">🔒</span>
+                            </div>
+                            <div class="frame-preview-box" data-frame="neon">
+                                <div class="mini-avatar-ring"></div>
+                                <div class="mini-avatar-dot">У</div>
+                            </div>
+                            <div class="frame-card-meta">
+                                <span class="frame-option-name">Неон</span>
+                                <span class="frame-option-tag tag-cyber">Квант</span>
+                            </div>
+                            <div class="frame-req-pill">🔒 Медаль «Верные ответы»</div>
+                        </button>
+
+                        <!-- Frame 3: Emerald -->
+                        <button type="button" class="frame-option-card" data-frame-id="emerald" role="radio" aria-checked="false" title="Изумрудный кристалл">
+                            <div class="frame-card-top-badges">
+                                <span class="frame-check-badge" aria-hidden="true">✔</span>
+                                <span class="frame-lock-badge" aria-hidden="true">🔒</span>
+                            </div>
+                            <div class="frame-preview-box" data-frame="emerald">
+                                <div class="mini-avatar-ring"></div>
+                                <div class="mini-avatar-dot">У</div>
+                            </div>
+                            <div class="frame-card-meta">
+                                <span class="frame-option-name">Изумруд</span>
+                                <span class="frame-option-tag tag-emerald">Алхимия</span>
+                            </div>
+                            <div class="frame-req-pill">🔒 Серия 15 в тренажёре</div>
+                        </button>
+
+                        <!-- Frame 4: Solar -->
+                        <button type="button" class="frame-option-card" data-frame-id="solar" role="radio" aria-checked="false" title="Золотая сингулярность">
+                            <div class="frame-card-top-badges">
+                                <span class="frame-check-badge" aria-hidden="true">✔</span>
+                                <span class="frame-lock-badge" aria-hidden="true">🔒</span>
+                            </div>
+                            <div class="frame-preview-box" data-frame="solar">
+                                <div class="mini-avatar-ring"></div>
+                                <div class="mini-avatar-dot">У</div>
+                            </div>
+                            <div class="frame-card-meta">
+                                <span class="frame-option-name">Сингулярность</span>
+                                <span class="frame-option-tag tag-legendary">Золото</span>
+                            </div>
+                            <div class="frame-req-pill">🔒 Серия 25 в тренажёре</div>
+                        </button>
+
+                        <!-- Frame 5: Cosmic -->
+                        <button type="button" class="frame-option-card" data-frame-id="cosmic" role="radio" aria-checked="false" title="Гравитационный разлом">
+                            <div class="frame-card-top-badges">
+                                <span class="frame-check-badge" aria-hidden="true">✔</span>
+                                <span class="frame-lock-badge" aria-hidden="true">🔒</span>
+                            </div>
+                            <div class="frame-preview-box" data-frame="cosmic">
+                                <div class="mini-avatar-ring"></div>
+                                <div class="mini-avatar-dot">У</div>
+                            </div>
+                            <div class="frame-card-meta">
+                                <span class="frame-option-name">Разлом</span>
+                                <span class="frame-option-tag tag-cosmic">Космос</span>
+                            </div>
+                            <div class="frame-req-pill">🔒 5-й уровень</div>
+                        </button>
+
+                        <!-- Frame 6: Gargantua -->
+                        <button type="button" class="frame-option-card" data-frame-id="gargantua" role="radio" aria-checked="false" title="Чёрная дыра Гаргантюа">
+                            <div class="frame-card-top-badges">
+                                <span class="frame-check-badge" aria-hidden="true">✔</span>
+                                <span class="frame-lock-badge" aria-hidden="true">🔒</span>
+                            </div>
+                            <div class="frame-preview-box" data-frame="gargantua">
+                                <div class="mini-avatar-ring"></div>
+                                <div class="mini-avatar-dot">У</div>
+                            </div>
+                            <div class="frame-card-meta">
+                                <span class="frame-option-name">Гаргантюа</span>
+                                <span class="frame-option-tag tag-mythic">Сингулярность</span>
+                            </div>
+                            <div class="frame-req-pill">🔒 9-й уровень</div>
+                        </button>
+                    </div>
+                    <div id="frame-lock-notice" class="frame-lock-notice hidden" role="alert" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- TAB PANE 2: ОСНОВНЫЕ НАСТРОЙКИ -->
+            <div id="settings-pane-general" class="settings-tab-pane hidden" role="tabpanel" aria-labelledby="settings-tab-btn-general">
+                <!-- 1. ТЕМА ОФОРМЛЕНИЯ -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            <span>Тема оформления</span>
+                        </h3>
+                        <span class="settings-badge" id="theme-mode-badge">Тёмная тема</span>
+                    </div>
+                    <div class="theme-toggle-row">
+                        <div class="theme-toggle-info">
+                            <span class="theme-toggle-label">Режим отображения</span>
+                            <span class="theme-toggle-desc" id="theme-toggle-desc">Тёмный космический интерфейс</span>
+                        </div>
+                        <label class="theme-switch" for="settings-theme-toggle" title="Переключить тему">
+                            <input type="checkbox" id="settings-theme-toggle" role="switch" aria-checked="false" aria-label="Переключить между светлой и тёмной темой">
+                            <span class="theme-slider">
+                                <span class="theme-slider-icon dark-icon" aria-hidden="true">🌙</span>
+                                <span class="theme-slider-icon light-icon" aria-hidden="true">☀️</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <!-- 2. EXPORT (КОД СОХРАНЕНИЯ) -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span>Твой код сохранения</span>
+                        </h3>
+                        <span class="settings-badge">Код профиля</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        В этом коде зашифрованы имя, XP, решённые задачи, серии и звания во всех тренажерах.
+                    </p>
+                    <textarea id="profile-code-output" class="profile-code-textarea" readonly rows="3" spellcheck="false" placeholder="Генерация кода..."></textarea>
+                    <div class="code-box-actions">
+                        <button type="button" id="copy-code-btn" class="settings-btn settings-btn-primary">
+                            <span id="copy-btn-text">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                Скопировать код
+                            </span>
+                        </button>
+                        <span id="copy-status" class="copy-status-msg" aria-live="polite"></span>
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <!-- 3. IMPORT (ВОССТАНОВЛЕНИЕ) -->
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Восстановление прогресса</span>
+                        </h3>
+                        <span class="settings-badge">Загрузка</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        Вставь скопированный ранее код профиля (начинается с STUDY-):
+                    </p>
+                    <textarea id="profile-code-input" class="profile-code-textarea" rows="2" spellcheck="false" placeholder="Вставь сюда код профиля..."></textarea>
+                    <div class="import-actions">
+                        <button type="button" id="apply-code-btn" class="settings-btn settings-btn-accent">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Восстановить профиль</span>
+                        </button>
+                        <button type="button" id="clear-input-btn" class="settings-btn settings-btn-secondary">
+                            Очистить
+                        </button>
+                    </div>
+                    <div id="import-status-msg" class="import-status-msg hidden" aria-live="polite"></div>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <!-- 4. RESET DANGER ZONE -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title" style="color: var(--danger);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        <span>Сброс данных на этом устройстве</span>
+                    </h3>
+                    <p class="settings-section-desc">
+                        Удалит локальные рекорды, серии и статистику. Сохрани код профиля выше перед сбросом!
+                    </p>
+                    <button type="button" id="reset-data-btn" class="settings-btn settings-btn-danger">
+                        Сбросить данные профиля
+                    </button>
+                </div>
+            </div>
             <button type="button" id="settings-close-bottom-btn" class="hidden"></button>
+        </div>
+    </dialog>
+
+    <!-- LEVEL PROGRESSION MODAL DIALOG -->
+    <dialog id="level-progress-dialog" aria-labelledby="level-modal-heading">
+        <div class="level-modal-content">
+            <div class="level-modal-header">
+                <div>
+                    <div class="level-modal-pretitle">Шкала развития</div>
+                    <h2 id="level-modal-heading" class="level-modal-heading">Прогресс по уровням</h2>
+                    <p class="level-modal-subtitle">Набирай опыт (XP) за решение задач и открывай новые академические ранги</p>
+                </div>
+                <button type="button" class="settings-close" id="level-modal-close-btn" aria-label="Закрыть окно уровней">×</button>
+            </div>
+
+            <!-- CURRENT LEVEL HERO STATUS -->
+            <div class="level-hero-status-card">
+                <div class="level-hero-status-row">
+                    <div class="level-hero-left">
+                        <div class="level-current-badge-orb" id="level-modal-orb">
+                            <span class="orb-num" id="level-modal-badge-num">1</span>
+                            <span class="orb-sub">УРОВЕНЬ</span>
+                        </div>
+                        <div class="level-hero-info">
+                            <span class="level-hero-tier-tag">Текущий ранг</span>
+                            <div class="level-hero-title" id="level-modal-current-title">Уровень 1 · Новичок</div>
+                            <div class="level-hero-total-xp">Всего опыта: <strong id="level-modal-total-xp">0 XP</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="level-hero-progress-block">
+                    <div class="level-hero-bar-label">
+                        <span id="level-modal-bar-label">0 / 100 XP до следующего уровня</span>
+                        <span id="level-modal-pct-label">0%</span>
+                    </div>
+                    <div class="level-hero-bar-track">
+                        <div class="level-hero-bar-fill" id="level-modal-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XP EARNING RULES -->
+            <div class="level-rules-row">
+                <div class="level-rule-pill">
+                    <span class="rule-icon">🎯</span>
+                    <span class="rule-text">Верная задача: <strong>+10 XP</strong></span>
+                </div>
+                <div class="level-rule-pill">
+                    <span class="rule-icon">⚡</span>
+                    <span class="rule-text">Попытка решения: <strong>+2 XP</strong></span>
+                </div>
+                <div class="level-rule-pill">
+                    <span class="rule-icon">⏱️</span>
+                    <span class="rule-text">Скоростной режим: <strong>+15 XP</strong></span>
+                </div>
+            </div>
+
+            <!-- ROADMAP OF ALL 10 LEVELS -->
+            <div class="level-roadmap-header">
+                <h3 class="level-roadmap-title">Все ранги исследователя (1 – 10)</h3>
+                <span class="level-roadmap-count" id="level-roadmap-count-badge">Достигнут 1 из 10</span>
+            </div>
+
+            <div class="level-roadmap-list" id="level-roadmap-list" role="list">
+                <!-- Injected via JavaScript -->
+            </div>
         </div>
     </dialog>
 
@@ -2459,64 +4527,22 @@
         function updateProfileIdentity(name) {
             const nicknameEl = document.getElementById('profile-nickname');
             const avatarEl = document.getElementById('profile-avatar');
+            const previewAvatarPlaceholder = document.getElementById('custom-preview-avatar-placeholder');
+            const previewName = document.getElementById('custom-preview-name');
             const trimmed = (name || '').trim() || 'Ученик';
+            const initial = trimmed.charAt(0).toLocaleUpperCase('ru-RU');
 
             if (nicknameEl) nicknameEl.textContent = trimmed;
-            if (avatarEl) avatarEl.textContent = trimmed.charAt(0).toLocaleUpperCase('ru-RU');
-        }
-
-        function initUserNameEditor() {
-            const displayWrap = document.getElementById('nickname-display-wrap');
-            const editForm = document.getElementById('nickname-edit-form');
-            const inputEl = document.getElementById('nickname-input');
-            const editBtn = document.getElementById('edit-name-btn');
-            const cancelBtn = document.getElementById('cancel-name-btn');
-            const nicknameEl = document.getElementById('profile-nickname');
-
-            updateProfileIdentity(getStoredUserName());
-
-            function startEditing() {
-                if (!editForm || !displayWrap || !inputEl) return;
-                const currentName = getStoredUserName();
-                inputEl.value = currentName === 'Ученик' ? '' : currentName;
-                displayWrap.classList.add('hidden');
-                editForm.classList.remove('hidden');
-                inputEl.focus();
-                inputEl.select();
-            }
-
-            function stopEditing() {
-                if (!editForm || !displayWrap) return;
-                editForm.classList.add('hidden');
-                displayWrap.classList.remove('hidden');
-            }
-
-            if (editBtn) editBtn.addEventListener('click', startEditing);
-            if (nicknameEl) nicknameEl.addEventListener('click', startEditing);
-            if (cancelBtn) cancelBtn.addEventListener('click', stopEditing);
-
-            if (editForm) {
-                editForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const newName = (inputEl.value || '').trim();
-                    if (newName) {
-                        try {
-                            localStorage.setItem(USERNAME_KEY, newName);
-                            localStorage.setItem(LEGACY_STORAGE_KEY, newName);
-                        } catch (err) {}
-                        updateProfileIdentity(newName);
-                    }
-                    stopEditing();
-                });
-            }
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && editForm && !editForm.classList.contains('hidden')) {
-                    stopEditing();
-                }
+            if (avatarEl) avatarEl.textContent = initial;
+            if (previewAvatarPlaceholder) previewAvatarPlaceholder.textContent = initial;
+            if (previewName) previewName.textContent = trimmed;
+            document.querySelectorAll('.mini-avatar-dot').forEach(dot => {
+                dot.textContent = initial;
             });
         }
-        initUserNameEditor();
+
+        // Initialize identity on load
+        updateProfileIdentity(getStoredUserName());
 
         // --- 3. EXPORT / IMPORT SYNC SYSTEM ---
         function generateProfileExportCode() {
@@ -2553,12 +4579,18 @@
                 userXP = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
             } catch (e) {}
 
+            let avatarFrame = 'orbit';
+            try {
+                avatarFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
+            } catch (e) {}
+
             const payload = {
                 v: 2,
                 app: 'study_site',
                 type: 'profile_export',
                 exportedAt: new Date().toISOString(),
                 userName: userName,
+                avatarFrame: avatarFrame,
                 metrics: metrics,
                 trainerRecords: trainerRecords,
                 totalSolvedTasks: totalSolvedTasks,
@@ -2618,6 +4650,9 @@
             if (data.userXP !== undefined) {
                 localStorage.setItem('user_xp', String(data.userXP));
             }
+            if (data.avatarFrame && typeof data.avatarFrame === 'string') {
+                localStorage.setItem('profileAvatarFrame', data.avatarFrame);
+            }
 
             return data;
         }
@@ -2636,9 +4671,429 @@
             const importStatusMsg = document.getElementById('import-status-msg');
             const resetDataBtn = document.getElementById('reset-data-btn');
 
+            // Settings internal tabs navigation
+            const tabBtnCustom = document.getElementById('settings-tab-btn-custom');
+            const tabBtnGeneral = document.getElementById('settings-tab-btn-general');
+            const paneCustom = document.getElementById('settings-pane-custom');
+            const paneGeneral = document.getElementById('settings-pane-general');
+
+            function switchSettingsTab(tab) {
+                if (tab === 'general') {
+                    if (tabBtnGeneral) {
+                        tabBtnGeneral.classList.add('active');
+                        tabBtnGeneral.setAttribute('aria-selected', 'true');
+                    }
+                    if (tabBtnCustom) {
+                        tabBtnCustom.classList.remove('active');
+                        tabBtnCustom.setAttribute('aria-selected', 'false');
+                    }
+                    if (paneGeneral) paneGeneral.classList.remove('hidden');
+                    if (paneCustom) paneCustom.classList.add('hidden');
+                } else {
+                    if (tabBtnCustom) {
+                        tabBtnCustom.classList.add('active');
+                        tabBtnCustom.setAttribute('aria-selected', 'true');
+                    }
+                    if (tabBtnGeneral) {
+                        tabBtnGeneral.classList.remove('active');
+                        tabBtnGeneral.setAttribute('aria-selected', 'false');
+                    }
+                    if (paneCustom) paneCustom.classList.remove('hidden');
+                    if (paneGeneral) paneGeneral.classList.add('hidden');
+                }
+            }
+
+            if (tabBtnCustom) tabBtnCustom.addEventListener('click', () => switchSettingsTab('custom'));
+            if (tabBtnGeneral) tabBtnGeneral.addEventListener('click', () => switchSettingsTab('general'));
+
+            // Theme toggle elements
+            const settingsThemeToggle = document.getElementById('settings-theme-toggle');
+            const themeModeBadge = document.getElementById('theme-mode-badge');
+            const themeToggleDesc = document.getElementById('theme-toggle-desc');
+
+            // Name editor elements
+            const settingsNameInput = document.getElementById('settings-name-input');
+            const settingsNameSaveBtn = document.getElementById('settings-name-save-btn');
+            const settingsNameStatus = document.getElementById('settings-name-status');
+
+            // Theme switcher
+            function applyProfileTheme(theme) {
+                document.documentElement.dataset.theme = theme;
+                try {
+                    localStorage.setItem('profileTheme', theme);
+                } catch(e) {}
+
+                const isLight = theme === 'light';
+                if (settingsThemeToggle) {
+                    settingsThemeToggle.checked = isLight;
+                    settingsThemeToggle.setAttribute('aria-checked', String(isLight));
+                }
+                if (themeModeBadge) {
+                    themeModeBadge.textContent = isLight ? 'Светлая тема' : 'Тёмная тема';
+                }
+                if (themeToggleDesc) {
+                    themeToggleDesc.textContent = isLight ? 'Светлый контрастный интерфейс' : 'Тёмный космический интерфейс';
+                }
+
+                const legacyToggle = document.getElementById('theme-toggle');
+                if (legacyToggle) {
+                    legacyToggle.setAttribute('aria-pressed', String(isLight));
+                    legacyToggle.textContent = isLight ? 'Светлая тема' : 'Тёмная тема';
+                }
+            }
+
+            const initialTheme = localStorage.getItem('profileTheme') || 'dark';
+            applyProfileTheme(initialTheme);
+
+            if (settingsThemeToggle) {
+                settingsThemeToggle.addEventListener('change', () => {
+                    const nextTheme = settingsThemeToggle.checked ? 'light' : 'dark';
+                    applyProfileTheme(nextTheme);
+                });
+            }
+
+            // Name editor in settings
+            function saveNameFromSettings() {
+                if (!settingsNameInput) return;
+                const newName = (settingsNameInput.value || '').trim();
+                if (!newName) {
+                    if (settingsNameStatus) {
+                        settingsNameStatus.textContent = 'Имя не может быть пустым';
+                        settingsNameStatus.className = 'copy-status-msg error';
+                    }
+                    return;
+                }
+                try {
+                    localStorage.setItem(USERNAME_KEY, newName);
+                    localStorage.setItem(LEGACY_STORAGE_KEY, newName);
+                } catch(e) {}
+                updateProfileIdentity(newName);
+                const customPreviewName = document.getElementById('custom-preview-name');
+                if (customPreviewName) customPreviewName.textContent = newName;
+                if (profileCodeOutput) {
+                    profileCodeOutput.value = generateProfileExportCode();
+                }
+                if (settingsNameStatus) {
+                    settingsNameStatus.textContent = '✔ Имя сохранено!';
+                    settingsNameStatus.className = 'copy-status-msg success';
+                    setTimeout(() => {
+                        if (settingsNameStatus) settingsNameStatus.textContent = '';
+                    }, 3000);
+                }
+            }
+
+            if (settingsNameSaveBtn) {
+                settingsNameSaveBtn.addEventListener('click', saveNameFromSettings);
+            }
+            if (settingsNameInput) {
+                settingsNameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        saveNameFromSettings();
+                    }
+                });
+                settingsNameInput.addEventListener('input', () => {
+                    const previewName = document.getElementById('custom-preview-name');
+                    const previewAvatar = document.getElementById('custom-preview-avatar-placeholder');
+                    const val = (settingsNameInput.value || '').trim() || 'Ученик';
+                    if (previewName) previewName.textContent = val;
+                    if (previewAvatar) previewAvatar.textContent = val.charAt(0).toLocaleUpperCase('ru-RU');
+                });
+            }
+
+            // --- AVATAR FRAME SELECTOR & UNLOCK SYSTEM ---
+            const frameCards = document.querySelectorAll('.frame-option-card');
+            const frameActiveBadge = document.getElementById('frame-active-badge');
+            const heroAvatarContainer = document.getElementById('avatar-container');
+            const customPreviewAvatarWrap = document.getElementById('custom-preview-avatar-wrap');
+            const customPreviewFrameLabel = document.getElementById('custom-preview-frame-label');
+            const frameLockNotice = document.getElementById('frame-lock-notice');
+
+            function getProfileUnlockStats() {
+                let earnedXp = 0;
+                let correctCount = 0;
+                try {
+                    const rawAttempts = localStorage.getItem('studyMetrics');
+                    const attempts = rawAttempts ? JSON.parse(rawAttempts) : [];
+                    const xpByTask = new Map();
+                    if (Array.isArray(attempts)) {
+                        attempts.forEach(attempt => {
+                            if (!attempt) return;
+                            const taskKey = `${attempt.subject}:${attempt.taskId}`;
+                            const taskXp = attempt.correct ? 10 : 2;
+                            xpByTask.set(taskKey, Math.max(xpByTask.get(taskKey) || 0, taskXp));
+                            if (attempt.correct) correctCount++;
+                        });
+                    }
+                    const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+                    earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0) + bonusXp;
+                } catch(e) {}
+
+                try {
+                    const directXp = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
+                    if (directXp > earnedXp) earnedXp = directXp;
+                } catch(e) {}
+
+                const totalEl = document.getElementById('experience-total');
+                if (totalEl && totalEl.textContent) {
+                    const match = totalEl.textContent.match(/(\d+)/);
+                    if (match) {
+                        const domXp = parseInt(match[1], 10);
+                        if (!isNaN(domXp) && domXp > earnedXp) earnedXp = domXp;
+                    }
+                }
+
+                const xpPerLevel = 100;
+                const level = Math.floor(earnedXp / xpPerLevel) + 1;
+
+                // Max streak in any trainer
+                let maxTrainerStreak = 0;
+                try {
+                    if (window.TrainerTracker && typeof window.TrainerTracker.getTrainerRecords === 'function') {
+                        const records = window.TrainerTracker.getTrainerRecords();
+                        Object.values(records || {}).forEach(r => {
+                            if (r && typeof r.maxStreak === 'number' && r.maxStreak > maxTrainerStreak) {
+                                maxTrainerStreak = r.maxStreak;
+                            }
+                        });
+                    }
+                } catch(e) {}
+                try {
+                    const rawRecords = localStorage.getItem('studyTrainerRecords');
+                    if (rawRecords) {
+                        const parsed = JSON.parse(rawRecords);
+                        Object.values(parsed || {}).forEach(r => {
+                            if (r && typeof r.maxStreak === 'number' && r.maxStreak > maxTrainerStreak) {
+                                maxTrainerStreak = r.maxStreak;
+                            }
+                        });
+                    }
+                } catch(e) {}
+
+                return {
+                    earnedXp,
+                    level,
+                    correctCount,
+                    maxTrainerStreak
+                };
+            }
+
+            const FRAME_CONFIG = {
+                orbit: {
+                    id: 'orbit',
+                    name: 'Орбита',
+                    fullName: 'Классическая орбита',
+                    checkUnlock: () => ({
+                        unlocked: true,
+                        reqLabel: 'Доступна сразу',
+                        badgeText: '✓ Открыто',
+                        lockReason: ''
+                    })
+                },
+                neon: {
+                    id: 'neon',
+                    name: 'Неон',
+                    fullName: 'Квантовый неон',
+                    checkUnlock: (stats) => {
+                        const unlocked = stats.correctCount >= 10;
+                        return {
+                            unlocked,
+                            reqLabel: 'Медаль «Верные ответы»',
+                            badgeText: unlocked ? '✓ Открыто' : `🔒 Медаль (${stats.correctCount}/10)`,
+                            lockReason: `Для рамки «Неон» получите медаль «Верные ответы» (требуется 10 верных ответов, сейчас: ${stats.correctCount}/10).`
+                        };
+                    }
+                },
+                emerald: {
+                    id: 'emerald',
+                    name: 'Изумруд',
+                    fullName: 'Изумрудный кристалл',
+                    checkUnlock: (stats) => {
+                        const unlocked = stats.maxTrainerStreak >= 15;
+                        return {
+                            unlocked,
+                            reqLabel: 'Серия 15 в тренажёре',
+                            badgeText: unlocked ? '✓ Открыто' : `🔒 Серия 15 (${stats.maxTrainerStreak}/15 🔥)`,
+                            lockReason: `Для рамки «Изумруд» требуется серия из 15 верных ответов подряд в любом тренажёре (текущий рекорд: ${stats.maxTrainerStreak}/15 🔥).`
+                        };
+                    }
+                },
+                solar: {
+                    id: 'solar',
+                    name: 'Сингулярность',
+                    fullName: 'Золотая сингулярность',
+                    checkUnlock: (stats) => {
+                        const unlocked = stats.maxTrainerStreak >= 25;
+                        return {
+                            unlocked,
+                            reqLabel: 'Серия 25 в тренажёре',
+                            badgeText: unlocked ? '✓ Открыто' : `🔒 Серия 25 (${stats.maxTrainerStreak}/25 🔥)`,
+                            lockReason: `Для рамки «Золотая сингулярность» требуется серия из 25 верных ответов подряд в любом тренажёре (текущий рекорд: ${stats.maxTrainerStreak}/25 🔥).`
+                        };
+                    }
+                },
+                cosmic: {
+                    id: 'cosmic',
+                    name: 'Разлом',
+                    fullName: 'Гравитационный разлом',
+                    checkUnlock: (stats) => {
+                        const unlocked = stats.level >= 5;
+                        return {
+                            unlocked,
+                            reqLabel: '5-й уровень',
+                            badgeText: unlocked ? '✓ Открыто' : `🔒 5 уровень (${stats.level}/5 ур.)`,
+                            lockReason: `Для рамки «Разлом» требуется достичь 5-го уровня исследователя (ваш текущий уровень: ${stats.level}/5).`
+                        };
+                    }
+                },
+                gargantua: {
+                    id: 'gargantua',
+                    name: 'Гаргантюа',
+                    fullName: 'Чёрная дыра Гаргантюа',
+                    checkUnlock: (stats) => {
+                        const unlocked = stats.level >= 9;
+                        return {
+                            unlocked,
+                            reqLabel: '9-й уровень',
+                            badgeText: unlocked ? '✓ Открыто' : `🔒 9 уровень (${stats.level}/9 ур.)`,
+                            lockReason: `Рамка «Гаргантюа» откроется только на 9-ом уровне исследователя (ваш текущий уровень: ${stats.level}/9).`
+                        };
+                    }
+                }
+            };
+
+            function updateFrameCardsState() {
+                const stats = getProfileUnlockStats();
+                frameCards.forEach(card => {
+                    const frameId = card.getAttribute('data-frame-id');
+                    const config = FRAME_CONFIG[frameId];
+                    if (!config) return;
+                    const status = config.checkUnlock(stats);
+
+                    card.classList.toggle('is-locked', !status.unlocked);
+                    card.classList.toggle('is-unlocked', status.unlocked);
+                    card.setAttribute('data-locked', String(!status.unlocked));
+
+                    const reqPill = card.querySelector('.frame-req-pill');
+                    if (reqPill) {
+                        reqPill.textContent = status.badgeText;
+                        reqPill.title = status.reqLabel;
+                    }
+
+                    if (!status.unlocked) {
+                        card.setAttribute('title', `🔒 Заблокировано: ${status.lockReason}`);
+                        card.setAttribute('aria-label', `${config.fullName} (🔒 Заблокировано: ${status.reqLabel})`);
+                    } else {
+                        card.setAttribute('title', `${config.fullName} (${status.reqLabel})`);
+                        card.setAttribute('aria-label', `${config.fullName} (✓ ${status.reqLabel})`);
+                    }
+                });
+            }
+
+            function applyAvatarFrame(frameId) {
+                const stats = getProfileUnlockStats();
+                let targetFrame = FRAME_CONFIG[frameId] ? frameId : 'orbit';
+                const status = FRAME_CONFIG[targetFrame].checkUnlock(stats);
+
+                // If chosen frame is locked, fallback safely to orbit
+                if (!status.unlocked) {
+                    targetFrame = 'orbit';
+                }
+
+                try {
+                    localStorage.setItem('profileAvatarFrame', targetFrame);
+                } catch(e) {}
+
+                if (heroAvatarContainer) {
+                    heroAvatarContainer.setAttribute('data-frame', targetFrame);
+                }
+                if (customPreviewAvatarWrap) {
+                    customPreviewAvatarWrap.setAttribute('data-frame', targetFrame);
+                }
+
+                if (frameActiveBadge) {
+                    frameActiveBadge.textContent = FRAME_CONFIG[targetFrame].fullName;
+                }
+                if (customPreviewFrameLabel) {
+                    customPreviewFrameLabel.textContent = 'Рамка: ' + FRAME_CONFIG[targetFrame].fullName;
+                }
+
+                frameCards.forEach(card => {
+                    const isSelected = card.getAttribute('data-frame-id') === targetFrame;
+                    card.classList.toggle('active', isSelected);
+                    card.setAttribute('aria-checked', String(isSelected));
+                });
+
+                if (profileCodeOutput && settingsDialog && settingsDialog.open) {
+                    profileCodeOutput.value = generateProfileExportCode();
+                }
+            }
+
+            updateFrameCardsState();
+            const initialFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
+            applyAvatarFrame(initialFrame);
+
+            frameCards.forEach(card => {
+                function handleCardSelect() {
+                    const frameId = card.getAttribute('data-frame-id');
+                    if (!frameId) return;
+
+                    const stats = getProfileUnlockStats();
+                    const config = FRAME_CONFIG[frameId];
+                    const status = config ? config.checkUnlock(stats) : { unlocked: false };
+
+                    if (!status.unlocked) {
+                        card.classList.remove('shake');
+                        void card.offsetWidth;
+                        card.classList.add('shake');
+
+                        if (frameLockNotice) {
+                            frameLockNotice.textContent = `🔒 ${status.lockReason}`;
+                            frameLockNotice.classList.remove('hidden');
+                            clearTimeout(frameLockNotice._timer);
+                            frameLockNotice._timer = setTimeout(() => {
+                                frameLockNotice.classList.add('hidden');
+                            }, 5000);
+                        }
+                        return;
+                    }
+
+                    if (frameLockNotice) frameLockNotice.classList.add('hidden');
+                    applyAvatarFrame(frameId);
+                }
+
+                card.addEventListener('click', handleCardSelect);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCardSelect();
+                    }
+                });
+            });
+
             function openSettings() {
                 if (!settingsDialog) return;
+                updateFrameCardsState();
+                if (frameLockNotice) frameLockNotice.classList.add('hidden');
                 profileCodeOutput.value = generateProfileExportCode();
+                const curName = getStoredUserName();
+                if (settingsNameInput) {
+                    settingsNameInput.value = curName;
+                }
+                const previewName = document.getElementById('custom-preview-name');
+                const previewAvatar = document.getElementById('custom-preview-avatar-placeholder');
+                if (previewName) previewName.textContent = curName;
+                if (previewAvatar) previewAvatar.textContent = curName.charAt(0).toLocaleUpperCase('ru-RU');
+
+                if (settingsNameStatus) {
+                    settingsNameStatus.textContent = '';
+                }
+                const curTheme = document.documentElement.dataset.theme || 'dark';
+                applyProfileTheme(curTheme);
+
+                const currentFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
+                applyAvatarFrame(currentFrame);
+
                 if (importStatusMsg) {
                     importStatusMsg.textContent = '';
                     importStatusMsg.className = 'import-status-msg hidden';
@@ -2731,12 +5186,189 @@
                         localStorage.removeItem('totalSolvedTasks');
                         localStorage.removeItem('user_xp');
                         localStorage.removeItem('studyClaimedTrainerGifts');
+                        localStorage.removeItem('profileAvatarFrame');
                     } catch (e) {}
                     window.location.reload();
                 });
             }
         }
         initSettingsModal();
+
+        // --- 4. LEVEL PROGRESSION MODAL SYSTEM ---
+        function initLevelProgressModal() {
+            const heroLevelCard = document.getElementById('hero-level-card');
+            const levelDialog = document.getElementById('level-progress-dialog');
+            const levelCloseBtn = document.getElementById('level-modal-close-btn');
+
+            const orbNum = document.getElementById('level-modal-badge-num');
+            const currentTitle = document.getElementById('level-modal-current-title');
+            const totalXp = document.getElementById('level-modal-total-xp');
+            const barLabel = document.getElementById('level-modal-bar-label');
+            const pctLabel = document.getElementById('level-modal-pct-label');
+            const barFill = document.getElementById('level-modal-bar-fill');
+            const countBadge = document.getElementById('level-roadmap-count-badge');
+            const roadmapList = document.getElementById('level-roadmap-list');
+
+            const RANKS = [
+                { level: 1, title: 'Новичок', minXp: 0, maxXp: 99, icon: '🌱', desc: 'Первые шаги: знакомство с базовыми формулами и тестами платформы' },
+                { level: 2, title: 'Ученик', minXp: 100, maxXp: 199, icon: '📘', desc: 'Освоение понятий: системный разбор решений и тренировка точности' },
+                { level: 3, title: 'Исследователь', minXp: 200, maxXp: 299, icon: '🔭', desc: 'Уверенная практика: открытие интерактивных игр и симуляций' },
+                { level: 4, title: 'Знаток', minXp: 300, maxXp: 399, icon: '⚡', desc: 'Аналитический склад ума: безошибочные серии и высокая скорость' },
+                { level: 5, title: 'Мастер', minXp: 400, maxXp: 499, icon: '🔮', desc: 'Мастерство решений: решение сложных комплексных заданий ОГЭ' },
+                { level: 6, title: 'Эксперт', minXp: 500, maxXp: 599, icon: '🧭', desc: 'Академический статус: безупречная теория и олимпиадный кругозор' },
+                { level: 7, title: 'Архитектор знаний', minXp: 600, maxXp: 699, icon: '🏛️', desc: 'Интеграция наук: глубокие связи между физикой и математикой' },
+                { level: 8, title: 'Профессор', minXp: 700, maxXp: 799, icon: '🎓', desc: 'Высший пилотаж: решение нестандартных исследовательских задач' },
+                { level: 9, title: 'Квантовый разум', minXp: 800, maxXp: 899, icon: '⚛️', desc: 'Квантовый уровень: симуляция космических сингулярностей' },
+                { level: 10, title: 'Легенда космоса', minXp: 900, maxXp: Infinity, icon: '👑', desc: 'Абсолютная вершина: почётное имя в зале славы НЕШколы' }
+            ];
+
+            function getLevelData() {
+                let earnedXp = 0;
+                try {
+                    const rawAttempts = localStorage.getItem('studyMetrics');
+                    const attempts = rawAttempts ? JSON.parse(rawAttempts) : [];
+                    const xpByTask = new Map();
+                    if (Array.isArray(attempts)) {
+                        attempts.forEach(attempt => {
+                            const taskKey = `${attempt.subject}:${attempt.taskId}`;
+                            const taskXp = attempt.correct ? 10 : 2;
+                            xpByTask.set(taskKey, Math.max(xpByTask.get(taskKey) || 0, taskXp));
+                        });
+                    }
+                    const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+                    earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0) + bonusXp;
+                } catch(e) {
+                    earnedXp = 0;
+                }
+
+                try {
+                    const directXp = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
+                    if (directXp > earnedXp) earnedXp = directXp;
+                } catch(e) {}
+
+                const totalEl = document.getElementById('experience-total');
+                if (totalEl && totalEl.textContent) {
+                    const match = totalEl.textContent.match(/(\d+)/);
+                    if (match) {
+                        const domXp = parseInt(match[1], 10);
+                        if (!isNaN(domXp) && domXp > earnedXp) earnedXp = domXp;
+                    }
+                }
+
+                const xpPerLevel = 100;
+                const level = Math.floor(earnedXp / xpPerLevel) + 1;
+                const currentLevelXp = earnedXp % xpPerLevel;
+                const remainingXp = xpPerLevel - currentLevelXp;
+                const currentRank = RANKS[Math.min(Math.max(level - 1, 0), RANKS.length - 1)];
+
+                return {
+                    earnedXp,
+                    level,
+                    currentLevelXp,
+                    xpPerLevel,
+                    remainingXp,
+                    currentRank
+                };
+            }
+
+            function renderLevelModal() {
+                const data = getLevelData();
+                const pct = Math.min(100, Math.round((data.currentLevelXp / data.xpPerLevel) * 100));
+
+                if (orbNum) orbNum.textContent = data.level;
+                if (currentTitle) currentTitle.textContent = `Уровень ${data.level} · ${data.currentRank.title}`;
+                if (totalXp) totalXp.textContent = `${data.earnedXp} XP`;
+                if (barLabel) {
+                    if (data.level >= 10) {
+                        barLabel.textContent = `Максимальный ранг достигнут · ${data.earnedXp} XP`;
+                    } else {
+                        barLabel.textContent = `${data.currentLevelXp} / ${data.xpPerLevel} XP до Уровня ${data.level + 1} (осталось ${data.remainingXp} XP)`;
+                    }
+                }
+                if (pctLabel) pctLabel.textContent = `${pct}%`;
+                if (barFill) barFill.style.width = `${pct}%`;
+                if (countBadge) countBadge.textContent = `Достигнут ${Math.min(data.level, 10)} из 10`;
+
+                if (roadmapList) {
+                    roadmapList.innerHTML = RANKS.map(item => {
+                        let statusClass = 'is-locked';
+                        let statusTag = '<span class="level-item-status-pill status-locked">🔒 Закрыт</span>';
+
+                        if (item.level < data.level) {
+                            statusClass = 'is-completed';
+                            statusTag = '<span class="level-item-status-pill status-completed">✔ Достигнут</span>';
+                        } else if (item.level === data.level) {
+                            statusClass = 'is-current';
+                            statusTag = '<span class="level-item-status-pill status-current">⚡ Текущий</span>';
+                        }
+
+                        const xpRangeText = item.maxXp === Infinity ? `${item.minXp}+ XP` : `${item.minXp} – ${item.maxXp} XP`;
+
+                        return `
+                            <div class="level-item-card ${statusClass}" role="listitem">
+                                <div class="level-item-left">
+                                    <div class="level-item-icon-box" aria-hidden="true">${item.icon}</div>
+                                    <div class="level-item-meta">
+                                        <div class="level-item-head">
+                                            <span class="level-item-title">Уровень ${item.level} · ${item.title}</span>
+                                            <span class="level-item-xp-badge">${xpRangeText}</span>
+                                        </div>
+                                        <span class="level-item-desc">${item.desc}</span>
+                                    </div>
+                                </div>
+                                <div class="level-item-right">
+                                    ${statusTag}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            function openLevelModal() {
+                if (!levelDialog) return;
+                renderLevelModal();
+                levelDialog.showModal();
+                if (heroLevelCard) heroLevelCard.setAttribute('aria-expanded', 'true');
+            }
+
+            function closeLevelModal() {
+                if (levelDialog && levelDialog.open) {
+                    levelDialog.close();
+                    if (heroLevelCard) heroLevelCard.setAttribute('aria-expanded', 'false');
+                }
+            }
+
+            if (heroLevelCard) {
+                heroLevelCard.addEventListener('click', openLevelModal);
+                heroLevelCard.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openLevelModal();
+                    }
+                });
+            }
+
+            if (levelCloseBtn) {
+                levelCloseBtn.addEventListener('click', closeLevelModal);
+            }
+
+            if (levelDialog) {
+                levelDialog.addEventListener('click', (e) => {
+                    const rect = levelDialog.getBoundingClientRect();
+                    const isInDialog = (
+                        e.clientX >= rect.left &&
+                        e.clientX <= rect.right &&
+                        e.clientY >= rect.top &&
+                        e.clientY <= rect.bottom
+                    );
+                    if (!isInDialog) {
+                        closeLevelModal();
+                    }
+                });
+            }
+        }
+        initLevelProgressModal();
     </script>
 </body>
 </html>
