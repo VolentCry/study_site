@@ -1,6 +1,6 @@
 """
 Образовательная платформа «Знания»
-Сервер приложения на Flask для локальной разработки и запуска проекта.
+Сервер приложения на Flask для локальной разработки и запуска проекта (включая хостинг PythonAnywhere).
 
 Использование:
     python main.py
@@ -12,8 +12,11 @@ import os
 import sys
 import argparse
 import mimetypes
+from datetime import timedelta
 from pathlib import Path
-from flask import Flask, send_from_directory, abort, render_template_string
+from flask import Flask, send_from_directory, abort, render_template_string, request, jsonify, session
+
+import db
 
 # Гарантируем корректные MIME-типы для Windows
 mimetypes.add_type('text/javascript', '.js')
@@ -31,6 +34,15 @@ app = Flask(
     static_folder=None  # Отключаем дефолтный /static, чтобы раздавать файлы из корня проекта
 )
 
+# Секретный ключ для подписанных cookies сессии (минимальное использование RAM/диска)
+app.secret_key = os.environ.get('SECRET_KEY', 'study-platform-pa-secret-key-salt-2026')
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+
+# Инициализируем SQLite таблицы при старте
+db.init_db()
+
 
 def is_safe_path(target_path: Path) -> bool:
     """Проверяет, что путь находится внутри BASE_DIR и не обращается к скрытым файлам."""
@@ -46,6 +58,143 @@ def is_safe_path(target_path: Path) -> bool:
     except (ValueError, RuntimeError):
         return False
 
+
+# ============================================================================
+# API МАРШРУТЫ: АУТЕНТИФИКАЦИЯ И СИНХРОНИЗАЦИЯ С БД
+# ============================================================================
+
+@app.route('/api/auth/me', methods=['GET'])
+def api_auth_me():
+    """Проверка текущего статуса авторизации."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'loggedIn': False})
+
+    user = db.get_user_by_id(user_id)
+    if not user:
+        session.clear()
+        return jsonify({'loggedIn': False})
+
+    return jsonify({
+        'loggedIn': True,
+        'user': {
+            'id': user['id'],
+            'username': user['username'],
+            'displayName': user['display_name'],
+            'createdAt': user['created_at'],
+            'lastLogin': user['last_login']
+        }
+    })
+
+
+@app.route('/api/auth/register', methods=['POST'])
+def api_auth_register():
+    """Регистрация нового пользователя."""
+    payload = request.get_json(silent=True) or {}
+    username = str(payload.get('username', '')).strip()
+    password = str(payload.get('password', ''))
+    display_name = str(payload.get('displayName', '')).strip() or None
+    local_data = payload.get('localData')
+
+    if not username or not password:
+        return jsonify({'success': False, 'error': 'Заполните логин и пароль.'}), 400
+
+    try:
+        user = db.create_user(
+            username=username,
+            password=password,
+            display_name=display_name,
+            initial_data=local_data if isinstance(local_data, dict) else None
+        )
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Внутренняя ошибка сервера при регистрации.'}), 500
+
+    # Авторизуем пользователя в сессии
+    session.permanent = True
+    session['user_id'] = user['id']
+
+    return jsonify({
+        'success': True,
+        'user': {
+            'id': user['id'],
+            'username': user['username'],
+            'displayName': user['display_name'],
+            'createdAt': user['created_at']
+        }
+    })
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_auth_login():
+    """Вход пользователя в систему."""
+    payload = request.get_json(silent=True) or {}
+    username = str(payload.get('username', '')).strip()
+    password = str(payload.get('password', ''))
+
+    if not username or not password:
+        return jsonify({'success': False, 'error': 'Введите имя пользователя и пароль.'}), 400
+
+    user = db.authenticate_user(username, password)
+    if not user:
+        return jsonify({'success': False, 'error': 'Неверный логин или пароль.'}), 401
+
+    session.permanent = True
+    session['user_id'] = user['id']
+
+    user_data = db.get_user_data(user['id'])
+
+    return jsonify({
+        'success': True,
+        'user': {
+            'id': user['id'],
+            'username': user['username'],
+            'displayName': user['display_name']
+        },
+        'data': user_data
+    })
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+def api_auth_logout():
+    """Выход из аккаунта (очистка сессионной куки)."""
+    session.clear()
+    return jsonify({'success': True})
+
+
+@app.route('/api/user/data', methods=['GET'])
+def api_get_user_data():
+    """Получение прогресса авторизованного пользователя из БД."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    data = db.get_user_data(user_id)
+    if not data:
+        return jsonify({'success': False, 'error': 'Данные пользователя не найдены.'}), 404
+
+    return jsonify({'success': True, 'data': data})
+
+
+@app.route('/api/user/sync', methods=['POST'])
+def api_sync_user_data():
+    """Сохранение/синхронизация прогресса пользователя в SQLite."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    try:
+        updated_at = db.save_user_data(user_id, payload)
+        return jsonify({'success': True, 'updatedAt': updated_at})
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сохранения данных в БД.'}), 500
+
+
+# ============================================================================
+# СТАТИЧЕСКИЕ МАРШРУТЫ И ЧПУ
+# ============================================================================
 
 @app.route('/')
 def index():
@@ -64,6 +213,9 @@ def serve_file(subpath: str):
     2. ЧПУ без расширения (например, /profile -> /profile.html)
     3. Директории с index.html внутри
     """
+    if subpath.startswith('api/'):
+        abort(404)
+
     target = BASE_DIR / subpath
 
     if not is_safe_path(target):

@@ -2152,6 +2152,8 @@
         .settings-btn-accent { background: var(--accent-cyan); color: #000; }
         .settings-btn-accent:hover { opacity: 0.9; }
         .settings-btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        [data-theme="light"] .settings-btn-secondary { background: #e2e8f0; color: #0f172a; border: 1px solid rgba(15, 23, 42, 0.15); }
+        [data-theme="light"] .settings-btn-secondary:hover { background: #cbd5e1; }
         .settings-btn-danger { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); }
         .settings-btn-danger:hover { background: var(--danger); color: #fff; }
 
@@ -4074,6 +4076,10 @@
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     <span>Основные</span>
                 </button>
+                <button type="button" class="settings-tab-btn" id="settings-tab-btn-cloud" role="tab" aria-selected="false" aria-controls="settings-pane-cloud">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                    <span>Облако</span>
+                </button>
             </div>
 
             <!-- TAB PANE 1: КАСТОМИЗАЦИЯ ПРОФИЛЯ -->
@@ -4328,6 +4334,22 @@
                     </button>
                 </div>
             </div>
+
+            <!-- TAB PANE 3: ОБЛАЧНЫЙ АККАУНТ (SQLITE) -->
+            <div id="settings-pane-cloud" class="settings-tab-pane hidden" role="tabpanel" aria-labelledby="settings-tab-btn-cloud">
+                <div class="settings-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                            <span>Облачный аккаунт</span>
+                        </h3>
+                        <span class="settings-badge" id="cloud-status-badge">База данных SQLite</span>
+                    </div>
+                    <div id="cloud-account-card" class="cloud-account-card">
+                        <!-- Динамически рендерится через js/auth_sync.js -->
+                    </div>
+                </div>
+            </div>
             <button type="button" id="settings-close-bottom-btn" class="hidden"></button>
         </div>
     </dialog>
@@ -4417,6 +4439,7 @@
     <!-- SCRIPTS -->
     <script src="js/trainer_rank_tracker.js?v=2.2"></script>
     <script src="js/profile_metrics.js?v=2.2"></script>
+    <script src="js/auth_sync.js?v=1.0"></script>
     <script>
         // --- 1. TABS SWITCHER ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -4674,37 +4697,32 @@
             // Settings internal tabs navigation
             const tabBtnCustom = document.getElementById('settings-tab-btn-custom');
             const tabBtnGeneral = document.getElementById('settings-tab-btn-general');
+            const tabBtnCloud = document.getElementById('settings-tab-btn-cloud');
             const paneCustom = document.getElementById('settings-pane-custom');
             const paneGeneral = document.getElementById('settings-pane-general');
+            const paneCloud = document.getElementById('settings-pane-cloud');
 
             function switchSettingsTab(tab) {
-                if (tab === 'general') {
-                    if (tabBtnGeneral) {
-                        tabBtnGeneral.classList.add('active');
-                        tabBtnGeneral.setAttribute('aria-selected', 'true');
+                const tabs = [
+                    { id: 'custom', btn: tabBtnCustom, pane: paneCustom },
+                    { id: 'general', btn: tabBtnGeneral, pane: paneGeneral },
+                    { id: 'cloud', btn: tabBtnCloud, pane: paneCloud }
+                ];
+                tabs.forEach(t => {
+                    const isActive = t.id === tab;
+                    if (t.btn) {
+                        t.btn.classList.toggle('active', isActive);
+                        t.btn.setAttribute('aria-selected', String(isActive));
                     }
-                    if (tabBtnCustom) {
-                        tabBtnCustom.classList.remove('active');
-                        tabBtnCustom.setAttribute('aria-selected', 'false');
+                    if (t.pane) {
+                        t.pane.classList.toggle('hidden', !isActive);
                     }
-                    if (paneGeneral) paneGeneral.classList.remove('hidden');
-                    if (paneCustom) paneCustom.classList.add('hidden');
-                } else {
-                    if (tabBtnCustom) {
-                        tabBtnCustom.classList.add('active');
-                        tabBtnCustom.setAttribute('aria-selected', 'true');
-                    }
-                    if (tabBtnGeneral) {
-                        tabBtnGeneral.classList.remove('active');
-                        tabBtnGeneral.setAttribute('aria-selected', 'false');
-                    }
-                    if (paneCustom) paneCustom.classList.remove('hidden');
-                    if (paneGeneral) paneGeneral.classList.add('hidden');
-                }
+                });
             }
 
             if (tabBtnCustom) tabBtnCustom.addEventListener('click', () => switchSettingsTab('custom'));
             if (tabBtnGeneral) tabBtnGeneral.addEventListener('click', () => switchSettingsTab('general'));
+            if (tabBtnCloud) tabBtnCloud.addEventListener('click', () => switchSettingsTab('cloud'));
 
             // Theme toggle elements
             const settingsThemeToggle = document.getElementById('settings-theme-toggle');
@@ -5093,6 +5111,10 @@
 
                 const currentFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
                 applyAvatarFrame(currentFrame);
+
+                if (window.AuthSync && typeof window.AuthSync.updateCloudSettingsCard === 'function') {
+                    window.AuthSync.updateCloudSettingsCard();
+                }
 
                 if (importStatusMsg) {
                     importStatusMsg.textContent = '';

@@ -1866,18 +1866,24 @@
     </footer>
 
     <!-- INTERACTIVE SCRIPTS & 3D DEPTH CANVAS KINETIC ENGINE -->
+    <script src="js/auth_sync.js?v=1.0"></script>
     <script>
       (function() {
         // --- 1. USER XP SYNCHRONIZATION ---
-        try {
-          const storedXP = localStorage.getItem('user_xp');
-          const headerBadge = document.getElementById('header-xp-badge');
-          if (storedXP && headerBadge) {
-            headerBadge.textContent = 'XP +' + storedXP;
+        function updateHeaderXP() {
+          try {
+            const storedXP = localStorage.getItem('user_xp') || '0';
+            const headerBadge = document.getElementById('header-xp-badge');
+            if (headerBadge) {
+              headerBadge.textContent = 'XP +' + storedXP;
+            }
+          } catch (e) {
+            console.warn('Storage access:', e);
           }
-        } catch (e) {
-          console.warn('Storage access:', e);
         }
+        updateHeaderXP();
+        window.addEventListener('study-cloud-synced', updateHeaderXP);
+        window.addEventListener('storage', updateHeaderXP);
 
         // --- 2. BACK TO TOP SMOOTH ACTION ---
         const bttBtn = document.getElementById('btn-back-to-top');
