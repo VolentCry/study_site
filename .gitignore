@@ -13,3 +13,8 @@ scratch/
 anti-slop/
 
 *drawio
+
+__pycache__/
+*.py[cod]
+*$py.class
+.env
