@@ -224,8 +224,11 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 7px 14px;
-            font-size: 0.82rem;
+            height: 40px;
+            box-sizing: border-box;
+            padding: 0 14px;
+            font-size: 0.85rem;
+            line-height: 1;
             font-weight: 700;
             font-family: var(--f-body, system-ui, sans-serif);
             border-radius: var(--r-pill, 9999px);
@@ -568,11 +571,11 @@
         }
     }
 
-    async function apiRegister(username, password, displayName, localData) {
+    async function apiRegister(username, password, displayName, localData, teacherCode) {
         const res = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, displayName, localData })
+            body: JSON.stringify({ username, password, displayName, localData, teacherCode })
         });
         const data = await res.json();
         if (!res.ok) {
@@ -664,6 +667,13 @@
                         </div>
                     </div>
 
+                    <div class="auth-field hidden" id="auth-field-teacher-code">
+                        <label class="auth-label" for="auth-input-teacher-code">Код учителя (для доступа к классам)</label>
+                        <div class="auth-input-wrap">
+                            <input class="auth-input" type="password" id="auth-input-teacher-code" name="teacherCode" placeholder="Секретный код (при наличии)">
+                        </div>
+                    </div>
+
                     <div class="auth-field">
                         <label class="auth-label" for="auth-input-password">Пароль</label>
                         <div class="auth-input-wrap">
@@ -714,6 +724,8 @@
                 tabRegister.classList.add('active');
                 tabRegister.setAttribute('aria-selected', 'true');
                 fieldDisplayName.classList.remove('hidden');
+                const fieldTCode = dialog.querySelector('#auth-field-teacher-code');
+                if (fieldTCode) fieldTCode.classList.remove('hidden');
                 registerHint.classList.remove('hidden');
                 titleEl.textContent = 'Создание аккаунта';
                 submitText.textContent = 'Зарегистрироваться';
@@ -723,6 +735,8 @@
                 tabLogin.classList.add('active');
                 tabLogin.setAttribute('aria-selected', 'true');
                 fieldDisplayName.classList.add('hidden');
+                const fieldTCode2 = dialog.querySelector('#auth-field-teacher-code');
+                if (fieldTCode2) fieldTCode2.classList.add('hidden');
                 registerHint.classList.add('hidden');
                 titleEl.textContent = 'Вход в аккаунт';
                 submitText.textContent = 'Войти';
@@ -759,7 +773,8 @@
             try {
                 if (isReg) {
                     const localData = collectLocalState();
-                    const res = await apiRegister(username, password, displayName, localData);
+                    const teacherCode = dialog.querySelector('#auth-input-teacher-code')?.value?.trim() || '';
+                    const res = await apiRegister(username, password, displayName, localData, teacherCode);
                     currentUser = res.user;
                     showToast(`Добро пожаловать, ${res.user.displayName || res.user.username}!`, 'success');
                 } else {
@@ -786,15 +801,21 @@
 
     // --- 6. HEADER & SETTINGS UI INTEGRATION ---
     function updateUIForAuthState() {
+        const isTeacher = currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin');
+        document.querySelectorAll('.teacher-only-link').forEach(el => {
+            el.classList.toggle('hidden', !isTeacher);
+        });
+
         const headerBtns = document.querySelectorAll('.auth-header-btn');
         headerBtns.forEach(btn => {
             if (currentUser) {
                 btn.classList.add('is-logged-in');
+                const roleIcon = isTeacher ? '🎓 ' : '';
                 btn.innerHTML = `
                     <span class="auth-status-dot"></span>
-                    <span>${currentUser.displayName || currentUser.username}</span>
+                    <span>${roleIcon}${currentUser.displayName || currentUser.username}</span>
                 `;
-                btn.title = `Авторизован: ${currentUser.username}. Нажмите для управления`;
+                btn.title = `Авторизован: ${currentUser.username} (${isTeacher ? 'Учитель' : 'Ученик'}). Нажмите для управления`;
             } else {
                 btn.classList.remove('is-logged-in');
                 btn.innerHTML = `
@@ -807,6 +828,8 @@
 
         // Update Cloud Settings Pane if present in profile.html
         updateCloudSettingsCard();
+
+        window.dispatchEvent(new CustomEvent('study-auth-changed', { detail: currentUser }));
     }
 
     function updateCloudSettingsCard() {
@@ -982,6 +1005,15 @@
                     <a href="/profile.html" class="settings-btn settings-btn-primary" style="text-decoration:none; text-align:center;">
                         Открыть личный кабинет
                     </a>
+                    ${(currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin')) ? `
+                    <a href="/teacher.html" class="settings-btn" style="text-decoration:none; text-align:center; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff !important; box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+                        🎓 Панель учителя (Классы)
+                    </a>
+                    ` : `
+                    <button type="button" id="quick-become-teacher-btn" class="settings-btn" style="background:rgba(255,255,255,0.06); color:var(--muted); font-size:0.82rem; border:1px dashed var(--line);">
+                        🎓 Войти как учитель
+                    </button>
+                    `}
                     <button type="button" id="quick-sync-btn" class="settings-btn settings-btn-accent">
                         Синхронизировать сейчас
                     </button>
@@ -1007,6 +1039,30 @@
                 btn.textContent = 'Синхронизировать сейчас';
             }
         });
+        const becomeTeacherBtn = dialog.querySelector('#quick-become-teacher-btn');
+        if (becomeTeacherBtn) {
+            becomeTeacherBtn.addEventListener('click', async () => {
+                const code = prompt('Введите секретный код доступа преподавателя:');
+                if (!code) return;
+                try {
+                    const res = await fetch('/api/teacher/become', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ teacherCode: code })
+                    });
+                    const d = await res.json();
+                    if (!res.ok) throw new Error(d.error || 'Ошибка активации');
+                    if (currentUser) currentUser.role = 'teacher';
+                    updateUIForAuthState();
+                    dialog.close();
+                    showToast('Статус учителя успешно активирован!', 'success');
+                    window.location.href = '/teacher.html';
+                } catch(e) {
+                    alert(e.message);
+                }
+            });
+        }
+
         dialog.querySelector('#quick-logout-btn').addEventListener('click', async () => {
             if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
                 await apiLogout();

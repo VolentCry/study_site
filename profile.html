@@ -721,20 +721,27 @@
         .nav-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            padding: 0.45rem 0.95rem;
+            justify-content: center;
+            gap: 0.5rem;
+            height: 40px;
+            box-sizing: border-box;
+            padding: 0 1.1rem;
             border-radius: var(--r-pill);
             font-family: var(--f-body);
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             font-weight: 600;
+            line-height: 1;
             color: var(--muted-bright);
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--line);
             text-decoration: none;
             cursor: pointer;
             transition: all 0.2s var(--ease-out);
+            white-space: nowrap;
         }
         .nav-btn svg {
+            width: 16px;
+            height: 16px;
             flex-shrink: 0;
             display: block;
         }
@@ -3786,6 +3793,433 @@
                 padding: 1.25rem 1.4rem;
             }
         }
+
+        /* --- STUDY & CALENDAR STYLES --- */
+        #tab-content-study {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* NEXT LESSON HERO CARD */
+        .next-lesson-hero {
+            background: linear-gradient(135deg, rgba(255, 119, 40, 0.12) 0%, rgba(44, 230, 214, 0.08) 100%), var(--surface-card);
+            border: 1px solid rgba(255, 119, 40, 0.25);
+            border-radius: var(--r-lg);
+            padding: 1.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .next-lesson-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-cyan));
+        }
+        [data-theme="light"] .next-lesson-hero {
+            background: #ffffff;
+            border-color: rgba(234, 88, 12, 0.3);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .lesson-hero-main {
+            flex: 1;
+            min-width: 280px;
+        }
+        .lesson-hero-tag {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+        .lesson-hero-title {
+            font-family: var(--f-display);
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            color: var(--ink);
+        }
+        .lesson-hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.88rem;
+            color: var(--muted-bright);
+        }
+        .lesson-hero-time {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            font-family: var(--f-mono);
+            font-size: 1.05rem;
+        }
+        .lesson-hero-action {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.65rem;
+        }
+        @media (max-width: 768px) {
+            .lesson-hero-action {
+                align-items: flex-start;
+                width: 100%;
+            }
+        }
+
+        /* STUDY DASHBOARD GRID */
+        .study-dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 992px) {
+            .study-dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .study-card {
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        [data-theme="light"] .study-card {
+            background: #ffffff;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        /* CALENDAR STYLES */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .cal-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .cal-title {
+            font-family: var(--f-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--ink);
+            min-width: 160px;
+        }
+        .cal-nav-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--r-pill);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cal-nav-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--line-active);
+        }
+        .cal-today-btn {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--r-pill);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--muted-bright);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cal-today-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 0.5rem;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .cal-day-cell {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--r-sm);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            font-family: var(--f-mono);
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--ink);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        [data-theme="light"] .cal-day-cell {
+            background: #f8fafc;
+        }
+        .cal-day-cell:hover {
+            background: var(--surface-hover);
+            border-color: var(--line-active);
+        }
+        .cal-day-cell.other-month {
+            opacity: 0.25;
+        }
+        .cal-day-cell.is-today {
+            border-color: var(--accent);
+            background: rgba(255, 119, 40, 0.1);
+            color: var(--accent);
+            font-weight: 800;
+        }
+        .cal-day-cell.is-selected {
+            background: var(--accent) !important;
+            color: #ffffff !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+        .cal-day-cell.is-selected .event-dot {
+            background: #ffffff !important;
+        }
+
+        /* Event Dots */
+        .cal-dots-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 3px;
+            height: 6px;
+        }
+        .event-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+        .dot-lesson {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 6px rgba(44, 230, 214, 0.6);
+        }
+        .dot-hw {
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+
+        .calendar-legend {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-top: 1rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid var(--line);
+            font-size: 0.78rem;
+            color: var(--muted);
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .dot-today {
+            border: 2px solid var(--accent);
+        }
+
+        /* DAY DETAILS & HOMEWORKS */
+        .study-side-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .day-details-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid var(--line);
+        }
+        .day-details-header h4 {
+            font-family: var(--f-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .day-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--r-pill);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--muted-bright);
+        }
+        .day-details-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .day-event-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-sm);
+            padding: 0.85rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+        .day-event-card:hover {
+            border-color: var(--line-active);
+        }
+        .day-event-time {
+            font-family: var(--f-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+        .day-event-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--ink);
+        }
+
+        /* STUDENT HW CARDS */
+        .card-section-title {
+            font-family: var(--f-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .badge-counter {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 0.2rem 0.55rem;
+            border-radius: var(--r-pill);
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .student-hw-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .student-hw-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r);
+            padding: 1rem 1.15rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            transition: all 0.2s ease;
+        }
+        .student-hw-card:hover {
+            border-color: var(--line-active);
+            transform: translateY(-1px);
+        }
+        .student-hw-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .student-hw-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--ink);
+            line-height: 1.35;
+        }
+        .student-hw-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+        .hw-action-btn {
+            height: 34px;
+            padding: 0 1rem;
+            border-radius: var(--r-pill);
+            font-family: var(--f-body);
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .hw-btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+        .hw-btn-primary:hover {
+            filter: brightness(1.1);
+        }
+        .hw-btn-secondary {
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            color: var(--ink);
+        }
+        .hw-btn-secondary:hover {
+            border-color: var(--line-active);
+        }
+
     </style>
 </head>
 <body>
@@ -3814,9 +4248,13 @@
 
             <!-- TABS SWITCHER -->
             <div class="profile-tabs-nav" role="tablist" aria-label="Вкладки профиля">
-                <button type="button" class="profile-tab-btn active" id="tab-btn-overview" role="tab" aria-selected="true" aria-controls="tab-content-overview">
+                <button type="button" class="profile-tab-btn active" id="tab-btn-study" role="tab" aria-selected="true" aria-controls="tab-content-study">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Учёба и расписание</span>
+                </button>
+                <button type="button" class="profile-tab-btn" id="tab-btn-overview" role="tab" aria-selected="false" aria-controls="tab-content-overview">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
-                    <span>Обзор и навыки</span>
+                    <span>Прогресс и навыки</span>
                 </button>
                 <button type="button" class="profile-tab-btn" id="tab-btn-ranks" role="tab" aria-selected="false" aria-controls="tab-content-ranks">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
@@ -3897,7 +4335,96 @@
         </section>
 
         <!-- TAB 1: OVERVIEW & SKILLS -->
-        <div id="tab-content-overview" class="section-wrap">
+        
+        <!-- TAB 1: УЧЁБА И РАСПИСАНИЕ (НОВЫЙ ЦЕНТРАЛЬНЫЙ ТАБ) -->
+        <div id="tab-content-study" class="section-wrap">
+            <!-- БЛИЖАЙШЕЕ ЗАНЯТИЕ HERO CARD -->
+            <div class="next-lesson-hero" id="next-lesson-card">
+                <div class="lesson-hero-main">
+                    <div class="lesson-hero-tag">
+                        <span>⚡ Ближайшее занятие</span>
+                    </div>
+                    <h2 class="lesson-hero-title" id="next-lesson-title">Загрузка расписания...</h2>
+                    <div class="lesson-hero-meta" id="next-lesson-meta">
+                        <span class="lesson-hero-time" id="next-lesson-time">—</span>
+                        <span id="next-lesson-class">—</span>
+                        <span id="next-lesson-teacher">—</span>
+                    </div>
+                </div>
+                <div class="lesson-hero-action" id="next-lesson-action-wrap">
+                    <!-- Dynamic CTA or status -->
+                </div>
+            </div>
+
+            <!-- СЕТКА: КАЛЕНДАРЬ МЕСЯЦА + СОБЫТИЯ И Д/З -->
+            <div class="study-dashboard-grid">
+                <!-- КАЛЕНДАРЬ ТЕКУЩЕГО МЕСЯЦА -->
+                <div class="study-card calendar-card">
+                    <div class="calendar-header">
+                        <div class="cal-nav-group">
+                            <button type="button" class="cal-nav-btn" id="cal-prev-btn" aria-label="Предыдущий месяц">‹</button>
+                            <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
+                            <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
+                        </div>
+                        <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
+                    </div>
+
+                    <div class="calendar-weekdays">
+                        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                    </div>
+
+                    <div class="calendar-grid" id="calendar-days-grid">
+                        <!-- Динамическая сетка дней -->
+                    </div>
+
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot dot-lesson"></span>
+                            <span>Урок</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot dot-hw"></span>
+                            <span>Дедлайн Д/З</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot dot-today"></span>
+                            <span>Сегодня</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ПРАВАЯ КОЛОНКА: ДЕТАЛИ ВЫБРАННОГО ДНЯ И СПИСОК Д/З -->
+                <div class="study-side-col">
+                    <!-- ДЕТАЛИ ВЫБРАННОГО ДНЯ -->
+                    <div class="study-card day-details-card">
+                        <div class="day-details-header">
+                            <h4 id="day-details-date">События дня</h4>
+                            <span class="day-badge" id="day-details-badge">0 событий</span>
+                        </div>
+                        <div id="day-details-content" class="day-details-list">
+                            <div style="color:var(--muted); font-size:0.88rem; text-align:center; padding:1.25rem 0;">
+                                Нажмите на любой день в календаре, чтобы посмотреть подробности занятий.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- СПИСОК МОИХ ДОМАШНИХ ЗАДАНИЙ -->
+                    <div class="study-card">
+                        <div class="card-section-title">
+                            <span>Мои домашние задания</span>
+                            <span class="badge-counter" id="active-hw-count">0</span>
+                        </div>
+                        <div id="student-homeworks-list" class="student-hw-list">
+                            <div style="color:var(--muted); font-size:0.88rem; text-align:center; padding:1.5rem 0;">
+                                Загрузка домашних заданий...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-content-overview" class="section-wrap hidden">
             <!-- BENTO 4-CARDS METRICS -->
             <section aria-labelledby="metrics-summary-heading">
                 <h2 id="metrics-summary-heading" class="hidden">Учебная статистика</h2>
@@ -4267,59 +4794,6 @@
 
                 <div class="settings-divider"></div>
 
-                <!-- 2. EXPORT (КОД СОХРАНЕНИЯ) -->
-                <div class="settings-section">
-                    <div class="settings-section-head">
-                        <h3 class="settings-section-title">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <span>Твой код сохранения</span>
-                        </h3>
-                        <span class="settings-badge">Код профиля</span>
-                    </div>
-                    <p class="settings-section-desc">
-                        В этом коде зашифрованы имя, XP, решённые задачи, серии и звания во всех тренажерах.
-                    </p>
-                    <textarea id="profile-code-output" class="profile-code-textarea" readonly rows="3" spellcheck="false" placeholder="Генерация кода..."></textarea>
-                    <div class="code-box-actions">
-                        <button type="button" id="copy-code-btn" class="settings-btn settings-btn-primary">
-                            <span id="copy-btn-text">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                Скопировать код
-                            </span>
-                        </button>
-                        <span id="copy-status" class="copy-status-msg" aria-live="polite"></span>
-                    </div>
-                </div>
-
-                <div class="settings-divider"></div>
-
-                <!-- 3. IMPORT (ВОССТАНОВЛЕНИЕ) -->
-                <div class="settings-section">
-                    <div class="settings-section-head">
-                        <h3 class="settings-section-title">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            <span>Восстановление прогресса</span>
-                        </h3>
-                        <span class="settings-badge">Загрузка</span>
-                    </div>
-                    <p class="settings-section-desc">
-                        Вставь скопированный ранее код профиля (начинается с STUDY-):
-                    </p>
-                    <textarea id="profile-code-input" class="profile-code-textarea" rows="2" spellcheck="false" placeholder="Вставь сюда код профиля..."></textarea>
-                    <div class="import-actions">
-                        <button type="button" id="apply-code-btn" class="settings-btn settings-btn-accent">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            <span>Восстановить профиль</span>
-                        </button>
-                        <button type="button" id="clear-input-btn" class="settings-btn settings-btn-secondary">
-                            Очистить
-                        </button>
-                    </div>
-                    <div id="import-status-msg" class="import-status-msg hidden" aria-live="polite"></div>
-                </div>
-
-                <div class="settings-divider"></div>
-
                 <!-- 4. RESET DANGER ZONE -->
                 <div class="settings-section">
                     <h3 class="settings-section-title" style="color: var(--danger);">
@@ -4431,6 +4905,7 @@
                 <a href="pages/oge_roadmap.html">Роадмап ОГЭ</a>
                 <a href="math_moduls/oge_task_6_trainer.html">Тренажер №6</a>
                 <a href="math_moduls/oge_task_8_trainer.html">Тренажер №8</a>
+                <a href="teacher.html" style="opacity: 0.65; transition: opacity 0.2s;" title="Панель преподавателя: классы и ученики">Для учителей</a>
                 <a href="index.html">На главную</a>
             </div>
         </div>
@@ -4443,9 +4918,11 @@
     <script>
         // --- 1. TABS SWITCHER ---
         document.addEventListener('DOMContentLoaded', () => {
+            const tabBtnStudy = document.getElementById('tab-btn-study');
             const tabBtnOverview = document.getElementById('tab-btn-overview');
             const tabBtnRanks = document.getElementById('tab-btn-ranks');
             const tabBtnAchievements = document.getElementById('tab-btn-achievements') || document.getElementById('achievements-open');
+            const tabContentStudy = document.getElementById('tab-content-study');
             const tabContentOverview = document.getElementById('tab-content-overview');
             const tabContentRanks = document.getElementById('tab-content-ranks');
             const tabContentAchievements = document.getElementById('tab-content-achievements');
@@ -4455,8 +4932,8 @@
             const overviewGotoMedalsBtn = document.getElementById('overview-goto-medals-btn');
 
             function switchTab(tabName) {
-                const buttons = [tabBtnOverview, tabBtnRanks, tabBtnAchievements];
-                const contents = [tabContentOverview, tabContentRanks, tabContentAchievements];
+                const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements];
+                const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements];
 
                 buttons.forEach(btn => {
                     if (btn) {
@@ -4468,7 +4945,17 @@
                     if (content) content.classList.add('hidden');
                 });
 
-                if (tabName === 'ranks') {
+                if (tabName === 'overview') {
+                    if (tabBtnOverview) {
+                        tabBtnOverview.classList.add('active');
+                        tabBtnOverview.setAttribute('aria-selected', 'true');
+                    }
+                    if (tabContentOverview) tabContentOverview.classList.remove('hidden');
+                    try {
+                        sessionStorage.setItem('profileActiveTab', 'overview');
+                        history.replaceState(null, '', '#overview');
+                    } catch (e) {}
+                } else if (tabName === 'ranks') {
                     if (tabBtnRanks) {
                         tabBtnRanks.classList.add('active');
                         tabBtnRanks.setAttribute('aria-selected', 'true');
@@ -4497,21 +4984,23 @@
                         history.replaceState(null, '', '#achievements');
                     } catch (e) {}
                 } else {
-                    if (tabBtnOverview) {
-                        tabBtnOverview.classList.add('active');
-                        tabBtnOverview.setAttribute('aria-selected', 'true');
+                    // Default tab: study
+                    if (tabBtnStudy) {
+                        tabBtnStudy.classList.add('active');
+                        tabBtnStudy.setAttribute('aria-selected', 'true');
                     }
-                    if (tabContentOverview) tabContentOverview.classList.remove('hidden');
-
+                    if (tabContentStudy) tabContentStudy.classList.remove('hidden');
+                    loadStudyData();
                     try {
-                        sessionStorage.setItem('profileActiveTab', 'overview');
-                        history.replaceState(null, '', '#overview');
+                        sessionStorage.setItem('profileActiveTab', 'study');
+                        history.replaceState(null, '', '#study');
                     } catch (e) {}
                 }
             }
 
             window.switchProfileTab = switchTab;
 
+            if (tabBtnStudy) tabBtnStudy.addEventListener('click', () => switchTab('study'));
             if (tabBtnOverview) tabBtnOverview.addEventListener('click', () => switchTab('overview'));
             if (tabBtnRanks) tabBtnRanks.addEventListener('click', () => switchTab('ranks'));
             if (tabBtnAchievements) tabBtnAchievements.addEventListener('click', () => switchTab('achievements'));
@@ -4525,13 +5014,394 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
+            
+            // =========================================================================
+            // STUDY & CALENDAR MODULE FOR STUDENT
+            // =========================================================================
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            let currentCalDate = new Date();
+            let monthScheduleData = null;
+            let studentHomeworksData = [];
+            let selectedDateStr = null;
+
+            const calMonthTitle = document.getElementById('cal-month-title');
+            const calDaysGrid = document.getElementById('calendar-days-grid');
+            const calPrevBtn = document.getElementById('cal-prev-btn');
+            const calNextBtn = document.getElementById('cal-next-btn');
+            const calTodayBtn = document.getElementById('cal-today-btn');
+            const nextLessonCard = document.getElementById('next-lesson-card');
+            const nextLessonTitle = document.getElementById('next-lesson-title');
+            const nextLessonTime = document.getElementById('next-lesson-time');
+            const nextLessonClass = document.getElementById('next-lesson-class');
+            const nextLessonTeacher = document.getElementById('next-lesson-teacher');
+            const nextLessonActionWrap = document.getElementById('next-lesson-action-wrap');
+            const dayDetailsDate = document.getElementById('day-details-date');
+            const dayDetailsBadge = document.getElementById('day-details-badge');
+            const dayDetailsContent = document.getElementById('day-details-content');
+            const studentHomeworksList = document.getElementById('student-homeworks-list');
+            const activeHwCount = document.getElementById('active-hw-count');
+
+            if (calPrevBtn) {
+                calPrevBtn.addEventListener('click', () => {
+                    currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+                    fetchMonthSchedule();
+                });
+            }
+            if (calNextBtn) {
+                calNextBtn.addEventListener('click', () => {
+                    currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+                    fetchMonthSchedule();
+                });
+            }
+            if (calTodayBtn) {
+                calTodayBtn.addEventListener('click', () => {
+                    currentCalDate = new Date();
+                    selectedDateStr = toDateKey(currentCalDate);
+                    fetchMonthSchedule();
+                });
+            }
+
+            function toDateKey(d) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            async function loadStudyData() {
+                if (!selectedDateStr) {
+                    selectedDateStr = toDateKey(new Date());
+                }
+                await Promise.all([fetchMonthSchedule(), fetchStudentHomeworks()]);
+            }
+
+            async function fetchMonthSchedule() {
+                const year = currentCalDate.getFullYear();
+                const month = currentCalDate.getMonth() + 1;
+
+                if (calMonthTitle) {
+                    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+                    calMonthTitle.textContent = `${monthNames[month - 1]} ${year}`;
+                }
+
+                try {
+                    const res = await fetch(`/api/schedule/month?year=${year}&month=${month}`, { cache: 'no-store' });
+                    const data = await res.json();
+                    if (data.success && data.schedule) {
+                        monthScheduleData = data.schedule;
+                        renderCalendar();
+                        renderUpcomingHero();
+                        renderDayDetails(selectedDateStr || toDateKey(new Date()));
+                    }
+                } catch(e) {
+                    console.error('Error fetching month schedule', e);
+                }
+            }
+
+            async function fetchStudentHomeworks() {
+                try {
+                    const res = await fetch('/api/student/homeworks', { cache: 'no-store' });
+                    const data = await res.json();
+                    if (data.success && data.homeworks) {
+                        studentHomeworksData = data.homeworks;
+                        renderStudentHomeworks();
+                    }
+                } catch(e) {
+                    console.error('Error fetching student homeworks', e);
+                }
+            }
+
+            function renderCalendar() {
+                if (!calDaysGrid) return;
+                calDaysGrid.innerHTML = '';
+
+                const year = currentCalDate.getFullYear();
+                const month = currentCalDate.getMonth();
+
+                const firstDayOfMonth = new Date(year, month, 1);
+                let startWeekday = (firstDayOfMonth.getDay() + 6) % 7;
+
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+                const todayKey = toDateKey(new Date());
+
+                const lessonsByDate = {};
+                const hwByDate = {};
+
+                if (monthScheduleData && monthScheduleData.lessons) {
+                    monthScheduleData.lessons.forEach(l => {
+                        const k = l.starts_at.slice(0, 10);
+                        if (!lessonsByDate[k]) lessonsByDate[k] = [];
+                        lessonsByDate[k].push(l);
+                    });
+                }
+                if (monthScheduleData && monthScheduleData.homeworks) {
+                    monthScheduleData.homeworks.forEach(h => {
+                        if (h.deadline) {
+                            const k = h.deadline.slice(0, 10);
+                            if (!hwByDate[k]) hwByDate[k] = [];
+                            hwByDate[k].push(h);
+                        }
+                    });
+                }
+
+                for (let i = startWeekday - 1; i >= 0; i--) {
+                    const dayNum = daysInPrevMonth - i;
+                    const prevDate = new Date(year, month - 1, dayNum);
+                    const cellKey = toDateKey(prevDate);
+                    createDayCell(dayNum, cellKey, true, lessonsByDate[cellKey], hwByDate[cellKey]);
+                }
+
+                for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
+                    const curDate = new Date(year, month, dayNum);
+                    const cellKey = toDateKey(curDate);
+                    createDayCell(dayNum, cellKey, false, lessonsByDate[cellKey], hwByDate[cellKey]);
+                }
+
+                const totalCells = startWeekday + daysInMonth;
+                const nextMonthCells = totalCells <= 35 ? (35 - totalCells) : (42 - totalCells);
+                for (let dayNum = 1; dayNum <= nextMonthCells; dayNum++) {
+                    const nextDate = new Date(year, month + 1, dayNum);
+                    const cellKey = toDateKey(nextDate);
+                    createDayCell(dayNum, cellKey, true, lessonsByDate[cellKey], hwByDate[cellKey]);
+                }
+            }
+
+            function createDayCell(dayNum, dateKey, isOtherMonth, lessons, hws) {
+                const cell = document.createElement('div');
+                cell.className = 'cal-day-cell';
+                if (isOtherMonth) cell.classList.add('other-month');
+
+                const todayKey = toDateKey(new Date());
+                if (dateKey === todayKey) cell.classList.add('is-today');
+                if (dateKey === selectedDateStr) cell.classList.add('is-selected');
+
+                let dotsHtml = '';
+                if ((lessons && lessons.length > 0) || (hws && hws.length > 0)) {
+                    dotsHtml = '<div class="cal-dots-row">';
+                    if (lessons && lessons.length > 0) dotsHtml += '<span class="event-dot dot-lesson" title="Урок"></span>';
+                    if (hws && hws.length > 0) dotsHtml += '<span class="event-dot dot-hw" title="Д/З"></span>';
+                    dotsHtml += '</div>';
+                }
+
+                cell.innerHTML = `<span>${dayNum}</span>${dotsHtml}`;
+
+                cell.addEventListener('click', () => {
+                    selectedDateStr = dateKey;
+                    document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('is-selected'));
+                    cell.classList.add('is-selected');
+                    renderDayDetails(dateKey);
+                });
+
+                calDaysGrid.appendChild(cell);
+            }
+
+            function renderUpcomingHero() {
+                if (!nextLessonCard) return;
+
+                const allLessons = (monthScheduleData && monthScheduleData.lessons) ? [...monthScheduleData.lessons] : [];
+                const now = new Date();
+
+                const futureLessons = allLessons
+                    .filter(l => new Date(l.starts_at) >= new Date(now.getTime() - 2 * 3600000))
+                    .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
+
+                if (futureLessons.length === 0) {
+                    nextLessonTitle.textContent = 'Нет запланированных уроков на этой неделе';
+                    nextLessonTime.textContent = 'Свободное время';
+                    nextLessonClass.textContent = 'Отличный повод потренироваться!';
+                    nextLessonTeacher.textContent = '';
+                    nextLessonActionWrap.innerHTML = `
+                        <a href="index.html#trainers" class="hw-action-btn hw-btn-secondary">
+                            🎯 Перейти к тренажёрам
+                        </a>
+                    `;
+                    return;
+                }
+
+                const next = futureLessons[0];
+                const d = new Date(next.starts_at);
+                const isToday = toDateKey(d) === toDateKey(now);
+                const tmrw = new Date(now.getTime() + 86400000);
+                const isTmrw = toDateKey(d) === toDateKey(tmrw);
+
+                let whenText = '';
+                if (isToday) whenText = `Сегодня в ${d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+                else if (isTmrw) whenText = `Завтра в ${d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+                else whenText = d.toLocaleString('ru-RU', { day: 'numeric', month: 'short', weekday: 'short', hour: '2-digit', minute: '2-digit' });
+
+                nextLessonTitle.textContent = next.title;
+                nextLessonTime.textContent = whenText;
+                nextLessonClass.textContent = `🏫 ${next.class_name}`;
+                nextLessonTeacher.textContent = next.teacher_name ? `Учитель: ${next.teacher_name}` : '';
+
+                if (next.homework_id) {
+                    nextLessonActionWrap.innerHTML = `
+                        <div style="font-size:0.8rem; color:var(--muted); text-align:right;">К уроку прикреплено задание:</div>
+                        <a href="homework.html?id=${next.homework_id}" class="hw-action-btn hw-btn-primary">
+                            📝 Решать домашнее задание
+                        </a>
+                    `;
+                } else {
+                    nextLessonActionWrap.innerHTML = `
+                        <span class="day-badge" style="background:rgba(44, 230, 214, 0.1); color:var(--accent-cyan); border-color:rgba(44, 230, 214, 0.3);">
+                            Урок запланирован
+                        </span>
+                    `;
+                }
+            }
+
+            function renderDayDetails(dateKey) {
+                if (!dayDetailsContent) return;
+
+                const [y, m, d] = dateKey.split('-').map(Number);
+                const dateObj = new Date(y, m - 1, d);
+                dayDetailsDate.textContent = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
+
+                const dayLessons = (monthScheduleData && monthScheduleData.lessons)
+                    ? monthScheduleData.lessons.filter(l => l.starts_at.slice(0, 10) === dateKey)
+                    : [];
+
+                const dayHws = (monthScheduleData && monthScheduleData.homeworks)
+                    ? monthScheduleData.homeworks.filter(h => h.deadline && h.deadline.slice(0, 10) === dateKey)
+                    : [];
+
+                const totalEvents = dayLessons.length + dayHws.length;
+                dayDetailsBadge.textContent = `${totalEvents} ${totalEvents === 1 ? 'событие' : (totalEvents >= 2 && totalEvents <= 4 ? 'события' : 'событий')}`;
+
+                if (totalEvents === 0) {
+                    dayDetailsContent.innerHTML = `
+                        <div style="color:var(--muted); font-size:0.88rem; text-align:center; padding:1.25rem 0;">
+                            На этот день занятий и сроков сдачи нет.
+                        </div>
+                    `;
+                    return;
+                }
+
+                let htmlItems = '';
+
+                dayLessons.forEach(les => {
+                    const t = new Date(les.starts_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                    let hwLine = '';
+                    if (les.homework_id) {
+                        hwLine = `
+                            <div style="margin-top:0.35rem;">
+                                <a href="homework.html?id=${les.homework_id}" style="color:var(--accent); font-weight:700; font-size:0.82rem; text-decoration:none;">
+                                    📝 Прикреплена домашка →
+                                </a>
+                            </div>
+                        `;
+                    }
+                    htmlItems += `
+                        <div class="day-event-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span class="day-event-time">⏰ ${t}</span>
+                                <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(les.class_name)}</span>
+                            </div>
+                            <div class="day-event-title">${escapeHtml(les.title)}</div>
+                            ${les.notes ? `<div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(les.notes)}</div>` : ''}
+                            ${hwLine}
+                        </div>
+                    `;
+                });
+
+                dayHws.forEach(h => {
+                    const t = new Date(h.deadline).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                    htmlItems += `
+                        <div class="day-event-card" style="border-left: 3px solid var(--accent);">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.8rem; font-weight:700; color:var(--accent);">Дедлайн до ${t}</span>
+                                <span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(h.subject)}</span>
+                            </div>
+                            <div class="day-event-title">${escapeHtml(h.title)}</div>
+                            <div style="margin-top:0.35rem;">
+                                <a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-primary" style="height:28px; font-size:0.75rem;">
+                                    Решать задание
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                dayDetailsContent.innerHTML = htmlItems;
+            }
+
+            function renderStudentHomeworks() {
+                if (!studentHomeworksList) return;
+                activeHwCount.textContent = studentHomeworksData.length;
+
+                if (studentHomeworksData.length === 0) {
+                    studentHomeworksList.innerHTML = `
+                        <div style="text-align:center; padding:1.75rem 1rem; color:var(--muted); font-size:0.88rem;">
+                            Вам пока не назначено домашних заданий.<br>Загляните позже или решайте задания в тренажёрах!
+                        </div>
+                    `;
+                    return;
+                }
+
+                studentHomeworksList.innerHTML = studentHomeworksData.map(h => {
+                    const sub = h.submission || {};
+                    const status = sub.status || 'not_started';
+                    let statusBadge = '';
+                    let actionBtn = '';
+
+                    if (status === 'checked') {
+                        statusBadge = `<span class="badge badge-status status-checked">Оценка: ${sub.score}/${sub.maxScore || sub.max_score || h.tasksCount || 0}</span>`;
+                        actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Результаты и разбор</a>`;
+                    } else if (status === 'submitted') {
+                        statusBadge = `<span class="badge badge-status status-submitted">На проверке</span>`;
+                        actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Смотреть ответы</a>`;
+                    } else {
+                        const hasDraft = (sub.answers && Object.keys(sub.answers).length > 0);
+                        statusBadge = hasDraft
+                            ? `<span class="badge badge-status" style="background:rgba(44,230,214,0.15); color:var(--accent-cyan); border:1px solid rgba(44,230,214,0.3);">В процессе</span>`
+                            : `<span class="badge badge-status status-pending">Не начато</span>`;
+                        actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-primary">${hasDraft ? 'Продолжить' : 'Приступить'}</a>`;
+                    }
+
+                    const deadlineStr = (h.deadline || h.deadlineAt)
+                        ? new Date(h.deadline || h.deadlineAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                        : 'Бессрочно';
+
+                    return `
+                        <div class="student-hw-card" id="student-hw-${h.id}">
+                            <div class="student-hw-card-top">
+                                <div>
+                                    <div class="student-hw-title">${escapeHtml(h.title)}</div>
+                                    <div class="student-hw-meta">
+                                        <span style="color:var(--accent-cyan); font-weight:700;">${escapeHtml(h.subject)}</span>
+                                        <span>Срок: ${deadlineStr}</span>
+                                        <span>${h.tasksCount || (h.tasks ? h.tasks.length : 0)} зад.</span>
+                                    </div>
+                                </div>
+                                ${statusBadge}
+                            </div>
+                            <div style="display:flex; justify-content:flex-end;">
+                                ${actionBtn}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
             const storedTab = sessionStorage.getItem('profileActiveTab');
             const hash = (window.location.hash || '').toLowerCase();
             const initialTab = (hash === '#ranks' || storedTab === 'ranks') 
                 ? 'ranks' 
                 : (hash.includes('achieve') || hash.includes('medal') || storedTab === 'achievements')
                     ? 'achievements'
-                    : 'overview';
+                    : (hash === '#overview' || storedTab === 'overview')
+                        ? 'overview'
+                        : 'study';
             switchTab(initialTab);
         });
 
@@ -5093,7 +5963,9 @@
                 if (!settingsDialog) return;
                 updateFrameCardsState();
                 if (frameLockNotice) frameLockNotice.classList.add('hidden');
-                profileCodeOutput.value = generateProfileExportCode();
+                if (profileCodeOutput) {
+                    profileCodeOutput.value = generateProfileExportCode();
+                }
                 const curName = getStoredUserName();
                 if (settingsNameInput) {
                     settingsNameInput.value = curName;

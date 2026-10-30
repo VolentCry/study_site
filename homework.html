@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Домашнее задание · НЕШкола</title>
+    <meta name="description" content="Интерактивное решение и отправка домашнего задания учителю на образовательной платформе НЕШкола.">
+    <link rel="canonical" href="http://127.0.0.1:5000/homework.html">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22 fill=%22none%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7728%22/><path d=%22M9 16l5 5 9-9%22 stroke=%22%23ffffff%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
+
+    <style>
+        /* --- DESIGN TOKENS --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --ground: #090c13;
+            --surface: #101522;
+            --surface-card: #151b2b;
+            --surface-hover: #1c2438;
+            --surface-glass: rgba(16, 21, 34, 0.88);
+            --ink: #f8fafc;
+            --muted: #b0bfd4;
+            --muted-bright: #e2e8f0;
+            --line: rgba(255, 255, 255, 0.12);
+            --line-active: rgba(255, 255, 255, 0.25);
+            --accent: #ff7728;
+            --accent-glow: rgba(255, 119, 40, 0.28);
+            --accent-cyan: #2ce6d6;
+            --accent-gold: #fbbf24;
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+            --danger: #ef4444;
+
+            --f-display: 'Unbounded', system-ui, sans-serif;
+            --f-body: 'Onest', system-ui, sans-serif;
+            --f-mono: 'JetBrains Mono', monospace;
+
+            --r-sm: 8px;
+            --r: 16px;
+            --r-lg: 24px;
+            --r-pill: 9999px;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="light"] {
+            --ground: #f4f6fa;
+            --surface: #ffffff;
+            --surface-card: #ffffff;
+            --surface-hover: #f1f5f9;
+            --surface-glass: rgba(255, 255, 255, 0.94);
+            --ink: #0f172a;
+            --muted: #475569;
+            --muted-bright: #1e293b;
+            --line: rgba(15, 23, 42, 0.12);
+            --line-active: rgba(15, 23, 42, 0.22);
+            --accent: #ea580c;
+            --accent-glow: rgba(234, 88, 12, 0.22);
+            --accent-cyan: #0284c7;
+            --accent-gold: #d97706;
+            --accent-emerald: #059669;
+            --accent-emerald-glow: rgba(5, 150, 105, 0.2);
+            --danger: #dc2626;
+        }
+
+        body {
+            background-color: var(--ground);
+            color: var(--ink);
+            font-family: var(--f-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .shell {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.25rem;
+        }
+
+        /* HEADER */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+            padding: 0.85rem 0;
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: var(--ink);
+            text-decoration: none;
+            font-family: var(--f-display);
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+        .brand-beacon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 18px var(--accent-glow);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .nav-btn {
+            height: 40px;
+            box-sizing: border-box;
+            padding: 0 1rem;
+            border-radius: var(--r-pill);
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            font-family: var(--f-body);
+            font-weight: 600;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .nav-btn:hover {
+            border-color: var(--line-active);
+            background: var(--surface-hover);
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            padding: 2rem 0 4rem;
+        }
+
+        /* HERO CARD */
+        .hw-hero {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            padding: 1.75rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .hw-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-cyan));
+        }
+        .hw-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .hw-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--r-pill);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .badge-subject {
+            background: rgba(44, 230, 214, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(44, 230, 214, 0.3);
+        }
+        .badge-class {
+            background: rgba(255, 119, 40, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(255, 119, 40, 0.3);
+        }
+        .badge-status {
+            font-family: var(--f-mono);
+        }
+        .status-pending {
+            background: rgba(176, 191, 212, 0.15);
+            color: var(--muted-bright);
+            border: 1px solid var(--line);
+        }
+        .status-submitted {
+            background: rgba(251, 191, 36, 0.18);
+            color: var(--accent-gold);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+        }
+        .status-checked {
+            background: rgba(16, 185, 129, 0.18);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+
+        .hw-title {
+            font-family: var(--f-display);
+            font-size: 1.65rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.6rem;
+            color: var(--ink);
+        }
+        .hw-desc {
+            color: var(--muted-bright);
+            font-size: 0.98rem;
+            margin-bottom: 1.25rem;
+            white-space: pre-wrap;
+        }
+        .hw-stats-strip {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--line);
+            font-size: 0.88rem;
+            color: var(--muted);
+            flex-wrap: wrap;
+        }
+        .hw-stats-strip strong {
+            color: var(--ink);
+        }
+
+        /* TEACHER FEEDBACK CARD */
+        .feedback-banner {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: var(--r);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .feedback-icon {
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+        .feedback-body h4 {
+            font-family: var(--f-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            margin-bottom: 0.35rem;
+        }
+        .feedback-body p {
+            color: var(--ink);
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        /* TASK CARDS */
+        .tasks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .task-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r);
+            padding: 1.75rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .task-card:hover {
+            border-color: var(--line-active);
+        }
+        .task-card.is-correct {
+            border-color: rgba(16, 185, 129, 0.45);
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.04) 0%, var(--surface) 100%);
+        }
+        .task-card.is-incorrect {
+            border-color: rgba(239, 68, 68, 0.45);
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.04) 0%, var(--surface) 100%);
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--line);
+        }
+        .task-number {
+            font-family: var(--f-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .task-cat {
+            font-size: 0.82rem;
+            color: var(--muted);
+            background: var(--surface-card);
+            padding: 0.25rem 0.65rem;
+            border-radius: var(--r-pill);
+            border: 1px solid var(--line);
+        }
+
+        .task-body {
+            font-size: 1.15rem;
+            color: var(--ink);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* MATH FORMULAS RENDERING */
+        .math-expr {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--f-mono);
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 0.2rem;
+            font-family: var(--f-mono);
+            font-size: 0.95em;
+        }
+        .fraction .num {
+            border-bottom: 1.5px solid currentColor;
+            padding-bottom: 2px;
+        }
+        .fraction .den {
+            padding-top: 2px;
+        }
+        .rad-wrap {
+            display: inline-flex;
+            align-items: stretch;
+            vertical-align: middle;
+        }
+        .rad-sign {
+            font-size: 1.25em;
+            line-height: 1;
+            margin-right: 1px;
+        }
+        .rad-body {
+            border-top: 1.5px solid currentColor;
+            padding-top: 1px;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+        /* INPUT AREA */
+        .answer-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .input-group {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+        .answer-input {
+            width: 100%;
+            height: 48px;
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            border-radius: var(--r-sm);
+            color: var(--ink);
+            font-family: var(--f-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0 1rem;
+            transition: all 0.2s ease;
+        }
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .answer-input:disabled {
+            opacity: 0.85;
+            cursor: not-allowed;
+            background: var(--surface-hover);
+        }
+
+        /* RESULT CALLOUTS */
+        .task-result-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .res-correct {
+            color: var(--accent-emerald);
+        }
+        .res-incorrect {
+            color: var(--danger);
+        }
+
+        .solution-details {
+            margin-top: 1.25rem;
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            border-radius: var(--r-sm);
+            padding: 1rem 1.25rem;
+        }
+        .solution-details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            user-select: none;
+            font-size: 0.92rem;
+        }
+        .solution-steps {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--line);
+            font-size: 0.92rem;
+            color: var(--muted-bright);
+            line-height: 1.6;
+        }
+        .solution-steps ol {
+            padding-left: 1.25rem;
+        }
+        .solution-steps li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* BOTTOM BAR */
+        .bottom-bar {
+            position: sticky;
+            bottom: 1.5rem;
+            background: var(--surface-glass);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--line-active);
+            border-radius: var(--r);
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            z-index: 50;
+        }
+        .save-indicator {
+            font-size: 0.88rem;
+            color: var(--muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .save-indicator.saving {
+            color: var(--accent-gold);
+        }
+        .save-indicator.saved {
+            color: var(--accent-emerald);
+        }
+
+        .bottom-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .btn-cta {
+            height: 44px;
+            padding: 0 1.5rem;
+            border-radius: var(--r-pill);
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            font-family: var(--f-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: all 0.2s ease;
+        }
+        .btn-cta:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            height: 44px;
+            padding: 0 1.25rem;
+            border-radius: var(--r-pill);
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            font-family: var(--f-body);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--line-active);
+        }
+
+        /* MODAL */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 12, 19, 0.8);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            max-width: 480px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: modalPop 0.25s var(--ease-out);
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-card h3 {
+            font-family: var(--f-display);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .modal-card p {
+            color: var(--muted-bright);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* EMPTY STATE / LOADER */
+        .loading-box, .error-box {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--muted);
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--line);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--r-pill);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-size: 0.9rem;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            transform: translateY(10px);
+        }
+        .toast.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="shell header-inner">
+            <a href="profile.html" class="brand" title="В личный профиль">
+                <div class="brand-beacon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+                <span>НЕШкола</span>
+            </a>
+
+            <div class="header-actions">
+                <button class="nav-btn" id="theme-toggle" aria-label="Сменить тему">
+                    <span id="theme-icon">☀️</span>
+                </button>
+                <a href="profile.html" class="nav-btn">
+                    <span>← В профиль</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="shell">
+        <div id="hw-loader" class="loading-box">
+            <div class="loading-spinner"></div>
+            <p>Загрузка домашнего задания...</p>
+        </div>
+
+        <div id="hw-error" class="error-box" style="display: none;">
+            <h3 style="color: var(--danger); font-family: var(--f-display); margin-bottom: 0.5rem;">Не удалось открыть задание</h3>
+            <p id="error-message">Задание не найдено или у вас нет доступа.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="profile.html" class="btn-cta">Вернуться в профиль</a>
+            </div>
+        </div>
+
+        <div id="hw-content" style="display: none;">
+            <!-- Hero Header -->
+            <div class="hw-hero">
+                <div class="hw-meta-row">
+                    <div class="hw-badges">
+                        <span class="badge badge-subject" id="hw-subject">Математика</span>
+                        <span class="badge badge-class" id="hw-class">Класс</span>
+                        <span class="badge badge-status status-pending" id="hw-status-badge">Не начато</span>
+                    </div>
+                    <div class="hw-deadline-wrap" id="hw-deadline-wrap">
+                        <span style="font-size: 0.85rem; color: var(--muted);">Срок сдачи: </span>
+                        <strong id="hw-deadline" style="color: var(--ink);">—</strong>
+                    </div>
+                </div>
+
+                <h1 class="hw-title" id="hw-title">Загрузка...</h1>
+                <p class="hw-desc" id="hw-description" style="display: none;"></p>
+
+                <div class="hw-stats-strip">
+                    <div>Заданий: <strong id="hw-tasks-count">0</strong></div>
+                    <div>Учитель: <strong id="hw-teacher-name">—</strong></div>
+                    <div id="hw-score-wrap" style="display: none;">Оценка: <strong id="hw-score" style="color: var(--accent-emerald); font-size: 1.1rem;">0/0</strong></div>
+                </div>
+            </div>
+
+            <!-- Teacher Feedback (if checked) -->
+            <div class="feedback-banner" id="hw-feedback-banner" style="display: none;">
+                <div class="feedback-icon">💬</div>
+                <div class="feedback-body">
+                    <h4>Комментарий преподавателя</h4>
+                    <p id="hw-feedback-text"></p>
+                </div>
+            </div>
+
+            <!-- Tasks Container -->
+            <div class="tasks-container" id="tasks-container"></div>
+
+            <!-- Sticky Bottom Actions -->
+            <div class="bottom-bar" id="hw-bottom-bar">
+                <div class="save-indicator" id="save-indicator">
+                    <span>•</span>
+                    <span id="save-indicator-text">Все изменения сохранены</span>
+                </div>
+
+                <div class="bottom-actions">
+                    <button type="button" class="btn-secondary" id="btn-save-draft">Сохранить черновик</button>
+                    <button type="button" class="btn-cta" id="btn-submit-hw">Сдать на проверку</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-backdrop" id="submit-confirm-modal">
+        <div class="modal-card">
+            <h3>Сдать работу на проверку?</h3>
+            <p>После отправки ответы будут зафиксированы и переданы учителю на проверку. Вы больше не сможете изменить введённые ответы.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="btn-cancel-modal">Отмена</button>
+                <button type="button" class="btn-cta" id="btn-confirm-submit">Да, сдать работу</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            // Theme setup
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const savedTheme = localStorage.getItem('site_theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '🌙';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.textContent = '☀️';
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme');
+                if (current === 'light') {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('site_theme', 'dark');
+                    themeIcon.textContent = '☀️';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('site_theme', 'light');
+                    themeIcon.textContent = '🌙';
+                }
+            });
+
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const homeworkId = urlParams.get('id');
+
+            const loader = document.getElementById('hw-loader');
+            const errorBox = document.getElementById('hw-error');
+            const errorMsg = document.getElementById('error-message');
+            const content = document.getElementById('hw-content');
+            const tasksContainer = document.getElementById('tasks-container');
+            const bottomBar = document.getElementById('hw-bottom-bar');
+            const saveIndicator = document.getElementById('save-indicator');
+            const saveIndicatorText = document.getElementById('save-indicator-text');
+            const btnSaveDraft = document.getElementById('btn-save-draft');
+            const btnSubmitHw = document.getElementById('btn-submit-hw');
+            const submitModal = document.getElementById('submit-confirm-modal');
+            const btnCancelModal = document.getElementById('btn-cancel-modal');
+            const btnConfirmSubmit = document.getElementById('btn-confirm-submit');
+            const toast = document.getElementById('toast');
+
+            let hwData = null;
+            let currentAnswers = {};
+            let isSavingDraft = false;
+            let draftDebounceTimer = null;
+
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add('visible');
+                setTimeout(() => toast.classList.remove('visible'), 2800);
+            }
+
+            if (!homeworkId) {
+                loader.style.display = 'none';
+                errorBox.style.display = 'block';
+                errorMsg.textContent = 'ID домашнего задания не указан в ссылке.';
+                return;
+            }
+
+            async function loadHomework() {
+                try {
+                    const res = await fetch(`/api/student/homeworks/${encodeURIComponent(homeworkId)}`);
+                    const data = await res.json();
+                    if (!data.success) {
+                        loader.style.display = 'none';
+                        errorBox.style.display = 'block';
+                        errorMsg.textContent = data.error || 'Ошибка загрузки задания';
+                        return;
+                    }
+
+                    hwData = data.homework;
+                    currentAnswers = (hwData.submission && hwData.submission.answers) ? { ...hwData.submission.answers } : {};
+                    renderHomework();
+                } catch (err) {
+                    loader.style.display = 'none';
+                    errorBox.style.display = 'block';
+                    errorMsg.textContent = 'Не удалось подключиться к серверу.';
+                }
+            }
+
+            function renderHomework() {
+                loader.style.display = 'none';
+                content.style.display = 'block';
+
+                document.title = `${hwData.title} · Домашнее задание`;
+                document.getElementById('hw-title').textContent = hwData.title;
+                document.getElementById('hw-subject').textContent = hwData.subject || 'Предмет';
+                document.getElementById('hw-class').textContent = hwData.class_name || 'Класс';
+                document.getElementById('hw-tasks-count').textContent = hwData.tasks ? hwData.tasks.length : 0;
+                document.getElementById('hw-teacher-name').textContent = hwData.teacher_name || 'Учитель';
+
+                if (hwData.description && hwData.description.trim()) {
+                    const descEl = document.getElementById('hw-description');
+                    descEl.textContent = hwData.description;
+                    descEl.style.display = 'block';
+                }
+
+                if (hwData.deadline) {
+                    const d = new Date(hwData.deadline);
+                    document.getElementById('hw-deadline').textContent = d.toLocaleString('ru-RU', {
+                        day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+                    });
+                } else {
+                    document.getElementById('hw-deadline').textContent = 'Без ограничений';
+                }
+
+                // Status Badge & Scores
+                const statusBadge = document.getElementById('hw-status-badge');
+                const scoreWrap = document.getElementById('hw-score-wrap');
+                const scoreEl = document.getElementById('hw-score');
+                const feedbackBanner = document.getElementById('hw-feedback-banner');
+                const feedbackText = document.getElementById('hw-feedback-text');
+
+                const status = (hwData.submission && hwData.submission.status) ? hwData.submission.status : 'pending';
+                const isFinal = (status === 'submitted' || status === 'checked');
+
+                if (status === 'checked') {
+                    statusBadge.className = 'badge badge-status status-checked';
+                    statusBadge.textContent = 'Проверено';
+                    scoreWrap.style.display = 'block';
+                    const maxScore = (hwData.submission.max_score != null) ? hwData.submission.max_score : hwData.tasks.length;
+                    scoreEl.textContent = `${hwData.submission.score} / ${maxScore}`;
+
+                    if (hwData.submission.teacher_feedback && hwData.submission.teacher_feedback.trim()) {
+                        feedbackBanner.style.display = 'flex';
+                        feedbackText.textContent = hwData.submission.teacher_feedback;
+                    }
+                    bottomBar.style.display = 'none';
+                } else if (status === 'submitted') {
+                    statusBadge.className = 'badge badge-status status-submitted';
+                    statusBadge.textContent = 'На проверке';
+                    bottomBar.style.display = 'none';
+                } else {
+                    statusBadge.className = 'badge badge-status status-pending';
+                    statusBadge.textContent = Object.keys(currentAnswers).length > 0 ? 'В процессе' : 'Не начато';
+                }
+
+                // Render task cards
+                tasksContainer.innerHTML = '';
+                (hwData.tasks || []).forEach((task, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'task-card';
+                    card.id = `task-card-${index}`;
+
+                    const studentVal = (currentAnswers[index] !== undefined && currentAnswers[index] !== null) ? currentAnswers[index] : '';
+
+                    // Check result decoration if checked
+                    let resultBadgeHtml = '';
+                    let solutionHtml = '';
+                    if (status === 'checked') {
+                        const isCorrect = (task.is_correct === true);
+                        if (isCorrect) {
+                            card.classList.add('is-correct');
+                            resultBadgeHtml = `<span class="task-result-status res-correct">✓ Верно (+1 балл)</span>`;
+                        } else {
+                            card.classList.add('is-incorrect');
+                            resultBadgeHtml = `<span class="task-result-status res-incorrect">✗ Неверно (Правильный ответ: <strong>${task.displayAnswer || task.answer}</strong>)</span>`;
+                        }
+
+                        // Solution steps if available
+                        if (task.solutionSteps && task.solutionSteps.length > 0) {
+                            const stepsLi = task.solutionSteps.map(s => `<li>${s}</li>`).join('');
+                            solutionHtml = `
+                                <details class="solution-details">
+                                    <summary>Разбор и ход решения задачи</summary>
+                                    <div class="solution-steps">
+                                        <ol>${stepsLi}</ol>
+                                    </div>
+                                </details>
+                            `;
+                        }
+                    }
+
+                    const categoryName = task.catName || task.category || 'Задание';
+
+                    card.innerHTML = `
+                        <div class="task-header">
+                            <span class="task-number">Задание №${index + 1}</span>
+                            <span class="task-cat">${categoryName}</span>
+                        </div>
+                        <div class="task-body">
+                            ${task.questionHtml || task.text || ''}
+                        </div>
+                        <div class="answer-box">
+                            <div class="input-group">
+                                <input type="text"
+                                    class="answer-input"
+                                    id="input-task-${index}"
+                                    placeholder="Ваш ответ..."
+                                    value="${studentVal}"
+                                    ${isFinal ? 'disabled' : ''}
+                                    autocomplete="off"
+                                    inputmode="decimal">
+                            </div>
+                            ${resultBadgeHtml}
+                        </div>
+                        ${solutionHtml}
+                    `;
+
+                    tasksContainer.appendChild(card);
+
+                    // Input change event
+                    if (!isFinal) {
+                        const input = card.querySelector(`#input-task-${index}`);
+                        input.addEventListener('input', (e) => {
+                            currentAnswers[index] = e.target.value.trim();
+                            triggerAutoSaveDraft();
+                        });
+                    }
+                });
+            }
+
+            function triggerAutoSaveDraft() {
+                saveIndicator.className = 'save-indicator saving';
+                saveIndicatorText.textContent = 'Сохранение черновика...';
+                if (draftDebounceTimer) clearTimeout(draftDebounceTimer);
+                draftDebounceTimer = setTimeout(saveDraft, 1200);
+            }
+
+            async function saveDraft() {
+                if (isSavingDraft) return;
+                isSavingDraft = true;
+                try {
+                    const res = await fetch(`/api/student/homeworks/${encodeURIComponent(homeworkId)}/draft`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ answers: currentAnswers })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        saveIndicator.className = 'save-indicator saved';
+                        saveIndicatorText.textContent = 'Черновик сохранён';
+                    }
+                } catch (e) {
+                    saveIndicator.className = 'save-indicator';
+                    saveIndicatorText.textContent = 'Ошибка сохранения';
+                } finally {
+                    isSavingDraft = false;
+                }
+            }
+
+            btnSaveDraft.addEventListener('click', async () => {
+                await saveDraft();
+                showToast('Черновик успешно сохранён');
+            });
+
+            btnSubmitHw.addEventListener('click', () => {
+                // Check if any answers filled
+                const totalTasks = hwData.tasks ? hwData.tasks.length : 0;
+                const filledCount = Object.values(currentAnswers).filter(v => v !== '').length;
+                if (filledCount === 0) {
+                    alert('Пожалуйста, решите хотя бы одно задание перед отправкой.');
+                    return;
+                }
+                submitModal.style.display = 'flex';
+            });
+
+            btnCancelModal.addEventListener('click', () => {
+                submitModal.style.display = 'none';
+            });
+
+            btnConfirmSubmit.addEventListener('click', async () => {
+                btnConfirmSubmit.disabled = true;
+                btnConfirmSubmit.textContent = 'Отправка...';
+
+                try {
+                    const res = await fetch(`/api/student/homeworks/${encodeURIComponent(homeworkId)}/submit`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ answers: currentAnswers })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        submitModal.style.display = 'none';
+                        showToast('Работа успешно сдана учителю!');
+                        // Reload page to display submitted status
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 800);
+                    } else {
+                        alert(data.error || 'Ошибка при отправке работы');
+                        btnConfirmSubmit.disabled = false;
+                        btnConfirmSubmit.textContent = 'Да, сдать работу';
+                    }
+                } catch (e) {
+                    alert('Не удалось отправить работу на сервер.');
+                    btnConfirmSubmit.disabled = false;
+                    btnConfirmSubmit.textContent = 'Да, сдать работу';
+                }
+            });
+
+            // Start loading
+            loadHomework();
+        })();
+    </script>
+</body>
+</html>

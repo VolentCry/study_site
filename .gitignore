@@ -18,5 +18,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
+*.env
+config.env
 *.db
 *.sqlite3
+instruction.txt

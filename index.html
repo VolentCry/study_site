@@ -251,13 +251,16 @@
         display: inline-flex;
         align-items: center;
         gap: 0.65rem;
+        height: 40px;
+        box-sizing: border-box;
         background: linear-gradient(135deg, var(--surface), #181d2a);
         border: 1px solid var(--line-active);
         color: var(--ink);
-        padding: 0.55rem 1.15rem;
+        padding: 0 1.15rem;
         border-radius: var(--r-pill);
-        font-size: 0.875rem;
+        font-size: 0.85rem;
         font-weight: 600;
+        line-height: 1;
         text-decoration: none;
         transition: all 0.25s var(--ease-out);
         box-shadow: 0 4px 14px rgba(0,0,0,0.3);
@@ -1174,6 +1177,27 @@
         color: var(--ink);
       }
 
+      .footer-teacher-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--muted-bright);
+        padding: 0.5rem 0.95rem;
+        border-radius: var(--r-pill);
+        font-family: var(--f-mono);
+        font-size: 0.76rem;
+        cursor: pointer;
+        text-decoration: none;
+        opacity: 0.65;
+        transition: all 0.2s ease;
+      }
+
+      .footer-teacher-btn:hover {
+        opacity: 1;
+        border-color: var(--line-active);
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
       /* --- RESPONSIVE BREAKPOINTS --- */
       @media (max-width: 1024px) {
         .card-math-hero { grid-column: span 12; }
@@ -1858,9 +1882,14 @@
           <div>
             55°45′N 37°37′E // ОРБИТАЛЬНЫЙ ДВИЖОК // ZERO DRY ROUTINE
           </div>
-          <button class="back-to-top" id="btn-back-to-top" aria-label="Вернуться наверх">
-            ↑ Наверх
-          </button>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <a href="teacher.html" class="footer-teacher-btn" title="Панель преподавателя: классы и статистика">
+              Для учителей
+            </a>
+            <button class="back-to-top" id="btn-back-to-top" aria-label="Вернуться наверх">
+              ↑ Наверх
+            </button>
+          </div>
         </div>
       </div>
     </footer>

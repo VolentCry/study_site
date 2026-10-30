@@ -383,6 +383,36 @@
         const streak = sessionStreaks[trainerId];
         const record = saveTrainerRecord(trainerId, streak, isCorrect);
 
+        // Автоматическая запись попытки в журнал заданий и автосинхронизация
+        try {
+            const rawMetrics = localStorage.getItem(METRICS_STORAGE_KEY);
+            let metrics = rawMetrics ? JSON.parse(rawMetrics) : [];
+            if (!Array.isArray(metrics)) metrics = [];
+            const config = getTrainerConfig(trainerId);
+            metrics.push({
+                timestamp: new Date().toISOString(),
+                subject: config ? (config.subject || 'Математика') : 'Математика',
+                skill: config ? (config.shortName || config.name || trainerId) : trainerId,
+                taskId: config ? (config.profileUrl || config.url || window.location.pathname) : window.location.pathname,
+                correct: !!isCorrect
+            });
+            if (metrics.length > 300) {
+                metrics.splice(0, metrics.length - 300);
+            }
+            localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(metrics));
+
+            if (isCorrect) {
+                const total = parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0;
+                localStorage.setItem('totalSolvedTasks', String(total + 1));
+            }
+
+            window.dispatchEvent(new CustomEvent('study-task-solved', {
+                detail: { trainerId, isCorrect, streak }
+            }));
+        } catch (e) {
+            // Ignore storage warnings
+        }
+
         return {
             currentStreak: streak,
             maxStreak: record.maxStreak,
