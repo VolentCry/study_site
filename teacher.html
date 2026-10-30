@@ -1433,6 +1433,24 @@
                                             <option value="oge9_quadratic">ОГЭ №9 · Квадратные уравнения</option>
                                             <option value="oge9_rational">ОГЭ №9 · Дробно-рациональные уравнения</option>
                                         </optgroup>
+                                        <optgroup label="ОГЭ Математика Задание №10 (Теория вероятностей)">
+                                            <option value="oge10_all">ОГЭ №10 · Все прототипы вероятностей</option>
+                                            <option value="oge10_classic">ОГЭ №10 · Пирожки и тарелки</option>
+                                            <option value="oge10_athletes">ОГЭ №10 · Жеребьёвка участников</option>
+                                            <option value="oge10_taxis">ОГЭ №10 · Такси и машины</option>
+                                            <option value="oge10_tickets">ОГЭ №10 · Билеты на экзамене</option>
+                                            <option value="oge10_quality">ОГЭ №10 · Контроль качества (брак)</option>
+                                            <option value="oge10_dice">ОГЭ №10 · Кости и монеты</option>
+                                        </optgroup>
+                                        <optgroup label="ОГЭ Математика Задание №18 (Геометрия на клетках)">
+                                            <option value="oge18_all">ОГЭ №18 · Все типы геометрии</option>
+                                            <option value="oge18_triangle">ОГЭ №18 · Площадь треугольника</option>
+                                            <option value="oge18_trapezoid">ОГЭ №18 · Площадь трапеции</option>
+                                            <option value="oge18_parallelogram">ОГЭ №18 · Параллелограмм и ромб</option>
+                                            <option value="oge18_tangent">ОГЭ №18 · Тангенс угла</option>
+                                            <option value="oge18_midline">ОГЭ №18 · Средняя линия</option>
+                                            <option value="oge18_distance">ОГЭ №18 · Расстояние от точки до прямой</option>
+                                        </optgroup>
                                         <optgroup label="Устный счёт и базовая арифметика">
                                             <option value="mult_table">Таблица умножения (2–9)</option>
                                             <option value="mult_2digit">Умножение двузначных на однозначные</option>
@@ -1779,6 +1797,8 @@
     <script src="js/oge_task_6_trainer.js"></script>
     <script src="js/oge_task_8_trainer.js"></script>
     <script src="js/oge_task_9_trainer.js"></script>
+    <script src="js/oge_task_10_trainer.js"></script>
+    <script src="js/oge_task_18_trainer.js"></script>
     <script src="js/auth_sync.js?v=1.1"></script>
     <script>
         (function() {
@@ -3072,6 +3092,32 @@
                                     'oge9_rational': 'rational_equations'
                                 };
                                 t = window.OgeTask9Trainer.generateTask(catMap[type] || 'mixed_all');
+                            }
+                        } else if (type.startsWith('oge10_')) {
+                            if (window.OgeTask10Trainer) {
+                                const catMap = {
+                                    'oge10_all': 'mixed_all',
+                                    'oge10_classic': 'fipi_classic',
+                                    'oge10_athletes': 'athletes_draw',
+                                    'oge10_taxis': 'taxis_colors',
+                                    'oge10_tickets': 'exam_tickets',
+                                    'oge10_quality': 'quality_defect',
+                                    'oge10_dice': 'dice_coins'
+                                };
+                                t = window.OgeTask10Trainer.generateTask(catMap[type] || 'mixed_all');
+                            }
+                        } else if (type.startsWith('oge18_')) {
+                            if (window.OgeTask18Trainer) {
+                                const catMap = {
+                                    'oge18_all': 'mixed_all',
+                                    'oge18_triangle': 'area_triangle',
+                                    'oge18_trapezoid': 'area_trapezoid',
+                                    'oge18_parallelogram': 'area_parallelogram',
+                                    'oge18_tangent': 'angle_tangent',
+                                    'oge18_midline': 'midline',
+                                    'oge18_distance': 'distance'
+                                };
+                                t = window.OgeTask18Trainer.generateTask(catMap[type] || 'mixed_all');
                             }
                         } else if (type.startsWith('mult_')) {
                             t = generateMultiplicationTask(type);

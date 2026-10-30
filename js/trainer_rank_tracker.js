@@ -218,6 +218,47 @@
                 { min: 1,  title: 'Ученик алгебры 🥉' }
             ]
         }
+,
+        {
+            id: 'oge_task_10',
+            name: 'ОГЭ №10 · Теория вероятностей',
+            shortName: 'ОГЭ Задание 10',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_10_trainer.html',
+            profileUrl: 'math_moduls/oge_task_10_trainer.html',
+            icon: '🎲',
+            description: 'Классическое определение вероятности, жеребьёвки, такси, экзаменационные билеты, контроль качества и случайные события.',
+            rankTiers: [
+                { min: 25, title: 'Магистр вероятностей 👑' },
+                { min: 18, title: 'Повелитель шанса 🧙' },
+                { min: 12, title: 'Мастер комбинаторики 💎' },
+                { min: 7,  title: 'Знаток вероятности 🥇' },
+                { min: 4,  title: 'Аналитик событий 🥈' },
+                { min: 1,  title: 'Искатель шанса 🥉' }
+            ]
+        },
+        {
+            id: 'oge_task_18',
+            name: 'ОГЭ №18 · Геометрия на клетках',
+            shortName: 'ОГЭ Задание 18',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_18_trainer.html',
+            profileUrl: 'math_moduls/oge_task_18_trainer.html',
+            icon: '📐',
+            description: 'Площади фигур (треугольник, трапеция, параллелограмм, ромб), тангенс угла, средняя линия и расстояние на клетках 1×1.',
+            rankTiers: [
+                { min: 25, title: 'Архимаг геометрии 👑' },
+                { min: 18, title: 'Виртуоз решётки 🧙' },
+                { min: 12, title: 'Мастер площадей 💎' },
+                { min: 7,  title: 'Знаток фигур 🥇' },
+                { min: 4,  title: 'Геометр 🥈' },
+                { min: 1,  title: 'Чертёжник 🥉' }
+            ]
+        }
     ];
 
     const sessionStreaks = {};

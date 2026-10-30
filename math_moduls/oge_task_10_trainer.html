@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр ОГЭ №10 · Теория вероятностей · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      max-width: 960px; margin: 0 auto; width: 100%; padding: 36px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title {
+      font: 900 clamp(28px, 4.5vw, 40px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 680px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 700; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 10px; border-radius: 999px;
+    }
+
+    /* PROBABILITY QUESTION DISPLAY */
+    .task-display {
+      width: 100%; text-align: left; margin-top: 10px;
+    }
+    .task-prompt {
+      font-size: 14px; color: var(--muted); margin-bottom: 14px; font-weight: 600; text-align: center;
+    }
+    .task-question-box {
+      font-size: clamp(16px, 2.5vw, 19px);
+      line-height: 1.7;
+      color: var(--indigo-dark);
+      padding: 22px 28px;
+      background: var(--paper-light);
+      border: 1px solid rgba(38,63,97,.14);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* FRACTION FORMATTING */
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 4px; font-size: 0.9em; line-height: 1.08;
+    }
+    .fraction .num {
+      border-bottom: 2px solid currentColor; padding-bottom: 2px;
+    }
+    .fraction .den {
+      padding-top: 2px;
+    }
+
+    /* ANSWER ROW & INPUT */
+    .answer-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 500px;
+    }
+    .answer-input-wrap {
+      flex: 1; min-width: 180px; position: relative;
+    }
+    .answer-input {
+      width: 100%; height: 52px; padding: 0 18px;
+      border: 2px solid var(--line); border-radius: 10px;
+      background: #fff; color: var(--ink); font-size: 20px; font-weight: 700;
+      font-family: 'DM Sans', monospace; text-align: center;
+      transition: all .2s ease;
+    }
+    .answer-input:focus,
+    .answer-input:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 1px;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+    .answer-input.correct {
+      border-color: var(--green); background: var(--green-light); color: var(--green);
+    }
+    .answer-input.wrong {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+    }
+
+    .btn-check,
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      padding: 0 28px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
+      transition: all .2s ease;
+    }
+    .btn-check:focus-visible,
+    .btn-next:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 2px;
+    }
+    .btn-check {
+      background: var(--vermilion);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover {
+      background: #d3525b;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .btn-check:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(183,70,78,.3);
+    }
+    .btn-check:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-next {
+      background: var(--indigo);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover {
+      background: #19273c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+    .btn-next:active {
+      transform: translateY(0);
+    }
+
+    /* FEEDBACK MESSAGE */
+    .feedback-banner {
+      width: 100%; max-width: 560px; padding: 12px 18px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; text-align: center; display: none;
+      animation: popIn .3s ease;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success {
+      background: var(--green-light); border: 1px solid rgba(46,125,50,.3); color: var(--green);
+    }
+    .feedback-banner.error {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
+    }
+
+    /* CARD ACTION TOOLS */
+    .card-tools {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      padding-top: 10px; border-top: 1px dashed var(--line); width: 100%;
+    }
+    .tool-link-btn {
+      font-size: 13px; font-weight: 700; color: var(--indigo);
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+      border-radius: 8px; background: var(--paper-light); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .tool-link-btn:hover { background: #fff; color: var(--vermilion); border-color: var(--vermilion); }
+
+    /* COLLAPSIBLE PANELS (SOLUTION & THEORY) */
+    .accordion-panel {
+      width: 100%; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 20px 24px; display: none;
+      animation: fadeIn .25s ease;
+    }
+    .accordion-panel.active { display: block; }
+    .accordion-panel h3 {
+      font: 700 17px 'Zen Old Mincho', serif; color: var(--indigo);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .solution-list {
+      display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6;
+    }
+    .solution-step {
+      background: #fff; padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--indigo);
+    }
+
+    .theory-content {
+      font-size: 14px; line-height: 1.7; color: var(--ink);
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .theory-rule-box {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px;
+    }
+    .theory-rule-title {
+      font-weight: 700; color: var(--indigo); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+
+    /* MILESTONE CELEBRATION TOAST */
+    .milestone-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--indigo-dark); color: #fff; padding: 14px 28px;
+      border-radius: 999px; box-shadow: var(--shadow-lg); font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; z-index: 100;
+      opacity: 0; transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .milestone-toast.active {
+      transform: translateX(-50%) translateY(0); opacity: 1;
+    }
+
+    @keyframes popIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media (max-width: 768px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .problem-card { padding: 24px 18px; }
+      .answer-row { flex-direction: column; width: 100%; }
+      .answer-input-wrap { width: 100%; min-width: 0; }
+      .btn-check, .btn-next { width: 100%; }
+      .nav-task-switcher { display: none; }
+    }
+
+    @media (max-width: 540px) {
+      .problem-card { padding-top: 50px; }
+      .card-top-tag { top: 14px; left: 16px; font-size: 10px; max-width: 52%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .card-help-badge { top: 14px; right: 16px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAV -->
+  <header class="site-nav" role="banner">
+    <a class="brand" href="../pages/math_9.html" aria-label="Вернуться в Математика 9 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <a href="oge_task_6_trainer.html" class="task-pill">№6 (Дроби)</a>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8 (Степени)</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9 (Уравнения)</a>
+      <span class="task-pill active" aria-current="page">№10 (Вероятность)</span>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18 (Геометрия)</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/oge_roadmap.html" class="nav-btn">🗺️ Роадмап</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <div class="trainer-header">
+      <div class="trainer-kicker">ОГЭ 2026 · Статистика и вероятность</div>
+      <h1 class="trainer-title">Задание №10: Теория вероятностей</h1>
+      <p class="trainer-subtitle">
+        Классическая вероятность события, жеребьёвка, машины такси, экзаменационные билеты и контроль качества. Практикуйся по прототипам ФИПИ и держи серию побед!
+      </p>
+    </div>
+
+    <!-- STATS DASHBOARD -->
+    <div class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">👑</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Лучшая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Решено задач</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank">Не начат</span>
+          <span class="stat-label">Текущее звание</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY FILTERS -->
+    <div class="category-filter" role="tablist" aria-label="Категории прототипов">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">🎲 Все типы №10</button>
+      <button type="button" class="cat-btn" data-cat="fipi_classic">🥧 Пирожки и тарелки</button>
+      <button type="button" class="cat-btn" data-cat="athletes_draw">🏃 Жеребьёвка</button>
+      <button type="button" class="cat-btn" data-cat="taxis_colors">🚕 Машины такси</button>
+      <button type="button" class="cat-btn" data-cat="exam_tickets">📑 Билеты на экзамене</button>
+      <button type="button" class="cat-btn" data-cat="quality_defect">⚙️ Контроль качества</button>
+      <button type="button" class="cat-btn" data-cat="dice_coins">🎲 Кости и монеты</button>
+    </div>
+
+    <!-- MAIN PROBLEM CARD -->
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Задание №10 · ОГЭ</span>
+      <span class="card-help-badge" id="task-cat-badge">Вероятность</span>
+
+      <div class="task-display">
+        <p class="task-prompt">Внимательно прочитайте условие задачи и определите вероятность события:</p>
+        <div class="task-question-box" id="task-container">
+          <!-- Dynamic Task Condition -->
+        </div>
+      </div>
+
+      <!-- ANSWER INPUT -->
+      <div class="answer-row">
+        <div class="answer-input-wrap">
+          <input 
+            type="text" 
+            id="answer-input" 
+            class="answer-input" 
+            placeholder="Ответ (например: 0,35)" 
+            autocomplete="off" 
+            aria-label="Ваш ответ"
+          />
+        </div>
+        <button type="button" class="btn-check" id="btn-check">Проверить</button>
+        <button type="button" class="btn-next" id="btn-next" style="display: none;">Следующее задание →</button>
+      </div>
+
+      <!-- FEEDBACK BANNER -->
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <!-- CARD ACTIONS -->
+      <div class="card-tools">
+        <button type="button" class="tool-link-btn" id="btn-toggle-solution">
+          <span>💡</span> <span>Разбор решения</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-toggle-theory">
+          <span>📖</span> <span>Справочная теория</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-new-task">
+          <span>🔄</span> <span>Другое задание</span>
+        </button>
+      </div>
+
+      <!-- SOLUTION ACCORDION -->
+      <div class="accordion-panel" id="solution-panel">
+        <h3>💡 Пошаговое решение задания:</h3>
+        <div class="solution-list" id="solution-content"></div>
+      </div>
+
+      <!-- THEORY ACCORDION -->
+      <div class="accordion-panel" id="theory-panel">
+        <h3>📖 Справочная шпаргалка к Заданию №10 ОГЭ</h3>
+        <div class="theory-content">
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">1. Классическая формула вероятности: P = m / n</div>
+            <p>Вероятность случайного события равна отношению числа <strong>благоприятных исходов (m)</strong> к общему числу <strong>всех возможных равновероятных исходов (n)</strong>.</p>
+            <p>Вероятность любого реального события всегда лежит в диапазоне: <strong>0 ≤ P ≤ 1</strong>. Если у вас получилось число больше 1 (например, 1,4), значит, вы перепутали числитель и знаменатель!</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">2. Противоположное событие: P(не A) = 1 − P(A)</div>
+            <p>Если известно число объектов без нужного свойства (например, «не выучил билет», «бракованный товар»), вероятность противоположного события вычисляется либо вычитанием из единицы: <strong>1 − P(A)</strong>, либо нахождением количества подходящих объектов: <strong>m = n − k</strong>.</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">3. Формат записи ответа в бланках ОГЭ</div>
+            <p>В бланке ответов ОГЭ №1 ответ записывается <strong>исключительно в виде целого числа или конечной десятичной дроби</strong> (с разделением запятой, например: <code>0,35</code> или <code>0,04</code>). Обыкновенные дроби вроде 7/20 в бланк вносить нельзя!</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">4. Жеребьёвка участников</div>
+            <p>Порядок выступления участников при честной жеребьёвке не имеет значения! Вероятность того, что спортсмен из определенной страны будет выступать <em>первым</em>, <em>третьим</em> или <em>последним</em>, абсолютно одинакова и равна <strong>m / n</strong> (число участников из этой страны, делённое на общее число участников).</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <!-- MILESTONE TOAST -->
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../js/oge_task_10_trainer.js"></script>
+  <script>
+    (function () {
+      const TRAINER_ID = 'oge_task_10';
+      let currentCategory = 'mixed_all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+
+      // DOM Elements
+      const taskContainer = document.getElementById('task-container');
+      const answerInput = document.getElementById('answer-input');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const taskBadge = document.getElementById('task-badge');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const theoryPanel = document.getElementById('theory-panel');
+      const milestoneToast = document.getElementById('milestone-toast');
+
+      // Web Audio API
+      let audioCtx = null;
+      function playTone(freq, type, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+      }
+
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const records = window.TrainerTracker.getTrainerRecords();
+          const cur = records[TRAINER_ID] || { maxStreak: 0, totalSolved: 0, maxRank: 'Не начат' };
+          statMaxStreak.textContent = cur.maxStreak || 0;
+          statTotal.textContent = cur.totalSolved || 0;
+          statRank.textContent = cur.maxRank || 'Не начат';
+        }
+
+        try {
+          const userXp = localStorage.getItem('user_xp') || '0';
+          navXpBadge.textContent = 'XP +' + userXp;
+        } catch(e) {}
+      }
+
+      function showToast(text) {
+        milestoneToast.textContent = text;
+        milestoneToast.classList.add('active');
+        setTimeout(() => milestoneToast.classList.remove('active'), 3200);
+      }
+
+      function loadNewTask() {
+        if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+          currentCategory = 'mixed_all';
+        }
+        hasAnsweredCurrent = false;
+        currentTask = OgeTask10Trainer.generateTask(currentCategory);
+        window._currentTask = currentTask;
+        taskContainer.innerHTML = currentTask.questionHtml;
+        taskCatBadge.textContent = currentTask.catName;
+        taskBadge.textContent = 'Задание №10 · ' + (currentTask.catName || 'ОГЭ');
+
+        answerInput.value = '';
+        answerInput.className = 'answer-input';
+        answerInput.disabled = false;
+        answerInput.focus();
+
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.textContent = '';
+        btnCheck.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
+
+        // Формируем пошаговое решение
+        solutionContent.innerHTML = currentTask.solutionSteps.map((step, idx) => `
+          <div class="solution-step">
+            <strong>Шаг ${idx + 1}:</strong> ${step}
+          </div>
+        `).join('');
+        solutionPanel.classList.remove('active');
+      }
+
+      function handleCheck() {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const val = answerInput.value.trim();
+        if (!val) {
+          answerInput.focus();
+          return;
+        }
+
+        const isCorrect = OgeTask10Trainer.checkAnswer(val, currentTask.answer);
+
+        if (isCorrect) {
+          hasAnsweredCurrent = true;
+          answerInput.className = 'answer-input correct';
+          answerInput.disabled = true;
+
+          playTone(587, 'sine', 0.15);
+          setTimeout(() => playTone(880, 'sine', 0.25), 120);
+
+          feedbackBanner.className = 'feedback-banner show success';
+          feedbackBanner.innerHTML = '🎉 <strong>Верно!</strong> Вероятность рассчитана абсолютно точно (+15 XP).';
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(true);
+          } else {
+            btnCheck.style.display = 'none';
+            btnNext.style.display = 'inline-flex';
+            btnNext.focus();
+          }
+
+          // XP начисление
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+          } catch(e) {}
+
+          // Запись в TrainerTracker
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, true);
+            statStreak.textContent = res.currentStreak;
+            syncStats();
+
+            // Юбилейные серии
+            if (res.currentStreak === 5) showToast('🔥 Серия 5! Отличный старт!');
+            if (res.currentStreak === 10) showToast('⚡ Серия 10! Теория вероятностей под твоим контролем!');
+            if (res.currentStreak === 25) showToast('💎 Серия 25! Звание «Магистр вероятностей 👑»!');
+            if (res.currentStreak === 50) showToast('🎁 СЕРИЯ 50! Бонус +500 XP разблокирован в профиле!');
+          }
+        } else {
+          answerInput.className = 'answer-input wrong';
+          playTone(220, 'triangle', 0.25);
+
+          feedbackBanner.className = 'feedback-banner show error';
+          feedbackBanner.innerHTML = '❌ <strong>Пока неверно.</strong> Проверьте числитель (m) и знаменатель (n) или загляните в разбор.';
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(false);
+          }
+
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, false);
+            statStreak.textContent = 0;
+            syncStats();
+          }
+        }
+      }
+
+      // Категории фильтров
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.dataset.cat;
+          loadNewTask();
+        });
+      });
+
+      // События кнопок
+      btnCheck.addEventListener('click', handleCheck);
+      btnNext.addEventListener('click', loadNewTask);
+      document.getElementById('btn-new-task').addEventListener('click', loadNewTask);
+
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (hasAnsweredCurrent) loadNewTask();
+          else handleCheck();
+        }
+      });
+
+      // Переключатели аккордеонов
+      document.getElementById('btn-toggle-solution').addEventListener('click', () => {
+        solutionPanel.classList.toggle('active');
+      });
+
+      document.getElementById('btn-toggle-theory').addEventListener('click', () => {
+        theoryPanel.classList.toggle('active');
+      });
+
+      // Инициализация
+      syncStats();
+      if (window.TrainerTimedMode) {
+        window.TrainerTimedMode.init({
+          trainerId: TRAINER_ID,
+          title: 'Задание №10',
+          onNextTask: loadNewTask
+        });
+      }
+      loadNewTask();
+    })();
+  </script>
+</body>
+</html>
