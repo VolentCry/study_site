@@ -496,6 +496,8 @@ def api_teacher_create_lesson():
     duration_min = payload.get('durationMin', payload.get('duration_min', 60))
     description = payload.get('description') or payload.get('notes') or ''
     homework_id = payload.get('homeworkId') or payload.get('homework_id')
+    student_id = payload.get('studentId') or payload.get('student_id')
+    student_id = int(student_id) if (student_id and str(student_id).isdigit()) else None
 
     if not class_id or not title or not scheduled_at:
         return jsonify({'success': False, 'error': 'Заполните класс, тему и время занятия.'}), 400
@@ -508,7 +510,8 @@ def api_teacher_create_lesson():
             scheduled_at=str(scheduled_at),
             duration_min=int(duration_min or 60),
             description=str(description or ''),
-            homework_id=int(homework_id) if homework_id else None
+            homework_id=int(homework_id) if homework_id else None,
+            student_id=student_id
         )
         return jsonify({'success': True, 'lesson': lesson})
     except ValueError as e:

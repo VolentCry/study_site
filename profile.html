@@ -5257,9 +5257,12 @@
                 const cName = next.class_name || next.className || '';
                 const tName = next.teacher_name || next.teacherName || '';
 
+                const isIndividual = Boolean(next.student_id);
+                const indBadge = isIndividual ? '<span class="day-badge" style="background:rgba(251, 191, 36, 0.15); color:var(--accent-gold); border-color:rgba(251, 191, 36, 0.4); margin-left:8px; font-weight:700;">👤 Индивидуально (1-на-1)</span>' : '';
+
                 nextLessonTitle.textContent = next.title;
                 nextLessonTime.textContent = whenText;
-                nextLessonClass.textContent = `🏫 ${cName}`;
+                nextLessonClass.innerHTML = `🏫 ${escapeHtml(cName)}${indBadge}`;
                 nextLessonTeacher.textContent = tName ? `Учитель: ${tName}` : '';
 
                 if (hwId) {
@@ -5329,11 +5332,14 @@
                             </div>
                         `;
                     }
+                    const isInd = Boolean(les.student_id);
+                    const indBadge = isInd ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(251, 191, 36, 0.15); color:var(--accent-gold); font-weight:700; margin-left:6px; border:1px solid rgba(251, 191, 36, 0.35);">👤 1-на-1</span>' : '';
+
                     htmlItems += `
                         <div class="day-event-card">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="day-event-time">⏰ ${t}</span>
-                                <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(cName)}</span>
+                                <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(cName)}${indBadge}</span>
                             </div>
                             <div class="day-event-title">${escapeHtml(les.title)}</div>
                             ${desc ? `<div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(desc)}</div>` : ''}

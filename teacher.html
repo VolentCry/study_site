@@ -1673,6 +1673,15 @@
                         <option value="">Выберите класс...</option>
                     </select>
                 </div>
+                <div class="form-group" id="lesson-target-student-group">
+                    <label class="form-label">Кому назначить занятие</label>
+                    <select id="lesson-target-student" class="form-select">
+                        <option value="">👥 Всему классу (групповой урок)</option>
+                    </select>
+                    <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">
+                        Для индивидуального урока (репетиторство) выберите конкретного ученика или оставьте «Всему классу».
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="form-label">Тема / Название урока *</label>
                     <input type="text" id="lesson-input-title" class="form-input" placeholder="Например: Квадратные уравнения и теорема Виета" required maxlength="120">
@@ -2686,12 +2695,16 @@
             const btnOpenCreateLesson = document.getElementById('btn-open-create-lesson');
             const lessonsTimelineContainer = document.getElementById('lessons-timeline-container');
             const lessonTargetClass = document.getElementById('lesson-target-class');
+            const lessonTargetStudent = document.getElementById('lesson-target-student');
             const lessonAttachHw = document.getElementById('lesson-attach-hw');
 
             if (btnOpenCreateLesson) {
                 btnOpenCreateLesson.addEventListener('click', async () => {
                     await populateLessonModalSelects();
                     formCreateLesson.reset();
+                    if (lessonTargetStudent) {
+                        lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>';
+                    }
                     // Set default date to tomorrow 16:00
                     const tmrw = new Date();
                     tmrw.setDate(tmrw.getDate() + 1);
@@ -2712,6 +2725,32 @@
                             dataCl.classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
                     }
 
+                    // Class change listener to populate students for individual lessons
+                    if (lessonTargetClass && !lessonTargetClass.__hasStudentListener) {
+                        lessonTargetClass.__hasStudentListener = true;
+                        lessonTargetClass.addEventListener('change', async () => {
+                            const cid = lessonTargetClass.value;
+                            if (!lessonTargetStudent) return;
+                            lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>';
+                            if (!cid) return;
+
+                            try {
+                                const res = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
+                                const data = await res.json();
+                                if (data.success && data.class && Array.isArray(data.class.students)) {
+                                    if (data.class.students.length > 0) {
+                                        lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>' +
+                                            data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                                    } else {
+                                        lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
+                                    }
+                                }
+                            } catch(e) {
+                                console.error('Error fetching students for class', e);
+                            }
+                        });
+                    }
+
                     // Populate homeworks
                     const resHw = await fetch('/api/teacher/homeworks', { cache: 'no-store' });
                     const dataHw = await resHw.json();
@@ -2728,6 +2767,8 @@
                 formCreateLesson.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const classId = lessonTargetClass.value;
+                    const studentIdVal = lessonTargetStudent ? lessonTargetStudent.value : '';
+                    const studentId = studentIdVal ? parseInt(studentIdVal, 10) : null;
                     const title = document.getElementById('lesson-input-title').value.trim();
                     const startsAt = document.getElementById('lesson-input-date').value;
                     const homeworkId = lessonAttachHw.value ? parseInt(lessonAttachHw.value, 10) : null;
@@ -2744,6 +2785,7 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 class_id: parseInt(classId, 10),
+                                student_id: studentId,
                                 title,
                                 starts_at: startsAt,
                                 homework_id: homeworkId,
@@ -2815,6 +2857,13 @@
                             hwBadgeHtml = `<span class="lesson-hw-badge" title="Срок: ${formatDateTime(hwDeadline)}">📝 Д/З: ${escapeHtml(hwTitle)}</span>`;
                         }
 
+                        let studentBadgeHtml = '';
+                        if (les.student_id && (les.student_name || les.student_username)) {
+                            studentBadgeHtml = `<span class="lesson-student-badge" style="background:rgba(251, 191, 36, 0.14); color:var(--accent-gold); border:1px solid rgba(251, 191, 36, 0.35); padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:700;">👤 Индивидуально: ${escapeHtml(les.student_name || les.student_username)}</span>`;
+                        } else {
+                            studentBadgeHtml = `<span style="font-size:0.75rem; color:var(--muted); background:rgba(255, 255, 255, 0.05); padding:2px 8px; border-radius:9999px;">👥 Весь класс</span>`;
+                        }
+
                         const isPast = d && (d.getTime() < Date.now() - 3600000);
                         const pastBadge = isPast ? '<span style="font-size:0.75rem; color:var(--muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:9999px;">Прошедший</span>' : '';
 
@@ -2831,6 +2880,7 @@
                                     </div>
                                     <div class="lesson-badges-row">
                                         <span class="lesson-class-badge">🏫 ${escapeHtml(cName)}</span>
+                                        ${studentBadgeHtml}
                                         ${hwBadgeHtml}
                                         ${notes ? `<span style="font-size:0.8rem; color:var(--muted);">${escapeHtml(notes)}</span>` : ''}
                                     </div>
