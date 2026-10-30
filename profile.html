@@ -3763,6 +3763,47 @@
             }
         }
 
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 0.75rem 0;
+                gap: 0.75rem;
+            }
+            .profile-tabs-nav {
+                order: 3;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                justify-content: flex-start;
+                padding: 4px;
+            }
+            .profile-tabs-nav::-webkit-scrollbar {
+                display: none;
+            }
+            .profile-tab-btn {
+                flex-shrink: 0;
+                white-space: nowrap;
+                padding: 0.4rem 0.85rem;
+                font-size: 0.8rem;
+            }
+            .calendar-grid {
+                gap: 3px;
+            }
+            .cal-day-cell {
+                font-size: 0.82rem;
+            }
+            .cal-dots-row {
+                gap: 2px;
+                height: 4px;
+            }
+            .event-dot {
+                width: 4px;
+                height: 4px;
+            }
+        }
+
         @media (max-width: 640px) {
             .header-inner {
                 flex-wrap: wrap;
@@ -3773,7 +3814,10 @@
             .profile-tabs-nav {
                 order: 3;
                 width: 100%;
-                justify-content: center;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                justify-content: flex-start;
             }
             .bento-metrics-grid,
             .trainer-ranks-summary {

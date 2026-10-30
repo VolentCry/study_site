@@ -361,16 +361,51 @@
 
         @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
+        @media (max-width: 960px) {
+            .nav-links { display: none; }
+            .class-switcher { display: none; }
+        }
+
         @media (max-width: 768px) {
-            .site-nav { min-height: 62px; padding: 0 16px; gap: 12px; }
-            .hero { min-height: 480px; height: 64svh; }
-            .hero-inner { width: calc(100% - 32px); padding: 48px 0; }
-            .hero h1 { font-size: 38px; }
-            .hero-copy { font-size: 14px; }
+            .site-nav {
+                min-height: 56px;
+                padding: 0 14px;
+                gap: 8px;
+                justify-content: space-between;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .brand { gap: 8px; }
+            .brand-mark { width: 32px; height: 32px; font-size: 16px; }
+            .brand-name { font-size: 16px; }
+            .brand-class { display: none; }
+            .nav-links { display: none; }
+            .class-switcher { display: none; }
+            .lobby-link { display: none; }
+            .profile-link { padding: 0 10px; font-size: 11px; min-height: 34px; }
+            .hero { min-height: 400px; height: auto; }
+            .hero-inner { width: calc(100% - 28px); padding: 36px 0 42px; }
+            .hero-kicker { font-size: 10px; margin-bottom: 10px; }
+            .hero h1 { font-size: clamp(28px, 7.5vw, 38px); }
+            .hero-copy { font-size: 14px; line-height: 1.6; }
+            .hero-actions { flex-direction: column; width: 100%; gap: 10px; margin-top: 24px; }
+            .hero-action { width: 100%; min-height: 44px; }
+            .hero-caption { display: none; }
+            .trainers-section { padding: 36px 14px 44px; }
+            .trainers-grid { grid-template-columns: 1fr; gap: 16px; }
+            .trainer-card { padding: 22px 18px; }
+            .section-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .section-heading h2 { font-size: 24px; }
+            .exam-strategy { padding: 36px 14px 44px; }
+            .strategy-grid { grid-template-columns: 1fr; gap: 14px; }
+            .geo-rule-alert { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 16px; }
+            .routes { padding: 36px 14px 48px; }
             .route-list { grid-template-columns: 1fr; }
+            .route-link { padding: 16px 12px; min-height: auto; gap: 12px; }
             .route-link + .route-link { border-left: 0; }
-            .banner-inner { flex-direction: column; align-items: flex-start; }
-            .strategy-grid { grid-template-columns: 1fr; }
+            .banner-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .banner-btn { width: 100%; justify-content: center; min-height: 48px; }
+            .page-footer { flex-direction: column; text-align: center; gap: 10px; padding: 20px 14px; }
         }
     </style>
 </head>

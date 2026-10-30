@@ -1119,6 +1119,117 @@
             padding-right: 2px;
         }
 
+
+        /* --- Mobile Responsive Optimizations --- */
+        @media (max-width: 900px) {
+            .constructor-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                height: auto;
+                padding: 10px 16px;
+            }
+            .header-inner {
+                flex-wrap: wrap;
+                height: auto;
+                gap: 10px;
+            }
+            .brand {
+                font-size: 1rem;
+            }
+            .header-actions {
+                flex-wrap: wrap;
+                gap: 6px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .header-actions .nav-btn {
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
+            .hud-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .teacher-tabs-nav {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                flex-wrap: nowrap;
+                gap: 6px;
+                padding: 4px 0 8px;
+                margin-bottom: 1.5rem;
+            }
+            .teacher-tabs-nav::-webkit-scrollbar {
+                display: none;
+            }
+            .teacher-tab-btn {
+                flex-shrink: 0;
+                white-space: nowrap;
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+            .schedule-hero {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .schedule-hero .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .classes-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .class-actions {
+                flex-wrap: wrap;
+            }
+            .lesson-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .lesson-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .data-table th, .data-table td {
+                padding: 10px 12px;
+                font-size: 0.82rem;
+            }
+            .admin-modal .modal-body {
+                width: 95vw !important;
+                max-width: 95vw !important;
+                padding: 16px 14px !important;
+                margin: 12px auto !important;
+            }
+            .generator-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .generator-row .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hud-grid {
+                grid-template-columns: 1fr;
+            }
+            .section-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .search-box-wrap {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>

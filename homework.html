@@ -631,6 +631,90 @@
             pointer-events: auto;
             transform: translateY(0);
         }
+
+        /* --- Mobile Responsive Optimizations --- */
+        @media (max-width: 768px) {
+            .site-header {
+                height: 56px;
+            }
+            .brand {
+                font-size: 1rem;
+            }
+            .nav-btn {
+                height: 36px;
+                padding: 0 0.75rem;
+                font-size: 0.8rem;
+            }
+            main {
+                padding: 1.25rem 0 3rem;
+            }
+            .hw-hero {
+                padding: 1.35rem 1.15rem;
+                gap: 1rem;
+            }
+            .hw-title {
+                font-size: 1.3rem;
+            }
+            .hw-meta-row {
+                gap: 0.75rem;
+                font-size: 0.82rem;
+            }
+            .task-card {
+                padding: 1.25rem 1rem;
+                border-radius: var(--r-md);
+            }
+            .task-header {
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+            }
+            .task-body {
+                font-size: 1.05rem;
+                margin-bottom: 1.25rem;
+            }
+            .task-answer-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.65rem;
+            }
+            .task-input {
+                width: 100%;
+                font-size: 16px; /* prevent iOS auto-zoom */
+                height: 48px;
+            }
+            .bottom-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.85rem;
+                padding: 1rem;
+                bottom: 0.75rem;
+                border-radius: var(--r-md);
+            }
+            .bottom-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.65rem;
+            }
+            .btn-cta, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+                height: 46px;
+            }
+            .save-indicator {
+                justify-content: center;
+            }
+            .modal-card {
+                padding: 1.5rem 1.25rem;
+                margin: 1rem;
+            }
+            .modal-actions {
+                flex-direction: column-reverse;
+                gap: 0.5rem;
+            }
+            .modal-actions .btn-cta, .modal-actions .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
