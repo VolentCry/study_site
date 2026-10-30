@@ -471,6 +471,17 @@ def api_get_month_schedule():
     return jsonify({'success': True, 'schedule': schedule_data})
 
 
+@app.route('/api/teacher/lessons', methods=['GET'])
+def api_teacher_lessons():
+    """Получение всех уроков преподавателя со сведениями о классах и заданиях."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    lessons = db.get_teacher_lessons(teacher['id'])
+    return jsonify({'success': True, 'lessons': lessons})
+
+
 @app.route('/api/teacher/lessons', methods=['POST'])
 def api_teacher_create_lesson():
     """Создание занятия в расписании учителем."""
@@ -778,6 +789,12 @@ def parse_args():
         action='store_true',
         help="Показать список всех зарегистрированных пользователей и их роли"
     )
+    parser.add_argument(
+        '--reset-password',
+        nargs=2,
+        metavar=('USERNAME', 'NEW_PASSWORD'),
+        help="Сбросить пароль пользователя: python main.py --reset-password USERNAME NEW_PASSWORD"
+    )
     return parser.parse_args()
 
 
@@ -799,6 +816,21 @@ if __name__ == '__main__':
                     last_login = last_login[:19].replace('T', ' ')
                 print(f"{u['id']:<6} {u['username']:<20} {u['displayName']:<22} {u['role']:<10} {last_login}")
         sys.exit(0)
+
+    # CLI-команда: сброс пароля пользователя
+    if args.reset_password:
+        username, new_pass = args.reset_password
+        try:
+            success = db.reset_user_password(username, new_pass)
+            if success:
+                print(f"[OK] Пароль пользователя '{username}' успешно обновлён!")
+                sys.exit(0)
+            else:
+                print(f"[ОШИБКА] Пользователь с логином '{username}' не найден в базе данных.")
+                sys.exit(1)
+        except ValueError as e:
+            print(f"[ОШИБКА] Недопустимый пароль: {e}")
+            sys.exit(1)
 
     # CLI-команда: назначить учителем
     if args.make_teacher:

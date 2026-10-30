@@ -342,6 +342,25 @@ def create_user(
         conn.close()
 
 
+def reset_user_password(username: str, new_password: str) -> bool:
+    """Сброс пароля пользователя администратором или CLI-командой."""
+    valid_p, msg_p = validate_password(new_password)
+    if not valid_p:
+        raise ValueError(msg_p)
+    password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET password_hash = ? WHERE username = ? COLLATE NOCASE",
+                (password_hash, username.strip())
+            )
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
 def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     """Аутентификация пользователя по логину и паролю."""
     if not username or not password:
@@ -1513,6 +1532,55 @@ def delete_lesson(lesson_id: int, teacher_id: Optional[int] = None) -> bool:
         conn.close()
 
 
+def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
+    """
+    Возвращает список всех уроков преподавателя со сведениями о классах и домашних заданиях,
+    отсортированный по дате проведения в хронологическом порядке.
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT l.*, c.name as class_name, h.title as homework_title, h.deadline_at as homework_deadline
+            FROM lessons l
+            JOIN classes c ON l.class_id = c.id
+            LEFT JOIN homeworks h ON l.homework_id = h.id
+            WHERE l.teacher_id = ?
+            ORDER BY l.scheduled_at ASC
+            """,
+            (teacher_id,)
+        )
+        lessons = []
+        for r in cursor.fetchall():
+            lessons.append({
+                'id': r['id'],
+                'classId': r['class_id'],
+                'class_id': r['class_id'],
+                'className': r['class_name'],
+                'class_name': r['class_name'],
+                'title': r['title'],
+                'description': r['description'],
+                'notes': r['description'],
+                'scheduledAt': r['scheduled_at'],
+                'scheduled_at': r['scheduled_at'],
+                'starts_at': r['scheduled_at'],
+                'durationMin': r['duration_min'],
+                'duration_min': r['duration_min'],
+                'homeworkId': r['homework_id'],
+                'homework_id': r['homework_id'],
+                'homeworkTitle': r['homework_title'],
+                'homework_title': r['homework_title'],
+                'homeworkDeadline': r['homework_deadline'],
+                'homework_deadline': r['homework_deadline'],
+                'createdAt': r['created_at'],
+                'created_at': r['created_at']
+            })
+        return lessons
+    finally:
+        conn.close()
+
+
 def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[str, Any]:
     """
     Возвращает расписание занятий и домашних заданий за указанный месяц.
@@ -1520,6 +1588,7 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
     Для учителя — по всем группам, которые он ведёт.
     """
     month_prefix = f"{year:04d}-{month:02d}"
+    now_local_prefix = datetime.now().strftime('%Y-%m-%dT%H:%M')
 
     conn = get_db_connection()
     try:
@@ -1539,11 +1608,13 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
         else:
             cursor.execute(
                 """
-                SELECT l.*, c.name as class_name, h.title as homework_title, h.deadline_at as homework_deadline,
+                SELECT l.*, c.name as class_name, u.display_name as teacher_name,
+                       h.title as homework_title, h.deadline_at as homework_deadline,
                        hs.status as submission_status, hs.score as submission_score, hs.max_score as submission_max_score
                 FROM lessons l
                 JOIN classes c ON l.class_id = c.id
                 JOIN class_members cm ON c.id = cm.class_id
+                JOIN users u ON l.teacher_id = u.id
                 LEFT JOIN homeworks h ON l.homework_id = h.id
                 LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
                 WHERE cm.student_id = ? AND l.scheduled_at LIKE ?
@@ -1557,25 +1628,133 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
             item = {
                 'id': r['id'],
                 'classId': r['class_id'],
+                'class_id': r['class_id'],
                 'className': r['class_name'],
+                'class_name': r['class_name'],
                 'title': r['title'],
                 'description': r['description'],
+                'notes': r['description'],
                 'scheduledAt': r['scheduled_at'],
+                'scheduled_at': r['scheduled_at'],
+                'starts_at': r['scheduled_at'],
                 'durationMin': r['duration_min'],
+                'duration_min': r['duration_min'],
                 'homeworkId': r['homework_id'],
+                'homework_id': r['homework_id'],
                 'homeworkTitle': r['homework_title'],
-                'homeworkDeadline': r['homework_deadline']
+                'homework_title': r['homework_title'],
+                'homeworkDeadline': r['homework_deadline'],
+                'homework_deadline': r['homework_deadline']
             }
+            if 'teacher_name' in r.keys():
+                item['teacherName'] = r['teacher_name']
+                item['teacher_name'] = r['teacher_name']
             if role == 'student':
                 item['submissionStatus'] = r['submission_status'] or ('not_started' if r['homework_id'] else None)
                 item['submissionScore'] = r['submission_score']
                 item['submissionMaxScore'] = r['submission_max_score']
             lessons.append(item)
 
+        # Homeworks with deadlines in this month for calendar dots
+        hw_list = []
+        if role in ('teacher', 'admin'):
+            cursor.execute(
+                """
+                SELECT h.*, c.name as class_name
+                FROM homeworks h
+                JOIN classes c ON h.class_id = c.id
+                WHERE h.teacher_id = ? AND h.deadline_at LIKE ?
+                ORDER BY h.deadline_at ASC
+                """,
+                (user_id, f"{month_prefix}%")
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT h.*, c.name as class_name, hs.status as submission_status
+                FROM homeworks h
+                JOIN classes c ON h.class_id = c.id
+                JOIN class_members cm ON c.id = cm.class_id
+                LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
+                WHERE cm.student_id = ? AND h.deadline_at LIKE ?
+                ORDER BY h.deadline_at ASC
+                """,
+                (user_id, user_id, f"{month_prefix}%")
+            )
+        for hr in cursor.fetchall():
+            hw_list.append({
+                'id': hr['id'],
+                'title': hr['title'],
+                'subject': hr['subject'],
+                'deadline': hr['deadline_at'],
+                'deadline_at': hr['deadline_at'],
+                'className': hr['class_name'],
+                'class_name': hr['class_name']
+            })
+
+        # Fetch closest upcoming lesson across any month from now onwards
+        upcoming_lesson = None
+        if role in ('teacher', 'admin'):
+            cursor.execute(
+                """
+                SELECT l.*, c.name as class_name, h.title as homework_title, h.deadline_at as homework_deadline
+                FROM lessons l
+                JOIN classes c ON l.class_id = c.id
+                LEFT JOIN homeworks h ON l.homework_id = h.id
+                WHERE l.teacher_id = ? AND l.scheduled_at >= ?
+                ORDER BY l.scheduled_at ASC
+                LIMIT 1
+                """,
+                (user_id, now_local_prefix)
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT l.*, c.name as class_name, u.display_name as teacher_name,
+                       h.title as homework_title, h.deadline_at as homework_deadline
+                FROM lessons l
+                JOIN classes c ON l.class_id = c.id
+                JOIN class_members cm ON c.id = cm.class_id
+                JOIN users u ON l.teacher_id = u.id
+                LEFT JOIN homeworks h ON l.homework_id = h.id
+                WHERE cm.student_id = ? AND l.scheduled_at >= ?
+                ORDER BY l.scheduled_at ASC
+                LIMIT 1
+                """,
+                (user_id, now_local_prefix)
+            )
+        row_up = cursor.fetchone()
+        if row_up:
+            upcoming_lesson = {
+                'id': row_up['id'],
+                'classId': row_up['class_id'],
+                'class_id': row_up['class_id'],
+                'className': row_up['class_name'],
+                'class_name': row_up['class_name'],
+                'title': row_up['title'],
+                'description': row_up['description'],
+                'notes': row_up['description'],
+                'scheduledAt': row_up['scheduled_at'],
+                'scheduled_at': row_up['scheduled_at'],
+                'starts_at': row_up['scheduled_at'],
+                'durationMin': row_up['duration_min'],
+                'duration_min': row_up['duration_min'],
+                'homeworkId': row_up['homework_id'],
+                'homework_id': row_up['homework_id'],
+                'homeworkTitle': row_up['homework_title'],
+                'homework_title': row_up['homework_title'],
+                'homeworkDeadline': row_up['homework_deadline'],
+                'homework_deadline': row_up['homework_deadline'],
+                'teacherName': row_up['teacher_name'] if 'teacher_name' in row_up.keys() else '',
+                'teacher_name': row_up['teacher_name'] if 'teacher_name' in row_up.keys() else ''
+            }
+
         return {
             'year': year,
             'month': month,
-            'lessons': lessons
+            'lessons': lessons,
+            'homeworks': hw_list,
+            'upcomingLesson': upcoming_lesson
         }
     finally:
         conn.close()

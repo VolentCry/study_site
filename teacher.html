@@ -2769,16 +2769,14 @@
                 lessonsTimelineContainer.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--muted);">Загрузка расписания...</div>';
 
                 try {
-                    const now = new Date();
-                    // Load current month and next month
-                    const res = await fetch(`/api/schedule/month?year=${now.getFullYear()}&month=${now.getMonth() + 1}`, { cache: 'no-store' });
+                    const res = await fetch('/api/teacher/lessons', { cache: 'no-store' });
                     const data = await res.json();
                     if (!data.success) {
                         lessonsTimelineContainer.innerHTML = `<div style="text-align:center; color:var(--danger); padding:2rem;">${data.error || 'Ошибка загрузки расписания'}</div>`;
                         return;
                     }
 
-                    const lessons = data.schedule ? data.schedule.lessons : [];
+                    const lessons = Array.isArray(data.lessons) ? data.lessons : [];
                     if (lessons.length === 0) {
                         lessonsTimelineContainer.innerHTML = `
                             <div style="text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
@@ -2794,30 +2792,47 @@
                     }
 
                     // Sort lessons chronologically
-                    lessons.sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
+                    lessons.sort((a, b) => {
+                        const da = new Date(a.starts_at || a.scheduled_at || a.scheduledAt || 0);
+                        const db = new Date(b.starts_at || b.scheduled_at || b.scheduledAt || 0);
+                        return da - db;
+                    });
 
                     lessonsTimelineContainer.innerHTML = lessons.map(les => {
-                        const d = new Date(les.starts_at);
-                        const dateStr = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'short' });
-                        const timeStr = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                        
+                        const rawDate = les.starts_at || les.scheduled_at || les.scheduledAt;
+                        const d = rawDate ? new Date(rawDate) : null;
+                        const dateStr = d ? d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'short' }) : '—';
+                        const timeStr = d ? d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
+
+                        const hwId = les.homework_id || les.homeworkId;
+                        const hwTitle = les.homework_title || les.homeworkTitle;
+                        const hwDeadline = les.homework_deadline || les.homeworkDeadline;
+                        const cName = les.class_name || les.className || '';
+                        const notes = les.notes || les.description || '';
+
                         let hwBadgeHtml = '';
-                        if (les.homework_id && les.homework_title) {
-                            hwBadgeHtml = `<span class="lesson-hw-badge" title="Срок: ${formatDateTime(les.homework_deadline)}">📝 Д/З: ${escapeHtml(les.homework_title)}</span>`;
+                        if (hwId && hwTitle) {
+                            hwBadgeHtml = `<span class="lesson-hw-badge" title="Срок: ${formatDateTime(hwDeadline)}">📝 Д/З: ${escapeHtml(hwTitle)}</span>`;
                         }
 
+                        const isPast = d && (d.getTime() < Date.now() - 3600000);
+                        const pastBadge = isPast ? '<span style="font-size:0.75rem; color:var(--muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:9999px;">Прошедший</span>' : '';
+
                         return `
-                            <div class="lesson-card" id="lesson-card-${les.id}">
+                            <div class="lesson-card" id="lesson-card-${les.id}" style="${isPast ? 'opacity:0.75;' : ''}">
                                 <div class="lesson-time-box">
                                     <div class="lesson-time-main">${timeStr}</div>
                                     <div class="lesson-time-sub">${dateStr}</div>
                                 </div>
                                 <div class="lesson-info">
-                                    <div class="lesson-title">${escapeHtml(les.title)}</div>
+                                    <div class="lesson-title" style="display:flex; align-items:center; gap:8px;">
+                                        <span>${escapeHtml(les.title)}</span>
+                                        ${pastBadge}
+                                    </div>
                                     <div class="lesson-badges-row">
-                                        <span class="lesson-class-badge">🏫 ${escapeHtml(les.class_name)}</span>
+                                        <span class="lesson-class-badge">🏫 ${escapeHtml(cName)}</span>
                                         ${hwBadgeHtml}
-                                        ${les.notes ? `<span style="font-size:0.8rem; color:var(--muted);">${escapeHtml(les.notes)}</span>` : ''}
+                                        ${notes ? `<span style="font-size:0.8rem; color:var(--muted);">${escapeHtml(notes)}</span>` : ''}
                                     </div>
                                 </div>
                                 <div>

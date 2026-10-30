@@ -5139,18 +5139,20 @@
 
                 if (monthScheduleData && monthScheduleData.lessons) {
                     monthScheduleData.lessons.forEach(l => {
-                        const k = l.starts_at.slice(0, 10);
+                        const raw = l.starts_at || l.scheduled_at || l.scheduledAt;
+                        if (!raw) return;
+                        const k = raw.slice(0, 10);
                         if (!lessonsByDate[k]) lessonsByDate[k] = [];
                         lessonsByDate[k].push(l);
                     });
                 }
                 if (monthScheduleData && monthScheduleData.homeworks) {
                     monthScheduleData.homeworks.forEach(h => {
-                        if (h.deadline) {
-                            const k = h.deadline.slice(0, 10);
-                            if (!hwByDate[k]) hwByDate[k] = [];
-                            hwByDate[k].push(h);
-                        }
+                        const raw = h.deadline || h.deadline_at;
+                        if (!raw) return;
+                        const k = raw.slice(0, 10);
+                        if (!hwByDate[k]) hwByDate[k] = [];
+                        hwByDate[k].push(h);
                     });
                 }
 
@@ -5208,15 +5210,26 @@
             function renderUpcomingHero() {
                 if (!nextLessonCard) return;
 
-                const allLessons = (monthScheduleData && monthScheduleData.lessons) ? [...monthScheduleData.lessons] : [];
-                const now = new Date();
+                // Priority: Use the server's global upcoming lesson, or find upcoming in month's lessons
+                let next = monthScheduleData && monthScheduleData.upcomingLesson;
+                if (!next) {
+                    const allLessons = (monthScheduleData && monthScheduleData.lessons) ? [...monthScheduleData.lessons] : [];
+                    const now = new Date();
+                    const futureLessons = allLessons
+                        .filter(l => {
+                            const raw = l.starts_at || l.scheduled_at || l.scheduledAt;
+                            return raw && (new Date(raw) >= new Date(now.getTime() - 2 * 3600000));
+                        })
+                        .sort((a, b) => {
+                            const da = new Date(a.starts_at || a.scheduled_at || a.scheduledAt || 0);
+                            const db = new Date(b.starts_at || b.scheduled_at || b.scheduledAt || 0);
+                            return da - db;
+                        });
+                    if (futureLessons.length > 0) next = futureLessons[0];
+                }
 
-                const futureLessons = allLessons
-                    .filter(l => new Date(l.starts_at) >= new Date(now.getTime() - 2 * 3600000))
-                    .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
-
-                if (futureLessons.length === 0) {
-                    nextLessonTitle.textContent = 'Нет запланированных уроков на этой неделе';
+                if (!next) {
+                    nextLessonTitle.textContent = 'Нет запланированных уроков';
                     nextLessonTime.textContent = 'Свободное время';
                     nextLessonClass.textContent = 'Отличный повод потренироваться!';
                     nextLessonTeacher.textContent = '';
@@ -5228,8 +5241,9 @@
                     return;
                 }
 
-                const next = futureLessons[0];
-                const d = new Date(next.starts_at);
+                const rawDate = next.starts_at || next.scheduled_at || next.scheduledAt;
+                const d = rawDate ? new Date(rawDate) : new Date();
+                const now = new Date();
                 const isToday = toDateKey(d) === toDateKey(now);
                 const tmrw = new Date(now.getTime() + 86400000);
                 const isTmrw = toDateKey(d) === toDateKey(tmrw);
@@ -5239,15 +5253,19 @@
                 else if (isTmrw) whenText = `Завтра в ${d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
                 else whenText = d.toLocaleString('ru-RU', { day: 'numeric', month: 'short', weekday: 'short', hour: '2-digit', minute: '2-digit' });
 
+                const hwId = next.homework_id || next.homeworkId;
+                const cName = next.class_name || next.className || '';
+                const tName = next.teacher_name || next.teacherName || '';
+
                 nextLessonTitle.textContent = next.title;
                 nextLessonTime.textContent = whenText;
-                nextLessonClass.textContent = `🏫 ${next.class_name}`;
-                nextLessonTeacher.textContent = next.teacher_name ? `Учитель: ${next.teacher_name}` : '';
+                nextLessonClass.textContent = `🏫 ${cName}`;
+                nextLessonTeacher.textContent = tName ? `Учитель: ${tName}` : '';
 
-                if (next.homework_id) {
+                if (hwId) {
                     nextLessonActionWrap.innerHTML = `
                         <div style="font-size:0.8rem; color:var(--muted); text-align:right;">К уроку прикреплено задание:</div>
-                        <a href="homework.html?id=${next.homework_id}" class="hw-action-btn hw-btn-primary">
+                        <a href="homework.html?id=${hwId}" class="hw-action-btn hw-btn-primary">
                             📝 Решать домашнее задание
                         </a>
                     `;
@@ -5268,11 +5286,17 @@
                 dayDetailsDate.textContent = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
 
                 const dayLessons = (monthScheduleData && monthScheduleData.lessons)
-                    ? monthScheduleData.lessons.filter(l => l.starts_at.slice(0, 10) === dateKey)
+                    ? monthScheduleData.lessons.filter(l => {
+                        const raw = l.starts_at || l.scheduled_at || l.scheduledAt;
+                        return raw && raw.slice(0, 10) === dateKey;
+                    })
                     : [];
 
                 const dayHws = (monthScheduleData && monthScheduleData.homeworks)
-                    ? monthScheduleData.homeworks.filter(h => h.deadline && h.deadline.slice(0, 10) === dateKey)
+                    ? monthScheduleData.homeworks.filter(h => {
+                        const raw = h.deadline || h.deadline_at;
+                        return raw && raw.slice(0, 10) === dateKey;
+                    })
                     : [];
 
                 const totalEvents = dayLessons.length + dayHws.length;
@@ -5290,12 +5314,16 @@
                 let htmlItems = '';
 
                 dayLessons.forEach(les => {
-                    const t = new Date(les.starts_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                    const rawDate = les.starts_at || les.scheduled_at || les.scheduledAt;
+                    const t = rawDate ? new Date(rawDate).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
+                    const hwId = les.homework_id || les.homeworkId;
+                    const cName = les.class_name || les.className || '';
+                    const desc = les.notes || les.description || '';
                     let hwLine = '';
-                    if (les.homework_id) {
+                    if (hwId) {
                         hwLine = `
                             <div style="margin-top:0.35rem;">
-                                <a href="homework.html?id=${les.homework_id}" style="color:var(--accent); font-weight:700; font-size:0.82rem; text-decoration:none;">
+                                <a href="homework.html?id=${hwId}" style="color:var(--accent); font-weight:700; font-size:0.82rem; text-decoration:none;">
                                     📝 Прикреплена домашка →
                                 </a>
                             </div>
@@ -5305,22 +5333,23 @@
                         <div class="day-event-card">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="day-event-time">⏰ ${t}</span>
-                                <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(les.class_name)}</span>
+                                <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(cName)}</span>
                             </div>
                             <div class="day-event-title">${escapeHtml(les.title)}</div>
-                            ${les.notes ? `<div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(les.notes)}</div>` : ''}
+                            ${desc ? `<div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(desc)}</div>` : ''}
                             ${hwLine}
                         </div>
                     `;
                 });
 
                 dayHws.forEach(h => {
-                    const t = new Date(h.deadline).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                    const rawDate = h.deadline || h.deadline_at;
+                    const t = rawDate ? new Date(rawDate).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
                     htmlItems += `
                         <div class="day-event-card" style="border-left: 3px solid var(--accent);">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span style="font-size:0.8rem; font-weight:700; color:var(--accent);">Дедлайн до ${t}</span>
-                                <span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(h.subject)}</span>
+                                <span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(h.subject || '')}</span>
                             </div>
                             <div class="day-event-title">${escapeHtml(h.title)}</div>
                             <div style="margin-top:0.35rem;">
