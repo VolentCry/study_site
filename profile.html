@@ -2012,15 +2012,25 @@
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid var(--line);
             color: #fff;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            max-width: 36px;
+            max-height: 36px;
+            aspect-ratio: 1 / 1;
             border-radius: 50%;
-            font-size: 1.2rem;
-            display: flex;
+            font-size: 1.25rem;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
+            flex-shrink: 0;
+            align-self: flex-start;
+            padding: 0;
+            line-height: 1;
+            box-sizing: border-box;
         }
         .settings-close:hover, .achievements-close:hover {
             background: var(--accent);
@@ -2730,6 +2740,28 @@
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--line);
             gap: 1rem;
+        }
+        .level-modal-header > div:first-child {
+            flex: 1;
+            min-width: 0;
+        }
+        #level-modal-close-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
+            aspect-ratio: 1 / 1 !important;
+            flex-shrink: 0 !important;
+            align-self: flex-start !important;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
         }
 
         .level-modal-pretitle {
@@ -3506,19 +3538,43 @@
 
         @media (max-width: 768px) {
             .header-inner {
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-areas:
+                    "brand actions"
+                    "tabs  tabs";
+                align-items: center;
                 height: auto;
-                padding: 0.75rem 0;
-                gap: 0.75rem;
+                padding: 0.75rem 0 0.5rem;
+                row-gap: 0.65rem;
+                column-gap: 0.5rem;
+            }
+            .brand {
+                grid-area: brand;
+                min-width: 0;
+                gap: 0.5rem;
+            }
+            .header-actions {
+                grid-area: actions;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 0.5rem;
+                flex-shrink: 0;
             }
             .profile-tabs-nav {
-                order: 3;
+                grid-area: tabs;
                 width: 100%;
+                display: flex;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
-                justify-content: flex-start;
+                gap: 4px;
                 padding: 4px;
+                border-radius: var(--r-pill);
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--line);
+                box-sizing: border-box;
             }
             .profile-tabs-nav::-webkit-scrollbar {
                 display: none;
@@ -3529,37 +3585,9 @@
                 padding: 0.4rem 0.85rem;
                 font-size: 0.8rem;
             }
-            .calendar-grid {
-                gap: 3px;
-            }
-            .cal-day-cell {
-                font-size: 0.82rem;
-            }
-            .cal-dots-row {
-                gap: 2px;
-                height: 4px;
-            }
-            .event-dot {
-                width: 4px;
-                height: 4px;
-            }
         }
 
         @media (max-width: 640px) {
-            .header-inner {
-                flex-wrap: wrap;
-                height: auto;
-                padding: 0.75rem 0;
-                gap: 0.75rem;
-            }
-            .profile-tabs-nav {
-                order: 3;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                justify-content: flex-start;
-            }
             .bento-metrics-grid,
             .trainer-ranks-summary {
                 grid-template-columns: 1fr;
@@ -3576,6 +3604,20 @@
                 flex-direction: column;
                 align-items: flex-start;
                 padding: 1.25rem 1.4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .site-header .brand-status {
+                display: none;
+            }
+            .header-actions .nav-btn {
+                padding: 0.35rem 0.65rem;
+                font-size: 0.78rem;
+                gap: 0.35rem;
+            }
+            .brand {
+                font-size: 0.95rem;
             }
         }
 
@@ -3618,7 +3660,7 @@
         }
         .lesson-hero-main {
             flex: 1;
-            min-width: 280px;
+            min-width: 0;
         }
         .lesson-hero-tag {
             font-size: 0.78rem;
@@ -3727,6 +3769,9 @@
         .cal-nav-btn:hover {
             background: var(--surface-hover);
             border-color: var(--line-active);
+        }
+        .cal-plan-btn {
+            margin-right: 8px;
         }
         .cal-today-btn {
             font-size: 0.8rem;
@@ -4005,6 +4050,215 @@
             border-color: var(--line-active);
         }
 
+        /* ==========================================================================
+           RESPONSIVE STUDY & SCHEDULE DASHBOARD (ZERO MOBILE OVERFLOW)
+           ========================================================================== */
+        @media (max-width: 992px) {
+            .study-dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .next-lesson-hero {
+                padding: 1.25rem 1.15rem 1.25rem 1.35rem;
+                gap: 1rem;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            .lesson-hero-main {
+                width: 100%;
+                min-width: 0;
+                padding-right: 0.5rem;
+            }
+            .lesson-hero-title {
+                font-size: clamp(1.15rem, 4.5vw, 1.35rem);
+                word-break: break-word;
+                overflow-wrap: break-word;
+                line-height: 1.25;
+                margin-bottom: 0.35rem;
+            }
+            .lesson-hero-meta {
+                gap: 0.4rem 0.85rem;
+                font-size: 0.82rem;
+            }
+            .lesson-hero-action {
+                width: 100%;
+                align-items: stretch;
+            }
+            .lesson-hero-action .hw-action-btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 40px;
+            }
+
+            .study-dashboard-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+            .study-card {
+                padding: 1.15rem 0.85rem;
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+                border-radius: var(--r);
+            }
+            .calendar-header {
+                flex-wrap: wrap;
+                gap: 0.65rem;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+            .cal-nav-group {
+                flex: 1;
+                min-width: 0;
+                justify-content: flex-start;
+                gap: 0.4rem;
+            }
+            .cal-title {
+                min-width: 0;
+                font-size: 0.98rem;
+            }
+            .cal-nav-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 1.1rem;
+                flex-shrink: 0;
+            }
+            .cal-today-btn {
+                order: 2;
+                flex-shrink: 0;
+                padding: 0.3rem 0.75rem;
+                font-size: 0.78rem;
+            }
+            #btn-open-methodical-plan {
+                order: 3;
+                width: 100% !important;
+                justify-content: center;
+                margin-right: 0 !important;
+                min-height: 38px;
+                box-sizing: border-box;
+            }
+            .calendar-weekdays {
+                display: grid;
+                grid-template-columns: repeat(7, minmax(0, 1fr));
+                font-size: 0.72rem;
+                gap: 2px;
+                padding-bottom: 0.5rem;
+                margin-bottom: 0.4rem;
+            }
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, minmax(0, 1fr));
+                gap: 3px;
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+            }
+            .cal-day-cell {
+                font-size: 0.8rem;
+                min-width: 0;
+                border-radius: 6px;
+            }
+            .cal-dots-row {
+                gap: 2px;
+                height: 4px;
+                margin-top: 2px;
+            }
+            .event-dot {
+                width: 4px;
+                height: 4px;
+            }
+            .calendar-legend {
+                gap: 0.65rem 1rem;
+                font-size: 0.74rem;
+                margin-top: 0.85rem;
+                padding-top: 0.65rem;
+            }
+            .study-side-col {
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                gap: 1.25rem;
+            }
+            .day-details-card,
+            .student-homeworks-card {
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+            .day-details-header {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-bottom: 0.85rem;
+            }
+            .day-details-header > div:first-child {
+                flex: 1;
+                min-width: 0;
+            }
+            .day-details-header h4 {
+                font-size: 0.98rem;
+                word-break: break-word;
+            }
+            .day-event-card {
+                padding: 0.75rem 0.85rem;
+                min-width: 0;
+                gap: 0.35rem;
+            }
+            .student-hw-list {
+                padding-right: 0;
+                max-height: none;
+                gap: 0.75rem;
+            }
+            .student-hw-card {
+                padding: 0.85rem 0.95rem;
+                min-width: 0;
+            }
+            .student-hw-card-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.45rem;
+                min-width: 0;
+            }
+            .student-hw-card-top > div:first-child {
+                width: 100%;
+                min-width: 0;
+            }
+            .student-hw-title {
+                font-size: 0.92rem;
+                word-break: break-word;
+            }
+            .student-hw-meta {
+                gap: 0.4rem 0.65rem;
+                font-size: 0.78rem;
+            }
+            .student-hw-card .hw-action-btn {
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.35rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .study-card {
+                padding: 1rem 0.65rem;
+            }
+            .cal-day-cell {
+                font-size: 0.75rem;
+            }
+            .calendar-weekdays span {
+                font-size: 0.68rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -4151,7 +4405,7 @@
                             <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
                             <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
                         </div>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px; margin-right:8px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
+                        <button type="button" class="btn btn-secondary btn-sm cal-plan-btn" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
                         <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
                     </div>
 
