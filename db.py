@@ -227,6 +227,40 @@ def init_db() -> None:
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_submissions_student ON homework_submissions(student_id);
             ''')
+
+            # Миграция: is_completed в lessons для учёта проведённых занятий
+            cursor.execute('PRAGMA table_info(lessons);')
+            lesson_cols = [row['name'] for row in cursor.fetchall()]
+            if 'is_completed' not in lesson_cols:
+                conn.execute("ALTER TABLE lessons ADD COLUMN is_completed INTEGER DEFAULT 0;")
+
+            # 8. Таблица методических планов занятий
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS methodical_plans (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    teacher_id INTEGER NOT NULL,
+                    student_id INTEGER,
+                    student_name TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    academic_year TEXT DEFAULT '2026-2027',
+                    subject TEXT DEFAULT 'Математика',
+                    tags_json TEXT DEFAULT '["#Репетиторство", "#Обучение"]',
+                    goals TEXT DEFAULT '',
+                    topics_json TEXT DEFAULT '[]',
+                    monthly_counts_json TEXT DEFAULT '{}',
+                    monthly_lessons_json TEXT DEFAULT '{}',
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE SET NULL
+                );
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_methodical_plans_teacher ON methodical_plans(teacher_id);
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_methodical_plans_student ON methodical_plans(student_id);
+            ''')
     finally:
         conn.close()
 
@@ -481,6 +515,7 @@ def delete_user(user_id: int) -> bool:
             cursor.execute("DELETE FROM class_members WHERE student_id = ?", (user_id,))
             cursor.execute("DELETE FROM user_data WHERE user_id = ?", (user_id,))
             cursor.execute("DELETE FROM lessons WHERE teacher_id = ? OR student_id = ?", (user_id, user_id))
+            cursor.execute("DELETE FROM methodical_plans WHERE teacher_id = ? OR student_id = ?", (user_id, user_id))
             cursor.execute("DELETE FROM homeworks WHERE teacher_id = ?", (user_id,))
             cursor.execute("DELETE FROM classes WHERE teacher_id = ?", (user_id,))
             cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
@@ -1728,12 +1763,16 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
                 'homework_title': r['homework_title'],
                 'homeworkDeadline': r['homework_deadline'],
                 'homework_deadline': r['homework_deadline'],
+                'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
+                'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
                 'studentId': r['student_id'],
                 'student_id': r['student_id'],
                 'studentName': r['student_name'] or '',
                 'student_name': r['student_name'] or '',
                 'studentUsername': r['student_username'] or '',
                 'student_username': r['student_username'] or '',
+                'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
+                'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
                 'createdAt': r['created_at'],
                 'created_at': r['created_at']
             })
@@ -1811,7 +1850,9 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 'homeworkTitle': r['homework_title'],
                 'homework_title': r['homework_title'],
                 'homeworkDeadline': r['homework_deadline'],
-                'homework_deadline': r['homework_deadline']
+                'homework_deadline': r['homework_deadline'],
+                'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
+                'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False
             }
             if 'teacher_name' in r.keys():
                 item['teacherName'] = r['teacher_name']
@@ -1941,3 +1982,385 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
         }
     finally:
         conn.close()
+
+
+# ============================================================================
+# ФУНКЦИИ: МЕТОДИЧЕСКИЙ ПЛАН И УЧЁТ ПРОВЕДЁННЫХ ЗАНЯТИЙ
+# ============================================================================
+
+def toggle_lesson_completed(lesson_id: int, teacher_id: Optional[int] = None, is_completed: Optional[bool] = None) -> bool:
+    """Переключение или установка статуса проведённого занятия в расписании."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            if is_completed is None:
+                if teacher_id:
+                    cursor.execute("UPDATE lessons SET is_completed = CASE WHEN is_completed = 1 THEN 0 ELSE 1 END WHERE id = ? AND teacher_id = ?", (lesson_id, teacher_id))
+                else:
+                    cursor.execute("UPDATE lessons SET is_completed = CASE WHEN is_completed = 1 THEN 0 ELSE 1 END WHERE id = ?", (lesson_id,))
+            else:
+                val = 1 if is_completed else 0
+                if teacher_id:
+                    cursor.execute("UPDATE lessons SET is_completed = ? WHERE id = ? AND teacher_id = ?", (val, lesson_id, teacher_id))
+                else:
+                    cursor.execute("UPDATE lessons SET is_completed = ? WHERE id = ?", (val, lesson_id))
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def format_methodical_plan_row(r: Any) -> Dict[str, Any]:
+    """Вспомогательная функция парсинга строки методического плана."""
+    def parse_json(val, default):
+        if not val:
+            return default
+        try:
+            return json.loads(val)
+        except Exception:
+            return default
+
+    tags = parse_json(r['tags_json'], ["#Репетиторство", "#Обучение"])
+    topics = parse_json(r['topics_json'], [])
+    monthly_counts = parse_json(r['monthly_counts_json'], {})
+    monthly_lessons = parse_json(r['monthly_lessons_json'], {})
+
+    total_conducted = 0
+    total_planned = 0
+    for month, count in monthly_counts.items():
+        try:
+            total_planned += int(count or 0)
+        except (ValueError, TypeError):
+            pass
+
+    for month, lessons in monthly_lessons.items():
+        if isinstance(lessons, list):
+            for l in lessons:
+                if isinstance(l, dict) and l.get('isConducted'):
+                    total_conducted += 1
+
+    return {
+        'id': r['id'],
+        'teacherId': r['teacher_id'],
+        'teacherName': r['teacher_name'] if 'teacher_name' in r.keys() else '',
+        'teacherUsername': r['teacher_username'] if 'teacher_username' in r.keys() else '',
+        'studentId': r['student_id'],
+        'studentName': r['student_name'] or (r['linked_student_name'] if ('linked_student_name' in r.keys() and r['linked_student_name']) else ''),
+        'linkedStudentUsername': r['linked_student_username'] if 'linked_student_username' in r.keys() else '',
+        'title': r['title'],
+        'academicYear': r['academic_year'] or '2026-2027',
+        'subject': r['subject'] or 'Математика',
+        'tags': tags,
+        'goals': r['goals'] or '',
+        'topics': topics,
+        'monthlyCounts': monthly_counts,
+        'monthlyLessons': monthly_lessons,
+        'totalPlanned': total_planned,
+        'totalConducted': total_conducted,
+        'conductedPercent': round((total_conducted / total_planned * 100), 1) if total_planned > 0 else 0.0,
+        'createdAt': r['created_at'],
+        'updatedAt': r['updated_at']
+    }
+
+
+def get_methodical_plans(teacher_id: Optional[int] = None, student_id: Optional[int] = None) -> List[Dict[str, Any]]:
+    """Получение списка методических планов."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT p.*,
+                   t.display_name as teacher_name, t.username as teacher_username,
+                   s.display_name as linked_student_name, s.username as linked_student_username
+            FROM methodical_plans p
+            JOIN users t ON p.teacher_id = t.id
+            LEFT JOIN users s ON p.student_id = s.id
+        """
+        params = []
+        conds = []
+        if teacher_id is not None:
+            conds.append("p.teacher_id = ?")
+            params.append(teacher_id)
+        if student_id is not None:
+            conds.append("(p.student_id = ? OR (p.student_id IS NULL AND LOWER(p.student_name) LIKE ?))")
+            params.append(student_id)
+            cur_user = cursor.execute("SELECT display_name, username FROM users WHERE id = ?", (student_id,)).fetchone()
+            sname = (cur_user['display_name'] or cur_user['username']) if cur_user else ''
+            params.append(f"%{sname.lower()}%")
+
+        if conds:
+            query += " WHERE " + " AND ".join(conds)
+        query += " ORDER BY p.updated_at DESC, p.id DESC"
+
+        cursor.execute(query, tuple(params))
+        rows = cursor.fetchall()
+        plans = []
+        for r in rows:
+            plans.append(format_methodical_plan_row(r))
+        return plans
+    finally:
+        conn.close()
+
+
+def get_methodical_plan_by_id(plan_id: int) -> Optional[Dict[str, Any]]:
+    """Получение методического плана по ID."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT p.*,
+                   t.display_name as teacher_name, t.username as teacher_username,
+                   s.display_name as linked_student_name, s.username as linked_student_username
+            FROM methodical_plans p
+            JOIN users t ON p.teacher_id = t.id
+            LEFT JOIN users s ON p.student_id = s.id
+            WHERE p.id = ?
+            """,
+            (plan_id,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return format_methodical_plan_row(row)
+    finally:
+        conn.close()
+
+
+def create_methodical_plan(teacher_id: int, data: Dict[str, Any]) -> int:
+    """Создание нового методического плана."""
+    conn = get_db_connection()
+    now_iso = datetime.now().isoformat()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            student_id = data.get('studentId') or data.get('student_id')
+            if student_id:
+                try:
+                    student_id = int(student_id)
+                except (ValueError, TypeError):
+                    student_id = None
+            student_name = (data.get('studentName') or data.get('student_name') or 'Ученик').strip()
+            title = (data.get('title') or f"Методический план · {student_name}").strip()
+            academic_year = data.get('academicYear') or data.get('academic_year') or '2026-2027'
+            subject = data.get('subject') or 'Математика'
+            tags = data.get('tags') or ["#Репетиторство", "#Обучение"]
+            goals = data.get('goals') or ''
+            topics = data.get('topics') or []
+            monthly_counts = data.get('monthlyCounts') or {}
+            monthly_lessons = data.get('monthlyLessons') or {}
+
+            cursor.execute(
+                """
+                INSERT INTO methodical_plans (
+                    teacher_id, student_id, student_name, title, academic_year, subject,
+                    tags_json, goals, topics_json, monthly_counts_json, monthly_lessons_json,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    teacher_id,
+                    student_id,
+                    student_name,
+                    title,
+                    academic_year,
+                    subject,
+                    json.dumps(tags, ensure_ascii=False),
+                    goals,
+                    json.dumps(topics, ensure_ascii=False),
+                    json.dumps(monthly_counts, ensure_ascii=False),
+                    json.dumps(monthly_lessons, ensure_ascii=False),
+                    now_iso,
+                    now_iso
+                )
+            )
+            return cursor.lastrowid
+    finally:
+        conn.close()
+
+
+def update_methodical_plan(plan_id: int, teacher_id: int, data: Dict[str, Any], is_admin: bool = False) -> bool:
+    """Обновление существующего методического плана."""
+    conn = get_db_connection()
+    now_iso = datetime.now().isoformat()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            if is_admin:
+                cursor.execute("SELECT id FROM methodical_plans WHERE id = ?", (plan_id,))
+            else:
+                cursor.execute("SELECT id FROM methodical_plans WHERE id = ? AND teacher_id = ?", (plan_id, teacher_id))
+            if not cursor.fetchone():
+                return False
+
+            student_id = data.get('studentId') or data.get('student_id')
+            if student_id:
+                try:
+                    student_id = int(student_id)
+                except (ValueError, TypeError):
+                    student_id = None
+            student_name = (data.get('studentName') or data.get('student_name') or 'Ученик').strip()
+            title = (data.get('title') or f"Методический план · {student_name}").strip()
+            academic_year = data.get('academicYear') or data.get('academic_year') or '2026-2027'
+            subject = data.get('subject') or 'Математика'
+            tags = data.get('tags') or ["#Репетиторство", "#Обучение"]
+            goals = data.get('goals') or ''
+            topics = data.get('topics') or []
+            monthly_counts = data.get('monthlyCounts') or {}
+            monthly_lessons = data.get('monthlyLessons') or {}
+
+            cursor.execute(
+                """
+                UPDATE methodical_plans SET
+                    student_id = ?,
+                    student_name = ?,
+                    title = ?,
+                    academic_year = ?,
+                    subject = ?,
+                    tags_json = ?,
+                    goals = ?,
+                    topics_json = ?,
+                    monthly_counts_json = ?,
+                    monthly_lessons_json = ?,
+                    updated_at = ?
+                WHERE id = ?
+                """,
+                (
+                    student_id,
+                    student_name,
+                    title,
+                    academic_year,
+                    subject,
+                    json.dumps(tags, ensure_ascii=False),
+                    goals,
+                    json.dumps(topics, ensure_ascii=False),
+                    json.dumps(monthly_counts, ensure_ascii=False),
+                    json.dumps(monthly_lessons, ensure_ascii=False),
+                    now_iso,
+                    plan_id
+                )
+            )
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def toggle_methodical_lesson(plan_id: int, month: str, lesson_index: int, is_conducted: bool, user_id: int, is_teacher: bool) -> bool:
+    """Быстрое переключение статуса проведения урока в методическом плане."""
+    conn = get_db_connection()
+    now_iso = datetime.now().isoformat()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT teacher_id, student_id, monthly_lessons_json FROM methodical_plans WHERE id = ?", (plan_id,))
+            row = cursor.fetchone()
+            if not row:
+                return False
+            if not is_teacher and row['teacher_id'] != user_id:
+                return False
+
+            try:
+                monthly_lessons = json.loads(row['monthly_lessons_json'] or '{}')
+            except Exception:
+                monthly_lessons = {}
+
+            month_list = monthly_lessons.get(month, [])
+            if not isinstance(month_list, list):
+                month_list = []
+
+            while len(month_list) <= lesson_index:
+                month_list.append({'num': len(month_list) + 1, 'title': '', 'isConducted': False})
+
+            month_list[lesson_index]['isConducted'] = is_conducted
+            month_list[lesson_index]['conductedAt'] = now_iso if is_conducted else None
+            monthly_lessons[month] = month_list
+
+            cursor.execute(
+                "UPDATE methodical_plans SET monthly_lessons_json = ?, updated_at = ? WHERE id = ?",
+                (json.dumps(monthly_lessons, ensure_ascii=False), now_iso, plan_id)
+            )
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def delete_methodical_plan(plan_id: int, teacher_id: int, is_admin: bool = False) -> bool:
+    """Удаление методического плана."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            if is_admin:
+                cursor.execute("DELETE FROM methodical_plans WHERE id = ?", (plan_id,))
+            else:
+                cursor.execute("DELETE FROM methodical_plans WHERE id = ? AND teacher_id = ?", (plan_id, teacher_id))
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def get_oge_math_template() -> Dict[str, Any]:
+    """Шаблон методического плана подготовки к ОГЭ по математике на основе образца из PDF."""
+    return {
+        'title': 'Методический план по математике. Аспидов Роман. 2026-2027 учебный год',
+        'studentName': 'Аспидов Роман',
+        'academicYear': '2026-2027',
+        'subject': 'Математика',
+        'tags': ['#Репетиторство', '#Обучение'],
+        'goals': 'Подготовка ОГЭ по Математике на оценку "Отлично" (22+ баллов)',
+        'legend': '(Цветом выделены задания 2-ой части)',
+        'topics': [
+            {'num': 1, 'title': 'Решение прикладных задач (Задания 1-5 ОГЭ)', 'hours': '10 занятий', 'isPart2': False},
+            {'num': 2, 'title': 'Числа, вычисления, алгебраические выражения (Задания 6, 8 ОГЭ)', 'hours': '1-2 занятия', 'isPart2': False},
+            {'num': 3, 'title': 'Числовые неравенства и неравенства на координатной прямой (Задание 7 ОГЭ)', 'hours': '1 занятие', 'isPart2': False},
+            {'num': 4, 'title': 'Расчёты по формулам (Задание 12 ОГЭ)', 'hours': '1 занятие', 'isPart2': False},
+            {'num': 5, 'title': 'Статистика и вероятность (Задания 10 ОГЭ)', 'hours': '3 занятия', 'isPart2': False},
+            {'num': 6, 'title': 'Графики функций (Задание 11 ОГЭ)', 'hours': '3 занятия', 'isPart2': False},
+            {'num': 7, 'title': 'Уравнения (Задание 9 ОГЭ)', 'hours': '2-3 занятия', 'isPart2': False},
+            {'num': 8, 'title': 'Уравнения и системы уравнений углублённо (Задание 20 ОГЭ)', 'hours': '3 занятия', 'isPart2': True},
+            {'num': 9, 'title': 'Геометрическая и арифметическая прогрессия (Задания 14 ОГЭ)', 'hours': '1-2 занятия', 'isPart2': False},
+            {'num': 10, 'title': 'Неравенства (Задания 13 ОГЭ)', 'hours': '2 занятия', 'isPart2': False},
+            {'num': 11, 'title': 'Анализ геометрических высказываний (Задание 19 ОГЭ)', 'hours': '1 занятие', 'isPart2': False},
+            {'num': 12, 'title': 'Фигуры на клеточках (Задание 18 ОГЭ)', 'hours': '1 занятие', 'isPart2': False},
+            {'num': 13, 'title': 'Треугольники (Задание 15 ОГЭ)', 'hours': '2 занятия', 'isPart2': False},
+            {'num': 14, 'title': 'Многоугольники (Задание 17 ОГЭ)', 'hours': '2 занятия', 'isPart2': False},
+            {'num': 15, 'title': 'Окружности (Задание 16 ОГЭ)', 'hours': '3 занятия', 'isPart2': False},
+            {'num': 16, 'title': 'Неравенства углублённо (Задание 20 ОГЭ)', 'hours': '2 занятия', 'isPart2': True},
+            {'num': 17, 'title': 'Текстовые задачи (Задание 21 ОГЭ)', 'hours': '5 занятий', 'isPart2': True},
+            {'num': 18, 'title': 'Построение графиков функций. Кусочно-заданные графики функций (Задание 22 ОГЭ)', 'hours': '3 занятия', 'isPart2': True},
+            {'num': 19, 'title': 'Геометрические задачи повышенной сложности (Задания 23-25 ОГЭ)', 'hours': '6-8 занятий', 'isPart2': True}
+        ],
+        'topicsSummary': 'Итого занятий: 38 занятий 1 часть ОГЭ + 21 занятие 2 часть ОГЭ',
+        'monthlyCounts': {
+            'Октябрь': 2,
+            'Ноябрь': 8,
+            'Декабрь': 8,
+            'Январь': 7,
+            'Февраль': 8,
+            'Март': 9,
+            'Апрель': 9,
+            'Май': 8
+        },
+        'monthlyLessons': {
+            'Октябрь': [
+                {'num': 1, 'title': 'Вводный урок. Разбор алгебры 1 части. Числа, вычисления, алгебраические выражения (Задание 8 ОГЭ)', 'isConducted': True},
+                {'num': 2, 'title': 'Числа, вычисления, алгебраические выражения (Задание 6 ОГЭ). Числовые неравенства и неравенства на координатной прямой (Задание 7 ОГЭ)', 'isConducted': True}
+            ],
+            'Ноябрь': [
+                {'num': 1, 'title': 'Уравнения (Задание 9 ОГЭ) + 1-2 задания 8 ОГЭ (повторение)', 'isConducted': False, 'review': '1-2 задания 8 ОГЭ (повторение)'},
+                {'num': 2, 'title': 'Уравнения (Задание 9 ОГЭ) + 2 неравенства на координатной прямой (повторение задания 7 ОГЭ)', 'isConducted': False, 'review': '2 неравенства на координатной прямой (повторение задания 7 ОГЭ)'},
+                {'num': 3, 'title': 'Неравенства (Задания 13 ОГЭ) / Уравнения (Задание 9 ОГЭ) (по необходимости)', 'isConducted': False},
+                {'num': 4, 'title': 'Расчёты по формулам (Задание 12 ОГЭ) + 2 задания 7 ОГЭ (повторение)', 'isConducted': False, 'review': '2 задания 7 ОГЭ (повторение)'},
+                {'num': 5, 'title': 'Неравенства (Задания 13 ОГЭ), Фигуры на клеточках (Задание 18 ОГЭ)', 'isConducted': False},
+                {'num': 6, 'title': '', 'isConducted': False},
+                {'num': 7, 'title': '', 'isConducted': False},
+                {'num': 8, 'title': '', 'isConducted': False}
+            ],
+            'Декабрь': [],
+            'Январь': [],
+            'Февраль': [],
+            'Март': [],
+            'Апрель': [],
+            'Май': []
+        }
+    }

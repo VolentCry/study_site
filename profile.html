@@ -11,6 +11,7 @@
 
     <!-- Pure WOFF2 Subsets (Zero Bloat, High-speed local fonts) -->
     <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="css/methodical_plan.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22 fill=%22none%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7728%22/><circle cx=%2216%22 cy=%2216%22 r=%226%22 fill=%22%23ffffff%22/><ellipse cx=%2216%22 cy=%2216%22 rx=%2211%22 ry=%224%22 transform=%22rotate(-25 16 16)%22 stroke=%22%23ffffff%22 stroke-width=%221.8%22/></svg>" />
 
     <style>
@@ -4150,6 +4151,7 @@
                             <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
                             <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
                         </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px; margin-right:8px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
                         <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
                     </div>
 
@@ -4665,6 +4667,7 @@
     <script src="js/trainer_rank_tracker.js?v=2.2"></script>
     <script src="js/profile_metrics.js?v=2.2"></script>
     <script src="js/auth_sync.js?v=1.0"></script>
+    <script src="js/methodical_plan.js"></script>
     <script>
         // --- 1. TABS SWITCHER ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -4679,6 +4682,12 @@
             const trainerRanksContainer = document.getElementById('trainer-ranks-container');
             const ranksOpenBtn = document.getElementById('ranks-open-btn');
             const heroMedalsBtn = document.getElementById('hero-medals-btn');
+
+            document.getElementById('btn-open-methodical-plan')?.addEventListener('click', () => {
+                if (window.MethodicalPlanManager) {
+                    window.MethodicalPlanManager.openModal();
+                }
+            });
 
             function switchTab(tabName) {
                 const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements];
@@ -5094,12 +5103,17 @@
                     }
                     const isInd = Boolean(les.student_id);
                     const indBadge = isInd ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(251, 191, 36, 0.15); color:var(--accent-gold); font-weight:700; margin-left:6px; border:1px solid rgba(251, 191, 36, 0.35);">👤 1-на-1</span>' : '';
+                    const isCompleted = Boolean(les.isCompleted || les.is_completed);
+                    const completedBadge = isCompleted ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(16, 185, 129, 0.15); color:var(--accent-emerald); font-weight:700; margin-left:6px; border:1px solid rgba(16, 185, 129, 0.35);">✅ Проведено</span>' : '';
 
                     htmlItems += `
                         <div class="day-event-card">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="day-event-time">⏰ ${t}</span>
-                                <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(cName)}${indBadge}</span>
+                                <div>
+                                    <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(cName)}${indBadge}</span>
+                                    ${completedBadge}
+                                </div>
                             </div>
                             <div class="day-event-title">${escapeHtml(les.title)}</div>
                             ${desc ? `<div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(desc)}</div>` : ''}

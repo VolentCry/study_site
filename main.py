@@ -561,6 +561,151 @@ def api_teacher_delete_lesson(lesson_id: int):
     return jsonify({'success': ok})
 
 
+@app.route('/api/teacher/lessons/<int:lesson_id>/toggle-conducted', methods=['POST'])
+def api_teacher_toggle_lesson_conducted(lesson_id: int):
+    """Отметка занятия как проведённого / непроведённого."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    tid = None if teacher.get('role') == 'admin' else teacher['id']
+    payload = request.get_json(silent=True) or {}
+    is_completed = payload.get('isCompleted')
+    if is_completed is not None:
+        is_completed = bool(is_completed)
+
+    ok = db.toggle_lesson_completed(lesson_id, tid, is_completed)
+    return jsonify({'success': ok})
+
+
+# ============================================================================
+# API МАРШРУТЫ: МЕТОДИЧЕСКИЕ ПЛАНЫ
+# ============================================================================
+
+@app.route('/api/methodical-plans/template/oge-math', methods=['GET'])
+def api_methodical_plan_template():
+    """Получение эталонного шаблона методического плана ОГЭ Математика."""
+    return jsonify({'success': True, 'template': db.get_oge_math_template()})
+
+
+@app.route('/api/methodical-plans', methods=['GET'])
+def api_get_methodical_plans():
+    """Получение списка методических планов."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    user = db.get_user_by_id(user_id)
+    if not user:
+        return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 404
+
+    if user.get('role') in ('teacher', 'admin'):
+        student_id = request.args.get('studentId') or request.args.get('student_id')
+        sid = int(student_id) if student_id and str(student_id).isdigit() else None
+        plans = db.get_methodical_plans(teacher_id=user['id'], student_id=sid)
+    else:
+        plans = db.get_methodical_plans(student_id=user['id'])
+
+    return jsonify({'success': True, 'plans': plans})
+
+
+@app.route('/api/methodical-plans/<int:plan_id>', methods=['GET'])
+def api_get_methodical_plan(plan_id: int):
+    """Получение детального плана по ID."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    user = db.get_user_by_id(user_id)
+    if not user:
+        return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 404
+
+    plan = db.get_methodical_plan_by_id(plan_id)
+    if not plan:
+        return jsonify({'success': False, 'error': 'Методический план не найден.'}), 404
+
+    if user.get('role') not in ('teacher', 'admin') and plan.get('studentId') != user['id']:
+        student_name = (user.get('display_name') or user.get('username') or '').strip().lower()
+        plan_sname = (plan.get('studentName') or '').strip().lower()
+        if student_name not in plan_sname and plan_sname not in student_name:
+            return jsonify({'success': False, 'error': 'Нет доступа к этому плану.'}), 403
+
+    return jsonify({'success': True, 'plan': plan})
+
+
+@app.route('/api/methodical-plans', methods=['POST'])
+def api_create_methodical_plan():
+    """Создание методического плана учителем."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    student_name = payload.get('studentName') or payload.get('student_name')
+    if not student_name or not str(student_name).strip():
+        return jsonify({'success': False, 'error': 'Укажите имя ученика для плана.'}), 400
+
+    plan_id = db.create_methodical_plan(teacher['id'], payload)
+    plan = db.get_methodical_plan_by_id(plan_id)
+    return jsonify({'success': True, 'id': plan_id, 'plan': plan})
+
+
+@app.route('/api/methodical-plans/<int:plan_id>', methods=['PUT'])
+def api_update_methodical_plan(plan_id: int):
+    """Обновление методического плана учителем."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    is_admin = teacher.get('role') == 'admin'
+    ok = db.update_methodical_plan(plan_id, teacher['id'], payload, is_admin=is_admin)
+    if not ok:
+        return jsonify({'success': False, 'error': 'План не найден или нет прав на изменение.'}), 404
+
+    plan = db.get_methodical_plan_by_id(plan_id)
+    return jsonify({'success': True, 'plan': plan})
+
+
+@app.route('/api/methodical-plans/<int:plan_id>/toggle-lesson', methods=['PATCH', 'POST'])
+def api_toggle_methodical_lesson(plan_id: int):
+    """Быстрая отметка урока в методическом плане как проведённого."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    month = payload.get('month')
+    lesson_index = payload.get('lessonIndex')
+    if lesson_index is None:
+        lesson_num = payload.get('lessonNum', 1)
+        lesson_index = max(0, int(lesson_num) - 1)
+    else:
+        lesson_index = int(lesson_index)
+
+    is_conducted = bool(payload.get('isConducted', True))
+    if not month:
+        return jsonify({'success': False, 'error': 'Не указан месяц.'}), 400
+
+    ok = db.toggle_methodical_lesson(plan_id, str(month), lesson_index, is_conducted, teacher['id'], is_teacher=True)
+    if not ok:
+        return jsonify({'success': False, 'error': 'Не удалось обновить статус урока.'}), 400
+
+    return jsonify({'success': True, 'isConducted': is_conducted})
+
+
+@app.route('/api/methodical-plans/<int:plan_id>', methods=['DELETE'])
+def api_delete_methodical_plan(plan_id: int):
+    """Удаление методического плана учителем."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    is_admin = teacher.get('role') == 'admin'
+    ok = db.delete_methodical_plan(plan_id, teacher['id'], is_admin=is_admin)
+    return jsonify({'success': ok})
+
+
 # ============================================================================
 # API МАРШРУТЫ: КОНСТРУКТОР И ДОМАШНИЕ ЗАДАНИЯ
 # ============================================================================
@@ -916,5 +1061,6 @@ if __name__ == '__main__':
     app.run(
         host=args.host,
         port=args.port,
-        debug=args.debug
+        debug=args.debug,
+        threaded=True
     )

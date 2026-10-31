@@ -11,6 +11,7 @@
 
     <!-- Fonts -->
     <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="css/methodical_plan.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22 fill=%22none%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%2310b981%22/><path d=%22M16 6L4 12l12 6 12-6-12-6zM4 18l12 6 12-6%22 stroke=%22%23ffffff%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
 
     <style>
@@ -1549,9 +1550,17 @@
                         <h2 style="font-family: var(--f-display); font-size: 1.4rem; font-weight: 800;">Расписание и уроки</h2>
                         <p style="color: var(--muted); font-size: 0.9rem;">Планируйте занятия для классов и прикрепляйте домашние задания</p>
                     </div>
-                    <button type="button" class="btn btn-emerald" id="btn-open-create-lesson">
-                        ➕ Запланировать занятие
+                    <button type="button" class="btn btn-secondary" id="btn-open-teacher-methodical-plan" style="margin-right:10px;">
+                        📋 Методический план
                     </button>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-secondary" id="btn-open-teacher-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700;">
+                            📋 Методический план
+                        </button>
+                        <button type="button" class="btn btn-emerald" id="btn-open-create-lesson">
+                            ➕ Запланировать занятие
+                        </button>
+                    </div>
                 </div>
 
                 <div id="lessons-timeline-container" class="lessons-timeline">
@@ -1791,6 +1800,11 @@
                     <div style="font-family:var(--f-display); font-size:1.25rem; font-weight:800;" id="dossier-name">Имя Ученика</div>
                     <div style="font-size:0.85rem; color:var(--muted);" id="dossier-sub">@username · ID: #0</div>
                 </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-plan" style="margin-left:auto;" title="Открыть методический план этого ученика">
+                    📋 Методический план
+                </button>
+
+                </div>
             </div>
 
             <!-- KPI Summary Grid -->
@@ -1993,6 +2007,7 @@
     <script src="js/oge_task_10_trainer.js"></script>
     <script src="js/oge_task_18_trainer.js"></script>
     <script src="js/auth_sync.js?v=1.1"></script>
+    <script src="js/methodical_plan.js"></script>
     <script>
         (function() {
             'use strict';
@@ -3008,6 +3023,15 @@
                     document.getElementById('dossier-sub').textContent = `@${u.username} · ID: #${u.id} · Рамка: ${u.avatarFrame || 'Орбита'}`;
                     document.getElementById('dossier-avatar').textContent = (u.displayName || u.username || 'У')[0].toUpperCase();
 
+                    const dossierPlanBtn = document.getElementById('btn-dossier-methodical-plan') || document.getElementById('dossier-btn-plan');
+                    if (dossierPlanBtn) {
+                        dossierPlanBtn.onclick = () => {
+                            if (window.MethodicalPlan) {
+                                window.MethodicalPlan.open(u.id);
+                            }
+                        };
+                    }
+
                     document.getElementById('dossier-xp').textContent = `${u.userXP || 0} XP`;
                     document.getElementById('dossier-accuracy').textContent = `${stats.accuracyPercent || 0}%`;
                     document.getElementById('dossier-correct-count').textContent = stats.correctAttempts || 0;
@@ -3054,6 +3078,15 @@
                         tasksTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--muted);">Ученик пока не решал задания в системе.</td></tr>';
                     }
 
+                    const planBtn = document.getElementById('dossier-btn-plan');
+                    if (planBtn) {
+                        planBtn.onclick = () => {
+                            if (window.MethodicalPlanManager) {
+                                window.MethodicalPlanManager.openForStudent(studentId, u.displayName || u.username);
+                            }
+                        };
+                    }
+
                     dossierModal.showModal();
                 } catch(err) {
                     alert('Ошибка при открытии досье: ' + err.message);
@@ -3085,6 +3118,14 @@
             const modalCreateLesson = document.getElementById('modal-create-lesson');
             const formCreateLesson = document.getElementById('form-create-lesson');
             const btnOpenCreateLesson = document.getElementById('btn-open-create-lesson');
+            const btnOpenTeacherMethodicalPlan = document.getElementById('btn-open-teacher-methodical-plan');
+            if (btnOpenTeacherMethodicalPlan) {
+                btnOpenTeacherMethodicalPlan.addEventListener('click', () => {
+                    if (window.MethodicalPlanManager) {
+                        window.MethodicalPlanManager.openModal();
+                    }
+                });
+            }
             const lessonsTimelineContainer = document.getElementById('lessons-timeline-container');
             const lessonTargetClass = document.getElementById('lesson-target-class');
             const lessonTargetStudent = document.getElementById('lesson-target-student');
@@ -3257,10 +3298,13 @@
                         }
 
                         const isPast = d && (d.getTime() < Date.now() - 3600000);
-                        const pastBadge = isPast ? '<span style="font-size:0.75rem; color:var(--muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:9999px;">Прошедший</span>' : '';
+                        const isCompleted = !!(les.isCompleted || les.is_completed);
+                        const statusBadge = isCompleted
+                            ? '<span class="badge badge-success" style="font-size:0.75rem;">✅ Проведено</span>'
+                            : (isPast ? '<span style="font-size:0.75rem; color:var(--muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:9999px;">Прошедший</span>' : '<span style="font-size:0.75rem; color:var(--accent-cyan); background:rgba(44,230,214,0.1); padding:2px 8px; border-radius:9999px;">Запланирован</span>');
 
                         return `
-                            <div class="lesson-card" id="lesson-card-${les.id}" style="${isPast ? 'opacity:0.75;' : ''}">
+                            <div class="lesson-card ${isCompleted ? 'lesson-card-completed' : ''}" id="lesson-card-${les.id}" style="${isPast && !isCompleted ? 'opacity:0.8;' : ''}">
                                 <div class="lesson-time-box">
                                     <div class="lesson-time-main">${timeStr}</div>
                                     <div class="lesson-time-sub">${dateStr}</div>
@@ -3268,7 +3312,7 @@
                                 <div class="lesson-info">
                                     <div class="lesson-title" style="display:flex; align-items:center; gap:8px;">
                                         <span>${escapeHtml(les.title)}</span>
-                                        ${pastBadge}
+                                        ${statusBadge}
                                     </div>
                                     <div class="lesson-badges-row">
                                         <span class="lesson-class-badge">🏫 ${escapeHtml(cName)}</span>
@@ -3277,14 +3321,41 @@
                                         ${notes ? `<span style="font-size:0.8rem; color:var(--muted);">${escapeHtml(notes)}</span>` : ''}
                                     </div>
                                 </div>
-                                <div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <button type="button" class="btn btn-sm ${isCompleted ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-complete" data-lesson-id="${les.id}" data-completed="${isCompleted ? '1' : '0'}" title="${isCompleted ? 'Снять отметку о проведении' : 'Отметить как проведённое занятие'}">
+                                        ${isCompleted ? '✓ Проведено' : '⏳ Провести'}
+                                    </button>
                                     <button type="button" class="btn btn-danger-outline btn-sm btn-delete-lesson" data-lesson-id="${les.id}" title="Отменить занятие">
-                                        🗑️ Отменить
+                                        🗑️
                                     </button>
                                 </div>
                             </div>
                         `;
                     }).join('');
+
+                    // Attach completion toggle listeners
+                    lessonsTimelineContainer.querySelectorAll('.btn-toggle-lesson-complete').forEach(b => {
+                        b.addEventListener('click', async () => {
+                            const lid = b.getAttribute('data-lesson-id');
+                            const wasCompleted = b.getAttribute('data-completed') === '1';
+                            try {
+                                const res = await fetch(`/api/teacher/lessons/${lid}/toggle-conducted`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ isCompleted: !wasCompleted })
+                                });
+                                const d = await res.json();
+                                if (d.success) {
+                                    showToast(!wasCompleted ? 'Занятие отмечено проведённым!' : 'Отметка о проведении снята');
+                                    loadSchedule();
+                                } else {
+                                    alert(d.error || 'Ошибка обновления статуса занятия');
+                                }
+                            } catch(e) {
+                                alert('Ошибка сети при обновлении статуса занятия');
+                            }
+                        });
+                    });
 
                     // Attach delete listeners
                     lessonsTimelineContainer.querySelectorAll('.btn-delete-lesson').forEach(b => {
