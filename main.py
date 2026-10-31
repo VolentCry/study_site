@@ -414,6 +414,32 @@ def api_teacher_set_user_role(user_id: int):
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
+@app.route('/api/teacher/users/<int:user_id>', methods=['DELETE'])
+def api_teacher_delete_user(user_id: int):
+    """Удаление пользователя учителем/администратором."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    # Защита от удаления своего собственного аккаунта
+    if teacher['id'] == user_id:
+        return jsonify({'success': False, 'error': 'Вы не можете удалить свой собственный аккаунт.'}), 400
+
+    target_user = db.get_user_by_id(user_id)
+    if not target_user:
+        return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 404
+
+    # Учитель может удалять только учеников. Администратор может удалять любых пользователей.
+    if teacher.get('role') != 'admin' and target_user.get('role') in ('teacher', 'admin'):
+        return jsonify({'success': False, 'error': 'Учитель может удалять только профили учеников.'}), 403
+
+    ok = db.delete_user(user_id)
+    if not ok:
+        return jsonify({'success': False, 'error': 'Ошибка при удалении пользователя.'}), 500
+
+    return jsonify({'success': True, 'deletedUserId': user_id})
+
+
 @app.route('/api/teacher/students/<int:student_id>/dossier', methods=['GET'])
 def api_teacher_student_dossier(student_id: int):
     """Подробнейшее досье ученика с историей выполненных заданий и званиями."""

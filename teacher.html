@@ -2404,9 +2404,10 @@
                     const roleBadgeClass = u.role === 'admin' ? 'badge-admin' : (u.role === 'teacher' ? 'badge-teacher' : 'badge-student');
                     const roleLabel = u.role === 'admin' ? 'Админ' : (u.role === 'teacher' ? 'Учитель' : 'Ученик');
                     const classesNames = u.classes && u.classes.length ? u.classes.map(c => escapeHtml(c.className)).join(', ') : '—';
+                    const isSelf = currentTeacher && currentTeacher.id === u.id;
 
                     return `
-                        <tr>
+                        <tr id="user-row-${u.id}">
                             <td>
                                 <div class="user-cell">
                                     <div class="avatar-circle">${escapeHtml((u.displayName || u.username)[0].toUpperCase())}</div>
@@ -2433,6 +2434,11 @@
                                 <button type="button" class="btn btn-secondary btn-sm btn-toggle-role" data-user-id="${u.id}" data-role="${u.role}" title="Сменить роль">
                                     👑
                                 </button>
+                                ${isSelf ? '' : `
+                                <button type="button" class="btn btn-danger-outline btn-sm btn-delete-user" data-user-id="${u.id}" data-name="${escapeHtml(u.displayName || u.username)}" data-uname="${escapeHtml(u.username)}" title="Удалить пользователя">
+                                    🗑️
+                                </button>
+                                `}
                             </td>
                         </tr>
                     `;
@@ -2451,6 +2457,31 @@
                 });
                 tbody.querySelectorAll('.btn-toggle-role').forEach(b => {
                     b.addEventListener('click', () => toggleUserRole(parseInt(b.getAttribute('data-user-id')), b.getAttribute('data-role')));
+                });
+                tbody.querySelectorAll('.btn-delete-user').forEach(b => {
+                    b.addEventListener('click', async () => {
+                        const uid = parseInt(b.getAttribute('data-user-id'), 10);
+                        const name = b.getAttribute('data-name');
+                        const uname = b.getAttribute('data-uname');
+
+                        if (!confirm(`Вы действительно хотите удалить пользователя "${name}" (@${uname}) и всю его историю решений?`)) {
+                            return;
+                        }
+
+                        try {
+                            const res = await fetch(`/api/teacher/users/${uid}`, { method: 'DELETE' });
+                            const data = await res.json();
+                            if (data.success) {
+                                showToast(`Пользователь ${name} успешно удалён`);
+                                loadAllUsers();
+                                loadClasses();
+                            } else {
+                                alert(data.error || 'Ошибка при удалении пользователя');
+                            }
+                        } catch(e) {
+                            alert('Ошибка сети при удалении пользователя');
+                        }
+                    });
                 });
             }
 

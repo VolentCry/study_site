@@ -470,6 +470,25 @@ def set_user_role_by_username(username: str, role: str) -> bool:
     return set_user_role(user['id'], role)
 
 
+def delete_user(user_id: int) -> bool:
+    """Удаляет пользователя и все связанные с ним данные из базы данных."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA foreign_keys = ON;")
+            cursor.execute("DELETE FROM homework_submissions WHERE student_id = ?", (user_id,))
+            cursor.execute("DELETE FROM class_members WHERE student_id = ?", (user_id,))
+            cursor.execute("DELETE FROM user_data WHERE user_id = ?", (user_id,))
+            cursor.execute("DELETE FROM lessons WHERE teacher_id = ? OR student_id = ?", (user_id, user_id))
+            cursor.execute("DELETE FROM homeworks WHERE teacher_id = ?", (user_id,))
+            cursor.execute("DELETE FROM classes WHERE teacher_id = ?", (user_id,))
+            cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
 def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
     """Получение полного игрового прогресса пользователя по ID."""
     conn = get_db_connection()
