@@ -32,27 +32,6 @@
       --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
       --r-md: 14px;
       --r-lg: 20px;
-      --accent: #ff7728;
-      --accent-cyan: #2ce6d6;
-    }
-
-    [data-theme="dark"] {
-      --paper: #090c13;
-      --paper-light: #101522;
-      --paper-card: #151b2b;
-      --ink: #f8fafc;
-      --muted: #94a3b8;
-      --indigo: #38bdf8;
-      --indigo-soft: rgba(56,189,248,0.12);
-      --indigo-dark: #f8fafc;
-      --vermilion: #ff7728;
-      --vermilion-light: rgba(255,119,40,0.15);
-      --vermilion-border: rgba(255,119,40,0.3);
-      --gold: #fbbf24;
-      --gold-light: rgba(251,191,36,0.12);
-      --green: #10b981;
-      --green-light: rgba(16,185,129,0.15);
-      --line: rgba(255,255,255,0.12);
     }
 
     body {
@@ -66,7 +45,6 @@
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
         radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
-      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     a { color: inherit; }
@@ -78,10 +56,6 @@
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
     }
-    [data-theme="dark"] .site-nav {
-      background: rgba(16,21,34,0.92);
-    }
-
     .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
     .brand-mark {
       width: 34px; height: 34px; display: grid; place-items: center;
@@ -96,11 +70,8 @@
       display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
       border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
     }
-    [data-theme="dark"] .nav-task-switcher {
-      background: rgba(255,255,255,0.06);
-    }
     .task-pill {
-      padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
       text-decoration: none; color: var(--muted); transition: all .2s ease;
     }
     .task-pill:hover { color: var(--vermilion); }
@@ -108,14 +79,14 @@
       background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
     }
 
-    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
     .nav-btn {
-      min-height: 36px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px;
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
       border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
       text-decoration: none; border-radius: 6px; background: var(--paper-light);
       transition: all .2s;
     }
-    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: var(--paper-card); }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
     .xp-counter {
       font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
       padding: 4px 10px; border-radius: 999px;
@@ -136,7 +107,7 @@
       text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
     }
     .trainer-title {
-      font: 900 clamp(26px, 4vw, 38px)/1.2 'Zen Old Mincho', serif;
+      font: 900 clamp(28px, 4.5vw, 40px)/1.2 'Zen Old Mincho', serif;
       color: var(--indigo-dark); margin-bottom: 8px;
     }
     .trainer-subtitle {
@@ -180,7 +151,6 @@
       border-radius: var(--r-lg); padding: 36px 32px 32px;
       box-shadow: var(--shadow-md); position: relative;
       display: flex; flex-direction: column; align-items: center; gap: 24px;
-      width: 100%; box-sizing: border-box;
     }
     .card-top-tag {
       position: absolute; top: 16px; left: 24px;
@@ -193,114 +163,97 @@
       background: var(--vermilion-light); padding: 3px 10px; border-radius: 999px;
     }
 
-    /* TASK DISPLAY */
+    /* TASK DISPLAY & SVG NUMBER LINE */
     .task-display {
       width: 100%; text-align: center; margin-top: 10px;
       display: flex; flex-direction: column; align-items: center; gap: 16px;
     }
     .task-prompt {
-      font-size: 16px; color: var(--ink); line-height: 1.5; font-weight: 600;
+      font-size: 15px; color: var(--ink); line-height: 1.6; font-weight: 600;
       max-width: 720px;
     }
     .task-prompt strong { color: var(--vermilion); }
 
-    /* NUMBER LINE SVG CONTAINER */
     .number-line-container {
       width: 100%; max-width: 760px;
       background: var(--paper-light);
       border: 1px solid var(--line);
       border-radius: var(--r-md);
-      padding: 12px 16px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
-      position: relative;
-      overflow: hidden;
+      box-shadow: inset 0 2px 6px rgba(38,63,97,.04);
+      overflow-x: auto;
     }
     .number-line-svg {
-      width: 100%; height: auto; display: block; max-height: 150px;
+      width: 100%; max-width: 680px; height: auto; display: block;
     }
 
-    /* SANDBOX HELPER CARD */
-    .sandbox-toggle-wrap {
-      width: 100%; display: flex; justify-content: center; margin-top: -6px;
-    }
-    .btn-sandbox {
-      font-size: 12px; font-weight: 700; color: var(--indigo);
-      background: rgba(38,63,97,.08); padding: 6px 14px; border-radius: 999px;
-      border: 1px dashed var(--indigo); cursor: pointer; transition: all .2s ease;
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-sandbox:hover {
-      background: var(--indigo); color: #fff;
-    }
-    .sandbox-card {
-      width: 100%; max-width: 760px;
-      background: var(--paper-light);
-      border: 1px solid var(--line);
-      border-radius: var(--r-md);
-      padding: 16px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--ink);
-      display: none;
-      animation: fadeIn 0.25s ease;
-    }
-    .sandbox-card.show { display: block; }
-    .sandbox-title {
-      font-weight: 800; font-family: 'Zen Old Mincho', serif;
-      font-size: 15px; margin-bottom: 6px; color: var(--indigo);
-      display: flex; align-items: center; gap: 6px;
-    }
-
-    /* OPTIONS GRID (4 ЧЕТКИХ ВАРИАНТА ОТВЕТА) */
+    /* OPTIONS GRID (4 CHOICE CARDS) */
     .options-grid {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-      width: 100%; max-width: 760px;
+      width: 100%; max-width: 680px;
     }
     .option-card {
       background: var(--paper-light);
       border: 2px solid var(--line);
       border-radius: var(--r-md);
-      padding: 14px 18px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all .2s ease;
       user-select: none;
       text-align: left;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--ink);
     }
     .option-card:hover {
       border-color: var(--indigo);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
       box-shadow: var(--shadow-sm);
+      background: #fff;
     }
     .option-card.selected {
       border-color: var(--vermilion);
       background: var(--vermilion-light);
-      box-shadow: 0 0 0 3px rgba(183,70,78,0.25);
+      box-shadow: 0 0 0 3px rgba(183,70,78,.18);
       color: var(--vermilion);
     }
     .option-num-badge {
       width: 28px; height: 28px; border-radius: 8px;
-      background: rgba(38,63,97,0.12); color: var(--indigo);
-      display: grid; place-items: center; font-size: 13px; font-weight: 800;
+      background: rgba(38,63,97,.08); color: var(--indigo);
+      display: grid; place-items: center; font-size: 13px; font-weight: 700;
       flex-shrink: 0; font-family: 'Zen Old Mincho', serif;
-      transition: all 0.2s;
+      transition: all .2s;
     }
     .option-card.selected .option-num-badge {
-      background: var(--vermilion); color: #ffffff;
+      background: var(--vermilion); color: #fff;
+    }
+    .option-card.correct {
+      border-color: var(--green) !important;
+      background: var(--green-light) !important;
+      color: var(--green) !important;
+    }
+    .option-card.correct .option-num-badge {
+      background: var(--green) !important; color: #fff !important;
+    }
+    .option-card.wrong {
+      border-color: var(--vermilion) !important;
+      background: var(--vermilion-light) !important;
+      color: var(--vermilion) !important;
+    }
+    .option-card.wrong .option-num-badge {
+      background: var(--vermilion) !important; color: #fff !important;
     }
     .option-text {
       flex: 1; word-break: break-word;
     }
 
-    /* ANSWER ROW & BUTTONS */
+    /* ANSWER ROW & INPUT */
     .answer-row {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
       width: 100%; max-width: 500px;
@@ -314,9 +267,6 @@
       background: #fff; color: var(--ink); font-size: 20px; font-weight: 700;
       font-family: 'DM Sans', monospace; text-align: center;
       transition: all .2s ease;
-    }
-    [data-theme="dark"] .answer-input {
-      background: var(--paper-light);
     }
     .answer-input:focus,
     .answer-input:focus-visible {
@@ -334,31 +284,61 @@
 
     .btn-check,
     .btn-next {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      height: 52px; padding: 0 28px; border-radius: 10px; border: none;
-      font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
-      line-height: 1; white-space: nowrap; text-align: center; box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      padding: 0 28px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
       transition: all .2s ease;
     }
     .btn-check:focus-visible,
     .btn-next:focus-visible {
-      outline: 2px solid var(--indigo); outline-offset: 2px;
+      outline: 2px solid var(--indigo);
+      outline-offset: 2px;
     }
     .btn-check {
-      background: var(--vermilion); color: #fff;
+      background: var(--vermilion);
+      color: #fff;
       box-shadow: 0 4px 14px rgba(183,70,78,.35);
     }
     .btn-check:hover {
-      background: #d3525b; transform: translateY(-1px);
+      background: #d3525b;
+      transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(183,70,78,.45);
     }
+    .btn-check:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(183,70,78,.3);
+    }
+    .btn-check:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .btn-next {
-      background: var(--indigo); color: #fff;
+      background: var(--indigo);
+      color: #fff;
       box-shadow: 0 4px 14px rgba(38,63,97,.25);
     }
     .btn-next:hover {
-      background: #19273c; transform: translateY(-1px);
+      background: #19273c;
+      transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+    .btn-next:active {
+      transform: translateY(0);
     }
 
     /* FEEDBACK MESSAGE */
@@ -375,7 +355,7 @@
       background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
     }
 
-    /* CARD TOOLS */
+    /* CARD ACTION TOOLS */
     .card-tools {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
       padding-top: 10px; border-top: 1px dashed var(--line); width: 100%;
@@ -386,45 +366,51 @@
       border-radius: 8px; background: var(--paper-light); border: 1px solid var(--line);
       transition: all .2s ease;
     }
-    .tool-link-btn:hover { border-color: var(--vermilion); color: var(--vermilion); }
+    .tool-link-btn:hover { background: #fff; color: var(--vermilion); border-color: var(--vermilion); }
 
-    /* SOLUTION BLOCK */
-    .solution-card {
-      width: 100%; max-width: 760px; background: var(--paper-light);
-      border: 1px solid var(--line); border-radius: var(--r-md);
-      padding: 22px; display: none; animation: fadeIn .3s ease;
+    /* COLLAPSIBLE PANELS (SOLUTION & THEORY & SANDBOX) */
+    .accordion-panel {
+      width: 100%; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 20px 24px; display: none;
+      animation: fadeIn .25s ease;
     }
-    .solution-card.show { display: block; }
-    .solution-head {
-      font: 700 16px/1.2 'Zen Old Mincho', serif; color: var(--indigo);
-      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    .accordion-panel.active { display: block; }
+    .accordion-panel h3 {
+      font: 700 17px 'Zen Old Mincho', serif; color: var(--indigo);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .solution-list {
+      display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6;
     }
     .solution-step {
-      margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px dashed var(--line);
+      background: #fff; padding: 12px 16px; border-radius: 8px; border-left: 3px solid var(--indigo);
     }
-    .solution-step:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-    .step-num {
+    .solution-step .step-num {
       font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
       color: var(--vermilion); margin-bottom: 4px;
     }
-    .step-text { font-size: 14px; line-height: 1.6; color: var(--ink); }
-
-    /* FOOTER */
-    .trainer-footer {
-      margin-top: auto; border-top: 1px solid var(--line); padding: 24px 5vw;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    .solution-step .step-text {
+      font-size: 14px; line-height: 1.6; color: var(--ink);
     }
-    .footer-links { display: flex; align-items: center; gap: 16px; }
-    .footer-links a:hover { color: var(--vermilion); }
+
+    /* MILESTONE CELEBRATION MODAL */
+    .milestone-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--indigo-dark); color: #fff; padding: 14px 28px;
+      border-radius: 999px; box-shadow: var(--shadow-lg); font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; z-index: 100;
+      opacity: 0; transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .milestone-toast.active {
+      transform: translateX(-50%) translateY(0); opacity: 1;
+    }
 
     @keyframes popIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes fadeIn { from { opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* RESPONSIVE */
     @media (max-width: 768px) {
       .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
-      .problem-card { padding: 32px 18px 24px; }
+      .problem-card { padding: 24px 18px; }
       .options-grid { grid-template-columns: 1fr; }
       .answer-row { flex-direction: column; width: 100%; }
       .answer-input-wrap { width: 100%; min-width: 0; }
@@ -433,63 +419,90 @@
     }
 
     @media (max-width: 540px) {
-      .site-nav { padding: 0 12px; min-height: 54px; gap: 6px; }
+      .site-nav {
+        padding: 0 12px;
+        min-height: 54px;
+        gap: 6px;
+      }
       .brand-sub { display: none; }
       .brand-name { font-size: 15px; }
       .nav-actions { gap: 6px; }
-      .nav-btn { padding: 0 8px; min-height: 32px; font-size: 11px; }
-      .trainer-shell { padding: 20px 14px 48px; gap: 16px; }
-      .problem-card { padding: 44px 14px 22px; }
-      .card-top-tag { top: 12px; left: 14px; font-size: 10px; }
-      .card-help-badge { top: 12px; right: 14px; font-size: 10px; }
-      .cat-btn { padding: 5px 10px; font-size: 11px; }
-      .tool-link-btn { width: 100%; justify-content: center; min-height: 42px; }
-      .number-line-container { padding: 8px 6px; }
+      .nav-btn {
+        padding: 0 8px;
+        min-height: 32px;
+        font-size: 11px;
+      }
+      .trainer-shell {
+        padding: 20px 14px 48px;
+        gap: 16px;
+      }
+      .problem-card {
+        padding: 44px 14px 22px;
+      }
+      .card-top-tag {
+        top: 12px; left: 14px; font-size: 10px; max-width: 52%;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .card-help-badge {
+        top: 12px; right: 14px; font-size: 10px;
+      }
+      .cat-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .tool-link-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 42px;
+      }
+      .number-line-container {
+        padding: 10px 8px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- SITE NAVIGATION -->
+  <!-- SITE NAV -->
   <header class="site-nav" role="banner">
-    <a class="brand" href="../pages/math_9.html" aria-label="Вернуться в модуль 9 класса">
-      <div class="brand-mark" aria-hidden="true">7</div>
+    <a class="brand" href="../pages/math_9.html" aria-label="Вернуться в Математика 9 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
       <div class="brand-text">
-        <span class="brand-name">НЕШКОЛА</span>
-        <span class="brand-sub">ОГЭ 9 класс · Математика</span>
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика</span>
       </div>
     </a>
 
-    <!-- ПЕРЕКЛЮЧАТЕЛЬ ЗАДАНИЙ ОГЭ В ШАПКЕ -->
-    <nav class="nav-task-switcher" aria-label="Другие задания ОГЭ">
-      <a href="oge_task_6_trainer.html" class="task-pill">№6 Дроби</a>
-      <a href="oge_task_7_trainer.html" class="task-pill active">№7 Прямая</a>
-      <a href="oge_task_8_trainer.html" class="task-pill">№8 Степени</a>
-      <a href="oge_task_9_trainer.html" class="task-pill">№9 Уравнения</a>
-      <a href="oge_task_10_trainer.html" class="task-pill">№10 Вероятность</a>
-      <a href="oge_task_18_trainer.html" class="task-pill">№18 Сетка</a>
-    </nav>
+    <!-- TASK SWITCHER -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <a href="oge_task_6_trainer.html" class="task-pill">№6 (Дроби)</a>
+      <span class="task-pill active" aria-current="page">№7 (Прямая)</span>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8 (Степени)</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9 (Уравнения)</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10 (Вероятность)</a>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18 (Геометрия)</a>
+    </div>
 
     <div class="nav-actions">
-      <span class="xp-counter" id="user-xp-badge" title="Накопленный опыт">⚡ 0 XP</span>
-      <button id="theme-toggle-btn" class="nav-btn" type="button" aria-label="Сменить тему оформления">🌓</button>
-      <a href="../pages/math_9.html" class="nav-btn">← К списку</a>
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/oge_roadmap.html" class="nav-btn">🗺️ Роадмап</a>
     </div>
   </header>
 
-  <!-- MAIN TRAINER CONTENT -->
   <main class="trainer-shell">
-
-    <!-- HERO HEADER -->
+    <!-- HEADER -->
     <div class="trainer-header">
-      <div class="trainer-kicker">ОГЭ 2026 · ЗАДАНИЕ №7</div>
-      <h1 class="trainer-title">Координатная прямая и неравенства</h1>
+      <div class="trainer-kicker">ОГЭ 2026 · Модуль «Алгебра»</div>
+      <h1 class="trainer-title">Задание №7: Числовые неравенства, координатная прямая</h1>
       <p class="trainer-subtitle">
-        Оценка квадратных корней, обыкновенные дроби на числовых отрезках, правила знаков для буквенных выражений и сравнение разностей по банку ФИПИ.
+        Числа на координатной прямой, оценка квадратных корней, обыкновенные дроби на числовых отрезках и знаки неравенств по банку ФИПИ.
       </p>
     </div>
 
-    <!-- STATS DASHBOARD (HUD) -->
+    <!-- STATS DASHBOARD -->
     <div class="stats-dashboard" aria-label="Статистика тренировки">
       <div class="stat-box streak-box">
         <div class="stat-icon">🔥</div>
@@ -506,23 +519,23 @@
         </div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon">🎯</div>
+        <div class="stat-icon">✅</div>
         <div class="stat-info">
           <span class="stat-num" id="stat-total-solved">0</span>
           <span class="stat-label">Всего решено</span>
         </div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon">👑</div>
+        <div class="stat-icon">🎖️</div>
         <div class="stat-info">
-          <span class="stat-num" id="stat-rank">Новичок</span>
+          <span class="stat-num" id="stat-rank">Не начат</span>
           <span class="stat-label">Звание ОГЭ</span>
         </div>
       </div>
     </div>
 
-    <!-- CATEGORY FILTER TABS -->
-    <div class="category-filter" role="tablist" aria-label="Категории прототипов задания 7">
+    <!-- CATEGORY FILTER -->
+    <div class="category-filter" role="tablist" aria-label="Выбор подтипа заданий">
       <button class="cat-btn active" data-cat="mixed_all">Все прототипы</button>
       <button class="cat-btn" data-cat="roots_on_line">Квадратные корни</button>
       <button class="cat-btn" data-cat="fractions_and_intervals">Дроби и отрезки</button>
@@ -533,104 +546,116 @@
     <!-- PROBLEM CARD -->
     <div class="problem-card">
       <span class="card-top-tag" id="task-badge">Задание №7 · ФИПИ</span>
-      <span class="card-help-badge" id="task-cat-badge">Квадратные корни</span>
+      <span class="card-help-badge" id="task-cat-badge">Координатная прямая</span>
 
       <div class="task-display">
         <div class="task-prompt" id="task-prompt">Загрузка задания...</div>
-        
-        <!-- КООРДИНАТНАЯ ПРЯМАЯ SVG -->
-        <div class="number-line-container" id="svg-container">
-          <!-- Динамический SVG -->
-        </div>
-
-        <!-- КНОПКА ПЕСОЧНИЦЫ ДЛЯ САМОПРОВЕРКИ -->
-        <div class="sandbox-toggle-wrap" id="sandbox-toggle-wrap">
-          <button type="button" class="btn-sandbox" id="btn-toggle-sandbox">
-            <span>🔬 Проверить на конкретных числах</span>
-          </button>
-        </div>
-
-        <!-- ПЕСОЧНИЦА ПОДСТАНОВКИ -->
-        <div class="sandbox-card" id="sandbox-card">
-          <div class="sandbox-title">💡 Песочница самопроверки</div>
-          <div id="sandbox-content"></div>
-        </div>
+        <div class="number-line-container" id="svg-container"></div>
       </div>
 
-      <!-- ВАРИАНТЫ ОТВЕТОВ (4 КЛИКАБЕЛЬНЫЕ КАРТОЧКИ) -->
-      <div class="options-grid" id="options-grid" role="radiogroup" aria-label="Варианты ответов">
-        <!-- Генерируются динамически -->
-      </div>
+      <!-- 4 OPTIONS GRID -->
+      <div class="options-grid" id="options-grid" role="radiogroup" aria-label="Варианты ответов"></div>
 
       <!-- ANSWER ROW -->
       <div class="answer-row">
         <div class="answer-input-wrap">
-          <input
-            type="text"
-            inputmode="numeric"
-            pattern="[1-4]"
-            id="answer-input"
-            class="answer-input"
+          <input 
+            type="text" 
+            inputmode="numeric" 
+            pattern="[1-4]" 
+            id="answer-input" 
+            class="answer-input" 
             placeholder="Номер ответа (1, 2, 3 или 4)"
             autocomplete="off"
             maxlength="1"
-            aria-label="Поле для номера правильного ответа"
+            aria-label="Поле для ввода номера ответа"
           />
         </div>
-        <button id="btn-check" class="btn-check" type="button">Проверить ответ ↵</button>
-        <button id="btn-next" class="btn-next" type="button" style="display: none;">Следующее задание →</button>
+        <button id="btn-check" class="btn-check">Проверить ↵</button>
+        <button id="btn-next" class="btn-next" style="display: none;">Следующее →</button>
       </div>
 
       <!-- FEEDBACK BANNER -->
       <div id="feedback-banner" class="feedback-banner" role="alert"></div>
 
-      <!-- CARD TOOLS -->
+      <!-- TOOLS -->
       <div class="card-tools">
         <button id="btn-toggle-solution" class="tool-link-btn" type="button">
-          <span>💡 Показать пошаговый разбор</span>
+          <span>💡</span> <span>Показать решение</span>
         </button>
-        <button id="btn-skip-task" class="tool-link-btn" type="button">
-          <span>🎲 Сгенерировать другое</span>
+        <button id="btn-toggle-theory" class="tool-link-btn" type="button">
+          <span>📖</span> <span>Шпаргалка формул №7</span>
+        </button>
+        <button id="btn-toggle-sandbox" class="tool-link-btn" type="button" style="display: none;">
+          <span>🔬</span> <span>Подстановка чисел</span>
+        </button>
+        <button id="btn-new-task" class="tool-link-btn" type="button">
+          <span>🔄</span> <span>Другой пример</span>
         </button>
       </div>
-
-      <!-- SOLUTION STEP-BY-STEP EXPLAINER -->
-      <div id="solution-card" class="solution-card">
-        <div class="solution-head">
-          <span>📐 Пошаговый алгоритм решения</span>
-        </div>
-        <div id="solution-content">
-          <!-- Решение генерируется динамически -->
-        </div>
-      </div>
-
     </div>
 
+    <!-- ACCORDION: STEP-BY-STEP SOLUTION -->
+    <div id="solution-panel" class="accordion-panel">
+      <h3><span>💡</span> Пошаговый разбор решения</h3>
+      <div class="solution-list" id="solution-content"></div>
+    </div>
+
+    <!-- ACCORDION: THEORY CHEAT SHEET -->
+    <div id="theory-panel" class="accordion-panel">
+      <h3><span>📖</span> Формулы и алгоритмы для Задания №7</h3>
+      <div class="solution-list">
+        <div class="solution-step">
+          <strong>1. Оценка квадратных корней на координатной прямой:</strong><br>
+          Чтобы найти положение корня вида √n между целыми числами, определите два ближайших точных квадрата:<br>
+          k² &lt; n &lt; (k + 1)², следовательно k &lt; √n &lt; k + 1.<br>
+          <em>Пример:</em> 36 &lt; 39 &lt; 49, значит 6 &lt; √39 &lt; 7. Чтобы узнать, к какому краю ближе корень, возведите в квадрат середину: 6,5² = 42,25. Так как 39 &lt; 42,25, число √39 лежит левее середины (ближе к 6).
+        </div>
+        <div class="solution-step">
+          <strong>2. Расположение обыкновенных дробей:</strong><br>
+          Чтобы нанести дробь вида a/b на числовую прямую, переведите её в десятичную делением числителя на знаменатель столбиком до 1–2 знаков после запятой.<br>
+          <em>Пример:</em> 43/7 = 6 1/7 = 6 + 0,14... &approx; 6,14. Значит, точка лежит чуть правее 6.
+        </div>
+        <div class="solution-step">
+          <strong>3. Неравенства с переменными (метод пробных чисел):</strong><br>
+          Если на прямой отмечены переменные x, y относительно 0, выпишите их приблизительные числовые значения с учётом знаков (например, x = −1,8; y = 2,7). Подставьте эти числа в каждое утверждение для быстрой и надёжной проверки.
+        </div>
+        <div class="solution-step">
+          <strong>4. Сравнение разностей:</strong><br>
+          • Если точка a лежит правее точки b (a &gt; b), то разность <strong>a − b &gt; 0</strong> (положительна).<br>
+          • Если точка a лежит левее точки b (a &lt; b), то разность <strong>a − b &lt; 0</strong> (отрицательна).
+        </div>
+        <div class="solution-step">
+          <strong>5. Запись ответа в бланк ОГЭ:</strong><br>
+          В бланке ответов ОГЭ №1 для Задания 7 записывается ТОЛЬКО одна цифра — номер выбранного варианта ответа (1, 2, 3 или 4) без пробелов, запятых и пояснений.
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCORDION: SANDBOX (ПОДСТАНОВКА ЧИСЕЛ) -->
+    <div id="sandbox-panel" class="accordion-panel">
+      <h3><span>🔬</span> Песочница численной проверки</h3>
+      <div class="solution-list">
+        <div class="solution-step" id="sandbox-content"></div>
+      </div>
+    </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="trainer-footer">
-    <div>НЕШкола · Образовательная платформа для подготовки к ОГЭ и олимпиадам</div>
-    <div class="footer-links">
-      <a href="../pages/math_9.html">Модуль 9 класса</a>
-      <a href="../pages/oge_roadmap.html">Дорожная карта ОГЭ</a>
-      <a href="../profile.html">Личный кабинет</a>
-    </div>
-  </footer>
+  <!-- CELEBRATION TOAST -->
+  <div id="milestone-toast" class="milestone-toast"></div>
 
-  <!-- СКРИПТЫ СИСТЕМЫ И ТРЕНАЖЕРА -->
+  <!-- SCRIPTS -->
   <script src="../js/trainer_rank_tracker.js"></script>
   <script src="../js/trainer_timed_mode.js"></script>
   <script src="../js/oge_task_7_trainer.js"></script>
-
   <script>
-    (function () {
+    (function() {
       const TRAINER_ID = 'oge_task_7';
       let currentCategory = 'mixed_all';
       let currentTask = null;
       let hasAnsweredCurrent = false;
 
-      // DOM Elements
+      // DOM элементы
       const taskPrompt = document.getElementById('task-prompt');
       const svgContainer = document.getElementById('svg-container');
       const optionsGrid = document.getElementById('options-grid');
@@ -640,58 +665,60 @@
       const feedbackBanner = document.getElementById('feedback-banner');
       const taskBadge = document.getElementById('task-badge');
       const taskCatBadge = document.getElementById('task-cat-badge');
-      const btnToggleSolution = document.getElementById('btn-toggle-solution');
-      const btnSkipTask = document.getElementById('btn-skip-task');
-      const solutionCard = document.getElementById('solution-card');
-      const solutionContent = document.getElementById('solution-content');
-      const sandboxCard = document.getElementById('sandbox-card');
-      const sandboxContent = document.getElementById('sandbox-content');
-      const btnToggleSandbox = document.getElementById('btn-toggle-sandbox');
-      const sandboxToggleWrap = document.getElementById('sandbox-toggle-wrap');
-      const themeToggleBtn = document.getElementById('theme-toggle-btn');
-      const userXpBadge = document.getElementById('user-xp-badge');
 
-      // HUD Stats Elements
       const statStreak = document.getElementById('stat-streak');
       const statMaxStreak = document.getElementById('stat-max-streak');
-      const statTotalSolved = document.getElementById('stat-total-solved');
+      const statTotal = document.getElementById('stat-total-solved');
       const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
 
-      // --- ИНИЦИАЛИЗАЦИЯ ТЕМЫ ОФОРМЛЕНИЯ ---
-      function initTheme() {
-        const savedTheme = localStorage.getItem('site_theme') || localStorage.getItem('profileTheme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        if (themeToggleBtn) {
-          themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌓';
-          themeToggleBtn.addEventListener('click', () => {
-            const cur = document.documentElement.getAttribute('data-theme') || 'light';
-            const next = cur === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('site_theme', next);
-            localStorage.setItem('profileTheme', next);
-            themeToggleBtn.textContent = next === 'dark' ? '☀️' : '🌓';
-          });
-        }
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const theoryPanel = document.getElementById('theory-panel');
+      const sandboxPanel = document.getElementById('sandbox-panel');
+      const sandboxContent = document.getElementById('sandbox-content');
+      const btnToggleSandbox = document.getElementById('btn-toggle-sandbox');
+      const milestoneToast = document.getElementById('milestone-toast');
+
+      // Инициализация звуков через Web Audio API
+      let audioCtx = null;
+      function playTone(freq, type, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
       }
 
-      // --- ОБНОВЛЕНИЕ HUD СТАТИСТИКИ ---
-      function updateStatsHUD() {
-        if (!window.TrainerRankTracker) return;
-        const stats = TrainerRankTracker.getStats(TRAINER_ID);
-        if (statStreak) statStreak.textContent = stats.currentStreak || 0;
-        if (statMaxStreak) statMaxStreak.textContent = stats.bestStreak || 0;
-        if (statTotalSolved) statTotalSolved.textContent = stats.totalSolved || 0;
-        if (statRank) {
-          const rankInfo = TrainerRankTracker.getRank(TRAINER_ID, stats.currentStreak || 0);
-          statRank.textContent = rankInfo ? rankInfo.title.split(' ')[0] : 'Новичок';
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const records = window.TrainerTracker.getTrainerRecords();
+          const cur = records[TRAINER_ID] || { maxStreak: 0, totalSolved: 0, maxRank: 'Не начат' };
+          statMaxStreak.textContent = cur.maxStreak || 0;
+          statTotal.textContent = cur.totalSolved || 0;
+          statRank.textContent = cur.maxRank || 'Не начат';
         }
-        if (userXpBadge) {
-          const xp = TrainerRankTracker.getUserXP ? TrainerRankTracker.getUserXP() : (stats.totalSolved || 0) * 10;
-          userXpBadge.textContent = `⚡ ${xp} XP`;
-        }
+
+        try {
+          const userXp = localStorage.getItem('user_xp') || '0';
+          navXpBadge.textContent = 'XP +' + userXp;
+        } catch(e) {}
       }
 
-      // --- ВЫБОР ОПЦИИ ОТВЕТА ---
+      function showToast(text) {
+        milestoneToast.textContent = text;
+        milestoneToast.classList.add('active');
+        setTimeout(() => milestoneToast.classList.remove('active'), 3200);
+      }
+
       function selectOption(optionNumber) {
         if (hasAnsweredCurrent) return;
         const cards = optionsGrid.querySelectorAll('.option-card');
@@ -705,24 +732,24 @@
           }
         });
         answerInput.value = optionNumber;
-        answerInput.classList.remove('wrong', 'correct');
+        answerInput.className = 'answer-input';
       }
 
-      // --- ЗАГРУЗКА НОВОЙ ЗАДАЧИ ---
       function loadNewTask() {
-        if (!window.OgeTask7Trainer) return;
-
+        if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+          currentCategory = 'mixed_all';
+        }
         hasAnsweredCurrent = false;
         currentTask = OgeTask7Trainer.generateTask(currentCategory);
 
-        // Обновляем текст и бейджи
         taskPrompt.innerHTML = currentTask.text;
         taskCatBadge.textContent = currentTask.categoryTitle;
+        taskBadge.textContent = 'Задание №7 · ' + (currentTask.categoryTitle || 'ФИПИ');
 
-        // Рендерим SVG
+        // Рендер SVG
         svgContainer.innerHTML = currentTask.svg;
 
-        // Рендерим варианты ответов
+        // Рендер карточек с вариантами
         optionsGrid.innerHTML = '';
         currentTask.options.forEach((optText, idx) => {
           const optCard = document.createElement('div');
@@ -745,126 +772,139 @@
           optionsGrid.appendChild(optCard);
         });
 
-        // Сбрасываем поля и кнопки
         answerInput.value = '';
+        answerInput.className = 'answer-input';
         answerInput.disabled = false;
-        answerInput.classList.remove('correct', 'wrong');
-        btnCheck.style.display = 'inline-flex';
-        btnNext.style.display = 'none';
+        answerInput.focus();
+
         feedbackBanner.className = 'feedback-banner';
         feedbackBanner.textContent = '';
-        solutionCard.classList.remove('show');
-        btnToggleSolution.querySelector('span').textContent = '💡 Показать пошаговый разбор';
+        btnCheck.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
 
-        // Настройка песочницы самопроверки
-        sandboxCard.classList.remove('show');
+        // Формируем решение
+        solutionContent.innerHTML = currentTask.explanation;
+        solutionPanel.classList.remove('active');
+
+        // Настройка песочницы подстановки
+        sandboxPanel.classList.remove('active');
         if (currentTask.sandbox) {
-          sandboxToggleWrap.style.display = 'flex';
+          btnToggleSandbox.style.display = 'inline-flex';
           let sbHtml = '';
           if (currentTask.sandbox.type === 'variables') {
             const sb = currentTask.sandbox;
             sbHtml = `
-              <div>
-                <strong>Пример конкретных чисел для проверки:</strong><br>
-                По рисунку видно, что <strong>x &approx; ${sb.x}</strong>, а <strong>y &approx; ${sb.y}</strong>.<br>
-                Подставим эти значения в каждое выражение и проверим знак:
-                <ul style="margin-top:6px; padding-left:18px;">
-                  <li>x + y = (${sb.x}) + (${sb.y}) = <strong>${(sb.x + sb.y).toFixed(1)}</strong></li>
-                  <li>x &middot; y = (${sb.x}) &middot; (${sb.y}) = <strong>${(sb.x * sb.y).toFixed(1)}</strong></li>
-                  <li>x &minus; y = (${sb.x}) &minus; (${sb.y}) = <strong>${(sb.x - sb.y).toFixed(1)}</strong></li>
-                </ul>
-              </div>
+              <strong>Пример конкретных чисел для быстрой проверки:</strong><br>
+              По рисунку видно, что <strong>x &approx; ${sb.x}</strong>, а <strong>y &approx; ${sb.y}</strong>.<br>
+              Подставим эти значения в каждое выражение и проверим знак:
+              <ul style="margin-top:6px; padding-left:18px; line-height: 1.7;">
+                <li>x + y = (${sb.x}) + (${sb.y}) = <strong>${(sb.x + sb.y).toFixed(1)}</strong></li>
+                <li>x &middot; y = (${sb.x}) &middot; (${sb.y}) = <strong>${(sb.x * sb.y).toFixed(1)}</strong></li>
+                <li>x &minus; y = (${sb.x}) &minus; (${sb.y}) = <strong>${(sb.x - sb.y).toFixed(1)}</strong></li>
+              </ul>
             `;
           } else if (currentTask.sandbox.type === 'roots') {
             const sb = currentTask.sandbox;
             sbHtml = `
-              <div>
-                <strong>Оценка ближайших квадратов:</strong><br>
-                ${sb.k}<sup>2</sup> = <strong>${sb.kSq}</strong> &nbsp;|&nbsp; 
-                (${sb.k},5)<sup>2</sup> = <strong>${((sb.k + 0.5) ** 2).toFixed(2)}</strong> &nbsp;|&nbsp; 
-                ${sb.nextK}<sup>2</sup> = <strong>${sb.nextKSq}</strong><br>
-                Число <strong>${sb.number}</strong> лежит между ${sb.kSq} и ${sb.nextKSq}, поэтому его корень заключён строго между <strong>${sb.k}</strong> и <strong>${sb.nextK}</strong>!
-              </div>
+              <strong>Оценка ближайших квадратов:</strong><br>
+              ${sb.k}<sup>2</sup> = <strong>${sb.kSq}</strong> &nbsp;|&nbsp; 
+              (${sb.k},5)<sup>2</sup> = <strong>${((sb.k + 0.5) ** 2).toFixed(2)}</strong> &nbsp;|&nbsp; 
+              ${sb.nextK}<sup>2</sup> = <strong>${sb.nextKSq}</strong><br>
+              Число <strong>${sb.number}</strong> лежит между ${sb.kSq} и ${sb.nextKSq}, поэтому его корень заключён строго между <strong>${sb.k}</strong> и <strong>${sb.nextK}</strong>!
             `;
           } else if (currentTask.sandbox.type === 'fraction') {
             const sb = currentTask.sandbox;
             sbHtml = `
-              <div>
-                <strong>Перевод дробей в десятичные:</strong><br>
-                Искомый отрезок: <strong>[${sb.interval[0]}; ${sb.interval[1]}]</strong><br>
-                Значения вариантов: ${sb.fractions.map(f => `<strong>${f.str} &approx; ${f.dec}</strong>`).join(' &nbsp;|&nbsp; ')}
-              </div>
+              <strong>Перевод дробей в десятичные:</strong><br>
+              Искомый отрезок: <strong>[${sb.interval[0]}; ${sb.interval[1]}]</strong><br>
+              Значения вариантов: ${sb.fractions.map(f => `<strong>${f.str} &approx; ${f.dec}</strong>`).join(' &nbsp;|&nbsp; ')}
             `;
           } else {
-            sbHtml = `<div>Используйте визуальную ось и пошаговый разбор для самопроверки.</div>`;
+            sbHtml = `Используйте визуальную ось и пошаговый разбор решения для самопроверки.`;
           }
           sandboxContent.innerHTML = sbHtml;
         } else {
-          sandboxToggleWrap.style.display = 'none';
+          btnToggleSandbox.style.display = 'none';
         }
-
-        // Заполняем разбор
-        solutionContent.innerHTML = currentTask.explanation;
-
-        // Фокус на ответ
-        setTimeout(() => answerInput.focus(), 50);
       }
 
-      // --- ПРОВЕРКА ОТВЕТА ---
-      function checkAnswer() {
+      function handleCheck() {
         if (hasAnsweredCurrent || !currentTask) return;
-
-        const rawVal = answerInput.value.trim();
-        if (!rawVal) {
-          feedbackBanner.className = 'feedback-banner show error';
-          feedbackBanner.textContent = 'Выберите один из 4 вариантов ответа (кликните по карточке или введите цифру 1-4)';
+        const val = answerInput.value.trim();
+        if (!val) {
+          answerInput.focus();
           return;
         }
 
-        const isCorrect = rawVal === currentTask.answer;
-        hasAnsweredCurrent = true;
-        answerInput.disabled = true;
-
+        const isCorrect = val === currentTask.answer;
         const cards = optionsGrid.querySelectorAll('.option-card');
         const correctCardIndex = currentTask.correctOptionIndex;
 
         if (isCorrect) {
-          answerInput.classList.add('correct');
-          cards[correctCardIndex].style.borderColor = 'var(--green)';
-          cards[correctCardIndex].style.background = 'var(--green-light)';
+          hasAnsweredCurrent = true;
+          answerInput.className = 'answer-input correct';
+          answerInput.disabled = true;
+
+          if (cards[correctCardIndex]) {
+            cards[correctCardIndex].classList.add('correct');
+          }
+
+          playTone(587, 'sine', 0.15);
+          setTimeout(() => playTone(880, 'sine', 0.25), 120);
 
           feedbackBanner.className = 'feedback-banner show success';
-          feedbackBanner.innerHTML = '🎉 <strong>Великолепно! Ответ верный!</strong> (+15 XP)';
+          feedbackBanner.innerHTML = '🎉 <strong>Великолепно!</strong> Ответ верный (+15 XP).';
 
-          if (window.TrainerRankTracker) {
-            TrainerRankTracker.recordSuccess(TRAINER_ID);
-            updateStatsHUD();
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(true);
+          } else {
+            btnCheck.style.display = 'none';
+            btnNext.style.display = 'inline-flex';
+            btnNext.focus();
           }
 
-          btnCheck.style.display = 'none';
-          btnNext.style.display = 'inline-flex';
-          btnNext.focus();
+          // XP начисление
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+          } catch(e) {}
 
+          // Запись в TrainerTracker
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, true);
+            statStreak.textContent = res.currentStreak;
+            syncStats();
+
+            // Юбилейные серии
+            if (res.currentStreak === 5) showToast('🔥 Серия 5! Координатная прямая покоряется!');
+            if (res.currentStreak === 10) showToast('⚡ Серия 10! Отличный глазомер и точность к ОГЭ!');
+            if (res.currentStreak === 25) showToast('💎 Серия 25! Звание «Повелитель числовой оси»!');
+            if (res.currentStreak === 50) showToast('🎁 СЕРИЯ 50! Подарок +500 XP разблокирован в профиле!');
+          }
         } else {
-          answerInput.classList.add('wrong');
-          const chosenIdx = parseInt(rawVal, 10) - 1;
+          answerInput.className = 'answer-input wrong';
+          playTone(220, 'triangle', 0.25);
+
+          const chosenIdx = parseInt(val, 10) - 1;
           if (cards[chosenIdx]) {
-            cards[chosenIdx].style.borderColor = 'var(--vermilion)';
-            cards[chosenIdx].style.background = 'var(--vermilion-light)';
+            cards[chosenIdx].classList.add('wrong');
           }
-          cards[correctCardIndex].style.borderColor = 'var(--green)';
+          if (cards[correctCardIndex]) {
+            cards[correctCardIndex].classList.add('correct');
+          }
 
           feedbackBanner.className = 'feedback-banner show error';
-          feedbackBanner.innerHTML = `❌ <strong>Не совсем так.</strong> Правильный ответ: <strong>${currentTask.answer}</strong> (${currentTask.options[correctCardIndex]})`;
+          feedbackBanner.innerHTML = `❌ <strong>Пока неверно.</strong> Правильный ответ: <strong>${currentTask.answer}</strong> (${currentTask.options[correctCardIndex]}).`;
 
-          if (window.TrainerRankTracker) {
-            TrainerRankTracker.recordFailure(TRAINER_ID);
-            updateStatsHUD();
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(false);
           }
 
-          // Автоматически раскрываем разбор при ошибке для закрепления
-          solutionCard.classList.add('show');
-          btnToggleSolution.querySelector('span').textContent = '🔼 Скрыть пошаговый разбор';
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, false);
+            statStreak.textContent = 0;
+            syncStats();
+          }
 
           btnCheck.style.display = 'none';
           btnNext.style.display = 'inline-flex';
@@ -872,25 +912,7 @@
         }
       }
 
-      // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
-      btnCheck.addEventListener('click', checkAnswer);
-      btnNext.addEventListener('click', loadNewTask);
-      btnSkipTask.addEventListener('click', loadNewTask);
-
-      // Раскрытие песочницы
-      btnToggleSandbox.addEventListener('click', () => {
-        sandboxCard.classList.toggle('show');
-      });
-
-      // Раскрытие решения
-      btnToggleSolution.addEventListener('click', () => {
-        const isShown = solutionCard.classList.toggle('show');
-        btnToggleSolution.querySelector('span').textContent = isShown
-          ? '🔼 Скрыть пошаговый разбор'
-          : '💡 Показать пошаговый разбор';
-      });
-
-      // Переключение категорий
+      // Категории фильтров
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -900,12 +922,23 @@
         });
       });
 
-      // Быстрый ввод клавишами 1, 2, 3, 4 и Enter
+      // События кнопок
+      btnCheck.addEventListener('click', handleCheck);
+      btnNext.addEventListener('click', loadNewTask);
+      document.getElementById('btn-new-task').addEventListener('click', loadNewTask);
+
+      // Ввод и переключение вариантов по клавишам
       answerInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          e.preventDefault();
           if (hasAnsweredCurrent) loadNewTask();
-          else checkAnswer();
+          else handleCheck();
+        }
+      });
+
+      answerInput.addEventListener('input', () => {
+        const v = parseInt(answerInput.value.trim(), 10);
+        if (v >= 1 && v <= 4) {
+          selectOption(v);
         }
       });
 
@@ -917,19 +950,29 @@
         }
       });
 
-      // Ссылка на ответ из input
-      answerInput.addEventListener('input', () => {
-        const v = parseInt(answerInput.value.trim(), 10);
-        if (v >= 1 && v <= 4) {
-          selectOption(v);
-        }
+      // Переключатели аккордеонов
+      document.getElementById('btn-toggle-solution').addEventListener('click', () => {
+        solutionPanel.classList.toggle('active');
       });
 
-      // СТАРТ
-      initTheme();
-      updateStatsHUD();
-      loadNewTask();
+      document.getElementById('btn-toggle-theory').addEventListener('click', () => {
+        theoryPanel.classList.toggle('active');
+      });
 
+      btnToggleSandbox.addEventListener('click', () => {
+        sandboxPanel.classList.toggle('active');
+      });
+
+      // Старт
+      syncStats();
+      if (window.TrainerTimedMode) {
+        window.TrainerTimedMode.init({
+          trainerId: TRAINER_ID,
+          title: 'Задание №7',
+          onNextTask: loadNewTask
+        });
+      }
+      loadNewTask();
     })();
   </script>
 </body>

@@ -64,22 +64,15 @@
 
     let svg = `<svg viewBox="0 0 ${width} ${height}" class="number-line-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Координатная прямая">`;
 
-    // Градиенты и стили свечения
+    // Градиенты и маркер стрелки
     svg += `
       <defs>
-        <linearGradient id="axisGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="var(--accent, #ff7728)" stop-opacity="0.8"/>
-          <stop offset="100%" stop-color="var(--accent-cyan, #2ce6d6)" stop-opacity="0.9"/>
-        </linearGradient>
-        <pattern id="intervalStripe" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="8" stroke="var(--accent-cyan, #2ce6d6)" stroke-width="2" stroke-opacity="0.3"/>
-        </pattern>
-        <filter id="pointGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="var(--accent, #ff7728)" flood-opacity="0.6"/>
-        </filter>
         <marker id="axisArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--ink, #f8fafc)"/>
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--indigo, #263f61)"/>
         </marker>
+        <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="rgba(38,63,97,0.14)"/>
+        </filter>
       </defs>
     `;
 
@@ -90,17 +83,17 @@
       const x2 = Math.min(xEnd, scaleX(iTo));
       const w = Math.max(2, x2 - x1);
       svg += `
-        <rect x="${x1}" y="${yAxis - 18}" width="${w}" height="36" rx="4" fill="url(#intervalStripe)"/>
-        <rect x="${x1}" y="${yAxis - 18}" width="${w}" height="36" rx="4" fill="var(--accent-cyan, #2ce6d6)" fill-opacity="0.08" stroke="var(--accent-cyan, #2ce6d6)" stroke-dasharray="3,3" stroke-width="1.2"/>
+        <rect x="${x1}" y="${yAxis - 18}" width="${w}" height="36" rx="4" fill="rgba(38,63,97,0.08)"/>
+        <rect x="${x1}" y="${yAxis - 18}" width="${w}" height="36" rx="4" fill="none" stroke="var(--indigo, #263f61)" stroke-dasharray="3,3" stroke-width="1.2"/>
         <!-- Квадратные скобки границ интервала -->
-        <path d="M ${x1 + 4} ${yAxis - 14} L ${x1} ${yAxis - 14} L ${x1} ${yAxis + 14} L ${x1 + 4} ${yAxis + 14}" fill="none" stroke="var(--accent-cyan, #2ce6d6)" stroke-width="2"/>
-        <path d="M ${x2 - 4} ${yAxis - 14} L ${x2} ${yAxis - 14} L ${x2} ${yAxis + 14} L ${x2 - 4} ${yAxis + 14}" fill="none" stroke="var(--accent-cyan, #2ce6d6)" stroke-width="2"/>
+        <path d="M ${x1 + 4} ${yAxis - 14} L ${x1} ${yAxis - 14} L ${x1} ${yAxis + 14} L ${x1 + 4} ${yAxis + 14}" fill="none" stroke="var(--indigo, #263f61)" stroke-width="2"/>
+        <path d="M ${x2 - 4} ${yAxis - 14} L ${x2} ${yAxis - 14} L ${x2} ${yAxis + 14} L ${x2 - 4} ${yAxis + 14}" fill="none" stroke="var(--indigo, #263f61)" stroke-width="2"/>
       `;
     }
 
     // Главная ось
     svg += `
-      <line x1="${xStart - 15}" y1="${yAxis}" x2="${xEnd + 22}" y2="${yAxis}" stroke="var(--ink, #f8fafc)" stroke-width="2.2" stroke-linecap="round" marker-end="url(#axisArrow)"/>
+      <line x1="${xStart - 15}" y1="${yAxis}" x2="${xEnd + 22}" y2="${yAxis}" stroke="var(--indigo, #263f61)" stroke-width="2.2" stroke-linecap="round" marker-end="url(#axisArrow)"/>
     `;
 
     // Засечки (ticks) и числовые подписи
@@ -110,11 +103,12 @@
         const isZero = t.val === 0;
         const tickH = isZero ? 14 : 9;
         const strokeW = isZero ? 2.2 : 1.4;
-        const strokeColor = isZero ? 'var(--accent, #ff7728)' : 'var(--muted, #94a3b8)';
+        const strokeColor = isZero ? 'var(--vermilion, #b7464e)' : 'rgba(38,63,97,0.45)';
+        const textColor = isZero ? 'var(--vermilion, #b7464e)' : 'var(--muted, #697383)';
         
         svg += `
           <line x1="${x}" y1="${yAxis - tickH}" x2="${x}" y2="${yAxis + tickH}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
-          <text x="${x}" y="${yAxis + 28}" text-anchor="middle" font-family="var(--f-mono, monospace)" font-size="${isZero ? '13' : '12'}" font-weight="${isZero ? '800' : '600'}" fill="${isZero ? 'var(--accent, #ff7728)' : 'var(--ink, #f8fafc)'}">${t.label}</text>
+          <text x="${x}" y="${yAxis + 26}" text-anchor="middle" font-family="'DM Sans', -apple-system, sans-serif" font-size="${isZero ? '13' : '12'}" font-weight="${isZero ? '800' : '600'}" fill="${textColor}">${t.label}</text>
         `;
       });
     }
@@ -122,33 +116,32 @@
     // Отмеченные точки (A, B, C, D или переменные a, b, x, y)
     if (cfg.points && cfg.points.length > 0) {
       const palette = [
-        { fill: '#ff7728', border: '#ffffff', glow: 'rgba(255,119,40,0.6)' }, // Orange
-        { fill: '#2ce6d6', border: '#ffffff', glow: 'rgba(44,230,214,0.6)' }, // Cyan
-        { fill: '#10b981', border: '#ffffff', glow: 'rgba(16,185,129,0.6)' }, // Emerald
-        { fill: '#fbbf24', border: '#ffffff', glow: 'rgba(251,191,36,0.6)' }, // Gold
-        { fill: '#ec4899', border: '#ffffff', glow: 'rgba(236,72,153,0.6)' }  // Pink
+        { fill: '#b7464e', border: '#ffffff' }, // Vermilion
+        { fill: '#263f61', border: '#ffffff' }, // Indigo
+        { fill: '#2e7d32', border: '#ffffff' }, // Green
+        { fill: '#c8956c', border: '#ffffff' }, // Gold
+        { fill: '#6a1b9a', border: '#ffffff' }  // Plum
       ];
 
       cfg.points.forEach((pt, idx) => {
         const x = scaleX(pt.val);
         const col = palette[idx % palette.length];
-        const isLetter = /^[a-zA-Zа-яА-Я]$/.test(pt.id);
         const labelText = pt.id;
 
         svg += `
-          <g class="nl-point-group" transform="translate(0, 0)" style="cursor: pointer;">
-            <!-- Невидимая увеличенная область касания для мобилок -->
-            <circle cx="${x}" cy="${yAxis}" r="20" fill="transparent"/>
+          <g class="nl-point-group" transform="translate(0, 0)">
+            <!-- Невидимая увеличенная область касания -->
+            <circle cx="${x}" cy="${yAxis}" r="18" fill="transparent"/>
             
-            <!-- Ореол свечения точки -->
-            <circle cx="${x}" cy="${yAxis}" r="9" fill="${col.fill}" fill-opacity="0.25"/>
+            <!-- Ореол точки -->
+            <circle cx="${x}" cy="${yAxis}" r="8" fill="${col.fill}" fill-opacity="0.18"/>
             
             <!-- Сама точка -->
-            <circle cx="${x}" cy="${yAxis}" r="5.5" fill="${col.fill}" stroke="${col.border}" stroke-width="2" filter="url(#pointGlow)"/>
+            <circle cx="${x}" cy="${yAxis}" r="5" fill="${col.fill}" stroke="${col.border}" stroke-width="1.8"/>
             
             <!-- Подпись точки (сверху от оси) -->
-            <rect x="${x - 14}" y="${yAxis - 42}" width="28" height="24" rx="6" fill="var(--surface-card, #151b2b)" stroke="${col.fill}" stroke-width="1.2"/>
-            <text x="${x}" y="${yAxis - 26}" text-anchor="middle" font-family="var(--f-display, sans-serif)" font-size="14" font-weight="800" fill="${col.fill}">${labelText}</text>
+            <rect x="${x - 13}" y="${yAxis - 38}" width="26" height="22" rx="6" fill="#ffffff" stroke="${col.fill}" stroke-width="1.4" filter="url(#badgeShadow)"/>
+            <text x="${x}" y="${yAxis - 23}" text-anchor="middle" font-family="'Zen Old Mincho', serif" font-size="13" font-weight="700" fill="${col.fill}">${labelText}</text>
           </g>
         `;
       });
@@ -438,7 +431,7 @@
           <div class="step-text">
             Чтобы узнать, какая дробь принадлежит отрезку [<strong>${leftDec}</strong>; <strong>${rightDec}</strong>], переведём каждую дробь в десятичную, разделив числитель на знаменатель <strong>уголком</strong> до 2-3 знаков:
             <ul style="margin: 8px 0 0 18px; line-height: 1.6;">
-              ${fractionOptions.map((f, i) => `<li>Вариант ${i + 1}) <strong>${f.num}/${f.denom}</strong> &approx; <strong>${f.val.toFixed(3)}</strong> ${f.isCorrect ? '<span style="color:var(--accent-emerald, #10b981); font-weight:700;">&larr; попадает в отрезок!</span>' : ''}</li>`).join('')}
+              ${fractionOptions.map((f, i) => `<li>Вариант ${i + 1}) <strong>${f.num}/${f.denom}</strong> &approx; <strong>${f.val.toFixed(3)}</strong> ${f.isCorrect ? '<span style="color:var(--green, #2e7d32); font-weight:700;">&larr; попадает в отрезок!</span>' : ''}</li>`).join('')}
             </ul>
           </div>
         </div>
