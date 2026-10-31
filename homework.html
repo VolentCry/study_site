@@ -349,21 +349,39 @@
             line-height: 1.6;
         }
 
-        /* MATH FORMULAS RENDERING */
+        /* MATH FORMULAS RENDERING & SUPERSCRIPTS */
+        sup, sub {
+            font-size: 0.7em;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+            font-family: inherit;
+        }
+        sup {
+            top: -0.55em;
+        }
+        sub {
+            bottom: -0.22em;
+        }
+        sup sup {
+            top: -0.45em;
+            font-size: 0.85em;
+        }
+
         .math-expr {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
+            display: inline-block;
+            vertical-align: middle;
             font-family: var(--f-mono);
             font-size: 1.2rem;
-            margin: 0.5rem 0;
+            margin: 0.4rem 0;
+            line-height: normal;
         }
         .fraction {
             display: inline-flex;
             flex-direction: column;
             vertical-align: middle;
             text-align: center;
-            padding: 0 0.2rem;
+            padding: 0 0.25rem;
             font-family: var(--f-mono);
             font-size: 0.95em;
         }
@@ -379,7 +397,7 @@
             align-items: stretch;
             vertical-align: middle;
         }
-        .rad-sign {
+        .rad-sign, .rad-sym {
             font-size: 1.25em;
             line-height: 1;
             margin-right: 1px;
@@ -389,6 +407,20 @@
             padding-top: 1px;
             padding-left: 2px;
             padding-right: 2px;
+        }
+        .math-cond {
+            font-family: var(--f-body);
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-left: 0.65rem;
+            vertical-align: middle;
+            font-style: italic;
+        }
+        .task-instruction {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-top: 0.4rem;
+            line-height: 1.4;
         }
 
         /* INPUT AREA */
@@ -928,6 +960,39 @@
                     .replace(/'/g, '&#039;');
             }
 
+            function formatMathHtml(raw) {
+                if (!raw) return '';
+                let str = String(raw);
+
+                // Convert caret power notation:
+                // 1) Enclosed exponent in parentheses: 2^(3+2), x^(-2), (a+b)^(n+1)
+                str = str.replace(/([a-zA-Z0-9_\)\]\}]+)\^\(([^)]+)\)/g, '$1<sup>$2</sup>');
+                // 2) Simple exponent: 2^3, x^2, 10^-5, a^n
+                str = str.replace(/([a-zA-Z0-9_\)\]\}]+)\^([+-]?\d+|[a-zA-Z])/g, '$1<sup>$2</sup>');
+
+                // 3) Common unicode superscripts
+                const supMap = { '⁰':'0', '¹':'1', '²':'2', '³':'3', '⁴':'4', '⁵':'5', '⁶':'6', '⁷':'7', '⁸':'8', '⁹':'9', '⁺':'+', '⁻':'-' };
+                str = str.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+/g, match => {
+                    const converted = Array.from(match).map(ch => supMap[ch] || ch).join('');
+                    return `<sup>${converted}</sup>`;
+                });
+
+                return str;
+            }
+
+            function formatSolutionStep(step) {
+                if (!step) return '';
+                let s = String(step);
+                const hasTags = /<[a-z][\s\S]*>/i.test(s);
+                if (!hasTags) {
+                    s = escapeHtml(s);
+                }
+                return formatMathHtml(s);
+            }
+
+            window.formatMathHtml = formatMathHtml;
+            window.formatSolutionStep = formatSolutionStep;
+
             function showToast(msg) {
                 toast.textContent = msg;
                 toast.classList.add('visible');
@@ -1082,7 +1147,7 @@
 
                         // Solution steps if available
                         if (task.solutionSteps && task.solutionSteps.length > 0) {
-                            const stepsLi = task.solutionSteps.map(s => `<li>${escapeHtml(s)}</li>`).join('');
+                            const stepsLi = task.solutionSteps.map(s => `<li>${formatSolutionStep(s)}</li>`).join('');
                             solutionHtml = `
                                 <details class="solution-details">
                                     <summary>Разбор и ход решения задачи</summary>
@@ -1128,7 +1193,7 @@
                             <span class="task-cat">${escapeHtml(categoryName)}</span>
                         </div>
                         <div class="task-body">
-                            ${task.questionHtml || escapeHtml(task.text || '')}
+                            ${task.questionHtml ? formatMathHtml(task.questionHtml) : formatMathHtml(escapeHtml(task.text || ''))}
                         </div>
                         ${answerUiHtml}
                         ${solutionHtml}

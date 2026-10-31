@@ -1079,21 +1079,39 @@
             text-transform: uppercase;
         }
 
-        /* --- MATH FORMULAS CSS --- */
+        /* --- MATH FORMULAS CSS & SUPERSCRIPTS --- */
+        sup, sub {
+            font-size: 0.7em;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+            font-family: inherit;
+        }
+        sup {
+            top: -0.55em;
+        }
+        sub {
+            bottom: -0.22em;
+        }
+        sup sup {
+            top: -0.45em;
+            font-size: 0.85em;
+        }
+
         .math-expr {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
+            display: inline-block;
+            vertical-align: middle;
             font-family: var(--f-mono);
             font-size: 1.05rem;
             margin: 0.35rem 0;
+            line-height: normal;
         }
         .fraction {
             display: inline-flex;
             flex-direction: column;
             vertical-align: middle;
             text-align: center;
-            padding: 0 0.2rem;
+            padding: 0 0.25rem;
             font-family: var(--f-mono);
             font-size: 0.95em;
         }
@@ -1109,7 +1127,7 @@
             align-items: stretch;
             vertical-align: middle;
         }
-        .rad-sign {
+        .rad-sign, .rad-sym {
             font-size: 1.2em;
             line-height: 1;
             margin-right: 1px;
@@ -1119,6 +1137,20 @@
             padding-top: 1px;
             padding-left: 2px;
             padding-right: 2px;
+        }
+        .math-cond {
+            font-family: var(--f-body);
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-left: 0.65rem;
+            vertical-align: middle;
+            font-style: italic;
+        }
+        .task-instruction {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-top: 0.4rem;
+            line-height: 1.4;
         }
 
 
@@ -3332,7 +3364,7 @@
                             </button>
                         </div>
                         <div class="draft-task-body">
-                            ${t.questionHtml || escapeHtml(t.text || '')}
+                            ${t.questionHtml ? formatMathHtml(t.questionHtml) : formatMathHtml(escapeHtml(t.text || ''))}
                         </div>
                         <div class="draft-task-footer">
                             <span class="draft-task-ans">Ответ: ${escapeHtml(String(t.displayAnswer || t.answer))}</span>
@@ -3545,10 +3577,10 @@
                     constructorDraftTasks.push({
                         category: 'custom',
                         catName: cat,
-                        questionHtml: `<div>${escapeHtml(condition).replace(/\n/g, '<br>')}</div>`,
+                        questionHtml: `<div>${formatMathHtml(escapeHtml(condition)).replace(/\n/g, '<br>')}</div>`,
                         answer: finalAns,
                         displayAnswer: ans,
-                        solutionSteps: sol ? [escapeHtml(sol)] : []
+                        solutionSteps: sol ? [formatMathHtml(escapeHtml(sol))] : []
                     });
 
                     // Clear fields
@@ -3909,7 +3941,7 @@
                             </span>
                         </div>
                         <div class="draft-task-body" style="font-size:0.95rem; line-height:1.5; margin:0.5rem 0;">
-                            ${t.questionHtml || escapeHtml(t.text || t.condition || '')}
+                            ${t.questionHtml ? formatMathHtml(t.questionHtml) : formatMathHtml(escapeHtml(t.text || t.condition || ''))}
                         </div>
                         <div style="background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r-sm); padding:0.6rem 0.85rem; display:flex; justify-content:space-between; font-size:0.88rem; flex-wrap:wrap; gap:0.5rem;">
                             <div>Ответ ученика: <strong style="color:${isCorrect ? 'var(--accent-emerald)' : (studentAns ? 'var(--danger)' : 'var(--muted)')}; font-family:var(--f-mono);">${escapeHtml(studentAns || '(пусто)')}</strong></div>
@@ -3998,6 +4030,26 @@
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;');
+            }
+
+            function formatMathHtml(raw) {
+                if (!raw) return '';
+                let str = String(raw);
+
+                // Convert caret power notation:
+                // 1) Enclosed exponent in parentheses: 2^(3+2), x^(-2), (a+b)^(n+1)
+                str = str.replace(/([a-zA-Z0-9_\)\]\}]+)\^\(([^)]+)\)/g, '$1<sup>$2</sup>');
+                // 2) Simple exponent: 2^3, x^2, 10^-5, a^n
+                str = str.replace(/([a-zA-Z0-9_\)\]\}]+)\^([+-]?\d+|[a-zA-Z])/g, '$1<sup>$2</sup>');
+
+                // 3) Common unicode superscripts
+                const supMap = { '⁰':'0', '¹':'1', '²':'2', '³':'3', '⁴':'4', '⁵':'5', '⁶':'6', '⁷':'7', '⁸':'8', '⁹':'9', '⁺':'+', '⁻':'-' };
+                str = str.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+/g, match => {
+                    const converted = Array.from(match).map(ch => supMap[ch] || ch).join('');
+                    return `<sup>${converted}</sup>`;
+                });
+
+                return str;
             }
 
             function formatDate(isoStr) {

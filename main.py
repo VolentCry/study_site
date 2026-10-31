@@ -118,12 +118,13 @@ def api_auth_register():
     password = str(payload.get('password', ''))
     display_name = str(payload.get('displayName', '')).strip() or None
     local_data = payload.get('localData')
-    teacher_code = str(payload.get('teacherCode', '')).strip()
 
     if not username or not password:
         return jsonify({'success': False, 'error': 'Заполните логин и пароль.'}), 400
 
-    role = 'teacher' if (teacher_code and db.verify_teacher_code(teacher_code)) else 'student'
+    # Регистрация всегда создаёт аккаунты с ролью ученика (student).
+    # Регистрация с кодом учителя отключена.
+    role = 'student'
 
     try:
         user = db.create_user(

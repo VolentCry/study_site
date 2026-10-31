@@ -768,11 +768,11 @@
         }
     }
 
-    async function apiRegister(username, password, displayName, localData, teacherCode) {
+    async function apiRegister(username, password, displayName, localData) {
         const res = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, displayName, localData, teacherCode })
+            body: JSON.stringify({ username, password, displayName, localData })
         });
         const data = await res.json();
         if (!res.ok) {
@@ -864,12 +864,7 @@
                         </div>
                     </div>
 
-                    <div class="auth-field hidden" id="auth-field-teacher-code">
-                        <label class="auth-label" for="auth-input-teacher-code">Код учителя (для доступа к классам)</label>
-                        <div class="auth-input-wrap">
-                            <input class="auth-input" type="password" id="auth-input-teacher-code" name="teacherCode" placeholder="Секретный код (при наличии)">
-                        </div>
-                    </div>
+
 
                     <div class="auth-field">
                         <label class="auth-label" for="auth-input-password">Пароль</label>
@@ -924,8 +919,6 @@
                 tabRegister.classList.add('active');
                 tabRegister.setAttribute('aria-selected', 'true');
                 fieldDisplayName.classList.remove('hidden');
-                const fieldTCode = dialog.querySelector('#auth-field-teacher-code');
-                if (fieldTCode) fieldTCode.classList.remove('hidden');
                 registerHint.classList.remove('hidden');
                 titleEl.textContent = 'Создание аккаунта';
                 submitText.textContent = 'Зарегистрироваться';
@@ -935,8 +928,6 @@
                 tabLogin.classList.add('active');
                 tabLogin.setAttribute('aria-selected', 'true');
                 fieldDisplayName.classList.add('hidden');
-                const fieldTCode2 = dialog.querySelector('#auth-field-teacher-code');
-                if (fieldTCode2) fieldTCode2.classList.add('hidden');
                 registerHint.classList.add('hidden');
                 titleEl.textContent = 'Вход в аккаунт';
                 submitText.textContent = 'Войти';
@@ -973,8 +964,7 @@
             try {
                 if (isReg) {
                     const localData = collectLocalState();
-                    const teacherCode = dialog.querySelector('#auth-input-teacher-code')?.value?.trim() || '';
-                    const res = await apiRegister(username, password, displayName, localData, teacherCode);
+                    const res = await apiRegister(username, password, displayName, localData);
                     currentUser = res.user;
                     showToast(`Добро пожаловать, ${res.user.displayName || res.user.username}!`, 'success');
                 } else {
