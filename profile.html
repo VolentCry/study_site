@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;var h=(window.location.hash||'').toLowerCase();var s=sessionStorage.getItem('profileActiveTab');if(h==='#ranks'||h.indexOf('achieve')!==-1||h.indexOf('medal')!==-1||s==='ranks'||s==='achievements'){document.documentElement.classList.add('hide-profile-hero');}}catch(e){}})();</script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный профиль исследователя · НЕШкола</title>
@@ -686,6 +686,13 @@
         }
 
         /* --- HERO PROFILE IDENTITY HUD --- */
+        html.hide-profile-hero .profile-hero {
+            display: none !important;
+        }
+        html.hide-profile-hero .section-wrap {
+            padding-top: 2rem;
+        }
+
         .profile-hero {
             padding: 2.5rem 0 1.5rem;
         }
@@ -4677,6 +4684,13 @@
                 const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements];
                 const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements];
 
+                const profileHero = document.querySelector('.profile-hero');
+                const isHeroHidden = (tabName === 'ranks' || tabName === 'achievements');
+                document.documentElement.classList.toggle('hide-profile-hero', isHeroHidden);
+                if (profileHero) {
+                    profileHero.classList.toggle('hidden', isHeroHidden);
+                }
+
                 buttons.forEach(btn => {
                     if (btn) {
                         btn.classList.remove('active');
@@ -4750,6 +4764,14 @@
             if (heroMedalsBtn) heroMedalsBtn.addEventListener('click', () => {
                 switchTab('achievements');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            window.addEventListener('hashchange', () => {
+                const hash = (window.location.hash || '').toLowerCase();
+                if (hash === '#ranks') switchTab('ranks');
+                else if (hash.includes('achieve') || hash.includes('medal')) switchTab('achievements');
+                else if (hash === '#overview') switchTab('overview');
+                else if (hash === '#study') switchTab('study');
             });
 
             

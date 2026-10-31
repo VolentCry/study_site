@@ -1413,15 +1413,63 @@
 
             <!-- PANE 2: ВСЕ ПОЛЬЗОВАТЕЛИ САЙТА -->
             <section id="pane-users" class="tab-pane hidden" role="tabpanel">
-                <div class="section-toolbar">
-                    <div class="search-box-wrap">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="users-search-input" class="search-input" placeholder="Поиск по имени или логину...">
+                <div class="users-filter-card" style="background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r-md); padding:1.1rem; margin-bottom:1.25rem; display:flex; flex-direction:column; gap:0.85rem;">
+                    <!-- Row 1: Search, Role buttons, Counter badge, Reset -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <div class="search-box-wrap" style="flex:1; min-width:240px; max-width:380px;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="users-search-input" class="search-input" placeholder="Поиск по имени, логину или ID...">
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <button type="button" class="btn btn-secondary btn-sm filter-role-btn active" data-role="">Все роли</button>
+                            <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="student">Ученики</button>
+                            <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="teacher">Учителя</button>
+                            <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="admin">Админы</button>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+                            <span class="badge" id="users-counter-badge" style="background:var(--surface); border:1px solid var(--line); padding:6px 12px; font-size:0.82rem; color:var(--muted); font-weight:600; white-space:nowrap;">
+                                Найдено: <strong id="users-count-current" style="color:var(--ink);">0</strong> из <span id="users-count-total">0</span>
+                            </span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-users-filters" title="Сбросить все фильтры" style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px;">
+                                ✕ Сброс
+                            </button>
+                        </div>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button type="button" class="btn btn-secondary btn-sm filter-role-btn active" data-role="">Все роли</button>
-                        <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="student">Ученики</button>
-                        <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="teacher">Учителя</button>
+
+                    <!-- Row 2: Class filter, Activity filter, Sort select -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; align-items:center;">
+                        <div>
+                            <label for="users-filter-class" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Класс</label>
+                            <select id="users-filter-class" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
+                                <option value="">Все классы</option>
+                                <option value="my_students">⭐ Только мои ученики</option>
+                                <option value="no_class">⚠️ Без класса</option>
+                                <optgroup id="users-filter-classes-group" label="Мои классы"></optgroup>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="users-filter-activity" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Активность</label>
+                            <select id="users-filter-activity" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
+                                <option value="">Любая активность</option>
+                                <option value="active_7">🟢 Активен за 7 дней</option>
+                                <option value="active_30">🟡 Активен за 30 дней</option>
+                                <option value="inactive">⚪ Не заходил > 30 дней</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="users-sort-select" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Сортировка</label>
+                            <select id="users-sort-select" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
+                                <option value="xp_desc">Опыт XP (по убыванию)</option>
+                                <option value="xp_asc">Опыт XP (по возрастанию)</option>
+                                <option value="solved_desc">Решено задач (по убыванию)</option>
+                                <option value="name_asc">Имя (А — Я)</option>
+                                <option value="name_desc">Имя (Я — А)</option>
+                                <option value="last_active">Последняя активность</option>
+                                <option value="newest">Сначала новые (ID ↓)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -2079,6 +2127,7 @@
                     const data = await res.json();
                     if (!data.success) return;
                     currentClasses = data.classes || [];
+                    updateUsersClassFilterOptions();
                     renderClassesGrid(currentClasses);
                 } catch(err) {
                     console.error('Failed to load classes:', err);
@@ -2370,22 +2419,127 @@
                 }
             }
 
-            // --- All Users Table Logic ---
+            // --- All Users Table Logic & Rich Filters ---
             let currentUsersFilter = '';
 
+            function updateUsersClassFilterOptions() {
+                const optgroup = document.getElementById('users-filter-classes-group');
+                if (!optgroup) return;
+                if (!currentClasses || !currentClasses.length) {
+                    optgroup.innerHTML = '<option value="" disabled>(Нет созданных классов)</option>';
+                    return;
+                }
+                optgroup.innerHTML = currentClasses.map(c => `<option value="class_${c.id}">${escapeHtml(c.name)}</option>`).join('');
+            }
+
+            function applyUsersFiltersAndRender() {
+                const totalEl = document.getElementById('users-count-total');
+                const currEl = document.getElementById('users-count-current');
+                if (totalEl) totalEl.textContent = allUsersCache.length;
+
+                let list = [...allUsersCache];
+
+                // 1. Search filter (name, username, ID)
+                const searchInput = document.getElementById('users-search-input');
+                const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+                if (q) {
+                    list = list.filter(u => {
+                        const disp = (u.displayName || '').toLowerCase();
+                        const uname = (u.username || '').toLowerCase();
+                        const uid = String(u.id);
+                        return disp.includes(q) || uname.includes(q) || uid === q || ('#' + uid) === q;
+                    });
+                }
+
+                // 2. Role filter
+                if (currentUsersFilter) {
+                    list = list.filter(u => (u.role || 'student') === currentUsersFilter);
+                }
+
+                // 3. Class enrollment filter
+                const classFilter = document.getElementById('users-filter-class')?.value || '';
+                if (classFilter === 'my_students') {
+                    list = list.filter(u => Boolean(u.isInMyClass));
+                } else if (classFilter === 'no_class') {
+                    list = list.filter(u => !u.classes || u.classes.length === 0);
+                } else if (classFilter.startsWith('class_')) {
+                    const targetClassId = parseInt(classFilter.replace('class_', ''), 10);
+                    list = list.filter(u => u.classes && u.classes.some(c => c.classId === targetClassId));
+                }
+
+                // 4. Activity filter
+                const actFilter = document.getElementById('users-filter-activity')?.value || '';
+                if (actFilter) {
+                    const now = Date.now();
+                    const ms7Days = 7 * 24 * 60 * 60 * 1000;
+                    const ms30Days = 30 * 24 * 60 * 60 * 1000;
+
+                    list = list.filter(u => {
+                        if (!u.lastLogin) {
+                            return actFilter === 'inactive';
+                        }
+                        const t = new Date(u.lastLogin.replace(' ', 'T')).getTime();
+                        if (isNaN(t)) {
+                            return actFilter === 'inactive';
+                        }
+                        const diff = now - t;
+                        if (actFilter === 'active_7') return diff <= ms7Days;
+                        if (actFilter === 'active_30') return diff <= ms30Days;
+                        if (actFilter === 'inactive') return diff > ms30Days;
+                        return true;
+                    });
+                }
+
+                // 5. Sort order
+                const sortVal = document.getElementById('users-sort-select')?.value || 'xp_desc';
+                list.sort((a, b) => {
+                    if (sortVal === 'xp_desc') {
+                        return (b.userXP || 0) - (a.userXP || 0) || (b.id - a.id);
+                    }
+                    if (sortVal === 'xp_asc') {
+                        return (a.userXP || 0) - (b.userXP || 0) || (a.id - b.id);
+                    }
+                    if (sortVal === 'solved_desc') {
+                        return (b.totalSolved || 0) - (a.totalSolved || 0) || (b.id - a.id);
+                    }
+                    if (sortVal === 'name_asc') {
+                        const nameA = a.displayName || a.username || '';
+                        const nameB = b.displayName || b.username || '';
+                        return nameA.localeCompare(nameB, 'ru');
+                    }
+                    if (sortVal === 'name_desc') {
+                        const nameA = a.displayName || a.username || '';
+                        const nameB = b.displayName || b.username || '';
+                        return nameB.localeCompare(nameA, 'ru');
+                    }
+                    if (sortVal === 'last_active') {
+                        const timeA = a.lastLogin ? new Date(a.lastLogin.replace(' ', 'T')).getTime() : 0;
+                        const timeB = b.lastLogin ? new Date(b.lastLogin.replace(' ', 'T')).getTime() : 0;
+                        return timeB - timeA || (b.id - a.id);
+                    }
+                    if (sortVal === 'newest') {
+                        return b.id - a.id;
+                    }
+                    return 0;
+                });
+
+                if (currEl) currEl.textContent = list.length;
+                renderUsersTable(list);
+            }
+
             async function loadAllUsers() {
-                const search = document.getElementById('users-search-input')?.value || '';
                 const tbody = document.getElementById('all-users-tbody');
                 if (!tbody) return;
 
+                updateUsersClassFilterOptions();
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">Загрузка пользователей...</td></tr>';
                 try {
-                    const res = await fetch(`/api/teacher/users?q=${encodeURIComponent(search)}&role=${encodeURIComponent(currentUsersFilter)}`, { cache: 'no-store' });
+                    const res = await fetch('/api/teacher/users', { cache: 'no-store' });
                     const d = await res.json();
                     if (!d.success) return;
 
                     allUsersCache = d.users || [];
-                    renderUsersTable(allUsersCache);
+                    applyUsersFiltersAndRender();
                 } catch(err) {
                     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--danger);">Ошибка загрузки.</td></tr>';
                 }
@@ -2485,15 +2639,39 @@
                 });
             }
 
-            document.getElementById('users-search-input')?.addEventListener('input', () => loadAllUsers());
+            document.getElementById('users-search-input')?.addEventListener('input', () => applyUsersFiltersAndRender());
+            document.getElementById('users-filter-class')?.addEventListener('change', () => applyUsersFiltersAndRender());
+            document.getElementById('users-filter-activity')?.addEventListener('change', () => applyUsersFiltersAndRender());
+            document.getElementById('users-sort-select')?.addEventListener('change', () => applyUsersFiltersAndRender());
 
             document.querySelectorAll('.filter-role-btn').forEach(b => {
                 b.addEventListener('click', () => {
                     document.querySelectorAll('.filter-role-btn').forEach(btn => btn.classList.remove('active'));
                     b.classList.add('active');
                     currentUsersFilter = b.getAttribute('data-role') || '';
-                    loadAllUsers();
+                    applyUsersFiltersAndRender();
                 });
+            });
+
+            document.getElementById('btn-reset-users-filters')?.addEventListener('click', () => {
+                const sInput = document.getElementById('users-search-input');
+                if (sInput) sInput.value = '';
+
+                document.querySelectorAll('.filter-role-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-role') === '');
+                });
+                currentUsersFilter = '';
+
+                const classSelect = document.getElementById('users-filter-class');
+                if (classSelect) classSelect.value = '';
+
+                const actSelect = document.getElementById('users-filter-activity');
+                if (actSelect) actSelect.value = '';
+
+                const sortSelect = document.getElementById('users-sort-select');
+                if (sortSelect) sortSelect.value = 'xp_desc';
+
+                applyUsersFiltersAndRender();
             });
 
             // --- Modal Quick Enroll Logic ---
