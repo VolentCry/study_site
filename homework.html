@@ -2,6 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Домашнее задание · НЕШкола</title>
     <meta name="description" content="Интерактивное решение и отправка домашнего задания учителю на образовательной платформе НЕШкола.">
@@ -863,26 +865,32 @@
             // Theme setup
             const themeToggleBtn = document.getElementById('theme-toggle');
             const themeIcon = document.getElementById('theme-icon');
-            const savedTheme = localStorage.getItem('site_theme') || 'dark';
-            if (savedTheme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                themeIcon.textContent = '🌙';
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                themeIcon.textContent = '☀️';
+            function updateHomeworkThemeUI(th) {
+                const isLight = th === 'light';
+                document.documentElement.setAttribute('data-theme', th);
+                document.documentElement.dataset.theme = th;
+                if (themeIcon) themeIcon.textContent = isLight ? '🌙' : '☀️';
+            }
+            const savedTheme = window.StudyTheme ? window.StudyTheme.get() : (localStorage.getItem('profileTheme') || localStorage.getItem('site_theme') || 'dark');
+            updateHomeworkThemeUI(savedTheme);
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    if (window.StudyTheme) {
+                        const next = window.StudyTheme.toggle(true);
+                        updateHomeworkThemeUI(next);
+                    } else {
+                        const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                        const next = cur === 'dark' ? 'light' : 'dark';
+                        localStorage.setItem('profileTheme', next);
+                        localStorage.setItem('site_theme', next);
+                        updateHomeworkThemeUI(next);
+                    }
+                });
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                const current = document.documentElement.getAttribute('data-theme');
-                if (current === 'light') {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('site_theme', 'dark');
-                    themeIcon.textContent = '☀️';
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                    localStorage.setItem('site_theme', 'light');
-                    themeIcon.textContent = '🌙';
-                }
+            window.addEventListener('study-theme-changed', (e) => {
+                updateHomeworkThemeUI(e.detail);
             });
 
             // Parse URL parameters

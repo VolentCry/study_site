@@ -2,6 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель учителя · НЕШкола</title>
     <meta name="description" content="Админ-панель преподавателя: управление классами, мониторинг всех пользователей и детальный журнал выполнения заданий.">
@@ -1925,17 +1927,35 @@
             // --- Theme handling ---
             const themeBtn = document.getElementById('theme-toggle-btn');
             function applyTheme(th) {
-                document.documentElement.dataset.theme = th;
-                try { localStorage.setItem('profileTheme', th); } catch(e) {}
+                if (window.StudyTheme) {
+                    window.StudyTheme.set(th, true);
+                } else {
+                    document.documentElement.dataset.theme = th;
+                    document.documentElement.setAttribute('data-theme', th);
+                    try {
+                        localStorage.setItem('profileTheme', th);
+                        localStorage.setItem('site_theme', th);
+                    } catch(e) {}
+                }
+                if (themeBtn) themeBtn.textContent = th === 'light' ? '🌙' : '☀️';
             }
-            const savedTheme = localStorage.getItem('profileTheme') || 'dark';
+            const savedTheme = window.StudyTheme ? window.StudyTheme.get() : (localStorage.getItem('profileTheme') || 'dark');
             applyTheme(savedTheme);
             if (themeBtn) {
                 themeBtn.addEventListener('click', () => {
-                    const cur = document.documentElement.dataset.theme || 'dark';
-                    applyTheme(cur === 'dark' ? 'light' : 'dark');
+                    if (window.StudyTheme) {
+                        const next = window.StudyTheme.toggle(true);
+                        if (themeBtn) themeBtn.textContent = next === 'light' ? '🌙' : '☀️';
+                    } else {
+                        const cur = document.documentElement.dataset.theme || 'dark';
+                        applyTheme(cur === 'dark' ? 'light' : 'dark');
+                    }
                 });
             }
+            window.addEventListener('study-theme-changed', (e) => {
+                const th = e.detail;
+                if (themeBtn) themeBtn.textContent = th === 'light' ? '🌙' : '☀️';
+            });
 
             // --- Initialize Dashboard ---
             async function init() {
@@ -3132,6 +3152,36 @@
                 });
             }
 
+            // Task Fingerprint helper for deduplication
+            function getTaskFingerprint(task) {
+                if (!task) return '';
+                if (task.category && String(task.category).startsWith('multiplication')) {
+                    const str = (task.questionHtml || task.text || '').replace(/<[^>]*>/g, ' ');
+                    const match = str.match(/(\d+)\s*[×*x]\s*(\d+)/i);
+                    if (match) {
+                        const n1 = parseInt(match[1], 10);
+                        const n2 = parseInt(match[2], 10);
+                        const pair = [n1, n2].sort((a, b) => a - b).join('x');
+                        return `mult:${pair}`;
+                    }
+                }
+                const rawContent = (task.questionHtml || task.text || '')
+                    .replace(/id="[^"]*"/gi, '')
+                    .replace(/class="[^"]*"/gi, '');
+                const cleanText = rawContent
+                    .replace(/<svg[\s\S]*?<\/svg>/gi, (svg) => {
+                        const coords = (svg.match(/[\d.]+/g) || []).slice(0, 8).join(',');
+                        return `[svg:${coords}]`;
+                    })
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .toLowerCase();
+
+                const cleanAns = String(task.answer !== undefined ? task.answer : (task.displayAnswer || '')).trim().toLowerCase();
+                return `${task.category || ''}:${cleanText}|ans:${cleanAns}`;
+            }
+
             // Task Generators
             function generateMultiplicationTask(mode) {
                 if (mode === 'mult_table') {
@@ -3171,8 +3221,16 @@
                     const type = genTrainerType.value;
                     const count = Math.max(1, Math.min(20, parseInt(genTasksCount.value, 10) || 5));
 
-                    let generated = [];
-                    for (let i = 0; i < count; i++) {
+                    // Deduplicate against existing draft tasks and within batch
+                    const existingFPs = new Set(constructorDraftTasks.map(getTaskFingerprint));
+                    const batchFPs = new Set();
+                    const generated = [];
+
+                    let attempts = 0;
+                    const maxAttempts = count * 45; // Generous retry budget to ensure uniqueness
+
+                    while (generated.length < count && attempts < maxAttempts) {
+                        attempts++;
                         let t = null;
                         if (type.startsWith('oge6_')) {
                             if (window.OgeTask6Trainer) {
@@ -3234,19 +3292,28 @@
                             t = generateMultiplicationTask(type);
                         }
 
-                        if (t) {
+                        if (!t) break;
+
+                        const fp = getTaskFingerprint(t);
+                        if (!existingFPs.has(fp) && !batchFPs.has(fp)) {
+                            batchFPs.add(fp);
+                            existingFPs.add(fp);
                             generated.push(t);
                         }
                     }
 
                     if (generated.length === 0) {
-                        alert('Генератор выбранного типа временно недоступен.');
+                        alert('Все доступные уникальные задачи этого типа уже добавлены в черновик.');
                         return;
                     }
 
                     constructorDraftTasks = constructorDraftTasks.concat(generated);
                     renderConstructorDraft();
-                    showToast(`Сгенерировано и добавлено ${generated.length} задач`);
+                    if (generated.length < count) {
+                        showToast(`Добавлено ${generated.length} уникальных задач (все возможные без повторов)`, 'info');
+                    } else {
+                        showToast(`Сгенерировано и добавлено ${generated.length} уникальных задач без повторов!`);
+                    }
                 });
             }
 

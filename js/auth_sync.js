@@ -15,6 +15,44 @@
     const SYNC_DEBOUNCE_MS = 2500;
     let syncTimer = null;
     let currentUser = null;
+
+    // --- Unified Global Theme Controller ---
+    const StudyTheme = {
+        get() {
+            try {
+                return localStorage.getItem('profileTheme') || localStorage.getItem('site_theme') || 'dark';
+            } catch (e) {
+                return 'dark';
+            }
+        },
+        set(th, sync = true) {
+            const theme = th === 'light' ? 'light' : 'dark';
+            try {
+                localStorage.setItem('profileTheme', theme);
+                localStorage.setItem('site_theme', theme);
+            } catch (e) {}
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.dataset.theme = theme;
+            window.dispatchEvent(new CustomEvent('study-theme-changed', { detail: theme }));
+            if (sync && currentUser) {
+                scheduleSync(80);
+            }
+            return theme;
+        },
+        toggle(sync = true) {
+            const next = this.get() === 'dark' ? 'light' : 'dark';
+            return this.set(next, sync);
+        }
+    };
+    window.StudyTheme = StudyTheme;
+
+    // Immediately apply theme on script load
+    try {
+        const curThemeOnLoad = StudyTheme.get();
+        document.documentElement.setAttribute('data-theme', curThemeOnLoad);
+        document.documentElement.dataset.theme = curThemeOnLoad;
+    } catch(e) {}
+
     let isInitialized = false;
 
     // --- 1. CSS STYLES FOR AUTH MODAL & HEADER BADGE ---
@@ -673,7 +711,12 @@
 
         // Theme
         if (data.theme && typeof data.theme === 'string') {
-            localStorage.setItem('profileTheme', data.theme);
+            const serverTh = data.theme === 'light' ? 'light' : 'dark';
+            localStorage.setItem('profileTheme', serverTh);
+            localStorage.setItem('site_theme', serverTh);
+            document.documentElement.setAttribute('data-theme', serverTh);
+            document.documentElement.dataset.theme = serverTh;
+            window.dispatchEvent(new CustomEvent('study-theme-changed', { detail: serverTh }));
         }
 
         // Refresh UI components if functions exist
@@ -1532,6 +1575,7 @@
         isAuthorized: () => !!currentUser,
         updateCloudSettingsCard,
         logout,
+        theme: StudyTheme,
         login,
         register,
         collectLocalState,

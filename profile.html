@@ -2,6 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный профиль исследователя · НЕШкола</title>
     <meta name="description" content="Личный кабинет и панель прогресса в НЕШколе: серии решений, звания в тренажерах, опыт XP и карта навыков.">
@@ -5687,10 +5689,16 @@
 
             // Theme switcher
             function applyProfileTheme(theme) {
-                document.documentElement.dataset.theme = theme;
-                try {
-                    localStorage.setItem('profileTheme', theme);
-                } catch(e) {}
+                if (window.StudyTheme) {
+                    window.StudyTheme.set(theme, true);
+                } else {
+                    document.documentElement.dataset.theme = theme;
+                    document.documentElement.setAttribute('data-theme', theme);
+                    try {
+                        localStorage.setItem('profileTheme', theme);
+                        localStorage.setItem('site_theme', theme);
+                    } catch(e) {}
+                }
 
                 const isLight = theme === 'light';
                 if (settingsThemeToggle) {
@@ -5711,7 +5719,7 @@
                 }
             }
 
-            const initialTheme = localStorage.getItem('profileTheme') || 'dark';
+            const initialTheme = window.StudyTheme ? window.StudyTheme.get() : (localStorage.getItem('profileTheme') || 'dark');
             applyProfileTheme(initialTheme);
 
             if (settingsThemeToggle) {
@@ -5720,6 +5728,21 @@
                     applyProfileTheme(nextTheme);
                 });
             }
+
+            window.addEventListener('study-theme-changed', (e) => {
+                const th = e.detail;
+                const isLight = th === 'light';
+                if (settingsThemeToggle && settingsThemeToggle.checked !== isLight) {
+                    settingsThemeToggle.checked = isLight;
+                    settingsThemeToggle.setAttribute('aria-checked', String(isLight));
+                }
+                if (themeModeBadge) {
+                    themeModeBadge.textContent = isLight ? 'Светлая тема' : 'Тёмная тема';
+                }
+                if (themeToggleDesc) {
+                    themeToggleDesc.textContent = isLight ? 'Светлый контрастный интерфейс' : 'Тёмный космический интерфейс';
+                }
+            });
 
             // Name editor in settings
             function saveNameFromSettings() {
@@ -6059,7 +6082,7 @@
                 if (settingsNameStatus) {
                     settingsNameStatus.textContent = '';
                 }
-                const curTheme = document.documentElement.dataset.theme || 'dark';
+                const curTheme = window.StudyTheme ? window.StudyTheme.get() : (document.documentElement.dataset.theme || 'dark');
                 applyProfileTheme(curTheme);
 
                 const currentFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';

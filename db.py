@@ -1091,6 +1091,27 @@ def create_homework(
     if not tasks:
         raise ValueError("Домашнее задание должно содержать хотя бы одну задачу.")
 
+    # Deduplicate tasks defensively
+    unique_tasks = []
+    seen_fps = set()
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        raw_text = str(t.get('questionHtml') or t.get('text') or '')
+        clean_text = re.sub(r'<[^>]*>', ' ', raw_text)
+        clean_text = re.sub(r'\s+', ' ', clean_text).strip().lower()
+        ans = str(t.get('answer') if t.get('answer') is not None else t.get('displayAnswer') or '').strip().lower()
+        mult_match = re.search(r'(\d+)\s*[\u00d7*xX]\s*(\d+)', clean_text)
+        if mult_match and 'multiplication' in str(t.get('category', '')).lower():
+            n1, n2 = sorted([int(mult_match.group(1)), int(mult_match.group(2))])
+            fp = f"mult:{n1}x{n2}"
+        else:
+            fp = f"{t.get('category', '')}:{clean_text}|ans:{ans}"
+        if fp not in seen_fps:
+            seen_fps.add(fp)
+            unique_tasks.append(t)
+    tasks = unique_tasks or tasks
+
     now_iso = datetime.now(timezone.utc).isoformat()
     tasks_json = json.dumps(tasks, ensure_ascii=False)
 
