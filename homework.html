@@ -441,6 +441,42 @@
             color: var(--danger);
         }
 
+        .submitted-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.55rem 0.95rem;
+            border-radius: var(--r-sm);
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            font-size: 0.92rem;
+            color: var(--muted-bright);
+        }
+        .submitted-pill-label {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .submitted-pill-val {
+            font-family: var(--f-mono);
+            color: var(--ink);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .submitted-pill.pill-correct {
+            border-color: rgba(46, 213, 115, 0.45);
+            background: rgba(46, 213, 115, 0.08);
+        }
+        .submitted-pill.pill-correct .submitted-pill-val {
+            color: var(--accent-emerald);
+        }
+        .submitted-pill.pill-incorrect {
+            border-color: rgba(255, 71, 87, 0.45);
+            background: rgba(255, 71, 87, 0.08);
+        }
+        .submitted-pill.pill-incorrect .submitted-pill-val {
+            color: var(--danger);
+        }
+
         .solution-details {
             margin-top: 1.25rem;
             background: var(--surface-card);
@@ -873,6 +909,16 @@
             let isSavingDraft = false;
             let draftDebounceTimer = null;
 
+            function escapeHtml(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             function showToast(msg) {
                 toast.textContent = msg;
                 toast.classList.add('visible');
@@ -898,7 +944,14 @@
                     }
 
                     hwData = data.homework;
-                    currentAnswers = (hwData.submission && hwData.submission.answers) ? { ...hwData.submission.answers } : {};
+                    currentAnswers = {};
+                    if (hwData.submission && hwData.submission.answers) {
+                        const raw = hwData.submission.answers;
+                        Object.keys(raw).forEach(k => {
+                            const val = raw[k];
+                            currentAnswers[k] = (typeof val === 'object' && val !== null) ? String(val.answer || '') : String(val || '');
+                        });
+                    }
                     renderHomework();
                 } catch (err) {
                     loader.style.display = 'none';
@@ -914,9 +967,9 @@
                 document.title = `${hwData.title} · Домашнее задание`;
                 document.getElementById('hw-title').textContent = hwData.title;
                 document.getElementById('hw-subject').textContent = hwData.subject || 'Предмет';
-                document.getElementById('hw-class').textContent = hwData.class_name || 'Класс';
+                document.getElementById('hw-class').textContent = hwData.class_name || hwData.className || 'Класс';
                 document.getElementById('hw-tasks-count').textContent = hwData.tasks ? hwData.tasks.length : 0;
-                document.getElementById('hw-teacher-name').textContent = hwData.teacher_name || 'Учитель';
+                document.getElementById('hw-teacher-name').textContent = hwData.teacher_name || hwData.teacherName || 'Учитель';
 
                 if (hwData.description && hwData.description.trim()) {
                     const descEl = document.getElementById('hw-description');
@@ -924,8 +977,9 @@
                     descEl.style.display = 'block';
                 }
 
-                if (hwData.deadline) {
-                    const d = new Date(hwData.deadline);
+                const rawDeadline = hwData.deadline || hwData.deadlineAt || hwData.deadline_at;
+                if (rawDeadline) {
+                    const d = new Date(rawDeadline);
                     document.getElementById('hw-deadline').textContent = d.toLocaleString('ru-RU', {
                         day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
                     });
@@ -940,19 +994,21 @@
                 const feedbackBanner = document.getElementById('hw-feedback-banner');
                 const feedbackText = document.getElementById('hw-feedback-text');
 
-                const status = (hwData.submission && hwData.submission.status) ? hwData.submission.status : 'pending';
+                const sub = hwData.submission || {};
+                const status = sub.status || 'pending';
                 const isFinal = (status === 'submitted' || status === 'checked');
 
                 if (status === 'checked') {
                     statusBadge.className = 'badge badge-status status-checked';
                     statusBadge.textContent = 'Проверено';
                     scoreWrap.style.display = 'block';
-                    const maxScore = (hwData.submission.max_score != null) ? hwData.submission.max_score : hwData.tasks.length;
-                    scoreEl.textContent = `${hwData.submission.score} / ${maxScore}`;
+                    const maxScore = (sub.max_score != null) ? sub.max_score : ((sub.maxScore != null) ? sub.maxScore : hwData.tasks.length);
+                    scoreEl.textContent = `${sub.score || 0} / ${maxScore}`;
 
-                    if (hwData.submission.teacher_feedback && hwData.submission.teacher_feedback.trim()) {
+                    const teacherFb = sub.teacher_feedback || sub.teacherFeedback;
+                    if (teacherFb && teacherFb.trim()) {
                         feedbackBanner.style.display = 'flex';
-                        feedbackText.textContent = hwData.submission.teacher_feedback;
+                        feedbackText.textContent = teacherFb;
                     }
                     bottomBar.style.display = 'none';
                 } else if (status === 'submitted') {
@@ -961,7 +1017,8 @@
                     bottomBar.style.display = 'none';
                 } else {
                     statusBadge.className = 'badge badge-status status-pending';
-                    statusBadge.textContent = Object.keys(currentAnswers).length > 0 ? 'В процессе' : 'Не начато';
+                    const hasAnyAns = Object.values(currentAnswers).some(v => v && String(v).trim().length > 0);
+                    statusBadge.textContent = hasAnyAns ? 'В процессе' : 'Не начато';
                 }
 
                 // Render task cards
@@ -971,24 +1028,51 @@
                     card.className = 'task-card';
                     card.id = `task-card-${index}`;
 
-                    const studentVal = (currentAnswers[index] !== undefined && currentAnswers[index] !== null) ? currentAnswers[index] : '';
+                    // Extract student answer
+                    let studentVal = '';
+                    if (task.studentAnswer !== undefined && task.studentAnswer !== null && String(task.studentAnswer).trim() !== '') {
+                        studentVal = String(task.studentAnswer).trim();
+                    } else if (currentAnswers[index] !== undefined && currentAnswers[index] !== null && String(currentAnswers[index]).trim() !== '') {
+                        studentVal = String(currentAnswers[index]).trim();
+                    } else if (currentAnswers[String(index)] !== undefined && currentAnswers[String(index)] !== null && String(currentAnswers[String(index)]).trim() !== '') {
+                        studentVal = String(currentAnswers[String(index)]).trim();
+                    } else if (task.taskId && currentAnswers[task.taskId] !== undefined && String(currentAnswers[task.taskId]).trim() !== '') {
+                        studentVal = String(currentAnswers[task.taskId]).trim();
+                    } else if (currentAnswers[`task_${index + 1}`] !== undefined && String(currentAnswers[`task_${index + 1}`]).trim() !== '') {
+                        studentVal = String(currentAnswers[`task_${index + 1}`]).trim();
+                    }
+                    currentAnswers[index] = studentVal;
 
-                    // Check result decoration if checked
-                    let resultBadgeHtml = '';
+                    let answerUiHtml = '';
                     let solutionHtml = '';
+
                     if (status === 'checked') {
-                        const isCorrect = (task.is_correct === true);
+                        const isCorrect = (task.is_correct === true || task.isCorrect === true);
                         if (isCorrect) {
                             card.classList.add('is-correct');
-                            resultBadgeHtml = `<span class="task-result-status res-correct">✓ Верно (+1 балл)</span>`;
                         } else {
                             card.classList.add('is-incorrect');
-                            resultBadgeHtml = `<span class="task-result-status res-incorrect">✗ Неверно (Правильный ответ: <strong>${task.displayAnswer || task.answer}</strong>)</span>`;
                         }
+
+                        const correctAnsDisplay = escapeHtml(String(task.displayAnswer || task.answer || ''));
+
+                        answerUiHtml = `
+                            <div class="answer-box">
+                                <div class="submitted-pill ${isCorrect ? 'pill-correct' : 'pill-incorrect'}">
+                                    <span class="submitted-pill-label">Ваш ответ:</span>
+                                    <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не решено)')}</strong>
+                                </div>
+                                <span class="task-result-status ${isCorrect ? 'res-correct' : 'res-incorrect'}">
+                                    ${isCorrect 
+                                        ? '✓ Верно (+1 балл)' 
+                                        : `✗ Неверно (Правильный ответ: <strong>${correctAnsDisplay}</strong>)`}
+                                </span>
+                            </div>
+                        `;
 
                         // Solution steps if available
                         if (task.solutionSteps && task.solutionSteps.length > 0) {
-                            const stepsLi = task.solutionSteps.map(s => `<li>${s}</li>`).join('');
+                            const stepsLi = task.solutionSteps.map(s => `<li>${escapeHtml(s)}</li>`).join('');
                             solutionHtml = `
                                 <details class="solution-details">
                                     <summary>Разбор и ход решения задачи</summary>
@@ -998,6 +1082,32 @@
                                 </details>
                             `;
                         }
+                    } else if (status === 'submitted') {
+                        answerUiHtml = `
+                            <div class="answer-box">
+                                <div class="submitted-pill">
+                                    <span class="submitted-pill-label">Ваш отправленный ответ:</span>
+                                    <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не заполнено)')}</strong>
+                                </div>
+                                <span class="task-result-status" style="color:var(--muted); font-size:0.85rem; font-weight:500;">
+                                    🔒 Ответ сохранён и зафиксирован
+                                </span>
+                            </div>
+                        `;
+                    } else {
+                        answerUiHtml = `
+                            <div class="answer-box">
+                                <div class="input-group">
+                                    <input type="text"
+                                        class="answer-input"
+                                        id="input-task-${index}"
+                                        placeholder="Ваш ответ..."
+                                        value="${escapeHtml(studentVal)}"
+                                        autocomplete="off"
+                                        inputmode="decimal">
+                                </div>
+                            </div>
+                        `;
                     }
 
                     const categoryName = task.catName || task.category || 'Задание';
@@ -1005,24 +1115,12 @@
                     card.innerHTML = `
                         <div class="task-header">
                             <span class="task-number">Задание №${index + 1}</span>
-                            <span class="task-cat">${categoryName}</span>
+                            <span class="task-cat">${escapeHtml(categoryName)}</span>
                         </div>
                         <div class="task-body">
-                            ${task.questionHtml || task.text || ''}
+                            ${task.questionHtml || escapeHtml(task.text || '')}
                         </div>
-                        <div class="answer-box">
-                            <div class="input-group">
-                                <input type="text"
-                                    class="answer-input"
-                                    id="input-task-${index}"
-                                    placeholder="Ваш ответ..."
-                                    value="${studentVal}"
-                                    ${isFinal ? 'disabled' : ''}
-                                    autocomplete="off"
-                                    inputmode="decimal">
-                            </div>
-                            ${resultBadgeHtml}
-                        </div>
+                        ${answerUiHtml}
                         ${solutionHtml}
                     `;
 
@@ -1031,10 +1129,12 @@
                     // Input change event
                     if (!isFinal) {
                         const input = card.querySelector(`#input-task-${index}`);
-                        input.addEventListener('input', (e) => {
-                            currentAnswers[index] = e.target.value.trim();
-                            triggerAutoSaveDraft();
-                        });
+                        if (input) {
+                            input.addEventListener('input', (e) => {
+                                currentAnswers[index] = e.target.value.trim();
+                                triggerAutoSaveDraft();
+                            });
+                        }
                     }
                 });
             }

@@ -1153,15 +1153,20 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
             )
             sub_row = cursor.fetchone()
             if sub_row:
+                raw_answers = json.loads(sub_row['answers_json']) if sub_row['answers_json'] else {}
                 submission = {
                     'id': sub_row['id'],
                     'status': sub_row['status'],
-                    'answers': json.loads(sub_row['answers_json']) if sub_row['answers_json'] else {},
+                    'answers': raw_answers,
                     'score': sub_row['score'],
                     'maxScore': sub_row['max_score'],
+                    'max_score': sub_row['max_score'],
                     'teacherFeedback': sub_row['teacher_feedback'],
+                    'teacher_feedback': sub_row['teacher_feedback'],
                     'submittedAt': sub_row['submitted_at'],
-                    'checkedAt': sub_row['checked_at']
+                    'submitted_at': sub_row['submitted_at'],
+                    'checkedAt': sub_row['checked_at'],
+                    'checked_at': sub_row['checked_at']
                 }
 
         # Если запрашивает ученик и работа ещё не проверена учителем - скрываем правильные ответы
@@ -1171,25 +1176,56 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
         sanitized_tasks = []
         for idx, t in enumerate(tasks):
             t_copy = dict(t)
-            t_copy['taskId'] = t.get('taskId') or t.get('id') or f"task_{idx + 1}"
+            t_id = t.get('taskId') or t.get('id') or f"task_{idx + 1}"
+            t_copy['taskId'] = t_id
+
+            # Extract student answer & correctness if submission exists
+            student_answer = ""
+            is_correct = None
+            if submission and submission.get('answers'):
+                sub_ans = submission['answers']
+                raw_item = None
+                for k in (str(idx), idx, t_id, f"task_{idx + 1}", t.get('taskId'), t.get('id')):
+                    if k is not None and k in sub_ans:
+                        raw_item = sub_ans[k]
+                        break
+                if raw_item is not None:
+                    if isinstance(raw_item, dict):
+                        student_answer = str(raw_item.get('answer', '')).strip()
+                        is_correct = raw_item.get('isCorrect')
+                    else:
+                        student_answer = str(raw_item).strip()
+
+            t_copy['studentAnswer'] = student_answer
+            t_copy['is_correct'] = is_correct
+            t_copy['isCorrect'] = is_correct
+
             if not is_teacher_or_admin and not is_checked:
                 # Скрываем ответы и подсказки с решением
                 t_copy.pop('answer', None)
                 t_copy.pop('displayAnswer', None)
                 t_copy.pop('solutionSteps', None)
+
             sanitized_tasks.append(t_copy)
 
         return {
             'id': row['id'],
             'teacherId': row['teacher_id'],
+            'teacher_id': row['teacher_id'],
             'teacherName': row['teacher_name'],
+            'teacher_name': row['teacher_name'],
             'classId': row['class_id'],
+            'class_id': row['class_id'],
             'className': row['class_name'],
+            'class_name': row['class_name'],
             'title': row['title'],
             'description': row['description'],
             'subject': row['subject'],
+            'deadline': row['deadline_at'],
             'deadlineAt': row['deadline_at'],
+            'deadline_at': row['deadline_at'],
             'createdAt': row['created_at'],
+            'created_at': row['created_at'],
             'tasks': sanitized_tasks,
             'submission': submission
         }
@@ -1347,8 +1383,32 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
         graded_answers = {}
         for idx, t in enumerate(tasks):
             t_id = str(t.get('taskId') or t.get('id') or f"task_{idx + 1}")
-            user_ans = str(answers.get(t_id, '')).strip()
-            correct_ans = str(t.get('answer', '')).strip()
+
+            # Robust answer retrieval from client payload
+            raw_val = None
+            candidate_keys = [
+                str(idx),
+                idx,
+                t_id,
+                f"task_{idx + 1}",
+                t.get('taskId'),
+                t.get('id')
+            ]
+            for ck in candidate_keys:
+                if ck is not None and ck in answers:
+                    raw_val = answers[ck]
+                    break
+
+            if raw_val is not None:
+                if isinstance(raw_val, dict):
+                    user_ans = str(raw_val.get('answer', '')).strip()
+                else:
+                    user_ans = str(raw_val).strip()
+            else:
+                user_ans = ''
+
+            # Correct answer from task
+            correct_ans = str(t.get('displayAnswer') or t.get('answer') or '').strip()
 
             is_correct = False
             if user_ans and correct_ans:
@@ -1365,10 +1425,15 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
             if is_correct:
                 computed_score += 1
 
-            graded_answers[t_id] = {
+            record = {
                 'answer': user_ans,
                 'isCorrect': is_correct
             }
+            # Key by index (string) and by task ID so all lookups succeed
+            graded_answers[str(idx)] = record
+            graded_answers[t_id] = record
+            if t.get('taskId'):
+                graded_answers[str(t.get('taskId'))] = record
 
         answers_json = json.dumps(graded_answers, ensure_ascii=False)
 
@@ -1436,18 +1501,27 @@ def get_homework_submissions_for_teacher(homework_id: int, teacher_id: Optional[
         submissions = []
         for r in cursor.fetchall():
             status = r['status'] or 'not_started'
+            raw_answers = json.loads(r['answers_json']) if r['answers_json'] else {}
             submissions.append({
                 'studentId': r['student_id'],
+                'student_id': r['student_id'],
                 'username': r['username'],
+                'student_username': r['username'],
                 'displayName': r['display_name'],
+                'student_display_name': r['display_name'],
                 'submissionId': r['submission_id'],
+                'submission_id': r['submission_id'],
                 'status': status,
                 'score': r['score'] or 0,
                 'maxScore': r['max_score'] or len(tasks),
+                'max_score': r['max_score'] or len(tasks),
                 'teacherFeedback': r['teacher_feedback'] or '',
+                'teacher_feedback': r['teacher_feedback'] or '',
                 'submittedAt': r['submitted_at'],
+                'submitted_at': r['submitted_at'],
                 'checkedAt': r['checked_at'],
-                'answers': json.loads(r['answers_json']) if r['answers_json'] else {}
+                'checked_at': r['checked_at'],
+                'answers': raw_answers
             })
 
         return {
@@ -1455,8 +1529,11 @@ def get_homework_submissions_for_teacher(homework_id: int, teacher_id: Optional[
                 'id': hw['id'],
                 'title': hw['title'],
                 'className': hw['class_name'],
+                'class_name': hw['class_name'],
                 'subject': hw['subject'],
+                'deadline': hw['deadline_at'],
                 'deadlineAt': hw['deadline_at'],
+                'deadline_at': hw['deadline_at'],
                 'tasks': tasks
             },
             'submissions': submissions

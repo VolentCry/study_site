@@ -3539,8 +3539,8 @@
 
             function openReviewSubmissionModal(sub, hw) {
                 currentReviewSubmission = sub;
-                document.getElementById('review-student-name').textContent = `Работа: ${sub.student_display_name || sub.student_username}`;
-                document.getElementById('review-hw-title').textContent = `${hw.title} (${hw.class_name})`;
+                document.getElementById('review-student-name').textContent = `Работа: ${sub.student_display_name || sub.student_username || sub.displayName || sub.username || ''}`;
+                document.getElementById('review-hw-title').textContent = `${hw.title} (${hw.class_name || hw.className || ''})`;
 
                 const tasksContainer = document.getElementById('review-tasks-container');
                 tasksContainer.innerHTML = '';
@@ -3551,8 +3551,18 @@
                 let autoCorrectCount = 0;
 
                 tasks.forEach((t, i) => {
-                    const studentAns = (answers[i] !== undefined && answers[i] !== null) ? String(answers[i]).trim() : '';
-                    const correctAns = String(t.displayAnswer || t.answer).trim();
+                    const rawAns = (answers[i] !== undefined)
+                        ? answers[i]
+                        : (answers[String(i)] !== undefined
+                            ? answers[String(i)]
+                            : (t.taskId && answers[t.taskId] !== undefined
+                                ? answers[t.taskId]
+                                : (answers[`task_${i + 1}`] !== undefined ? answers[`task_${i + 1}`] : '')));
+                    const studentAns = (typeof rawAns === 'object' && rawAns !== null)
+                        ? String(rawAns.answer || '').trim()
+                        : String(rawAns || '').trim();
+
+                    const correctAns = String(t.displayAnswer || t.answer || '').trim();
 
                     // Check equality
                     const normStudent = studentAns.replace(/\s+/g, '').replace(',', '.');
