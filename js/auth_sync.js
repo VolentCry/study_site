@@ -288,29 +288,64 @@
             background: rgba(16, 185, 129, 0.16) !important;
             box-shadow: 0 4px 18px rgba(16, 185, 129, 0.25) !important;
         }
+                .auth-dropdown-caret {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            opacity: 0.75;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s;
+            flex-shrink: 0;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 3px;
+        }
+        .unified-auth-wrap:hover .auth-dropdown-caret,
+        .unified-auth-wrap.is-open .auth-dropdown-caret {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
         .auth-dropdown-menu {
-            display: none;
+            display: block;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
             position: absolute;
             top: calc(100% + 8px);
             right: 0;
-            min-width: 210px;
+            min-width: 220px;
             background: var(--surface-card, #151b2b);
             border: 1px solid var(--line, rgba(255, 255, 255, 0.15));
             border-radius: var(--r, 14px);
-            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
             padding: 8px;
             z-index: 10000;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            animation: authDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(-4px);
+            transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.2s;
         }
-        @keyframes authDropdownFade {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Invisible hover bridge to eliminate dead zone between button and dropdown */
+        .auth-dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -18px;
+            left: -20px;
+            right: -20px;
+            height: 20px;
+            background: transparent;
+            pointer-events: auto;
         }
         .unified-auth-wrap:hover .auth-dropdown-menu,
-        .unified-auth-wrap:focus-within .auth-dropdown-menu {
-            display: block;
+        .unified-auth-wrap:focus-within .auth-dropdown-menu,
+        .unified-auth-wrap.is-open .auth-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+            transition-delay: 0s;
         }
         @media (max-width: 768px) {
             .auth-dropdown-menu {
@@ -1022,15 +1057,19 @@
                 const inner = btn.querySelector('.profile-cta-inner');
                 const xpEl = btn.querySelector('.xp-badge, #header-xp-badge, .xp-counter, #nav-xp-badge');
 
+                const caretSvg = `<svg class="auth-dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+
                 if (inner) {
                     inner.innerHTML = `
                         <span class="auth-status-dot"></span>
                         <span class="profile-cta-text">${roleBadge}${escapeHtml(displayName)}</span>
+                        ${caretSvg}
                     `;
                 } else {
                     btn.innerHTML = `
                         <span class="auth-status-dot"></span>
                         <span class="auth-btn-text">${roleBadge}${escapeHtml(displayName)}</span>
+                        ${caretSvg}
                         ${xpEl ? xpEl.outerHTML : `<span class="xp-badge">${xpText}</span>`}
                     `;
                 }
@@ -1081,6 +1120,61 @@
                             }
                         });
                     }
+
+                    dropdown.querySelectorAll('.auth-dropdown-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            if (wrap) wrap.classList.remove('is-open');
+                        });
+                    });
+                }
+
+                // Bind hover intent & outside click listeners to wrap
+                if (wrap && !wrap.dataset.dropdownEventsBound) {
+                    wrap.dataset.dropdownEventsBound = 'true';
+                    let closeTimer = null;
+
+                    const openDropdown = () => {
+                        if (closeTimer) {
+                            clearTimeout(closeTimer);
+                            closeTimer = null;
+                        }
+                        if (currentUser) {
+                            wrap.classList.add('is-open');
+                        }
+                    };
+
+                    const closeDropdown = (delay = 240) => {
+                        if (closeTimer) clearTimeout(closeTimer);
+                        closeTimer = setTimeout(() => {
+                            wrap.classList.remove('is-open');
+                        }, delay);
+                    };
+
+                    wrap.addEventListener('mouseenter', openDropdown);
+                    wrap.addEventListener('mouseleave', () => closeDropdown(240));
+
+                    btn.addEventListener('click', (e) => {
+                        if (!currentUser) return;
+                        if (window.innerWidth > 768) {
+                            if (e.target.closest('.auth-dropdown-caret')) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                wrap.classList.toggle('is-open');
+                            }
+                        }
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (!wrap.contains(e.target)) {
+                            wrap.classList.remove('is-open');
+                        }
+                    });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            wrap.classList.remove('is-open');
+                        }
+                    });
                 }
             } else {
                 btn.classList.remove('is-logged-in');
