@@ -179,6 +179,26 @@
             ]
         },
         {
+            id: 'oge_task_7',
+            name: 'ОГЭ №7 · Координатная прямая и неравенства',
+            shortName: 'ОГЭ Задание 7',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_7_trainer.html',
+            profileUrl: 'math_moduls/oge_task_7_trainer.html',
+            icon: '📏',
+            description: 'Числа на координатной прямой, оценка квадратных корней, сравнение дробей и знаки неравенств с переменными.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель числовой оси 👑' },
+                { min: 18, title: 'Магистр неравенств 🧙' },
+                { min: 12, title: 'Мастер координат 💎' },
+                { min: 7,  title: 'Знаток прямой 🥇' },
+                { min: 4,  title: 'Точный глазомер 🥈' },
+                { min: 1,  title: 'Ученик координат 🥉' }
+            ]
+        },
+        {
             id: 'oge_task_8',
             name: 'ОГЭ №8 · Степени и корни',
             shortName: 'ОГЭ Задание 8',
