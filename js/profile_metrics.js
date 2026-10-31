@@ -238,34 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const statTier = document.getElementById('ach-stat-tier');
         if (statTier) statTier.textContent = tier;
 
-        // Hero badge & Overview showcase sync
+        // Hero badge sync
         const heroMedalsCount = document.getElementById('hero-medals-count');
         if (heroMedalsCount) heroMedalsCount.textContent = `${earnedCount} / ${totalCount}`;
-
-        const ovEarned = document.getElementById('overview-medals-earned');
-        if (ovEarned) ovEarned.textContent = `${earnedCount} / ${totalCount}`;
-
-        const ovPct = document.getElementById('overview-medals-pct');
-        if (ovPct) ovPct.textContent = `${percent}%`;
-
-        const ovTier = document.getElementById('overview-medals-tier');
-        if (ovTier) ovTier.textContent = tier;
-
-        const overviewPreviewGrid = document.getElementById('overview-medals-preview-grid');
-        if (overviewPreviewGrid) {
-            overviewPreviewGrid.replaceChildren();
-            const previewSubset = achievements.slice(0, 6);
-            previewSubset.forEach(ach => {
-                const item = document.createElement('div');
-                item.className = `preview-medal-item ${ach.earned ? 'is-earned' : ''}`;
-                item.innerHTML = `
-                    <span class="preview-medal-icon">${ach.icon}</span>
-                    <span class="preview-medal-name" title="${ach.name}">${ach.name}</span>
-                    <span class="preview-medal-status">${ach.earned ? '✓ Открыто' : '🔒 Закрыто'}</span>
-                `;
-                overviewPreviewGrid.appendChild(item);
-            });
-        }
 
         // Filter button texts and active states
         const filterBtns = document.querySelectorAll('.ach-filter-btn');
