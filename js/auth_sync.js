@@ -264,6 +264,125 @@
             background: #10b981;
             box-shadow: 0 0 8px #10b981;
         }
+        /* Unified Profile & Auth Dropdown & Styles */
+        .unified-auth-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .profile-cta.is-logged-in,
+        .profile-link.is-logged-in,
+        .nav-profile-link.is-logged-in,
+        .nav-profile-btn.is-logged-in,
+        .auth-header-btn.is-logged-in {
+            border-color: rgba(16, 185, 129, 0.45) !important;
+            background: rgba(16, 185, 129, 0.08) !important;
+            color: var(--ink, #f8fafc) !important;
+        }
+        .profile-cta.is-logged-in:hover,
+        .profile-link.is-logged-in:hover,
+        .nav-profile-link.is-logged-in:hover,
+        .nav-profile-btn.is-logged-in:hover,
+        .auth-header-btn.is-logged-in:hover {
+            border-color: rgba(16, 185, 129, 0.75) !important;
+            background: rgba(16, 185, 129, 0.16) !important;
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.25) !important;
+        }
+        .auth-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 210px;
+            background: var(--surface-card, #151b2b);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.15));
+            border-radius: var(--r, 14px);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+            padding: 8px;
+            z-index: 10000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: authDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes authDropdownFade {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .unified-auth-wrap:hover .auth-dropdown-menu,
+        .unified-auth-wrap:focus-within .auth-dropdown-menu {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .auth-dropdown-menu {
+                display: none !important;
+            }
+        }
+        .auth-dropdown-header {
+            padding: 8px 10px 10px;
+            border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.1));
+            margin-bottom: 6px;
+        }
+        .auth-dropdown-user {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--ink, #ffffff);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .auth-dropdown-role {
+            font-size: 0.78rem;
+            color: var(--muted, #94a3b8);
+        }
+        .auth-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--ink, #f8fafc);
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, color 0.15s;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .auth-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--accent, #ff7728);
+        }
+        .auth-dropdown-logout-btn {
+            color: var(--danger, #ff4757) !important;
+            border-top: 1px solid var(--line, rgba(255, 255, 255, 0.08)) !important;
+            margin-top: 4px;
+            padding-top: 10px;
+        }
+        .auth-dropdown-logout-btn:hover {
+            background: rgba(255, 71, 87, 0.12) !important;
+            color: #ff6b81 !important;
+        }
+        .auth-guest-link-row {
+            text-align: center;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line, rgba(255, 255, 255, 0.1));
+        }
+        .auth-guest-link {
+            color: var(--muted, #94a3b8);
+            font-size: 0.85rem;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+        .auth-guest-link:hover {
+            color: var(--ink, #ffffff);
+        }
         /* Sync Toast Notification */
         .auth-sync-toast {
             position: fixed;
@@ -692,6 +811,9 @@
                     <button type="submit" class="auth-submit-btn" id="auth-submit-btn">
                         <span id="auth-submit-text">Войти</span>
                     </button>
+                    <div class="auth-guest-link-row">
+                        <a href="profile.html" class="auth-guest-link" id="auth-guest-profile-link">Или перейти в гостевой профиль без входа →</a>
+                    </div>
                 </form>
             </div>
         `;
@@ -800,30 +922,201 @@
     }
 
     // --- 6. HEADER & SETTINGS UI INTEGRATION ---
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function setupHeaderAuthProfileButton() {
+        const isProfilePage = window.location.pathname.endsWith('profile.html') || window.location.pathname.endsWith('/profile');
+
+        // Look for existing profile links on page
+        const existingProfileLinks = document.querySelectorAll(
+            '#header-profile-link, .profile-cta, .nav-profile-link, .profile-link, .nav-profile-btn, .nav-btn[href*="profile.html"]'
+        );
+
+        if (existingProfileLinks.length > 0) {
+            existingProfileLinks.forEach(link => {
+                if (link.dataset.unifiedAuthBound) return;
+                link.dataset.unifiedAuthBound = 'true';
+                link.classList.add('unified-auth-btn');
+
+                // Wrap in .unified-auth-wrap if not already wrapped
+                if (!link.parentElement.classList.contains('unified-auth-wrap')) {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'unified-auth-wrap';
+                    link.parentNode.insertBefore(wrap, link);
+                    wrap.appendChild(link);
+                }
+
+                link.addEventListener('click', (e) => {
+                    if (!currentUser) {
+                        e.preventDefault();
+                        openModal('login');
+                    }
+                });
+            });
+            return;
+        }
+
+        if (isProfilePage) {
+            // Already on profile page, no separate profile button needed
+            return;
+        }
+
+        // On other pages with an action container, inject single unified button
+        const containers = document.querySelectorAll('.header-actions, .nav-actions');
+        containers.forEach(container => {
+            if (container.querySelector('.unified-auth-btn, .auth-header-btn')) return;
+
+            const wrap = document.createElement('div');
+            wrap.className = 'unified-auth-wrap';
+
+            const link = document.createElement('a');
+            link.href = 'profile.html';
+            link.className = 'auth-header-btn unified-auth-btn';
+            link.dataset.unifiedAuthBound = 'true';
+            link.innerHTML = `
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="auth-btn-text">Войти</span>
+            `;
+
+            link.addEventListener('click', (e) => {
+                if (!currentUser) {
+                    e.preventDefault();
+                    openModal('login');
+                }
+            });
+
+            wrap.appendChild(link);
+            container.insertBefore(wrap, container.firstChild);
+        });
+    }
+
     function updateUIForAuthState() {
         const isTeacher = currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin');
         document.querySelectorAll('.teacher-only-link').forEach(el => {
             el.classList.toggle('hidden', !isTeacher);
         });
 
-        const headerBtns = document.querySelectorAll('.auth-header-btn');
-        headerBtns.forEach(btn => {
+        const localXP = parseInt(localStorage.getItem('user_xp') || '0', 10);
+        const xpText = `XP +${localXP}`;
+
+        const unifiedButtons = document.querySelectorAll('.unified-auth-btn, #header-profile-link, .profile-cta, .nav-profile-link, .profile-link, .nav-profile-btn, .auth-header-btn');
+
+        unifiedButtons.forEach(btn => {
+            const wrap = btn.closest('.unified-auth-wrap') || btn.parentElement;
+            let dropdown = wrap ? wrap.querySelector('.auth-dropdown-menu') : null;
+
             if (currentUser) {
                 btn.classList.add('is-logged-in');
-                const roleIcon = isTeacher ? '🎓 ' : '';
-                btn.innerHTML = `
-                    <span class="auth-status-dot"></span>
-                    <span>${roleIcon}${currentUser.displayName || currentUser.username}</span>
-                `;
-                btn.title = `Авторизован: ${currentUser.username} (${isTeacher ? 'Учитель' : 'Ученик'}). Нажмите для управления`;
+                const displayName = currentUser.displayName || currentUser.username;
+                const roleBadge = isTeacher ? '🎓 ' : '';
+                btn.title = `Личный кабинет: ${displayName} (${isTeacher ? 'Учитель' : 'Ученик'}). Нажмите для перехода`;
+
+                const inner = btn.querySelector('.profile-cta-inner');
+                const xpEl = btn.querySelector('.xp-badge, #header-xp-badge, .xp-counter, #nav-xp-badge');
+
+                if (inner) {
+                    inner.innerHTML = `
+                        <span class="auth-status-dot"></span>
+                        <span class="profile-cta-text">${roleBadge}${escapeHtml(displayName)}</span>
+                    `;
+                } else {
+                    btn.innerHTML = `
+                        <span class="auth-status-dot"></span>
+                        <span class="auth-btn-text">${roleBadge}${escapeHtml(displayName)}</span>
+                        ${xpEl ? xpEl.outerHTML : `<span class="xp-badge">${xpText}</span>`}
+                    `;
+                }
+
+                if (xpEl) {
+                    xpEl.textContent = xpText;
+                }
+
+                // Attach dropdown menu inside wrap
+                if (wrap && !dropdown) {
+                    dropdown = document.createElement('div');
+                    dropdown.className = 'auth-dropdown-menu';
+                    wrap.appendChild(dropdown);
+                }
+
+                if (dropdown) {
+                    const isSubdir = window.location.pathname.includes('/pages/') || window.location.pathname.includes('/math_moduls/');
+                    const prefix = isSubdir ? '../' : '';
+
+                    dropdown.innerHTML = `
+                        <div class="auth-dropdown-header">
+                            <div class="auth-dropdown-user">${escapeHtml(displayName)}</div>
+                            <div class="auth-dropdown-role">@${escapeHtml(currentUser.username)} · ${isTeacher ? 'Учитель' : 'Ученик'}</div>
+                        </div>
+                        <a href="${prefix}profile.html" class="auth-dropdown-item">
+                            <span>👤 Личный кабинет</span>
+                        </a>
+                        ${isTeacher ? `
+                        <a href="${prefix}teacher.html" class="auth-dropdown-item">
+                            <span>🎓 Панель учителя</span>
+                        </a>
+                        ` : ''}
+                        <button type="button" class="auth-dropdown-item auth-dropdown-logout-btn">
+                            <span>🚪 Выйти из аккаунта</span>
+                        </button>
+                    `;
+
+                    const logoutBtn = dropdown.querySelector('.auth-dropdown-logout-btn');
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+                                await apiLogout();
+                                currentUser = null;
+                                updateUIForAuthState();
+                                showToast('Вы вышли из аккаунта', 'success');
+                            }
+                        });
+                    }
+                }
             } else {
                 btn.classList.remove('is-logged-in');
-                btn.innerHTML = `
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span>Войти</span>
-                `;
-                btn.title = 'Войти или создать аккаунт для сохранения в базе данных';
+                btn.title = 'Войти в профиль';
+
+                const inner = btn.querySelector('.profile-cta-inner');
+                const xpEl = btn.querySelector('.xp-badge, #header-xp-badge, .xp-counter, #nav-xp-badge');
+
+                const userSvg = `<svg class="profile-cta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+                if (inner) {
+                    inner.innerHTML = `
+                        ${userSvg}
+                        <span class="profile-cta-text">Войти</span>
+                    `;
+                } else {
+                    btn.innerHTML = `
+                        ${userSvg}
+                        <span class="auth-btn-text">Войти</span>
+                        ${xpEl ? xpEl.outerHTML : `<span class="xp-badge">${xpText}</span>`}
+                    `;
+                }
+
+                if (xpEl) {
+                    xpEl.textContent = xpText;
+                }
+
+                if (dropdown) {
+                    dropdown.remove();
+                }
             }
+        });
+
+        // Update standalone XP badges
+        document.querySelectorAll('#header-xp-badge, #nav-xp-badge').forEach(el => {
+            el.textContent = xpText;
         });
 
         // Update Cloud Settings Pane if present in profile.html
@@ -914,38 +1207,7 @@
     }
 
     function injectHeaderTrigger() {
-        // Look for common action containers
-        const containers = document.querySelectorAll('.header-actions, .nav-actions');
-        containers.forEach(container => {
-            if (container.querySelector('.auth-header-btn')) return;
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'auth-header-btn';
-            btn.innerHTML = `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span>Войти</span>
-            `;
-
-            btn.addEventListener('click', () => {
-                if (currentUser) {
-                    const settingsBtn = document.getElementById('settings-open-btn');
-                    const tabBtnCloud = document.getElementById('settings-tab-btn-cloud');
-                    if (settingsBtn && tabBtnCloud) {
-                        settingsBtn.click();
-                        tabBtnCloud.click();
-                    } else {
-                        // Open Account Modal or navigate to profile
-                        openAccountModal();
-                    }
-                } else {
-                    openModal('login');
-                }
-            });
-
-            // Insert at the beginning or before other buttons
-            container.insertBefore(btn, container.firstChild);
-        });
+        setupHeaderAuthProfileButton();
     }
 
     // --- 7. PUBLIC API & AUTO-SYNC ---
