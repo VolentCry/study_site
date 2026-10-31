@@ -1550,9 +1550,6 @@
                         <h2 style="font-family: var(--f-display); font-size: 1.4rem; font-weight: 800;">Расписание и уроки</h2>
                         <p style="color: var(--muted); font-size: 0.9rem;">Планируйте занятия для классов и прикрепляйте домашние задания</p>
                     </div>
-                    <button type="button" class="btn btn-secondary" id="btn-open-teacher-methodical-plan" style="margin-right:10px;">
-                        📋 Методический план
-                    </button>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button type="button" class="btn btn-secondary" id="btn-open-teacher-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700;">
                             📋 Методический план
@@ -1623,6 +1620,13 @@
                                             <option value="oge6_decimal">ОГЭ №6 · Десятичные дроби</option>
                                             <option value="oge6_multistory">ОГЭ №6 · Многоэтажные дроби</option>
                                             <option value="oge6_powers">ОГЭ №6 · Степени 10 и стандартный вид</option>
+                                        </optgroup>
+                                        <optgroup label="ОГЭ Математика Задание №7 (Координатная прямая и неравенства)">
+                                            <option value="oge7_all">ОГЭ №7 · Все прототипы задания 7</option>
+                                            <option value="oge7_roots">ОГЭ №7 · Квадратные корни на прямой</option>
+                                            <option value="oge7_fractions">ОГЭ №7 · Дроби и числовые отрезки</option>
+                                            <option value="oge7_variables">ОГЭ №7 · Неравенства с переменными (x, y)</option>
+                                            <option value="oge7_differences">ОГЭ №7 · Сравнение разностей</option>
                                         </optgroup>
                                         <optgroup label="ОГЭ Математика Задание №8 (Числа, корни и степени)">
                                             <option value="oge8_all">ОГЭ №8 · Все типы корней и степеней</option>
@@ -2002,6 +2006,7 @@
     <!-- SCRIPTS -->
         <!-- Trainer Engines for Homework Constructor -->
     <script src="js/oge_task_6_trainer.js"></script>
+    <script src="js/oge_task_7_trainer.js"></script>
     <script src="js/oge_task_8_trainer.js"></script>
     <script src="js/oge_task_9_trainer.js"></script>
     <script src="js/oge_task_10_trainer.js"></script>
@@ -3554,6 +3559,17 @@
                                     'oge6_powers': 'powers_of_ten_mixed'
                                 };
                                 t = window.OgeTask6Trainer.generateTask(catMap[type] || 'mixed_all');
+                            }
+                        } else if (type.startsWith('oge7_')) {
+                            if (window.OgeTask7Trainer) {
+                                const catMap = {
+                                    'oge7_all': 'mixed_all',
+                                    'oge7_roots': 'roots_on_line',
+                                    'oge7_fractions': 'fractions_and_intervals',
+                                    'oge7_variables': 'variable_inequalities',
+                                    'oge7_differences': 'differences_comparison'
+                                };
+                                t = window.OgeTask7Trainer.generateTask(catMap[type] || 'mixed_all');
                             }
                         } else if (type.startsWith('oge8_')) {
                             if (window.OgeTask8Trainer) {

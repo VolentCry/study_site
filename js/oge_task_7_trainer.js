@@ -827,20 +827,64 @@
     }
   };
 
+  function normalizeTask(t) {
+    if (!t) return t;
+    if (!t.catName) t.catName = t.categoryTitle || 'Координатная прямая';
+    if (!t.displayAnswer) {
+      const optText = (t.options && t.options[t.correctOptionIndex]) ? ` (${t.options[t.correctOptionIndex]})` : '';
+      t.displayAnswer = String(t.answer) + optText;
+    }
+    if (!t.questionHtml) {
+      const optionsHtml = (t.options || []).map((opt, i) => `
+        <div style="padding: 6px 12px; background: rgba(38,63,97,0.06); border: 1px solid rgba(38,63,97,0.14); border-radius: 8px; font-size: 0.92rem; text-align: left;">
+          <strong style="color: var(--vermilion, #b7464e);">${i + 1})</strong> ${opt}
+        </div>
+      `).join('');
+      t.questionHtml = `
+        <div class="task-prompt" style="font-weight: 600; margin-bottom: 10px; line-height: 1.5;">${t.text}</div>
+        <div class="number-line-container" style="width: 100%; max-width: 680px; margin: 12px auto; background: var(--paper-light, #fbf9f4); border: 1px solid rgba(38,63,97,0.18); border-radius: 12px; padding: 12px; display: flex; justify-content: center; overflow-x: auto;">
+          ${t.svg}
+        </div>
+        <div class="options-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 10px;">
+          ${optionsHtml}
+        </div>
+      `;
+    }
+    if (!t.solutionSteps && t.explanation) {
+      const stepMatches = t.explanation.match(/<div class="step-text">([\s\S]*?)<\/div>/g);
+      if (stepMatches && stepMatches.length > 0) {
+        t.solutionSteps = stepMatches.map(s => s.replace(/<\/?div[^>]*>/g, '').trim());
+      } else {
+        t.solutionSteps = [t.explanation.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()];
+      }
+    }
+    return t;
+  }
+
+  function checkAnswer(userRaw, correctAnswer) {
+    if (userRaw === undefined || userRaw === null) return false;
+    const u = String(userRaw).trim().replace(',', '.');
+    const c = String(correctAnswer).trim().replace(',', '.');
+    return u === c;
+  }
+
   function generateTask(categoryId) {
+    let t = null;
     if (!categoryId || categoryId === 'mixed_all') {
       const allKeys = Object.keys(CATEGORIES);
       const chosenKey = randomChoice(allKeys);
-      return CATEGORIES[chosenKey].generator();
+      t = CATEGORIES[chosenKey].generator();
+    } else if (CATEGORIES[categoryId]) {
+      t = CATEGORIES[categoryId].generator();
+    } else {
+      t = generateRootsTask();
     }
-    if (CATEGORIES[categoryId]) {
-      return CATEGORIES[categoryId].generator();
-    }
-    return generateRootsTask();
+    return normalizeTask(t);
   }
 
   return {
     generateTask: generateTask,
+    checkAnswer: checkAnswer,
     renderNumberLineSVG: renderNumberLineSVG,
     categories: CATEGORIES
   };
