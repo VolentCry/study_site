@@ -3537,7 +3537,8 @@
             async function openSubmissionsModal(hw) {
                 currentReviewHw = hw;
                 document.getElementById('submissions-modal-title').textContent = hw.title;
-                document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name} · Всего заданий: ${hw.tasks ? hw.tasks.length : 0}`;
+                const initialTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
+                document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''} · Всего заданий: ${initialTaskCount}`;
                 submissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--muted);">Загрузка работ...</td></tr>';
                 modalSubmissionsList.showModal();
 
@@ -3547,6 +3548,13 @@
                     if (!data.success) {
                         submissionsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger);">${data.error || 'Ошибка загрузки'}</td></tr>`;
                         return;
+                    }
+
+                    if (data.homework) {
+                        hw = Object.assign(hw, data.homework);
+                        currentReviewHw = hw;
+                        const updatedTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
+                        document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''} · Всего заданий: ${updatedTaskCount}`;
                     }
 
                     const subs = data.submissions || [];
@@ -3565,12 +3573,14 @@
                             statusBadge = `<span class="badge badge-status status-pending">Не начато</span>`;
                         }
 
-                        const maxSc = s.maxScore || s.max_score || (hw.tasks ? hw.tasks.length : 0);
-                        const scoreDisplay = s.status === 'checked' ? `<strong>${s.score}</strong> / ${maxSc}` : '—';
+                        const maxSc = s.maxScore || s.max_score || (hw.tasks ? hw.tasks.length : (hw.tasksCount || 0));
+                        const scoreDisplay = s.status === 'checked' 
+                            ? `<strong>${s.score}</strong> / ${maxSc}` 
+                            : (s.status === 'submitted' ? `<span style="color:var(--accent-gold); font-weight:700;">${s.score} / ${maxSc}</span> (авто)` : '—');
                         const submitTime = (s.submittedAt || s.submitted_at) ? formatDateTime(s.submittedAt || s.submitted_at) : '—';
                         const sName = s.displayName || s.display_name || s.username || s.student_username;
                         const sUname = s.username || s.student_username;
-                        const subIdVal = s.submissionId || s.id || sIdx;
+                        const sId = s.studentId || s.student_id;
 
                         return `
                             <tr>
@@ -3581,10 +3591,13 @@
                                 <td>${statusBadge}</td>
                                 <td style="font-size:0.85rem;">${submitTime}</td>
                                 <td>${scoreDisplay}</td>
-                                <td style="text-align:right;">
-                                    <button type="button" class="btn btn-emerald btn-sm btn-review-work" data-sub-idx="${sIdx}">
+                                <td style="text-align:right; white-space:nowrap;">
+                                    <button type="button" class="btn btn-emerald btn-sm btn-review-work" data-sub-idx="${sIdx}" style="margin-right:4px;">
                                         ${s.status === 'checked' ? '✏️ Изменить' : '🔍 Проверить'}
                                     </button>
+                                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-secondary btn-sm" title="Открыть работу в интерактивном плеере" style="padding:0.25rem 0.55rem; font-size:0.8rem; text-decoration:none;">
+                                        ↗ Плеер
+                                    </a>
                                 </td>
                             </tr>
                         `;
@@ -3595,7 +3608,7 @@
                         b.addEventListener('click', () => {
                             const sIdx = parseInt(b.getAttribute('data-sub-idx'), 10);
                             const foundSub = subs[sIdx];
-                            if (foundSub) openReviewSubmissionModal(foundSub, hw);
+                            if (foundSub) openReviewSubmissionModal(foundSub, currentReviewHw || hw);
                         });
                     });
 
@@ -3604,37 +3617,74 @@
                 }
             }
 
-            function openReviewSubmissionModal(sub, hw) {
+            async function openReviewSubmissionModal(sub, hw) {
                 currentReviewSubmission = sub;
+                currentReviewHw = hw;
                 document.getElementById('review-student-name').textContent = `Работа: ${sub.student_display_name || sub.student_username || sub.displayName || sub.username || ''}`;
                 document.getElementById('review-hw-title').textContent = `${hw.title} (${hw.class_name || hw.className || ''})`;
 
                 const tasksContainer = document.getElementById('review-tasks-container');
-                tasksContainer.innerHTML = '';
+                tasksContainer.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--muted);">Загрузка заданий...</div>';
+
+                if (modalSubmissionsList && modalSubmissionsList.open) modalSubmissionsList.close();
+                modalReviewSubmission.showModal();
+
+                if (!hw.tasks || hw.tasks.length === 0) {
+                    try {
+                        const res = await fetch(`/api/teacher/homeworks/${hw.id}`);
+                        const data = await res.json();
+                        if (data.success && data.homework && data.homework.tasks) {
+                            hw = Object.assign(hw, data.homework);
+                            currentReviewHw = hw;
+                        }
+                    } catch(e) {
+                        console.error('Error fetching homework tasks:', e);
+                    }
+                }
 
                 const tasks = hw.tasks || [];
                 const answers = sub.answers || {};
 
+                tasksContainer.innerHTML = '';
+
+                if (tasks.length === 0) {
+                    tasksContainer.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--muted);">В этом домашнем задании нет сохранённых вопросов.</div>';
+                    return;
+                }
+
                 let autoCorrectCount = 0;
 
                 tasks.forEach((t, i) => {
+                    const taskId = t.taskId || t.id || `task_${i + 1}`;
                     const rawAns = (answers[i] !== undefined)
                         ? answers[i]
                         : (answers[String(i)] !== undefined
                             ? answers[String(i)]
-                            : (t.taskId && answers[t.taskId] !== undefined
-                                ? answers[t.taskId]
+                            : (answers[taskId] !== undefined
+                                ? answers[taskId]
                                 : (answers[`task_${i + 1}`] !== undefined ? answers[`task_${i + 1}`] : '')));
+
                     const studentAns = (typeof rawAns === 'object' && rawAns !== null)
-                        ? String(rawAns.answer || '').trim()
-                        : String(rawAns || '').trim();
+                        ? String(rawAns.answer !== undefined ? rawAns.answer : '').trim()
+                        : String(rawAns !== undefined ? rawAns : '').trim();
 
                     const correctAns = String(t.displayAnswer || t.answer || '').trim();
 
                     // Check equality
                     const normStudent = studentAns.replace(/\s+/g, '').replace(',', '.');
                     const normCorrect = correctAns.replace(/\s+/g, '').replace(',', '.');
-                    const isCorrect = (normStudent !== '' && (normStudent === normCorrect || Math.abs(parseFloat(normStudent) - parseFloat(normCorrect)) < 0.0001));
+                    let isCorrect = false;
+                    if (typeof rawAns === 'object' && rawAns !== null && typeof rawAns.isCorrect === 'boolean') {
+                        isCorrect = rawAns.isCorrect;
+                    } else if (normStudent !== '' && normCorrect !== '') {
+                        const fStud = parseFloat(normStudent);
+                        const fCorr = parseFloat(normCorrect);
+                        if (!isNaN(fStud) && !isNaN(fCorr)) {
+                            isCorrect = Math.abs(fStud - fCorr) < 0.0001;
+                        } else {
+                            isCorrect = (normStudent.toLowerCase() === normCorrect.toLowerCase());
+                        }
+                    }
 
                     if (isCorrect) autoCorrectCount++;
 
@@ -3644,17 +3694,17 @@
 
                     item.innerHTML = `
                         <div class="draft-task-header">
-                            <span class="draft-task-num">Задание №${i + 1} · ${escapeHtml(t.catName || t.category || '')}</span>
+                            <span class="draft-task-num">Задание №${i + 1} · ${escapeHtml(t.catName || t.category || 'Задание')}</span>
                             <span style="font-weight:700; color:${isCorrect ? 'var(--accent-emerald)' : 'var(--danger)'};">
                                 ${isCorrect ? '✓ Ответ совпал' : (studentAns ? '✗ Ответ не совпал' : '— Не решено')}
                             </span>
                         </div>
-                        <div class="draft-task-body" style="font-size:0.95rem;">
-                            ${t.questionHtml || escapeHtml(t.text || '')}
+                        <div class="draft-task-body" style="font-size:0.95rem; line-height:1.5; margin:0.5rem 0;">
+                            ${t.questionHtml || escapeHtml(t.text || t.condition || '')}
                         </div>
                         <div style="background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r-sm); padding:0.6rem 0.85rem; display:flex; justify-content:space-between; font-size:0.88rem; flex-wrap:wrap; gap:0.5rem;">
-                            <div>Ответ ученика: <strong style="color:${isCorrect ? 'var(--accent-emerald)' : 'var(--ink)'}; font-family:var(--f-mono);">${escapeHtml(studentAns || '(пусто)')}</strong></div>
-                            <div>Правильный ответ: <strong style="color:var(--accent-cyan); font-family:var(--f-mono);">${escapeHtml(correctAns)}</strong></div>
+                            <div>Ответ ученика: <strong style="color:${isCorrect ? 'var(--accent-emerald)' : (studentAns ? 'var(--danger)' : 'var(--muted)')}; font-family:var(--f-mono);">${escapeHtml(studentAns || '(пусто)')}</strong></div>
+                            <div>Правильный ответ: <strong style="color:var(--accent-cyan); font-family:var(--f-mono);">${escapeHtml(correctAns || '—')}</strong></div>
                         </div>
                     `;
                     tasksContainer.appendChild(item);
@@ -3665,11 +3715,10 @@
                 const gradeFeedbackInput = document.getElementById('grade-input-feedback');
 
                 gradeScoreInput.max = tasks.length;
-                gradeScoreInput.value = (sub.score !== null && sub.score !== undefined) ? sub.score : autoCorrectCount;
-                gradeFeedbackInput.value = sub.teacher_feedback || '';
-
-                if (modalSubmissionsList && modalSubmissionsList.open) modalSubmissionsList.close();
-                modalReviewSubmission.showModal();
+                gradeScoreInput.value = (sub.score !== null && sub.score !== undefined && sub.status === 'checked') 
+                    ? sub.score 
+                    : autoCorrectCount;
+                gradeFeedbackInput.value = sub.teacher_feedback || sub.teacherFeedback || '';
             }
 
             if (formGradeSubmission) {
@@ -3681,13 +3730,19 @@
                     const feedback = document.getElementById('grade-input-feedback').value.trim();
 
                     try {
-                        const targetSubId = currentReviewSubmission.submissionId || currentReviewSubmission.id;
+                        const targetSubId = currentReviewSubmission.submissionId || currentReviewSubmission.id || currentReviewSubmission.submission_id || 0;
+                        const studentId = currentReviewSubmission.studentId || currentReviewSubmission.student_id;
+                        const hwId = (currentReviewHw && currentReviewHw.id) ? currentReviewHw.id : null;
+
                         const res = await fetch(`/api/teacher/submissions/${targetSubId}/grade`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 score,
-                                teacher_feedback: feedback
+                                teacher_feedback: feedback,
+                                teacherFeedback: feedback,
+                                student_id: studentId,
+                                homework_id: hwId
                             })
                         });
                         const data = await res.json();

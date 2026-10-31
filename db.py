@@ -1284,6 +1284,7 @@ def get_teacher_homeworks(teacher_id: int) -> List[Dict[str, Any]]:
                 'subject': r['subject'],
                 'deadlineAt': r['deadline_at'],
                 'createdAt': r['created_at'],
+                'tasks': tasks,
                 'tasksCount': len(tasks),
                 'totalStudents': r['total_students'],
                 'submittedCount': r['submitted_count'],
@@ -1563,22 +1564,46 @@ def get_homework_submissions_for_teacher(homework_id: int, teacher_id: Optional[
         conn.close()
 
 
-def grade_submission(submission_id: int, score: int, teacher_feedback: str = '') -> bool:
+def grade_submission(
+    submission_id: Optional[int] = None,
+    score: int = 0,
+    teacher_feedback: str = '',
+    homework_id: Optional[int] = None,
+    student_id: Optional[int] = None
+) -> bool:
     """Учитель выставляет итоговый балл и оставляет отзыв на работу ученика."""
     now_iso = datetime.now(timezone.utc).isoformat()
     conn = get_db_connection()
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute(
-                """
-                UPDATE homework_submissions
-                SET score = ?, teacher_feedback = ?, status = 'checked', checked_at = ?
-                WHERE id = ?
-                """,
-                (score, teacher_feedback.strip(), now_iso, submission_id)
-            )
-            return cursor.rowcount > 0
+            if submission_id and submission_id > 0:
+                cursor.execute(
+                    """
+                    UPDATE homework_submissions
+                    SET score = ?, teacher_feedback = ?, status = 'checked', checked_at = ?
+                    WHERE id = ?
+                    """,
+                    (score, teacher_feedback.strip(), now_iso, submission_id)
+                )
+                return cursor.rowcount > 0
+            elif homework_id and student_id:
+                cursor.execute(
+                    """
+                    INSERT INTO homework_submissions (
+                        homework_id, student_id, status, score, teacher_feedback, checked_at, created_at
+                    )
+                    VALUES (?, ?, 'checked', ?, ?, ?, ?)
+                    ON CONFLICT(homework_id, student_id) DO UPDATE SET
+                        score = excluded.score,
+                        teacher_feedback = excluded.teacher_feedback,
+                        status = 'checked',
+                        checked_at = excluded.checked_at
+                    """,
+                    (homework_id, student_id, score, teacher_feedback.strip(), now_iso, now_iso)
+                )
+                return True
+            return False
     finally:
         conn.close()
 

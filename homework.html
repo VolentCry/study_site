@@ -896,6 +896,7 @@
             // Parse URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const homeworkId = urlParams.get('id');
+            const studentIdParam = urlParams.get('student_id');
 
             const loader = document.getElementById('hw-loader');
             const errorBox = document.getElementById('hw-error');
@@ -942,7 +943,8 @@
 
             async function loadHomework() {
                 try {
-                    const res = await fetch(`/api/student/homeworks/${encodeURIComponent(homeworkId)}`);
+                    const queryStr = studentIdParam ? `?student_id=${encodeURIComponent(studentIdParam)}` : '';
+                    const res = await fetch(`/api/student/homeworks/${encodeURIComponent(homeworkId)}${queryStr}`);
                     const data = await res.json();
                     if (!data.success) {
                         loader.style.display = 'none';

@@ -141,6 +141,7 @@ def api_auth_register():
     # Авторизуем пользователя в сессии
     session.permanent = True
     session['user_id'] = user['id']
+    session['role'] = user.get('role', 'student')
 
     return jsonify({
         'success': True,
@@ -170,6 +171,7 @@ def api_auth_login():
 
     session.permanent = True
     session['user_id'] = user['id']
+    session['role'] = user.get('role', 'student')
 
     user_data = db.get_user_data(user['id'])
 
@@ -615,13 +617,21 @@ def api_teacher_grade_submission(submission_id: int):
 
     payload = request.get_json(silent=True) or {}
     score = payload.get('score')
-    teacher_feedback = payload.get('teacherFeedback', '')
+    teacher_feedback = payload.get('teacherFeedback') or payload.get('teacher_feedback') or ''
+    student_id = payload.get('student_id') or payload.get('studentId')
+    homework_id = payload.get('homework_id') or payload.get('homeworkId')
 
     if score is None:
         return jsonify({'success': False, 'error': 'Укажите итоговый балл.'}), 400
 
     try:
-        ok = db.grade_submission(submission_id, int(score), str(teacher_feedback or ''))
+        ok = db.grade_submission(
+            submission_id=submission_id if submission_id > 0 else None,
+            score=int(score),
+            teacher_feedback=str(teacher_feedback or ''),
+            homework_id=int(homework_id) if homework_id else None,
+            student_id=int(student_id) if student_id else None
+        )
         return jsonify({'success': ok})
     except Exception as e:
         return jsonify({'success': False, 'error': 'Ошибка сохранения оценки.'}), 500
@@ -644,12 +654,20 @@ def api_student_homeworks():
 
 @app.route('/api/student/homeworks/<int:homework_id>', methods=['GET'])
 def api_student_homework_detail(homework_id: int):
-    """Получение задания домашки для прорешивания учеником."""
+    """Получение задания домашки для прорешивания учеником или проверки учителем."""
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
 
-    hw = db.get_homework_by_id(homework_id, user_id=user_id, role='student')
+    user = db.get_user_by_id(user_id)
+    if not user:
+        return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 401
+
+    role = user.get('role', 'student')
+    student_id = request.args.get('student_id', type=int)
+    target_user_id = student_id if (student_id and role in ('teacher', 'admin')) else user_id
+
+    hw = db.get_homework_by_id(homework_id, user_id=target_user_id, role=role)
     if not hw:
         return jsonify({'success': False, 'error': 'Домашнее задание не найдено или недоступно.'}), 404
     return jsonify({'success': True, 'homework': hw})
