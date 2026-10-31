@@ -253,6 +253,24 @@
       flex: 1; word-break: break-word;
     }
 
+    /* FRACTIONS */
+    .fraction {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 4px;
+      font-size: 0.95em;
+      line-height: 1.1;
+    }
+    .fraction .num {
+      border-bottom: 2px solid currentColor;
+      padding-bottom: 2px;
+    }
+    .fraction .den {
+      padding-top: 2px;
+    }
+
     /* ANSWER ROW & INPUT */
     .answer-row {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;

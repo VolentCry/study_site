@@ -1586,6 +1586,15 @@
                                     <option value="">Выберите класс...</option>
                                 </select>
                             </div>
+                            <div class="form-group" id="hw-target-student-group">
+                                <label class="form-label">Кому назначить задание</label>
+                                <select id="hw-target-student" class="form-select">
+                                    <option value="">👥 Всему классу (все ученики)</option>
+                                </select>
+                                <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">
+                                    Для индивидуального Д/З выберите конкретного ученика или оставьте «Всему классу».
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label class="form-label">Название домашнего задания *</label>
                                 <input type="text" id="hw-input-title" class="form-input" placeholder="Например: Д/З №5: Дроби и уравнения">
@@ -3390,6 +3399,7 @@
             // HOMEWORK CONSTRUCTOR
             // =========================================================================
             const hwTargetClass = document.getElementById('hw-target-class');
+            const hwTargetStudent = document.getElementById('hw-target-student');
             const hwInputTitle = document.getElementById('hw-input-title');
             const hwInputSubject = document.getElementById('hw-input-subject');
             const hwInputDeadline = document.getElementById('hw-input-deadline');
@@ -3412,6 +3422,31 @@
                     if (data.success && data.classes && hwTargetClass) {
                         hwTargetClass.innerHTML = '<option value="">Выберите класс...</option>' +
                             data.classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                    }
+
+                    if (hwTargetClass && !hwTargetClass.__hasStudentListener) {
+                        hwTargetClass.__hasStudentListener = true;
+                        hwTargetClass.addEventListener('change', async () => {
+                            const cid = hwTargetClass.value;
+                            if (!hwTargetStudent) return;
+                            hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
+                            if (!cid) return;
+
+                            try {
+                                const res = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
+                                const data = await res.json();
+                                if (data.success && data.class && Array.isArray(data.class.students)) {
+                                    if (data.class.students.length > 0) {
+                                        hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>' +
+                                            data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                                    } else {
+                                        hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
+                                    }
+                                }
+                            } catch(e) {
+                                console.error('Error fetching students for homework target class', e);
+                            }
+                        });
                     }
                 } catch(e) {
                     console.error('Error loading constructor classes', e);
@@ -3443,7 +3478,7 @@
                             ${t.questionHtml ? formatMathHtml(t.questionHtml) : formatMathHtml(escapeHtml(t.text || ''))}
                         </div>
                         <div class="draft-task-footer">
-                            <span class="draft-task-ans">Ответ: ${escapeHtml(String(t.displayAnswer || t.answer))}</span>
+                            <span class="draft-task-ans">Ответ: ${escapeHtml(cleanDisplayAnswer(t.displayAnswer || t.answer))}</span>
                             ${t.solutionSteps ? `<span style="color:var(--muted); font-size:0.75rem;">Шагов разбора: ${t.solutionSteps.length}</span>` : ''}
                         </div>
                     </div>
@@ -3684,6 +3719,8 @@
             if (btnPublishHomework) {
                 btnPublishHomework.addEventListener('click', async () => {
                     const classId = hwTargetClass.value;
+                    const studentIdVal = hwTargetStudent ? hwTargetStudent.value : '';
+                    const studentId = studentIdVal ? parseInt(studentIdVal, 10) : null;
                     const title = hwInputTitle.value.trim();
                     const subject = hwInputSubject.value.trim() || 'Математика';
                     const deadline = hwInputDeadline.value || null;
@@ -3713,6 +3750,7 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 class_id: parseInt(classId, 10),
+                                student_id: studentId,
                                 title,
                                 subject,
                                 description: desc,
@@ -3726,6 +3764,9 @@
                             constructorDraftTasks = [];
                             hwInputTitle.value = '';
                             hwInputDesc.value = '';
+                            if (hwTargetStudent) {
+                                hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
+                            }
                             renderConstructorDraft();
                             switchTab('grading');
                         } else {
@@ -3796,6 +3837,7 @@
                                 <div class="hw-card-top">
                                     <div class="hw-card-meta">
                                         <span class="lesson-class-badge">🏫 ${escapeHtml(h.className || h.class_name)}</span>
+                                        ${h.studentName ? `<span class="lesson-class-badge" style="background:rgba(255,119,40,0.15); border-color:rgba(255,119,40,0.3); color:var(--accent);">👤 ${escapeHtml(h.studentName)}</span>` : ''}
                                         <span style="color:var(--accent-cyan); font-weight:700;">${escapeHtml(h.subject)}</span>
                                         <span>Срок: ${deadlineStr}</span>
                                     </div>
@@ -3866,7 +3908,9 @@
                 currentReviewHw = hw;
                 document.getElementById('submissions-modal-title').textContent = hw.title;
                 const initialTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
-                document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''} · Всего заданий: ${initialTaskCount}`;
+                const sNameInit = hw.studentName || (hw.student_name ? hw.student_name : '');
+                const studentSubInit = sNameInit ? ` · 👤 Индивидуально: ${sNameInit}` : '';
+                document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubInit} · Всего заданий: ${initialTaskCount}`;
                 submissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--muted);">Загрузка работ...</td></tr>';
                 modalSubmissionsList.showModal();
 
@@ -3882,7 +3926,9 @@
                         hw = Object.assign(hw, data.homework);
                         currentReviewHw = hw;
                         const updatedTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
-                        document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''} · Всего заданий: ${updatedTaskCount}`;
+                        const sNameUpd = hw.studentName || (hw.student_name ? hw.student_name : '');
+                        const studentSubUpd = sNameUpd ? ` · 👤 Индивидуально: ${sNameUpd}` : '';
+                        document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubUpd} · Всего заданий: ${updatedTaskCount}`;
                     }
 
                     const subs = data.submissions || [];
@@ -3996,22 +4042,25 @@
                         ? String(rawAns.answer !== undefined ? rawAns.answer : '').trim()
                         : String(rawAns !== undefined ? rawAns : '').trim();
 
-                    const correctAns = String(t.displayAnswer || t.answer || '').trim();
+                    const primaryCorrectAns = String(t.answer !== undefined && String(t.answer).trim() !== '' ? t.answer : (t.displayAnswer || '')).trim();
+                    const correctAns = cleanDisplayAnswer(t.displayAnswer || t.answer || '').trim();
 
                     // Check equality
                     const normStudent = studentAns.replace(/\s+/g, '').replace(',', '.');
-                    const normCorrect = correctAns.replace(/\s+/g, '').replace(',', '.');
+                    const normPrimary = primaryCorrectAns.replace(/\s+/g, '').replace(',', '.');
+                    const normDisplay = correctAns.replace(/\s+/g, '').replace(',', '.');
                     let isCorrect = false;
                     if (typeof rawAns === 'object' && rawAns !== null && typeof rawAns.isCorrect === 'boolean') {
                         isCorrect = rawAns.isCorrect;
-                    } else if (normStudent !== '' && normCorrect !== '') {
-                        const fStud = parseFloat(normStudent);
-                        const fCorr = parseFloat(normCorrect);
-                        if (!isNaN(fStud) && !isNaN(fCorr)) {
-                            isCorrect = Math.abs(fStud - fCorr) < 0.0001;
-                        } else {
-                            isCorrect = (normStudent.toLowerCase() === normCorrect.toLowerCase());
-                        }
+                    } else if (normStudent !== '' && (normPrimary !== '' || normDisplay !== '')) {
+                        const checkEquiv = (s, c) => {
+                            if (!s || !c) return false;
+                            const fs = parseFloat(s);
+                            const fc = parseFloat(c);
+                            if (!isNaN(fs) && !isNaN(fc)) return Math.abs(fs - fc) < 0.0001;
+                            return s.toLowerCase() === c.toLowerCase();
+                        };
+                        isCorrect = checkEquiv(normStudent, normPrimary) || checkEquiv(normStudent, normDisplay);
                     }
 
                     if (isCorrect) autoCorrectCount++;
@@ -4136,6 +4185,20 @@
                     return `<sup>${converted}</sup>`;
                 });
 
+                // 4) Clean malformed &frac; entities and LaTeX fractions
+                str = str.replace(/&frac;\s*([^{;\s]+)\s*;\s*\{?([^}]+)\}?/g, '<span class="fraction"><span class="num">$1</span><span class="den">$2</span></span>');
+                str = str.replace(/\\?frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="fraction"><span class="num">$1</span><span class="den">$2</span></span>');
+
+                return str;
+            }
+
+            function cleanDisplayAnswer(raw) {
+                if (!raw) return '';
+                let str = String(raw);
+                str = str.replace(/<span class="fraction"><span class="num">([^<]+)<\/span><span class="den">([^<]+)<\/span><\/span>/g, '$1/$2');
+                str = str.replace(/&frac;\s*([^{;\s]+)\s*;\s*\{?([^}]+)\}?/g, '$1/$2');
+                str = str.replace(/\\?frac\{([^}]+)\}\{([^}]+)\}/g, '$1/$2');
+                str = str.replace(/<[^>]+>/g, '').trim();
                 return str;
             }
 

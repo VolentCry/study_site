@@ -37,6 +37,10 @@
     return copy;
   }
 
+  function fracHtml(num, den) {
+    return `<span class="fraction"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+  }
+
   // --- SVG КООРДИНАТНОЙ ПРЯМОЙ ---
   /**
    * Рендерит адаптивный SVG координатной прямой
@@ -409,7 +413,7 @@
         correctIdx = 0;
       }
 
-      const options = fractionOptions.map(f => `&frac;${f.num};{${f.denom}}`);
+      const options = fractionOptions.map(f => fracHtml(f.num, f.denom));
       const correctF = fractionOptions[correctIdx];
 
       // Рисуем SVG интервала
@@ -440,7 +444,7 @@
           <div class="step-text">
             Сравним полученные десятичные дроби с границами отрезка:<br>
             <strong>${leftDec} &le; ${correctF.val.toFixed(3)} &le; ${rightDec}</strong>.<br>
-            Следовательно, отрезку принадлежит число <strong>&frac;${correctF.num};{${correctF.denom}}</strong> (вариант <strong>${correctIdx + 1}</strong>).
+            Следовательно, отрезку принадлежит число <strong>${fracHtml(correctF.num, correctF.denom)}</strong> (вариант <strong>${correctIdx + 1}</strong>).
           </div>
         </div>
       `;
@@ -502,15 +506,15 @@
         <div class="solution-step">
           <div class="step-num">Шаг 1</div>
           <div class="step-text">
-            Выделим целую часть из неправильной дроби <strong>&frac;${totalNum};{${denom}}</strong>:<br>
-            <strong>&frac;${totalNum};{${denom}} = ${intPart} &frac;${numPart};{${denom}}</strong>.
+            Выделим целую часть из неправильной дроби <strong>${fracHtml(totalNum, denom)}</strong>:<br>
+            <strong>${fracHtml(totalNum, denom)} = ${intPart} ${fracHtml(numPart, denom)}</strong>.
           </div>
         </div>
         <div class="solution-step">
           <div class="step-num">Шаг 2</div>
           <div class="step-text">
             Переведём дробную часть в десятичную с точностью до десятых:<br>
-            ${numPart} : ${denom} &approx; ${(numPart / denom).toFixed(2)} &rArr; <strong>${intPart} &frac;${numPart};{${denom}} &approx; ${exactVal.toFixed(2)}</strong>.
+            ${numPart} : ${denom} &approx; ${(numPart / denom).toFixed(2)} &rArr; <strong>${intPart} ${fracHtml(numPart, denom)} &approx; ${exactVal.toFixed(2)}</strong>.
           </div>
         </div>
         <div class="solution-step">
@@ -526,7 +530,7 @@
         id: 'fractions_pt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
         category: 'fractions_and_intervals',
         categoryTitle: 'Дроби и числовые отрезки',
-        text: `На координатной прямой отмечены точки <strong>A, B, C, D</strong>.<br>Одна из них соответствует числу <strong>&frac;${totalNum};{${denom}}</strong>. Какая это точка?`,
+        text: `На координатной прямой отмечены точки <strong>A, B, C, D</strong>.<br>Одна из них соответствует числу <strong>${fracHtml(totalNum, denom)}</strong>. Какая это точка?`,
         svg: svg,
         options: options,
         correctOptionIndex: correctIdx,
@@ -831,7 +835,14 @@
     if (!t) return t;
     if (!t.catName) t.catName = t.categoryTitle || 'Координатная прямая';
     if (!t.displayAnswer) {
-      const optText = (t.options && t.options[t.correctOptionIndex]) ? ` (${t.options[t.correctOptionIndex]})` : '';
+      let optText = '';
+      if (t.options && t.options[t.correctOptionIndex] !== undefined) {
+        let rawOpt = String(t.options[t.correctOptionIndex]);
+        rawOpt = rawOpt.replace(/<span class="fraction"><span class="num">([^<]+)<\/span><span class="den">([^<]+)<\/span><\/span>/g, '$1/$2');
+        rawOpt = rawOpt.replace(/&frac;\s*([^{;\s]+)\s*;\s*\{?([^}]+)\}?/g, '$1/$2');
+        rawOpt = rawOpt.replace(/<[^>]+>/g, '').trim();
+        optText = rawOpt ? ` (${rawOpt})` : '';
+      }
       t.displayAnswer = String(t.answer) + optText;
     }
     if (!t.questionHtml) {

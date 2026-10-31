@@ -742,6 +742,14 @@ def api_teacher_homeworks():
 
     payload = request.get_json(silent=True) or {}
     class_id = payload.get('classId') or payload.get('class_id')
+    student_id = payload.get('studentId') or payload.get('student_id')
+    if student_id:
+        try:
+            student_id = int(student_id)
+        except (ValueError, TypeError):
+            student_id = None
+    else:
+        student_id = None
     title = payload.get('title')
     subject = payload.get('subject', 'math')
     tasks = payload.get('tasks', [])
@@ -761,7 +769,8 @@ def api_teacher_homeworks():
             subject=str(subject),
             tasks=tasks,
             description=str(description or ''),
-            deadline_at=str(deadline_at) if deadline_at else None
+            deadline_at=str(deadline_at) if deadline_at else None,
+            student_id=student_id
         )
         return jsonify({'success': True, 'homework': hw})
     except ValueError as e:

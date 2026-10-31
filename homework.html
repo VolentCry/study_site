@@ -977,6 +977,20 @@
                     return `<sup>${converted}</sup>`;
                 });
 
+                // 4) Clean malformed &frac; entities and LaTeX fractions
+                str = str.replace(/&frac;\s*([^{;\s]+)\s*;\s*\{?([^}]+)\}?/g, '<span class="fraction"><span class="num">$1</span><span class="den">$2</span></span>');
+                str = str.replace(/\\?frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="fraction"><span class="num">$1</span><span class="den">$2</span></span>');
+
+                return str;
+            }
+
+            function cleanDisplayAnswer(raw) {
+                if (!raw) return '';
+                let str = String(raw);
+                str = str.replace(/<span class="fraction"><span class="num">([^<]+)<\/span><span class="den">([^<]+)<\/span><\/span>/g, '$1/$2');
+                str = str.replace(/&frac;\s*([^{;\s]+)\s*;\s*\{?([^}]+)\}?/g, '$1/$2');
+                str = str.replace(/\\?frac\{([^}]+)\}\{([^}]+)\}/g, '$1/$2');
+                str = str.replace(/<[^>]+>/g, '').trim();
                 return str;
             }
 
@@ -1129,7 +1143,7 @@
                             card.classList.add('is-incorrect');
                         }
 
-                        const correctAnsDisplay = escapeHtml(String(task.displayAnswer || task.answer || ''));
+                        const correctAnsDisplay = escapeHtml(cleanDisplayAnswer(task.displayAnswer || task.answer || ''));
 
                         answerUiHtml = `
                             <div class="answer-box">

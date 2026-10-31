@@ -204,6 +204,15 @@ def init_db() -> None:
                 CREATE INDEX IF NOT EXISTS idx_lessons_student ON lessons(student_id);
             ''')
 
+            # Миграция: student_id в homeworks для назначения Д/З конкретному ученику
+            cursor.execute('PRAGMA table_info(homeworks);')
+            hw_cols = [row['name'] for row in cursor.fetchall()]
+            if 'student_id' not in hw_cols:
+                conn.execute("ALTER TABLE homeworks ADD COLUMN student_id INTEGER REFERENCES users(id) ON DELETE SET NULL;")
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_homeworks_student ON homeworks(student_id);
+            ''')
+
             # 7. Таблица сданных решений учеников
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS homework_submissions (
@@ -1148,7 +1157,8 @@ def create_homework(
     subject: str,
     tasks: List[Dict[str, Any]],
     description: str = '',
-    deadline_at: Optional[str] = None
+    deadline_at: Optional[str] = None,
+    student_id: Optional[int] = None
 ) -> Dict[str, Any]:
     """Создаёт новое домашнее задание для класса."""
     title_clean = str(title).strip()
@@ -1188,16 +1198,17 @@ def create_homework(
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO homeworks (teacher_id, class_id, title, description, subject, tasks_json, deadline_at, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO homeworks (teacher_id, class_id, student_id, title, description, subject, tasks_json, deadline_at, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (teacher_id, class_id, title_clean, description.strip(), subject.strip(), tasks_json, deadline_at, now_iso)
+                (teacher_id, class_id, student_id, title_clean, description.strip(), subject.strip(), tasks_json, deadline_at, now_iso)
             )
             hw_id = cursor.lastrowid
             return {
                 'id': hw_id,
                 'teacherId': teacher_id,
                 'classId': class_id,
+                'studentId': student_id,
                 'title': title_clean,
                 'description': description.strip(),
                 'subject': subject.strip(),
@@ -1219,10 +1230,12 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
         cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT h.*, c.name as class_name, u.display_name as teacher_name
+            SELECT h.*, c.name as class_name, u.display_name as teacher_name,
+                   su.display_name as student_name, su.username as student_username
             FROM homeworks h
             JOIN classes c ON h.class_id = c.id
             JOIN users u ON h.teacher_id = u.id
+            LEFT JOIN users su ON h.student_id = su.id
             WHERE h.id = ?
             """,
             (homework_id,)
@@ -1230,6 +1243,11 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
         row = cursor.fetchone()
         if not row:
             return None
+
+        # Если это индивидуальное Д/З другого ученика - доступ запрещён
+        if role == 'student' and user_id and row['student_id'] is not None:
+            if int(row['student_id']) != int(user_id):
+                return None
 
         tasks = json.loads(row['tasks_json']) if row['tasks_json'] else []
         submission = None
@@ -1329,11 +1347,13 @@ def get_teacher_homeworks(teacher_id: int) -> List[Dict[str, Any]]:
         cursor.execute(
             """
             SELECT h.*, c.name as class_name,
-                   (SELECT COUNT(*) FROM class_members cm WHERE cm.class_id = h.class_id) as total_students,
+                   su.display_name as student_name, su.username as student_username,
+                   CASE WHEN h.student_id IS NOT NULL THEN 1 ELSE (SELECT COUNT(*) FROM class_members cm WHERE cm.class_id = h.class_id) END as total_students,
                    (SELECT COUNT(*) FROM homework_submissions hs WHERE hs.homework_id = h.id AND hs.status IN ('submitted', 'checked')) as submitted_count,
                    (SELECT COUNT(*) FROM homework_submissions hs WHERE hs.homework_id = h.id AND hs.status = 'checked') as checked_count
             FROM homeworks h
             JOIN classes c ON h.class_id = c.id
+            LEFT JOIN users su ON h.student_id = su.id
             WHERE h.teacher_id = ?
             ORDER BY h.created_at DESC
             """,
@@ -1346,6 +1366,9 @@ def get_teacher_homeworks(teacher_id: int) -> List[Dict[str, Any]]:
                 'id': r['id'],
                 'classId': r['class_id'],
                 'className': r['class_name'],
+                'studentId': r['student_id'],
+                'studentName': r['student_name'] or '',
+                'studentUsername': r['student_username'] or '',
                 'title': r['title'],
                 'description': r['description'],
                 'subject': r['subject'],
@@ -1379,10 +1402,10 @@ def get_student_homeworks(student_id: int) -> List[Dict[str, Any]]:
             JOIN class_members cm ON c.id = cm.class_id
             JOIN users u ON h.teacher_id = u.id
             LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
-            WHERE cm.student_id = ?
+            WHERE cm.student_id = ? AND (h.student_id IS NULL OR h.student_id = ?)
             ORDER BY (h.deadline_at IS NULL), h.deadline_at ASC, h.created_at DESC
             """,
-            (student_id, student_id)
+            (student_id, student_id, student_id)
         )
         res = []
         for r in cursor.fetchall():
@@ -1498,20 +1521,30 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
             else:
                 user_ans = ''
 
-            # Correct answer from task
-            correct_ans = str(t.get('displayAnswer') or t.get('answer') or '').strip()
+            # Correct answer from task: check primary answer first, displayAnswer second
+            primary_ans = str(t.get('answer') if t.get('answer') is not None and str(t.get('answer')).strip() != '' else (t.get('displayAnswer') or '')).strip()
+            display_ans = str(t.get('displayAnswer') or t.get('answer') or '').strip()
+
+            def _answers_match(u_val: str, c_val: str) -> bool:
+                if not u_val or not c_val:
+                    return False
+                nu = u_val.replace(' ', '').replace(',', '.')
+                nc = c_val.replace(' ', '').replace(',', '.')
+                try:
+                    fu = float(nu)
+                    fc = float(nc)
+                    return abs(fu - fc) < 0.0001
+                except ValueError:
+                    return nu.lower() == nc.lower()
 
             is_correct = False
-            if user_ans and correct_ans:
-                # Сравнение с нормализацией запятой/точки
-                norm_user = user_ans.replace(' ', '').replace(',', '.')
-                norm_corr = correct_ans.replace(' ', '').replace(',', '.')
-                try:
-                    f_user = float(norm_user)
-                    f_corr = float(norm_corr)
-                    is_correct = abs(f_user - f_corr) < 0.0001
-                except ValueError:
-                    is_correct = (norm_user.lower() == norm_corr.lower())
+            if user_ans and (primary_ans or display_ans):
+                is_correct = _answers_match(user_ans, primary_ans)
+                if not is_correct and display_ans and display_ans != primary_ans:
+                    is_correct = _answers_match(user_ans, display_ans)
+                    if not is_correct and '(' in display_ans and ')' in display_ans:
+                        inner_opt = display_ans[display_ans.find('(') + 1 : display_ans.rfind(')')].strip()
+                        is_correct = _answers_match(user_ans, inner_opt)
 
             if is_correct:
                 computed_score += 1
@@ -1576,19 +1609,32 @@ def get_homework_submissions_for_teacher(homework_id: int, teacher_id: Optional[
 
         tasks = json.loads(hw['tasks_json']) if hw['tasks_json'] else []
 
-        cursor.execute(
-            """
-            SELECT u.id as student_id, u.username, u.display_name,
-                   hs.id as submission_id, hs.status, hs.answers_json, hs.score, hs.max_score,
-                   hs.teacher_feedback, hs.submitted_at, hs.checked_at
-            FROM class_members cm
-            JOIN users u ON cm.student_id = u.id
-            LEFT JOIN homework_submissions hs ON hs.homework_id = ? AND hs.student_id = u.id
-            WHERE cm.class_id = ?
-            ORDER BY u.display_name ASC
-            """,
-            (homework_id, hw['class_id'])
-        )
+        if hw['student_id'] is not None:
+            cursor.execute(
+                """
+                SELECT u.id as student_id, u.username, u.display_name,
+                       hs.id as submission_id, hs.status, hs.answers_json, hs.score, hs.max_score,
+                       hs.teacher_feedback, hs.submitted_at, hs.checked_at
+                FROM users u
+                LEFT JOIN homework_submissions hs ON hs.homework_id = ? AND hs.student_id = u.id
+                WHERE u.id = ?
+                """,
+                (homework_id, hw['student_id'])
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT u.id as student_id, u.username, u.display_name,
+                       hs.id as submission_id, hs.status, hs.answers_json, hs.score, hs.max_score,
+                       hs.teacher_feedback, hs.submitted_at, hs.checked_at
+                FROM class_members cm
+                JOIN users u ON cm.student_id = u.id
+                LEFT JOIN homework_submissions hs ON hs.homework_id = ? AND hs.student_id = u.id
+                WHERE cm.class_id = ?
+                ORDER BY u.display_name ASC
+                """,
+                (homework_id, hw['class_id'])
+            )
 
         submissions = []
         for r in cursor.fetchall():
@@ -1909,10 +1955,10 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 JOIN classes c ON h.class_id = c.id
                 JOIN class_members cm ON c.id = cm.class_id
                 LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
-                WHERE cm.student_id = ? AND h.deadline_at LIKE ?
+                WHERE cm.student_id = ? AND (h.student_id IS NULL OR h.student_id = ?) AND h.deadline_at LIKE ?
                 ORDER BY h.deadline_at ASC
                 """,
-                (user_id, user_id, f"{month_prefix}%")
+                (user_id, user_id, user_id, f"{month_prefix}%")
             )
         for hr in cursor.fetchall():
             hw_list.append({
