@@ -765,7 +765,7 @@
             padding: clamp(1.5rem, 3.5vw, 2.5rem);
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
             display: grid;
-            grid-template-columns: auto 1fr 340px;
+            grid-template-columns: auto 1fr clamp(340px, 30vw, 420px);
             align-items: center;
             gap: 2rem;
             position: relative;
@@ -2772,11 +2772,12 @@
 
         /* --- LEVEL PROGRESSION MODAL DIALOG --- */
         #level-progress-dialog {
-            max-width: 680px;
+            max-width: 960px;
+            width: min(960px, 94vw);
         }
 
         .level-modal-content {
-            padding: 2rem;
+            padding: clamp(1.25rem, 2.5vw, 2.25rem);
             display: flex;
             flex-direction: column;
             gap: 1.35rem;
@@ -3048,8 +3049,9 @@
         .level-item-left {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
+            gap: 1rem;
             min-width: 0;
+            flex: 1;
         }
 
         .level-item-icon-box {

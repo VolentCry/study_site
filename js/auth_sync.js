@@ -1034,7 +1034,8 @@
     }
 
     function updateUIForAuthState() {
-        const isTeacher = currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin');
+        const isTeacherPage = window.location.pathname.endsWith('teacher.html') || window.location.pathname.endsWith('/teacher');
+        const isTeacher = (currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin')) || isTeacherPage;
         document.querySelectorAll('.teacher-only-link').forEach(el => {
             el.classList.toggle('hidden', !isTeacher);
         });
@@ -1070,12 +1071,17 @@
                         <span class="auth-status-dot"></span>
                         <span class="auth-btn-text">${roleBadge}${escapeHtml(displayName)}</span>
                         ${caretSvg}
-                        ${xpEl ? xpEl.outerHTML : `<span class="xp-badge">${xpText}</span>`}
+                        ${(!isTeacher && xpEl) ? xpEl.outerHTML : (!isTeacher ? `<span class="xp-badge">${xpText}</span>` : '')}
                     `;
                 }
 
                 if (xpEl) {
-                    xpEl.textContent = xpText;
+                    if (isTeacher) {
+                        xpEl.style.display = 'none';
+                    } else {
+                        xpEl.style.display = '';
+                        xpEl.textContent = xpText;
+                    }
                 }
 
                 // Attach dropdown menu inside wrap
@@ -1208,9 +1214,14 @@
             }
         });
 
-        // Update standalone XP badges
+        // Update standalone XP badges (hidden for teachers)
         document.querySelectorAll('#header-xp-badge, #nav-xp-badge').forEach(el => {
-            el.textContent = xpText;
+            if (isTeacher) {
+                el.style.display = 'none';
+            } else {
+                el.style.display = '';
+                el.textContent = xpText;
+            }
         });
 
         // Update Cloud Settings Pane if present in profile.html
