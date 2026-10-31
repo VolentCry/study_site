@@ -67,9 +67,11 @@ def get_db_connection() -> sqlite3.Connection:
 
 
 def init_db() -> None:
+
     """Инициализация таблиц базы данных и миграции схемы."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             # 1. Таблица пользователей
             conn.execute('''
@@ -329,6 +331,7 @@ def create_user(
 
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -393,6 +396,7 @@ def reset_user_password(username: str, new_password: str) -> bool:
     password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -425,6 +429,7 @@ def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
             return None
 
         now_iso = datetime.now(timezone.utc).isoformat()
+        cursor = conn.cursor()
         with conn:
             conn.execute('UPDATE users SET last_login = ? WHERE id = ?', (now_iso, row['id']))
 
@@ -488,6 +493,7 @@ def set_user_role(user_id: int, role: str) -> bool:
         raise ValueError("Некорректная роль пользователя.")
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute('UPDATE users SET role = ? WHERE id = ?', (role, user_id))
@@ -508,6 +514,7 @@ def delete_user(user_id: int) -> bool:
     """Удаляет пользователя и все связанные с ним данные из базы данных."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute("PRAGMA foreign_keys = ON;")
@@ -606,11 +613,12 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
 
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
-            # Обновляем отображаемое имя, если передано
+            # Обновляем отображаемое имя, если передано и не является гостевым дефолтом
             if display_name and isinstance(display_name, str):
                 clean_name = display_name.strip()[:30]
-                if clean_name:
+                if clean_name and clean_name != 'Ученик':
                     conn.execute('UPDATE users SET display_name = ? WHERE id = ?', (clean_name, user_id))
 
             conn.execute(
@@ -658,6 +666,7 @@ def create_class(teacher_id: int, name: str, description: str = '') -> Dict[str,
 
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -716,6 +725,7 @@ def delete_class(class_id: int, teacher_id: Optional[int] = None) -> bool:
     """Удаляет класс учителя."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if teacher_id is not None:
@@ -786,6 +796,7 @@ def add_student_to_class(class_id: int, student_id: int) -> bool:
     now_iso = datetime.now(timezone.utc).isoformat()
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -804,6 +815,7 @@ def remove_student_from_class(class_id: int, student_id: int) -> bool:
     """Исключает ученика из класса."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -1171,6 +1183,7 @@ def create_homework(
 
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -1404,6 +1417,7 @@ def delete_homework(homework_id: int, teacher_id: Optional[int] = None) -> bool:
     """Удаляет домашнее задание."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if teacher_id:
@@ -1422,6 +1436,7 @@ def save_homework_draft(homework_id: int, student_id: int, answers: Dict[str, An
 
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -1513,6 +1528,7 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
 
         answers_json = json.dumps(graded_answers, ensure_ascii=False)
 
+        cursor = conn.cursor()
         with conn:
             conn.execute(
                 """
@@ -1629,6 +1645,7 @@ def grade_submission(
     now_iso = datetime.now(timezone.utc).isoformat()
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if submission_id and submission_id > 0:
@@ -1680,6 +1697,7 @@ def create_lesson(
 
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -1709,6 +1727,7 @@ def delete_lesson(lesson_id: int, teacher_id: Optional[int] = None) -> bool:
     """Удаляет урок из расписания."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if teacher_id:
@@ -1992,6 +2011,7 @@ def toggle_lesson_completed(lesson_id: int, teacher_id: Optional[int] = None, is
     """Переключение или установка статуса проведённого занятия в расписании."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if is_completed is None:
@@ -2132,6 +2152,7 @@ def create_methodical_plan(teacher_id: int, data: Dict[str, Any]) -> int:
     conn = get_db_connection()
     now_iso = datetime.now().isoformat()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             student_id = data.get('studentId') or data.get('student_id')
@@ -2184,6 +2205,7 @@ def update_methodical_plan(plan_id: int, teacher_id: int, data: Dict[str, Any], 
     conn = get_db_connection()
     now_iso = datetime.now().isoformat()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if is_admin:
@@ -2250,6 +2272,7 @@ def toggle_methodical_lesson(plan_id: int, month: str, lesson_index: int, is_con
     conn = get_db_connection()
     now_iso = datetime.now().isoformat()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             cursor.execute("SELECT teacher_id, student_id, monthly_lessons_json FROM methodical_plans WHERE id = ?", (plan_id,))
@@ -2288,6 +2311,7 @@ def delete_methodical_plan(plan_id: int, teacher_id: int, is_admin: bool = False
     """Удаление методического плана."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if is_admin:
@@ -2364,3 +2388,16 @@ def get_oge_math_template() -> Dict[str, Any]:
             'Май': []
         }
     }
+
+
+def update_user_display_name(user_id: int, display_name: str) -> bool:
+    """Обновляет отображаемое имя пользователя."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            clean = display_name.strip()[:30]
+            cursor.execute('UPDATE users SET display_name = ? WHERE id = ?', (clean, user_id))
+            return cursor.rowcount > 0
+    finally:
+        conn.close()

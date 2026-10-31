@@ -224,6 +224,25 @@ def api_sync_user_data():
         return jsonify({'success': False, 'error': 'Ошибка сохранения данных в БД.'}), 500
 
 
+@app.route('/api/user/profile', methods=['POST', 'PUT'])
+def api_update_user_profile():
+    """Обновление настроек профиля (отображаемое имя)."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    display_name = payload.get('displayName') or payload.get('userName')
+    if display_name and isinstance(display_name, str):
+        clean_name = display_name.strip()[:30]
+        if clean_name:
+            db.update_user_display_name(user_id, clean_name)
+            user = db.get_user_by_id(user_id)
+            return jsonify({'success': True, 'displayName': user['display_name']})
+
+    return jsonify({'success': False, 'error': 'Не указано имя.'}), 400
+
+
 # ============================================================================
 # API МАРШРУТЫ: АДМИН-ПАНЕЛЬ УЧИТЕЛЯ (КЛАССЫ, ДОСЬЕ, ЛЕНТА ЗАДАНИЙ)
 # ============================================================================

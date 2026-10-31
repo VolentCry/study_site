@@ -58,6 +58,13 @@
     // --- 1. CSS STYLES FOR AUTH MODAL & HEADER BADGE ---
     const AUTH_STYLES = `
         /* Cloud Auth Dialog */
+        .auth-dialog .hidden,
+        .auth-dialog [hidden],
+        .auth-field.hidden,
+        .auth-progress-save-hint.hidden,
+        .auth-error-box.hidden {
+            display: none !important;
+        }
         .auth-dialog {
             border: 1px solid var(--line, rgba(255, 255, 255, 0.15));
             border-radius: var(--r-lg, 24px);
@@ -628,7 +635,15 @@
         const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
         const avatarFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
         const theme = localStorage.getItem('profileTheme') || 'dark';
-        const userName = localStorage.getItem('studyUserName') || localStorage.getItem('loggedInUser') || 'Ученик';
+        let userName = localStorage.getItem('studyUserName') || localStorage.getItem('loggedInUser');
+        if ((!userName || userName === 'Ученик') && currentUser) {
+            userName = currentUser.displayName || currentUser.username;
+            try {
+                localStorage.setItem('studyUserName', userName);
+                localStorage.setItem('loggedInUser', userName);
+            } catch(e) {}
+        }
+        if (!userName) userName = 'Ученик';
 
         return {
             userName,
@@ -857,7 +872,7 @@
                         </div>
                     </div>
 
-                    <div class="auth-field hidden" id="auth-field-display-name">
+                    <div class="auth-field hidden" id="auth-field-display-name" style="display: none;">
                         <label class="auth-label" for="auth-input-display-name">Отображаемое имя (необязательно)</label>
                         <div class="auth-input-wrap">
                             <input class="auth-input" type="text" id="auth-input-display-name" name="displayName" placeholder="Например: Алексей">
@@ -874,7 +889,7 @@
                         </div>
                     </div>
 
-                    <div class="auth-progress-save-hint hidden" id="auth-register-hint">
+                    <div class="auth-progress-save-hint hidden" id="auth-register-hint" style="display: none;">
                         <span>⚡</span>
                         <span>Ваш текущий гостевой прогресс (XP, серии, рекорды) будет автоматически привязан к новому аккаунту!</span>
                     </div>
@@ -919,7 +934,9 @@
                 tabRegister.classList.add('active');
                 tabRegister.setAttribute('aria-selected', 'true');
                 fieldDisplayName.classList.remove('hidden');
+                fieldDisplayName.style.display = 'flex';
                 registerHint.classList.remove('hidden');
+                registerHint.style.display = 'flex';
                 titleEl.textContent = 'Создание аккаунта';
                 submitText.textContent = 'Зарегистрироваться';
             } else {
@@ -928,11 +945,14 @@
                 tabLogin.classList.add('active');
                 tabLogin.setAttribute('aria-selected', 'true');
                 fieldDisplayName.classList.add('hidden');
+                fieldDisplayName.style.display = 'none';
                 registerHint.classList.add('hidden');
+                registerHint.style.display = 'none';
                 titleEl.textContent = 'Вход в аккаунт';
                 submitText.textContent = 'Войти';
             }
         }
+        dialog.switchMode = switchMode;
 
         tabLogin.addEventListener('click', () => switchMode('login'));
         tabRegister.addEventListener('click', () => switchMode('register'));
@@ -953,7 +973,7 @@
             const isReg = tabRegister.classList.contains('active');
             const username = dialog.querySelector('#auth-input-username').value.trim();
             const password = pwdInput.value;
-            const displayName = dialog.querySelector('#auth-input-display-name').value.trim();
+            const displayName = isReg ? dialog.querySelector('#auth-input-display-name').value.trim() : '';
 
             errorBox.classList.add('hidden');
             errorBox.textContent = '';
@@ -966,14 +986,22 @@
                     const localData = collectLocalState();
                     const res = await apiRegister(username, password, displayName, localData);
                     currentUser = res.user;
-                    showToast(`Добро пожаловать, ${res.user.displayName || res.user.username}!`, 'success');
+                    const authDisplayName = res.user.displayName || res.user.username;
+                    localStorage.setItem('studyUserName', authDisplayName);
+                    localStorage.setItem('loggedInUser', authDisplayName);
+                    showToast(`Добро пожаловать, ${authDisplayName}!`, 'success');
                 } else {
                     const res = await apiLogin(username, password);
                     currentUser = res.user;
+                    const authDisplayName = res.user.displayName || res.user.username;
+                    localStorage.setItem('studyUserName', authDisplayName);
+                    localStorage.setItem('loggedInUser', authDisplayName);
                     if (res.data) {
                         applyServerState(res.data);
                     }
-                    showToast(`Вы вошли как ${res.user.displayName || res.user.username}`, 'success');
+                    localStorage.setItem('studyUserName', authDisplayName);
+                    localStorage.setItem('loggedInUser', authDisplayName);
+                    showToast(`Вы вошли как ${authDisplayName}`, 'success');
                 }
 
                 dialog.close();
@@ -1481,10 +1509,14 @@
         const dialog = document.getElementById('auth-modal');
         if (!dialog) return;
 
-        const tabBtn = mode === 'register'
-            ? dialog.querySelector('#auth-tab-register')
-            : dialog.querySelector('#auth-tab-login');
-        if (tabBtn) tabBtn.click();
+        if (typeof dialog.switchMode === 'function') {
+            dialog.switchMode(mode);
+        } else {
+            const tabBtn = mode === 'register'
+                ? dialog.querySelector('#auth-tab-register')
+                : dialog.querySelector('#auth-tab-login');
+            if (tabBtn) tabBtn.click();
+        }
 
         dialog.showModal();
     }
@@ -1554,8 +1586,31 @@
     }
 
     // Export module
+    async function setDisplayName(name) {
+        const clean = (name || '').trim();
+        if (!clean) return;
+        localStorage.setItem('studyUserName', clean);
+        localStorage.setItem('loggedInUser', clean);
+        if (currentUser) {
+            currentUser.displayName = clean;
+            try {
+                await fetch('/api/user/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ displayName: clean })
+                });
+            } catch (e) {
+                console.warn('[AuthSync] Profile name save error:', e);
+            }
+            scheduleSync(100);
+        }
+        updateUIForAuthState();
+        window.dispatchEvent(new CustomEvent('study-auth-changed', { detail: currentUser }));
+    }
+
     window.AuthSync = {
         init,
+        setDisplayName,
         openModal,
         closeModal,
         openAccountModal,

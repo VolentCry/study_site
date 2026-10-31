@@ -5246,6 +5246,17 @@
         // Initialize identity on load
         updateProfileIdentity(getStoredUserName());
 
+        // Update identity when user logs in or auth state syncs
+        window.addEventListener('study-auth-changed', (e) => {
+            const u = e.detail;
+            if (u) {
+                const name = u.displayName || u.username;
+                updateProfileIdentity(name);
+                const sInput = document.getElementById('settings-name-input');
+                if (sInput) sInput.value = name;
+            }
+        });
+
         // --- 3. EXPORT / IMPORT SYNC SYSTEM ---
         function generateProfileExportCode() {
             const userName = localStorage.getItem('studyUserName') || localStorage.getItem('loggedInUser') || 'Ученик';
@@ -5490,6 +5501,9 @@
                 if (customPreviewName) customPreviewName.textContent = newName;
                 if (profileCodeOutput) {
                     profileCodeOutput.value = generateProfileExportCode();
+                }
+                if (window.AuthSync && typeof window.AuthSync.setDisplayName === 'function') {
+                    window.AuthSync.setDisplayName(newName);
                 }
                 if (settingsNameStatus) {
                     settingsNameStatus.textContent = '✔ Имя сохранено!';
