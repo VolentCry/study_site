@@ -1333,7 +1333,9 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
             'createdAt': row['created_at'],
             'created_at': row['created_at'],
             'tasks': sanitized_tasks,
-            'submission': submission
+            'submission': submission,
+            'isTeacherView': is_teacher_or_admin,
+            'viewerRole': role
         }
     finally:
         conn.close()
@@ -1545,6 +1547,13 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
                     if not is_correct and '(' in display_ans and ')' in display_ans:
                         inner_opt = display_ans[display_ans.find('(') + 1 : display_ans.rfind(')')].strip()
                         is_correct = _answers_match(user_ans, inner_opt)
+                    if not is_correct:
+                        acc_list = t.get('acceptedAnswers') or t.get('accepted_answers') or []
+                        if isinstance(acc_list, list):
+                            for acc in acc_list:
+                                if acc and _answers_match(user_ans, str(acc)):
+                                    is_correct = True
+                                    break
 
             if is_correct:
                 computed_score += 1
@@ -2043,7 +2052,8 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
             'month': month,
             'lessons': lessons,
             'homeworks': hw_list,
-            'upcomingLesson': upcoming_lesson
+            'upcomingLesson': upcoming_lesson,
+            'role': role
         }
     finally:
         conn.close()

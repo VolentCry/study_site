@@ -1055,6 +1055,8 @@
                     }
 
                     hwData = data.homework;
+                    window.userRole = data.userRole || (hwData && hwData.viewerRole) || 'student';
+                    window.isTeacher = Boolean(data.isTeacher || (hwData && hwData.isTeacherView) || window.userRole === 'teacher' || window.userRole === 'admin');
                     currentAnswers = {};
                     if (hwData.submission && hwData.submission.answers) {
                         const raw = hwData.submission.answers;
@@ -1107,11 +1109,17 @@
 
                 const sub = hwData.submission || {};
                 const status = sub.status || 'pending';
+                const hasStudentSubmission = Boolean(sub.id && (sub.status === 'submitted' || sub.status === 'checked'));
+                const isTeacher = Boolean(window.isTeacher || (hwData && hwData.isTeacherView));
                 const isFinal = (status === 'submitted' || status === 'checked');
+
+                if (isTeacher) {
+                    bottomBar.style.display = 'none';
+                }
 
                 if (status === 'checked') {
                     statusBadge.className = 'badge badge-status status-checked';
-                    statusBadge.textContent = 'Проверено';
+                    statusBadge.textContent = isTeacher ? `Проверено (ученик: ${escapeHtml(hwData.studentName || hwData.student_name || 'Ученик')})` : 'Проверено';
                     scoreWrap.style.display = 'block';
                     const maxScore = (sub.max_score != null) ? sub.max_score : ((sub.maxScore != null) ? sub.maxScore : hwData.tasks.length);
                     scoreEl.textContent = `${sub.score || 0} / ${maxScore}`;
@@ -1124,7 +1132,15 @@
                     bottomBar.style.display = 'none';
                 } else if (status === 'submitted') {
                     statusBadge.className = 'badge badge-status status-submitted';
-                    statusBadge.textContent = 'На проверке';
+                    statusBadge.textContent = isTeacher ? `Сдано на проверку (ученик: ${escapeHtml(hwData.studentName || hwData.student_name || 'Ученик')})` : 'На проверке';
+                    bottomBar.style.display = 'none';
+                } else if (isTeacher) {
+                    statusBadge.className = 'badge badge-status';
+                    statusBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+                    statusBadge.style.color = 'var(--accent-emerald)';
+                    statusBadge.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+                    statusBadge.innerHTML = '👀 Режим просмотра учителя · Ответы открыты';
+                    if (scoreWrap) scoreWrap.style.display = 'none';
                     bottomBar.style.display = 'none';
                 } else {
                     statusBadge.className = 'badge badge-status status-pending';
@@ -1157,7 +1173,37 @@
                     let answerUiHtml = '';
                     let solutionHtml = '';
 
-                    if (status === 'checked') {
+                    const rawAns = task.displayAnswer || task.answer || '';
+                    const correctAnsDisplay = formatMathHtml(escapeHtml(cleanDisplayAnswer(rawAns) || String(rawAns)));
+
+                    if (isTeacher && !hasStudentSubmission) {
+                        card.classList.add('is-teacher-view');
+                        answerUiHtml = `
+                            <div class="answer-box teacher-answer-box" style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:12px; padding:12px 16px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                                    <div class="submitted-pill pill-correct" style="margin:0; background:rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.4);">
+                                        <span class="submitted-pill-label" style="font-weight:700; color:var(--accent-emerald);">Правильный ответ:</span>
+                                        <strong class="submitted-pill-val" style="font-size:1.1rem; color:var(--accent-emerald);">${correctAnsDisplay || '—'}</strong>
+                                    </div>
+                                    <span class="task-result-status res-correct" style="font-weight:700; font-size:0.82rem;">
+                                        ✓ Ответ для учителя
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+
+                        if (task.solutionSteps && task.solutionSteps.length > 0) {
+                            const stepsLi = task.solutionSteps.map(s => `<li>${formatSolutionStep(s)}</li>`).join('');
+                            solutionHtml = `
+                                <details class="solution-details" open style="margin-top:12px;">
+                                    <summary style="cursor:pointer; font-weight:700; color:var(--accent-cyan);">💡 Разбор и ход решения задачи</summary>
+                                    <div class="solution-steps" style="margin-top:8px;">
+                                        <ol>${stepsLi}</ol>
+                                    </div>
+                                </details>
+                            `;
+                        }
+                    } else if (status === 'checked') {
                         const isCorrect = (task.is_correct === true || task.isCorrect === true);
                         if (isCorrect) {
                             card.classList.add('is-correct');
@@ -1165,12 +1211,10 @@
                             card.classList.add('is-incorrect');
                         }
 
-                        const correctAnsDisplay = escapeHtml(cleanDisplayAnswer(task.displayAnswer || task.answer || ''));
-
                         answerUiHtml = `
                             <div class="answer-box">
                                 <div class="submitted-pill ${isCorrect ? 'pill-correct' : 'pill-incorrect'}">
-                                    <span class="submitted-pill-label">Ваш ответ:</span>
+                                    <span class="submitted-pill-label">${isTeacher ? 'Ответ ученика:' : 'Ваш ответ:'}</span>
                                     <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не решено)')}</strong>
                                 </div>
                                 <span class="task-result-status ${isCorrect ? 'res-correct' : 'res-incorrect'}">
@@ -1197,14 +1241,33 @@
                         answerUiHtml = `
                             <div class="answer-box">
                                 <div class="submitted-pill">
-                                    <span class="submitted-pill-label">Ваш отправленный ответ:</span>
+                                    <span class="submitted-pill-label">${isTeacher ? 'Ответ ученика:' : 'Ваш отправленный ответ:'}</span>
                                     <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не заполнено)')}</strong>
                                 </div>
-                                <span class="task-result-status" style="color:var(--muted); font-size:0.85rem; font-weight:500;">
-                                    🔒 Ответ сохранён и зафиксирован
-                                </span>
+                                ${isTeacher ? `
+                                    <div class="submitted-pill pill-correct" style="margin-top:8px; display:inline-flex;">
+                                        <span class="submitted-pill-label">Правильный ответ:</span>
+                                        <strong class="submitted-pill-val">${correctAnsDisplay || '—'}</strong>
+                                    </div>
+                                ` : `
+                                    <span class="task-result-status" style="color:var(--muted); font-size:0.85rem; font-weight:500;">
+                                        🔒 Ответ сохранён и зафиксирован
+                                    </span>
+                                `}
                             </div>
                         `;
+
+                        if (isTeacher && task.solutionSteps && task.solutionSteps.length > 0) {
+                            const stepsLi = task.solutionSteps.map(s => `<li>${formatSolutionStep(s)}</li>`).join('');
+                            solutionHtml = `
+                                <details class="solution-details" style="margin-top:12px;">
+                                    <summary style="cursor:pointer; font-weight:700; color:var(--accent-cyan);">💡 Разбор и ход решения задачи</summary>
+                                    <div class="solution-steps" style="margin-top:8px;">
+                                        <ol>${stepsLi}</ol>
+                                    </div>
+                                </details>
+                            `;
+                        }
                     } else {
                         answerUiHtml = `
                             <div class="answer-box">
@@ -1237,8 +1300,8 @@
 
                     tasksContainer.appendChild(card);
 
-                    // Input change event
-                    if (!isFinal) {
+                    // Input change event (only for students solving)
+                    if (!isFinal && !isTeacher) {
                         const input = card.querySelector(`#input-task-${index}`);
                         if (input) {
                             input.addEventListener('input', (e) => {

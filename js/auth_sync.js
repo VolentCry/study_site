@@ -315,10 +315,21 @@
             display: inline-flex;
             align-items: center;
         }
+        .unified-auth-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 7px !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
         .profile-cta.is-logged-in,
         .profile-link.is-logged-in,
         .nav-profile-link.is-logged-in,
         .nav-profile-btn.is-logged-in,
+        .menu-profile-btn.is-logged-in,
+        .nav-btn-secondary.is-logged-in,
         .auth-header-btn.is-logged-in {
             border-color: rgba(16, 185, 129, 0.45) !important;
             background: rgba(16, 185, 129, 0.08) !important;
@@ -328,6 +339,8 @@
         .profile-link.is-logged-in:hover,
         .nav-profile-link.is-logged-in:hover,
         .nav-profile-btn.is-logged-in:hover,
+        .menu-profile-btn.is-logged-in:hover,
+        .nav-btn-secondary.is-logged-in:hover,
         .auth-header-btn.is-logged-in:hover {
             border-color: rgba(16, 185, 129, 0.75) !important;
             background: rgba(16, 185, 129, 0.16) !important;
@@ -832,6 +845,22 @@
         return data;
     }
 
+    // Helper: Determine root relative URL for links
+    function getSiteRootUrl(subpath) {
+        if (window.location.protocol.startsWith('http')) {
+            return '/' + subpath.replace(/^\//, '');
+        }
+        const pathParts = window.location.pathname.replace(/\\/g, '/').split('/').filter(Boolean);
+        const studySiteIdx = pathParts.findIndex(p => p.toLowerCase() === 'study_site');
+        if (studySiteIdx !== -1) {
+            const depth = pathParts.length - 1 - studySiteIdx;
+            const prefix = depth > 0 ? '../'.repeat(depth) : './';
+            return prefix + subpath.replace(/^\//, '');
+        }
+        const depth = Math.max(0, pathParts.length - 1);
+        return (depth > 0 ? '../'.repeat(depth) : './') + subpath.replace(/^\//, '');
+    }
+
     // --- 5. DOM MODAL INJECTION & LOGIC ---
     function ensureModalInDOM() {
         if (document.getElementById('auth-modal')) return;
@@ -900,7 +929,7 @@
                         <span id="auth-submit-text">Войти</span>
                     </button>
                     <div class="auth-guest-link-row">
-                        <a href="profile.html" class="auth-guest-link" id="auth-guest-profile-link">Или перейти в гостевой профиль без входа →</a>
+                        <a href="${getSiteRootUrl('profile.html')}" class="auth-guest-link" id="auth-guest-profile-link">Или перейти в гостевой профиль без входа →</a>
                     </div>
                 </form>
             </div>
@@ -1031,16 +1060,39 @@
     function setupHeaderAuthProfileButton() {
         const isProfilePage = window.location.pathname.endsWith('profile.html') || window.location.pathname.endsWith('/profile');
 
-        // Look for existing profile links on page
-        const existingProfileLinks = document.querySelectorAll(
-            '#header-profile-link, .profile-cta, .nav-profile-link, .profile-link, .nav-profile-btn, .nav-btn[href*="profile.html"]'
-        );
+        const isCandidateHeaderLink = (link) => {
+            if (link.closest('footer, .footer, .page-footer, .site-footer')) return false;
+            if (link.closest('.mobile-dock, .mobile-nav-dock')) return false;
+            if (link.closest('dialog, .auth-dialog, #auth-modal')) return false;
+            if (link.classList.contains('brand') || link.closest('.brand, .nav-brand')) return false;
+            const txt = (link.textContent || '').trim();
+            if (txt.includes('←') || txt.includes('Вернуться') || txt.includes('Назад')) return false;
+            if (link.classList.contains('back-link') || link.classList.contains('nav-back')) return false;
+            if (link.closest('#hero, .hero, .hero-content, .hero-actions, .promo-banner')) return false;
+            return true;
+        };
 
-        if (existingProfileLinks.length > 0) {
-            existingProfileLinks.forEach(link => {
+        const allCandidateSelectors = '#header-profile-link, .profile-cta, .nav-profile-link, .profile-link, .nav-profile-btn, .menu-profile-btn, .nav-btn[href*="profile.html"], .nav-btn-secondary[href*="profile.html"], a[href*="profile.html"]';
+        const candidateLinks = Array.from(document.querySelectorAll(allCandidateSelectors)).filter(isCandidateHeaderLink);
+
+        if (candidateLinks.length > 0) {
+            candidateLinks.forEach(link => {
                 if (link.dataset.unifiedAuthBound) return;
                 link.dataset.unifiedAuthBound = 'true';
                 link.classList.add('unified-auth-btn');
+
+                // If link doesn't already have a button style class, add auth-header-btn
+                if (!link.classList.contains('profile-cta') &&
+                    !link.classList.contains('nav-profile-btn') &&
+                    !link.classList.contains('nav-profile-link') &&
+                    !link.classList.contains('profile-link') &&
+                    !link.classList.contains('menu-profile-btn') &&
+                    !link.classList.contains('nav-btn') &&
+                    !link.classList.contains('nav-btn-secondary')) {
+                    link.classList.add('auth-header-btn');
+                }
+
+                link.href = getSiteRootUrl('profile.html');
 
                 // Wrap in .unified-auth-wrap if not already wrapped
                 if (!link.parentElement.classList.contains('unified-auth-wrap')) {
@@ -1061,7 +1113,6 @@
         }
 
         if (isProfilePage) {
-            // Already on profile page, no separate profile button needed
             return;
         }
 
@@ -1074,11 +1125,11 @@
             wrap.className = 'unified-auth-wrap';
 
             const link = document.createElement('a');
-            link.href = 'profile.html';
+            link.href = getSiteRootUrl('profile.html');
             link.className = 'auth-header-btn unified-auth-btn';
             link.dataset.unifiedAuthBound = 'true';
             link.innerHTML = `
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg class="profile-cta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 <span class="auth-btn-text">Войти</span>
             `;
 
@@ -1090,7 +1141,7 @@
             });
 
             wrap.appendChild(link);
-            container.insertBefore(wrap, container.firstChild);
+            container.appendChild(wrap);
         });
     }
 
@@ -1104,7 +1155,9 @@
         const localXP = parseInt(localStorage.getItem('user_xp') || '0', 10);
         const xpText = `XP +${localXP}`;
 
-        const unifiedButtons = document.querySelectorAll('.unified-auth-btn, #header-profile-link, .profile-cta, .nav-profile-link, .profile-link, .nav-profile-btn, .auth-header-btn');
+        const unifiedButtons = document.querySelectorAll(
+            '.unified-auth-btn, #header-profile-link, .profile-cta, .nav-profile-link, .profile-link, .nav-profile-btn, .menu-profile-btn, .nav-btn-secondary, .auth-header-btn'
+        );
 
         unifiedButtons.forEach(btn => {
             const wrap = btn.closest('.unified-auth-wrap') || btn.parentElement;
@@ -1153,19 +1206,16 @@
                 }
 
                 if (dropdown) {
-                    const isSubdir = window.location.pathname.includes('/pages/') || window.location.pathname.includes('/math_moduls/');
-                    const prefix = isSubdir ? '../' : '';
-
                     dropdown.innerHTML = `
                         <div class="auth-dropdown-header">
                             <div class="auth-dropdown-user">${escapeHtml(displayName)}</div>
                             <div class="auth-dropdown-role">@${escapeHtml(currentUser.username)} · ${isTeacher ? 'Учитель' : 'Ученик'}</div>
                         </div>
-                        <a href="${prefix}profile.html" class="auth-dropdown-item">
+                        <a href="${getSiteRootUrl('profile.html')}" class="auth-dropdown-item">
                             <span>👤 Личный кабинет</span>
                         </a>
                         ${isTeacher ? `
-                        <a href="${prefix}teacher.html" class="auth-dropdown-item">
+                        <a href="${getSiteRootUrl('teacher.html')}" class="auth-dropdown-item">
                             <span>🎓 Панель учителя</span>
                         </a>
                         ` : ''}
@@ -1261,12 +1311,11 @@
                     btn.innerHTML = `
                         ${userSvg}
                         <span class="auth-btn-text">Войти</span>
-                        ${xpEl ? xpEl.outerHTML : `<span class="xp-badge">${xpText}</span>`}
                     `;
                 }
 
                 if (xpEl) {
-                    xpEl.textContent = xpText;
+                    xpEl.style.display = 'none';
                 }
 
                 if (dropdown) {
@@ -1275,9 +1324,9 @@
             }
         });
 
-        // Update standalone XP badges (hidden for teachers)
+        // Update standalone XP badges (hidden for guests and teachers, shown only for logged in students)
         document.querySelectorAll('#header-xp-badge, #nav-xp-badge').forEach(el => {
-            if (isTeacher) {
+            if (!currentUser || isTeacher) {
                 el.style.display = 'none';
             } else {
                 el.style.display = '';
@@ -1285,7 +1334,7 @@
             }
         });
 
-        // Update Cloud Settings Pane if present in profile.html
+                // Update Cloud Settings Pane if present in profile.html
         updateCloudSettingsCard();
 
         window.dispatchEvent(new CustomEvent('study-auth-changed', { detail: currentUser }));
@@ -1295,51 +1344,22 @@
         const card = document.getElementById('cloud-account-card');
         if (!card) return;
 
+        const badge = document.getElementById('account-status-badge');
+
         if (currentUser) {
+            if (badge) badge.textContent = 'В сети';
             card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <div>
-                        <div style="font-weight:800; font-size:1.1rem; color:var(--ink);">${currentUser.displayName || currentUser.username}</div>
-                        <div style="font-size:0.8rem; color:var(--muted);">Логин: @${currentUser.username} · ID: #${currentUser.id}</div>
-                    </div>
-                    <span style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; padding:4px 10px; border-radius:9999px; background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); font-weight:700;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:#10b981;"></span>
-                        В сети
-                    </span>
+                <div style="margin-bottom:14px;">
+                    <div style="font-weight:800; font-size:1.05rem; color:var(--ink);">${escapeHtml(currentUser.displayName || currentUser.username)}</div>
+                    <div style="font-size:0.82rem; color:var(--muted); margin-top:2px;">Логин: @${escapeHtml(currentUser.username)} · ID: #${currentUser.id}</div>
                 </div>
-                <p style="font-size:0.85rem; color:var(--muted); line-height:1.4; margin-bottom:14px;">
-                    Ваш прогресс сохраняется в базе данных SQLite. Изменения автоматически синхронизируются при решении задач.
-                </p>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button type="button" id="cloud-sync-now-btn" class="settings-btn settings-btn-primary" style="flex:1;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        Синхронизировать сейчас
-                    </button>
-                    <button type="button" id="cloud-logout-btn" class="settings-btn settings-btn-secondary" style="flex:1;">
+                <div>
+                    <button type="button" id="cloud-logout-btn" class="settings-btn settings-btn-secondary" style="width:100%; justify-content:center; color:var(--danger, #ff4757); border-color:rgba(255, 71, 87, 0.35); min-height:44px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                         Выйти из аккаунта
                     </button>
                 </div>
             `;
-
-            const syncBtn = card.querySelector('#cloud-sync-now-btn');
-            if (syncBtn) {
-                syncBtn.addEventListener('click', async () => {
-                    syncBtn.disabled = true;
-                    syncBtn.textContent = 'Синхронизация...';
-                    try {
-                        await syncToCloud();
-                        showToast('Все данные успешно сохранены в облачной базе данных!', 'success');
-                    } catch (e) {
-                        showToast('Ошибка сохранения: ' + e.message, 'error');
-                    } finally {
-                        syncBtn.disabled = false;
-                        syncBtn.innerHTML = `
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            Синхронизировать сейчас
-                        `;
-                    }
-                });
-            }
 
             const logoutBtn = card.querySelector('#cloud-logout-btn');
             if (logoutBtn) {
@@ -1353,17 +1373,18 @@
                 });
             }
         } else {
+            if (badge) badge.textContent = 'Гость';
             card.innerHTML = `
-                <div style="margin-bottom:12px;">
-                    <div style="font-weight:800; font-size:1.05rem; color:var(--ink); margin-bottom:4px;">Гостевой режим</div>
-                    <div style="font-size:0.85rem; color:var(--muted); line-height:1.4;">
-                        Вы не авторизованы. Данные сохраняются только в локальном браузере. Войдите или создайте аккаунт, чтобы сохранять прогресс в базе данных и иметь к нему доступ с любого устройства.
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <div style="font-weight:800; font-size:1.02rem; color:var(--ink); margin-bottom:2px;">Гостевой режим</div>
+                        <div style="font-size:0.82rem; color:var(--muted);">Вы не авторизованы. Войдите в свой аккаунт.</div>
                     </div>
+                    <button type="button" id="cloud-open-auth-btn" class="settings-btn settings-btn-accent" style="padding:8px 16px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Войти
+                    </button>
                 </div>
-                <button type="button" id="cloud-open-auth-btn" class="settings-btn settings-btn-accent" style="width:100%;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    Войти или зарегистрироваться
-                </button>
             `;
             const openBtn = card.querySelector('#cloud-open-auth-btn');
             if (openBtn) {

@@ -154,7 +154,13 @@
 <body>
   <header class="topbar">
     <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">Н</span> НЕшкола</a>
-    <a class="back-link" href="bank_tasks.html"><span aria-hidden="true">←</span> Банк задач</a>
+    <div class="topbar-actions" style="display: flex; align-items: center; gap: 12px;">
+      <a class="auth-header-btn unified-auth-btn" href="profile.html">
+        <svg class="profile-cta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="auth-btn-text">Войти</span>
+      </a>
+      <a class="back-link" href="bank_tasks.html"><span aria-hidden="true">←</span> Банк задач</a>
+    </div>
   </header>
 
   <main>
@@ -362,5 +368,6 @@
 
     renderTasks();
   </script>
+  <script src="js/auth_sync.js"></script>
 </body>
 </html>

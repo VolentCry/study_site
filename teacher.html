@@ -3381,7 +3381,7 @@
 
                         let hwBadgeHtml = '';
                         if (hwId && hwTitle) {
-                            hwBadgeHtml = `<span class="lesson-hw-badge" title="Срок: ${formatDateTime(hwDeadline)}">📝 Д/З: ${escapeHtml(hwTitle)}</span>`;
+                            hwBadgeHtml = `<a href="homework.html?id=${hwId}" target="_blank" class="lesson-hw-badge" title="Смотреть домашнее задание с ответами" style="text-decoration:none; cursor:pointer;">👀 Д/З: ${escapeHtml(hwTitle)} ↗</a>`;
                         }
 
                         let studentBadgeHtml = '';
@@ -4329,10 +4329,15 @@
                                     </div>
                                 </div>
 
-                                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-                                    <button type="button" class="btn btn-emerald btn-sm btn-view-submissions" data-hw-id="${h.id}">
-                                        👥 Сданные работы (${subCount})
-                                    </button>
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                                    <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                                        <button type="button" class="btn btn-emerald btn-sm btn-view-submissions" data-hw-id="${h.id}">
+                                            👥 Сданные работы (${subCount})
+                                        </button>
+                                        <a href="homework.html?id=${h.id}" target="_blank" class="btn btn-secondary btn-sm" title="Смотреть домашнее задание с ответами" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                            👀 Смотреть задание
+                                        </a>
+                                    </div>
                                     <button type="button" class="btn btn-danger-outline btn-sm btn-delete-hw" data-hw-id="${h.id}" title="Удалить Д/З">
                                         🗑️
                                     </button>
@@ -4438,8 +4443,8 @@
                                     <button type="button" class="btn btn-emerald btn-sm btn-review-work" data-sub-idx="${sIdx}" style="margin-right:4px;">
                                         ${s.status === 'checked' ? '✏️ Изменить' : '🔍 Проверить'}
                                     </button>
-                                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-secondary btn-sm" title="Открыть работу в интерактивном плеере" style="padding:0.25rem 0.55rem; font-size:0.8rem; text-decoration:none;">
-                                        ↗ Плеер
+                                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-secondary btn-sm" title="Смотреть домашнее задание с ответами" style="padding:0.25rem 0.55rem; font-size:0.8rem; text-decoration:none;">
+                                        👀 Смотреть работу
                                     </a>
                                 </td>
                             </tr>

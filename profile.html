@@ -4609,10 +4609,6 @@
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     <span>Основные</span>
                 </button>
-                <button type="button" class="settings-tab-btn" id="settings-tab-btn-cloud" role="tab" aria-selected="false" aria-controls="settings-pane-cloud">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-                    <span>Облако</span>
-                </button>
             </div>
 
             <!-- TAB PANE 1: КАСТОМИЗАЦИЯ ПРОФИЛЯ -->
@@ -4800,6 +4796,22 @@
 
                 <div class="settings-divider"></div>
 
+                <!-- 2. УЧЁТНАЯ ЗАПИСЬ -->
+                <div class="settings-section" id="settings-account-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Учётная запись</span>
+                        </h3>
+                        <span class="settings-badge" id="account-status-badge">Аккаунт</span>
+                    </div>
+                    <div id="cloud-account-card" class="cloud-account-card">
+                        <!-- Динамически рендерится через js/auth_sync.js -->
+                    </div>
+                </div>
+
+                <div class="settings-divider"></div>
+
                 <!-- 4. RESET DANGER ZONE -->
                 <div class="settings-section">
                     <h3 class="settings-section-title" style="color: var(--danger);">
@@ -4814,21 +4826,6 @@
                     </button>
                 </div>
             </div>
-
-            <!-- TAB PANE 3: ОБЛАЧНЫЙ АККАУНТ (SQLITE) -->
-            <div id="settings-pane-cloud" class="settings-tab-pane hidden" role="tabpanel" aria-labelledby="settings-tab-btn-cloud">
-                <div class="settings-section">
-                    <div class="settings-section-head">
-                        <h3 class="settings-section-title">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-                            <span>Облачный аккаунт</span>
-                        </h3>
-                        <span class="settings-badge" id="cloud-status-badge">База данных SQLite</span>
-                    </div>
-                    <div id="cloud-account-card" class="cloud-account-card">
-                        <!-- Динамически рендерится через js/auth_sync.js -->
-                    </div>
-                </div>
             </div>
             <button type="button" id="settings-close-bottom-btn" class="hidden"></button>
         </div>
@@ -5095,11 +5092,46 @@
                 return `${year}-${month}-${day}`;
             }
 
+            function isTeacherUser() {
+                if (window.AuthSync && typeof window.AuthSync.getUser === 'function') {
+                    const u = window.AuthSync.getUser();
+                    if (u && (u.role === 'teacher' || u.role === 'admin')) return true;
+                }
+                if (monthScheduleData && (monthScheduleData.role === 'teacher' || monthScheduleData.role === 'admin')) {
+                    return true;
+                }
+                return false;
+            }
+
             async function loadStudyData() {
                 if (!selectedDateStr) {
                     selectedDateStr = toDateKey(new Date());
                 }
-                await Promise.all([fetchMonthSchedule(), fetchStudentHomeworks()]);
+                const isTeacher = isTeacherUser();
+                if (isTeacher) {
+                    await fetchMonthSchedule();
+                    if (studentHomeworksList) {
+                        const hwCard = studentHomeworksList.closest('.study-card');
+                        if (hwCard) {
+                            const titleSpan = hwCard.querySelector('.card-section-title span');
+                            if (titleSpan) titleSpan.textContent = 'Панель преподавателя';
+                            const counter = document.getElementById('active-hw-count');
+                            if (counter) counter.style.display = 'none';
+                            studentHomeworksList.innerHTML = `
+                                <div style="text-align:center; padding:1.5rem 1rem;">
+                                    <div style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem;">
+                                        Вы авторизованы как учитель. Управление домашними заданиями и проверка работ доступны в панели преподавателя.
+                                    </div>
+                                    <a href="teacher.html#grading" class="hw-action-btn hw-btn-primary" style="display:inline-flex; width:auto; padding:0.6rem 1.2rem; text-decoration:none;">
+                                        👩‍🏫 Перейти к проверке домашних заданий
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    }
+                } else {
+                    await Promise.all([fetchMonthSchedule(), fetchStudentHomeworks()]);
+                }
             }
 
             async function fetchMonthSchedule() {
@@ -5285,10 +5317,13 @@
                 nextLessonTeacher.textContent = tName ? `Учитель: ${tName}` : '';
 
                 if (hwId) {
+                    const isTeacher = isTeacherUser();
+                    const actionLabel = isTeacher ? '👀 Смотреть домашнее задание' : '📝 Решать домашнее задание';
+                    const noticeText = isTeacher ? 'К уроку прикреплено домашнее задание:' : 'К уроку прикреплено задание:';
                     nextLessonActionWrap.innerHTML = `
-                        <div style="font-size:0.8rem; color:var(--muted); text-align:right;">К уроку прикреплено задание:</div>
-                        <a href="homework.html?id=${hwId}" class="hw-action-btn hw-btn-primary">
-                            📝 Решать домашнее задание
+                        <div style="font-size:0.8rem; color:var(--muted); text-align:right;">${noticeText}</div>
+                        <a href="homework.html?id=${hwId}" class="hw-action-btn hw-btn-primary" style="text-decoration:none;">
+                            ${actionLabel}
                         </a>
                     `;
                 } else {
@@ -5343,10 +5378,12 @@
                     const desc = les.notes || les.description || '';
                     let hwLine = '';
                     if (hwId) {
+                        const isTeacher = isTeacherUser();
+                        const linkText = isTeacher ? '👀 Смотреть домашнее задание →' : '📝 Прикреплена домашка →';
                         hwLine = `
                             <div style="margin-top:0.35rem;">
                                 <a href="homework.html?id=${hwId}" style="color:var(--accent); font-weight:700; font-size:0.82rem; text-decoration:none;">
-                                    📝 Прикреплена домашка →
+                                    ${linkText}
                                 </a>
                             </div>
                         `;
@@ -5383,8 +5420,8 @@
                             </div>
                             <div class="day-event-title">${escapeHtml(h.title)}</div>
                             <div style="margin-top:0.35rem;">
-                                <a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-primary" style="height:28px; font-size:0.75rem;">
-                                    Решать задание
+                                <a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-primary" style="height:28px; font-size:0.75rem; text-decoration:none;">
+                                    ${isTeacherUser() ? '👀 Смотреть домашнее задание' : 'Решать задание'}
                                 </a>
                             </div>
                         </div>
@@ -5637,16 +5674,13 @@
             // Settings internal tabs navigation
             const tabBtnCustom = document.getElementById('settings-tab-btn-custom');
             const tabBtnGeneral = document.getElementById('settings-tab-btn-general');
-            const tabBtnCloud = document.getElementById('settings-tab-btn-cloud');
             const paneCustom = document.getElementById('settings-pane-custom');
             const paneGeneral = document.getElementById('settings-pane-general');
-            const paneCloud = document.getElementById('settings-pane-cloud');
 
             function switchSettingsTab(tab) {
                 const tabs = [
                     { id: 'custom', btn: tabBtnCustom, pane: paneCustom },
-                    { id: 'general', btn: tabBtnGeneral, pane: paneGeneral },
-                    { id: 'cloud', btn: tabBtnCloud, pane: paneCloud }
+                    { id: 'general', btn: tabBtnGeneral, pane: paneGeneral }
                 ];
                 tabs.forEach(t => {
                     const isActive = t.id === tab;
@@ -5662,7 +5696,6 @@
 
             if (tabBtnCustom) tabBtnCustom.addEventListener('click', () => switchSettingsTab('custom'));
             if (tabBtnGeneral) tabBtnGeneral.addEventListener('click', () => switchSettingsTab('general'));
-            if (tabBtnCloud) tabBtnCloud.addEventListener('click', () => switchSettingsTab('cloud'));
 
             // Theme toggle elements
             const settingsThemeToggle = document.getElementById('settings-theme-toggle');

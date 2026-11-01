@@ -75,6 +75,14 @@
     transition: color 0.2s;
   }
   .nav-links a:hover { color: var(--accent); }
+  @media (max-width: 768px) {
+    nav { padding: 0 14px; height: 56px; }
+    .nav-links { display: none; }
+    .nav-brand { gap: 8px; }
+    .nav-logo { font-size: 16px; }
+    .nav-lobby { font-size: 11px; padding: 6px 8px; }
+    .nav-profile-btn { padding: 6px 12px; font-size: 11px; }
+  }
 
   /* ─── HERO ─── */
   #hero {
@@ -308,13 +316,13 @@
   }
   @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 560px) { .cards-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 560px) {
-    nav { height: auto; min-height: 64px; flex-wrap: wrap; justify-content: flex-start; gap: 8px 18px; padding: 10px 16px; }
-    .nav-brand { width: 100%; justify-content: space-between; gap: 10px; }
-    .nav-lobby { padding: 7px 9px; font-size: 11px; }
-    .nav-logo { font-size: 18px; }
-    .nav-links { gap: 18px; }
-    .nav-links a { font-size: 11px; }
+  @media (max-width: 768px) {
+    nav { height: 60px; min-height: 60px; flex-wrap: nowrap; justify-content: space-between; padding: 0 16px; }
+    .nav-brand { width: auto; gap: 8px; }
+    .nav-lobby { padding: 6px 10px; font-size: 11px; }
+    .nav-logo { font-size: 16px; }
+    .nav-links { display: none; }
+    .nav-profile-btn { padding: 6px 12px; font-size: 12px; flex-shrink: 0; }
   }
   .sim-card {
     background: var(--card-bg);
@@ -931,5 +939,6 @@ const observer = new IntersectionObserver((entries)=>{
 },{ threshold:0.12 });
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 </script>
+<script src="../js/auth_sync.js"></script>
 </body>
 </html>

@@ -870,7 +870,12 @@ def api_student_homework_detail(homework_id: int):
     hw = db.get_homework_by_id(homework_id, user_id=target_user_id, role=role)
     if not hw:
         return jsonify({'success': False, 'error': 'Домашнее задание не найдено или недоступно.'}), 404
-    return jsonify({'success': True, 'homework': hw})
+    return jsonify({
+        'success': True,
+        'homework': hw,
+        'userRole': role,
+        'isTeacher': role in ('teacher', 'admin')
+    })
 
 
 @app.route('/api/student/homeworks/<int:homework_id>/draft', methods=['POST'])

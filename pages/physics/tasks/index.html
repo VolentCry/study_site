@@ -1349,13 +1349,40 @@ function stopTestTimer() {
   }
 }
 
+function shuffleOptionsArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function openPhysicsTest(topicIdx) {
   if (typeof PhysicsTests8 === 'undefined' || !PhysicsTests8.hasTest(topicIdx)) {
     alert('Тестирование по этой теме находится в разработке.');
     return;
   }
 
-  activeTesting = PhysicsTests8.getTest(topicIdx);
+  const baseTest = PhysicsTests8.getTest(topicIdx);
+  // Deep clone and dynamically randomize option positions on each attempt
+  activeTesting = {
+    topicId: baseTest.topicId,
+    topicTitle: baseTest.topicTitle,
+    grade: baseTest.grade,
+    description: baseTest.description,
+    questions: baseTest.questions.map(q => {
+      const correctText = q.options[q.correctIndex];
+      const shuffledOptions = shuffleOptionsArray(q.options);
+      const newCorrectIndex = shuffledOptions.indexOf(correctText);
+      return {
+        ...q,
+        options: shuffledOptions,
+        correctIndex: newCorrectIndex
+      };
+    })
+  };
+  window.activeTesting = activeTesting;
   activeTestIndex = 0;
   userTestAnswers = {};
   testIsFinished = false;
@@ -1606,5 +1633,6 @@ if (grade === '8' && testUrlParam !== null) {
 }
 
 </script>
+<script src="../../../js/auth_sync.js"></script>
 </body>
 </html>
