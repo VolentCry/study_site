@@ -192,6 +192,408 @@
     main { width: min(100% - 32px, 1100px); padding-top: 44px; }
     .topic-card { padding: 19px; }
   }
+
+  /* ========================================================================= */
+  /* TEST DIALOG & RUNNER STYLES */
+  /* ========================================================================= */
+  .task-dialog.test-dialog {
+    width: min(840px, calc(100% - 24px));
+    max-height: calc(100vh - 36px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg2);
+    box-shadow: 0 32px 100px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(56, 189, 248, 0.15);
+  }
+  .task-dialog.test-dialog[open] {
+    display: flex;
+  }
+  .test-dialog-header {
+    padding: 18px 24px 14px;
+    background: rgba(5, 12, 26, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .test-dialog-kicker {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .test-dialog-title {
+    color: var(--text);
+    font: 700 clamp(18px, 3.5vw, 23px)/1.25 'Playfair Display', serif;
+  }
+  .test-meta-bar {
+    padding: 10px 24px;
+    background: rgba(14, 28, 54, 0.55);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .test-progress-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .test-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+  .test-progress-track {
+    width: 100%;
+    height: 5px;
+    background: rgba(148, 163, 184, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .test-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 6.66%;
+    transition: width 0.25s ease;
+  }
+  .test-body {
+    padding: 22px 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .test-question-box {
+    margin-bottom: 20px;
+  }
+  .test-question-text {
+    font-size: clamp(15px, 2.2vw, 18px);
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .test-question-text strong {
+    color: #fff;
+    font-weight: 700;
+  }
+  .test-options-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .test-option-btn {
+    width: 100%;
+    padding: 13px 16px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    background: rgba(14, 28, 54, 0.65);
+    color: var(--text);
+    font: 500 14px/1.45 Raleway, sans-serif;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .test-option-btn:hover {
+    border-color: var(--accent);
+    background: rgba(56, 189, 248, 0.09);
+    transform: translateY(-1px);
+  }
+  .test-option-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .test-option-btn.is-selected {
+    border-color: var(--accent);
+    background: rgba(56, 189, 248, 0.18);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+  }
+  .test-opt-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .test-option-btn.is-selected .test-opt-badge {
+    background: var(--accent);
+    color: #071222;
+  }
+  .test-opt-text {
+    flex: 1;
+  }
+  .test-pills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding: 12px 0 4px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    margin-top: auto;
+  }
+  .test-q-pill {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: transparent;
+    color: var(--text2);
+    font: 700 12px Raleway, sans-serif;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: grid;
+    place-items: center;
+  }
+  .test-q-pill:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .test-q-pill.is-active {
+    border-color: var(--accent);
+    color: #fff;
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .test-q-pill.is-answered {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .test-footer-actions {
+    padding: 16px 24px;
+    background: rgba(5, 12, 26, 0.92);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .test-btn {
+    min-height: 42px;
+    padding: 0 18px;
+    border-radius: 10px;
+    font: 700 13px Raleway, sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .test-btn-secondary {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+  }
+  .test-btn-secondary:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .test-btn-secondary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .test-btn-primary {
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #071222;
+  }
+  .test-btn-primary:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+  }
+  .test-btn-finish {
+    border: 1px solid #22c55e;
+    background: #22c55e;
+    color: #071222;
+  }
+  .test-btn-finish:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+  }
+
+  /* RESULTS SCREEN */
+  .test-results-container {
+    padding: 6px 0;
+  }
+  .test-score-hero {
+    text-align: center;
+    padding: 24px 20px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(14, 28, 54, 0.85), rgba(7, 18, 34, 0.92));
+    border: 1px solid var(--border);
+    margin-bottom: 22px;
+  }
+  .test-score-ring {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: grid;
+    place-items: center;
+    font: 900 26px 'Playfair Display', serif;
+    color: #fff;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.3);
+    background: rgba(56, 189, 248, 0.1);
+  }
+  .test-score-hero.score-5 .test-score-ring { border-color: #22c55e; color: #22c55e; box-shadow: 0 0 24px rgba(34, 197, 94, 0.35); }
+  .test-score-hero.score-4 .test-score-ring { border-color: #38bdf8; color: #38bdf8; }
+  .test-score-hero.score-3 .test-score-ring { border-color: #fbbf24; color: #fbbf24; }
+  .test-score-hero.score-2 .test-score-ring { border-color: #f43f5e; color: #f43f5e; }
+  .test-score-title {
+    font: 700 22px 'Playfair Display', serif;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .test-score-desc {
+    color: var(--text2);
+    font-size: 14px;
+    max-width: 520px;
+    margin: 0 auto 14px;
+    line-height: 1.6;
+  }
+  .test-score-stats {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .test-score-stats strong { color: var(--text); }
+
+  /* REVIEW LIST */
+  .test-review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .test-review-filters {
+    display: flex;
+    gap: 8px;
+  }
+  .test-filter-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .test-filter-btn.active {
+    background: var(--accent);
+    color: #071222;
+    border-color: var(--accent);
+  }
+  .test-review-item {
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: rgba(14, 28, 54, 0.45);
+  }
+  .test-review-item.is-correct {
+    border-left: 4px solid #22c55e;
+  }
+  .test-review-item.is-wrong {
+    border-left: 4px solid #f43f5e;
+  }
+  .test-review-q-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text2);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .test-review-q-text {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.55;
+  }
+  .test-review-ans-box {
+    background: rgba(5, 12, 26, 0.65);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+  }
+  .test-review-expl {
+    padding: 10px 14px;
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text2);
+  }
+  .test-review-expl strong {
+    color: var(--accent);
+  }
+
+  .test-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid rgba(59, 130, 246, 0.35);
+  }
+  .test-badge.is-completed {
+    background: rgba(34, 197, 94, 0.18);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.4);
+  }
+  .task-list button.test-button.is-available:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+  }
+
 </style>
 </head>
 <body>
@@ -277,6 +679,75 @@
     </div>
   </div>
 </dialog>
+
+<dialog class="task-dialog test-dialog" id="test-dialog" aria-labelledby="test-dialog-title">
+  <div class="test-dialog-header">
+    <div>
+      <p class="test-dialog-kicker" id="test-dialog-kicker">Физика · 8 класс · Тестирование</p>
+      <h2 class="test-dialog-title" id="test-dialog-title">Тестирование</h2>
+    </div>
+    <button class="task-dialog-close" id="close-test-dialog" type="button" aria-label="Закрыть тестирование">×</button>
+  </div>
+  
+  <div class="test-progress-track">
+    <div class="test-progress-fill" id="test-progress-fill"></div>
+  </div>
+
+  <div class="test-meta-bar" id="test-meta-bar">
+    <div class="test-progress-info">
+      <span>Вопрос <strong id="test-q-cur">1</strong> из <strong id="test-q-total">15</strong></span>
+      <span class="test-type-badge" id="test-type-badge">📖 Теория</span>
+    </div>
+    <div style="font-size:12px; color:var(--text2);" id="test-timer-display">⏱ 0:00</div>
+  </div>
+
+  <!-- QUESTION VIEW -->
+  <div class="test-body" id="test-question-view">
+    <div class="test-question-box">
+      <div class="test-question-text" id="test-question-text">Загрузка вопроса...</div>
+    </div>
+    <div class="test-options-grid" id="test-options-grid"></div>
+    <div class="test-pills-row" id="test-pills-row"></div>
+  </div>
+
+  <!-- RESULTS VIEW (Hidden initially) -->
+  <div class="test-body" id="test-results-view" style="display:none;">
+    <div class="test-results-container">
+      <div class="test-score-hero" id="test-score-hero">
+        <div class="test-score-ring" id="test-score-ring">15/15</div>
+        <h3 class="test-score-title" id="test-score-title">Отлично!</h3>
+        <p class="test-score-desc" id="test-score-desc">Вы успешно ответили на все вопросы теста!</p>
+        <div class="test-score-stats">
+          <div>Верно: <strong id="test-stat-correct" style="color:#22c55e;">15</strong></div>
+          <div>Ошибок: <strong id="test-stat-wrong" style="color:#f43f5e;">0</strong></div>
+          <div>Точность: <strong id="test-stat-pct">100%</strong></div>
+          <div>Время: <strong id="test-stat-time">2 мин</strong></div>
+        </div>
+      </div>
+
+      <div class="test-review-header">
+        <h4 style="font:700 16px 'Playfair Display', serif; color:var(--text);">Разбор всех 15 заданий</h4>
+        <div class="test-review-filters">
+          <button class="test-filter-btn active" id="filter-all-btn" type="button">Все (15)</button>
+          <button class="test-filter-btn" id="filter-errors-btn" type="button">Только ошибки (<span id="filter-err-count">0</span>)</button>
+        </div>
+      </div>
+      <div class="test-review-list" id="test-review-list"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER ACTIONS -->
+  <div class="test-footer-actions" id="test-footer-actions">
+    <button class="test-btn test-btn-secondary" id="test-btn-prev" type="button">← Назад</button>
+    <div style="display:flex; gap:10px;">
+      <button class="test-btn test-btn-secondary" id="test-btn-restart" type="button" style="display:none;">Заново</button>
+      <button class="test-btn test-btn-primary" id="test-btn-next" type="button">Вперёд →</button>
+      <button class="test-btn test-btn-finish" id="test-btn-finish" type="button">Завершить тест ✓</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="../../../js/physics_tests_8.js"></script>
 <script>
 const gradeCatalogs = {
   '7': {
@@ -475,7 +946,27 @@ if (catalog) {
               ? `<li><button class="task-link${isSolved ? ' is-solved' : ''}" type="button" data-task-index="${index}" data-task-id="${taskId}"><span class="task-title">${task}</span>${isSolved ? CHECKMARK_ICON_HTML : '<span class="task-arrow" aria-hidden="true">↗</span>'}</button></li>`
               : `<li><span class="task-link unavailable" aria-disabled="true">${task}</span></li>`;
           }).join('')}
-            <li><button class="task-link test-button" type="button">Пройти тестирование</button></li>
+            ${(() => {
+              const hasTest = (grade === '8' && typeof PhysicsTests8 !== 'undefined' && PhysicsTests8.hasTest(topicIndex));
+              const testResult = getSavedTestResult(grade, topicIndex);
+              if (hasTest) {
+                return `<li>
+                  <button class="task-link test-button is-available${testResult ? ' has-result' : ''}" type="button" data-test-topic="${topicIndex}">
+                    <span class="task-title">Пройти тестирование</span>
+                    ${testResult 
+                      ? `<span class="test-badge is-completed" title="Лучший результат: ${testResult.score}/${testResult.total}">✓ ${testResult.score}/${testResult.total}</span>` 
+                      : `<span class="test-badge">15 заданий ⚡</span>`}
+                  </button>
+                </li>`;
+              } else {
+                return `<li>
+                  <button class="task-link test-button" type="button" data-test-topic="${topicIndex}" data-test-unavailable="true">
+                    <span class="task-title">Пройти тестирование</span>
+                    <span class="task-arrow" aria-hidden="true">↗</span>
+                  </button>
+                </li>`;
+              }
+            })()}
           </ul>
         </article>`).join('')}
     </section>
@@ -647,6 +1138,374 @@ taskDialog.addEventListener('close', () => {
   answerForm.reset();
   answerFeedback.textContent = '';
 });
+
+// =========================================================================
+// TEST RESULT STORAGE HELPERS
+// =========================================================================
+function getSavedTestResult(gradeVal, topicIdx) {
+  try {
+    const raw = localStorage.getItem('physics_test_results');
+    if (raw) {
+      const data = JSON.parse(raw);
+      return data[`${gradeVal}_${topicIdx}`] || null;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function saveTestResult(gradeVal, topicIdx, score, total) {
+  try {
+    const raw = localStorage.getItem('physics_test_results');
+    const data = raw ? JSON.parse(raw) : {};
+    const prev = data[`${gradeVal}_${topicIdx}`];
+    if (!prev || score >= prev.score) {
+      data[`${gradeVal}_${topicIdx}`] = {
+        score: score,
+        total: total,
+        date: new Date().toISOString()
+      };
+      localStorage.setItem('physics_test_results', JSON.stringify(data));
+    }
+  } catch(e) {}
+}
+
+// Enhance recordPhysicsAttempt to support test questions
+const _origRecordPhysicsAttempt = recordPhysicsAttempt;
+recordPhysicsAttempt = function(isCorrect, customTaskId, customSkill) {
+  if (customTaskId) {
+    const storageKey = 'studyMetrics';
+    let attempts;
+    try {
+      const storedAttempts = localStorage.getItem(storageKey);
+      attempts = storedAttempts ? JSON.parse(storedAttempts) : [];
+      if (!Array.isArray(attempts)) attempts = [];
+    } catch (e) { attempts = []; }
+
+    attempts.push({
+      timestamp: new Date().toISOString(),
+      subject: 'Физика',
+      taskId: customTaskId,
+      skill: customSkill ? getPhysicsSkill(customSkill) : 'thermal',
+      correct: isCorrect
+    });
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(attempts));
+    } catch(e) {}
+  } else {
+    _origRecordPhysicsAttempt(isCorrect);
+  }
+};
+
+// =========================================================================
+// TEST RUNNER IMPLEMENTATION
+// =========================================================================
+const testDialog = document.getElementById('test-dialog');
+const closeTestDialogBtn = document.getElementById('close-test-dialog');
+const testDialogTitle = document.getElementById('test-dialog-title');
+const testProgressFill = document.getElementById('test-progress-fill');
+const testQCur = document.getElementById('test-q-cur');
+const testQTotal = document.getElementById('test-q-total');
+const testTypeBadge = document.getElementById('test-type-badge');
+const testTimerDisplay = document.getElementById('test-timer-display');
+const testQuestionView = document.getElementById('test-question-view');
+const testQuestionText = document.getElementById('test-question-text');
+const testOptionsGrid = document.getElementById('test-options-grid');
+const testPillsRow = document.getElementById('test-pills-row');
+const testResultsView = document.getElementById('test-results-view');
+const testBtnPrev = document.getElementById('test-btn-prev');
+const testBtnNext = document.getElementById('test-btn-next');
+const testBtnFinish = document.getElementById('test-btn-finish');
+const testBtnRestart = document.getElementById('test-btn-restart');
+const filterAllBtn = document.getElementById('filter-all-btn');
+const filterErrorsBtn = document.getElementById('filter-errors-btn');
+const testReviewList = document.getElementById('test-review-list');
+
+let activeTesting = null;
+let activeTestIndex = 0;
+let userTestAnswers = {};
+let testTimerInterval = null;
+let testSecondsElapsed = 0;
+let testIsFinished = false;
+
+function formatTestTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function startTestTimer() {
+  stopTestTimer();
+  testSecondsElapsed = 0;
+  testTimerDisplay.textContent = '⏱ 0:00';
+  testTimerInterval = setInterval(() => {
+    testSecondsElapsed++;
+    testTimerDisplay.textContent = '⏱ ' + formatTestTime(testSecondsElapsed);
+  }, 1000);
+}
+
+function stopTestTimer() {
+  if (testTimerInterval) {
+    clearInterval(testTimerInterval);
+    testTimerInterval = null;
+  }
+}
+
+function openPhysicsTest(topicIdx) {
+  if (typeof PhysicsTests8 === 'undefined' || !PhysicsTests8.hasTest(topicIdx)) {
+    alert('Тестирование по этой теме находится в разработке.');
+    return;
+  }
+
+  activeTesting = PhysicsTests8.getTest(topicIdx);
+  activeTestIndex = 0;
+  userTestAnswers = {};
+  testIsFinished = false;
+
+  testDialogTitle.textContent = activeTesting.topicTitle;
+  testQTotal.textContent = activeTesting.questions.length;
+
+  // Reset Views
+  testQuestionView.style.display = 'flex';
+  testResultsView.style.display = 'none';
+  testBtnRestart.style.display = 'none';
+  testBtnPrev.style.display = 'inline-flex';
+  testBtnNext.style.display = 'inline-flex';
+  testBtnFinish.style.display = 'none';
+
+  startTestTimer();
+  renderTestQuestion(0);
+  testDialog.showModal();
+}
+
+function renderTestQuestion(idx) {
+  if (!activeTesting) return;
+  activeTestIndex = idx;
+  const q = activeTesting.questions[idx];
+  const total = activeTesting.questions.length;
+
+  testQCur.textContent = idx + 1;
+  testTypeBadge.textContent = q.typeLabel || 'Вопрос';
+  testProgressFill.style.width = `${((idx + 1) / total) * 100}%`;
+
+  testQuestionText.innerHTML = q.question;
+
+  // Options
+  const letters = ['A', 'B', 'C', 'D'];
+  testOptionsGrid.innerHTML = q.options.map((opt, oIdx) => {
+    const isSelected = (userTestAnswers[idx] === oIdx);
+    return `
+      <button type="button" class="test-option-btn${isSelected ? ' is-selected' : ''}" data-opt-idx="${oIdx}">
+        <span class="test-opt-badge">${letters[oIdx] || (oIdx + 1)}</span>
+        <span class="test-opt-text">${opt}</span>
+      </button>
+    `;
+  }).join('');
+
+  // Pills
+  testPillsRow.innerHTML = activeTesting.questions.map((_, pIdx) => {
+    const isAns = (userTestAnswers[pIdx] !== undefined);
+    const isCur = (pIdx === idx);
+    return `
+      <button type="button" class="test-q-pill${isCur ? ' is-active' : ''}${isAns ? ' is-answered' : ''}" data-pill-idx="${pIdx}">
+        ${pIdx + 1}
+      </button>
+    `;
+  }).join('');
+
+  // Button visibility
+  testBtnPrev.disabled = (idx === 0);
+  if (idx === total - 1) {
+    testBtnNext.style.display = 'none';
+    testBtnFinish.style.display = 'inline-flex';
+  } else {
+    testBtnNext.style.display = 'inline-flex';
+    testBtnFinish.style.display = 'none';
+  }
+}
+
+function selectTestOption(optIdx) {
+  userTestAnswers[activeTestIndex] = optIdx;
+  renderTestQuestion(activeTestIndex);
+}
+
+function finishPhysicsTest() {
+  if (!activeTesting) return;
+  stopTestTimer();
+  testIsFinished = true;
+
+  const total = activeTesting.questions.length;
+  let correctCount = 0;
+
+  activeTesting.questions.forEach((q, idx) => {
+    const userOpt = userTestAnswers[idx];
+    const isCorrect = (userOpt === q.correctIndex);
+    if (isCorrect) correctCount++;
+
+    // Record into studyMetrics
+    recordPhysicsAttempt(isCorrect, q.id, activeTesting.topicTitle);
+  });
+
+  const scorePct = Math.round((correctCount / total) * 100);
+  let gradeLetter = 5;
+  let gradeClass = 'score-5';
+  let gradeTitle = 'Отлично!';
+  let gradeDesc = 'Тема освоена безупречно. Вы продемонстрировали глубокое понимание формул, теории и решения задач!';
+
+  if (correctCount >= 14) {
+    gradeLetter = 5; gradeClass = 'score-5'; gradeTitle = 'Отлично!';
+  } else if (correctCount >= 11) {
+    gradeLetter = 4; gradeClass = 'score-4'; gradeTitle = 'Хорошо!';
+    gradeDesc = 'Достойный результат! Вы отлично ориентируетесь в теме, но повторите пару нюансов.';
+  } else if (correctCount >= 8) {
+    gradeLetter = 3; gradeClass = 'score-3'; gradeTitle = 'Удовлетворительно';
+    gradeDesc = 'Базовые понятия усвоены, но рекомендуется ещё раз перечитать теорию и повторить формулы.';
+  } else {
+    gradeLetter = 2; gradeClass = 'score-2'; gradeTitle = 'Требуется повторение';
+    gradeDesc = 'Тема вызвала затруднения. Прочитайте раздел теории и попробуйте пройти тестирование заново.';
+  }
+
+  // Save best result
+  saveTestResult(grade, activeTesting.topicId, correctCount, total);
+
+  // Update button badge on page
+  const topicBtn = document.querySelector(`[data-test-topic="${activeTesting.topicId}"]`);
+  if (topicBtn) {
+    topicBtn.classList.add('has-result');
+    const badge = topicBtn.querySelector('.test-badge');
+    if (badge) {
+      badge.className = 'test-badge is-completed';
+      badge.textContent = `✓ ${correctCount}/${total}`;
+      badge.title = `Лучший результат: ${correctCount}/${total}`;
+    }
+  }
+
+  // Update Hero
+  const hero = document.getElementById('test-score-hero');
+  hero.className = 'test-score-hero ' + gradeClass;
+  document.getElementById('test-score-ring').textContent = `${correctCount}/${total}`;
+  document.getElementById('test-score-title').textContent = `${gradeTitle} (Оценка ${gradeLetter})`;
+  document.getElementById('test-score-desc').textContent = gradeDesc;
+  document.getElementById('test-stat-correct').textContent = correctCount;
+  document.getElementById('test-stat-wrong').textContent = total - correctCount;
+  document.getElementById('test-stat-pct').textContent = scorePct + '%';
+  document.getElementById('test-stat-time').textContent = formatTestTime(testSecondsElapsed);
+  document.getElementById('filter-err-count').textContent = total - correctCount;
+
+  // Switch to results view
+  testQuestionView.style.display = 'none';
+  testResultsView.style.display = 'block';
+  testBtnPrev.style.display = 'none';
+  testBtnNext.style.display = 'none';
+  testBtnFinish.style.display = 'none';
+  testBtnRestart.style.display = 'inline-flex';
+
+  renderTestReview('all');
+}
+
+function renderTestReview(filterType) {
+  if (!activeTesting) return;
+  const letters = ['A', 'B', 'C', 'D'];
+  filterAllBtn.classList.toggle('active', filterType === 'all');
+  filterErrorsBtn.classList.toggle('active', filterType === 'errors');
+
+  const html = activeTesting.questions.map((q, idx) => {
+    const userOpt = userTestAnswers[idx];
+    const isCorrect = (userOpt === q.correctIndex);
+    if (filterType === 'errors' && isCorrect) return '';
+
+    const userAnsText = (userOpt !== undefined) ? q.options[userOpt] : '— (ответ не дан)';
+    const correctAnsText = q.options[q.correctIndex];
+
+    return `
+      <div class="test-review-item ${isCorrect ? 'is-correct' : 'is-wrong'}">
+        <div class="test-review-q-num">
+          <span>Вопрос ${idx + 1} · ${q.typeLabel || 'Задание'}</span>
+          <strong style="color:${isCorrect ? '#22c55e' : '#f43f5e'};">
+            ${isCorrect ? '✓ Верно (+1)' : '✗ Ошибка (0)'}
+          </strong>
+        </div>
+        <div class="test-review-q-text">${q.question}</div>
+        <div class="test-review-ans-box">
+          <div>Ваш ответ: <strong style="color:${isCorrect ? '#22c55e' : '#f43f5e'};">${userAnsText}</strong></div>
+          ${!isCorrect ? `<div style="margin-top:4px; color:#38bdf8;">Правильный ответ: <strong>${correctAnsText}</strong></div>` : ''}
+        </div>
+        <div class="test-review-expl">
+          <strong>Пояснение:</strong> ${q.explanation}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  testReviewList.innerHTML = html || '<p style="text-align:center; color:var(--text2); padding:20px;">Ошибок нет! Отличная работа!</p>';
+}
+
+function closePhysicsTest() {
+  if (!testIsFinished && activeTesting && Object.keys(userTestAnswers).length > 0) {
+    if (!confirm('Вы действительно хотите прервать тестирование? Текущий прогресс не будет сохранён.')) {
+      return;
+    }
+  }
+  stopTestTimer();
+  testDialog.close();
+  activeTesting = null;
+  activeTestIndex = 0;
+  userTestAnswers = {};
+}
+
+// Event Listeners for Test Runner
+testOptionsGrid.addEventListener('click', e => {
+  const btn = e.target.closest('.test-option-btn');
+  if (!btn) return;
+  const optIdx = parseInt(btn.dataset.optIdx, 10);
+  selectTestOption(optIdx);
+});
+
+testPillsRow.addEventListener('click', e => {
+  const pill = e.target.closest('.test-q-pill');
+  if (!pill) return;
+  const pIdx = parseInt(pill.dataset.pillIdx, 10);
+  renderTestQuestion(pIdx);
+});
+
+testBtnPrev.addEventListener('click', () => {
+  if (activeTestIndex > 0) renderTestQuestion(activeTestIndex - 1);
+});
+
+testBtnNext.addEventListener('click', () => {
+  if (activeTesting && activeTestIndex < activeTesting.questions.length - 1) {
+    renderTestQuestion(activeTestIndex + 1);
+  }
+});
+
+testBtnFinish.addEventListener('click', () => {
+  finishPhysicsTest();
+});
+
+testBtnRestart.addEventListener('click', () => {
+  if (activeTesting) openPhysicsTest(activeTesting.topicId);
+});
+
+filterAllBtn.addEventListener('click', () => renderTestReview('all'));
+filterErrorsBtn.addEventListener('click', () => renderTestReview('errors'));
+closeTestDialogBtn.addEventListener('click', closePhysicsTest);
+
+// Click test button on topic card
+main.addEventListener('click', event => {
+  const btn = event.target.closest('[data-test-topic]');
+  if (!btn) return;
+  const topicIdx = parseInt(btn.dataset.testTopic, 10);
+  openPhysicsTest(topicIdx);
+});
+
+// Auto-launch if URL has ?grade=8&test=X
+const testUrlParam = new URLSearchParams(window.location.search).get('test');
+if (grade === '8' && testUrlParam !== null) {
+  const tIdx = parseInt(testUrlParam, 10);
+  if (!isNaN(tIdx)) {
+    setTimeout(() => openPhysicsTest(tIdx), 150);
+  }
+}
+
 </script>
 </body>
 </html>

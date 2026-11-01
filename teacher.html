@@ -1685,6 +1685,37 @@
                                 </div>
                             </div>
 
+                            <!-- Блок добавления из Банка задач НЕшколы -->
+                            <div class="generator-subcard" style="border-color: rgba(99, 102, 241, 0.35); background: rgba(99, 102, 241, 0.04); margin-top: 1.25rem;">
+                                <div class="generator-subcard-title" style="color: var(--accent-cyan); display: flex; justify-content: space-between; align-items: center;">
+                                    <span>📚 Задания из Банка задач (Каталог и Тестирования)</span>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0.85rem;">
+                                    <label class="form-label" for="bank-topic-select">Тема из Банка задач</label>
+                                    <select id="bank-topic-select" class="form-select">
+                                        <option value="">Загрузка каталога тем...</option>
+                                    </select>
+                                </div>
+                                <div class="generator-row">
+                                    <div style="flex: 1; min-width: 120px;">
+                                        <label class="form-label" for="bank-tasks-count">Кол-во задач</label>
+                                        <input type="number" id="bank-tasks-count" class="form-input" min="1" max="25" value="3">
+                                    </div>
+                                    <div style="margin-top: 1.4rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                        <button type="button" class="btn btn-emerald" id="btn-add-bank-random" title="Добавить указанное количество случайных задач из выбранной темы">
+                                            ⚡ Добавить случайно
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" id="btn-open-bank-picker" title="Выбрать конкретные задачи из списка с предпросмотром">
+                                            🔍 Выбрать вручную...
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="bank-topic-preview-meta" style="margin-top: 0.65rem; font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                    <span id="bank-topic-stats-text">Выберите тему для просмотра</span>
+                                    <a href="bank_tasks.html" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 600;">Весь Банк задач ↗</a>
+                                </div>
+                            </div>
+
                             <!-- Ручное добавление авторской задачи -->
                             <details style="margin-top: 1rem;">
                                 <summary style="cursor: pointer; font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan); user-select: none;">
@@ -2012,6 +2043,51 @@
         </div>
     </dialog>
 
+    <!-- Модальное окно ручного выбора заданий из Банка задач -->
+    <dialog id="modal-bank-tasks-picker" class="admin-modal">
+        <div class="modal-body" style="max-width: 860px; width: min(860px, 95vw);">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="bank-picker-modal-title">Выбор заданий из Банка задач</h3>
+                    <p style="font-size: 0.85rem; color: var(--muted);" id="bank-picker-topic-subtitle">Выберите тему и отметьте галочками нужные задачи</p>
+                </div>
+                <button type="button" class="modal-close" data-close-modal="modal-bank-tasks-picker">✕</button>
+            </div>
+
+            <!-- Верхняя панель фильтрации темы и поиска -->
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end;">
+                <div style="flex: 2; min-width: 220px;">
+                    <label class="form-label" style="margin-bottom: 4px; font-size: 0.78rem;">Тема Банка задач</label>
+                    <select id="modal-bank-topic-select" class="form-select" style="font-size: 0.88rem; padding: 7px 12px;"></select>
+                </div>
+                <div style="flex: 2; min-width: 180px;">
+                    <label class="form-label" style="margin-bottom: 4px; font-size: 0.78rem;">Поиск по тексту</label>
+                    <input type="text" id="modal-bank-search" class="form-input" placeholder="Поиск по условию..." style="font-size: 0.88rem; padding: 7px 12px;">
+                </div>
+                <div style="flex: 1; min-width: 140px; display: flex; gap: 6px;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-bank-select-all" style="flex: 1; padding: 7px 10px; font-size: 0.78rem;" title="Выбрать все отфильтрованные задачи">Все</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-bank-deselect-all" style="flex: 1; padding: 7px 10px; font-size: 0.78rem;" title="Снять выбор">Снять</button>
+                </div>
+            </div>
+
+            <!-- Список задач выбранной темы -->
+            <div id="modal-bank-tasks-list" style="max-height: 440px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: var(--r-sm); background: rgba(0,0,0,0.12);">
+                <!-- Карточки задач с чекбоксами -->
+            </div>
+
+            <!-- Футер с кнопками добавления -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top: 1px solid var(--line); padding-top: 1rem;">
+                <div style="font-size: 0.88rem; color: var(--ink);">
+                    Выбрано для добавления: <strong id="modal-bank-selected-count" style="color: var(--accent-cyan); font-size: 1.05rem;">0</strong>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-bank-tasks-picker">Отмена</button>
+                    <button type="button" class="btn btn-emerald" id="btn-confirm-add-bank-tasks">➕ Добавить выбранные в Д/З</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
     <!-- SCRIPTS -->
         <!-- Trainer Engines for Homework Constructor -->
     <script src="js/oge_task_6_trainer.js"></script>
@@ -2022,6 +2098,10 @@
     <script src="js/oge_task_18_trainer.js"></script>
     <script src="js/auth_sync.js?v=1.1"></script>
     <script src="js/methodical_plan.js"></script>
+    <!-- Bank of Tasks & Physics Tests -->
+    <script src="js/physics_tests_8.js"></script>
+    <script src="js/bank_tasks_data.js"></script>
+    <script src="js/bank_tasks_runner.js"></script>
     <script>
         (function() {
             'use strict';
@@ -3413,9 +3493,54 @@
             const btnPublishHomework = document.getElementById('btn-publish-homework');
             const btnAddManualTask = document.getElementById('btn-add-manual-task');
 
+            // Bank of Tasks elements
+            const bankTopicSelect = document.getElementById('bank-topic-select');
+            const bankTasksCount = document.getElementById('bank-tasks-count');
+            const btnAddBankRandom = document.getElementById('btn-add-bank-random');
+            const btnOpenBankPicker = document.getElementById('btn-open-bank-picker');
+            const bankTopicStatsText = document.getElementById('bank-topic-stats-text');
+
+            // Modal Bank Picker elements
+            const modalBankTasksPicker = document.getElementById('modal-bank-tasks-picker');
+            const modalBankTopicSelect = document.getElementById('modal-bank-topic-select');
+            const modalBankSearch = document.getElementById('modal-bank-search');
+            const btnBankSelectAll = document.getElementById('btn-bank-select-all');
+            const btnBankDeselectAll = document.getElementById('btn-bank-deselect-all');
+            const modalBankTasksList = document.getElementById('modal-bank-tasks-list');
+            const modalBankSelectedCount = document.getElementById('modal-bank-selected-count');
+            const btnConfirmAddBankTasks = document.getElementById('btn-confirm-add-bank-tasks');
+
             let constructorDraftTasks = [];
 
+            function loadDraftFromStorage() {
+                try {
+                    const raw = localStorage.getItem('teacher_hw_draft_tasks');
+                    if (raw) {
+                        const list = JSON.parse(raw);
+                        if (Array.isArray(list) && list.length > 0) {
+                            constructorDraftTasks = list;
+                        }
+                    }
+                } catch(e) {
+                    console.error('Error loading draft tasks from storage', e);
+                }
+            }
+
+            function saveDraftToStorage() {
+                try {
+                    if (constructorDraftTasks && constructorDraftTasks.length > 0) {
+                        localStorage.setItem('teacher_hw_draft_tasks', JSON.stringify(constructorDraftTasks));
+                    } else {
+                        localStorage.removeItem('teacher_hw_draft_tasks');
+                    }
+                } catch(e) {
+                    console.error('Error saving draft tasks to storage', e);
+                }
+            }
+
             async function loadConstructor() {
+                loadDraftFromStorage();
+                initBankTopics();
                 try {
                     const res = await fetch('/api/teacher/classes', { cache: 'no-store' });
                     const data = await res.json();
@@ -3463,6 +3588,7 @@
                             Задачи ещё не добавлены.<br>Используйте генератор слева для быстрого наполнения.
                         </div>
                     `;
+                    saveDraftToStorage();
                     return;
                 }
 
@@ -3479,7 +3605,8 @@
                         </div>
                         <div class="draft-task-footer">
                             <span class="draft-task-ans">Ответ: ${escapeHtml(cleanDisplayAnswer(t.displayAnswer || t.answer))}</span>
-                            ${t.solutionSteps ? `<span style="color:var(--muted); font-size:0.75rem;">Шагов разбора: ${t.solutionSteps.length}</span>` : ''}
+                            ${t.unit ? `<span style="color:var(--muted); font-size:0.75rem;">Ед. изм.: ${escapeHtml(t.unit)}</span>` : ''}
+                            ${t.solutionSteps && t.solutionSteps.length ? `<span style="color:var(--muted); font-size:0.75rem;">Шагов разбора: ${t.solutionSteps.length}</span>` : ''}
                         </div>
                     </div>
                 `).join('');
@@ -3492,6 +3619,8 @@
                         renderConstructorDraft();
                     });
                 });
+
+                saveDraftToStorage();
             }
 
             if (btnClearDraftTasks) {
@@ -3499,6 +3628,7 @@
                     if (constructorDraftTasks.length === 0) return;
                     if (confirm('Очистить все добавленные задачи из текущего черновика?')) {
                         constructorDraftTasks = [];
+                        saveDraftToStorage();
                         renderConstructorDraft();
                     }
                 });
@@ -3762,6 +3892,7 @@
                         if (data.success) {
                             showToast('Домашнее задание успешно опубликовано!');
                             constructorDraftTasks = [];
+                            saveDraftToStorage();
                             hwInputTitle.value = '';
                             hwInputDesc.value = '';
                             if (hwTargetStudent) {
@@ -3780,6 +3911,344 @@
                     }
                 });
             }
+
+            // -------------------------------------------------------------------------
+            // Bank of Tasks Integration & Manual Picker
+            // -------------------------------------------------------------------------
+            function populateBankTopicSelect(selectEl, selectedId) {
+                if (!selectEl || !window.BankTasksData || !Array.isArray(window.BankTasksData.topics)) return;
+                const topics = window.BankTasksData.topics;
+
+                const physicsTests = topics.filter(t => t.subject === 'physics' && t.isTest);
+                const physicsProblems = topics.filter(t => t.subject === 'physics' && !t.isTest);
+                const mathTopics = topics.filter(t => t.subject === 'math');
+                const englishTopics = topics.filter(t => t.subject === 'english');
+                const otherTopics = topics.filter(t => t.subject !== 'physics' && t.subject !== 'math' && t.subject !== 'english');
+
+                let html = '<option value="">-- Выберите тему из Банка задач --</option>';
+
+                if (physicsTests.length > 0) {
+                    html += '<optgroup label="⚡ Физика 8 класс · Тестирования (по 15 вопросов)">';
+                    physicsTests.forEach(t => {
+                        const sel = t.id === selectedId ? 'selected' : '';
+                        html += `<option value="${t.id}" ${sel}>[Тест] ${escapeHtml(t.title)} (${t.tasks.length} вопр.)</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                if (physicsProblems.length > 0) {
+                    html += '<optgroup label="🔬 Физика 7, 9, 10 классы · Задачи">';
+                    physicsProblems.forEach(t => {
+                        const sel = t.id === selectedId ? 'selected' : '';
+                        html += `<option value="${t.id}" ${sel}>${escapeHtml(t.title)} (${t.tasks.length} зад.)</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                if (mathTopics.length > 0) {
+                    html += '<optgroup label="📐 Математика · Задачи и вычисления">';
+                    mathTopics.forEach(t => {
+                        const sel = t.id === selectedId ? 'selected' : '';
+                        html += `<option value="${t.id}" ${sel}>${escapeHtml(t.title)} (${t.tasks.length} зад.)</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                if (englishTopics.length > 0) {
+                    html += '<optgroup label="🇬🇧 Английский язык">';
+                    englishTopics.forEach(t => {
+                        const sel = t.id === selectedId ? 'selected' : '';
+                        html += `<option value="${t.id}" ${sel}>${escapeHtml(t.title)} (${t.tasks.length} зад.)</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                if (otherTopics.length > 0) {
+                    html += '<optgroup label="📚 Другие темы">';
+                    otherTopics.forEach(t => {
+                        const sel = t.id === selectedId ? 'selected' : '';
+                        html += `<option value="${t.id}" ${sel}>${escapeHtml(t.title)} (${t.tasks.length} зад.)</option>`;
+                    });
+                    html += '</optgroup>';
+                }
+
+                selectEl.innerHTML = html;
+            }
+
+            function updateBankTopicStats() {
+                if (!bankTopicSelect || !bankTopicStatsText) return;
+                const tid = bankTopicSelect.value;
+                if (!tid || !window.BankTasksData) {
+                    bankTopicStatsText.textContent = 'Выберите тему для просмотра';
+                    return;
+                }
+                const topic = window.BankTasksData.getTopicById(tid);
+                if (!topic) {
+                    bankTopicStatsText.textContent = '';
+                    return;
+                }
+                const typeLabel = topic.isTest ? 'тестовых вопросов' : 'заданий';
+                bankTopicStatsText.innerHTML = `В теме: <strong>${topic.tasks.length}</strong> ${typeLabel} · Класс: <strong>${escapeHtml(topic.class || 'Все')}</strong>`;
+            }
+
+            let bankTopicsInitialized = false;
+            function initBankTopics() {
+                if (bankTopicsInitialized) return;
+                if (!window.BankTasksData) return;
+                bankTopicsInitialized = true;
+                populateBankTopicSelect(bankTopicSelect);
+                updateBankTopicStats();
+            }
+
+            if (bankTopicSelect) {
+                bankTopicSelect.addEventListener('change', () => {
+                    updateBankTopicStats();
+                    const tid = bankTopicSelect.value;
+                    if (tid && window.BankTasksData) {
+                        const topic = window.BankTasksData.getTopicById(tid);
+                        if (topic && hwInputSubject) {
+                            if (topic.subject === 'physics') {
+                                hwInputSubject.value = 'Физика';
+                            } else if (topic.subject === 'english') {
+                                hwInputSubject.value = 'Английский язык';
+                            } else if (topic.subject === 'math') {
+                                hwInputSubject.value = 'Математика';
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (btnAddBankRandom) {
+                btnAddBankRandom.addEventListener('click', () => {
+                    const tid = bankTopicSelect ? bankTopicSelect.value : '';
+                    if (!tid) {
+                        alert('Пожалуйста, выберите тему из Банка задач.');
+                        if (bankTopicSelect) bankTopicSelect.focus();
+                        return;
+                    }
+                    if (!window.BankTasksData || !window.BankTasksRunner) {
+                        alert('Модуль Банка задач ещё загружается...');
+                        return;
+                    }
+                    const topic = window.BankTasksData.getTopicById(tid);
+                    if (!topic || !Array.isArray(topic.tasks) || topic.tasks.length === 0) {
+                        alert('В выбранной теме нет заданий.');
+                        return;
+                    }
+
+                    const count = Math.max(1, Math.min(topic.tasks.length, parseInt(bankTasksCount.value, 10) || 3));
+                    const existingBankIds = new Set(constructorDraftTasks.map(t => t.bankTaskId || t.id));
+                    const available = topic.tasks.filter(t => !existingBankIds.has(t.id));
+
+                    if (available.length === 0) {
+                        alert('Все задания из этой темы уже добавлены в ваше текущее домашнее задание!');
+                        return;
+                    }
+
+                    const shuffled = [...available].sort(() => 0.5 - Math.random());
+                    const toAdd = shuffled.slice(0, count);
+
+                    const converted = toAdd.map(t => window.BankTasksRunner.convertBankTaskToHomeworkTask(t, topic));
+                    constructorDraftTasks = constructorDraftTasks.concat(converted);
+                    renderConstructorDraft();
+                    showToast(`Добавлено ${converted.length} зад. из темы «${topic.title}»`);
+                });
+            }
+
+            // --- Manual Task Picker Modal Logic ---
+            let pickerCurrentTopic = null;
+            let pickerSelectedTaskIds = new Set();
+
+            function openBankPickerModal(topicId) {
+                if (!modalBankTasksPicker || !window.BankTasksData) return;
+                const defaultTid = topicId || (bankTopicSelect ? bankTopicSelect.value : '') || (window.BankTasksData.topics[0] ? window.BankTasksData.topics[0].id : '');
+                populateBankTopicSelect(modalBankTopicSelect, defaultTid);
+                if (modalBankTopicSelect) {
+                    modalBankTopicSelect.value = defaultTid;
+                }
+                loadPickerTopic(defaultTid);
+                if (modalBankSearch) modalBankSearch.value = '';
+                modalBankTasksPicker.showModal();
+            }
+
+            function loadPickerTopic(topicId) {
+                pickerSelectedTaskIds.clear();
+                pickerCurrentTopic = window.BankTasksData ? window.BankTasksData.getTopicById(topicId) : null;
+                const subtitle = document.getElementById('bank-picker-topic-subtitle');
+                if (subtitle && pickerCurrentTopic) {
+                    subtitle.textContent = `${pickerCurrentTopic.title} · ${pickerCurrentTopic.tasks.length} заданий (Класс: ${pickerCurrentTopic.class || 'Все'})`;
+                }
+                renderPickerTasks();
+            }
+
+            function renderPickerTasks() {
+                if (!modalBankTasksList) return;
+                if (!pickerCurrentTopic || !Array.isArray(pickerCurrentTopic.tasks) || pickerCurrentTopic.tasks.length === 0) {
+                    modalBankTasksList.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--muted);">В этой теме пока нет заданий</div>';
+                    updatePickerSelectionCount();
+                    return;
+                }
+
+                const searchQuery = modalBankSearch ? modalBankSearch.value.trim().toLowerCase() : '';
+                const existingBankIds = new Set(constructorDraftTasks.map(t => t.bankTaskId || t.id));
+
+                let visibleTasks = pickerCurrentTopic.tasks;
+                if (searchQuery) {
+                    visibleTasks = visibleTasks.filter(t => {
+                        const raw = ((t.text || '') + ' ' + (t.html || '') + ' ' + (t.title || '') + ' ' + (t.explanation || '')).toLowerCase();
+                        return raw.includes(searchQuery);
+                    });
+                }
+
+                if (visibleTasks.length === 0) {
+                    modalBankTasksList.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--muted);">Ничего не найдено по вашему поисковому запросу</div>';
+                    updatePickerSelectionCount();
+                    return;
+                }
+
+                modalBankTasksList.innerHTML = visibleTasks.map((t, idx) => {
+                    const isAlreadyInDraft = existingBankIds.has(t.id);
+                    const isChecked = pickerSelectedTaskIds.has(t.id);
+                    const itemBg = isAlreadyInDraft ? 'rgba(255, 255, 255, 0.02)' : 'var(--surface-card)';
+                    const itemBorder = isChecked ? 'var(--accent-cyan)' : 'var(--line)';
+
+                    let previewText = t.html ? t.html : (t.text || '');
+                    if (previewText.length > 250) {
+                        previewText = previewText.slice(0, 250) + '...';
+                    }
+
+                    let optionsPreview = '';
+                    if (t.options && Array.isArray(t.options)) {
+                        const letters = ['А', 'Б', 'В', 'Г'];
+                        optionsPreview = `
+                            <div style="margin-top:6px; font-size:0.8rem; color:var(--muted); display:flex; flex-wrap:wrap; gap:8px;">
+                                ${t.options.map((opt, i) => `<span><strong style="color:var(--ink);">${letters[i] || (i+1)})</strong> ${escapeHtml(opt)}</span>`).join('')}
+                            </div>
+                        `;
+                    }
+
+                    let thumbHtml = '';
+                    if (t.image) {
+                        const cleanPath = t.image.replace(/^(\.\.\/|\.\/)+/, '');
+                        thumbHtml = `<img src="${cleanPath}" alt="" style="width:54px; height:54px; object-fit:cover; border-radius:6px; border:1px solid var(--line); flex-shrink:0;">`;
+                    }
+
+                    return `
+                        <div class="bank-picker-task-card" data-task-id="${t.id}" style="display:flex; gap:12px; align-items:flex-start; padding:10px 14px; background:${itemBg}; border:1px solid ${itemBorder}; border-radius:var(--r-sm); opacity:${isAlreadyInDraft ? 0.6 : 1};">
+                            <input type="checkbox" class="bank-picker-cb" data-task-id="${t.id}" ${isAlreadyInDraft ? 'disabled' : ''} ${isChecked ? 'checked' : ''} style="margin-top:4px; width:18px; height:18px; cursor:${isAlreadyInDraft ? 'default' : 'pointer'}; accent-color:var(--accent-cyan);">
+                            ${thumbHtml}
+                            <div style="flex:1; min-width:0;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
+                                    <span style="font-weight:700; font-size:0.88rem; color:var(--ink);">
+                                        №${t.num || idx + 1}. ${escapeHtml(t.title || 'Задание')}
+                                    </span>
+                                    ${isAlreadyInDraft ? '<span style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700;">✓ Уже в Д/З</span>' : ''}
+                                </div>
+                                <div style="font-size:0.84rem; color:var(--ink); line-height:1.4;">${previewText}</div>
+                                ${optionsPreview}
+                                ${t.unit ? `<div style="font-size:0.78rem; color:var(--muted); margin-top:4px;">Ед. изм.: <strong>${escapeHtml(t.unit)}</strong></div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                modalBankTasksList.querySelectorAll('.bank-picker-cb').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const tid = cb.getAttribute('data-task-id');
+                        if (cb.checked) {
+                            pickerSelectedTaskIds.add(tid);
+                        } else {
+                            pickerSelectedTaskIds.delete(tid);
+                        }
+                        const card = cb.closest('.bank-picker-task-card');
+                        if (card) {
+                            card.style.borderColor = cb.checked ? 'var(--accent-cyan)' : 'var(--line)';
+                        }
+                        updatePickerSelectionCount();
+                    });
+                });
+
+                updatePickerSelectionCount();
+            }
+
+            function updatePickerSelectionCount() {
+                if (modalBankSelectedCount) {
+                    modalBankSelectedCount.textContent = pickerSelectedTaskIds.size;
+                }
+            }
+
+            if (btnOpenBankPicker) {
+                btnOpenBankPicker.addEventListener('click', () => {
+                    const tid = bankTopicSelect ? bankTopicSelect.value : '';
+                    openBankPickerModal(tid);
+                });
+            }
+
+            if (modalBankTopicSelect) {
+                modalBankTopicSelect.addEventListener('change', () => {
+                    loadPickerTopic(modalBankTopicSelect.value);
+                });
+            }
+
+            if (modalBankSearch) {
+                modalBankSearch.addEventListener('input', () => {
+                    renderPickerTasks();
+                });
+            }
+
+            if (btnBankSelectAll) {
+                btnBankSelectAll.addEventListener('click', () => {
+                    if (!pickerCurrentTopic || !modalBankTasksList) return;
+                    modalBankTasksList.querySelectorAll('.bank-picker-cb:not(:disabled)').forEach(cb => {
+                        const tid = cb.getAttribute('data-task-id');
+                        cb.checked = true;
+                        pickerSelectedTaskIds.add(tid);
+                        const card = cb.closest('.bank-picker-task-card');
+                        if (card) card.style.borderColor = 'var(--accent-cyan)';
+                    });
+                    updatePickerSelectionCount();
+                });
+            }
+
+            if (btnBankDeselectAll) {
+                btnBankDeselectAll.addEventListener('click', () => {
+                    if (!modalBankTasksList) return;
+                    modalBankTasksList.querySelectorAll('.bank-picker-cb').forEach(cb => {
+                        const tid = cb.getAttribute('data-task-id');
+                        cb.checked = false;
+                        pickerSelectedTaskIds.delete(tid);
+                        const card = cb.closest('.bank-picker-task-card');
+                        if (card) card.style.borderColor = 'var(--line)';
+                    });
+                    updatePickerSelectionCount();
+                });
+            }
+
+            if (btnConfirmAddBankTasks) {
+                btnConfirmAddBankTasks.addEventListener('click', () => {
+                    if (pickerSelectedTaskIds.size === 0) {
+                        alert('Пожалуйста, отметьте галочками хотя бы одну задачу.');
+                        return;
+                    }
+                    if (!pickerCurrentTopic || !window.BankTasksRunner) return;
+
+                    const tasksToAdd = pickerCurrentTopic.tasks.filter(t => pickerSelectedTaskIds.has(t.id));
+                    const converted = tasksToAdd.map(t => window.BankTasksRunner.convertBankTaskToHomeworkTask(t, pickerCurrentTopic));
+
+                    constructorDraftTasks = constructorDraftTasks.concat(converted);
+                    renderConstructorDraft();
+                    modalBankTasksPicker.close();
+                    showToast(`Добавлено ${converted.length} задач в черновик Д/З!`);
+                });
+            }
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'teacher_hw_draft_tasks') {
+                    loadDraftFromStorage();
+                    renderConstructorDraft();
+                }
+            });
 
 
             // =========================================================================

@@ -70,11 +70,11 @@
     .filter-icon i:nth-child(2) { width: 13px; margin-left: 3px; }
     .filter-icon i:nth-child(3) { width: 7px; margin-left: 6px; }
 
-    .filter-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 16px; margin-top: 12px; padding: 19px; border: 1px solid var(--line); border-radius: 4px; background: rgba(255, 250, 240, .94); box-shadow: 0 10px 28px rgba(33, 74, 64, .08); }
+    .filter-panel { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 14px; margin-top: 12px; padding: 19px; border: 1px solid var(--line); border-radius: 4px; background: rgba(255, 250, 240, .94); box-shadow: 0 10px 28px rgba(33, 74, 64, .08); }
     .filter-field { display: grid; min-width: 0; gap: 7px; }
     .filter-field label { color: #58736a; font-size: 12px; font-weight: 800; }
-    .filter-field select { width: 100%; min-height: 42px; padding: 0 35px 0 12px; border: 1px solid var(--line); border-radius: 3px; background: #fffdf7; color: var(--ink); font: 700 13px 'Nunito', sans-serif; }
-    .filter-actions { display: flex; grid-column: 1 / -1; align-items: center; justify-content: flex-end; gap: 10px; }
+    .filter-field select { width: 100%; min-height: 42px; padding: 0 30px 0 12px; border: 1px solid var(--line); border-radius: 3px; background: #fffdf7; color: var(--ink); font: 700 13px 'Nunito', sans-serif; }
+    .filter-actions { display: flex; grid-column: 1 / -1; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 6px; }
     .apply-button { min-height: 42px; padding: 0 17px; border: 1px solid var(--forest); border-radius: 3px; background: var(--forest); color: var(--cream); font: 800 13px 'Nunito', sans-serif; cursor: pointer; transition: background .2s ease; }
     .apply-button:hover { background: #326253; }
     .reset-button { min-height: 42px; padding: 0 12px; border: 0; background: transparent; color: #58736a; font: 800 12px 'Nunito', sans-serif; cursor: pointer; white-space: nowrap; }
@@ -87,19 +87,25 @@
 
     .task-card { display: flex; min-width: 0; min-height: 224px; flex-direction: column; padding: 19px; border: 1px solid rgba(33, 74, 64, .14); border-radius: 4px; background: rgba(255, 250, 240, .85); box-shadow: 0 4px 15px rgba(33, 74, 64, .04); transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
     .task-card:hover { transform: translateY(-3px); border-color: rgba(33, 74, 64, .38); box-shadow: 0 10px 24px rgba(33, 74, 64, .1); }
-    .card-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #698078; font-size: 11px; font-weight: 800; }
+    .card-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; color: #698078; font-size: 11px; font-weight: 800; }
+    .card-meta-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .subject-label { display: inline-flex; align-items: center; gap: 7px; color: var(--forest); }
     .subject-label::before { width: 7px; height: 7px; border-radius: 50%; background: #c89138; content: ''; }
     .difficulty { padding: 4px 8px; border-radius: 2px; background: #edf0dd; color: #526d5c; white-space: nowrap; }
     .difficulty[data-level="medium"] { background: #f5e8c5; color: #775d2d; }
     .difficulty[data-level="hard"] { background: #f2ddd0; color: #8b503d; }
-    .task-card h3 { margin: 17px 0 7px; color: var(--forest-dark); font: 700 19px/1.25 'Playfair Display', Georgia, serif; }
+    .test-badge-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0369a1; border: 1px solid rgba(3, 105, 161, 0.25); white-space: nowrap; }
+
+    .task-card h3 { margin: 15px 0 7px; color: var(--forest-dark); font: 700 19px/1.25 'Playfair Display', Georgia, serif; }
     .task-card p { margin: 0; color: #687d75; font-size: 13px; line-height: 1.55; }
-    .card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 18px; }
+    .card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 18px; flex-wrap: wrap; }
     .class-label { color: #80918a; font-size: 11px; font-weight: 800; }
-    .task-link { display: inline-flex; min-height: 34px; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--forest); font: 800 12px 'Nunito', sans-serif; text-decoration: none; cursor: pointer; }
-    .task-link:hover { color: #a75a31; }
-    .task-link span { font-size: 16px; }
+    .card-actions { display: flex; align-items: center; gap: 8px; }
+    .task-link { display: inline-flex; min-height: 38px; align-items: center; gap: 6px; padding: 4px 12px; border: 1px solid rgba(33, 74, 64, 0.2); border-radius: 4px; background: rgba(33, 74, 64, 0.05); color: var(--forest); font: 800 12px 'Nunito', sans-serif; text-decoration: none; cursor: pointer; transition: all .15s ease; white-space: nowrap; }
+    .task-link:hover { color: #fff; background: var(--forest); border-color: var(--forest); }
+    .task-link span { font-size: 14px; }
+    .task-secondary-link { background: transparent !important; color: #58736a !important; border-color: rgba(33, 74, 64, 0.2) !important; padding: 4px 8px !important; }
+    .task-secondary-link:hover { background: rgba(33, 74, 64, 0.08) !important; color: var(--forest) !important; }
 
     .empty-state { padding: 48px 20px; border: 1px dashed rgba(33, 74, 64, .28); color: #71847d; text-align: center; }
     .empty-state strong { display: block; margin-bottom: 7px; color: var(--forest); font: 700 20px 'Playfair Display', Georgia, serif; }
@@ -107,10 +113,13 @@
     .page-footer a { color: var(--forest); font-weight: 800; text-decoration: none; }
     .page-footer a:hover { color: #a75a31; }
 
+    @media (max-width: 950px) {
+      .filter-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
     @media (max-width: 850px) {
       main { width: min(100% - 40px, 700px); padding-top: 48px; }
       .task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .filter-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width: 560px) {
@@ -131,6 +140,9 @@
       .results-bar { align-items: flex-start; flex-direction: column; gap: 5px; margin-top: 25px; }
       .task-grid { grid-template-columns: 1fr; }
       .task-card { min-height: 190px; }
+      .card-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .card-actions { width: 100%; justify-content: space-between; }
+      .card-actions .task-link { flex: 1; justify-content: center; }
       .page-footer { align-items: flex-start; flex-direction: column; }
     }
 
@@ -149,14 +161,14 @@
     <header class="page-intro">
       <div class="eyebrow">Тренируйся в своём темпе</div>
       <h1>Каталог заданий</h1>
-      <p class="intro-copy">Найди нужную тему по названию или настрой фильтры по сложности, классу и предмету.</p>
+      <p class="intro-copy">Найди нужную тему по названию или настрой фильтры по сложности, классу, предмету и типу (задачи или тестирования).</p>
     </header>
 
     <section aria-label="Поиск и фильтры заданий">
       <div class="search-toolbar">
         <label class="search-box">
           <span class="search-mark" aria-hidden="true"></span>
-          <input id="task-search" type="search" placeholder="Поиск по теме или классу" autocomplete="off" />
+          <input id="task-search" type="search" placeholder="Поиск по теме, предмету, тестам или классу" autocomplete="off" />
         </label>
         <button class="filter-toggle" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel">
           <span class="filter-icon" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -194,6 +206,14 @@
             <option value="physics">Физика</option>
           </select>
         </div>
+        <div class="filter-field">
+          <label for="type-filter">Тип заданий</label>
+          <select id="type-filter">
+            <option value="">Все типы</option>
+            <option value="test">🧪 Только тестирования (15 заданий)</option>
+            <option value="task">Тренировочные задачи</option>
+          </select>
+        </div>
         <div class="filter-actions">
           <button class="reset-button" id="reset-filters" type="button">Сбросить</button>
           <button class="apply-button" id="apply-filters" type="button">Применить фильтр</button>
@@ -203,7 +223,7 @@
 
     <section aria-labelledby="results-heading">
       <div class="results-bar">
-        <h2 id="results-heading">Задания</h2>
+        <h2 id="results-heading">Задания и тестирования</h2>
         <span id="results-count" aria-live="polite"></span>
       </div>
       <div class="task-grid" id="task-grid"></div>
@@ -219,38 +239,10 @@
     </footer>
   </main>
 
+  <script src="js/physics_tests_8.js"></script>
+  <script src="js/bank_tasks_data.js"></script>
+  <script src="js/bank_tasks_runner.js"></script>
   <script>
-    const tasks = [
-      { subject: 'math', title: 'Задачи на умножение', class: '4', level: 'easy', description: 'Текстовые задачи на умножение и вычисления.', href: 'tasks/tasks.html#multiplication-section' },
-      { subject: 'math', title: 'Задачи на формулу пути', class: '4', level: 'easy', description: 'Находи путь, скорость и время движения.', href: 'tasks/tasks.html#way-section' },
-      { subject: 'math', title: 'Задачи на формулу стоимости', class: '4', level: 'medium', description: 'Рассчитывай стоимость, цену и количество.', href: 'tasks/tasks.html#cost-section' },
-      { subject: 'math', title: 'Доли и проценты', class: '4', level: 'medium', description: 'Задачи на доли, проценты и их сравнение.', href: 'tasks/tasks.html#shares-and-percentages' },
-      { subject: 'math', title: 'Решение выражений', class: '4', level: 'hard', description: 'Практика вычислений и порядка действий.', href: 'tasks/tasks.html#expressions-section' },
-      { subject: 'math', title: 'Десятичные дроби', class: '4', level: 'medium', description: 'Интерактивный тренажёр для практики с дробями.', href: 'math_moduls/decimal_fraction_trainer.html' },
-      { subject: 'math', title: 'Обыкновенные дроби', class: '4', level: 'medium', description: 'Интерактивный тренажёр: сложение, вычитание, умножение, деление, сокращение, выделение целой части и перевод в десятичные дроби.', href: 'math_moduls/common_fraction_trainer.html' },
-      { subject: 'math', title: 'Уравнения', class: '4', level: 'medium', description: 'Тренажёр уравнений с подбором уровня.', href: 'math_moduls/equations_trainer_easy.html' },
-      { subject: 'english', title: 'Повторение времён', class: '4', level: 'medium', description: 'Десять интерактивных заданий по английской грамматике.', href: 'pages/english_lessons/lesson_1.html' },
-      { subject: 'english', title: 'Units of Measurement', class: '4', level: 'medium', description: 'Урок с упражнениями на английские названия единиц измерения.', href: 'pages/english_lessons/lesson_2.html' },
-      { subject: 'physics', title: 'Физические величины и измерения', class: '7', level: 'easy', description: 'Измерения, единицы величин и работа со шкалами приборов.' },
-      { subject: 'physics', title: 'Механическое движение', class: '7', level: 'easy', description: 'Путь, время и траектория движения тел.' },
-      { subject: 'physics', title: 'Скорость и равномерное движение', class: '7', level: 'medium', description: 'Расчёт скорости и задачи на движение.' },
-      { subject: 'physics', title: 'Силы и закон Гука', class: '7', level: 'medium', description: 'Сила упругости, трение и сила тяжести.' },
-      { subject: 'physics', title: 'Давление и сила Архимеда', class: '7', level: 'hard', description: 'Давление в жидкостях и условия плавания тел.' },
-      { subject: 'physics', title: 'Тепловое движение и внутренняя энергия', class: '8', level: 'easy', description: 'Нагревание, теплопередача и изменение внутренней энергии.' },
-      { subject: 'physics', title: 'Количество теплоты и теплоёмкость', class: '8', level: 'medium', description: 'Расчёты нагревания и смешивания веществ.' },
-      { subject: 'physics', title: 'Электрический ток и закон Ома', class: '8', level: 'medium', description: 'Сила тока, напряжение и сопротивление.' },
-      { subject: 'physics', title: 'Электрические цепи и работа тока', class: '8', level: 'hard', description: 'Соединение резисторов и расчёт электроэнергии.' },
-      { subject: 'physics', title: 'Равноускоренное движение', class: '9', level: 'easy', description: 'Ускорение и путь тела за заданное время.' },
-      { subject: 'physics', title: 'Законы Ньютона', class: '9', level: 'medium', description: 'Равнодействующая сил и движение тел.' },
-      { subject: 'physics', title: 'Импульс и закон его сохранения', class: '9', level: 'hard', description: 'Импульс тела и взаимодействие в замкнутой системе.' },
-      { subject: 'physics', title: 'Механическая энергия', class: '9', level: 'hard', description: 'Кинетическая и потенциальная энергия.' },
-      { subject: 'physics', title: 'Кинематика и динамика', class: '10-11', level: 'medium', description: 'Движение тела и ускорение под действием сил.' },
-      { subject: 'physics', title: 'Законы сохранения в механике', class: '10-11', level: 'hard', description: 'Импульс и механическая энергия системы.' },
-      { subject: 'physics', title: 'Электростатическое поле', class: '10-11', level: 'hard', description: 'Напряжённость поля и потенциальная энергия зарядов.' },
-      { subject: 'physics', title: 'Колебания и электромагнитные волны', class: '10-11', level: 'medium', description: 'Колебательный контур, период и длина волны.' },
-      { subject: 'physics', title: 'Квантовая физика', class: '10-11', level: 'hard', description: 'Фотоэффект, энергия фотона и строение ядра.' },
-    ];
-
     const difficultyLabels = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
     const subjectLabels = { math: 'Математика', english: 'Английский', physics: 'Физика' };
     const taskGrid = document.getElementById('task-grid');
@@ -258,44 +250,85 @@
     const difficultyFilter = document.getElementById('difficulty-filter');
     const classFilter = document.getElementById('class-filter');
     const subjectFilter = document.getElementById('subject-filter');
+    const typeFilter = document.getElementById('type-filter');
     const filterToggle = document.getElementById('filter-toggle');
     const filterPanel = document.getElementById('filter-panel');
     const resultsCount = document.getElementById('results-count');
     const emptyState = document.getElementById('empty-state');
-    const appliedFilters = { difficulty: '', class: '', subject: '' };
+    const appliedFilters = { difficulty: '', class: '', subject: '', type: '' };
 
     function normalize(value) {
       return value.toLocaleLowerCase('ru').replaceAll('ё', 'е').trim();
     }
 
+    function getTopicList() {
+      if (typeof BankTasksData !== 'undefined' && Array.isArray(BankTasksData.topics)) {
+        return BankTasksData.topics;
+      }
+      return [];
+    }
+
     function renderTasks() {
       const query = normalize(taskSearch.value);
-      const visibleTasks = tasks.filter(task => {
-        const matchesSearch = normalize(`${task.title} ${task.description} ${task.class} ${subjectLabels[task.subject]}`).includes(query);
+      const allTopics = getTopicList();
+      const visibleTasks = allTopics.filter(task => {
+        const sLabel = subjectLabels[task.subject] || task.subjectLabel || '';
+        const searchTags = `${task.title} ${task.description || ''} ${task.class} ${sLabel} ${task.isTest ? 'тест тестирование физика 8' : ''}`;
+        const matchesSearch = normalize(searchTags).includes(query);
         return matchesSearch
           && (!appliedFilters.difficulty || task.level === appliedFilters.difficulty)
           && (!appliedFilters.class || task.class === appliedFilters.class)
-          && (!appliedFilters.subject || task.subject === appliedFilters.subject);
+          && (!appliedFilters.subject || task.subject === appliedFilters.subject)
+          && (!appliedFilters.type || (appliedFilters.type === 'test' ? task.isTest : !task.isTest));
       });
 
-      taskGrid.innerHTML = visibleTasks.map(task => `
-        <article class="task-card">
-          <div class="card-meta">
-            <span class="subject-label">${subjectLabels[task.subject]}</span>
-            <span class="difficulty" data-level="${task.level}">${difficultyLabels[task.level]}</span>
-          </div>
-          <h3>${task.title}</h3>
-          <p>${task.description}</p>
-          <div class="card-bottom">
-            <span class="class-label">${task.class === '10-11' ? '10–11' : task.class} класс</span>
-            <a class="task-link" href="${task.href || `pages/physics/tasks/index.html?grade=${task.class}`}">Открыть задания <span aria-hidden="true">↗</span></a>
-          </div>
-        </article>`).join('');
+      taskGrid.innerHTML = visibleTasks.map(task => {
+        const taskCount = task.tasks ? task.tasks.length : 0;
+        const sLabel = subjectLabels[task.subject] || task.subjectLabel || 'Задания';
+        const dLabel = difficultyLabels[task.level] || 'Средний';
+        const isTest = Boolean(task.isTest);
+
+        return `
+          <article class="task-card" data-card-topic-id="${task.id}">
+            <div class="card-meta">
+              <div class="card-meta-left">
+                <span class="subject-label">${sLabel}</span>
+                <span class="difficulty" data-level="${task.level}">${dLabel}</span>
+              </div>
+              ${isTest ? '<span class="test-badge-pill">🧪 Тестирование</span>' : ''}
+            </div>
+            <h3>${task.title}</h3>
+            <p>${task.description || ''}</p>
+            <div class="card-bottom">
+              <span class="class-label">${task.class === '10-11' ? '10–11' : task.class} класс • ${taskCount} ${taskCount === 1 ? 'задание' : (taskCount < 5 ? 'задания' : 'заданий')}</span>
+              <div class="card-actions">
+                <button type="button" class="task-link btn-open-topic" data-topic-id="${task.id}" aria-label="Открыть ${task.title}">
+                  ${isTest ? 'Пройти тест (15)' : 'Открыть задания'} <span aria-hidden="true">▶</span>
+                </button>
+                ${task.testUrl ? `<a class="task-link task-secondary-link" href="${task.testUrl}" title="Пройти тестирование с таймером в режиме экзамена">На время ↗</a>` : ''}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
 
       resultsCount.textContent = `Найдено: ${visibleTasks.length}`;
       emptyState.hidden = visibleTasks.length !== 0;
       taskGrid.hidden = visibleTasks.length === 0;
+
+      if (window.BankTasksRunner) {
+        window.BankTasksRunner.updateTopicCardBadges();
+      }
     }
+
+    taskGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-open-topic');
+      if (!btn) return;
+      const topicId = btn.dataset.topicId;
+      if (topicId && window.BankTasksRunner) {
+        window.BankTasksRunner.openTopicModal(topicId);
+      }
+    });
 
     filterToggle.addEventListener('click', () => {
       const isExpanded = filterToggle.getAttribute('aria-expanded') === 'true';
@@ -309,6 +342,7 @@
       appliedFilters.difficulty = difficultyFilter.value;
       appliedFilters.class = classFilter.value;
       appliedFilters.subject = subjectFilter.value;
+      appliedFilters.type = typeFilter.value;
       renderTasks();
     });
 
@@ -317,9 +351,11 @@
       difficultyFilter.value = '';
       classFilter.value = '';
       subjectFilter.value = '';
+      typeFilter.value = '';
       appliedFilters.difficulty = '';
       appliedFilters.class = '';
       appliedFilters.subject = '';
+      appliedFilters.type = '';
       renderTasks();
       taskSearch.focus();
     });
