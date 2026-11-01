@@ -181,6 +181,59 @@
   .back-link { display: inline-block; margin-top: 34px; color: var(--text2); font-size: 14px; text-decoration: none; }
   .back-link:hover, .back-link:focus-visible { color: var(--grade-color, var(--accent)); }
   .empty-state { padding: 32px; border: 1px solid var(--border); border-radius: 16px; color: var(--text2); text-align: center; }
+
+  /* Theory Full Notes Button */
+  .theory-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .theory-dialog-footer[hidden] {
+    display: none !important;
+  }
+  .theory-notes-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 10px;
+    border: 1px solid var(--grade-color, var(--accent));
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(59, 130, 246, 0.22));
+    color: var(--text);
+    font: 700 14px/1.2 Raleway, sans-serif;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+  .theory-notes-btn:hover {
+    background: var(--grade-color, var(--accent));
+    color: #050c1a;
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35);
+    transform: translateY(-1px);
+  }
+  .theory-notes-btn:active {
+    transform: translateY(0);
+  }
+  .theory-notes-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+  @media (max-width: 600px) {
+    .theory-dialog-footer {
+      justify-content: stretch;
+    }
+    .theory-notes-btn {
+      width: 100%;
+    }
+  }
   @media (max-width: 700px) {
     nav { padding: 0 20px; }
     .nav-links { gap: 16px; }
@@ -677,6 +730,12 @@
         </ul>
       </section>
     </div>
+    <div class="theory-dialog-footer" id="theory-dialog-footer" hidden>
+      <a class="theory-notes-btn" id="theory-notes-link" href="#" target="_blank" rel="noopener noreferrer">
+        <span class="theory-notes-icon">📄</span>
+        <span>Смотреть конспект полностью ↗</span>
+      </a>
+    </div>
   </div>
 </dialog>
 
@@ -809,7 +868,10 @@ const gradeCatalogs = {
 
 const topicTheories = {
   '7': [
-    { description: 'Физические величины описывают свойства тел и явлений. Результат измерения сравнивают с единицей измерения; цену деления шкалы находят, разделив разность соседних подписанных отметок на число промежутков.', formula: 'V = abc; цена деления = разность отметок / число делений' },
+    { 
+      description: 'Физические величины описывают свойства тел и явлений. Результат измерения сравнивают с единицей измерения; цену деления шкалы находят, разделив разность соседних подписанных отметок на число промежутков.',
+      formula: 'V = abc; цена деления = разность отметок / число делений'
+    },
     { description: 'Механическое движение: изменение положения тела относительно выбранного тела отсчёта с течением времени. Траектория: линия движения, а путь: её длина.', formula: 'Путь s измеряется в метрах (м)' },
     { description: 'При равномерном движении тело за равные промежутки времени проходит одинаковые пути. Скорость показывает, какой путь пройден за единицу времени.', formula: 'v = s / t; s = vt' },
     { description: 'Инерция: явление сохранения телом покоя или равномерного прямолинейного движения, если действия других тел скомпенсированы. Изменить скорость можно только взаимодействием.', formula: 'Если равнодействующая сил равна нулю, скорость не меняется' },
@@ -819,12 +881,36 @@ const topicTheories = {
     { description: 'В неподвижной жидкости давление растёт с глубиной. На погружённое тело действует выталкивающая сила, равная весу вытесненной жидкости.', formula: 'p = ρgh; F<sub>А</sub> = ρgV' },
   ],
   '8': [
-    { description: 'Внутренняя энергия складывается из энергии хаотического движения и взаимодействия частиц. Она меняется при теплопередаче и совершении работы.', formula: 'ΔU = Q + A<sub>внешних сил</sub>' },
-    { description: 'Количество теплоты зависит от массы тела, вещества и изменения температуры. Удельная теплоёмкость показывает, сколько энергии нужно для нагрева 1 кг вещества на 1 °C.', formula: 'Q = cmΔT' },
-    { description: 'Закон Ньютона–Рихмана описывает теплообмен тела со средой: мощность теплоотдачи пропорциональна площади поверхности и разности температур.', formula: 'Q̇ = αS(T<sub>пов</sub> − T<sub>ср</sub>)', richman: true },
-    { description: 'Во время плавления температура чистого кристаллического вещества остаётся постоянной. Полученная энергия идёт на разрушение кристаллической решётки.', formula: 'Q = λm' },
-    { description: 'Испарение происходит с поверхности жидкости при любой температуре, а кипение: по всему объёму при температуре кипения. При конденсации пар отдаёт энергию.', formula: 'Q = Lm' },
-    { description: 'Одноимённые электрические заряды отталкиваются, разноимённые притягиваются. Сила взаимодействия зависит от зарядов и расстояния между ними.', formula: 'F = k|q<sub>1</sub>q<sub>2</sub>| / r²' },
+    {
+      description: 'Внутренняя энергия складывается из энергии хаотического движения и взаимодействия частиц. Она меняется при теплопередаче и совершении работы.',
+      formula: 'ΔU = Q + A<sub>внешних сил</sub>',
+      notesUrl: 'https://drive.google.com/file/d/1SzCITPvYLkWHQEF4FhLti5_ovawXltM9/view?usp=sharing'
+    },
+    {
+      description: 'Количество теплоты зависит от массы тела, вещества и изменения температуры. Удельная теплоёмкость показывает, сколько энергии нужно для нагрева 1 кг вещества на 1 °C.',
+      formula: 'Q = cmΔT',
+      notesUrl: 'https://drive.google.com/file/d/1SzCITPvYLkWHQEF4FhLti5_ovawXltM9/view?usp=sharing'
+    },
+    {
+      description: 'Закон Ньютона–Рихмана описывает теплообмен тела со средой: мощность теплоотдачи пропорциональна площади поверхности и разности температур.',
+      formula: 'Q̇ = αS(T<sub>пов</sub> − T<sub>ср</sub>)',
+      richman: true,
+      notesUrl: 'https://drive.google.com/file/d/1SzCITPvYLkWHQEF4FhLti5_ovawXltM9/view?usp=sharing'
+    },
+    {
+      description: 'Во время плавления температура чистого кристаллического вещества остаётся постоянной. Полученная энергия идёт на разрушение кристаллической решётки.',
+      formula: 'Q = λm',
+      notesUrl: 'https://drive.google.com/file/d/1SzCITPvYLkWHQEF4FhLti5_ovawXltM9/view?usp=sharing'
+    },
+    {
+      description: 'Испарение происходит с поверхности жидкости при любой температуре, а кипение: по всему объёму при температуре кипения. При конденсации пар отдаёт энергию.',
+      formula: 'Q = Lm',
+      notesUrl: 'https://drive.google.com/file/d/1SzCITPvYLkWHQEF4FhLti5_ovawXltM9/view?usp=sharing'
+    },
+    {
+      description: 'Одноимённые электрические заряды отталкиваются, разноимённые притягиваются. Сила взаимодействия зависит от зарядов и расстояния между ними.',
+      formula: 'F = k|q<sub>1</sub>q<sub>2</sub>| / r²'
+    },
     { description: 'Сила тока равна заряду, проходящему через поперечное сечение проводника за единицу времени. Для участка цепи ток пропорционален напряжению и обратно пропорционален сопротивлению.', formula: 'I = q / t; I = U / R' },
     { description: 'При последовательном соединении сила тока одинакова во всех элементах, а напряжения складываются. Работа тока зависит от напряжения, силы тока и времени.', formula: 'A = UIt; P = UI' },
     { description: 'Магнитное поле создаётся магнитами и электрическим током. При отражении света от плоского зеркала угол отражения равен углу падения.', formula: 'Угол падения = угол отражения' },
@@ -1054,6 +1140,19 @@ main.addEventListener('click', event => {
     .split(';')
     .map(formula => `<span>${formula.trim()}</span>`)
     .join('');
+
+  // Handle Google Drive full notes button
+  const notesFooter = document.getElementById('theory-dialog-footer');
+  const notesLink = document.getElementById('theory-notes-link');
+  if (notesFooter && notesLink) {
+    if (theory && theory.notesUrl && theory.notesUrl.trim()) {
+      notesLink.href = theory.notesUrl.trim();
+      notesFooter.hidden = false;
+    } else {
+      notesFooter.hidden = true;
+    }
+  }
+
   theoryDialog.showModal();
 });
 
