@@ -5858,6 +5858,14 @@
                     }
                 }
 
+                try {
+                    localStorage.setItem('user_xp', String(earnedXp));
+                    if (correctCount > 0) {
+                        const curSolved = parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0;
+                        localStorage.setItem('totalSolvedTasks', String(Math.max(curSolved, correctCount)));
+                    }
+                } catch(e) {}
+
                 const xpPerLevel = 100;
                 const level = Math.floor(earnedXp / xpPerLevel) + 1;
 

@@ -50,6 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         try {
             localStorage.setItem(storageKey, JSON.stringify(attempts));
+            window.dispatchEvent(new CustomEvent('study-task-solved', {
+                detail: { subject: 'Математика', taskId: window.location.pathname, correct: isCorrect }
+            }));
+            if (window.AuthSync && typeof window.AuthSync.scheduleSync === 'function') {
+                window.AuthSync.scheduleSync(1200);
+            }
         } catch (error) {
             console.error('Не удалось сохранить статистику учебных задач.', error);
         }

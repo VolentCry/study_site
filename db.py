@@ -272,6 +272,19 @@ def init_db() -> None:
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_methodical_plans_student ON methodical_plans(student_id);
             ''')
+
+            # Auto-heal: recalculate user_xp and total_solved for records with metrics
+            try:
+                cur_heal = conn.cursor()
+                cur_heal.execute("SELECT user_id, user_xp, bonus_xp, total_solved, metrics_json FROM user_data WHERE length(metrics_json) > 2")
+                for urow in cur_heal.fetchall():
+                    calc_xp, calc_solved = compute_user_metrics_xp(urow[4], urow[2])
+                    cur_xp = int(urow[1] or 0)
+                    cur_solved = int(urow[3] or 0)
+                    if calc_xp > cur_xp or calc_solved > cur_solved:
+                        conn.execute("UPDATE user_data SET user_xp = ?, total_solved = ? WHERE user_id = ?", (max(cur_xp, calc_xp), max(cur_solved, calc_solved), urow[0]))
+            except Exception:
+                pass
     finally:
         conn.close()
 
@@ -540,6 +553,45 @@ def delete_user(user_id: int) -> bool:
         conn.close()
 
 
+def compute_user_metrics_xp(metrics_raw: Any, bonus_xp: int = 0) -> Tuple[int, int]:
+    """
+    Вычисляет реальный накопленный XP и количество уникальных верно решённых задач
+    на основе журнала попыток (metrics_json):
+      - 10 XP за каждую уникальную верно решённую задачу
+      - 2 XP за попытку с ошибкой (если задача ещё не решена верно)
+      - плюс bonus_xp (награды за серии и достижения)
+      - total_solved: количество уникальных верно решённых задач
+    """
+    if isinstance(metrics_raw, str):
+        try:
+            metrics = json.loads(metrics_raw)
+        except Exception:
+            metrics = []
+    elif isinstance(metrics_raw, list):
+        metrics = metrics_raw
+    else:
+        metrics = []
+
+    xp_by_task: Dict[str, int] = {}
+    solved_set: Set[str] = set()
+
+    for m in metrics:
+        if not isinstance(m, dict):
+            continue
+        subj = str(m.get('subject') or '')
+        task_id = str(m.get('taskId') or m.get('taskName') or '')
+        task_key = f"{subj}:{task_id}" if task_id else str(m.get('skill') or id(m))
+        is_correct = bool(m.get('correct'))
+
+        pts = 10 if is_correct else 2
+        xp_by_task[task_key] = max(xp_by_task.get(task_key, 0), pts)
+        if is_correct:
+            solved_set.add(task_key)
+
+    total_xp = sum(xp_by_task.values()) + int(bonus_xp or 0)
+    return total_xp, len(solved_set)
+
+
 def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
     """Получение полного игрового прогресса пользователя по ID."""
     conn = get_db_connection()
@@ -575,15 +627,19 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
         except Exception:
             claimed_gifts = {}
 
+        calc_xp, calc_solved = compute_user_metrics_xp(metrics, row['bonus_xp'])
+        final_xp = max(int(row['user_xp'] or 0), calc_xp)
+        final_solved = max(int(row['total_solved'] or 0), calc_solved)
+
         return {
             'userId': row['id'],
             'username': row['username'],
             'userName': row['display_name'] or row['username'],
             'role': row['role'] or 'student',
             'avatarFrame': row['avatar_frame'] or 'orbit',
-            'userXP': row['user_xp'] or 0,
+            'userXP': final_xp,
             'bonusXp': row['bonus_xp'] or 0,
-            'totalSolvedTasks': row['total_solved'] or 0,
+            'totalSolvedTasks': final_solved,
             'theme': row['theme'] or 'dark',
             'metrics': metrics,
             'trainerRecords': trainer_records,
@@ -601,9 +657,7 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
     """
     now_iso = datetime.now(timezone.utc).isoformat()
     avatar_frame = str(payload.get('avatarFrame', 'orbit'))[:32]
-    user_xp = int(payload.get('userXP', 0) or 0)
     bonus_xp = int(payload.get('bonusXp', 0) or 0)
-    total_solved = int(payload.get('totalSolvedTasks', 0) or 0)
     theme = str(payload.get('theme', 'dark'))[:16]
     display_name = payload.get('userName')
 
@@ -613,6 +667,12 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
     if not isinstance(metrics, list):
         metrics = []
     metrics_json = json.dumps(metrics, ensure_ascii=False)
+
+    calc_xp, calc_solved = compute_user_metrics_xp(metrics, bonus_xp)
+    raw_user_xp = int(payload.get('userXP', 0) or 0)
+    raw_total_solved = int(payload.get('totalSolvedTasks', 0) or 0)
+    user_xp = max(raw_user_xp, calc_xp)
+    total_solved = max(raw_total_solved, calc_solved)
 
     trainer_records = payload.get('trainerRecords', {})
     trainer_records_json = json.dumps(trainer_records if isinstance(trainer_records, dict) else {}, ensure_ascii=False)
@@ -764,7 +824,7 @@ def get_class_details(class_id: int, teacher_id: Optional[int] = None) -> Option
         cursor.execute(
             '''
             SELECT u.id, u.username, u.display_name, u.role, u.last_login,
-                   d.avatar_frame, d.user_xp, d.total_solved, cm.joined_at
+                   d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved, d.metrics_json, cm.joined_at
             FROM class_members cm
             JOIN users u ON cm.student_id = u.id
             LEFT JOIN user_data d ON u.id = d.user_id
@@ -775,14 +835,17 @@ def get_class_details(class_id: int, teacher_id: Optional[int] = None) -> Option
         )
         students = []
         for s in cursor.fetchall():
+            calc_xp, calc_solved = compute_user_metrics_xp(s['metrics_json'], s['bonus_xp'])
+            final_xp = max(int(s['user_xp'] or 0), calc_xp)
+            final_solved = max(int(s['total_solved'] or 0), calc_solved)
             students.append({
                 'id': s['id'],
                 'username': s['username'],
                 'displayName': s['display_name'],
                 'role': s['role'] or 'student',
                 'avatarFrame': s['avatar_frame'] or 'orbit',
-                'userXP': s['user_xp'] or 0,
-                'totalSolved': s['total_solved'] or 0,
+                'userXP': final_xp,
+                'totalSolved': final_solved,
                 'lastLogin': s['last_login'],
                 'joinedAt': s['joined_at']
             })
@@ -850,7 +913,7 @@ def get_all_users_for_teacher(
         cursor = conn.cursor()
         query = '''
             SELECT u.id, u.username, u.display_name, u.role, u.created_at, u.last_login,
-                   d.avatar_frame, d.user_xp, d.total_solved, d.updated_at
+                   d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved, d.metrics_json, d.updated_at
             FROM users u
             LEFT JOIN user_data d ON u.id = d.user_id
             WHERE 1=1
@@ -897,6 +960,10 @@ def get_all_users_for_teacher(
             if teacher_id is not None:
                 in_teacher_class = any(c['teacherId'] == teacher_id for c in enrolled)
 
+            calc_xp, calc_solved = compute_user_metrics_xp(r['metrics_json'], r['bonus_xp'])
+            final_xp = max(int(r['user_xp'] or 0), calc_xp)
+            final_solved = max(int(r['total_solved'] or 0), calc_solved)
+
             users.append({
                 'id': uid,
                 'username': r['username'],
@@ -905,12 +972,14 @@ def get_all_users_for_teacher(
                 'createdAt': r['created_at'],
                 'lastLogin': r['last_login'],
                 'avatarFrame': r['avatar_frame'] or 'orbit',
-                'userXP': r['user_xp'] or 0,
-                'totalSolved': r['total_solved'] or 0,
+                'userXP': final_xp,
+                'totalSolved': final_solved,
                 'updatedAt': r['updated_at'],
                 'classes': enrolled,
                 'isInMyClass': in_teacher_class
             })
+        # Keep sorted by XP descending so teacher sees most active students first
+        users.sort(key=lambda u: (u['userXP'], u['totalSolved'], u['id']), reverse=True)
         return users
     finally:
         conn.close()
@@ -1009,6 +1078,10 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
                 'teacherName': c_row['teacher_name']
             })
 
+        calc_xp, calc_solved = compute_user_metrics_xp(metrics, row['bonus_xp'])
+        final_xp = max(int(row['user_xp'] or 0), calc_xp)
+        final_solved = max(int(row['total_solved'] or 0), calc_solved)
+
         return {
             'user': {
                 'id': row['id'],
@@ -1018,9 +1091,9 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
                 'createdAt': row['created_at'],
                 'lastLogin': row['last_login'],
                 'avatarFrame': row['avatar_frame'] or 'orbit',
-                'userXP': row['user_xp'] or 0,
+                'userXP': final_xp,
                 'bonusXp': row['bonus_xp'] or 0,
-                'totalSolved': row['total_solved'] or 0,
+                'totalSolved': final_solved,
                 'updatedAt': row['updated_at']
             },
             'stats': {

@@ -643,6 +643,13 @@
         correct: isCorrect
       });
       localStorage.setItem('studyMetrics', JSON.stringify(attempts));
+
+      window.dispatchEvent(new CustomEvent('study-task-solved', {
+        detail: { subject: subject || 'Математика', taskId: taskId, correct: isCorrect }
+      }));
+      if (window.AuthSync && typeof window.AuthSync.scheduleSync === 'function') {
+        window.AuthSync.scheduleSync(1200);
+      }
     } catch (e) {}
   }
 

@@ -155,6 +155,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('experience-progressbar').setAttribute('aria-valuenow', String(currentLevelXp));
         document.getElementById('experience-detail').textContent =
             `${currentLevelXp} из ${xpPerLevel} XP до следующего уровня · осталось ${xpPerLevel - currentLevelXp} XP. За задачу: 2 XP за ошибочный ответ или 10 XP за верный; повторные проверки не суммируются.`;
+
+        try {
+            localStorage.setItem('user_xp', String(earnedXp));
+            const totalSolved = countSolvedTasks(attempts);
+            localStorage.setItem('totalSolvedTasks', String(totalSolved));
+            if (window.AuthSync && typeof window.AuthSync.scheduleSync === 'function') {
+                window.AuthSync.scheduleSync(1500);
+            }
+        } catch (e) {}
     }
 
     function getAchievements(attempts) {

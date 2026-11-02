@@ -1415,6 +1415,9 @@
                             <p class="class-desc" id="single-class-desc">Описание класса</p>
                         </div>
                         <div style="display:flex; gap:10px;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-single-class" title="Обновить список учеников">
+                                🔄 Обновить
+                            </button>
                             <button type="button" class="btn btn-emerald btn-sm" id="btn-add-student-to-open-class">
                                 ➕ Добавить ученика
                             </button>
@@ -1463,6 +1466,9 @@
                             <span class="badge" id="users-counter-badge" style="background:var(--surface); border:1px solid var(--line); padding:6px 12px; font-size:0.82rem; color:var(--muted); font-weight:600; white-space:nowrap;">
                                 Найдено: <strong id="users-count-current" style="color:var(--ink);">0</strong> из <span id="users-count-total">0</span>
                             </span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-users" title="Обновить список пользователей" style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px;">
+                                🔄 Обновить
+                            </button>
                             <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-users-filters" title="Сбросить все фильтры" style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px;">
                                 ✕ Сброс
                             </button>
@@ -2793,6 +2799,36 @@
                     applyUsersFiltersAndRender();
                 });
             });
+
+            document.getElementById('btn-refresh-users')?.addEventListener('click', () => {
+                loadAllUsers();
+            });
+
+            document.getElementById('btn-refresh-single-class')?.addEventListener('click', () => {
+                if (activeClassId) loadSingleClass(activeClassId);
+            });
+
+            // Auto-refresh when tab is focused or periodically
+            window.addEventListener('focus', () => {
+                if (currentTab === 'users') {
+                    loadAllUsers();
+                } else if (currentTab === 'feed') {
+                    loadActivityFeed();
+                } else if (currentTab === 'classes' && activeClassId) {
+                    loadSingleClass(activeClassId);
+                }
+            });
+
+            setInterval(() => {
+                if (document.hidden) return;
+                if (currentTab === 'users') {
+                    loadAllUsers();
+                } else if (currentTab === 'feed') {
+                    loadActivityFeed();
+                } else if (currentTab === 'classes' && activeClassId) {
+                    loadSingleClass(activeClassId);
+                }
+            }, 30000);
 
             document.getElementById('btn-reset-users-filters')?.addEventListener('click', () => {
                 const sInput = document.getElementById('users-search-input');

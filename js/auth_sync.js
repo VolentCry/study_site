@@ -643,9 +643,38 @@
             claimedGifts = {};
         }
 
-        const totalSolvedTasks = parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0;
-        const userXP = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
         const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+
+        // Dynamic XP & Solved count calculation from metrics
+        let calculatedXp = 0;
+        let calculatedSolved = 0;
+        try {
+            const xpByTask = new Map();
+            const solvedSet = new Set();
+            metrics.forEach(m => {
+                if (!m) return;
+                const key = `${m.subject || ''}:${m.taskId || m.taskName || ''}`;
+                const pts = m.correct ? 10 : 2;
+                xpByTask.set(key, Math.max(xpByTask.get(key) || 0, pts));
+                if (m.correct) solvedSet.add(key);
+            });
+            calculatedXp = [...xpByTask.values()].reduce((sum, pts) => sum + pts, 0) + bonusXp;
+            calculatedSolved = solvedSet.size;
+        } catch (e) {}
+
+        const userXP = Math.max(
+            parseInt(localStorage.getItem('user_xp') || '0', 10) || 0,
+            calculatedXp
+        );
+        const totalSolvedTasks = Math.max(
+            parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0,
+            calculatedSolved
+        );
+
+        try {
+            localStorage.setItem('user_xp', String(userXP));
+            localStorage.setItem('totalSolvedTasks', String(totalSolvedTasks));
+        } catch (e) {}
         const avatarFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
         const theme = localStorage.getItem('profileTheme') || 'dark';
         let userName = localStorage.getItem('studyUserName') || localStorage.getItem('loggedInUser');
@@ -691,6 +720,22 @@
             } catch (e) {
                 localStorage.setItem('studyMetrics', JSON.stringify(data.metrics));
             }
+        }
+
+        // XP, solved tasks & bonus XP synchronization
+        if (typeof data.userXP === 'number') {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
+            const finalXp = Math.max(curXp, data.userXP);
+            localStorage.setItem('user_xp', String(finalXp));
+        }
+        if (typeof data.totalSolvedTasks === 'number') {
+            const curSolved = parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0;
+            const finalSolved = Math.max(curSolved, data.totalSolvedTasks);
+            localStorage.setItem('totalSolvedTasks', String(finalSolved));
+        }
+        if (typeof data.bonusXp === 'number') {
+            const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+            localStorage.setItem('studyBonusXp', String(Math.max(curBonus, data.bonusXp)));
         }
 
         // Trainer records (max streak, level etc.)
