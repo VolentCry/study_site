@@ -5464,6 +5464,9 @@
                         actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-primary">${hasDraft ? 'Продолжить' : 'Приступить'}</a>`;
                     }
 
+                    const createdStr = (h.created_at || h.createdAt)
+                        ? new Date(h.created_at || h.createdAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                        : '—';
                     const deadlineStr = (h.deadline || h.deadlineAt)
                         ? new Date(h.deadline || h.deadlineAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
                         : 'Бессрочно';
@@ -5475,7 +5478,8 @@
                                     <div class="student-hw-title">${escapeHtml(h.title)}</div>
                                     <div class="student-hw-meta">
                                         <span style="color:var(--accent-cyan); font-weight:700;">${escapeHtml(h.subject)}</span>
-                                        <span>Срок: ${deadlineStr}</span>
+                                        <span title="Дата выдачи задания">📅 Выдано: ${createdStr}</span>
+                                        <span title="Срок сдачи задания">⏳ Срок: ${deadlineStr}</span>
                                         <span>${h.tasksCount || (h.tasks ? h.tasks.length : 0)} зад.</span>
                                     </div>
                                 </div>

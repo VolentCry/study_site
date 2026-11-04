@@ -568,6 +568,53 @@ def api_teacher_create_lesson():
         return jsonify({'success': False, 'error': 'Ошибка сервера при создании урока.'}), 500
 
 
+@app.route('/api/teacher/lessons/<int:lesson_id>', methods=['PUT', 'POST', 'PATCH'])
+def api_teacher_update_lesson(lesson_id: int):
+    """Редактирование занятия в расписании учителем."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    tid = None if teacher.get('role') == 'admin' else teacher['id']
+    payload = request.get_json(silent=True) or {}
+
+    class_id = payload.get('classId') or payload.get('class_id')
+    title = payload.get('title')
+    scheduled_at = payload.get('scheduledAt') or payload.get('starts_at') or payload.get('scheduled_at')
+    duration_min = payload.get('durationMin', payload.get('duration_min'))
+    description = payload.get('description', payload.get('notes'))
+
+    homework_id = 'UNCHANGED'
+    if 'homeworkId' in payload or 'homework_id' in payload:
+        raw_hw = payload.get('homeworkId') if 'homeworkId' in payload else payload.get('homework_id')
+        homework_id = int(raw_hw) if (raw_hw and str(raw_hw).isdigit()) else None
+
+    student_id = 'UNCHANGED'
+    if 'studentId' in payload or 'student_id' in payload:
+        raw_st = payload.get('studentId') if 'studentId' in payload else payload.get('student_id')
+        student_id = int(raw_st) if (raw_st and str(raw_st).isdigit()) else None
+
+    try:
+        updated = db.update_lesson(
+            lesson_id=lesson_id,
+            teacher_id=tid,
+            class_id=int(class_id) if class_id else None,
+            title=str(title).strip() if title else None,
+            scheduled_at=str(scheduled_at).strip() if scheduled_at else None,
+            duration_min=int(duration_min) if duration_min else None,
+            description=str(description) if description is not None else None,
+            homework_id=homework_id,
+            student_id=student_id
+        )
+        if not updated:
+            return jsonify({'success': False, 'error': 'Занятие не найдено или нет прав на изменение.'}), 404
+        return jsonify({'success': True, 'lesson': updated})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера при обновлении занятия.'}), 500
+
+
 @app.route('/api/teacher/lessons/<int:lesson_id>', methods=['DELETE'])
 def api_teacher_delete_lesson(lesson_id: int):
     """Удаление занятия из расписания."""

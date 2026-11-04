@@ -1463,7 +1463,10 @@ def get_teacher_homeworks(teacher_id: int) -> List[Dict[str, Any]]:
                 'description': r['description'],
                 'subject': r['subject'],
                 'deadlineAt': r['deadline_at'],
+                'deadline': r['deadline_at'],
+                'deadline_at': r['deadline_at'],
                 'createdAt': r['created_at'],
+                'created_at': r['created_at'],
                 'tasks': tasks,
                 'tasksCount': len(tasks),
                 'totalStudents': r['total_students'],
@@ -1506,7 +1509,10 @@ def get_student_homeworks(student_id: int) -> List[Dict[str, Any]]:
                 'description': r['description'],
                 'subject': r['subject'],
                 'deadlineAt': r['deadline_at'],
+                'deadline': r['deadline_at'],
+                'deadline_at': r['deadline_at'],
                 'createdAt': r['created_at'],
+                'created_at': r['created_at'],
                 'classId': r['class_id'],
                 'className': r['class_name'],
                 'teacherName': r['teacher_name'],
@@ -1862,6 +1868,102 @@ def create_lesson(
                 'studentId': student_id,
                 'createdAt': now_iso
             }
+    finally:
+        conn.close()
+
+
+def update_lesson(
+    lesson_id: int,
+    teacher_id: Optional[int] = None,
+    class_id: Optional[int] = None,
+    title: Optional[str] = None,
+    scheduled_at: Optional[str] = None,
+    duration_min: Optional[int] = None,
+    description: Optional[str] = None,
+    homework_id: Any = 'UNCHANGED',
+    student_id: Any = 'UNCHANGED'
+) -> Optional[Dict[str, Any]]:
+    """Обновляет существующее занятие в расписании."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        if teacher_id is not None:
+            cursor.execute("SELECT * FROM lessons WHERE id = ? AND teacher_id = ?", (lesson_id, teacher_id))
+        else:
+            cursor.execute("SELECT * FROM lessons WHERE id = ?", (lesson_id,))
+        current = cursor.fetchone()
+        if not current:
+            return None
+
+        final_class_id = class_id if class_id is not None else current['class_id']
+        final_title = str(title).strip() if (title is not None and str(title).strip()) else current['title']
+        final_scheduled_at = str(scheduled_at).strip() if (scheduled_at is not None and str(scheduled_at).strip()) else current['scheduled_at']
+        final_duration = int(duration_min) if duration_min is not None else current['duration_min']
+        final_description = str(description).strip() if description is not None else (current['description'] or '')
+
+        final_homework_id = current['homework_id'] if homework_id == 'UNCHANGED' else homework_id
+        final_student_id = current['student_id'] if student_id == 'UNCHANGED' else student_id
+
+        with conn:
+            cursor.execute(
+                """
+                UPDATE lessons
+                SET class_id = ?, title = ?, scheduled_at = ?, duration_min = ?,
+                    description = ?, homework_id = ?, student_id = ?
+                WHERE id = ?
+                """,
+                (final_class_id, final_title, final_scheduled_at, final_duration,
+                 final_description, final_homework_id, final_student_id, lesson_id)
+            )
+
+        cursor.execute(
+            """
+            SELECT l.*, c.name as class_name, h.title as homework_title, h.deadline_at as homework_deadline,
+                   su.display_name as student_name, su.username as student_username
+            FROM lessons l
+            JOIN classes c ON l.class_id = c.id
+            LEFT JOIN users su ON l.student_id = su.id
+            LEFT JOIN homeworks h ON l.homework_id = h.id
+            WHERE l.id = ?
+            """,
+            (lesson_id,)
+        )
+        r = cursor.fetchone()
+        if not r:
+            return None
+
+        is_comp = bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False
+        return {
+            'id': r['id'],
+            'classId': r['class_id'],
+            'class_id': r['class_id'],
+            'className': r['class_name'],
+            'class_name': r['class_name'],
+            'title': r['title'],
+            'description': r['description'],
+            'notes': r['description'],
+            'scheduledAt': r['scheduled_at'],
+            'scheduled_at': r['scheduled_at'],
+            'starts_at': r['scheduled_at'],
+            'durationMin': r['duration_min'],
+            'duration_min': r['duration_min'],
+            'homeworkId': r['homework_id'],
+            'homework_id': r['homework_id'],
+            'homeworkTitle': r['homework_title'],
+            'homework_title': r['homework_title'],
+            'homeworkDeadline': r['homework_deadline'],
+            'homework_deadline': r['homework_deadline'],
+            'studentId': r['student_id'],
+            'student_id': r['student_id'],
+            'studentName': r['student_name'] or '',
+            'student_name': r['student_name'] or '',
+            'studentUsername': r['student_username'] or '',
+            'student_username': r['student_username'] or '',
+            'isCompleted': is_comp,
+            'is_completed': is_comp,
+            'createdAt': r['created_at'],
+            'created_at': r['created_at']
+        }
     finally:
         conn.close()
 

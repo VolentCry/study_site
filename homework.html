@@ -995,6 +995,7 @@
                 <div class="hw-stats-strip">
                     <div>Заданий: <strong id="hw-tasks-count">0</strong></div>
                     <div>Учитель: <strong id="hw-teacher-name">—</strong></div>
+                    <div id="hw-created-wrap">Выдано: <strong id="hw-created-at" style="color: var(--ink);">—</strong></div>
                     <div id="hw-score-wrap" style="display: none;">Оценка: <strong id="hw-score" style="color: var(--accent-emerald); font-size: 1.1rem;">0/0</strong></div>
                 </div>
             </div>
@@ -1249,6 +1250,16 @@
                     const descEl = document.getElementById('hw-description');
                     descEl.textContent = hwData.description;
                     descEl.style.display = 'block';
+                }
+
+                const rawCreated = hwData.created_at || hwData.createdAt;
+                if (rawCreated) {
+                    const cd = new Date(rawCreated);
+                    document.getElementById('hw-created-at').textContent = cd.toLocaleString('ru-RU', {
+                        day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+                    });
+                } else {
+                    document.getElementById('hw-created-at').textContent = '—';
                 }
 
                 const rawDeadline = hwData.deadline || hwData.deadlineAt || hwData.deadline_at;

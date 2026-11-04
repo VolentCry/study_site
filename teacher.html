@@ -1939,10 +1939,11 @@
     <dialog id="modal-create-lesson" class="admin-modal">
         <div class="modal-body" style="max-width: 520px;">
             <div class="modal-header">
-                <h3 class="modal-title">Запланировать занятие</h3>
+                <h3 class="modal-title" id="modal-lesson-title">Запланировать занятие</h3>
                 <button type="button" class="modal-close" data-close-modal="modal-create-lesson">✕</button>
             </div>
             <form id="form-create-lesson" style="display:flex; flex-direction:column; gap:14px;">
+                <input type="hidden" id="lesson-edit-id" value="">
                 <div class="form-group">
                     <label class="form-label">Класс *</label>
                     <select id="lesson-target-class" class="form-select" required>
@@ -1978,7 +1979,7 @@
                 </div>
                 <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
                     <button type="button" class="btn btn-secondary" data-close-modal="modal-create-lesson">Отмена</button>
-                    <button type="submit" class="btn btn-emerald">Сохранить занятие</button>
+                    <button type="submit" class="btn btn-emerald" id="btn-submit-lesson">Сохранить занятие</button>
                 </div>
             </form>
         </div>
@@ -3269,8 +3270,12 @@
 
             if (btnOpenCreateLesson) {
                 btnOpenCreateLesson.addEventListener('click', async () => {
+                    document.getElementById('lesson-edit-id').value = '';
+                    document.getElementById('modal-lesson-title').textContent = 'Запланировать занятие';
+                    document.getElementById('btn-submit-lesson').textContent = 'Сохранить занятие';
                     await populateLessonModalSelects();
                     formCreateLesson.reset();
+                    document.getElementById('lesson-edit-id').value = '';
                     if (lessonTargetStudent) {
                         lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>';
                     }
@@ -3335,6 +3340,7 @@
             if (formCreateLesson) {
                 formCreateLesson.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    const editId = document.getElementById('lesson-edit-id').value;
                     const classId = lessonTargetClass.value;
                     const studentIdVal = lessonTargetStudent ? lessonTargetStudent.value : '';
                     const studentId = studentIdVal ? parseInt(studentIdVal, 10) : null;
@@ -3348,9 +3354,14 @@
                         return;
                     }
 
+                    const submitBtn = document.getElementById('btn-submit-lesson');
+                    submitBtn.disabled = true;
+
                     try {
-                        const res = await fetch('/api/teacher/lessons', {
-                            method: 'POST',
+                        const url = editId ? `/api/teacher/lessons/${editId}` : '/api/teacher/lessons';
+                        const method = editId ? 'PUT' : 'POST';
+                        const res = await fetch(url, {
+                            method,
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 class_id: parseInt(classId, 10),
@@ -3364,16 +3375,20 @@
                         const data = await res.json();
                         if (data.success) {
                             modalCreateLesson.close();
-                            showToast('Занятие успешно запланировано');
+                            showToast(editId ? '✓ Занятие успешно обновлено!' : '✓ Занятие успешно запланировано!');
                             loadSchedule();
                         } else {
                             alert(data.error || 'Ошибка при сохранении урока');
                         }
                     } catch(err) {
                         console.error('SERVER ERR:', err); alert('ERR: ' + err.message);
+                    } finally {
+                        submitBtn.disabled = false;
                     }
                 });
             }
+
+            let currentScheduleLessons = [];
 
             async function loadSchedule() {
                 if (!lessonsTimelineContainer) return;
@@ -3388,6 +3403,7 @@
                     }
 
                     const lessons = Array.isArray(data.lessons) ? data.lessons : [];
+                    currentScheduleLessons = lessons;
                     if (lessons.length === 0) {
                         lessonsTimelineContainer.innerHTML = `
                             <div style="text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
@@ -3461,6 +3477,9 @@
                                     <button type="button" class="btn btn-sm ${isCompleted ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-complete" data-lesson-id="${les.id}" data-completed="${isCompleted ? '1' : '0'}" title="${isCompleted ? 'Снять отметку о проведении' : 'Отметить как проведённое занятие'}">
                                         ${isCompleted ? '✓ Проведено' : '⏳ Провести'}
                                     </button>
+                                    <button type="button" class="btn btn-secondary btn-sm btn-edit-lesson" data-lesson-id="${les.id}" title="Редактировать занятие" style="padding:0.25rem 0.55rem; font-size:0.85rem;">
+                                        ✏️
+                                    </button>
                                     <button type="button" class="btn btn-danger-outline btn-sm btn-delete-lesson" data-lesson-id="${les.id}" title="Отменить занятие">
                                         🗑️
                                     </button>
@@ -3490,6 +3509,59 @@
                             } catch(e) {
                                 alert('Ошибка сети при обновлении статуса занятия');
                             }
+                        });
+                    });
+
+                    // Attach edit listeners
+                    lessonsTimelineContainer.querySelectorAll('.btn-edit-lesson').forEach(b => {
+                        b.addEventListener('click', async () => {
+                            const lid = parseInt(b.getAttribute('data-lesson-id'), 10);
+                            const les = currentScheduleLessons.find(l => (l.id === lid));
+                            if (!les) return;
+
+                            document.getElementById('lesson-edit-id').value = String(les.id);
+                            document.getElementById('modal-lesson-title').textContent = 'Редактировать занятие';
+                            document.getElementById('btn-submit-lesson').textContent = 'Сохранить изменения';
+
+                            await populateLessonModalSelects();
+
+                            const cid = String(les.class_id || les.classId || '');
+                            lessonTargetClass.value = cid;
+
+                            // Populate students for selected class and select the lesson student
+                            const targetStudentId = les.student_id || les.studentId;
+                            if (cid) {
+                                try {
+                                    const res = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
+                                    const data = await res.json();
+                                    if (data.success && data.class && Array.isArray(data.class.students)) {
+                                        if (data.class.students.length > 0) {
+                                            lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>' +
+                                                data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                                        } else {
+                                            lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
+                                        }
+                                    }
+                                } catch(e) {}
+                            }
+                            lessonTargetStudent.value = targetStudentId ? String(targetStudentId) : '';
+
+                            document.getElementById('lesson-input-title').value = les.title || '';
+
+                            // Format datetime to YYYY-MM-DDTHH:MM local
+                            const rawDt = les.starts_at || les.scheduled_at || les.scheduledAt;
+                            if (rawDt) {
+                                const dt = new Date(rawDt);
+                                const localIso = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                                document.getElementById('lesson-input-date').value = localIso;
+                            } else {
+                                document.getElementById('lesson-input-date').value = '';
+                            }
+
+                            lessonAttachHw.value = (les.homework_id || les.homeworkId) ? String(les.homework_id || les.homeworkId) : '';
+                            document.getElementById('lesson-input-notes').value = les.notes || les.description || '';
+
+                            modalCreateLesson.showModal();
                         });
                     });
 
@@ -4355,6 +4427,7 @@
                         const taskCount = h.tasks ? h.tasks.length : (h.tasksCount || 0);
                         const subCount = h.submittedCount !== undefined ? h.submittedCount : (h.submissions_count || 0);
                         const chkCount = h.checkedCount !== undefined ? h.checkedCount : (h.checked_count || 0);
+                        const createdStr = (h.created_at || h.createdAt) ? formatDateTime(h.created_at || h.createdAt) : '—';
                         const deadlineStr = (h.deadline || h.deadlineAt) ? formatDateTime(h.deadline || h.deadlineAt) : 'Бессрочно';
 
                         return `
@@ -4364,7 +4437,8 @@
                                         <span class="lesson-class-badge">🏫 ${escapeHtml(h.className || h.class_name)}</span>
                                         ${h.studentName ? `<span class="lesson-class-badge" style="background:rgba(255,119,40,0.15); border-color:rgba(255,119,40,0.3); color:var(--accent);">👤 ${escapeHtml(h.studentName)}</span>` : ''}
                                         <span style="color:var(--accent-cyan); font-weight:700;">${escapeHtml(h.subject)}</span>
-                                        <span>Срок: ${deadlineStr}</span>
+                                        <span title="Дата создания задания" style="display:inline-flex; align-items:center; gap:3px;">📅 Выдано: <strong style="color:var(--ink);">${createdStr}</strong></span>
+                                        <span title="Срок сдачи задания" style="display:inline-flex; align-items:center; gap:3px;">⏳ Срок: <strong style="color:var(--ink);">${deadlineStr}</strong></span>
                                     </div>
                                     <h3 class="hw-card-title">${escapeHtml(h.title)}</h3>
                                     ${h.description ? `<p style="font-size:0.85rem; color:var(--muted);">${escapeHtml(h.description)}</p>` : ''}
@@ -4440,7 +4514,8 @@
                 const initialTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
                 const sNameInit = hw.studentName || (hw.student_name ? hw.student_name : '');
                 const studentSubInit = sNameInit ? ` · 👤 Индивидуально: ${sNameInit}` : '';
-                document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubInit} · Всего заданий: ${initialTaskCount}`;
+                const crDateInit = (hw.created_at || hw.createdAt) ? formatDateTime(hw.created_at || hw.createdAt) : '—';
+                document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubInit} · 📅 Выдано: ${crDateInit} · Всего заданий: ${initialTaskCount}`;
                 submissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--muted);">Загрузка работ...</td></tr>';
                 modalSubmissionsList.showModal();
 
@@ -4458,7 +4533,8 @@
                         const updatedTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
                         const sNameUpd = hw.studentName || (hw.student_name ? hw.student_name : '');
                         const studentSubUpd = sNameUpd ? ` · 👤 Индивидуально: ${sNameUpd}` : '';
-                        document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubUpd} · Всего заданий: ${updatedTaskCount}`;
+                        const crDateUpd = (hw.created_at || hw.createdAt) ? formatDateTime(hw.created_at || hw.createdAt) : '—';
+                        document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubUpd} · 📅 Выдано: ${crDateUpd} · Всего заданий: ${updatedTaskCount}`;
                     }
 
                     const subs = data.submissions || [];
