@@ -831,11 +831,54 @@
     }
 
     // --- 4. API CLIENT CALLS ---
+    async function safeParseJson(res, defaultErrMsg) {
+        let text = '';
+        try {
+            text = await res.text();
+        } catch (e) {
+            text = '';
+        }
+
+        let data = null;
+        if (text) {
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                // Сервер вернул не JSON (например, HTML 502/504 или пустой ответ)
+            }
+        }
+
+        if (!res.ok) {
+            if (data && data.error) {
+                throw new Error(data.error);
+            }
+            if (res.status === 404) {
+                throw new Error('Маршрут API не найден (404). Проверьте запуск сервера Flask.');
+            }
+            if (res.status === 405) {
+                throw new Error('Метод не разрешён (405). Возможно, сайт открыт через статический веб-сервер вместо Flask.');
+            }
+            if (res.status === 502 || res.status === 503 || res.status === 504) {
+                throw new Error(`Сервер недоступен (${res.status}). Перезагрузите веб-приложение (Reload) на вкладке Web хостинга.`);
+            }
+            if (res.status >= 500) {
+                throw new Error(`Внутренняя ошибка сервера (${res.status}). Проверьте error.log в панели хостинга.`);
+            }
+            throw new Error(defaultErrMsg || `Ошибка запроса (HTTP ${res.status})`);
+        }
+
+        if (!data) {
+            throw new Error(defaultErrMsg || 'Сервер вернул пустой ответ.');
+        }
+
+        return data;
+    }
+
     async function apiCheckMe() {
         try {
             const res = await fetch(`${API_BASE}/auth/me`, { cache: 'no-store' });
             if (!res.ok) return { loggedIn: false };
-            return await res.json();
+            return await safeParseJson(res, 'Ошибка проверки авторизации');
         } catch (e) {
             return { loggedIn: false, error: e.message };
         }
@@ -847,11 +890,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password, displayName, localData })
         });
-        const data = await res.json();
-        if (!res.ok) {
-            throw new Error(data.error || 'Ошибка при регистрации');
-        }
-        return data;
+        return await safeParseJson(res, 'Ошибка при регистрации');
     }
 
     async function apiLogin(username, password) {
@@ -860,22 +899,17 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-        const data = await res.json();
-        if (!res.ok) {
-            throw new Error(data.error || 'Неверный логин или пароль');
-        }
-        return data;
+        return await safeParseJson(res, 'Неверный логин или пароль');
     }
 
     async function apiLogout() {
         const res = await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
-        return await res.json();
+        return await safeParseJson(res, 'Ошибка при выходе из аккаунта');
     }
 
     async function apiGetUserData() {
         const res = await fetch(`${API_BASE}/user/data`, { cache: 'no-store' });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Не удалось загрузить данные');
+        const data = await safeParseJson(res, 'Не удалось загрузить данные');
         return data.data;
     }
 
@@ -885,9 +919,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Ошибка синхронизации');
-        return data;
+        return await safeParseJson(res, 'Ошибка синхронизации');
     }
 
     // Helper: Determine root relative URL for links
