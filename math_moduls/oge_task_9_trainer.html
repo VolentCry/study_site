@@ -688,6 +688,7 @@
         }
         hasAnsweredCurrent = false;
         currentTask = OgeTask9Trainer.generateTask(currentCategory);
+        window._currentTask = currentTask;
         mathContainer.innerHTML = currentTask.questionHtml;
         taskCatBadge.textContent = currentTask.catName;
         taskBadge.textContent = 'Задание №9 · ' + (currentTask.catName || 'ОГЭ');

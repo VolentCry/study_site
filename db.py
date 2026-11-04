@@ -1325,6 +1325,15 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
         tasks = json.loads(row['tasks_json']) if row['tasks_json'] else []
         submission = None
 
+        actual_student_name = row['student_name']
+        actual_student_username = row['student_username']
+        if user_id and not actual_student_name:
+            cursor.execute("SELECT display_name, username FROM users WHERE id = ?", (user_id,))
+            u_row = cursor.fetchone()
+            if u_row:
+                actual_student_name = u_row['display_name'] or u_row['username']
+                actual_student_username = u_row['username']
+
         if user_id:
             cursor.execute(
                 "SELECT * FROM homework_submissions WHERE homework_id = ? AND student_id = ?",
@@ -1407,6 +1416,12 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
             'created_at': row['created_at'],
             'tasks': sanitized_tasks,
             'submission': submission,
+            'studentName': actual_student_name,
+            'student_name': actual_student_name,
+            'studentUsername': actual_student_username,
+            'student_username': actual_student_username,
+            'studentId': user_id,
+            'student_id': user_id,
             'isTeacherView': is_teacher_or_admin,
             'viewerRole': role
         }

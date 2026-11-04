@@ -1653,6 +1653,7 @@
                                             <option value="oge9_linear">ОГЭ №9 · Линейные уравнения</option>
                                             <option value="oge9_quadratic">ОГЭ №9 · Квадратные уравнения</option>
                                             <option value="oge9_rational">ОГЭ №9 · Дробно-рациональные уравнения</option>
+                                            <option value="oge9_systems">ОГЭ №9 · Системы уравнений</option>
                                         </optgroup>
                                         <optgroup label="ОГЭ Математика Задание №10 (Теория вероятностей)">
                                             <option value="oge10_all">ОГЭ №10 · Все прототипы вероятностей</option>
@@ -2021,7 +2022,12 @@
                     <h3 class="modal-title" id="review-student-name">Проверка работы ученика</h3>
                     <p style="font-size: 0.85rem; color: var(--muted);" id="review-hw-title"></p>
                 </div>
-                <button type="button" class="modal-close" data-close-modal="modal-review-submission">✕</button>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <a id="btn-review-modal-open-fullscreen" href="#" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Открыть на весь экран в новом окне">
+                        ↗️ В новом окне
+                    </a>
+                    <button type="button" class="modal-close" data-close-modal="modal-review-submission">✕</button>
+                </div>
             </div>
 
             <!-- Список заданий с ответами -->
@@ -3787,7 +3793,8 @@
                                     'oge9_all': 'mixed_all',
                                     'oge9_linear': 'linear_equations',
                                     'oge9_quadratic': 'quadratic_equations',
-                                    'oge9_rational': 'rational_equations'
+                                    'oge9_rational': 'rational_equations',
+                                    'oge9_systems': 'equation_systems'
                                 };
                                 t = window.OgeTask9Trainer.generateTask(catMap[type] || 'mixed_all');
                             }
@@ -3827,6 +3834,9 @@
                         if (!existingFPs.has(fp) && !batchFPs.has(fp)) {
                             batchFPs.add(fp);
                             existingFPs.add(fp);
+                            if (!t.taskId) {
+                                t.taskId = (type.startsWith('oge') ? type.split('_')[0] : 'task') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
+                            }
                             generated.push(t);
                         }
                     }
@@ -4304,6 +4314,16 @@
                 btnRefreshGrading.addEventListener('click', loadGrading);
             }
 
+            // Автообновление списка сданных работ при оценивании в новом окне
+            window.addEventListener('message', (ev) => {
+                if (ev.data && ev.data.type === 'hw-graded') {
+                    if (currentReviewHw) {
+                        openSubmissionsModal(currentReviewHw);
+                    }
+                    loadGrading();
+                }
+            });
+
             async function loadGrading() {
                 if (!gradingHwGrid) return;
                 gradingHwGrid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--muted); grid-column:1/-1;">Загрузка домашних заданий...</div>';
@@ -4476,12 +4496,12 @@
                                 <td style="font-size:0.85rem;">${submitTime}</td>
                                 <td>${scoreDisplay}</td>
                                 <td style="text-align:right; white-space:nowrap;">
-                                    <button type="button" class="btn btn-emerald btn-sm btn-review-work" data-sub-idx="${sIdx}" style="margin-right:4px;">
-                                        ${s.status === 'checked' ? '✏️ Изменить' : '🔍 Проверить'}
-                                    </button>
-                                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-secondary btn-sm" title="Смотреть домашнее задание с ответами" style="padding:0.25rem 0.55rem; font-size:0.8rem; text-decoration:none;">
-                                        👀 Смотреть работу
+                                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-emerald btn-sm" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; font-weight:600;" title="Проверить работу в отдельном окне на весь экран">
+                                        ${s.status === 'checked' ? '✏️ Изменить в новом окне' : '🔍 Проверить в новом окне'}
                                     </a>
+                                    <button type="button" class="btn btn-secondary btn-sm btn-review-work" data-sub-idx="${sIdx}" title="Быстрый просмотр в компактном окне" style="margin-left:4px; padding:0.25rem 0.55rem; font-size:0.8rem;">
+                                        🗗 В окне
+                                    </button>
                                 </td>
                             </tr>
                         `;
@@ -4506,6 +4526,12 @@
                 currentReviewHw = hw;
                 document.getElementById('review-student-name').textContent = `Работа: ${sub.student_display_name || sub.student_username || sub.displayName || sub.username || ''}`;
                 document.getElementById('review-hw-title').textContent = `${hw.title} (${hw.class_name || hw.className || ''})`;
+
+                const btnOpenFull = document.getElementById('btn-review-modal-open-fullscreen');
+                if (btnOpenFull) {
+                    const sId = sub.studentId || sub.student_id;
+                    btnOpenFull.href = `homework.html?id=${hw.id}&student_id=${sId}`;
+                }
 
                 const tasksContainer = document.getElementById('review-tasks-container');
                 tasksContainer.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--muted);">Загрузка заданий...</div>';
