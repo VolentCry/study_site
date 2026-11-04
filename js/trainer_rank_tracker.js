@@ -19,6 +19,26 @@
     // Конфигурация всех тренажёров платформы
     const TRAINERS = [
         {
+            id: 'powers_trainer',
+            name: 'Степени чисел (4–5 класс)',
+            shortName: 'Степени чисел',
+            subject: 'Математика',
+            category: 'Степени',
+            classNum: '4-5 класс',
+            url: '../math_moduls/powers_trainer.html',
+            profileUrl: 'math_moduls/powers_trainer.html',
+            icon: '⚡',
+            description: 'Возведение в степень, решение уравнений со степенью и порядок действий в примерах.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель степеней 👑' },
+                { min: 18, title: 'Архимаг математики 🧙' },
+                { min: 12, title: 'Мастер степеней 💎' },
+                { min: 7,  title: 'Знаток степеней 🥇' },
+                { min: 4,  title: 'Точный счетовод 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'common_fractions',
             name: 'Обыкновенные дроби',
             shortName: 'Обыкновенные дроби',
@@ -339,6 +359,7 @@
                 else if (path.includes('multiplication_trainer')) trainerId = 'multiplication_easy';
                 else if (path.includes('equations_trainer_medium')) trainerId = 'equations_medium';
                 else if (path.includes('equations_trainer_easy')) trainerId = 'equations_easy';
+                else if (path.includes('powers_trainer')) trainerId = 'powers_trainer';
 
                 if (!trainerId) return;
 
