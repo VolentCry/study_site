@@ -571,7 +571,12 @@
 
         // Слушатель смены плана в выпадающем списке
         document.getElementById('plan-select-dropdown')?.addEventListener('change', (e) => {
-            const planId = parseInt(e.target.value, 10);
+            const val = e.target.value;
+            if (val === 'draft') {
+                if (currentPlan) renderPlanView(true);
+                return;
+            }
+            const planId = parseInt(val, 10);
             if (planId) {
                 loadPlanById(planId);
             }
@@ -595,60 +600,123 @@
     }
 
     // Загрузка доступных планов
-    async function loadPlansList(preselectStudentId = null) {
+    async function loadPlansList(preselectStudentId = null, preselectStudentName = null) {
         try {
+            // Для учителя всегда загружаем полный список планов, чтобы в выпадающем списке можно было переключаться между всеми учениками
             let url = '/api/methodical-plans';
-            if (preselectStudentId) url += `?studentId=${preselectStudentId}`;
+            if (!isTeacherUser && preselectStudentId) {
+                url += `?studentId=${preselectStudentId}`;
+            }
             const res = await fetch(url, { cache: 'no-store' });
             if (!res.ok) throw new Error('Ошибка загрузки планов');
             const data = await res.json();
             availablePlans = data.plans || [];
 
             const dropdown = document.getElementById('plan-select-dropdown');
-            if (dropdown) {
-                if (availablePlans.length > 0 && isTeacherUser) {
+            let matchingPlan = null;
+
+            if (isTeacherUser) {
+                // Ищем план конкретного ученика, если передан ID или имя
+                if (preselectStudentId) {
+                    const sid = parseInt(preselectStudentId, 10);
+                    matchingPlan = availablePlans.find(p => p.studentId === sid || (p.student_id && parseInt(p.student_id, 10) === sid));
+                }
+                if (!matchingPlan && preselectStudentName) {
+                    const normName = preselectStudentName.trim().toLowerCase();
+                    matchingPlan = availablePlans.find(p => (p.studentName || '').trim().toLowerCase() === normName);
+                }
+
+                if (dropdown) {
                     dropdown.style.display = 'inline-block';
-                    dropdown.innerHTML = '<option value="">-- Выбрать план --</option>' + availablePlans.map(p => `
+                    let optionsHtml = '';
+                    if (matchingPlan) {
+                        optionsHtml += '<option value="">-- Выбрать план --</option>';
+                    } else if (preselectStudentId) {
+                        const sLabel = preselectStudentName || 'Ученик';
+                        optionsHtml += `<option value="draft" selected>➕ Новый план · ${escapeHtml(sLabel)} (черновик)</option>`;
+                    } else if (availablePlans.length > 0) {
+                        optionsHtml += '<option value="">-- Выбрать план --</option>';
+                    }
+
+                    optionsHtml += availablePlans.map(p => `
                         <option value="${p.id}">${escapeHtml(p.studentName || p.title)} (${p.academicYear || '2026-2027'})</option>
                     `).join('');
-                } else {
-                    dropdown.style.display = 'none';
-                }
-            }
 
-            if (availablePlans.length > 0) {
-                // Если был указан конкретный студент или открываем первый
-                currentPlan = availablePlans[0];
-                if (dropdown) dropdown.value = currentPlan.id;
-                renderPlanView(isTeacherUser);
-            } else if (isTeacherUser) {
-                // Если планов ещё нет, загружаем эталон ОГЭ
-                const tmpl = await getOgeMathTemplate();
-                currentPlan = tmpl || {
-                    id: null,
-                    title: 'Методический план по математике. 2026-2027 учебный год',
-                    studentName: 'Аспидов Роман',
-                    academicYear: '2026-2027',
-                    subject: 'Математика',
-                    tags: ['#Репетиторство', '#Обучение'],
-                    goals: 'Подготовка ОГЭ по Математике на оценку "Отлично" (22+ баллов)',
-                    legend: '(Цветом выделены задания 2-ой части)',
-                    topics: [],
-                    monthlyCounts: {},
-                    monthlyLessons: {}
-                };
-                renderPlanView(true);
+                    dropdown.innerHTML = optionsHtml;
+                }
+
+                if (matchingPlan) {
+                    currentPlan = matchingPlan;
+                    if (dropdown) dropdown.value = currentPlan.id;
+                    renderPlanView(true);
+                } else if (preselectStudentId) {
+                    // Ученик выбран, но плана ещё нет — создаём черновик плана именно для него
+                    const tmpl = await getOgeMathTemplate();
+                    const sLabel = (preselectStudentName || 'Ученик').trim();
+                    currentPlan = tmpl ? {
+                        ...JSON.parse(JSON.stringify(tmpl)),
+                        id: null,
+                        studentId: parseInt(preselectStudentId, 10) || null,
+                        studentName: sLabel,
+                        title: `Методический план · ${sLabel}`
+                    } : {
+                        id: null,
+                        studentId: parseInt(preselectStudentId, 10) || null,
+                        studentName: sLabel,
+                        title: `Методический план · ${sLabel}`,
+                        academicYear: '2026-2027',
+                        subject: 'Математика',
+                        tags: ['#Репетиторство', '#Обучение'],
+                        goals: 'Подготовка к экзамену',
+                        legend: '(Цветом выделены задания 2-ой части)',
+                        topics: [],
+                        monthlyCounts: {
+                            'Сентябрь': 0, 'Октябрь': 8, 'Ноябрь': 8, 'Декабрь': 8,
+                            'Январь': 8, 'Февраль': 8, 'Март': 8, 'Апрель': 8, 'Май': 8
+                        },
+                        monthlyLessons: {}
+                    };
+                    if (dropdown) dropdown.value = 'draft';
+                    renderPlanView(true);
+                } else if (availablePlans.length > 0) {
+                    currentPlan = availablePlans[0];
+                    if (dropdown) dropdown.value = currentPlan.id;
+                    renderPlanView(true);
+                } else {
+                    // Планов ещё нет вовсе — открываем эталон ОГЭ
+                    const tmpl = await getOgeMathTemplate();
+                    currentPlan = tmpl || {
+                        id: null,
+                        title: 'Методический план по математике. 2026-2027 учебный год',
+                        studentName: 'Аспидов Роман',
+                        academicYear: '2026-2027',
+                        subject: 'Математика',
+                        tags: ['#Репетиторство', '#Обучение'],
+                        goals: 'Подготовка ОГЭ по Математике на оценку "Отлично" (22+ баллов)',
+                        legend: '(Цветом выделены задания 2-ой части)',
+                        topics: [],
+                        monthlyCounts: {},
+                        monthlyLessons: {}
+                    };
+                    renderPlanView(true);
+                }
             } else {
-                // Ученик без назначенного плана
-                const body = document.getElementById('plan-modal-body');
-                if (body) {
-                    body.innerHTML = `
-                        <div style="text-align:center; padding:3rem 1.5rem; color:var(--muted);">
-                            <div style="font-size:3rem; margin-bottom:12px;">📋</div>
-                            <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--ink);">Методический план пока не составлен</h3>
-                            <p style="max-width:450px; margin:0 auto; font-size:0.9rem;">Ваш преподаватель ещё не прикрепил индивидуальный методический план занятий. Как только план будет готов, он появится в этом разделе.</p>
-                        </div>
-                    `;
+                // Ученик
+                if (dropdown) dropdown.style.display = 'none';
+                if (availablePlans.length > 0) {
+                    currentPlan = availablePlans[0];
+                    renderPlanView(false);
+                } else {
+                    const body = document.getElementById('plan-modal-body');
+                    if (body) {
+                        body.innerHTML = `
+                            <div style="text-align:center; padding:3rem 1.5rem; color:var(--muted);">
+                                <div style="font-size:3rem; margin-bottom:12px;">📋</div>
+                                <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--ink);">Методический план пока не составлен</h3>
+                                <p style="max-width:450px; margin:0 auto; font-size:0.9rem;">Ваш преподаватель ещё не прикрепил индивидуальный методический план занятий. Как только план будет готов, он появится в этом разделе.</p>
+                            </div>
+                        `;
+                    }
                 }
             }
         } catch (e) {
@@ -1230,7 +1298,7 @@
     }
 
     // Открытие модального окна методического плана
-    async function openMethodicalPlanModal(studentId = null) {
+    async function openMethodicalPlanModal(studentId = null, studentName = null) {
         injectStyles();
         ensureModalExists();
         await fetchUserRole();
@@ -1239,19 +1307,26 @@
         if (!dialog) return;
 
         if (typeof dialog.showModal === 'function') {
-            dialog.showModal();
+            if (!dialog.open) {
+                dialog.showModal();
+            }
         } else {
             dialog.setAttribute('open', 'true');
         }
 
-        await loadPlansList(studentId);
+        await loadPlansList(studentId, studentName);
     }
 
     // Экспорт в глобальное пространство
-    window.MethodicalPlan = {
-        open: openMethodicalPlanModal,
+    const methodicalPlanApi = {
+        open: (studentId = null, studentName = null) => openMethodicalPlanModal(studentId, studentName),
+        openModal: (studentId = null, studentName = null) => openMethodicalPlanModal(studentId, studentName),
+        openForStudent: (studentId, studentName) => openMethodicalPlanModal(studentId, studentName),
         loadTemplate: getOgeMathTemplate
     };
+
+    window.MethodicalPlan = methodicalPlanApi;
+    window.MethodicalPlanManager = methodicalPlanApi;
 
     // Автоинициализация кнопок на страницах
     document.addEventListener('DOMContentLoaded', () => {

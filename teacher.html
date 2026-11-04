@@ -752,6 +752,9 @@
         #student-dossier-modal {
             max-width: 820px;
         }
+        #student-dossier-modal .modal-body {
+            padding: 2rem 2.25rem;
+        }
         .dossier-hud-card {
             display: flex;
             align-items: center;
@@ -1846,16 +1849,14 @@
 
             <!-- Identity HUD -->
             <div class="dossier-hud-card" id="dossier-hud">
-                <div class="avatar-circle" id="dossier-avatar" style="width:52px; height:52px; font-size:1.4rem;">У</div>
-                <div>
-                    <div style="font-family:var(--f-display); font-size:1.25rem; font-weight:800;" id="dossier-name">Имя Ученика</div>
-                    <div style="font-size:0.85rem; color:var(--muted);" id="dossier-sub">@username · ID: #0</div>
+                <div class="avatar-circle" id="dossier-avatar" style="width:52px; height:52px; font-size:1.4rem; flex-shrink:0;">У</div>
+                <div style="display:flex; flex-direction:column; gap:4px; min-width:0;">
+                    <div style="font-family:var(--f-display); font-size:1.25rem; font-weight:800; word-break:break-word;" id="dossier-name">Имя Ученика</div>
+                    <div style="font-size:0.85rem; color:var(--muted); word-break:break-word;" id="dossier-sub">@username · ID: #0</div>
                 </div>
-                <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-plan" style="margin-left:auto;" title="Открыть методический план этого ученика">
+                <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-plan" style="margin-left:auto; flex-shrink:0;" title="Открыть методический план этого ученика">
                     📋 Методический план
                 </button>
-
-                </div>
             </div>
 
             <!-- KPI Summary Grid -->
@@ -3163,8 +3164,10 @@
                     const dossierPlanBtn = document.getElementById('btn-dossier-methodical-plan') || document.getElementById('dossier-btn-plan');
                     if (dossierPlanBtn) {
                         dossierPlanBtn.onclick = () => {
-                            if (window.MethodicalPlan) {
-                                window.MethodicalPlan.open(u.id);
+                            if (window.MethodicalPlanManager) {
+                                window.MethodicalPlanManager.openForStudent(u.id, u.displayName || u.username);
+                            } else if (window.MethodicalPlan) {
+                                window.MethodicalPlan.open(u.id, u.displayName || u.username);
                             }
                         };
                     }
@@ -3215,14 +3218,7 @@
                         tasksTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--muted);">Ученик пока не решал задания в системе.</td></tr>';
                     }
 
-                    const planBtn = document.getElementById('dossier-btn-plan');
-                    if (planBtn) {
-                        planBtn.onclick = () => {
-                            if (window.MethodicalPlanManager) {
-                                window.MethodicalPlanManager.openForStudent(studentId, u.displayName || u.username);
-                            }
-                        };
-                    }
+
 
                     dossierModal.showModal();
                 } catch(err) {
@@ -3260,6 +3256,8 @@
                 btnOpenTeacherMethodicalPlan.addEventListener('click', () => {
                     if (window.MethodicalPlanManager) {
                         window.MethodicalPlanManager.openModal();
+                    } else if (window.MethodicalPlan) {
+                        window.MethodicalPlan.open();
                     }
                 });
             }
