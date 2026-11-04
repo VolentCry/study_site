@@ -1,896 +1,509 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тренажёр обыкновенных дробей - Математика</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body.fraction-trainer-page {
-            background-image: url('../assets/bg/multiplication_trainer_background_.jpg') !important;
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            background-attachment: fixed !important;
-            min-height: 100vh !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 24px 16px 80px;
-            font-family: 'MinecraftFont', 'Nunito', sans-serif;
-            color: #ffffff;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        .trainer-header-container {
-            width: min(880px, 100%);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 16px;
-            margin-top: 10px;
-        }
-
-        .trainer-main-title {
-            font-size: clamp(1.6rem, 3.8vw, 2.4rem);
-            color: #fff;
-            text-shadow: 3px 3px 0 #222, -1px -1px 0 #000;
-            text-align: center;
-            margin: 0;
-            flex: 1;
-        }
-
-        /* Верхняя панель со статистикой и рангом */
-        .stats-dashboard {
-            width: min(880px, 100%);
-            background: rgba(22, 28, 38, 0.88);
-            border: 3px solid #505050;
-            box-shadow: 4px 4px 0 #111, inset 0 0 12px rgba(0,0,0,0.4);
-            border-radius: 8px;
-            padding: 12px 20px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        .stat-badge {
-            background: #2a374a;
-            border: 2px solid #6b7280;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #fcd34d;
-        }
-
-        .streak-fire {
-            color: #fb923c;
-            font-size: 1.25rem;
-            animation: pulse-fire 1.5s infinite;
-        }
-
-        @keyframes pulse-fire {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.18); }
-        }
-
-        .dashboard-tools {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .icon-tool-btn {
-            background: #374151;
-            border: 2px solid #9ca3af;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            font-family: inherit;
-        }
-
-        .icon-tool-btn:hover {
-            background: #4b5563;
-            transform: translateY(-2px);
-        }
-
-        .icon-tool-btn:active {
-            transform: translateY(1px);
-        }
-
-        /* Переключатель режимов */
-        .mode-tabs-container {
-            width: min(880px, 100%);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 22px;
-        }
-
-        .mode-tab {
-            background: rgba(30, 41, 59, 0.9);
-            border: 2px solid #4b5563;
-            color: #d1d5db;
-            padding: 9px 13px;
-            border-radius: 6px;
-            font-size: 0.86rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .mode-tab:hover {
-            background: #334155;
-            color: #fff;
-            border-color: #94a3b8;
-        }
-
-        .mode-tab.active {
-            background: #d97706;
-            border-color: #fde68a;
-            color: #111827;
-            box-shadow: 2px 2px 0 #78350f;
-            transform: translateY(-1px);
-        }
-
-        /* Главная карточка верстака тренажёра */
-        .workbench-card {
-            width: min(880px, 100%);
-            background: rgba(17, 24, 39, 0.92);
-            border: 4px solid #6b7280;
-            box-shadow: 6px 6px 0 #0f172a, inset 0 0 20px rgba(0,0,0,0.6);
-            border-radius: 12px;
-            padding: 28px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            backdrop-filter: blur(4px);
-        }
-
-        .problem-prompt {
-            font-size: 1.15rem;
-            color: #e2e8f0;
-            margin-bottom: 24px;
-            text-align: center;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-
-        /* Контейнер математического примера */
-        .problem-formula-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 16px 20px;
-            margin-bottom: 24px;
-            padding: 16px 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid #374151;
-            border-radius: 8px;
-            min-height: 120px;
-        }
-
-        /* Отображение обыкновенной дроби */
-        .math-fraction-view {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #f8fafc;
-            text-shadow: 2px 2px 0 #000;
-            min-width: 48px;
-            user-select: none;
-        }
-
-        .math-num {
-            padding: 2px 6px;
-        }
-
-        .math-bar {
-            width: 100%;
-            height: 4px;
-            background: #f8fafc;
-            box-shadow: 0 1px 2px #000;
-            border-radius: 2px;
-        }
-
-        .math-den {
-            padding: 2px 6px;
-        }
-
-        /* Смешанное число в условии */
-        .math-mixed-view {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #f8fafc;
-            text-shadow: 2px 2px 0 #000;
-            user-select: none;
-        }
-
-        .math-whole {
-            font-size: 2.6rem;
-            color: #fcd34d;
-            padding-right: 2px;
-        }
-
-        /* Знаки операций (+, -, ×, ÷, =) */
-        .operator-sign {
-            font-size: 2.6rem;
-            color: #fcd34d;
-            text-shadow: 2px 2px 0 #000;
-            user-select: none;
-            padding: 0 4px;
-        }
-
-        /* Блок ввода дроби */
-        .fraction-answer-inputs {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-left: 6px;
-        }
-
-        .fraction-input-num, .fraction-input-den {
-            width: 82px;
-            height: 46px;
-            font-family: 'MinecraftFont', sans-serif;
-            font-size: 1.8rem;
-            text-align: center;
-            background-color: #cbd5e1;
-            color: #0f172a;
-            border: 3px solid #475569;
-            border-radius: 4px;
-            outline: none;
-            transition: all 0.2s;
-            box-shadow: inset 2px 2px 0 #94a3b8;
-        }
-
-        .fraction-input-num:focus, .fraction-input-den:focus {
-            background-color: #ffffff;
-            border-color: #f59e0b;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-        }
-
-        .fraction-input-num.correct-val, .fraction-input-den.correct-val {
-            background-color: #86efac !important;
-            border-color: #16a34a !important;
-            color: #064e3b !important;
-        }
-
-        .fraction-input-num.incorrect-val, .fraction-input-den.incorrect-val {
-            background-color: #fca5a5 !important;
-            border-color: #dc2626 !important;
-            color: #7f1d1d !important;
-            animation: shake 0.35s ease;
-        }
-
-        .fraction-input-num.warning-val, .fraction-input-den.warning-val {
-            background-color: #fde68a !important;
-            border-color: #d97706 !important;
-            color: #78350f !important;
-        }
-
-        .fraction-input-divider {
-            width: 82px;
-            height: 4px;
-            background-color: #f8fafc;
-            border-radius: 2px;
-        }
-
-        /* Блок ввода смешанного числа (выделение целой части) */
-        .mixed-answer-inputs {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: 6px;
-        }
-
-        .fraction-input-whole {
-            width: 82px;
-            height: 52px;
-            font-family: 'MinecraftFont', sans-serif;
-            font-size: 1.8rem;
-            text-align: center;
-            background-color: #cbd5e1;
-            color: #0f172a;
-            border: 3px solid #475569;
-            border-radius: 4px;
-            outline: none;
-            transition: all 0.2s;
-            box-shadow: inset 2px 2px 0 #94a3b8;
-        }
-
-        .fraction-input-whole:focus {
-            background-color: #ffffff;
-            border-color: #f59e0b;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-        }
-
-        .fraction-input-whole.correct-val {
-            background-color: #86efac !important;
-            border-color: #16a34a !important;
-            color: #064e3b !important;
-        }
-
-        .fraction-input-whole.incorrect-val {
-            background-color: #fca5a5 !important;
-            border-color: #dc2626 !important;
-            color: #7f1d1d !important;
-            animation: shake 0.35s ease;
-        }
-
-        .fraction-input-whole.warning-val {
-            background-color: #fde68a !important;
-            border-color: #d97706 !important;
-            color: #78350f !important;
-        }
-
-        /* Блок ввода десятичной дроби */
-        .decimal-answer-inputs {
-            display: inline-flex;
-            align-items: center;
-            margin-left: 6px;
-        }
-
-        .decimal-input-box {
-            width: 150px;
-            height: 50px;
-            font-family: 'MinecraftFont', sans-serif;
-            font-size: 1.8rem;
-            text-align: center;
-            background-color: #cbd5e1;
-            color: #0f172a;
-            border: 3px solid #475569;
-            border-radius: 4px;
-            outline: none;
-            transition: all 0.2s;
-            box-shadow: inset 2px 2px 0 #94a3b8;
-        }
-
-        .decimal-input-box:focus {
-            background-color: #ffffff;
-            border-color: #f59e0b;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-        }
-
-        .decimal-input-box.correct-val {
-            background-color: #86efac !important;
-            border-color: #16a34a !important;
-            color: #064e3b !important;
-        }
-
-        .decimal-input-box.incorrect-val {
-            background-color: #fca5a5 !important;
-            border-color: #dc2626 !important;
-            color: #7f1d1d !important;
-            animation: shake 0.35s ease;
-        }
-
-        /* Выбор знака в режиме сравнения */
-        .compare-selector-box {
-            display: inline-flex;
-            gap: 8px;
-            padding: 8px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px dashed #64748b;
-            border-radius: 8px;
-        }
-
-        .compare-choice-btn {
-            width: 48px;
-            height: 48px;
-            background: #334155;
-            border: 2px solid #94a3b8;
-            color: #fff;
-            font-size: 1.8rem;
-            font-family: inherit;
-            cursor: pointer;
-            border-radius: 6px;
-            display: grid;
-            place-items: center;
-            transition: all 0.15s;
-        }
-
-        .compare-choice-btn:hover {
-            background: #475569;
-            border-color: #fcd34d;
-            transform: scale(1.08);
-        }
-
-        .compare-choice-btn.selected {
-            background: #d97706;
-            border-color: #fef08a;
-            color: #0f172a;
-            box-shadow: 0 0 10px rgba(217, 119, 6, 0.8);
-        }
-
-        /* Кнопки управления */
-        .action-controls-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 18px;
-        }
-
-        .game-btn {
-            min-height: 44px;
-            padding: 0 22px;
-            font-family: 'MinecraftFont', 'Nunito', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        .game-btn-primary {
-            background: #16a34a;
-            border: 2px solid #86efac;
-            color: #fff;
-            box-shadow: 3px 3px 0 #14532d;
-        }
-
-        .game-btn-primary:hover {
-            background: #22c55e;
-            transform: translateY(-2px);
-            box-shadow: 3px 5px 0 #14532d;
-        }
-
-        .game-btn-secondary {
-            background: #475569;
-            border: 2px solid #94a3b8;
-            color: #f1f5f9;
-            box-shadow: 3px 3px 0 #1e293b;
-        }
-
-        .game-btn-secondary:hover {
-            background: #64748b;
-            transform: translateY(-2px);
-        }
-
-        .game-btn-hint {
-            background: #d97706;
-            border: 2px solid #fde68a;
-            color: #fff;
-            box-shadow: 3px 3px 0 #78350f;
-        }
-
-        .game-btn-hint:hover {
-            background: #b45309;
-            transform: translateY(-2px);
-        }
-
-        .game-btn-danger {
-            background: #dc2626;
-            border: 2px solid #fca5a5;
-            color: #fff;
-            box-shadow: 3px 3px 0 #7f1d1d;
-        }
-
-        .game-btn-danger:hover {
-            background: #ef4444;
-            transform: translateY(-2px);
-            box-shadow: 3px 5px 0 #7f1d1d;
-        }
-
-        .shake-anim {
-            animation: shake 0.4s ease;
-        }
-
-        /* Модальное окно подтверждения пропуска */
-        .trainer-modal {
-            border: none;
-            padding: 0;
-            background: transparent;
-            max-width: 480px;
-            width: calc(100% - 32px);
-            margin: auto;
-        }
-
-        .trainer-modal::backdrop {
-            background: rgba(5, 12, 26, 0.82);
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-box {
-            background: #1e293b;
-            border: 3px solid #ef4444;
-            border-radius: 12px;
-            padding: 24px 22px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.05);
-            color: #f8fafc;
-            text-align: center;
-            font-family: 'Nunito', sans-serif;
-            animation: modal-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes modal-pop {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .modal-icon {
-            font-size: 1.8rem;
-        }
-
-        .modal-title {
-            margin: 0;
-            font-family: 'Playfair Display', 'MinecraftFont', serif;
-            font-size: 1.35rem;
-            color: #fca5a5;
-            font-weight: 700;
-        }
-
-        .modal-message {
-            font-size: 1.02rem;
-            line-height: 1.6;
-            color: #e2e8f0;
-            margin: 0 0 22px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .game-btn:active {
-            transform: translateY(2px) !important;
-            box-shadow: 1px 1px 0 #000 !important;
-        }
-
-        /* Обратная связь */
-        .trainer-feedback {
-            min-height: 38px;
-            font-size: 1.15rem;
-            font-weight: bold;
-            text-align: center;
-            font-family: 'Nunito', sans-serif;
-            margin-bottom: 16px;
-            padding: 6px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-
-        .trainer-feedback.success {
-            color: #4ade80;
-            background: rgba(22, 163, 74, 0.2);
-            border: 1px solid rgba(74, 222, 128, 0.4);
-            animation: pop-feedback 0.3s ease;
-        }
-
-        .trainer-feedback.error {
-            color: #f87171;
-            background: rgba(220, 38, 38, 0.2);
-            border: 1px solid rgba(248, 113, 113, 0.4);
-        }
-
-        .trainer-feedback.warning {
-            color: #fbbf24;
-            background: rgba(217, 119, 6, 0.2);
-            border: 1px solid rgba(251, 191, 36, 0.4);
-        }
-
-        @keyframes pop-feedback {
-            0% { transform: scale(0.92); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Визуальная модель (SVG) */
-        .fraction-visual-container {
-            width: 100%;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-
-        .visual-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 2px solid #475569;
-            border-radius: 8px;
-            padding: 14px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .visual-label {
-            font-size: 0.95rem;
-            color: #cbd5e1;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-        }
-
-        .visual-strip-row {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .visual-strip-tag {
-            font-size: 0.88rem;
-            color: #94a3b8;
-            min-width: 160px;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 600;
-        }
-
-        .fraction-strip-svg {
-            background: #0f172a;
-            border-radius: 4px;
-            box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* Карточка решения / подсказки */
-        .solution-card {
-            width: 100%;
-            background: #1e293b;
-            border: 2px solid #f59e0b;
-            border-radius: 8px;
-            padding: 18px 20px;
-            margin-top: 14px;
-            color: #f1f5f9;
-            font-family: 'Nunito', sans-serif;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            animation: slide-down 0.3s ease;
-        }
-
-        .solution-card.hidden {
-            display: none;
-        }
-
-        .solution-card h3 {
-            margin-top: 0;
-            color: #fcd34d;
-            font-size: 1.15rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .solution-content {
-            font-size: 0.98rem;
-            line-height: 1.6;
-        }
-
-        .solution-content code {
-            background: #0f172a;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #67e8f9;
-            font-family: monospace;
-            font-size: 1.05em;
-        }
-
-        @keyframes slide-down {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-
-        /* Декорация в углу */
-        .floating-decoration {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .floating-decoration img {
-            width: 52px;
-            height: 52px;
-            image-rendering: pixelated;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));
-            animation: float-spin 6s ease-in-out infinite;
-        }
-
-        @keyframes float-spin {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(8deg); }
-        }
-
-        /* Адаптивность для мобильных */
-        @media (max-width: 640px) {
-            body.fraction-trainer-page {
-                padding: 16px 10px 70px;
-            }
-            .stats-dashboard {
-                padding: 10px 14px;
-                gap: 10px;
-            }
-            .mode-tab {
-                font-size: 0.78rem;
-                padding: 7px 10px;
-            }
-            .workbench-card {
-                padding: 20px 14px;
-            }
-            .problem-formula-wrapper {
-                gap: 10px;
-                padding: 12px 10px;
-            }
-            .math-fraction-view, .math-mixed-view {
-                font-size: 1.6rem;
-            }
-            .math-whole {
-                font-size: 2rem;
-            }
-            .operator-sign {
-                font-size: 1.8rem;
-            }
-            .fraction-input-num, .fraction-input-den, .fraction-input-whole {
-                width: 64px;
-                height: 40px;
-                font-size: 1.4rem;
-            }
-            .decimal-input-box {
-                width: 120px;
-                height: 42px;
-                font-size: 1.4rem;
-            }
-            .fraction-input-divider {
-                width: 64px;
-            }
-            .compare-choice-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 1.5rem;
-            }
-            .floating-decoration {
-                display: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр обыкновенных дробей · 4 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      max-width: 960px; margin: 0 auto; width: 100%; padding: 36px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title {
+      font: 900 clamp(28px, 4.5vw, 40px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 680px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* DASHBOARD TOOLS */
+    .dashboard-tools {
+      display: flex; align-items: center; gap: 8px; justify-content: flex-end;
+    }
+    .icon-tool-btn {
+      padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 6px;
+      background: #fff; border: 1px solid var(--line); color: var(--indigo);
+      cursor: pointer; transition: all .2s;
+    }
+    .icon-tool-btn:hover { border-color: var(--vermilion); color: var(--vermilion); }
+
+    /* CATEGORY / MODE TABS */
+    .mode-tabs-container {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .mode-tab {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      transition: all .2s ease; cursor: pointer;
+    }
+    .mode-tab:hover { color: var(--indigo); border-color: var(--indigo); }
+    .mode-tab.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* MAIN PROBLEM CARD */
+    .workbench-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 700; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 10px; border-radius: 999px;
+    }
+
+    .problem-prompt {
+      font-size: 15px; color: var(--muted); font-weight: 600; text-align: center; margin-top: 10px;
+    }
+
+    /* FORMULA WRAPPER */
+    .problem-formula-wrapper {
+      display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+      gap: 16px 20px; padding: 18px 28px; background: var(--paper-light);
+      border: 1px solid rgba(38,63,97,.14); border-radius: 12px;
+      min-height: 110px; width: 100%; max-width: 680px;
+    }
+
+    /* FRACTION DISPLAY */
+    .math-fraction-view {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 26px; font-weight: 700; color: var(--indigo-dark);
+      min-width: 40px; user-select: none; line-height: 1.1;
+    }
+    .math-num { padding: 2px 6px; }
+    .math-bar {
+      width: 100%; height: 2px; background: var(--indigo); border-radius: 1px;
+    }
+    .math-den { padding: 2px 6px; }
+
+    /* MIXED FRACTION */
+    .math-mixed-view {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 26px; font-weight: 700;
+      color: var(--indigo-dark); user-select: none;
+    }
+    .math-whole {
+      font: 700 32px 'Zen Old Mincho', serif; color: var(--vermilion); padding-right: 2px;
+    }
+    .operator-sign {
+      font-size: 28px; font-weight: 700; color: var(--vermilion); user-select: none; padding: 0 4px;
+    }
+
+    /* INPUTS */
+    .fraction-answer-inputs {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; margin-left: 6px;
+    }
+    .fraction-input-num, .fraction-input-den {
+      width: 68px; height: 44px; font-family: 'DM Sans', monospace; font-size: 20px; font-weight: 700;
+      text-align: center; background: #fff; color: var(--ink); border: 2px solid var(--line);
+      border-radius: 8px; outline: none; transition: all .2s;
+    }
+    .fraction-input-num:focus, .fraction-input-den:focus {
+      border-color: var(--indigo); outline: 2px solid var(--indigo); outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+    .fraction-input-divider {
+      width: 68px; height: 2px; background-color: var(--indigo); border-radius: 1px;
+    }
+
+    .mixed-answer-inputs {
+      display: inline-flex; align-items: center; gap: 8px; margin-left: 6px;
+    }
+    .fraction-input-whole {
+      width: 68px; height: 50px; font-family: 'DM Sans', monospace; font-size: 22px; font-weight: 700;
+      text-align: center; background: #fff; color: var(--ink); border: 2px solid var(--line);
+      border-radius: 8px; outline: none; transition: all .2s;
+    }
+    .fraction-input-whole:focus {
+      border-color: var(--indigo); outline: 2px solid var(--indigo); outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+
+    .decimal-answer-inputs { display: inline-flex; align-items: center; margin-left: 6px; }
+    .decimal-input-box {
+      width: 140px; height: 50px; font-family: 'DM Sans', monospace; font-size: 20px; font-weight: 700;
+      text-align: center; background: #fff; color: var(--ink); border: 2px solid var(--line);
+      border-radius: 8px; outline: none; transition: all .2s;
+    }
+    .decimal-input-box:focus {
+      border-color: var(--indigo); outline: 2px solid var(--indigo); outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+
+    .correct-val {
+      background-color: var(--green-light) !important; border-color: var(--green) !important; color: var(--green) !important;
+    }
+    .incorrect-val {
+      background-color: var(--vermilion-light) !important; border-color: var(--vermilion) !important; color: var(--vermilion) !important;
+    }
+    .warning-val {
+      background-color: #fdf6ec !important; border-color: var(--gold) !important; color: var(--gold) !important;
+    }
+
+    /* COMPARE SELECTOR */
+    .compare-selector-box {
+      display: inline-flex; gap: 8px; padding: 6px 10px; background: var(--paper-light);
+      border: 1px dashed var(--line); border-radius: 8px;
+    }
+    .compare-choice-btn {
+      width: 44px; height: 44px; background: #fff; border: 2px solid var(--line);
+      color: var(--indigo); font-size: 22px; font-weight: 700; cursor: pointer;
+      border-radius: 8px; display: grid; place-items: center; transition: all .15s;
+    }
+    .compare-choice-btn:hover { border-color: var(--indigo); background: var(--paper-light); }
+    .compare-choice-btn.selected {
+      background: var(--indigo); border-color: var(--indigo); color: #fff;
+    }
+
+    /* ACTIONS ROW */
+    .action-controls-row {
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;
+    }
+    .game-btn {
+      min-height: 48px; padding: 0 24px; font-family: inherit; font-size: 14px; font-weight: 700;
+      border-radius: 10px; cursor: pointer; transition: all .2s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .game-btn-primary {
+      background: var(--vermilion); color: #fff; box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .game-btn-primary:hover {
+      background: #d3525b; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .game-btn-secondary {
+      background: var(--indigo); color: #fff; box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .game-btn-secondary:hover { background: #19273c; transform: translateY(-1px); }
+    .game-btn-hint {
+      background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo);
+    }
+    .game-btn-hint:hover { background: #fff; border-color: var(--indigo); color: var(--vermilion); }
+    .game-btn-danger {
+      background: var(--paper-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
+    }
+    .game-btn-danger:hover { background: var(--vermilion-light); }
+
+    /* FEEDBACK */
+    .trainer-feedback {
+      min-height: 38px; font-size: 14px; font-weight: 600; text-align: center;
+      padding: 10px 18px; border-radius: 10px; display: none; width: 100%; max-width: 560px;
+    }
+    .trainer-feedback.success {
+      display: block; background: var(--green-light); border: 1px solid rgba(46,125,50,.3); color: var(--green);
+    }
+    .trainer-feedback.error {
+      display: block; background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
+    }
+    .trainer-feedback.warning {
+      display: block; background: #fdf6ec; border: 1px solid var(--gold); color: #b45309;
+    }
+
+    /* VISUAL & SOLUTION CARDS */
+    .fraction-visual-container { width: 100%; max-width: 680px; }
+    .visual-card {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px 18px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .visual-label { font-size: 13px; font-weight: 700; color: var(--indigo); }
+    .fraction-strip-svg {
+      background: #fff; border: 1px solid var(--line); border-radius: 6px; max-width: 100%; height: auto;
+    }
+
+    .solution-card {
+      width: 100%; max-width: 680px; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 18px 22px; color: var(--ink);
+    }
+    .solution-card.hidden { display: none; }
+    .solution-card h3 {
+      font: 700 16px 'Zen Old Mincho', serif; color: var(--indigo); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .solution-content { font-size: 14px; line-height: 1.6; }
+    .solution-content code {
+      background: #fff; padding: 2px 6px; border-radius: 4px; color: var(--indigo);
+      border: 1px solid var(--line); font-family: monospace; font-weight: 700;
+    }
+
+    /* MODAL */
+    .trainer-modal {
+      border: none; padding: 0; background: transparent; max-width: 440px; width: calc(100% - 32px); margin: auto;
+    }
+    .trainer-modal::backdrop { background: rgba(32,42,58,.5); backdrop-filter: blur(4px); }
+    .modal-box {
+      background: #fff; border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 24px; box-shadow: var(--shadow-lg); text-align: center;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+    .modal-title { font: 700 18px 'Zen Old Mincho', serif; color: var(--vermilion); }
+    .modal-message { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+    @media (max-width: 768px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .workbench-card { padding: 24px 16px; }
+      .action-controls-row { flex-direction: column; }
+      .game-btn { width: 100%; }
+      .nav-task-switcher { display: none; }
+    }
+  </style>
 </head>
-<body class="fraction-trainer-page">
-    <a href="../pages/math_4.html" class="back-button" title="Вернуться в раздел Математики">&#x2190;</a>
+<body>
 
-    <div class="trainer-header-container">
-        <h1 class="trainer-main-title">Обыкновенные дроби</h1>
+  <!-- SITE NAV -->
+  <header class="site-nav" role="banner">
+    <a class="brand" href="../pages/math_4.html" aria-label="Вернуться в Математика 4 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">4–5 класс · Математика</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор тренажёра">
+      <a href="multiplication_trainer.html" class="task-pill">№1 Умножение</a>
+      <a href="decimal_fraction_trainer.html" class="task-pill">№4 Десятичные</a>
+      <a href="equations_trainer_easy.html" class="task-pill">№5 Уравнения</a>
+      <span class="task-pill active" aria-current="page">№7 Обыкновенные</span>
+      <a href="powers_trainer.html" class="task-pill">№8 Степени</a>
     </div>
 
-    <!-- Верхняя информационная панель со статистикой и рангом -->
-    <div class="stats-dashboard">
-        <div class="stat-item">
-            <span>Звание:</span>
-            <span id="rank-title" class="stat-badge">Ученик</span>
-        </div>
-        <div class="stat-item">
-            <span class="streak-fire">🔥</span>
-            <span>Серия:</span>
-            <span id="stat-streak" class="stat-badge">0</span>
-        </div>
-        <div class="stat-item">
-            <span>Решено:</span>
-            <span class="stat-badge"><span id="stat-correct">0</span> / <span id="stat-total">0</span></span>
-        </div>
-        <div class="dashboard-tools">
-            <button type="button" id="toggle-visual-btn" class="icon-tool-btn" title="Скрыть или показать графическую схему">📊 Скрыть схему</button>
-            <button type="button" id="sound-toggle-btn" class="icon-tool-btn" title="Включить / выключить звук">🔊</button>
-        </div>
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/math_4.html" class="nav-btn">← Раздел 4 класса</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <div class="trainer-header">
+      <div class="trainer-kicker">Математика · 4 класс</div>
+      <h1 class="trainer-title">Обыкновенные дроби</h1>
+      <p class="trainer-subtitle">
+        Сложение, вычитание, сокращение, выделение целой части и перевод в десятичные. Тренируй понимание долей, держи непрерывную серию и получай звания.
+      </p>
     </div>
 
-    <!-- Переключатель режимов тренировки -->
-    <div class="mode-tabs-container">
-        <button type="button" class="mode-tab active" data-mode="same_denom">➕ Одинаковые знам.</button>
-        <button type="button" class="mode-tab" data-mode="diff_denom">⚡ Разные знам.</button>
-        <button type="button" class="mode-tab" data-mode="reduce">🎯 Сокращение</button>
-        <button type="button" class="mode-tab" data-mode="extract_whole">🍰 Выделение целой части</button>
-        <button type="button" class="mode-tab" data-mode="to_decimal">🔢 В десятичную дробь</button>
-        <button type="button" class="mode-tab" data-mode="mul_div">✖️ Умножение и деление</button>
-        <button type="button" class="mode-tab" data-mode="compare">⚖️ Сравнение</button>
-        <button type="button" class="mode-tab" data-mode="mixed">🎲 Микс</button>
+    <!-- STATS DASHBOARD -->
+    <div class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-num"><span id="stat-correct">0</span> / <span id="stat-total">0</span></span>
+          <span class="stat-label">Решено / Всего</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="rank-title">Ученик 🥉</span>
+          <span class="stat-label">Текущее звание</span>
+        </div>
+      </div>
+      <div class="dashboard-tools">
+        <button type="button" id="toggle-visual-btn" class="icon-tool-btn" title="Скрыть или показать графическую схему">📊 Схема</button>
+        <button type="button" id="sound-toggle-btn" class="icon-tool-btn" title="Включить / выключить звук">🔊 Звук</button>
+      </div>
     </div>
 
-    <!-- Основной блок верстака тренажёра -->
-    <div class="workbench-card">
-        <div id="problem-prompt" class="problem-prompt">Вычисли значение выражения:</div>
-
-        <div id="problem-container" class="problem-formula-wrapper">
-            <!-- Динамически наполняется JavaScript -->
-        </div>
-
-        <!-- Визуальная графическая модель дроби -->
-        <div id="fraction-visual-container" class="fraction-visual-container">
-            <!-- Рендерится динамически в SVG -->
-        </div>
-
-        <!-- Кнопки действий -->
-        <div class="action-controls-row">
-            <button type="button" id="trainer-check-button" class="game-btn game-btn-primary">✔ Проверить (Enter)</button>
-            <button type="button" id="trainer-hint-button" class="game-btn game-btn-hint">💡 Подсказка</button>
-            <button type="button" id="trainer-next-button" class="game-btn game-btn-secondary">➔ Следующий</button>
-            <button type="button" id="trainer-skip-button" class="game-btn game-btn-danger">⏭ Пропустить</button>
-        </div>
-
-        <!-- Сообщение обратной связи -->
-        <div id="trainer-feedback" class="trainer-feedback"></div>
-
-        <!-- Карточка пошагового решения -->
-        <div id="solution-card" class="solution-card hidden">
-            <h3>💡 Пошаговое решение:</h3>
-            <div id="solution-content" class="solution-content"></div>
-        </div>
+    <!-- CATEGORY / MODE TABS -->
+    <div class="mode-tabs-container" role="tablist" aria-label="Режимы тренировки">
+      <button type="button" class="mode-tab active" data-mode="same_denom">➕ Одинаковые знам.</button>
+      <button type="button" class="mode-tab" data-mode="diff_denom">⚡ Разные знам.</button>
+      <button type="button" class="mode-tab" data-mode="reduce">🎯 Сокращение</button>
+      <button type="button" class="mode-tab" data-mode="extract_whole">🍰 Целая часть</button>
+      <button type="button" class="mode-tab" data-mode="to_decimal">🔢 В десятичную</button>
+      <button type="button" class="mode-tab" data-mode="mul_div">✖️ Умножение и деление</button>
+      <button type="button" class="mode-tab" data-mode="compare">⚖️ Сравнение</button>
+      <button type="button" class="mode-tab" data-mode="mixed">🎲 Микс</button>
     </div>
 
-    <div class="floating-decoration">
-        <img src="../assets/images/crafting_table.png" alt="Верстак" class="spinning-icon" title="Верстак знаний">
+    <!-- MAIN PROBLEM CARD -->
+    <article class="workbench-card">
+      <span class="card-top-tag" id="task-badge">Обыкновенные дроби</span>
+      <span class="card-help-badge" id="task-cat-badge">Действия с дробями</span>
+
+      <div id="problem-prompt" class="problem-prompt">Вычислите значение выражения:</div>
+
+      <div id="problem-container" class="problem-formula-wrapper">
+        <!-- Dynamic Fraction Math Expression -->
+      </div>
+
+      <!-- Graphical Visual Model (SVG) -->
+      <div id="fraction-visual-container" class="fraction-visual-container">
+        <!-- SVG rendered dynamically -->
+      </div>
+
+      <!-- Action Controls -->
+      <div class="action-controls-row">
+        <button type="button" id="trainer-check-button" class="game-btn game-btn-primary">✔ Проверить (Enter)</button>
+        <button type="button" id="trainer-hint-button" class="game-btn game-btn-hint">💡 Подсказка</button>
+        <button type="button" id="trainer-next-button" class="game-btn game-btn-secondary">➔ Следующее задание</button>
+        <button type="button" id="trainer-skip-button" class="game-btn game-btn-danger">⏭ Пропустить</button>
+      </div>
+
+      <!-- Feedback -->
+      <div id="trainer-feedback" class="trainer-feedback"></div>
+
+      <!-- Solution Card -->
+      <div id="solution-card" class="solution-card hidden">
+        <h3>💡 Пошаговое решение:</h3>
+        <div id="solution-content" class="solution-content"></div>
+      </div>
+    </article>
+  </main>
+
+  <!-- Confirm Skip Modal -->
+  <dialog id="confirm-skip-dialog" class="trainer-modal" aria-labelledby="skip-dialog-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-icon">⚠️</span>
+        <h2 id="skip-dialog-title" class="modal-title">Пропустить задание?</h2>
+      </div>
+      <p class="modal-message">
+        Вы уверены, что хотите пропустить задание? Текущая серия правильных ответов будет сброшена.
+      </p>
+      <div class="modal-actions">
+        <button type="button" id="skip-dialog-cancel" class="game-btn game-btn-secondary">Остаться</button>
+        <button type="button" id="skip-dialog-confirm" class="game-btn game-btn-danger">Пропустить</button>
+      </div>
     </div>
+  </dialog>
 
-        <!-- Модальное окно подтверждения пропуска -->
-    <dialog id="confirm-skip-dialog" class="trainer-modal" aria-labelledby="skip-dialog-title">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span class="modal-icon">⚠️</span>
-                <h2 id="skip-dialog-title" class="modal-title">Пропустить задание?</h2>
-            </div>
-            <p class="modal-message">
-                Вы уверены, что хотите пропустить задание? В таком случае ваша серия и звание сбросятся.
-            </p>
-            <div class="modal-actions">
-                <button type="button" id="skip-dialog-cancel" class="game-btn game-btn-secondary">Остаться</button>
-                <button type="button" id="skip-dialog-confirm" class="game-btn game-btn-danger">Пропустить</button>
-            </div>
-        </div>
-    </dialog>
-
-    <script src="../js/trainer_rank_tracker.js"></script>
-    <script src="../js/common_fraction_trainer.js"></script>
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/common_fraction_trainer.js"></script>
 </body>
 </html>
