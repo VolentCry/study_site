@@ -19,6 +19,26 @@
     // Конфигурация всех тренажёров платформы
     const TRAINERS = [
         {
+            id: 'powers_compare',
+            name: 'Сравнение степеней (<, >, =)',
+            shortName: 'Сравнение степеней',
+            subject: 'Математика',
+            category: 'Степени',
+            classNum: '4-5 класс',
+            url: '../math_moduls/powers_compare_trainer.html',
+            profileUrl: 'math_moduls/powers_compare_trainer.html',
+            icon: '⚖️',
+            description: 'Сравнение выражений со степенями: одинаковые основания, одинаковые показатели, вычисление значений и свойства степеней.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель сравнений 👑' },
+                { min: 18, title: 'Архимаг неравенств 🧙' },
+                { min: 12, title: 'Мастер сравнения степеней 💎' },
+                { min: 7,  title: 'Знаток степеней 🥇' },
+                { min: 4,  title: 'Точный счетовод 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'powers_trainer',
             name: 'Степени чисел (4–5 класс)',
             shortName: 'Степени чисел',
@@ -359,6 +379,7 @@
                 else if (path.includes('multiplication_trainer')) trainerId = 'multiplication_easy';
                 else if (path.includes('equations_trainer_medium')) trainerId = 'equations_medium';
                 else if (path.includes('equations_trainer_easy')) trainerId = 'equations_easy';
+                else if (path.includes('powers_compare')) trainerId = 'powers_compare';
                 else if (path.includes('powers_trainer')) trainerId = 'powers_trainer';
 
                 if (!trainerId) return;

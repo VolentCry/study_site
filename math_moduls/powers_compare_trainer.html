@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр сравнения степеней · 4–5 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      max-width: 960px; margin: 0 auto; width: 100%; padding: 36px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title {
+      font: 900 clamp(28px, 4.5vw, 40px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 720px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 700; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 10px; border-radius: 999px;
+    }
+
+    /* COMPARISON DISPLAY */
+    .task-display {
+      width: 100%; text-align: center; margin-top: 10px;
+    }
+    .task-prompt {
+      font-size: 15px; color: var(--muted); margin-bottom: 20px; font-weight: 600;
+    }
+
+    .compare-display {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 24px 36px;
+      background: var(--paper-light);
+      border: 1px solid rgba(38,63,97,.14);
+      border-radius: 16px;
+      box-shadow: inset 0 2px 6px rgba(38,63,97,.04);
+      flex-wrap: wrap;
+    }
+    .compare-side {
+      font-size: clamp(28px, 4.8vw, 42px);
+      font-weight: 700;
+      color: var(--indigo-dark);
+      font-family: 'DM Sans', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+    .compare-side sup {
+      font-size: 0.62em;
+      vertical-align: super;
+      line-height: 0;
+      color: var(--vermilion);
+      font-weight: 800;
+      margin-left: 2px;
+    }
+
+    .compare-slot {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      border: 2px dashed rgba(38,63,97,.3);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--muted);
+      font-family: 'DM Sans', monospace;
+      transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-slot.filled {
+      border: 2px solid var(--indigo);
+      color: var(--indigo);
+      background: var(--indigo-soft);
+      transform: scale(1.06);
+    }
+    .compare-slot.correct {
+      border-color: var(--green) !important;
+      color: var(--green) !important;
+      background: var(--green-light) !important;
+      transform: scale(1.1);
+    }
+    .compare-slot.wrong {
+      border-color: var(--vermilion) !important;
+      color: var(--vermilion) !important;
+      background: var(--vermilion-light) !important;
+      transform: scale(1.05);
+    }
+
+    /* INTERACTIVE SIGN BUTTONS */
+    .compare-buttons-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 460px;
+      justify-content: center;
+    }
+    .compare-sign-btn {
+      flex: 1;
+      height: 60px;
+      min-width: 90px;
+      border-radius: 12px;
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--indigo-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      transition: all .2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-sign-btn:hover {
+      border-color: var(--indigo);
+      background: var(--paper-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .compare-sign-btn:active {
+      transform: translateY(0);
+    }
+    .compare-sign-btn.active {
+      border-color: var(--vermilion);
+      background: var(--vermilion-light);
+      color: var(--vermilion);
+      box-shadow: 0 4px 14px rgba(183,70,78,.25);
+      transform: translateY(-2px);
+    }
+    .compare-sign-btn .sign-glyph {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .compare-sign-btn .sign-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .02em;
+    }
+    .compare-sign-btn.active .sign-label {
+      color: var(--vermilion);
+    }
+
+    /* ACTION BUTTONS (CHECK / NEXT) */
+    .action-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      width: 100%;
+      max-width: 460px;
+    }
+    .btn-check,
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      padding: 0 32px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
+      transition: all .2s ease;
+      width: 100%;
+    }
+    .btn-check {
+      background: var(--vermilion);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover {
+      background: #d3525b;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .btn-check:active { transform: translateY(0); }
+    .btn-check:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-next {
+      background: var(--indigo);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover {
+      background: #19273c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+
+    /* FEEDBACK BANNER */
+    .feedback-banner {
+      width: 100%; max-width: 560px; padding: 14px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; text-align: center; display: none;
+      animation: popIn .3s ease; line-height: 1.5;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success {
+      background: var(--green-light); border: 1px solid rgba(46,125,50,.3); color: var(--green);
+    }
+    .feedback-banner.error {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
+    }
+
+    /* CARD ACTION TOOLS */
+    .card-tools {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      padding-top: 14px; border-top: 1px dashed var(--line); width: 100%;
+    }
+    .tool-link-btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      color: var(--indigo); background: var(--paper-light); border: 1px solid var(--line);
+      display: inline-flex; align-items: center; gap: 6px; transition: all .2s;
+    }
+    .tool-link-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+    /* ACCORDION PANELS */
+    .accordion-panel {
+      width: 100%; max-width: 720px; background: var(--paper-light);
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 22px;
+      display: none; animation: fadeIn .3s ease;
+    }
+    .accordion-panel.active { display: block; }
+    .accordion-panel h3 {
+      font: 700 16px 'Zen Old Mincho', serif; color: var(--indigo); margin-bottom: 12px;
+    }
+    .solution-list {
+      display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.6;
+    }
+    .solution-step {
+      padding: 10px 14px; background: #fff; border-radius: 8px; border: 1px solid rgba(38,63,97,.1);
+    }
+    .solution-step strong { color: var(--indigo); }
+
+    /* THEORY BOX */
+    .theory-content { display: flex; flex-direction: column; gap: 14px; font-size: 13px; line-height: 1.6; }
+    .theory-rule-box {
+      background: #fff; padding: 14px 16px; border-radius: 8px; border: 1px solid rgba(38,63,97,.1);
+    }
+    .theory-rule-title {
+      font-weight: 700; color: var(--indigo); margin-bottom: 4px; font-size: 14px;
+    }
+    .powers-grid-table {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-top: 8px;
+    }
+    .powers-table-cell {
+      padding: 5px 8px; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: 6px; text-align: center; font-weight: 600; font-size: 12px;
+    }
+
+    /* SCRATCHPAD CANVAS */
+    .scratchpad-container {
+      width: 100%; max-width: 720px; background: #fff; border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px; display: none; flex-direction: column; gap: 10px;
+    }
+    .scratchpad-container.active { display: flex; }
+    .scratchpad-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    }
+    .scratchpad-title { font-size: 13px; font-weight: 700; color: var(--indigo); }
+    .scratchpad-actions { display: flex; align-items: center; gap: 6px; }
+    .scratch-btn {
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      border: 1px solid var(--line); background: var(--paper-light); color: var(--muted);
+      cursor: pointer; transition: all .2s;
+    }
+    .scratch-btn:hover { color: var(--vermilion); border-color: var(--vermilion); background: #fff; }
+    .scratchpad-canvas {
+      width: 100%; height: 180px; border: 1px dashed rgba(38,63,97,.2); border-radius: 8px;
+      cursor: crosshair; touch-action: none; background: #ffffff;
+    }
+
+    /* MILESTONE CELEBRATION TOAST */
+    .milestone-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--indigo-dark); color: #fff; padding: 14px 28px;
+      border-radius: 999px; box-shadow: var(--shadow-lg); font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; z-index: 100;
+      opacity: 0; transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .milestone-toast.active {
+      transform: translateX(-50%) translateY(0); opacity: 1;
+    }
+
+    @keyframes popIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media (max-width: 768px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .problem-card { padding: 24px 18px; }
+      .compare-display { padding: 18px 20px; gap: 12px; }
+      .compare-side { font-size: 26px; }
+      .compare-slot { width: 52px; height: 52px; font-size: 26px; }
+      .compare-buttons-row { gap: 8px; }
+      .compare-sign-btn { height: 52px; }
+      .nav-task-switcher { display: none; }
+    }
+
+    @media (max-width: 540px) {
+      .site-nav { padding: 0 12px; min-height: 54px; gap: 6px; }
+      .brand-sub { display: none; }
+      .brand-name { font-size: 15px; }
+      .nav-actions { gap: 6px; }
+      .nav-btn { padding: 0 8px; min-height: 32px; font-size: 11px; }
+      .trainer-shell { padding: 20px 14px 48px; gap: 16px; }
+      .problem-card { padding: 44px 14px 22px; }
+      .card-top-tag { top: 12px; left: 14px; font-size: 10px; max-width: 52%; }
+      .card-help-badge { top: 12px; right: 14px; font-size: 10px; }
+      .cat-btn { padding: 5px 10px; font-size: 11px; }
+      .tool-link-btn { width: 100%; justify-content: center; min-height: 42px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAV -->
+  <header class="site-nav" role="banner">
+    <a class="brand" href="../pages/math_4.html" aria-label="Вернуться в Математика 4 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">4–5 класс · Математика</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор тренажёра">
+      <a href="multiplication_trainer.html" class="task-pill">№1 Умножение</a>
+      <a href="decimal_fraction_trainer.html" class="task-pill">№4 Десятичные</a>
+      <a href="equations_trainer_easy.html" class="task-pill">№5 Уравнения</a>
+      <a href="common_fraction_trainer.html" class="task-pill">№7 Обыкновенные</a>
+      <a href="powers_trainer.html" class="task-pill">№8 Степени</a>
+      <span class="task-pill active" aria-current="page">№9 Сравнение степеней</span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html#ranks" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/math_4.html" class="nav-btn">← Раздел 4 класса</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <div class="trainer-header">
+      <div class="trainer-kicker">Математика · 4–5 класс</div>
+      <h1 class="trainer-title">Сравнение степеней</h1>
+      <p class="trainer-subtitle">
+        Сравнивайте значения выражений со степенями: одинаковые основания, одинаковые показатели, вычисление значений и особые свойства степеней. Держите победную серию и получайте звания!
+      </p>
+    </div>
+
+    <!-- STATS DASHBOARD -->
+    <div class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">👑</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Лучшая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Решено задач</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank">Начинающий 🥉</span>
+          <span class="stat-label">Текущее звание</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY FILTERS -->
+    <div class="category-filter" role="tablist" aria-label="Категории заданий">
+      <button type="button" class="cat-btn active" data-cat="compare_all">🎲 Все задания (Микс)</button>
+      <button type="button" class="cat-btn" data-cat="compare_same_base">📐 1. Одинаковые основания</button>
+      <button type="button" class="cat-btn" data-cat="compare_same_exp">⚖️ 2. Одинаковые показатели</button>
+      <button type="button" class="cat-btn" data-cat="compare_calc">🔢 3. Вычисление и свойства</button>
+    </div>
+
+    <!-- MAIN PROBLEM CARD -->
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Сравнение степеней · 4–5 класс</span>
+      <span class="card-help-badge" id="task-cat-badge">Микс</span>
+
+      <div class="task-display">
+        <p class="task-prompt" id="task-prompt">Сравните два значения и выберите верный знак (&lt;, &gt;, =):</p>
+        <div id="math-container">
+          <!-- Dynamic Comparison Expression -->
+        </div>
+      </div>
+
+      <!-- INTERACTIVE SIGN BUTTONS -->
+      <div class="compare-buttons-row" role="group" aria-label="Выберите знак сравнения">
+        <button type="button" class="compare-sign-btn" data-sign="<" id="btn-sign-lt" aria-label="Меньше (<)">
+          <span class="sign-glyph">&lt;</span>
+          <span class="sign-label">Меньше (&lt;)</span>
+        </button>
+        <button type="button" class="compare-sign-btn" data-sign="=" id="btn-sign-eq" aria-label="Равно (=)">
+          <span class="sign-glyph">=</span>
+          <span class="sign-label">Равно (=)</span>
+        </button>
+        <button type="button" class="compare-sign-btn" data-sign=">" id="btn-sign-gt" aria-label="Больше (>)">
+          <span class="sign-glyph">&gt;</span>
+          <span class="sign-label">Больше (&gt;)</span>
+        </button>
+      </div>
+
+      <!-- ACTION CONTROLS -->
+      <div class="action-controls-row">
+        <button type="button" class="btn-check" id="btn-check" disabled>Проверить знак</button>
+        <button type="button" class="btn-next" id="btn-next" style="display: none;">Следующее задание →</button>
+      </div>
+
+      <!-- FEEDBACK BANNER -->
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <!-- CARD ACTIONS -->
+      <div class="card-tools">
+        <button type="button" class="tool-link-btn" id="btn-toggle-solution">
+          <span>💡</span> <span>Разбор решения</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-toggle-theory">
+          <span>📖</span> <span>Памятка и правила</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-toggle-scratch">
+          <span>✏️</span> <span>Черновик</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-new-task">
+          <span>🔄</span> <span>Другое задание</span>
+        </button>
+      </div>
+
+      <!-- SCRATCHPAD CANVAS -->
+      <div class="scratchpad-container" id="scratchpad-container">
+        <div class="scratchpad-bar">
+          <span class="scratchpad-title">✏️ Черновик для вычислений</span>
+          <div class="scratchpad-actions">
+            <button type="button" class="scratch-btn" id="scratch-clear">Очистить</button>
+            <button type="button" class="scratch-btn" id="scratch-close">Скрыть</button>
+          </div>
+        </div>
+        <canvas class="scratchpad-canvas" id="scratch-canvas" width="680" height="180"></canvas>
+      </div>
+
+      <!-- SOLUTION ACCORDION -->
+      <div class="accordion-panel" id="solution-panel">
+        <h3>💡 Пошаговое объяснение сравнения:</h3>
+        <div class="solution-list" id="solution-content"></div>
+      </div>
+
+      <!-- THEORY ACCORDION -->
+      <div class="accordion-panel" id="theory-panel">
+        <h3>📖 Справочные правила сравнения степеней</h3>
+        <div class="theory-content">
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">1. Сравнение степеней с одинаковым основанием</div>
+            <p>Если основания одинаковы и больше 1 (<strong>a &gt; 1</strong>):</p>
+            <p><strong>Чем больше показатель степени, тем больше само число.</strong></p>
+            <p style="margin-top: 4px;"><em>Пример:</em> <strong>3<sup>7</sup> &gt; 3<sup>4</sup></strong> (так как 7 &gt; 4), <strong>2<sup>5</sup> &lt; 2<sup>8</sup></strong> (так как 5 &lt; 8).</p>
+            <p style="margin-top: 4px;">Если основания и показатели одинаковы: <strong>5<sup>4</sup> = 5<sup>4</sup></strong>.</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">2. Сравнение степеней с одинаковым показателем</div>
+            <p>Если показатели степеней одинаковы (<strong>n &gt; 0</strong>):</p>
+            <p><strong>Чем больше основание степени, тем больше само число.</strong></p>
+            <p style="margin-top: 4px;"><em>Пример:</em> <strong>8<sup>3</sup> &gt; 5<sup>3</sup></strong> (так как 8 &gt; 5), <strong>4<sup>5</sup> &lt; 7<sup>5</sup></strong> (так как 4 &lt; 7).</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">3. Сравнение через вычисление значений</div>
+            <p>Если и основания, и показатели разные, вычисляем каждую часть отдельно:</p>
+            <p><em>Пример 1:</em> <strong>2<sup>5</sup></strong> и <strong>5<sup>2</sup></strong>: 2<sup>5</sup> = 32, а 5<sup>2</sup> = 25. Так как 32 &gt; 25, то <strong>2<sup>5</sup> &gt; 5<sup>2</sup></strong>.</p>
+            <p><em>Пример 2:</em> <strong>3<sup>3</sup></strong> и <strong>2<sup>5</sup></strong>: 3<sup>3</sup> = 27, а 2<sup>5</sup> = 32. 27 &lt; 32, значит <strong>3<sup>3</sup> &lt; 2<sup>5</sup></strong>.</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">4. Равенства степеней (степени 2, 4, 8, 9, 16)</div>
+            <p>• <strong>2<sup>4</sup> = 4<sup>2</sup> = 16</strong></p>
+            <p>• <strong>2<sup>6</sup> = 4<sup>3</sup> = 8<sup>2</sup> = 64</strong></p>
+            <p>• <strong>3<sup>4</sup> = 9<sup>2</sup> = 81</strong></p>
+            <p>• <strong>2<sup>8</sup> = 4<sup>4</sup> = 16<sup>2</sup> = 256</strong></p>
+            <p>• <strong>3<sup>2</sup> + 4<sup>2</sup> = 5<sup>2</sup> = 25</strong> (9 + 16 = 25)</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">5. Особые показатели: 0 и 1</div>
+            <p>• Любое ненулевое число в степени 0 равно 1: <strong>a<sup>0</sup> = 1</strong> (например, 7<sup>0</sup> = 1, 100<sup>0</sup> = 1).</p>
+            <p>• Единица в любой степени равна 1: <strong>1<sup>n</sup> = 1</strong> (например, 1<sup>15</sup> = 1).</p>
+            <p>• Любое число в степени 1 равно самому себе: <strong>a<sup>1</sup> = a</strong> (например, 5<sup>1</sup> = 5).</p>
+            <p>• Ноль в натуральной степени равен 0: <strong>0<sup>n</sup> = 0</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <!-- MILESTONE TOAST -->
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/powers_compare_trainer.js"></script>
+  <script>
+    (function () {
+      const TRAINER_ID = 'powers_compare';
+      let currentCategory = 'compare_all';
+      let currentTask = null;
+      let selectedSign = null;
+      let hasAnsweredCurrent = false;
+      let streak = 0;
+
+      // DOM Elements
+      const mathContainer = document.getElementById('math-container');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const taskBadge = document.getElementById('task-badge');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+      const taskPrompt = document.getElementById('task-prompt');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const theoryPanel = document.getElementById('theory-panel');
+      const scratchContainer = document.getElementById('scratchpad-container');
+      const milestoneToast = document.getElementById('milestone-toast');
+
+      const signButtons = document.querySelectorAll('.compare-sign-btn');
+
+      // Web Audio API Sound Effects
+      let audioCtx = null;
+      function playTone(freq, type, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      function playSuccessSound() {
+        playTone(523.25, 'sine', 0.12);
+        setTimeout(() => playTone(659.25, 'sine', 0.12), 100);
+        setTimeout(() => playTone(783.99, 'sine', 0.22), 200);
+      }
+
+      function playErrorSound() {
+        playTone(220.00, 'triangle', 0.15);
+        setTimeout(() => playTone(185.00, 'triangle', 0.25), 120);
+      }
+
+      function playRankUpSound() {
+        playTone(440.0, 'triangle', 0.12);
+        setTimeout(() => playTone(554.37, 'triangle', 0.12), 110);
+        setTimeout(() => playTone(659.25, 'triangle', 0.14), 220);
+        setTimeout(() => playTone(880.00, 'triangle', 0.35), 330);
+      }
+
+      function showToast(text) {
+        if (!milestoneToast) return;
+        milestoneToast.textContent = text;
+        milestoneToast.classList.add('active');
+        setTimeout(() => {
+          milestoneToast.classList.remove('active');
+        }, 3400);
+      }
+
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const records = window.TrainerTracker.getTrainerRecords();
+          const cur = records[TRAINER_ID] || { maxStreak: 0, totalSolved: 0, maxRank: 'Начинающий 🥉' };
+          if (statStreak) statStreak.textContent = streak;
+          if (statMaxStreak) statMaxStreak.textContent = cur.maxStreak || 0;
+          if (statTotal) statTotal.textContent = cur.totalSolved || 0;
+          if (statRank) statRank.textContent = cur.maxRank || 'Начинающий 🥉';
+        }
+        try {
+          const userXp = localStorage.getItem('user_xp') || '0';
+          if (navXpBadge) navXpBadge.textContent = 'XP +' + userXp;
+        } catch (e) {}
+      }
+
+      function selectSign(sign) {
+        if (hasAnsweredCurrent) return;
+        selectedSign = sign;
+
+        signButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-sign') === sign);
+        });
+
+        const slot = document.getElementById('compare-slot');
+        if (slot) {
+          slot.textContent = sign;
+          slot.classList.add('filled');
+        }
+
+        btnCheck.disabled = false;
+        btnCheck.focus();
+      }
+
+      function loadNewTask() {
+        hasAnsweredCurrent = false;
+        selectedSign = null;
+
+        solutionPanel.classList.remove('active');
+        theoryPanel.classList.remove('active');
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.textContent = '';
+
+        signButtons.forEach(btn => {
+          btn.classList.remove('active');
+          btn.disabled = false;
+        });
+
+        btnCheck.style.display = 'inline-flex';
+        btnCheck.disabled = true;
+        btnNext.style.display = 'none';
+
+        if (window.PowersCompareTrainer) {
+          currentTask = PowersCompareTrainer.generateTask(currentCategory);
+        } else {
+          currentTask = {
+            category: 'compare_same_base',
+            catName: 'Одинаковые основания',
+            prompt: 'Сравните значения со степенями:',
+            leftHtml: '2<sup>5</sup>',
+            rightHtml: '2<sup>3</sup>',
+            answer: '>',
+            questionHtml: '<div class="compare-display"><div class="compare-side">2<sup>5</sup></div><div class="compare-slot" id="compare-slot">?</div><div class="compare-side">2<sup>3</sup></div></div>',
+            solutionSteps: ['2⁵ = 32, 2³ = 8. 32 > 8.']
+          };
+        }
+
+        renderTask(currentTask);
+      }
+
+      function renderTask(task) {
+        if (taskPrompt) {
+          taskPrompt.textContent = task.prompt || 'Сравните значения и выберите верный знак (<, >, =):';
+        }
+        if (taskCatBadge) {
+          taskCatBadge.textContent = task.catName || 'Сравнение степеней';
+        }
+
+        // Render question HTML with slot id attached
+        let qHtml = task.questionHtml || '';
+        if (qHtml.includes('class="compare-slot"')) {
+          qHtml = qHtml.replace('class="compare-slot"', 'class="compare-slot" id="compare-slot"');
+        }
+        mathContainer.innerHTML = qHtml;
+
+        if (solutionContent) {
+          solutionContent.innerHTML = '';
+          const steps = task.solutionSteps || [];
+          steps.forEach(step => {
+            const div = document.createElement('div');
+            div.className = 'solution-step';
+            div.innerHTML = step;
+            solutionContent.appendChild(div);
+          });
+        }
+      }
+
+      function checkAnswer() {
+        if (hasAnsweredCurrent) return;
+        if (!selectedSign) {
+          feedbackBanner.className = 'feedback-banner error show';
+          feedbackBanner.textContent = '⚠️ Пожалуйста, выберите знак: <, = или >!';
+          return;
+        }
+
+        hasAnsweredCurrent = true;
+        const expected = currentTask.answer;
+        const isCorrect = (selectedSign === expected);
+
+        btnCheck.style.display = 'none';
+        btnNext.style.display = 'inline-flex';
+        btnNext.focus();
+
+        signButtons.forEach(btn => btn.disabled = true);
+        const slot = document.getElementById('compare-slot');
+
+        if (isCorrect) {
+          streak++;
+          if (slot) {
+            slot.classList.remove('wrong');
+            slot.classList.add('correct');
+          }
+          feedbackBanner.className = 'feedback-banner success show';
+          feedbackBanner.textContent = `🎉 Отлично! Знак «${expected}» абсолютно верный! (+15 XP)`;
+          playSuccessSound();
+
+          if (window.TrainerTracker) {
+            const res = TrainerTracker.recordAttempt(TRAINER_ID, true);
+            syncStats();
+
+            if (res && res.rankChanged) {
+              playRankUpSound();
+              showToast('🎖️ Поздравляем! Новое звание: ' + res.rankTitle);
+            } else if (res && res.currentStreak > 0 && res.currentStreak % 5 === 0) {
+              showToast('🔥 Огонь! Серия ' + res.currentStreak + ' правильных ответов подряд!');
+            }
+          }
+        } else {
+          streak = 0;
+          if (slot) {
+            slot.textContent = expected;
+            slot.classList.remove('correct');
+            slot.classList.add('wrong');
+          }
+          feedbackBanner.className = 'feedback-banner error show';
+          feedbackBanner.textContent = `❌ Неверно. Правильный знак: «${expected}». Смотрите разбор решения ниже.`;
+          playErrorSound();
+
+          if (window.TrainerTracker) {
+            TrainerTracker.recordAttempt(TRAINER_ID, false);
+            syncStats();
+          }
+          solutionPanel.classList.add('active');
+        }
+      }
+
+      // Event Listeners for sign buttons
+      signButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectSign(btn.getAttribute('data-sign'));
+        });
+      });
+
+      btnCheck.addEventListener('click', checkAnswer);
+      btnNext.addEventListener('click', loadNewTask);
+
+      // Keyboard navigation
+      window.addEventListener('keydown', (e) => {
+        if (e.target && e.target.tagName === 'INPUT') return;
+
+        if (e.key === '<' || e.key === ',' || e.key === 'б' || e.key === 'Б') {
+          selectSign('<');
+        } else if (e.key === '>' || e.key === '.' || e.key === 'ю' || e.key === 'Ю') {
+          selectSign('>');
+        } else if (e.key === '=' || e.key === '+') {
+          selectSign('=');
+        } else if (e.key === 'Enter') {
+          if (!hasAnsweredCurrent) {
+            if (selectedSign) checkAnswer();
+          } else {
+            loadNewTask();
+          }
+        }
+      });
+
+      document.getElementById('btn-new-task').addEventListener('click', loadNewTask);
+
+      document.getElementById('btn-toggle-solution').addEventListener('click', () => {
+        solutionPanel.classList.toggle('active');
+      });
+
+      document.getElementById('btn-toggle-theory').addEventListener('click', () => {
+        theoryPanel.classList.toggle('active');
+      });
+
+      // Category Switcher
+      const catButtons = document.querySelectorAll('.cat-btn');
+      catButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          catButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat') || 'compare_all';
+          loadNewTask();
+        });
+      });
+
+      // Scratchpad Drawing Logic
+      const btnToggleScratch = document.getElementById('btn-toggle-scratch');
+      const scratchCanvas = document.getElementById('scratch-canvas');
+      const scratchClear = document.getElementById('scratch-clear');
+      const scratchClose = document.getElementById('scratch-close');
+
+      if (scratchCanvas && scratchCanvas.getContext) {
+        const ctx = scratchCanvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function resizeCanvas() {
+          const rect = scratchCanvas.getBoundingClientRect();
+          if (scratchCanvas.width !== rect.width || scratchCanvas.height !== rect.height) {
+            scratchCanvas.width = rect.width;
+            scratchCanvas.height = rect.height;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#263f61';
+            ctx.lineWidth = 2.5;
+          }
+        }
+
+        btnToggleScratch.addEventListener('click', () => {
+          scratchContainer.classList.toggle('active');
+          if (scratchContainer.classList.contains('active')) {
+            setTimeout(resizeCanvas, 50);
+          }
+        });
+
+        scratchClose.addEventListener('click', () => {
+          scratchContainer.classList.remove('active');
+        });
+
+        scratchClear.addEventListener('click', () => {
+          ctx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        });
+
+        function getPos(e) {
+          const rect = scratchCanvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+          };
+        }
+
+        function startDraw(e) {
+          isDrawing = true;
+          const pos = getPos(e);
+          lastX = pos.x;
+          lastY = pos.y;
+        }
+
+        function draw(e) {
+          if (!isDrawing) return;
+          e.preventDefault();
+          const pos = getPos(e);
+          ctx.beginPath();
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(pos.x, pos.y);
+          ctx.stroke();
+          lastX = pos.x;
+          lastY = pos.y;
+        }
+
+        function stopDraw() {
+          isDrawing = false;
+        }
+
+        scratchCanvas.addEventListener('mousedown', startDraw);
+        scratchCanvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDraw);
+
+        scratchCanvas.addEventListener('touchstart', startDraw, { passive: false });
+        scratchCanvas.addEventListener('touchmove', draw, { passive: false });
+        scratchCanvas.addEventListener('touchend', stopDraw);
+      }
+
+      // Initial startup
+      syncStats();
+      loadNewTask();
+    })();
+  </script>
+</body>
+</html>

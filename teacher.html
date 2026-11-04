@@ -1681,6 +1681,7 @@
                                             <option value="powers_calculate">Степени · Возведение числа в степень</option>
                                             <option value="powers_equations">Степени · Уравнения со степенями</option>
                                             <option value="powers_expressions">Степени · Примеры и порядок действий со степенями</option>
+                                            <option value="powers_compare_all">Степени · Сравнение выражений со степенями (&lt;, &gt;, =)</option>
                                         </optgroup>
                                         <optgroup label="Устный счёт и базовая арифметика">
                                             <option value="mult_table">Таблица умножения (2–9)</option>
@@ -2117,6 +2118,7 @@
     <script src="js/oge_task_10_trainer.js"></script>
     <script src="js/oge_task_18_trainer.js"></script>
     <script src="js/powers_trainer.js"></script>
+    <script src="js/powers_compare_trainer.js"></script>
     <script src="js/auth_sync.js?v=1.1"></script>
     <script src="js/methodical_plan.js"></script>
     <!-- Bank of Tasks & Physics Tests -->
@@ -3903,6 +3905,10 @@
                             }
                         } else if (type.startsWith('mult_')) {
                             t = generateMultiplicationTask(type);
+                        } else if (type.startsWith('powers_compare')) {
+                            if (window.PowersCompareTrainer) {
+                                t = window.PowersCompareTrainer.generateTask('compare_all');
+                            }
                         } else if (type.startsWith('powers_')) {
                             if (window.PowersTrainer) {
                                 t = window.PowersTrainer.generateTask(type);
