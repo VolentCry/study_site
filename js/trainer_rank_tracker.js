@@ -19,6 +19,26 @@
     // Конфигурация всех тренажёров платформы
     const TRAINERS = [
         {
+            id: 'fsu_trainer',
+            name: 'Формулы сокращённого умножения (ФСУ)',
+            shortName: 'ФСУ 7 класс',
+            subject: 'Математика',
+            category: 'Алгебра',
+            classNum: '7 класс',
+            url: '../math_moduls/fsu_trainer.html',
+            profileUrl: 'math_moduls/fsu_trainer.html',
+            icon: '📐',
+            description: 'Квадрат суммы, квадрат разности, разность квадратов, раскрытие скобок и быстрые вычисления с помощью формул сокращённого умножения.',
+            rankTiers: [
+                { min: 50, title: 'Архимаг тождеств 👑' },
+                { min: 35, title: 'Сенсей алгебры 🧙' },
+                { min: 20, title: 'Мастер ФСУ 💎' },
+                { min: 12, title: 'Знаток формул 🥇' },
+                { min: 6,  title: 'Юный алгебраист 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'powers_compare',
             name: 'Сравнение степеней (<, >, =)',
             shortName: 'Сравнение степеней',

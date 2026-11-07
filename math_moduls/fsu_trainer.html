@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр «Формулы сокращённого умножения (ФСУ)» · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .nav-btn.primary { background: var(--vermilion); color: #fff; border-color: var(--vermilion); }
+    .nav-btn.primary:hover { background: #9c363d; }
+
+    /* MAIN CONTAINER */
+    .trainer-shell {
+      max-width: 920px; margin: 0 auto; width: 100%; padding: 32px 5vw 64px;
+      display: flex; flex-direction: column; gap: 22px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 10px;
+    }
+    .trainer-title {
+      font: 900 clamp(26px, 4.2vw, 38px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 680px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; flex-direction: column; gap: 4px; }
+    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .stat-val { font-size: 20px; font-weight: 800; color: var(--indigo-dark); display: flex; align-items: center; gap: 6px; }
+    .stat-val.streak { color: var(--vermilion); }
+
+    /* CATEGORY PILLS */
+    .cat-bar {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      background: rgba(38,63,97,.05); border: 1px solid var(--line);
+      border-radius: 999px; padding: 4px;
+    }
+    .cat-pill {
+      padding: 7px 16px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      color: var(--indigo); transition: all .2s; border: 1px solid transparent;
+      user-select: none;
+    }
+    .cat-pill:hover { background: rgba(183,70,78,.08); color: var(--vermilion); }
+    .cat-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 8px rgba(183,70,78,.35);
+    }
+
+    /* SPOILER FORMULAS CARD */
+    .cheat-card {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      overflow: hidden; transition: all .25s ease;
+    }
+    .cheat-header {
+      padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none; background: rgba(38,63,97,.03);
+    }
+    .cheat-title { font-size: 13px; font-weight: 700; color: var(--indigo); display: flex; align-items: center; gap: 8px; }
+    .cheat-toggle { font-size: 12px; font-weight: 700; color: var(--vermilion); display: flex; align-items: center; gap: 4px; }
+    .cheat-body {
+      padding: 16px 20px; display: none; border-top: 1px solid var(--line);
+      background: #fff; font-size: 13px; line-height: 1.7; color: var(--ink);
+    }
+    .cheat-card.open .cheat-body { display: block; }
+    .cheat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;
+    }
+    .cheat-item {
+      padding: 10px 14px; border-radius: 8px; background: var(--paper-light);
+      border-left: 3px solid var(--vermilion);
+    }
+    .cheat-item strong { display: block; color: var(--indigo); font-size: 12px; margin-bottom: 2px; }
+    .cheat-math { font-family: 'Zen Old Mincho', serif; font-size: 15px; font-weight: 700; color: var(--vermilion); }
+
+    /* CARD PLAYGROUND */
+    .playground-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px 28px; box-shadow: var(--shadow-md); display: flex; flex-direction: column;
+      gap: 24px; position: relative;
+    }
+    .task-meta {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .task-topic-badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 11px;
+      font-weight: 700; border-radius: 6px;
+    }
+    .task-prompt {
+      font-size: 15px; font-weight: 600; color: var(--muted); text-align: center;
+    }
+    .task-formula-box {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 24px 20px; text-align: center; box-shadow: inset 0 2px 6px rgba(0,0,0,.03);
+    }
+    .formula-expression {
+      font: 700 clamp(24px, 4.5vw, 36px)/1.3 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); letter-spacing: .02em;
+    }
+    .formula-expression sup { font-size: .65em; vertical-align: super; }
+
+    /* OPTIONS GRID */
+    .options-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    }
+    .option-btn {
+      padding: 16px 20px; border-radius: var(--r-md); border: 1px solid var(--line);
+      background: var(--paper-light); color: var(--indigo-dark);
+      font: 700 17px/1.3 'Zen Old Mincho', serif; display: flex; align-items: center;
+      justify-content: flex-start; gap: 14px; text-align: left; transition: all .18s ease;
+      cursor: pointer; position: relative;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--vermilion); background: var(--vermilion-light);
+      transform: translateY(-2px); box-shadow: var(--shadow-sm);
+    }
+    .option-key {
+      width: 26px; height: 26px; border-radius: 6px; background: rgba(38,63,97,.08);
+      color: var(--muted); font: 700 12px 'DM Sans', sans-serif; display: grid;
+      place-items: center; flex-shrink: 0;
+    }
+    .option-btn:hover .option-key { background: var(--vermilion); color: #fff; }
+    .option-btn.correct {
+      background: var(--green-light) !important; border-color: var(--green) !important;
+      color: var(--green) !important; font-weight: 800;
+    }
+    .option-btn.wrong {
+      background: var(--vermilion-light) !important; border-color: var(--vermilion) !important;
+      color: var(--vermilion) !important;
+    }
+    .option-btn:disabled { cursor: default; }
+
+    /* FAST CALC INPUT VIEW */
+    .input-mode-box {
+      display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%;
+    }
+    .answer-input-wrap {
+      display: flex; align-items: center; gap: 10px; width: 100%; max-width: 380px;
+    }
+    .answer-input {
+      width: 100%; height: 50px; padding: 0 16px; border-radius: var(--r-md);
+      border: 2px solid var(--line); background: #fff; font: 700 22px 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); text-align: center; transition: border-color .2s;
+    }
+    .answer-input:focus { outline: none; border-color: var(--vermilion); }
+    .submit-answer-btn {
+      height: 50px; padding: 0 24px; border-radius: var(--r-md); background: var(--vermilion);
+      color: #fff; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background .2s;
+    }
+    .submit-answer-btn:hover { background: #9c363d; }
+
+    /* FEEDBACK CARD */
+    .feedback-banner {
+      display: none; padding: 14px 18px; border-radius: var(--r-md);
+      font-size: 14px; font-weight: 600; line-height: 1.5; align-items: flex-start; gap: 12px;
+    }
+    .feedback-banner.show { display: flex; }
+    .feedback-banner.correct {
+      background: var(--green-light); border: 1px solid var(--green); color: var(--green);
+    }
+    .feedback-banner.wrong {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion); color: var(--vermilion);
+    }
+
+    /* STEP SOLUTION */
+    .solution-card {
+      display: none; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 16px 20px; font-size: 14px; line-height: 1.6;
+    }
+    .solution-card.show { display: block; }
+    .solution-title { font-weight: 800; color: var(--indigo); margin-bottom: 6px; font-size: 13px; }
+    .solution-steps { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .solution-steps li { position: relative; padding-left: 18px; }
+    .solution-steps li::before {
+      content: '•'; position: absolute; left: 4px; color: var(--vermilion); font-weight: 900;
+    }
+
+    /* NEXT ACTION BUTTON */
+    .next-wrap { display: flex; justify-content: flex-end; }
+    .next-btn {
+      min-height: 46px; padding: 0 26px; border-radius: var(--r-md); background: var(--indigo);
+      color: #fff; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center;
+      gap: 8px; transition: all .2s; user-select: none;
+    }
+    .next-btn:hover { background: var(--vermilion); transform: translateY(-1px); }
+
+    /* FOOTER */
+    .page-footer {
+      margin-top: auto; border-top: 1px solid var(--line); padding: 22px 5vw;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--muted); background: var(--paper-light);
+    }
+
+    @media (max-width: 640px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .options-grid { grid-template-columns: 1fr; }
+      .playground-card { padding: 20px 16px; }
+      .formula-expression { font-size: 22px; }
+      .answer-input-wrap { flex-direction: column; }
+      .submit-answer-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SITE NAV -->
+  <nav class="site-nav" aria-label="Главная навигация">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">Математика</span>
+        <span class="brand-sub">7 класс · Алгебра</span>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="../pages/math_7.html">← В 7 класс</a>
+      <a class="nav-btn primary" href="../profile.html">Мой профиль</a>
+    </div>
+  </nav>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <header class="trainer-header">
+      <div class="trainer-kicker">Алгебра · 7 класс · Интерактивный тренажёр</div>
+      <h1 class="trainer-title">Формулы сокращённого умножения</h1>
+      <p class="trainer-subtitle">
+        Отрабатывай квадрат суммы, квадрат разности, разность квадратов и быстрый устный счёт. Запоминай тождества и прокачивай серию правильных ответов!
+      </p>
+    </header>
+
+    <!-- STATS DASHBOARD -->
+    <section class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box">
+        <span class="stat-label">Серия (Streak)</span>
+        <span class="stat-val streak" id="stat-streak">0 <span aria-hidden="true">🔥</span></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Точность</span>
+        <span class="stat-val" id="stat-accuracy">100%</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Решено</span>
+        <span class="stat-val" id="stat-solved">0</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Текущее звание</span>
+        <span class="stat-val" id="stat-rank" style="font-size: 15px;">Ученик 🥉</span>
+      </div>
+    </section>
+
+    <!-- CATEGORY PILLS -->
+    <nav class="cat-bar" role="tablist" aria-label="Выбор категории формул">
+      <button class="cat-pill active" data-cat="all" role="tab" aria-selected="true">Все формулы (Микс)</button>
+      <button class="cat-pill" data-cat="square_sum" role="tab" aria-selected="false">Квадрат суммы (a+b)²</button>
+      <button class="cat-pill" data-cat="square_diff" role="tab" aria-selected="false">Квадрат разности (a-b)²</button>
+      <button class="cat-pill" data-cat="diff_squares" role="tab" aria-selected="false">Разность квадратов (a²-b²)</button>
+      <button class="cat-pill" data-cat="fast_calc" role="tab" aria-selected="false">Быстрый счёт ФСУ</button>
+    </nav>
+
+    <!-- FORMULAS CHEAT SHEET -->
+    <section class="cheat-card" id="cheat-card">
+      <div class="cheat-header" id="cheat-header" role="button" aria-expanded="false" tabindex="0">
+        <div class="cheat-title">
+          <span>📖</span>
+          <span>Шпаргалка: Ключевые формулы 7 класса (ФСУ)</span>
+        </div>
+        <div class="cheat-toggle" id="cheat-toggle-text">Показать формулы ▾</div>
+      </div>
+      <div class="cheat-body">
+        <div class="cheat-grid">
+          <div class="cheat-item">
+            <strong>Квадрат суммы:</strong>
+            <div class="cheat-math">(a + b)² = a² + 2ab + b²</div>
+            <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Квадрат первого + удвоенное произведение + квадрат второго</p>
+          </div>
+          <div class="cheat-item">
+            <strong>Квадрат разности:</strong>
+            <div class="cheat-math">(a - b)² = a² - 2ab + b²</div>
+            <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Квадрат первого минус удвоенное произведение + квадрат второго</p>
+          </div>
+          <div class="cheat-item">
+            <strong>Разность квадратов:</strong>
+            <div class="cheat-math">a² - b² = (a - b)(a + b)</div>
+            <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Произведение разности двух выражений на их сумму</p>
+          </div>
+          <div class="cheat-item">
+            <strong>Быстрый счёт (пример):</strong>
+            <div class="cheat-math">79 · 81 = 80² - 1² = 6399</div>
+            <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Используем (a - 1)(a + 1) = a² - 1 для мгновенного счёта</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYGROUND CARD -->
+    <section class="playground-card" aria-label="Карточка задания">
+      <div class="task-meta">
+        <span class="task-topic-badge" id="task-topic-badge">Квадрат суммы</span>
+        <span style="font-size: 12px; color: var(--muted);" id="task-difficulty">Уровень 7 класса</span>
+      </div>
+
+      <p class="task-prompt" id="task-prompt">Раскройте скобки с помощью формулы:</p>
+
+      <div class="task-formula-box">
+        <div class="formula-expression" id="formula-expression">(x + 4)²</div>
+      </div>
+
+      <!-- Multiple choice options grid -->
+      <div class="options-grid" id="options-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Input mode for fast calc -->
+      <div class="input-mode-box" id="input-mode-box" style="display: none;">
+        <div class="answer-input-wrap">
+          <input type="text" class="answer-input" id="answer-input" placeholder="Введите число..." inputmode="numeric" autocomplete="off" />
+          <button class="submit-answer-btn" id="submit-answer-btn">Проверить</button>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback-banner" id="feedback-banner">
+        <span id="feedback-icon" style="font-size: 20px;">✓</span>
+        <div id="feedback-text">Отлично! Формула применена правильно.</div>
+      </div>
+
+      <!-- Step Solution -->
+      <div class="solution-card" id="solution-card">
+        <div class="solution-title">Разбор решения:</div>
+        <ul class="solution-steps" id="solution-steps">
+          <!-- Steps injected -->
+        </ul>
+      </div>
+
+      <!-- Next Button -->
+      <div class="next-wrap">
+        <button class="next-btn" id="next-btn">
+          <span>Следующее задание</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <span>НЕШкола · Математика 7 класс · Алгебра</span>
+    <a href="../pages/math_7.html">← Вернуться в 7 класс</a>
+  </footer>
+
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/fsu_trainer.js"></script>
+  <script src="../js/auth_sync.js"></script>
+</body>
+</html>
