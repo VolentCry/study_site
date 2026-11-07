@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Геншиноведение · Кафедра лора Тейвата — НЕШКОЛА</title>
+  <meta name="description" content="Академическое геншиноведение: интерактивные тестирования по всем 7 регионам Тейвата, 3 уровня лора от Путешественника до Дайнслейфа, симулятор молитв и Кодекс Ирминсуля.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Zen+Old+Mincho:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* --- DESIGN SYSTEM & CSS VARIABLES --- */
+    :root {
+      --bg-dark: #0a0c14;
+      --bg-card: rgba(18, 22, 38, 0.85);
+      --bg-card-hover: rgba(28, 34, 58, 0.95);
+      --border-celestial: rgba(212, 175, 55, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      
+      --gold-akasha: #f5d47a;
+      --gold-dark: #c59f43;
+      --gold-glow: rgba(245, 212, 122, 0.4);
+      --text-main: #f0f3fa;
+      --text-muted: #9aa4be;
+      --text-dim: #65708c;
+
+      /* Element Colors */
+      --anemo: #4fe3c1;
+      --geo: #e5b042;
+      --electro: #bf6ffb;
+      --dendro: #58c734;
+      --hydro: #3898ec;
+      --pyro: #ef5a38;
+      --cryo: #7ce8ff;
+      --celestia: #ff5a79;
+      --abyss: #8a3ffc;
+
+      --font-display: 'Cinzel', 'Zen Old Mincho', serif;
+      --font-serif: 'Zen Old Mincho', serif;
+      --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(56, 152, 236, 0.15), transparent 60%),
+        radial-gradient(circle at 80% 30%, rgba(191, 111, 251, 0.12), transparent 50%),
+        radial-gradient(circle at 20% 70%, rgba(229, 176, 66, 0.1), transparent 50%),
+        #090b12;
+      position: relative;
+    }
+
+    /* Subtle Starfield & Irminsul Dust Overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        radial-gradient(1.5px 1.5px at 10% 20%, rgba(255, 255, 255, 0.8), transparent),
+        radial-gradient(1px 1px at 25% 45%, rgba(245, 212, 122, 0.7), transparent),
+        radial-gradient(1.5px 1.5px at 60% 15%, rgba(79, 227, 193, 0.8), transparent),
+        radial-gradient(1px 1px at 85% 65%, rgba(255, 255, 255, 0.6), transparent),
+        radial-gradient(2px 2px at 40% 85%, rgba(191, 111, 251, 0.7), transparent),
+        radial-gradient(1px 1px at 70% 90%, rgba(245, 212, 122, 0.5), transparent);
+      background-size: 550px 550px;
+      opacity: 0.7;
+      z-index: 1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* --- SITE NAVIGATION HEADER --- */
+    .genshin-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 11, 18, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-celestial);
+      padding: 14px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 0.08em;
+      color: var(--gold-akasha);
+      font-weight: 700;
+    }
+
+    .nav-brand-logo {
+      height: 34px;
+      width: auto;
+      filter: drop-shadow(0 0 8px var(--gold-glow));
+    }
+
+    .nav-tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 12px;
+      font-family: var(--font-sans);
+      font-weight: 400;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .primo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 212, 122, 0.12);
+      border: 1px solid var(--border-celestial);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--gold-akasha);
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 14px rgba(245, 212, 122, 0.2);
+    }
+
+    .btn-return {
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-return:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: var(--gold-akasha);
+    }
+
+    /* --- HERO POSTER SECTION --- */
+    .hero-genshin {
+      position: relative;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 5vw 60px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-celestial);
+    }
+
+    .hero-backdrop {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to bottom, rgba(9, 11, 18, 0.6) 0%, rgba(9, 11, 18, 0.85) 75%, #090b12 100%),
+        radial-gradient(ellipse at 50% 40%, rgba(212, 175, 55, 0.15), transparent 70%),
+        url('../assets/images/genshin_hero.jpg');
+      background-size: cover;
+      background-position: center 35%;
+      filter: brightness(0.95);
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 18px;
+      border-radius: 999px;
+      background: rgba(18, 22, 38, 0.8);
+      border: 1px solid var(--border-celestial);
+      color: var(--gold-akasha);
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-logo-img {
+      max-width: 380px;
+      width: 80%;
+      height: auto;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 25px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px var(--gold-glow));
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5.5vw, 4.4rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #ffffff 20%, var(--gold-akasha) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(245, 212, 122, 0.3);
+    }
+
+    .hero-desc {
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 760px;
+      margin-bottom: 36px;
+      font-family: var(--font-sans);
+    }
+
+    .hero-desc strong {
+      color: var(--gold-akasha);
+      font-weight: 600;
+    }
+
+    /* Hero CTA Row */
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 40px;
+    }
+
+    .btn-celestial-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--gold-akasha) 0%, var(--gold-dark) 100%);
+      color: #121008;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: 1px solid #ffe9a6;
+      box-shadow: 0 4px 25px var(--gold-glow), 0 0 10px rgba(245, 212, 122, 0.5);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-celestial-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 35px rgba(245, 212, 122, 0.6), 0 0 20px rgba(255, 233, 166, 0.8);
+      filter: brightness(1.1);
+    }
+
+    .btn-celestial-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(18, 22, 38, 0.75);
+      border: 1px solid var(--border-celestial);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-celestial-secondary:hover {
+      background: rgba(28, 34, 58, 0.9);
+      border-color: var(--gold-akasha);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Wish stats preview bar */
+    .wish-quickbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 12px 28px;
+      border-radius: 16px;
+      background: rgba(18, 22, 38, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .wish-quickbar span strong {
+      color: #fff;
+    }
+
+    /* --- SHELL & SECTION LAYOUTS --- */
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 5vw;
+    }
+
+    .section-wrap {
+      padding: 90px 0;
+      position: relative;
+    }
+
+    .section-head {
+      text-align: center;
+      max-width: 820px;
+      margin: 0 auto 56px;
+    }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--gold-akasha);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.8vw, 3rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+
+    .section-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* --- 7 REGIONAL PAVILIONS GRID --- */
+    .regions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .region-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .region-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--region-color, var(--gold-akasha));
+      opacity: 0.8;
+      transition: height 0.3s ease;
+    }
+
+    .region-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, var(--region-color-fade, rgba(255,255,255,0.05)), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .region-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--region-color, var(--gold-akasha));
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 24px var(--region-color-glow, rgba(245, 212, 122, 0.2));
+    }
+    .region-card:hover::before {
+      height: 6px;
+    }
+    .region-card:hover::after {
+      opacity: 1;
+    }
+
+    .region-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .region-icon-pill {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .region-element-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--region-color);
+      border: 1px solid var(--region-color);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .region-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .region-archon {
+      font-size: 0.85rem;
+      color: var(--gold-akasha);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .region-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .region-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+
+    .topic-tag {
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: var(--text-dim);
+    }
+
+    .region-card:hover .topic-tag {
+      color: var(--text-muted);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .region-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 16px;
+    }
+
+    .region-q-count {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .region-btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--region-color, var(--gold-akasha));
+      transition: gap 0.2s ease;
+    }
+    .region-card:hover .region-btn-action {
+      gap: 10px;
+    }
+
+    /* --- 3 GENERAL LORE LEVELS --- */
+    .lore-levels-wrap {
+      margin-top: 80px;
+      background: linear-gradient(180deg, rgba(18, 22, 38, 0.7) 0%, rgba(10, 13, 24, 0.9) 100%);
+      border: 1px solid var(--border-celestial);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lore-levels-wrap::before {
+      content: "";
+      position: absolute;
+      top: -150px;
+      right: -150px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(245, 212, 122, 0.15), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .lore-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 36px;
+    }
+
+    .lore-card {
+      background: rgba(14, 18, 32, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .lore-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold-akasha);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
+    }
+
+    .lore-level-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      width: fit-content;
+      margin-bottom: 14px;
+    }
+    .lvl-1 { background: rgba(79, 227, 193, 0.15); border: 1px solid var(--anemo); color: var(--anemo); }
+    .lvl-2 { background: rgba(88, 199, 52, 0.15); border: 1px solid var(--dendro); color: var(--dendro); }
+    .lvl-3 { background: rgba(255, 90, 121, 0.15); border: 1px solid var(--celestia); color: var(--celestia); }
+
+    .lore-card-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .lore-card-mentor {
+      font-size: 0.85rem;
+      color: var(--gold-akasha);
+      margin-bottom: 12px;
+    }
+
+    .lore-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+
+    /* --- CODEX OF TEYVAT (LORE ENCYCLOPEDIA COMPONENT) --- */
+    .codex-section {
+      background: rgba(12, 15, 26, 0.6);
+      border-top: 1px solid var(--border-celestial);
+      border-bottom: 1px solid var(--border-celestial);
+    }
+
+    .codex-tabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .codex-tab-btn {
+      padding: 10px 22px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .codex-tab-btn:hover {
+      color: #fff;
+      border-color: rgba(245, 212, 122, 0.5);
+    }
+    .codex-tab-btn.active {
+      background: rgba(245, 212, 122, 0.15);
+      border-color: var(--gold-akasha);
+      color: var(--gold-akasha);
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    .codex-panel {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 0.4s ease;
+    }
+    .codex-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .codex-grid-inner {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .codex-entry {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 22px;
+      border-left: 3px solid var(--gold-akasha);
+    }
+    .codex-entry h4 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .codex-entry p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* --- WISH SIMULATOR MODAL OVERLAY --- */
+    .wish-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: radial-gradient(circle at center, rgba(14, 18, 36, 0.97) 0%, rgba(5, 7, 12, 0.99) 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .wish-overlay.active {
+      display: flex;
+    }
+
+    .wish-meteor-star {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 30px #ffe599, 0 0 60px #ffb300, 0 0 100px #ff9100;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .wish-meteor-star.falling {
+      opacity: 1;
+      animation: meteorFly 1.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes meteorFly {
+      0% {
+        top: -10%;
+        right: -10%;
+        transform: scale(0.5) rotate(45deg);
+      }
+      60% {
+        top: 50%;
+        right: 50%;
+        transform: scale(2.5) translate(50%, -50%) rotate(45deg);
+      }
+      100% {
+        top: 50%;
+        right: 50%;
+        transform: scale(6) translate(50%, -50%) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    .wish-result-card {
+      display: none;
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(145deg, rgba(28, 34, 58, 0.95), rgba(16, 20, 36, 0.95));
+      border: 2px solid var(--loot-accent, var(--gold-akasha));
+      border-radius: 24px;
+      padding: 44px 36px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 60px var(--loot-accent, var(--gold-glow)), 0 20px 50px rgba(0, 0, 0, 0.9);
+      animation: popResult 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .wish-result-card.show {
+      display: block;
+    }
+
+    @keyframes popResult {
+      0% { opacity: 0; transform: scale(0.7) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .wish-loot-stars {
+      color: #ffc107;
+      font-size: 1.4rem;
+      letter-spacing: 4px;
+      margin-bottom: 12px;
+      text-shadow: 0 0 12px #ffc107;
+    }
+
+    .wish-loot-icon {
+      font-size: 4rem;
+      margin-bottom: 12px;
+      display: inline-block;
+      filter: drop-shadow(0 0 15px rgba(255,255,255,0.4));
+    }
+
+    .wish-loot-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .wish-loot-type {
+      font-size: 0.9rem;
+      color: var(--loot-accent, var(--gold-akasha));
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .wish-loot-quote {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-style: italic;
+      color: #e2e8f0;
+      line-height: 1.6;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* --- QUIZ MODAL TERMINAL --- */
+    .quiz-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(5, 7, 14, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .quiz-modal.open {
+      display: flex;
+    }
+
+    .quiz-dialog {
+      background: linear-gradient(180deg, #121626 0%, #0d101c 100%);
+      border: 1px solid var(--border-celestial);
+      border-radius: 24px;
+      max-width: 760px;
+      width: 100%;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 40px rgba(245, 212, 122, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .quiz-dialog-header {
+      padding: 24px 32px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .quiz-head-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .quiz-modal-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--gold-akasha);
+      color: var(--gold-akasha);
+      width: fit-content;
+    }
+
+    .quiz-modal-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .quiz-modal-close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .quiz-modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    /* Progress bar */
+    .quiz-progress-track {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      width: 100%;
+      position: relative;
+    }
+    .quiz-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-akasha));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Quiz Body */
+    .quiz-body-view {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .quiz-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .quiz-question-box {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      line-height: 1.5;
+      color: #ffffff;
+      font-weight: 700;
+      min-height: 56px;
+    }
+
+    .quiz-options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-option-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      color: #e2e8f0;
+      font-family: var(--font-sans);
+      font-size: 0.98rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .quiz-option-btn:hover:not(:disabled) {
+      background: rgba(245, 212, 122, 0.08);
+      border-color: rgba(245, 212, 122, 0.4);
+      transform: translateX(4px);
+    }
+    .quiz-option-btn .opt-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold-akasha);
+      flex-shrink: 0;
+    }
+    .quiz-option-btn .opt-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .quiz-option-btn.correct {
+      background: rgba(88, 199, 52, 0.18) !important;
+      border-color: var(--dendro) !important;
+      color: #a8ff85 !important;
+    }
+    .quiz-option-btn.wrong {
+      background: rgba(239, 90, 56, 0.18) !important;
+      border-color: var(--pyro) !important;
+      color: #ff9d85 !important;
+    }
+
+    /* Feedback Banner */
+    .quiz-feedback-box {
+      border-radius: 14px;
+      padding: 18px 22px;
+      display: none;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease;
+    }
+    .quiz-feedback-box.correct {
+      background: rgba(88, 199, 52, 0.1);
+      border: 1px solid var(--dendro);
+      color: #c0fcc0;
+    }
+    .quiz-feedback-box.wrong {
+      background: rgba(239, 90, 56, 0.1);
+      border: 1px solid var(--pyro);
+      color: #ffd2c7;
+    }
+    .quiz-explanation-text {
+      margin-top: 8px;
+      font-size: 0.88rem;
+      color: #d1d9e6;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 8px;
+    }
+
+    .quiz-foot-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 20px;
+    }
+
+    .btn-advance {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--gold-akasha) 0%, var(--gold-dark) 100%);
+      color: #0c0e14;
+      font-weight: 800;
+      padding: 12px 28px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      margin-left: auto;
+    }
+    .btn-advance:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .btn-advance:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(1);
+    }
+
+    /* Results View */
+    .quiz-results-view {
+      padding: 48px 32px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .results-score-big {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--gold-akasha);
+      text-shadow: 0 0 25px var(--gold-glow);
+      line-height: 1;
+    }
+
+    .results-percent-badge {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .results-rewards-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-celestial);
+      padding: 12px 28px;
+      border-radius: 16px;
+    }
+    .reward-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--gold-akasha);
+      font-size: 1rem;
+    }
+
+    .results-rank-badge {
+      padding: 6px 18px;
+      border-radius: 999px;
+      background: rgba(245, 212, 122, 0.15);
+      border: 1px solid var(--gold-akasha);
+      color: var(--gold-akasha);
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .results-verdict-quote {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: #e2e8f0;
+      max-width: 600px;
+      line-height: 1.6;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px 24px;
+    }
+
+    .results-btns-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* --- FOOTER --- */
+    .genshin-footer {
+      border-top: 1px solid var(--border-celestial);
+      padding: 60px 5vw 40px;
+      background: #06080d;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    .genshin-footer a {
+      color: var(--gold-akasha);
+    }
+    .footer-quote {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+
+    /* --- RESPONSIVE ADJUSTMENTS --- */
+    @media (max-width: 768px) {
+      .genshin-nav {
+        padding: 12px 4vw;
+      }
+      .nav-tagline {
+        display: none;
+      }
+      .hero-genshin {
+        padding: 60px 4vw 40px;
+      }
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      .btn-celestial-primary, .btn-celestial-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+      .regions-grid {
+        grid-template-columns: 1fr;
+      }
+      .lore-levels-wrap {
+        padding: 24px 16px;
+      }
+      .quiz-dialog-header {
+        padding: 18px 20px;
+      }
+      .quiz-body-view {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAVIGATION HEADER -->
+  <header class="genshin-nav" role="banner">
+    <a href="../index.html" class="nav-brand" title="На главную НЕШКОЛЫ">
+      <img src="../assets/images/genshin_wordmark.svg" alt="Genshin Impact" class="nav-brand-logo">
+      <span>ГЕНШИНОВЕДЕНИЕ</span>
+    </a>
+    <span class="nav-tagline">Интерактивная кафедра лора Тейвата</span>
+
+    <div class="nav-actions">
+      <div class="primo-pill" id="primo-counter" title="Ваши Камни Истока">
+        1600 ✦
+      </div>
+      <a href="../index.html#gaming" class="btn-return">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>В лобби</span>
+      </a>
+      <a href="../profile.html" class="btn-return" title="Личный кабинет">
+        <span>Профиль</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO SECTION -->
+    <section class="hero-genshin" aria-labelledby="hero-title">
+      <div class="hero-backdrop" aria-hidden="true"></div>
+      
+      <div class="hero-content">
+        <div class="hero-pill-badge">
+          ✦ Академическая игромания // 7 Королевств Тейвата
+        </div>
+
+        <img src="../assets/images/genshin_logo_ru.png" alt="Genshin Impact — Геншин Импакт" class="hero-logo-img">
+        
+        <h1 id="hero-title" class="hero-title">
+          Кафедра Геншиноведения
+        </h1>
+
+        <p class="hero-desc">
+          Добро пожаловать в высшую обсерваторию хроник Тейвата. Здесь сходятся законы <strong>Селестии</strong>, 
+          шёпот корней <strong>Ирминсуля</strong>, интриги <strong>11 Предвестников Фатуи</strong> и тайны павшей цивилизации <strong>Каэнри'ах</strong>.
+          Пройдите испытания каждого из 7 регионов, подтвердите уровень знаний и совершите молитву в симуляторе судьбы!
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn-celestial-primary" id="btn-make-wish" type="button">
+            <span>Совершить Молитву</span>
+            <span style="font-size: 0.85em; opacity: 0.85;">(✦ 160)</span>
+          </button>
+          <a href="#regions" class="btn-celestial-secondary">
+            <span>Выбрать регион для экзамена ↓</span>
+          </a>
+          <a href="#general-lore" class="btn-celestial-secondary">
+            <span>Хардкорный лор Дайнслейфа</span>
+          </a>
+        </div>
+
+        <div class="wish-quickbar">
+          <span>Сделано молитв: <strong id="wish-count-display">0</strong></span>
+          <span>•</span>
+          <span>Всего вопросов в базе: <strong>100 каноничных</strong></span>
+          <span>•</span>
+          <span>Награда: <strong>до 200 ✦ за тест</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 REGIONAL PAVILIONS SECTION -->
+    <section id="regions" class="section-wrap" aria-labelledby="regions-heading">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-eyebrow">✦ Испытания Семи Архонтов</div>
+          <h2 id="regions-heading" class="section-title">Академические тесты по 7 регионам</h2>
+          <p class="section-subtitle">
+            Каждый тест содержит 10 вопросов, составленных строго по канону из фолиантов Тейвата.
+            Выберите регион, чтобы открыть экзаменационный терминал.
+          </p>
+        </div>
+
+        <div class="regions-grid">
+          <!-- 1. МОНДШТАДТ -->
+          <div class="region-card" data-quiz-cat="mondstadt" 
+               style="--region-color: var(--anemo); --region-color-fade: rgba(79, 227, 193, 0.12); --region-color-glow: rgba(79, 227, 193, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">🍃</div>
+                <span class="region-element-badge">Анемо · Свобода</span>
+              </div>
+              <h3 class="region-title">Мондштадт</h3>
+              <div class="region-archon">✦ Барбатос (Венти) · Бог Свободы</div>
+              <p class="region-desc">
+                Город ветров и одуванчиков. История Ордо Фавониус, дракона Двалина, Волка Севера Андриуса и истоков аристократии Лоуренсов.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Ордо Фавониус</span>
+                <span class="topic-tag">Венти</span>
+                <span class="topic-tag">Двалин</span>
+                <span class="topic-tag">Венесса</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Базовый</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+
+          <!-- 2. ЛИ ЮЭ -->
+          <div class="region-card" data-quiz-cat="liyue" 
+               style="--region-color: var(--geo); --region-color-fade: rgba(229, 176, 66, 0.12); --region-color-glow: rgba(229, 176, 66, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">🔶</div>
+                <span class="region-element-badge">Гео · Контракты</span>
+              </div>
+              <h3 class="region-title">Ли Юэ</h3>
+              <div class="region-archon">✦ Моракс (Чжун Ли) · Властелин Камня</div>
+              <p class="region-desc">
+                Гавань контрактов, Нефритовый дворец Нин Гуан, Адепты Заоблачного предела, битва при Осиале и древнее сокровище Гуйли.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Цисин</span>
+                <span class="topic-tag">Чжун Ли</span>
+                <span class="topic-tag">Сяо</span>
+                <span class="topic-tag">Осиал</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Базовый</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+
+          <!-- 3. ИНАДЗУМА -->
+          <div class="region-card" data-quiz-cat="inazuma" 
+               style="--region-color: var(--electro); --region-color-fade: rgba(191, 111, 251, 0.12); --region-color-glow: rgba(191, 111, 251, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">⚡</div>
+                <span class="region-element-badge">Электро · Вечность</span>
+              </div>
+              <h3 class="region-title">Инадзума</h3>
+              <div class="region-archon">✦ Райдэн Эи · Владычица Вечности</div>
+              <p class="region-desc">
+                Островное царство гроз. Указ Сакоку, Охота на Глаза Бога, трагедия Макото, Царство Эвтимии и сопротивление Сангономии.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Сёгун Райдэн</span>
+                <span class="topic-tag">Яэ Мико</span>
+                <span class="topic-tag">Сакоку</span>
+                <span class="topic-tag">Кадзуха</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Средний</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+
+          <!-- 4. СУМЕРУ -->
+          <div class="region-card" data-quiz-cat="sumeru" 
+               style="--region-color: var(--dendro); --region-color-fade: rgba(88, 199, 52, 0.12); --region-color-glow: rgba(88, 199, 52, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">🌿</div>
+                <span class="region-element-badge">Дендро · Мудрость</span>
+              </div>
+              <h3 class="region-title">Сумеру</h3>
+              <div class="region-archon">✦ Нахида · Малая владычица Кусанали</div>
+              <p class="region-desc">
+                Тропические леса и бескрайние пески Дешрета. Шесть даршанов Академии, сеть Акаши, спасение Ирминсуля от запретного знания.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Ирминсуль</span>
+                <span class="topic-tag">Нахида</span>
+                <span class="topic-tag">Царь Дешрет</span>
+                <span class="topic-tag">Академия</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Средний</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+
+          <!-- 5. ФОНТЕЙН -->
+          <div class="region-card" data-quiz-cat="fontaine" 
+               style="--region-color: var(--hydro); --region-color-fade: rgba(56, 152, 236, 0.12); --region-color-glow: rgba(56, 152, 236, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">💧</div>
+                <span class="region-element-badge">Гидро · Справедливость</span>
+              </div>
+              <h3 class="region-title">Фонтейн</h3>
+              <div class="region-archon">✦ Фокалорс & Нёвиллет · Суд и Закон</div>
+              <p class="region-desc">
+                Нация справедливости и стимпанка. Опера «Эпиклез», Оратрис Меканик д’Анализ Кардиналь, пророчество о потопе и тайна океанид.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Нёвиллет</span>
+                <span class="topic-tag">Фурина</span>
+                <span class="topic-tag">Оратрис</span>
+                <span class="topic-tag">Первозданные воды</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Продвинутый</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+
+          <!-- 6. НАТЛАН -->
+          <div class="region-card" data-quiz-cat="natlan" 
+               style="--region-color: var(--pyro); --region-color-fade: rgba(239, 90, 56, 0.12); --region-color-glow: rgba(239, 90, 56, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">🔥</div>
+                <span class="region-element-badge">Пиро · Война</span>
+              </div>
+              <h3 class="region-title">Натлан</h3>
+              <div class="region-archon">✦ Мавуика · Владычица Войны</div>
+              <p class="region-desc">
+                Царство огня и шести племён. Священный Огонь, древние завры, благословение Ночного Духа и вечная борьба с бездной.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Мавуика</span>
+                <span class="topic-tag">Завры</span>
+                <span class="topic-tag">Ночной дух</span>
+                <span class="topic-tag">Капитано</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Продвинутый</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+
+          <!-- 7. СНЕЖНАЯ & КАЭНРИ'АХ -->
+          <div class="region-card" data-quiz-cat="snezhnaya" 
+               style="--region-color: var(--cryo); --region-color-fade: rgba(124, 232, 255, 0.12); --region-color-glow: rgba(124, 232, 255, 0.3);">
+            <div>
+              <div class="region-head">
+                <div class="region-icon-pill">❄️</div>
+                <span class="region-element-badge">Крио · Бунт против Селестии</span>
+              </div>
+              <h3 class="region-title">Снежная, Каэнри'ах и Селестия</h3>
+              <div class="region-archon">✦ Царица · Фатуи и Небесный Порядок</div>
+              <p class="region-desc">
+                Заполярный дворец Заполярного дворца, сбор Сердец Бога, 500 лет со дня Катаклизма и проклятие бессмертия Дайнслейфа.
+              </p>
+              <div class="region-topics">
+                <span class="topic-tag">Предвестники Фатуи</span>
+                <span class="topic-tag">Катаклизм</span>
+                <span class="topic-tag">Каэнри'ах</span>
+                <span class="topic-tag">Селестия</span>
+              </div>
+            </div>
+            <div class="region-foot">
+              <span class="region-q-count">10 вопросов · Экспертный</span>
+              <span class="region-btn-action">Сдать экзамен →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 GENERAL LORE LEVELS SECTION -->
+        <div id="general-lore" class="lore-levels-wrap">
+          <div class="section-head" style="margin-bottom: 24px;">
+            <div class="section-eyebrow">✦ Три ступени посвящения</div>
+            <h3 class="section-title">Общий лор Тейвата по уровням сложности</h3>
+            <p class="section-subtitle">
+              От базовых основ странствий до глубочайших метафизических тайн Ирминсуля, Сошедших и истинного облика мира.
+            </p>
+          </div>
+
+          <div class="lore-cards-grid">
+            <!-- Уровень 1 -->
+            <div class="lore-card" data-quiz-cat="lore_traveler">
+              <div>
+                <span class="lore-level-pill lvl-1">Уровень 1 · Базовый</span>
+                <h4 class="lore-card-title">Путешественник</h4>
+                <div class="lore-card-mentor">Наставник: Паймон</div>
+                <p class="lore-card-desc">
+                  Основы мира: Глаза Бога, Сердца Бога, элементы, элементальные реакции и главные вехи первых приключений.
+                </p>
+              </div>
+              <div class="region-foot">
+                <span class="region-q-count">10 вопросов</span>
+                <span class="region-btn-action" style="color: var(--anemo);">Пройти тест →</span>
+              </div>
+            </div>
+
+            <!-- Уровень 2 -->
+            <div class="lore-card" data-quiz-cat="lore_scholar">
+              <div>
+                <span class="lore-level-pill lvl-2">Уровень 2 · Продвинутый</span>
+                <h4 class="lore-card-title">Учёный Академии Сумеру</h4>
+                <div class="lore-card-mentor">Наставник: Нахида & Аль-Хайтам</div>
+                <p class="lore-card-desc">
+                  Глубокие хроники Войны Архонтов, создание Моры, природа Драконьих Суверенов и структура древа памяти Ирминсуль.
+                </p>
+              </div>
+              <div class="region-foot">
+                <span class="region-q-count">10 вопросов</span>
+                <span class="region-btn-action" style="color: var(--dendro);">Пройти тест →</span>
+              </div>
+            </div>
+
+            <!-- Уровень 3 -->
+            <div class="lore-card" data-quiz-cat="lore_dainsleif">
+              <div>
+                <span class="lore-level-pill lvl-3">Уровень 3 · Хардкор</span>
+                <h4 class="lore-card-title">Хранитель Ветвей Дайнслейф</h4>
+                <div class="lore-card-mentor">Наставник: Дайнслейф & Пьеро</div>
+                <p class="lore-card-desc">
+                  Истинные тайны: Первый Престол (Изначальный), Четыре Тени, Четверо Сошедших, грешники Каэнри'ах и Фальшивое Небо.
+                </p>
+              </div>
+              <div class="region-foot">
+                <span class="region-q-count">10 вопросов</span>
+                <span class="region-btn-action" style="color: var(--celestia);">Бросить вызов →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CODEX OF TEYVAT TABBED SECTION -->
+    <section class="section-wrap codex-section" aria-labelledby="codex-heading">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-eyebrow">✦ Фолианты Кафедры</div>
+          <h2 id="codex-heading" class="section-title">Кодекс Тейвата · Справочник понятий</h2>
+          <p class="section-subtitle">
+            Перед сдачей экзаменов сверьтесь с ключевыми терминами фундаментального лора.
+          </p>
+        </div>
+
+        <div class="codex-tabs-bar">
+          <button class="codex-tab-btn active" data-tab="irminsul" type="button">Древо Ирминсуль</button>
+          <button class="codex-tab-btn" data-tab="gnosis" type="button">Сердца Бога (Гнозисы)</button>
+          <button class="codex-tab-btn" data-tab="harbingers" type="button">11 Предвестников Фатуи</button>
+          <button class="codex-tab-btn" data-tab="descenders" type="button">Сошедшие (Descenders)</button>
+          <button class="codex-tab-btn" data-tab="khaenriah" type="button">Каэнри'ах & Катаклизм</button>
+        </div>
+
+        <!-- Panels -->
+        <div class="codex-panel active" id="codex-panel-irminsul">
+          <div class="codex-grid-inner">
+            <div class="codex-entry">
+              <h4>Природа Древа</h4>
+              <p>Ирминсуль — гигантское кристаллическое древо, чьи корни пронизывают весь Тейват. Оно непрерывно записывает все события, мысли и воспоминания всех обитателей мира.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Изменение памяти</h4>
+              <p>Если стереть или изменить информацию в ветвях Ирминсуля (как это сделал Скарамучча или Руккхадевата), память всех жителей Тейвата мгновенно переписывается в соответствии с новой версией реальности.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Иммунитет Сошедших</h4>
+              <p>Существа, пришедшие из-за пределов Тейвата (Сошедшие, включая Путешественника), не принадлежат Ирминсулю. Их память не стирается и не изменяется при правке древа.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="codex-panel" id="codex-panel-gnosis">
+          <div class="codex-grid-inner">
+            <div class="codex-entry">
+              <h4>Происхождение Сердец</h4>
+              <p>Сердца Бога (Гнозисы) были дарованы Селестией победителям Войны Архонтов. Как выясняется в Фонтейне, они созданы из останков Третьего Сошедшего.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Форма шахматных фигур</h4>
+              <p>Каждый Гнозис имеет форму шахматной фигуры (Король, Ферзь, Ладья, Конь и т.д.), что символизирует роль Архонтов как фигур на космической шахматной доске Небесного Порядка.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>План Царицы</h4>
+              <p>Крио Архонт Царица собирает все 7 Сердец Бога силами Предвестников Фатуи, чтобы бросить прямой вызов Селестии и переписать правила Небесного Порядка.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="codex-panel" id="codex-panel-harbingers">
+          <div class="codex-grid-inner">
+            <div class="codex-entry">
+              <h4>Пьеро (Шут) · Лидер</h4>
+              <p>Первый Предвестник и основатель Фатуи. Бывший королевский маг Каэнри'ах, не сумевший остановить падение своей родины от безумия алхимии.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Иль Дотторе & Колумбина</h4>
+              <p>Второй Предвестник Дотторе («Доктор») создал срезы своей личности на разных этапах жизни. Третья — Колумбина («Субретка»), существо со сверхчеловеческой ангельской силой.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Арлекино & Капитано</h4>
+              <p>Четвертый Предвестник Арлекино («Слуга») правит Домом Очага и несёт в себе кровь Лунной Династии. Капитано («Капитан») — сильнейший воин Тейвата, прибывший в Натлан.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="codex-panel" id="codex-panel-descenders">
+          <div class="codex-grid-inner">
+            <div class="codex-entry">
+              <h4>Кто такие Сошедшие?</h4>
+              <p>Существа из иных миров, обладающие волей, способной соперничать с целым миром и влиять на судьбу Тейвата. Всего в истории зафиксировано четверо Сошедших.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Первый и Третий</h4>
+              <p>Первый Сошедший — Фанет (Изначальный), создавший жизнь в Тейвате и победивший Драконьих Владык. Третий Сошедший погиб, а его останки послужили материалом для Сердец Бога.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Четвертый Сошедший</h4>
+              <p>Главный герой — Путешественник (Итэр или Люмин) официально классифицирован Фатуи как Четвертый Сошедший. Близнец путешественника при этом записан в Ирминсуле!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="codex-panel" id="codex-panel-khaenriah">
+          <div class="codex-grid-inner">
+            <div class="codex-entry">
+              <h4>Королевство без богов</h4>
+              <p>Подземное государство Каэнри'ах развивалось исключительно силой науки и алхимии «Кхемия», создавая культиваторов (стражей руин) и искусственную жизнь.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Катаклизм 500 лет назад</h4>
+              <p>Эксперименты алхимика Голд (Рэйндоттир) пробили брешь в бездну, выпустив орды монстров. Селестия и Архонты уничтожили Каэнри'ах, наложив на её народ проклятие дикости (хиличурлы) и бессмертия.</p>
+            </div>
+            <div class="codex-entry">
+              <h4>Орден Бездны</h4>
+              <p>Остатки Каэнри'ах объединились под знамёнами Ордена Бездны под предводительством потерянного Близнеца Путешественника, стремясь свергнуть Селестию.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- WISH SIMULATOR MODAL OVERLAY -->
+  <div class="wish-overlay" id="wish-overlay" role="dialog" aria-modal="true" aria-label="Молитва Тейвата">
+    <div class="wish-meteor-star" id="wish-meteor" aria-hidden="true"></div>
+    
+    <div class="wish-result-card" id="wish-result-card">
+      <div class="wish-loot-stars">★★★★★</div>
+      <div class="wish-loot-icon" id="wish-loot-icon">🔶</div>
+      <h3 class="wish-loot-title" id="wish-loot-title">Властелин Камня</h3>
+      <div class="wish-loot-type" id="wish-loot-type">Гео Архонт</div>
+      <blockquote class="wish-loot-quote" id="wish-loot-quote">
+        «Контракт не может быть нарушен.»
+      </blockquote>
+      <button class="btn-celestial-primary" id="btn-close-wish" type="button" style="width: 100%; justify-content: center;">
+        Принять благословение ✦
+      </button>
+    </div>
+  </div>
+
+  <!-- QUIZ MODAL TERMINAL -->
+  <div class="quiz-modal" id="quiz-modal" role="dialog" aria-modal="true" aria-label="Терминал тестирования">
+    <div class="quiz-dialog">
+      <!-- Modal Header -->
+      <div class="quiz-dialog-header">
+        <div class="quiz-head-info">
+          <span class="quiz-modal-badge" id="quiz-modal-badge">Мондштадт</span>
+          <h3 class="quiz-modal-title" id="quiz-modal-title">Экзамен по Мондштадту</h3>
+        </div>
+        <button class="quiz-modal-close-btn" id="quiz-modal-close" type="button" aria-label="Закрыть тест">✕</button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="quiz-progress-track">
+        <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+      </div>
+
+      <!-- Active Quiz View -->
+      <div class="quiz-body-view" id="quiz-body-view">
+        <div class="quiz-progress-meta">
+          <span id="quiz-progress-text">Вопрос 1 из 10</span>
+          <span>Горячие клавиши: [1], [2], [3], [4]</span>
+        </div>
+
+        <div class="quiz-question-box" id="quiz-question-text">
+          Загрузка вопроса...
+        </div>
+
+        <div class="quiz-options-grid" id="quiz-options-container">
+          <!-- Dynamically populated by js/genshin.js -->
+        </div>
+
+        <!-- Feedback & Lore explanation banner -->
+        <div class="quiz-feedback-box" id="quiz-feedback-box">
+          <div id="quiz-feedback-status"></div>
+          <div class="quiz-explanation-text" id="quiz-explanation-text"></div>
+        </div>
+
+        <div class="quiz-foot-actions">
+          <button class="btn-advance" id="quiz-next-btn" type="button" disabled>
+            <span>Следующий вопрос →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Final Results View -->
+      <div class="quiz-results-view" id="quiz-results-view">
+        <div class="results-score-big" id="results-score-text">10 из 10</div>
+        <div class="results-percent-badge" id="results-percent-text">100% правильных ответов</div>
+        <div class="results-rank-badge" id="results-rank-badge">Звание: Хранитель Ветвей</div>
+        
+        <div class="results-rewards-row">
+          <div class="reward-item">
+            <span>Камни Истока:</span>
+            <span id="results-primo-reward">+200 ✦</span>
+          </div>
+          <div class="reward-item" style="color: #e5b042;">
+            <span>Мора:</span>
+            <span id="results-mora-reward">+10,000</span>
+          </div>
+        </div>
+
+        <blockquote class="results-verdict-quote" id="results-verdict-quote">
+          «Поразительно! Твои познания равны мудрости древа Ирминсуль!» — Нахида
+        </blockquote>
+
+        <div class="results-btns-row">
+          <button class="btn-celestial-secondary" id="results-retake-btn" type="button">
+            Пройти снова
+          </button>
+          <button class="btn-celestial-primary" id="results-finish-btn" type="button">
+            Завершить экзамен
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="genshin-footer">
+    <div class="shell">
+      <p class="footer-quote">
+        «Пока звезды на небе горят фальшивым светом, смертные продолжают писать свою подлинную историю.»
+      </p>
+      <p>
+        Кафедра Геншиноведения · Проект <a href="../index.html">НЕШКОЛА</a>. Все права на персонажей и вселенную Genshin Impact принадлежат HoYoverse (COGNOSPHERE PTE. LTD.).
+      </p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="../js/genshin_quiz_data.js"></script>
+  <script src="../js/genshin.js"></script>
+</body>
+</html>
