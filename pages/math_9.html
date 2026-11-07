@@ -43,18 +43,163 @@
         .brand-name { color: var(--indigo); font: 700 19px 'Zen Old Mincho', serif; }
         .brand-class { margin-left: 2px; color: var(--muted); font-size: 11px; font-weight: 600; }
 
-        /* CLASS SWITCHER */
-        .class-switcher {
-            display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
-            border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+        /* CLASS DROPDOWN SWITCHER */
+        .class-dropdown {
+            position: relative;
+            display: inline-block;
         }
-        .class-pill {
-            padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
-            text-decoration: none; color: var(--muted); transition: all .2s ease;
+        .class-dropdown-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 34px;
+            padding: 0 12px 0 6px;
+            background: rgba(38, 63, 97, .06);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--indigo);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s ease;
+            user-select: none;
         }
-        .class-pill:hover { color: var(--vermilion); }
-        .class-pill.active {
-            background: var(--vermilion); color: #fff; box-shadow: 0 2px 8px rgba(183,70,78,.35);
+        .class-dropdown-trigger:hover,
+        .class-dropdown.open .class-dropdown-trigger {
+            background: rgba(183, 70, 78, .08);
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+        }
+        .class-dropdown-trigger:focus-visible {
+            outline: 3px solid var(--vermilion);
+            outline-offset: 2px;
+        }
+        .class-dropdown-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--vermilion);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Zen Old Mincho', serif;
+            line-height: 1;
+            box-shadow: 0 1px 4px rgba(183,70,78,.3);
+        }
+        .class-dropdown-label {
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .class-dropdown-arrow {
+            transition: transform .25s ease;
+            color: var(--muted);
+            margin-left: 2px;
+        }
+        .class-dropdown-trigger:hover .class-dropdown-arrow,
+        .class-dropdown.open .class-dropdown-arrow {
+            color: var(--vermilion);
+        }
+        .class-dropdown.open .class-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .class-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 240px;
+            padding: 6px;
+            background: rgba(251, 249, 244, 0.98);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 14px 32px rgba(38, 63, 97, .16), 0 3px 8px rgba(0,0,0,.04);
+            backdrop-filter: blur(14px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity .2s ease, transform .2s ease, visibility .2s;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .class-dropdown.open .class-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .class-dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--ink);
+            transition: background .18s ease, color .18s ease;
+        }
+        .class-dropdown-item:hover {
+            background: rgba(183, 70, 78, .07);
+            color: var(--vermilion);
+        }
+        .class-dropdown-item.active {
+            background: var(--vermilion);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(183,70,78,.3);
+        }
+        .class-item-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .class-item-badge {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            background: rgba(38, 63, 97, .07);
+            color: var(--indigo);
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Zen Old Mincho', serif;
+        }
+        .class-dropdown-item.active .class-item-badge {
+            background: rgba(255, 255, 255, .22);
+            color: #fff;
+        }
+        .class-item-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .class-item-title {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .class-item-desc {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 500;
+            line-height: 1.3;
+            margin-top: 1px;
+        }
+        .class-dropdown-item.active .class-item-desc {
+            color: rgba(255, 255, 255, .82);
+        }
+        .class-item-check {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .class-dropdown-menu {
+                left: auto;
+                right: -10px;
+            }
         }
 
         .nav-links { display: flex; align-items: center; gap: 24px; }
@@ -363,7 +508,7 @@
 
         @media (max-width: 960px) {
             .nav-links { display: none; }
-            .class-switcher { display: none; }
+            /* class switcher replaced by dropdown */
         }
 
         @media (max-width: 768px) {
@@ -380,7 +525,7 @@
             .brand-name { font-size: 16px; }
             .brand-class { display: none; }
             .nav-links { display: none; }
-            .class-switcher { display: none; }
+            /* class switcher replaced by dropdown */
             .lobby-link { display: none; }
             .profile-link { padding: 0 10px; font-size: 11px; min-height: 34px; }
             .hero { min-height: 400px; height: auto; }
@@ -419,18 +564,74 @@
             <span class="brand-class">9 класс</span>
         </a>
 
-        <!-- CLASS SWITCHER -->
-        <div class="class-switcher" role="group" aria-label="Выбор класса">
-            <a href="math_4.html" class="class-pill">4 класс</a>
-            <span class="class-pill active" aria-current="page">9 класс</span>
+        <!-- CLASS DROPDOWN SWITCHER -->
+        <div class="class-dropdown" id="class-dropdown">
+            <button class="class-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Выбрать класс обучения">
+                <span class="class-dropdown-badge">9</span>
+                <span class="class-dropdown-label">9 класс</span>
+                <svg class="class-dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div class="class-dropdown-menu" role="menu">
+                <a href="math_4.html" class="class-dropdown-item" role="menuitem">
+                    <div class="class-item-main">
+                        <span class="class-item-badge">4</span>
+                        <div class="class-item-info">
+                            <span class="class-item-title">4 класс</span>
+                            <span class="class-item-desc">Начальная школа</span>
+                        </div>
+                    </div>
+                    
+                </a>
+                <a href="math_6.html" class="class-dropdown-item" role="menuitem">
+                    <div class="class-item-main">
+                        <span class="class-item-badge">6</span>
+                        <div class="class-item-info">
+                            <span class="class-item-title">6 класс</span>
+                            <span class="class-item-desc">Дроби и пропорции</span>
+                        </div>
+                    </div>
+                    
+                </a>
+                <a href="math_7.html" class="class-dropdown-item" role="menuitem">
+                    <div class="class-item-main">
+                        <span class="class-item-badge">7</span>
+                        <div class="class-item-info">
+                            <span class="class-item-title">7 класс</span>
+                            <span class="class-item-desc">Алгебра и геометрия</span>
+                        </div>
+                    </div>
+                    
+                </a>
+                <a href="math_8.html" class="class-dropdown-item" role="menuitem">
+                    <div class="class-item-main">
+                        <span class="class-item-badge">8</span>
+                        <div class="class-item-info">
+                            <span class="class-item-title">8 класс</span>
+                            <span class="class-item-desc">Функции и корни</span>
+                        </div>
+                    </div>
+                    
+                </a>
+                <a href="math_9.html" class="class-dropdown-item active" role="menuitem">
+                    <div class="class-item-main">
+                        <span class="class-item-badge">9</span>
+                        <div class="class-item-info">
+                            <span class="class-item-title">9 класс</span>
+                            <span class="class-item-desc">Подготовка к ОГЭ</span>
+                        </div>
+                    </div>
+                    <span class="class-item-check" aria-hidden="true">✓</span>
+                </a>
+            </div>
         </div>
 
         <div class="nav-links">
             <a href="oge_roadmap.html" class="highlight">Роадмап ОГЭ</a>
             <a href="#trainers">Тренажёры ОГЭ</a>
             <a href="#strategy">Критерии ОГЭ</a>
-            <a href="#routes">Маршруты</a>
-            <a href="maths/math_tests.html">Тестирования</a>
+            <!-- <a href="maths/math_tests.html">Тестирования</a> -->
         </div>
 
         <div class="nav-actions">
@@ -448,8 +649,8 @@
             <div class="hero-frosted-tint" aria-hidden="true"></div>
             
             <div class="hero-inner">
-                <p class="hero-kicker">Учебная мастерская · девятый класс · ОГЭ</p>
-                <h1 id="hero-title">Математика 9 класс</h1>
+                <p class="hero-kicker">Учебная мастерская · 9 класс · ОГЭ</p>
+                <h1 id="hero-title">Математика</h1>
                 <p class="hero-copy">Систематизированный свод тем, формул и алгоритмов для заданий №1–25. Изучай теорию, повторяй ключевые понятия и уверенно иди к максимальному баллу на экзамене.</p>
                 <div class="hero-actions">
                     <a class="hero-action primary" href="oge_roadmap.html">
@@ -780,6 +981,37 @@
     <!-- INTERACTIVE GAUSSIAN-DIFFUSED FROST SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+        // Class Switcher Dropdown Controller
+        (function initClassDropdown() {
+            const dropdown = document.getElementById('class-dropdown');
+            if (!dropdown) return;
+            const trigger = dropdown.querySelector('.class-dropdown-trigger');
+
+            function toggleDropdown(open) {
+                const isOpen = open !== undefined ? open : !dropdown.classList.contains('open');
+                dropdown.classList.toggle('open', isOpen);
+                trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    toggleDropdown(false);
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && dropdown.classList.contains('open')) {
+                    toggleDropdown(false);
+                    trigger.focus();
+                }
+            });
+        })();
+
             const hero = document.getElementById('hero-temple-section');
             if (!hero) return;
 
