@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр ОГЭ №20 · Уравнения, неравенства и системы (Часть 2) · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(38,63,97,.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(183,70,78,.03) 0%, transparent 40%);
+    }
+
+    /* SITE NAV */
+    .site-nav {
+      background: rgba(245,242,235,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px; gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--indigo-dark);
+    }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--indigo); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'Zen Old Mincho', serif; font-size: 20px; font-weight: 700;
+      box-shadow: 0 4px 10px rgba(38,63,97,.2);
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+    .brand-sub { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+    
+    .nav-task-divider {
+      width: 1px; height: 16px; background: var(--line); margin: 0 4px; display: inline-block;
+    }
+    .nav-task-part-badge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--vermilion); letter-spacing: .08em; padding: 0 2px;
+    }
+    .task-pill.task-pill-part2 {
+      border: 1px dashed rgba(183,70,78,.4); color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .task-pill.task-pill-part2:hover {
+      background: var(--vermilion); color: #fff;
+    }
+    .task-pill.task-pill-part2.active {
+      background: var(--vermilion); color: #fff; border-style: solid; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-task-switcher {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      padding: 4px; border-radius: 999px; overflow-x: auto; max-width: 100%;
+    }
+    .task-pill {
+      font-size: 12px; font-weight: 600; text-decoration: none;
+      padding: 5px 12px; border-radius: 999px; color: var(--muted);
+      transition: all .2s ease; white-space: nowrap;
+    }
+    .task-pill:hover { color: var(--indigo); background: rgba(38,63,97,.06); }
+    .task-pill.active {
+      background: var(--indigo); color: #fff;
+      box-shadow: 0 2px 6px rgba(38,63,97,.25);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--paper-card);
+      font-size: 12px; font-weight: 600; color: var(--indigo-dark);
+      text-decoration: none; transition: all .2s ease;
+    }
+    .nav-btn:hover { border-color: var(--indigo); background: #fff; transform: translateY(-1px); }
+    .xp-counter {
+      background: var(--gold-light); color: #9c6734; border: 1px solid rgba(200,149,108,.3);
+      padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      flex: 1; max-width: 960px; width: 100%; margin: 0 auto;
+      padding: 28px 20px 48px; display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; max-width: 760px; margin: 0 auto; }
+    .trainer-kicker {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--vermilion); margin-bottom: 6px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .trainer-title {
+      font-family: 'Zen Old Mincho', serif;
+      font-size: clamp(26px, 4.2vw, 36px);
+      font-weight: 700; color: var(--indigo-dark);
+      line-height: 1.2; margin-bottom: 10px;
+    }
+    .trainer-subtitle {
+      font-size: 14px; color: var(--muted); line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .stat-box {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-icon { font-size: 20px; }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font-size: 16px; font-weight: 700; color: var(--indigo-dark); line-height: 1.1; }
+    .stat-label { font-size: 11px; color: var(--muted); }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      cursor: pointer; font-family: inherit; transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 22px;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 700; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 12px; border-radius: 999px;
+      border: 1px solid var(--vermilion-border);
+    }
+
+    /* MATH EXPRESSION DISPLAY */
+    .task-display {
+      width: 100%; text-align: center; margin-top: 10px;
+    }
+    .task-prompt {
+      font-size: 14px; color: var(--muted); margin-bottom: 16px; font-weight: 600;
+    }
+    .math-expr {
+      display: inline-block;
+      font-size: clamp(20px, 3.5vw, 30px);
+      color: var(--indigo-dark);
+      padding: 20px 32px;
+      background: var(--paper-light);
+      border: 1px solid rgba(38,63,97,.14);
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,.02);
+    }
+    .expr-line {
+      display: inline-block;
+    }
+
+    /* SYSTEM OF EQUATIONS FORMATTING */
+    .system-bracket {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95em;
+    }
+    .system-brace {
+      font-size: 2.3em;
+      font-weight: 300;
+      color: var(--indigo);
+      line-height: 1;
+      transform: scaleY(1.3);
+      display: inline-block;
+      user-select: none;
+    }
+    .system-equations {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    /* FRACTION FORMATTING */
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 4px; font-size: 0.9em; line-height: 1.08;
+    }
+    .fraction .num {
+      border-bottom: 2px solid currentColor; padding-bottom: 2px;
+    }
+    .fraction .den {
+      padding-top: 2px;
+    }
+    sup {
+      font-size: 0.65em;
+      vertical-align: super;
+      line-height: 0;
+    }
+
+    /* QUICK SYMBOL HELPER BUTTONS */
+    .quick-symbols-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: -6px;
+      margin-bottom: 2px;
+    }
+    .quick-symbol-btn {
+      background: var(--paper-light);
+      border: 1px solid var(--line);
+      color: var(--indigo);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', monospace;
+      transition: all .15s ease;
+      user-select: none;
+    }
+    .quick-symbol-btn:hover {
+      background: #fff;
+      border-color: var(--indigo);
+      transform: translateY(-1px);
+    }
+    .quick-symbol-btn:active {
+      transform: translateY(0);
+      background: var(--indigo-soft);
+    }
+
+    .format-hint {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: -8px;
+    }
+
+    /* ANSWER ROW & INPUT */
+    .answer-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 560px;
+    }
+    .answer-input-wrap {
+      flex: 1; min-width: 200px; position: relative;
+    }
+    .answer-input {
+      width: 100%; height: 52px; padding: 0 18px;
+      border: 2px solid var(--line); border-radius: 12px;
+      background: #fff; color: var(--ink); font-size: 19px; font-weight: 700;
+      font-family: 'DM Sans', monospace; text-align: center;
+      transition: all .2s ease;
+    }
+    .answer-input:focus,
+    .answer-input:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 1px;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+    .answer-input.correct {
+      border-color: var(--green); background: var(--green-light); color: var(--green);
+    }
+    .answer-input.wrong {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+    }
+
+    .btn-check,
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      padding: 0 28px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
+      transition: all .2s ease;
+    }
+    .btn-check:focus-visible,
+    .btn-next:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 2px;
+    }
+    .btn-check {
+      background: var(--vermilion);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover {
+      background: #d3525b;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .btn-check:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(183,70,78,.3);
+    }
+
+    .btn-next {
+      background: var(--indigo);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover {
+      background: #19273c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+
+    /* FEEDBACK MESSAGE */
+    .feedback-banner {
+      width: 100%; max-width: 560px; border-radius: 12px; padding: 12px 18px;
+      font-size: 13px; font-weight: 600; display: none; line-height: 1.5;
+      animation: fadeIn .25s ease; text-align: center;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success {
+      background: var(--green-light); color: var(--green); border: 1px solid rgba(46,125,50,.25);
+    }
+    .feedback-banner.error {
+      background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* CARD ACTION TOOLS */
+    .card-tools {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
+      border-top: 1px solid var(--line); width: 100%; padding-top: 20px; margin-top: 6px;
+    }
+    .tool-btn {
+      background: none; border: 1px solid var(--line); border-radius: 999px;
+      padding: 7px 16px; font-size: 12px; font-weight: 600; color: var(--muted);
+      cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+      transition: all .2s ease;
+    }
+    .tool-btn:hover { color: var(--indigo); border-color: var(--indigo); background: #fff; }
+
+    /* COLLAPSIBLE PANELS (SOLUTION & THEORY) */
+    .accordion-panel {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 24px 28px; box-shadow: var(--shadow-sm);
+      display: none; flex-direction: column; gap: 16px;
+      animation: fadeIn .3s ease;
+    }
+    .accordion-panel.active { display: flex; }
+    .accordion-panel h3 {
+      font-family: 'Zen Old Mincho', serif; font-size: 18px; color: var(--indigo-dark);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .solution-step {
+      background: var(--paper-light); border-left: 3px solid var(--indigo);
+      padding: 12px 16px; border-radius: 0 10px 10px 0;
+      font-size: 14px; line-height: 1.6; color: var(--ink);
+    }
+    .criteria-box {
+      background: var(--gold-light); border: 1px solid rgba(200,149,108,.3);
+      border-radius: 12px; padding: 14px 18px; font-size: 13px; line-height: 1.5;
+      color: #7a4f23;
+    }
+    .criteria-box strong { color: #5a3614; }
+
+    .theory-content { display: flex; flex-direction: column; gap: 16px; font-size: 14px; line-height: 1.6; }
+    .theory-rule-box {
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px 18px;
+    }
+    .theory-rule-title { font-weight: 700; color: var(--indigo-dark); margin-bottom: 6px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .problem-card { padding: 32px 18px 24px; }
+      .card-top-tag { font-size: 10px; left: 16px; }
+      .card-help-badge { font-size: 10px; right: 16px; }
+      .answer-row { flex-direction: column; }
+      .answer-input-wrap, .btn-check, .btn-next { width: 100%; }
+      .site-nav { flex-wrap: wrap; }
+      .nav-task-switcher { order: 3; width: 100%; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAV -->
+  <header class="site-nav" role="banner">
+    <a class="brand" href="../pages/math_9.html" aria-label="Вернуться в Математика 9 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <span class="nav-task-part-badge" style="color:var(--muted);">Ч. 1:</span>
+      <a href="oge_task_6_trainer.html" class="task-pill">№6</a>
+      <a href="oge_task_7_trainer.html" class="task-pill">№7</a>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10</a>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <span class="nav-task-divider" aria-hidden="true"></span>
+      <span class="nav-task-part-badge">Ч. 2:</span>
+      <span class="task-pill task-pill-part2 active" aria-current="page">№20 (2 б.)</span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/oge_roadmap.html" class="nav-btn">🗺️ Роадмап</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <div class="trainer-header">
+      <div class="trainer-kicker">ОГЭ 2026 · Часть 2 · Повышенный уровень (2 балла)</div>
+      <h1 class="trainer-title">Задание №20: Уравнения, неравенства и системы</h1>
+      <p class="trainer-subtitle">
+        Биквадратные уравнения, уравнения 3-й степени методом группировки, строгий учёт ОДЗ, дробно-рациональные неравенства методом интервалов и нелинейные системы уравнений. Полноценная подготовка к максимальным баллам второй части!
+      </p>
+    </div>
+
+    <!-- STATS DASHBOARD -->
+    <div class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Лучший рекорд</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Всего решено</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank" style="font-size: 13px;">Новичок</span>
+          <span class="stat-label">Текущее звание</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY FILTER / MODES -->
+    <div class="category-filter" role="tablist" aria-label="Режимы задания 20">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">🎲 Все типы №20</button>
+      <button type="button" class="cat-btn" data-cat="equations">🧮 Уравнения</button>
+      <button type="button" class="cat-btn" data-cat="inequalities">📐 Неравенства</button>
+      <button type="button" class="cat-btn" data-cat="systems">⛓️ Системы уравнений</button>
+    </div>
+
+    <!-- MAIN PROBLEM CARD -->
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Задание №20 · Часть 2 (2 балла)</span>
+      <span class="card-help-badge" id="task-cat-badge">Алгебра</span>
+
+      <div class="task-display">
+        <p class="task-prompt" id="task-prompt">Решите уравнение, неравенство или систему уравнений:</p>
+        <div id="math-container">
+          <!-- Dynamic Math Expression -->
+        </div>
+      </div>
+
+      <!-- Quick Symbol Helper Buttons -->
+      <div class="quick-symbols-bar" id="quick-symbols-bar" aria-label="Быстрый ввод математических символов">
+        <!-- Injected dynamically based on task type -->
+      </div>
+
+      <div class="format-hint" id="format-hint">
+        <!-- Format hint -->
+      </div>
+
+      <div class="answer-row">
+        <div class="answer-input-wrap">
+          <input type="text" id="answer-input" class="answer-input" placeholder="Введите ваш ответ" autocomplete="off" autocapitalize="off" spellcheck="false" />
+        </div>
+        <button type="button" id="btn-check" class="btn-check">
+          <span>Проверить ответ</span>
+          <span>✓</span>
+        </button>
+        <button type="button" id="btn-next" class="btn-next" style="display: none;">
+          <span>Следующее задание</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <div id="feedback-banner" class="feedback-banner" role="alert"></div>
+
+      <div class="card-tools">
+        <button type="button" class="tool-btn" id="btn-toggle-solution">
+          <span>💡 Показать решение и критерии ФИПИ</span>
+        </button>
+        <button type="button" class="tool-btn" id="btn-toggle-theory">
+          <span>📖 Справочник теории к №20</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- SOLUTION ACCORDION -->
+    <div class="accordion-panel" id="solution-panel">
+      <h3>
+        <span>💡 Пошаговое решение по критериям ФИПИ</span>
+      </h3>
+      <div class="criteria-box" id="criteria-box">
+        <!-- Criteria info -->
+      </div>
+      <div id="solution-content" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    <!-- THEORY ACCORDION -->
+    <div class="accordion-panel" id="theory-panel">
+      <h3>
+        <span>📖 Справочник по заданию №20 ОГЭ (Часть 2)</span>
+      </h3>
+      <div class="theory-content">
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">1. Биквадратные уравнения: ax⁴ + bx² + c = 0</div>
+          <p>Вводим замену переменной: <strong>пусть t = x²</strong>, при этом <strong>обязательно указывать условие t ≥ 0</strong>. Решаем квадратное уравнение <em>at² + bt + c = 0</em>. Если один из корней <em>t &lt; 0</em>, обязательно пишем: <em>«не удовлетворяет условию t ≥ 0, корней нет»</em>. Для <em>t &gt; 0</em> делаем обратную замену: <strong>x = ±√t</strong>.</p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">2. Уравнения вида x⁴ = (ax + b)²</div>
+          <p>Ни в коем случае не раскрывайте бином 4-й степени! Перенесите выражение в левую часть и примените формулу разности квадратов:<br>
+          <strong>(x²)² − (ax + b)² = 0 ⟹ (x² − (ax + b))(x² + (ax + b)) = 0</strong>.<br>
+          Каждую скобку приравниваем к нулю и решаем два квадратных уравнения.</p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">3. Уравнения 3-й степени (метод группировки)</div>
+          <p>Группируем слагаемые парами: <strong>(x³ + ax²) − (bx + ab) = 0</strong>. Выносим общий множитель из каждой пары: <strong>x²(x + a) − b(x + a) = 0</strong>. Затем выносим общую скобку: <strong>(x + a)(x² − b) = 0</strong>.</p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">4. Учёт ОДЗ при взаимном уничтожении корней</div>
+          <p>Если в уравнении есть слагаемые с квадратным корнем <strong>+√(k − x)</strong> слева и справа, их <strong>нельзя просто зачеркнуть без нахождения ОДЗ</strong>! Сначала записываем: <strong>ОДЗ: k − x ≥ 0 ⟹ x ≤ k</strong>. После нахождения корней квадратного уравнения отбрасываем те, которые не удовлетворяют ОДЗ.</p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">5. Дробно-рациональные неравенства методом интервалов</div>
+          <p>• Неравенство <strong>−C / ((x − a)² − b²) ≥ 0</strong>: так как числитель <em>−C &lt; 0</em>, то дробь ≥ 0 тогда и только тогда, когда <strong>знаменатель строго меньше нуля: (x − a)² − b² &lt; 0</strong> (скобки строго круглые!).<br>
+          • В дробных неравенствах нули знаменателя <em>всегда выколоты</em> (круглая скобка), а нули числителя закрашены (квадратная скобка) только если знак неравенства нестрогий (≤ или ≥).<br>
+          • <strong>Запрещено умножать неравенство на выражение с переменной</strong>, знак которого может меняться!</p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">6. Системы уравнений второй части</div>
+          <p>• <strong>Метод сложения:</strong> складываем уравнения, чтобы исключить одну из переменных (например, <em>+y</em> и <em>−y</em> или с одинаковыми коэффициентами при <em>x²</em>).<br>
+          • <strong>Метод подстановки:</strong> выражаем переменную первой степени через другую и подставляем в квадратное уравнение.<br>
+          • <strong>Запись ответа:</strong> решения записываются strictly упорядоченными парами <strong>(x; y)</strong> через точку с запятой.</p>
+        </div>
+
+        <div class="theory-rule-box" style="border-left: 3px solid var(--gold); background: var(--gold-light);">
+          <div class="theory-rule-title" style="color: #7a4f23;">⚖️ Критерии проверки экспертами ФИПИ (2 балла):</div>
+          <p style="color: #5a3614;">
+            <strong>2 балла:</strong> Обоснованно получен верный ответ.<br>
+            <strong>1 балл:</strong> Решение доведено до конца, но допущена одна вычислительная ошибка или описка, с её учётом дальнейшие шаги выполнены верно; либо в неравенстве неверно включена/исключена граничная точка.<br>
+            <strong>0 баллов:</strong> Другие случаи, не соответствующие указанным критериям (например, потеря ОДЗ или деление на выражение с неизвестной).
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../js/oge_task_20_trainer.js"></script>
+  <script src="../js/oge_theory_data.js"></script>
+
+  <script>
+    (function () {
+      const TRAINER_ID = 'oge_task_20';
+      let currentCategory = 'mixed_all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+
+      // DOM Elements
+      const mathContainer = document.getElementById('math-container');
+      const taskPrompt = document.getElementById('task-prompt');
+      const formatHint = document.getElementById('format-hint');
+      const quickSymbolsBar = document.getElementById('quick-symbols-bar');
+      const answerInput = document.getElementById('answer-input');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const taskBadge = document.getElementById('task-badge');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const criteriaBox = document.getElementById('criteria-box');
+      const theoryPanel = document.getElementById('theory-panel');
+
+      const btnToggleSolution = document.getElementById('btn-toggle-solution');
+      const btnToggleTheory = document.getElementById('btn-toggle-theory');
+
+      // Web Audio API
+      let audioCtx = null;
+      function playTone(freq, type, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      // Rank Tracker & Stats
+      function updateStatsDisplay() {
+        if (!window.TrainerTracker) return;
+        const stats = window.TrainerTracker.getStats(TRAINER_ID);
+        statStreak.textContent = stats.streak;
+        statMaxStreak.textContent = stats.maxStreak;
+        statTotal.textContent = stats.totalSolved;
+        statRank.textContent = stats.currentRank.title;
+        if (navXpBadge) {
+          navXpBadge.textContent = 'XP +' + (stats.totalSolved * 25);
+        }
+      }
+
+      function renderQuickSymbols(symbols) {
+        quickSymbolsBar.innerHTML = '';
+        if (!symbols || !symbols.length) return;
+
+        symbols.forEach(sym => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'quick-symbol-btn';
+          btn.textContent = sym;
+          btn.addEventListener('click', () => {
+            insertSymbol(sym);
+          });
+          quickSymbolsBar.appendChild(btn);
+        });
+      }
+
+      function insertSymbol(sym) {
+        const start = answerInput.selectionStart || answerInput.value.length;
+        const end = answerInput.selectionEnd || answerInput.value.length;
+        const val = answerInput.value;
+        const textToInsert = sym === 'нет корней' ? 'нет корней' : sym;
+        answerInput.value = val.substring(0, start) + textToInsert + val.substring(end);
+        answerInput.focus();
+        const newPos = start + textToInsert.length;
+        answerInput.setSelectionRange(newPos, newPos);
+      }
+
+      // Task Generation
+      function nextTask() {
+        if (!window.OgeTask20Trainer) return;
+        hasAnsweredCurrent = false;
+        currentTask = window.OgeTask20Trainer.generateTask(currentCategory);
+        window._currentTask = currentTask;
+
+        mathContainer.innerHTML = currentTask.questionHtml;
+        taskPrompt.textContent = currentTask.promptText || 'Решите задание:';
+        taskCatBadge.textContent = currentTask.catName || 'Задание №20';
+        taskBadge.textContent = 'Задание №20 · Часть 2 (2 балла)';
+
+        formatHint.textContent = currentTask.inputPlaceholder || '';
+        renderQuickSymbols(currentTask.quickSymbols);
+
+        answerInput.value = '';
+        answerInput.className = 'answer-input';
+        answerInput.disabled = false;
+        answerInput.placeholder = currentTask.inputPlaceholder || 'Введите ответ';
+        answerInput.focus();
+
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.textContent = '';
+        btnCheck.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
+
+        // Prepare solution & criteria
+        criteriaBox.innerHTML = `<strong>Критерии ФИПИ (2 балла):</strong> ${currentTask.criteriaInfo || ''}`;
+        solutionContent.innerHTML = currentTask.solutionSteps.map((step, idx) => `
+          <div class="solution-step">
+            <strong>Шаг ${idx + 1}:</strong> ${step}
+          </div>
+        `).join('') + `
+          <div class="solution-step" style="border-left-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 700;">
+            Ответ: ${currentTask.displayAnswer}
+          </div>
+        `;
+        solutionPanel.classList.remove('active');
+      }
+
+      function handleCheck() {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const val = answerInput.value.trim();
+        if (!val) {
+          answerInput.focus();
+          return;
+        }
+
+        const isCorrect = window.OgeTask20Trainer.checkAnswer(val, currentTask);
+
+        if (isCorrect) {
+          hasAnsweredCurrent = true;
+          answerInput.className = 'answer-input correct';
+          answerInput.disabled = true;
+
+          playTone(587, 'sine', 0.15);
+          setTimeout(() => playTone(880, 'sine', 0.25), 120);
+
+          feedbackBanner.className = 'feedback-banner show success';
+          feedbackBanner.innerHTML = '🎉 <strong>Великолепно!</strong> Ответ полностью верен по критериям ФИПИ (+25 XP).';
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(true);
+          } else {
+            btnCheck.style.display = 'none';
+            btnNext.style.display = 'inline-flex';
+            btnNext.focus();
+          }
+
+          if (window.TrainerTracker) {
+            window.TrainerTracker.recordAnswer(TRAINER_ID, true);
+            updateStatsDisplay();
+          }
+        } else {
+          answerInput.className = 'answer-input wrong';
+          playTone(220, 'sawtooth', 0.25);
+
+          feedbackBanner.className = 'feedback-banner show error';
+          feedbackBanner.innerHTML = `✕ <strong>Не совсем так.</strong> Правильный ответ: <code>${currentTask.displayAnswer}</code>.<br><span style="font-weight:400;">Нажмите кнопку «Показать решение», чтобы увидеть оформление по критериям ФИПИ.</span>`;
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(false);
+          }
+
+          if (window.TrainerTracker) {
+            window.TrainerTracker.recordAnswer(TRAINER_ID, false);
+            updateStatsDisplay();
+          }
+        }
+      }
+
+      // Event Listeners
+      btnCheck.addEventListener('click', handleCheck);
+      btnNext.addEventListener('click', nextTask);
+
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (!hasAnsweredCurrent) {
+            handleCheck();
+          } else {
+            nextTask();
+          }
+        }
+      });
+
+      // Categories switching
+      const catButtons = document.querySelectorAll('.cat-btn');
+      catButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          catButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat') || 'mixed_all';
+          nextTask();
+        });
+      });
+
+      // Toggle Solution & Theory
+      btnToggleSolution.addEventListener('click', () => {
+        solutionPanel.classList.toggle('active');
+        if (solutionPanel.classList.contains('active')) {
+          solutionPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+
+      btnToggleTheory.addEventListener('click', () => {
+        theoryPanel.classList.toggle('active');
+        if (theoryPanel.classList.contains('active')) {
+          theoryPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+
+      // Init Timed Mode
+      if (window.TrainerTimedMode) {
+        window.TrainerTimedMode.init({
+          trainerId: TRAINER_ID,
+          durationMinutes: 10,
+          onStart: () => nextTask(),
+          onFinish: (solved) => {
+            feedbackBanner.className = 'feedback-banner show success';
+            feedbackBanner.innerHTML = `⏱️ <strong>Время вышло!</strong> Вы решили ${solved} заданий №20 повышенной сложности. Отличный результат!`;
+          }
+        });
+      }
+
+      // Initial startup
+      if (window.TrainerTracker) {
+        updateStatsDisplay();
+      }
+      nextTask();
+    })();
+  </script>
+  <script src="../js/auth_sync.js"></script>
+</body>
+</html>

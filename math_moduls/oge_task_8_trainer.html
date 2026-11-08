@@ -66,6 +66,23 @@
     .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
     .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
 
+    
+    .nav-task-divider {
+      width: 1px; height: 16px; background: var(--line); margin: 0 4px; display: inline-block;
+    }
+    .nav-task-part-badge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--vermilion); letter-spacing: .08em; padding: 0 2px;
+    }
+    .task-pill.task-pill-part2 {
+      border: 1px dashed rgba(183,70,78,.4); color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .task-pill.task-pill-part2:hover {
+      background: var(--vermilion); color: #fff;
+    }
+    .task-pill.task-pill-part2.active {
+      background: var(--vermilion); color: #fff; border-style: solid; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
     .nav-task-switcher {
       display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
       border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
@@ -417,12 +434,16 @@
 
     <!-- TASK SWITCHER -->
         <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
-      <a href="oge_task_6_trainer.html" class="task-pill">№6 (Дроби)</a>
-      <a href="oge_task_7_trainer.html" class="task-pill">№7 (Прямая)</a>
-      <span class="task-pill active" aria-current="page">№8 (Степени)</span>
-      <a href="oge_task_9_trainer.html" class="task-pill">№9 (Уравнения)</a>
-      <a href="oge_task_10_trainer.html" class="task-pill">№10 (Вероятность)</a>
-      <a href="oge_task_18_trainer.html" class="task-pill">№18 (Геометрия)</a>
+      <span class="nav-task-part-badge" style="color:var(--muted);">Ч. 1:</span>
+      <a href="oge_task_6_trainer.html" class="task-pill">№6</a>
+      <a href="oge_task_7_trainer.html" class="task-pill">№7</a>
+      <span class="task-pill active" aria-current="page">№8</span>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10</a>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <span class="nav-task-divider" aria-hidden="true"></span>
+      <span class="nav-task-part-badge">Ч. 2:</span>
+      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20 (2 б.)</a>
     </div>
 
     <div class="nav-actions">

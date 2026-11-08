@@ -337,6 +337,50 @@
         }
 
         /* OGE TRAINERS SHOWCASE */
+        
+        /* PART BLOCKS & SUBHEADINGS */
+        .part-block {
+            margin-bottom: 56px;
+        }
+        .part-block:last-child {
+            margin-bottom: 0;
+        }
+        .part-subheading {
+            display: flex; flex-direction: column; gap: 8px;
+            margin-bottom: 24px; padding-bottom: 16px;
+            border-bottom: 2px solid var(--line);
+        }
+        .part-subheading.part2-heading {
+            border-bottom-color: rgba(183,70,78,.35);
+        }
+        .part-subheading-tag {
+            display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: .12em; color: var(--indigo);
+        }
+        .part-subheading-tag.part2-tag {
+            color: var(--vermilion);
+        }
+        .part-dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+        }
+        .part-score-pill {
+            background: rgba(38,63,97,.08); color: var(--indigo);
+            border: 1px solid rgba(38,63,97,.15);
+            padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800;
+        }
+        .part-score-pill.part2-pill {
+            background: var(--vermilion-light); color: var(--vermilion);
+            border-color: var(--vermilion-border);
+        }
+        .part-subheading-title {
+            font: 700 clamp(20px, 3.2vw, 26px)/1.2 'Zen Old Mincho', serif; color: var(--indigo-dark);
+            margin: 2px 0 0;
+        }
+        .part-subheading-desc {
+            font-size: 14px; color: var(--muted); line-height: 1.55; margin: 0; max-width: 800px;
+        }
+
         .trainers-section {
             padding: 56px 24px 64px; background: var(--paper-light); border-bottom: 1px solid var(--line);
         }
@@ -675,8 +719,22 @@
                     <p class="section-note">Решай прототипы ФИПИ и СдамГИА, держи непрерывную серию правильных ответов и получай опыт XP.</p>
                 </div>
 
-                <div class="trainers-grid">
-                    <!-- TRAINER 6 -->
+                <!-- PART 1 BLOCK -->
+                <div class="part-block" id="part1-block">
+                    <div class="part-subheading">
+                        <div class="part-subheading-tag">
+                            <span class="part-dot" style="background: var(--indigo);"></span>
+                            <span>Часть 1 · Базовый уровень · Задания №1–19</span>
+                            <span class="part-score-pill">1 балл за задачу</span>
+                        </div>
+                        <h3 class="part-subheading-title">Краткий ответ: вычисления, уравнения и геометрия</h3>
+                        <p class="part-subheading-desc">
+                            Задания №6–10 (Алгебра) и №18 (Геометрия) с вводом целого числа или конечной десятичной дроби в бланк ответов №1.
+                        </p>
+                    </div>
+
+                    <div class="trainers-grid">
+                        <!-- TRAINER 6 -->
                     <div class="trainer-card">
                         <div>
                             <div class="trainer-card-top">
@@ -842,6 +900,53 @@
                             </a>
                         </div>
                     </div>
+
+                    </div>
+                </div>
+
+                <!-- PART 2 BLOCK -->
+                <div class="part-block" id="part2-block">
+                    <div class="part-subheading part2-heading">
+                        <div class="part-subheading-tag part2-tag">
+                            <span class="part-dot" style="background: var(--vermilion);"></span>
+                            <span>Часть 2 · Повышенный и высокий уровни · Задания №20–25</span>
+                            <span class="part-score-pill part2-pill">2 балла за задачу</span>
+                        </div>
+                        <h3 class="part-subheading-title">Развёрнутое решение: строгое обоснование и критерии ФИПИ</h3>
+                        <p class="part-subheading-desc">
+                            Задания с полной записью решения в бланк ответов №2. Эксперты оценивают обоснованность, учёт ОДЗ и отсутствие логических ошибок.
+                        </p>
+                    </div>
+
+                    <div class="trainers-grid">
+                        <!-- TRAINER 20 -->
+                    <div class="trainer-card" style="border-color: rgba(183,70,78,.35); box-shadow: 0 8px 24px rgba(183,70,78,.08);">
+                        <div>
+                            <div class="trainer-card-top">
+                                <span class="trainer-badge" style="background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);">Задание №20 · Часть 2 · 2 балла</span>
+                                <div class="trainer-icon">🧮</div>
+                            </div>
+                            <h3>Уравнения, неравенства и системы</h3>
+                            <p>Биквадратные уравнения, уравнения 3-й степени методом группировки, строгий учёт ОДЗ, дробно-рациональные неравенства методом интервалов и нелинейные системы уравнений. Развёрнутые решения по критериям ФИПИ.</p>
+                            <div class="trainer-tags">
+                                <span class="trainer-tag-chip">ФИПИ 2026</span>
+                                <span class="trainer-tag-chip">Часть 2 (2 балла)</span>
+                                <span class="trainer-tag-chip">Биквадратные</span>
+                                <span class="trainer-tag-chip">Метод интервалов</span>
+                                <span class="trainer-tag-chip">Системы</span>
+                            </div>
+                        </div>
+                        <div class="trainer-card-actions">
+                            <a href="../math_moduls/oge_task_20_trainer.html" class="trainer-btn" style="background: var(--vermilion); box-shadow: 0 4px 14px rgba(183,70,78,.35);">
+                                <span>Запустить тренажёр №20</span>
+                                <span>→</span>
+                            </a>
+                            <a href="../math_moduls/oge_task_20_trainer.html?mode=timed" class="trainer-btn trainer-btn-timed">
+                                <span>⏱️ Сыграть на время!</span>
+                                <span class="trainer-timed-badge">10 мин</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -981,6 +1086,9 @@
     <!-- INTERACTIVE GAUSSIAN-DIFFUSED FROST SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+        
+
         // Class Switcher Dropdown Controller
         (function initClassDropdown() {
             const dropdown = document.getElementById('class-dropdown');
