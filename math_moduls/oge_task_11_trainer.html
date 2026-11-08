@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр ОГЭ №11 · Графики функций · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-divider {
+      width: 1px; height: 16px; background: var(--line); margin: 0 4px; display: inline-block;
+    }
+    .nav-task-part-badge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--vermilion); letter-spacing: .08em; padding: 0 2px;
+    }
+    .task-pill.task-pill-part2 {
+      border: 1px dashed rgba(183,70,78,.4); color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .task-pill.task-pill-part2:hover {
+      background: var(--vermilion); color: #fff;
+    }
+    .task-pill.task-pill-part2.active {
+      background: var(--vermilion); color: #fff; border-style: solid; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      max-width: 960px; margin: 0 auto; width: 100%; padding: 36px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title {
+      font: 900 clamp(28px, 4.5vw, 40px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 680px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 700; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 10px; border-radius: 999px;
+    }
+
+    /* TASK DISPLAY */
+    .task-display {
+      width: 100%; text-align: center; margin-top: 10px;
+    }
+    .task-statement {
+      font-size: clamp(16px, 2.5vw, 18px);
+      line-height: 1.5;
+      color: var(--indigo-dark);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .task-subtext {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    /* GRAPHS ROW & SVG CARDS */
+    .task-graphs-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      width: 100%;
+      margin: 14px 0;
+    }
+    .task-graphs-row.single-graph-center {
+      justify-content: center;
+    }
+    .graph-card-item {
+      background: #ffffff;
+      border: 1px solid rgba(38,63,97,0.18);
+      border-radius: 12px;
+      padding: 10px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(38,63,97,0.06);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .graph-card-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(38,63,97,0.1);
+    }
+    .graph-label-badge {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--indigo);
+      border-radius: 6px;
+      padding: 3px 14px;
+      margin-bottom: 8px;
+      letter-spacing: .05em;
+    }
+    .graph-svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 6px;
+    }
+
+    /* MATCHING OPTIONS CHIPS */
+    .matching-options-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 12px 0 16px;
+      width: 100%;
+    }
+    .matching-opt-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--paper-light);
+      border: 1px solid rgba(38,63,97,0.2);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--indigo-dark);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .matching-opt-num {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--vermilion-light);
+      color: var(--vermilion);
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .matching-opt-val {
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* FIPI MATCHING TABLE & INTERACTIVE SELECTOR */
+    .matching-table-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0 4px;
+      width: 100%;
+    }
+    .matching-fipi-table {
+      border-collapse: collapse;
+      background: #ffffff;
+      border: 2px solid var(--indigo);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(38,63,97,0.08);
+      min-width: 260px;
+    }
+    .matching-fipi-table th {
+      background: var(--indigo);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 6px 20px;
+      text-align: center;
+      letter-spacing: .08em;
+    }
+    .matching-fipi-table td {
+      border: 1px solid rgba(38,63,97,0.25);
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--vermilion);
+      min-width: 60px;
+    }
+    .slot-val {
+      display: inline-block;
+      min-width: 20px;
+      height: 28px;
+      line-height: 28px;
+    }
+    .slot-pick-row td {
+      padding: 8px 6px;
+      background: var(--paper-light);
+    }
+    .quick-pick-btn {
+      width: 28px;
+      height: 28px;
+      margin: 2px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--indigo);
+      font-size: 12px;
+      font-weight: 700;
+      transition: all .15s ease;
+    }
+    .quick-pick-btn:hover {
+      border-color: var(--vermilion);
+      color: var(--vermilion);
+    }
+    .quick-pick-btn.active {
+      background: var(--vermilion);
+      color: #fff;
+      border-color: var(--vermilion);
+    }
+
+    /* FRACTION FORMATTING */
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 4px; font-size: 0.9em; line-height: 1.08;
+    }
+    .fraction .num {
+      border-bottom: 2px solid currentColor; padding-bottom: 2px;
+    }
+    .fraction .den {
+      padding-top: 2px;
+    }
+
+    /* ANSWER ROW & INPUT */
+    .answer-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 500px;
+    }
+    .answer-input-wrap {
+      flex: 1; min-width: 180px; position: relative;
+    }
+    .answer-input {
+      width: 100%; height: 52px; padding: 0 18px;
+      border: 2px solid var(--line); border-radius: 10px;
+      background: #fff; color: var(--ink); font-size: 20px; font-weight: 700;
+      font-family: 'DM Sans', monospace; text-align: center;
+      transition: all .2s ease;
+    }
+    .answer-input:focus,
+    .answer-input:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 1px;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+    .answer-input.correct {
+      border-color: var(--green); background: var(--green-light); color: var(--green);
+    }
+    .answer-input.wrong {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+    }
+
+    .btn-check,
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 52px;
+      padding: 0 28px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
+      transition: all .2s ease;
+    }
+    .btn-check:focus-visible,
+    .btn-next:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 2px;
+    }
+    .btn-check {
+      background: var(--vermilion);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover {
+      background: #d3525b;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .btn-check:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(183,70,78,.3);
+    }
+    .btn-check:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-next {
+      background: var(--indigo);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover {
+      background: #19273c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+    .btn-next:active {
+      transform: translateY(0);
+    }
+
+    /* FEEDBACK MESSAGE */
+    .feedback-banner {
+      width: 100%; max-width: 560px; padding: 12px 18px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; text-align: center; display: none;
+      animation: popIn .3s ease;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success {
+      background: var(--green-light); border: 1px solid rgba(46,125,50,.3); color: var(--green);
+    }
+    .feedback-banner.error {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
+    }
+
+    /* CARD ACTION TOOLS */
+    .card-tools {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      padding-top: 10px; border-top: 1px dashed var(--line); width: 100%;
+    }
+    .tool-link-btn {
+      font-size: 13px; font-weight: 700; color: var(--indigo);
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+      border-radius: 8px; background: var(--paper-light); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .tool-link-btn:hover { background: #fff; color: var(--vermilion); border-color: var(--vermilion); }
+
+    /* COLLAPSIBLE PANELS (SOLUTION & THEORY) */
+    .accordion-panel {
+      width: 100%; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 20px 24px; display: none;
+      animation: fadeIn .25s ease;
+    }
+    .accordion-panel.active { display: block; }
+    .accordion-panel h3 {
+      font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); margin-bottom: 14px;
+    }
+    .solution-list {
+      display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6;
+    }
+    .solution-step {
+      padding: 10px 14px; background: #fff; border-radius: 8px; border-left: 3px solid var(--indigo);
+      box-shadow: 0 1px 4px rgba(0,0,0,.03);
+    }
+
+    .theory-content {
+      display: flex; flex-direction: column; gap: 14px; font-size: 14px; line-height: 1.6;
+    }
+    .theory-rule-box {
+      background: #fff; border-radius: 8px; padding: 12px 16px; border: 1px solid var(--line);
+    }
+    .theory-rule-title {
+      font-weight: 700; color: var(--vermilion); margin-bottom: 4px;
+    }
+
+    /* TOAST */
+    .milestone-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--indigo-dark); color: #fff; padding: 12px 24px; border-radius: 999px;
+      font-size: 13px; font-weight: 700; box-shadow: var(--shadow-lg); z-index: 100;
+      opacity: 0; pointer-events: none; transition: all .35s cubic-bezier(.175, .885, .32, 1.275);
+    }
+    .milestone-toast.active {
+      transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .problem-card { padding: 36px 16px 24px; }
+      .task-graphs-row { flex-direction: column; align-items: center; }
+      .nav-task-switcher { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAVIGATION -->
+  <header class="site-nav">
+    <a href="../index.html" class="brand">
+      <div class="brand-mark">Н</div>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика 2026</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER NAV -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <span class="nav-task-part-badge" style="color:var(--muted);">Ч. 1:</span>
+      <a href="oge_task_6_trainer.html" class="task-pill">№6</a>
+      <a href="oge_task_7_trainer.html" class="task-pill">№7</a>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10</a>
+      <span class="task-pill active" aria-current="page">№11</span>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <span class="nav-task-divider" aria-hidden="true"></span>
+      <span class="nav-task-part-badge">Ч. 2:</span>
+      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20 (2 б.)</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="trainer-shell">
+
+    <!-- HEADER BLOCK -->
+    <section class="trainer-header">
+      <div class="trainer-kicker">ОГЭ 2026 · Задание №11 · Алгебра</div>
+      <h1 class="trainer-title">Графики функций</h1>
+      <p class="trainer-subtitle">
+        Линейные функции, параболы, гиперболы, чтение формул, знаки коэффициентов <em>k, b, a, c</em>, координаты вершин и нахождение значений по графику.
+      </p>
+    </section>
+
+    <!-- STATS DASHBOARD -->
+    <section class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Рекорд серии</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Всего решено</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">👑</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank">Новичок 🥉</span>
+          <span class="stat-label">Текущий ранг</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORY FILTER BUTTONS -->
+    <nav class="category-filter" aria-label="Выбор категории прототипов">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">⚡ Все типы (экзамен)</button>
+      <button type="button" class="cat-btn" data-cat="parabolas">📈 Параболы (a, c, вершина, формулы)</button>
+      <button type="button" class="cat-btn" data-cat="linear">📏 Прямые (k, b, наклон, Oy)</button>
+      <button type="button" class="cat-btn" data-cat="hyperbolas">🌀 Гиперболы (знак k, четверти)</button>
+      <button type="button" class="cat-btn" data-cat="mixed_types">🔀 Разные функции (линейная, квадрат, дробь)</button>
+      <button type="button" class="cat-btn" data-cat="find_value">🎯 Значения по графику (найти k, c, f(x))</button>
+    </nav>
+
+    <!-- MAIN PROBLEM CARD -->
+    <article class="problem-card">
+      <div class="card-top-tag" id="task-badge">Задание №11 · ОГЭ</div>
+      <div class="card-help-badge" id="task-cat-badge">Графики функций</div>
+
+      <!-- TASK CONTAINER -->
+      <div class="task-display">
+        <div id="task-container">
+          <!-- Генерируемое задание с графиками и формулами -->
+        </div>
+      </div>
+
+      <!-- INTERACTIVE PICKER ROW (для таблиц А, Б, В) -->
+      <div id="table-interactive-picker" style="display:none; width:100%; max-width:320px;">
+        <table class="matching-fipi-table" style="width:100%;">
+          <thead>
+            <tr><th>А</th><th>Б</th><th>В</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="slot-val" id="slot-letter-A">—</span></td>
+              <td><span class="slot-val" id="slot-letter-B">—</span></td>
+              <td><span class="slot-val" id="slot-letter-V">—</span></td>
+            </tr>
+            <tr class="slot-pick-row">
+              <td id="quick-group-A"></td>
+              <td id="quick-group-B"></td>
+              <td id="quick-group-V"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ANSWER INPUT & CONTROLS -->
+      <div class="answer-row">
+        <div class="answer-input-wrap">
+          <input
+            type="text"
+            id="answer-input"
+            class="answer-input"
+            placeholder="Ответ (например, 132)"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Поле ввода ответа"
+          />
+        </div>
+        <button type="button" class="btn-check" id="btn-check">
+          <span>Проверить</span>
+          <span>✓</span>
+        </button>
+        <button type="button" class="btn-next" id="btn-next" style="display: none;">
+          <span>Следующее</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <!-- FEEDBACK MESSAGE BANNER -->
+      <div class="feedback-banner" id="feedback-banner" role="status" aria-live="polite"></div>
+
+      <!-- HELPER TOOLS -->
+      <div class="card-tools">
+        <button type="button" class="tool-link-btn" id="btn-toggle-solution">
+          <span>💡</span> <span>Пошаговое решение</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-toggle-theory">
+          <span>📖</span> <span>Справочная теория</span>
+        </button>
+        <button type="button" class="tool-link-btn" id="btn-new-task">
+          <span>🔄</span> <span>Другое задание</span>
+        </button>
+      </div>
+
+      <!-- SOLUTION ACCORDION -->
+      <div class="accordion-panel" id="solution-panel">
+        <h3>💡 Пошаговое решение задания:</h3>
+        <div class="solution-list" id="solution-content"></div>
+      </div>
+
+      <!-- THEORY ACCORDION -->
+      <div class="accordion-panel" id="theory-panel">
+        <h3>📖 Справочные формулы и свойства графиков (№11 ОГЭ)</h3>
+        <div class="theory-content">
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">1. Линейная функция: y = kx + b (прямая)</div>
+            <p>• <strong>Коэффициент k (угловой коэффициент):</strong> отвечает за угол наклона прямой к оси Ox. Если <em>k &gt; 0</em> — угол острый, функция <strong>возрастает</strong> (слева направо идёт вверх). Если <em>k &lt; 0</em> — угол тупой, функция <strong>убывает</strong>.</p>
+            <p>• <strong>Коэффициент b:</strong> ордината точки пересечения с осью <em>Oy</em> (точка <em>(0; b)</em>). Если <em>b &gt; 0</em> — пересекает <em>Oy</em> выше оси Ox; если <em>b &lt; 0</em> — ниже.</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">2. Квадратичная функция: y = ax² + bx + c (парабола)</div>
+            <p>• <strong>Коэффициент a:</strong> направление ветвей. Если <em>a &gt; 0</em> — ветви направлены <strong>вверх</strong>. Если <em>a &lt; 0</em> — ветви направлены <strong>вниз</strong>.</p>
+            <p>• <strong>Коэффициент c:</strong> ордината точки пересечения с осью <em>Oy</em>: <em>y(0) = c</em> (точка <em>(0; c)</em>).</p>
+            <p>• <strong>Вершина параболы:</strong> абсцисса вершины вычисляется по формуле: <strong>x₀ = -b / (2a)</strong>. Подставив <em>x₀</em> в формулу, находим <em>y₀</em>.</p>
+            <p>• <strong>Дискриминант D = b² - 4ac:</strong> если <em>D &gt; 0</em> — парабола пересекает <em>Ox</em> в двух точках; если <em>D = 0</em> — вершина касается <em>Ox</em>; если <em>D &lt; 0</em> — пересечений с <em>Ox</em> нет.</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">3. Обратная пропорциональность: y = k / x (гипербола)</div>
+            <p>• График состоит из двух ветвей и никогда не пересекает оси координат (так как <em>x ≠ 0</em> и <em>y ≠ 0</em>).</p>
+            <p>• Если <em>k &gt; 0</em> — ветви лежат в <strong>I и III координатных четвертях</strong>.</p>
+            <p>• Если <em>k &lt; 0</em> — ветви лежат во <strong>II и IV координатных четвертях</strong>.</p>
+            <p>• Значение <em>k</em> легко проверить по контрольной точке: <strong>k = x · y</strong>.</p>
+          </div>
+
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">4. Функция квадратного корня: y = √x</div>
+            <p>• График представляет собой верхнюю ветвь параболы, выходящую из начала координат <em>(0; 0)</em> вправо-вверх (область определения <em>x ≥ 0</em>, <em>y ≥ 0</em>).</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <!-- MILESTONE TOAST -->
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../js/oge_task_11_trainer.js"></script>
+  <script>
+    (function () {
+      const TRAINER_ID = 'oge_task_11';
+      let currentCategory = 'mixed_all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+
+      // Slot selections for matching: A, B, V
+      let selectedSlots = { A: '', B: '', V: '' };
+
+      // DOM Elements
+      const taskContainer = document.getElementById('task-container');
+      const tablePickerWrap = document.getElementById('table-interactive-picker');
+      const slotLetterA = document.getElementById('slot-letter-A');
+      const slotLetterB = document.getElementById('slot-letter-B');
+      const slotLetterV = document.getElementById('slot-letter-V');
+      const quickGroupA = document.getElementById('quick-group-A');
+      const quickGroupB = document.getElementById('quick-group-B');
+      const quickGroupV = document.getElementById('quick-group-V');
+
+      const answerInput = document.getElementById('answer-input');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const taskBadge = document.getElementById('task-badge');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const theoryPanel = document.getElementById('theory-panel');
+      const milestoneToast = document.getElementById('milestone-toast');
+
+      // Web Audio API
+      let audioCtx = null;
+      function playTone(freq, type, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+      }
+
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const records = window.TrainerTracker.getTrainerRecords();
+          const cur = records[TRAINER_ID] || { maxStreak: 0, totalSolved: 0, maxRank: 'Не начат' };
+          statMaxStreak.textContent = cur.maxStreak || 0;
+          statTotal.textContent = cur.totalSolved || 0;
+          statRank.textContent = cur.maxRank || 'Не начат';
+        }
+
+        try {
+          const userXp = localStorage.getItem('user_xp') || '0';
+          navXpBadge.textContent = 'XP +' + userXp;
+        } catch(e) {}
+      }
+
+      function showToast(text) {
+        milestoneToast.textContent = text;
+        milestoneToast.classList.add('active');
+        setTimeout(() => milestoneToast.classList.remove('active'), 3200);
+      }
+
+      function renderInteractiveTableSlots(optionsCount = 3) {
+        selectedSlots = { A: '', B: '', V: '' };
+        slotLetterA.textContent = '—';
+        slotLetterB.textContent = '—';
+        slotLetterV.textContent = '—';
+
+        function createButtons(letter, container) {
+          container.innerHTML = '';
+          for (let i = 1; i <= optionsCount; i++) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'quick-pick-btn';
+            b.textContent = i;
+            b.dataset.letter = letter;
+            b.dataset.val = i;
+            b.addEventListener('click', () => {
+              if (hasAnsweredCurrent) return;
+              selectedSlots[letter] = String(i);
+              updateSlotDisplay();
+            });
+            container.appendChild(b);
+          }
+        }
+
+        createButtons('A', quickGroupA);
+        createButtons('B', quickGroupB);
+        createButtons('V', quickGroupV);
+
+        tablePickerWrap.style.display = 'block';
+      }
+
+      function updateSlotDisplay() {
+        slotLetterA.textContent = selectedSlots.A || '—';
+        slotLetterB.textContent = selectedSlots.B || '—';
+        slotLetterV.textContent = selectedSlots.V || '—';
+
+        // Обновляем ячейки в самой карточке задания, если они там есть
+        const cA = document.getElementById('slot-cell-A');
+        const cB = document.getElementById('slot-cell-B');
+        const cV = document.getElementById('slot-cell-V');
+        if (cA) cA.textContent = selectedSlots.A || '?';
+        if (cB) cB.textContent = selectedSlots.B || '?';
+        if (cV) cV.textContent = selectedSlots.V || '?';
+
+        // Обновляем класс active у кнопок
+        document.querySelectorAll('.quick-pick-btn').forEach(b => {
+          const letCode = b.dataset.letter;
+          b.classList.toggle('active', selectedSlots[letCode] === b.dataset.val);
+        });
+
+        // Записываем собранный код в answerInput
+        const code = (selectedSlots.A || '') + (selectedSlots.B || '') + (selectedSlots.V || '');
+        if (code.length === 3) {
+          answerInput.value = code;
+        } else if (code.length > 0) {
+          answerInput.value = code;
+        }
+      }
+
+      function syncSlotsFromInput(val) {
+        const clean = val.replace(/[^1-9]/g, '');
+        selectedSlots.A = clean[0] || '';
+        selectedSlots.B = clean[1] || '';
+        selectedSlots.V = clean[2] || '';
+        updateSlotDisplay();
+      }
+
+      function loadNewTask() {
+        if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+          currentCategory = 'mixed_all';
+        }
+        hasAnsweredCurrent = false;
+        currentTask = OgeTask11Trainer.generateTask(currentCategory);
+        window._currentTask = currentTask;
+        taskContainer.innerHTML = currentTask.questionHtml;
+        taskCatBadge.textContent = currentTask.catName;
+        taskBadge.textContent = 'Задание №11 · ' + (currentTask.catName || 'ОГЭ');
+
+        answerInput.value = '';
+        answerInput.className = 'answer-input';
+        answerInput.disabled = false;
+
+        if (currentTask.type === 'matching') {
+          answerInput.placeholder = 'Ответ (например, 132)';
+          renderInteractiveTableSlots(currentTask.optionsCount || 3);
+        } else {
+          answerInput.placeholder = 'Введите число (например, -2)';
+          tablePickerWrap.style.display = 'none';
+        }
+
+        answerInput.focus();
+
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.textContent = '';
+        btnCheck.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
+
+        // Формируем пошаговое решение
+        solutionContent.innerHTML = currentTask.solutionSteps.map((step, idx) => `
+          <div class="solution-step">
+            <strong>Шаг ${idx + 1}:</strong> ${step}
+          </div>
+        `).join('');
+        solutionPanel.classList.remove('active');
+      }
+
+      function handleCheck() {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const val = answerInput.value.trim();
+        if (!val) {
+          answerInput.focus();
+          return;
+        }
+
+        const isCorrect = OgeTask11Trainer.checkAnswer(val, currentTask.answer, currentTask.type);
+
+        if (isCorrect) {
+          hasAnsweredCurrent = true;
+          answerInput.className = 'answer-input correct';
+          answerInput.disabled = true;
+
+          playTone(587, 'sine', 0.15);
+          setTimeout(() => playTone(880, 'sine', 0.25), 120);
+
+          feedbackBanner.className = 'feedback-banner show success';
+          feedbackBanner.innerHTML = '🎉 <strong>Отлично!</strong> Графики сопоставлены безошибочно (+15 XP).';
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(true);
+          } else {
+            btnCheck.style.display = 'none';
+            btnNext.style.display = 'inline-flex';
+            btnNext.focus();
+          }
+
+          // XP начисление
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+          } catch(e) {}
+
+          // Запись в TrainerTracker
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, true);
+            statStreak.textContent = res.currentStreak;
+            syncStats();
+
+            // Юбилейные серии
+            if (res.currentStreak === 5) showToast('🔥 Серия 5! Параболы и прямые под контролем!');
+            if (res.currentStreak === 10) showToast('⚡ Серия 10! Мастерство чтения графиков растёт!');
+            if (res.currentStreak === 25) showToast('💎 Серия 25! Звание «Архитектор функций 👑»!');
+            if (res.currentStreak === 50) showToast('🎁 СЕРИЯ 50! Награда +500 XP разблокирована в профиле!');
+          }
+        } else {
+          answerInput.className = 'answer-input wrong';
+          playTone(220, 'triangle', 0.25);
+
+          feedbackBanner.className = 'feedback-banner show error';
+          feedbackBanner.innerHTML = `❌ <strong>Пока неверно.</strong> Правильный ответ: <strong>${currentTask.displayAnswer}</strong>. Изучите пошаговый разбор ниже.`;
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(false);
+          }
+
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, false);
+            statStreak.textContent = 0;
+            syncStats();
+          }
+        }
+      }
+
+      // Категории фильтров
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.dataset.cat;
+          loadNewTask();
+        });
+      });
+
+      // События кнопок
+      btnCheck.addEventListener('click', handleCheck);
+      btnNext.addEventListener('click', loadNewTask);
+      document.getElementById('btn-new-task').addEventListener('click', loadNewTask);
+
+      answerInput.addEventListener('input', (e) => {
+        if (currentTask && currentTask.type === 'matching') {
+          syncSlotsFromInput(e.target.value);
+        }
+      });
+
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (hasAnsweredCurrent) loadNewTask();
+          else handleCheck();
+        }
+      });
+
+      // Переключатели аккордеонов
+      document.getElementById('btn-toggle-solution').addEventListener('click', () => {
+        solutionPanel.classList.toggle('active');
+      });
+
+      document.getElementById('btn-toggle-theory').addEventListener('click', () => {
+        theoryPanel.classList.toggle('active');
+      });
+
+      // Инициализация
+      syncStats();
+      if (window.TrainerTimedMode) {
+        window.TrainerTimedMode.init({
+          trainerId: TRAINER_ID,
+          title: 'Задание №11',
+          onNextTask: loadNewTask
+        });
+      }
+      loadNewTask();
+    })();
+  </script>
+<script src="../js/auth_sync.js"></script>
+</body>
+</html>

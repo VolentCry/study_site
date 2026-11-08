@@ -1141,6 +1141,92 @@
             user-select: none;
             color: var(--accent-cyan, #06b6d4);
         }
+        
+        /* Task 11 Graph Styles */
+        .task-graphs-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .graph-card-item {
+            background: #ffffff;
+            border: 1px solid rgba(38,63,97,0.18);
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .graph-label-badge {
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            background: #263f61;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin-bottom: 6px;
+        }
+        .graph-svg {
+            max-width: 180px;
+            height: auto;
+            display: block;
+        }
+        .matching-options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .matching-opt-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .matching-opt-num {
+            display: inline-grid;
+            place-items: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(183,70,78,0.12);
+            color: #b7464e;
+            font-weight: 800;
+            font-size: 11px;
+        }
+        .matching-fipi-table {
+            border-collapse: collapse;
+            background: #ffffff;
+            border: 1.5px solid #263f61;
+            border-radius: 6px;
+            margin: 8px auto;
+        }
+        .matching-fipi-table th {
+            background: #263f61;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 4px 14px;
+        }
+        .matching-fipi-table td {
+            border: 1px solid rgba(38,63,97,0.2);
+            padding: 6px 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #b7464e;
+        }
+
         .system-equations {
             display: flex;
             flex-direction: column;
@@ -1688,6 +1774,14 @@
                                             <option value="oge10_quality">ОГЭ №10 · Контроль качества (брак)</option>
                                             <option value="oge10_dice">ОГЭ №10 · Кости и монеты</option>
                                         </optgroup>
+                                                                                <optgroup label="ОГЭ Математика Задание №11 (Графики функций · Часть 1 · 1 балл)">
+                                            <option value="oge11_all">ОГЭ №11 · Все типы задания №11 (Графики функций)</option>
+                                            <option value="oge11_parabolas">ОГЭ №11 · Параболы (знаки a, c, вершины, формулы)</option>
+                                            <option value="oge11_linear">ОГЭ №11 · Прямые (знаки k, b, наклон, пересечение с Oy)</option>
+                                            <option value="oge11_hyperbolas">ОГЭ №11 · Гиперболы (обратная пропорциональность)</option>
+                                            <option value="oge11_mixed_types">ОГЭ №11 · Разные функции (прямая, парабола, гипербола)</option>
+                                            <option value="oge11_find_value">ОГЭ №11 · Поиск коэффициентов и значений по графику</option>
+                                        </optgroup>
                                         <optgroup label="ОГЭ Математика Задание №18 (Геометрия на клетках)">
                                             <option value="oge18_all">ОГЭ №18 · Все типы геометрии</option>
                                             <option value="oge18_triangle">ОГЭ №18 · Площадь треугольника</option>
@@ -2143,6 +2237,7 @@
     <script src="js/oge_task_8_trainer.js"></script>
     <script src="js/oge_task_9_trainer.js"></script>
     <script src="js/oge_task_10_trainer.js"></script>
+    <script src="js/oge_task_11_trainer.js"></script>
     <script src="js/oge_task_18_trainer.js"></script>
     <script src="js/oge_task_20_trainer.js"></script>
     <script src="js/powers_trainer.js"></script>
@@ -3917,6 +4012,18 @@
                                     'oge10_dice': 'dice_coins'
                                 };
                                 t = window.OgeTask10Trainer.generateTask(catMap[type] || 'mixed_all');
+                            }
+                        } else if (type.startsWith('oge11_')) {
+                            if (window.OgeTask11Trainer) {
+                                const catMap = {
+                                    'oge11_all': 'mixed_all',
+                                    'oge11_parabolas': 'parabolas',
+                                    'oge11_linear': 'linear',
+                                    'oge11_hyperbolas': 'hyperbolas',
+                                    'oge11_mixed_types': 'mixed_types',
+                                    'oge11_find_value': 'find_value'
+                                };
+                                t = window.OgeTask11Trainer.generateTask(catMap[type] || 'mixed_all');
                             }
                         } else if (type.startsWith('oge18_')) {
                             if (window.OgeTask18Trainer) {
