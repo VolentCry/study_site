@@ -779,6 +779,7 @@
      ОСНОВНОЙ ГЕНЕРАТОР ЗАДАНИЙ (ПО РЕЖИМАМ / КАТЕГОРИЯМ)
      -------------------------------------------------------------------------- */
   function generateTask(category = 'mixed_all') {
+    let task = null;
     switch (category) {
       case 'equations': {
         const gen = pickRandom([
@@ -788,7 +789,8 @@
           genSquareRootOdz,
           genSumOfSquaresZero
         ]);
-        return gen();
+        task = gen();
+        break;
       }
 
       case 'inequalities': {
@@ -797,7 +799,8 @@
           genIneqQuadraticBrackets,
           genIneqIntervalFraction
         ]);
-        return gen();
+        task = gen();
+        break;
       }
 
       case 'systems': {
@@ -807,7 +810,8 @@
           genSystemCircleLine,
           genSystemEqualSquares
         ]);
-        return gen();
+        task = gen();
+        break;
       }
 
       case 'mixed_all':
@@ -826,9 +830,18 @@
           genSystemCircleLine,
           genSystemEqualSquares
         ];
-        return pickRandom(all)();
+        task = pickRandom(all)();
+        break;
       }
     }
+
+    if (task) {
+      if (!task.answer) task.answer = task.displayAnswer;
+      if (!task.text) {
+        task.text = task.questionHtml ? task.questionHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+      }
+    }
+    return task;
   }
 
   /* --------------------------------------------------------------------------

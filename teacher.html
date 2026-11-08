@@ -1126,6 +1126,27 @@
         .fraction .den {
             padding-top: 1px;
         }
+        .system-bracket {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+        .system-brace {
+            font-size: 2.2em;
+            font-weight: 300;
+            line-height: 1;
+            transform: scaleY(1.3);
+            display: inline-block;
+            user-select: none;
+            color: var(--accent-cyan, #06b6d4);
+        }
+        .system-equations {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+        }
         .rad-wrap {
             display: inline-flex;
             align-items: stretch;
@@ -1676,6 +1697,12 @@
                                             <option value="oge18_midline">ОГЭ №18 · Средняя линия</option>
                                             <option value="oge18_distance">ОГЭ №18 · Расстояние от точки до прямой</option>
                                         </optgroup>
+                                        <optgroup label="ОГЭ Математика Задание №20 (Уравнения, неравенства, системы · Часть 2 · 2 балла)">
+                                            <option value="oge20_all">ОГЭ №20 · Все типы задания №20 (Часть 2)</option>
+                                            <option value="oge20_equations">ОГЭ №20 · Уравнения (3–4 ст., биквадратные, ОДЗ)</option>
+                                            <option value="oge20_inequalities">ОГЭ №20 · Неравенства (дробно-рациональные, метод интервалов)</option>
+                                            <option value="oge20_systems">ОГЭ №20 · Системы уравнений (нелинейные, симметричные)</option>
+                                        </optgroup>
                                         <optgroup label="Математика 4–5 класс (Степени чисел)">
                                             <option value="powers_all">Степени · Все прототипы вперемешку</option>
                                             <option value="powers_calculate">Степени · Возведение числа в степень</option>
@@ -2117,6 +2144,7 @@
     <script src="js/oge_task_9_trainer.js"></script>
     <script src="js/oge_task_10_trainer.js"></script>
     <script src="js/oge_task_18_trainer.js"></script>
+    <script src="js/oge_task_20_trainer.js"></script>
     <script src="js/powers_trainer.js"></script>
     <script src="js/powers_compare_trainer.js"></script>
     <script src="js/auth_sync.js?v=1.1"></script>
@@ -3902,6 +3930,16 @@
                                     'oge18_distance': 'distance'
                                 };
                                 t = window.OgeTask18Trainer.generateTask(catMap[type] || 'mixed_all');
+                            }
+                        } else if (type.startsWith('oge20_')) {
+                            if (window.OgeTask20Trainer) {
+                                const catMap = {
+                                    'oge20_all': 'mixed_all',
+                                    'oge20_equations': 'equations',
+                                    'oge20_inequalities': 'inequalities',
+                                    'oge20_systems': 'systems'
+                                };
+                                t = window.OgeTask20Trainer.generateTask(catMap[type] || 'mixed_all');
                             }
                         } else if (type.startsWith('mult_')) {
                             t = generateMultiplicationTask(type);
