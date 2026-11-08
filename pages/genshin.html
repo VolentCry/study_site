@@ -4,28 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Геншиноведение · Кафедра лора Тейвата — НЕШКОЛА</title>
-  <meta name="description" content="Академическое геншиноведение: интерактивные тестирования по всем 7 регионам Тейвата, 3 уровня лора от Путешественника до Дайнслейфа, симулятор молитв и Кодекс Ирминсуля.">
+  <meta name="description" content="Академическое геншиноведение: интерактивная астролябия Тейвата, 10 тестирований по каноничному лору 7 регионов, симулятор молитв и Кодекс Ирминсуля.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Zen+Old+Mincho:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&family=Zen+Old+Mincho:wght@500;700;900&display=swap" rel="stylesheet">
   
   <style>
-    /* --- DESIGN SYSTEM & CSS VARIABLES --- */
+    /* ==========================================================================
+       1. ANATOMY ISOMETRIC CORE & THEME TOKENS
+       ========================================================================== */
     :root {
-      --bg-dark: #0a0c14;
-      --bg-card: rgba(18, 22, 38, 0.85);
-      --bg-card-hover: rgba(28, 34, 58, 0.95);
-      --border-celestial: rgba(212, 175, 55, 0.35);
-      --border-subtle: rgba(255, 255, 255, 0.1);
-      
+      /* Anatomy ISO Palette (Dark Celestial Theme) */
+      --anatomy-page: #080a10;
+      --anatomy-card: #0d111a;
+      --anatomy-text: #b8c4db;
+      --anatomy-strong: #f0f4fc;
+      --anatomy-muted: #67748e;
+      --anatomy-paper: #0d111a;
+      --anatomy-face: #141a27;
+      --anatomy-top: #1c2436;
+      --anatomy-shade-0: #0b0e17;
+      --anatomy-shade-1: #0f1420;
+      --anatomy-shade-2: #141a28;
+      --anatomy-shade-3: #192032;
+      --anatomy-lit-top: #2c3852;
+      --anatomy-lit-shade: #212c42;
+      --anatomy-hi: #e2e8f5;
+      --anatomy-mid: #5b6982;
+      --anatomy-lo: #2c3547;
+      --anatomy-faint: #182030;
+      --anatomy-lit: #f5d47a;
+      --anatomy-halo: rgba(5, 7, 12, 0.7);
+      --anatomy-mono: 'JetBrains Mono', monospace;
+
+      /* Celestial & Elemental Spectrum */
       --gold-akasha: #f5d47a;
       --gold-dark: #c59f43;
-      --gold-glow: rgba(245, 212, 122, 0.4);
-      --text-main: #f0f3fa;
-      --text-muted: #9aa4be;
-      --text-dim: #65708c;
+      --gold-glow: rgba(245, 212, 122, 0.45);
+      --border-celestial: rgba(245, 212, 122, 0.28);
+      --border-subtle: rgba(255, 255, 255, 0.08);
 
-      /* Element Colors */
       --anemo: #4fe3c1;
       --geo: #e5b042;
       --electro: #bf6ffb;
@@ -34,11 +52,15 @@
       --pyro: #ef5a38;
       --cryo: #7ce8ff;
       --celestia: #ff5a79;
-      --abyss: #8a3ffc;
+
+      /* Dynamic Gnosis Core Glow */
+      --gnosis-glow: #f5d47a;
+      --gnosis-color: #f5d47a;
 
       --font-display: 'Cinzel', 'Zen Old Mincho', serif;
       --font-serif: 'Zen Old Mincho', serif;
-      --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-sans: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     *, *::before, *::after {
@@ -49,8 +71,8 @@
 
     html {
       scroll-behavior: smooth;
-      background: var(--bg-dark);
-      color: var(--text-main);
+      background: var(--anatomy-page);
+      color: var(--anatomy-strong);
       font-family: var(--font-sans);
     }
 
@@ -58,28 +80,27 @@
       min-height: 100vh;
       overflow-x: hidden;
       background: 
-        radial-gradient(circle at 50% 0%, rgba(56, 152, 236, 0.15), transparent 60%),
-        radial-gradient(circle at 80% 30%, rgba(191, 111, 251, 0.12), transparent 50%),
-        radial-gradient(circle at 20% 70%, rgba(229, 176, 66, 0.1), transparent 50%),
-        #090b12;
+        radial-gradient(circle at 50% 0%, rgba(56, 152, 236, 0.12), transparent 50%),
+        radial-gradient(circle at 80% 25%, rgba(191, 111, 251, 0.1), transparent 45%),
+        radial-gradient(circle at 20% 65%, rgba(245, 212, 122, 0.08), transparent 45%),
+        var(--anatomy-page);
       position: relative;
     }
 
-    /* Subtle Starfield & Irminsul Dust Overlay */
+    /* Subtle Irminsul Dust Overlay */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
       background-image: 
-        radial-gradient(1.5px 1.5px at 10% 20%, rgba(255, 255, 255, 0.8), transparent),
-        radial-gradient(1px 1px at 25% 45%, rgba(245, 212, 122, 0.7), transparent),
-        radial-gradient(1.5px 1.5px at 60% 15%, rgba(79, 227, 193, 0.8), transparent),
-        radial-gradient(1px 1px at 85% 65%, rgba(255, 255, 255, 0.6), transparent),
-        radial-gradient(2px 2px at 40% 85%, rgba(191, 111, 251, 0.7), transparent),
-        radial-gradient(1px 1px at 70% 90%, rgba(245, 212, 122, 0.5), transparent);
-      background-size: 550px 550px;
-      opacity: 0.7;
+        radial-gradient(1.5px 1.5px at 15% 15%, rgba(255, 255, 255, 0.7), transparent),
+        radial-gradient(1px 1px at 35% 40%, rgba(245, 212, 122, 0.6), transparent),
+        radial-gradient(1.5px 1.5px at 70% 20%, rgba(79, 227, 193, 0.7), transparent),
+        radial-gradient(1px 1px at 85% 65%, rgba(191, 111, 251, 0.6), transparent),
+        radial-gradient(2px 2px at 50% 85%, rgba(245, 212, 122, 0.5), transparent);
+      background-size: 500px 500px;
+      opacity: 0.6;
       z-index: 1;
     }
 
@@ -88,12 +109,228 @@
       text-decoration: none;
     }
 
-    /* --- SITE NAVIGATION HEADER --- */
+    /* ==========================================================================
+       2. ANATOMY SVG & PLATE STYLES (Strict Anatomy Rules)
+       ========================================================================== */
+    .iso-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 840px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    /* Tone hierarchy: base & feet lo, structure mid, subject hi, lit accent */
+    .iso-solid[data-tone="lo"] { fill: var(--anatomy-shade-0); stroke: var(--anatomy-lo); stroke-width: 0.6; stroke-linejoin: round; }
+    .iso-solid[data-tone="mid"] { fill: var(--anatomy-shade-1); stroke: var(--anatomy-mid); stroke-width: 0.6; stroke-linejoin: round; }
+    .iso-solid[data-tone="hi"] { fill: var(--anatomy-face); stroke: var(--anatomy-hi); stroke-width: 0.6; stroke-linejoin: round; }
+    .iso-solid[data-lit="true"] { fill: var(--anatomy-lit-top); stroke: var(--gnosis-color, var(--gold-akasha)); stroke-width: 0.8; }
+
+    .iso-line[data-tone="faint"] { stroke: var(--anatomy-faint); stroke-width: 0.5; fill: none; }
+    .iso-line[data-tone="lo"] { stroke: var(--anatomy-lo); stroke-width: 0.6; fill: none; }
+    .iso-line[data-tone="mid"] { stroke: var(--anatomy-mid); stroke-width: 0.7; fill: none; }
+    .iso-line[data-tone="hi"] { stroke: var(--anatomy-hi); stroke-width: 0.8; fill: none; }
+    .iso-line[data-tone="lit"] { stroke: var(--gnosis-color, var(--gold-akasha)); stroke-width: 1.2; fill: none; }
+
+    .iso-dots[data-tone="lo"] circle { fill: var(--anatomy-lo); }
+    .iso-dots[data-tone="mid"] circle { fill: var(--anatomy-mid); }
+    .iso-dots[data-tone="hi"] circle { fill: var(--anatomy-hi); }
+    .iso-dots[data-tone="lit"] circle { fill: var(--gnosis-color, var(--gold-akasha)); }
+
+    .iso-halo { fill: var(--anatomy-halo); }
+
+    /* Anatomy Framed Plate Card (Rule 8) */
+    .iso-figure {
+      margin: 36px 0 44px;
+      width: 100%;
+    }
+
+    .iso-plate {
+      position: relative;
+      padding: 56px 28px 48px;
+      background: linear-gradient(180deg, rgba(16, 21, 33, 0.95) 0%, rgba(10, 14, 22, 0.98) 100%);
+      border: 1px solid var(--border-celestial);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(245, 212, 122, 0.12);
+      backdrop-filter: blur(16px);
+      overflow: hidden;
+    }
+
+    .iso-plate::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-akasha), transparent);
+    }
+
+    .iso-plate-corners {
+      position: absolute;
+      inset: 18px 22px;
+      pointer-events: none;
+    }
+
+    .iso-plate-corner {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .iso-plate-corner[data-corner="fig"] {
+      top: 0; left: 0;
+      color: var(--gold-akasha);
+      font-weight: 700;
+    }
+    .iso-plate-corner[data-corner="title"] {
+      top: 0; right: 0;
+      color: var(--anatomy-text);
+      letter-spacing: 0.12em;
+    }
+    .iso-plate-corner[data-corner="hint"] {
+      bottom: 0; left: 0;
+      color: var(--anatomy-muted);
+    }
+    .iso-plate-corner[data-corner="readout"] {
+      bottom: 0; right: 0;
+      color: var(--gold-akasha);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Astrolabe Control Panel under Stage */
+    .astrolabe-controls-bar {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      background: rgba(8, 11, 18, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    .element-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .element-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--anatomy-text);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .element-pill-btn:hover {
+      border-color: var(--pill-color, var(--gold-akasha));
+      color: #fff;
+    }
+    .element-pill-btn.active {
+      background: rgba(245, 212, 122, 0.15);
+      border-color: var(--pill-color, var(--gold-akasha));
+      color: var(--pill-color, var(--gold-akasha));
+      box-shadow: 0 0 12px var(--pill-color, var(--gold-glow));
+    }
+
+    .vernier-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--anatomy-muted);
+    }
+    .vernier-slider-wrap input[type="range"] {
+      width: 140px;
+      accent-color: var(--gold-akasha);
+      cursor: pointer;
+    }
+
+    /* Plunger Trigger Button */
+    .btn-plunger-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--gold-akasha) 0%, var(--gold-dark) 100%);
+      color: #0b0d14;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid #ffe9a6;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.2s ease;
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+    .btn-plunger-trigger:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+    .btn-plunger-trigger:active {
+      transform: translateY(2px) scale(0.98);
+    }
+
+    /* Legend & Physical Lore Caption */
+    .iso-legend {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+      color: var(--anatomy-muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .iso-keys {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+    .iso-key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--anatomy-text);
+    }
+    .iso-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .iso-caption {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: #9eb0cc;
+      border-left: 2px solid var(--border-celestial);
+      padding-left: 14px;
+    }
+
+    /* ==========================================================================
+       3. SITE NAVIGATION HEADER
+       ========================================================================== */
     .genshin-nav {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(9, 11, 18, 0.85);
+      background: rgba(8, 10, 16, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-celestial);
@@ -116,25 +353,24 @@
     }
 
     .nav-brand-logo {
-      height: 34px;
+      height: 32px;
       width: auto;
       filter: drop-shadow(0 0 8px var(--gold-glow));
     }
 
     .nav-tagline {
       font-size: 0.75rem;
-      color: var(--text-muted);
+      color: var(--anatomy-muted);
       letter-spacing: 0.05em;
       border-left: 1px solid var(--border-subtle);
       padding-left: 12px;
       font-family: var(--font-sans);
-      font-weight: 400;
     }
 
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .primo-pill {
@@ -148,18 +384,18 @@
       font-size: 0.9rem;
       font-weight: 700;
       color: var(--gold-akasha);
-      letter-spacing: 0.04em;
+      font-family: var(--font-mono);
       box-shadow: 0 0 14px rgba(245, 212, 122, 0.2);
     }
 
     .btn-return {
-      padding: 8px 18px;
-      font-size: 0.85rem;
+      padding: 8px 16px;
+      font-size: 0.82rem;
       border: 1px solid var(--border-subtle);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.04);
-      color: var(--text-muted);
-      transition: all 0.25s ease;
+      color: var(--anatomy-text);
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -170,43 +406,15 @@
       border-color: var(--gold-akasha);
     }
 
-    /* --- HERO POSTER SECTION --- */
+    /* ==========================================================================
+       4. HERO BANNER & HEADER COPY
+       ========================================================================== */
     .hero-genshin {
-      position: relative;
-      min-height: 80vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 5vw 60px;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border-celestial);
-    }
-
-    .hero-backdrop {
-      position: absolute;
-      inset: 0;
-      background-image: 
-        linear-gradient(to bottom, rgba(9, 11, 18, 0.6) 0%, rgba(9, 11, 18, 0.85) 75%, #090b12 100%),
-        radial-gradient(ellipse at 50% 40%, rgba(212, 175, 55, 0.15), transparent 70%),
-        url('../assets/images/genshin_hero.jpg');
-      background-size: cover;
-      background-position: center 35%;
-      filter: brightness(0.95);
-      z-index: 0;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 1000px;
-      margin: 0 auto;
+      padding: 60px 5vw 40px;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
-    .hero-pill-badge {
+    .hero-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -215,122 +423,106 @@
       background: rgba(18, 22, 38, 0.8);
       border: 1px solid var(--border-celestial);
       color: var(--gold-akasha);
-      font-size: 0.85rem;
-      letter-spacing: 0.12em;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       font-weight: 700;
-      margin-bottom: 24px;
-      backdrop-filter: blur(8px);
+      margin-bottom: 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .hero-logo-img {
-      max-width: 380px;
-      width: 80%;
-      height: auto;
-      margin-bottom: 16px;
-      filter: drop-shadow(0 4px 25px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px var(--gold-glow));
     }
 
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(2.2rem, 5.5vw, 4.4rem);
+      font-size: clamp(2.2rem, 5vw, 4rem);
       font-weight: 900;
       letter-spacing: 0.04em;
-      line-height: 1.1;
-      margin-bottom: 18px;
-      background: linear-gradient(135deg, #ffffff 20%, var(--gold-akasha) 80%);
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--gold-akasha) 90%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 40px rgba(245, 212, 122, 0.3);
+      text-shadow: 0 0 35px rgba(245, 212, 122, 0.25);
     }
 
     .hero-desc {
-      font-size: clamp(1rem, 1.8vw, 1.25rem);
-      color: var(--text-muted);
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      color: var(--anatomy-text);
       line-height: 1.65;
-      max-width: 760px;
-      margin-bottom: 36px;
+      max-width: 820px;
+      margin: 0 auto 36px;
       font-family: var(--font-sans);
     }
-
     .hero-desc strong {
       color: var(--gold-akasha);
       font-weight: 600;
     }
 
-    /* Hero CTA Row */
-    .hero-actions {
+    /* Post-Ironic Academic Micro-Badges */
+    .hero-badges-row {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
       justify-content: center;
-      gap: 18px;
-      margin-bottom: 40px;
-    }
-
-    .btn-celestial-primary {
-      display: inline-flex;
-      align-items: center;
       gap: 12px;
-      background: linear-gradient(135deg, var(--gold-akasha) 0%, var(--gold-dark) 100%);
-      color: #121008;
-      font-weight: 800;
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-      padding: 14px 32px;
-      border-radius: 12px;
-      border: 1px solid #ffe9a6;
-      box-shadow: 0 4px 25px var(--gold-glow), 0 0 10px rgba(245, 212, 122, 0.5);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin: 0 auto 36px;
+      max-width: 960px;
     }
-    .btn-celestial-primary:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 35px rgba(245, 212, 122, 0.6), 0 0 20px rgba(255, 233, 166, 0.8);
-      filter: brightness(1.1);
-    }
-
-    .btn-celestial-secondary {
+    .academic-badge {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      background: rgba(18, 22, 38, 0.75);
-      border: 1px solid var(--border-celestial);
-      color: var(--text-main);
-      font-weight: 600;
-      font-size: 0.95rem;
-      padding: 14px 28px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      cursor: pointer;
-      transition: all 0.3s ease;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(13, 17, 26, 0.75);
+      border: 1px solid rgba(245, 212, 122, 0.2);
+      color: #b8c4db;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s ease;
     }
-    .btn-celestial-secondary:hover {
-      background: rgba(28, 34, 58, 0.9);
+    .academic-badge:hover {
       border-color: var(--gold-akasha);
-      color: #fff;
+      color: #ffffff;
       transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(245, 212, 122, 0.15);
+    }
+    .academic-badge .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .region-satire-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--gold-akasha);
+      background: rgba(245, 212, 122, 0.08);
+      border-left: 2px solid var(--region-color, var(--gold-akasha));
+      padding: 6px 10px;
+      border-radius: 0 8px 8px 0;
+      margin: 10px 0 14px;
+      line-height: 1.4;
+      font-style: italic;
+    }
+    .lore-satire-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--gold-akasha);
+      background: rgba(245, 212, 122, 0.08);
+      border-left: 2px solid var(--gold-akasha);
+      padding: 6px 10px;
+      border-radius: 0 8px 8px 0;
+      margin: 10px 0 14px;
+      line-height: 1.4;
     }
 
-    /* Wish stats preview bar */
-    .wish-quickbar {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      padding: 12px 28px;
-      border-radius: 16px;
-      background: rgba(18, 22, 38, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    .wish-quickbar span strong {
-      color: #fff;
-    }
 
-    /* --- SHELL & SECTION LAYOUTS --- */
+    /* ==========================================================================
+       5. 7 REGIONAL ARCHIVAL PAVILIONS GRID
+       ========================================================================== */
     .shell {
       max-width: 1280px;
       margin: 0 auto;
@@ -338,22 +530,22 @@
     }
 
     .section-wrap {
-      padding: 90px 0;
+      padding: 80px 0;
       position: relative;
     }
 
     .section-head {
       text-align: center;
       max-width: 820px;
-      margin: 0 auto 56px;
+      margin: 0 auto 50px;
     }
 
     .section-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-family: var(--font-display);
-      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
       letter-spacing: 0.15em;
       color: var(--gold-akasha);
       text-transform: uppercase;
@@ -363,21 +555,19 @@
 
     .section-title {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 3.8vw, 3rem);
+      font-size: clamp(1.8rem, 3.4vw, 2.8rem);
       font-weight: 800;
-      letter-spacing: 0.02em;
       line-height: 1.2;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       color: #ffffff;
     }
 
     .section-subtitle {
-      font-size: 1.05rem;
-      color: var(--text-muted);
+      font-size: 1rem;
+      color: var(--anatomy-muted);
       line-height: 1.6;
     }
 
-    /* --- 7 REGIONAL PAVILIONS GRID --- */
     .regions-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -386,7 +576,7 @@
 
     .region-card {
       position: relative;
-      background: var(--bg-card);
+      background: var(--anatomy-card);
       border: 1px solid var(--border-subtle);
       border-radius: 18px;
       padding: 28px;
@@ -396,7 +586,7 @@
       overflow: hidden;
       cursor: pointer;
       transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
 
     .region-card::before {
@@ -411,26 +601,13 @@
       transition: height 0.3s ease;
     }
 
-    .region-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top right, var(--region-color-fade, rgba(255,255,255,0.05)), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.35s ease;
-      pointer-events: none;
-    }
-
     .region-card:hover {
       transform: translateY(-6px);
       border-color: var(--region-color, var(--gold-akasha));
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 24px var(--region-color-glow, rgba(245, 212, 122, 0.2));
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.6), 0 0 25px var(--region-color-glow, rgba(245, 212, 122, 0.2));
     }
     .region-card:hover::before {
       height: 6px;
-    }
-    .region-card:hover::after {
-      opacity: 1;
     }
 
     .region-head {
@@ -454,7 +631,8 @@
     }
 
     .region-element-badge {
-      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -467,10 +645,10 @@
 
     .region-title {
       font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .region-archon {
@@ -484,10 +662,10 @@
     }
 
     .region-desc {
-      font-size: 0.92rem;
-      color: var(--text-muted);
+      font-size: 0.9rem;
+      color: var(--anatomy-muted);
       line-height: 1.55;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .region-topics {
@@ -498,17 +676,13 @@
     }
 
     .topic-tag {
-      font-size: 0.75rem;
-      background: rgba(255, 255, 255, 0.05);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       padding: 3px 8px;
       border-radius: 6px;
-      color: var(--text-dim);
-    }
-
-    .region-card:hover .topic-tag {
-      color: var(--text-muted);
-      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--anatomy-muted);
     }
 
     .region-foot {
@@ -520,8 +694,9 @@
     }
 
     .region-q-count {
-      font-size: 0.8rem;
-      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--anatomy-muted);
     }
 
     .region-btn-action {
@@ -537,39 +712,28 @@
       gap: 10px;
     }
 
-    /* --- 3 GENERAL LORE LEVELS --- */
+    /* ==========================================================================
+       6. 3 LORE LEVELS (ТРИ СТУПЕНИ ПОСВЯЩЕНИЯ)
+       ========================================================================== */
     .lore-levels-wrap {
-      margin-top: 80px;
-      background: linear-gradient(180deg, rgba(18, 22, 38, 0.7) 0%, rgba(10, 13, 24, 0.9) 100%);
+      margin-top: 70px;
+      background: linear-gradient(180deg, rgba(16, 21, 33, 0.8) 0%, rgba(10, 14, 22, 0.95) 100%);
       border: 1px solid var(--border-celestial);
-      border-radius: 24px;
-      padding: 48px;
+      border-radius: 22px;
+      padding: 44px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
       position: relative;
-      overflow: hidden;
-    }
-
-    .lore-levels-wrap::before {
-      content: "";
-      position: absolute;
-      top: -150px;
-      right: -150px;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(245, 212, 122, 0.15), transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
     }
 
     .lore-cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 24px;
-      margin-top: 36px;
+      margin-top: 32px;
     }
 
     .lore-card {
-      background: rgba(14, 18, 32, 0.85);
+      background: rgba(13, 17, 26, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
       padding: 28px;
@@ -578,19 +742,16 @@
       flex-direction: column;
       justify-content: space-between;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
     }
     .lore-card:hover {
       transform: translateY(-5px);
       border-color: var(--gold-akasha);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 20px var(--gold-glow);
     }
 
     .lore-level-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -605,7 +766,7 @@
 
     .lore-card-title {
       font-family: var(--font-display);
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: #fff;
       margin-bottom: 8px;
@@ -618,15 +779,17 @@
     }
 
     .lore-card-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
+      font-size: 0.88rem;
+      color: var(--anatomy-muted);
       line-height: 1.55;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
-    /* --- CODEX OF TEYVAT (LORE ENCYCLOPEDIA COMPONENT) --- */
+    /* ==========================================================================
+       7. CODEX OF TEYVAT TABS
+       ========================================================================== */
     .codex-section {
-      background: rgba(12, 15, 26, 0.6);
+      background: rgba(10, 13, 20, 0.6);
       border-top: 1px solid var(--border-celestial);
       border-bottom: 1px solid var(--border-celestial);
     }
@@ -645,7 +808,7 @@
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
+      color: var(--anatomy-muted);
       font-family: var(--font-display);
       font-size: 0.9rem;
       font-weight: 700;
@@ -665,26 +828,26 @@
 
     .codex-panel {
       display: none;
-      background: var(--bg-card);
+      background: var(--anatomy-card);
       border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 40px;
+      border-radius: 18px;
+      padding: 36px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-      animation: fadeIn 0.4s ease;
+      animation: fadeIn 0.35s ease;
     }
     .codex-panel.active {
       display: block;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     .codex-grid-inner {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
+      gap: 22px;
     }
 
     .codex-entry {
@@ -702,11 +865,13 @@
     }
     .codex-entry p {
       font-size: 0.88rem;
-      color: var(--text-muted);
+      color: var(--anatomy-muted);
       line-height: 1.6;
     }
 
-    /* --- WISH SIMULATOR MODAL OVERLAY --- */
+    /* ==========================================================================
+       8. WISH SIMULATOR MODAL OVERLAY
+       ========================================================================== */
     .wish-overlay {
       position: fixed;
       inset: 0;
@@ -737,22 +902,9 @@
     }
 
     @keyframes meteorFly {
-      0% {
-        top: -10%;
-        right: -10%;
-        transform: scale(0.5) rotate(45deg);
-      }
-      60% {
-        top: 50%;
-        right: 50%;
-        transform: scale(2.5) translate(50%, -50%) rotate(45deg);
-      }
-      100% {
-        top: 50%;
-        right: 50%;
-        transform: scale(6) translate(50%, -50%) rotate(45deg);
-        opacity: 0;
-      }
+      0% { top: -10%; right: -10%; transform: scale(0.5) rotate(45deg); }
+      60% { top: 50%; right: 50%; transform: scale(2.5) translate(50%, -50%) rotate(45deg); }
+      100% { top: 50%; right: 50%; transform: scale(6) translate(50%, -50%) rotate(45deg); opacity: 0; }
     }
 
     .wish-result-card {
@@ -790,7 +942,6 @@
       font-size: 4rem;
       margin-bottom: 12px;
       display: inline-block;
-      filter: drop-shadow(0 0 15px rgba(255,255,255,0.4));
     }
 
     .wish-loot-title {
@@ -801,7 +952,8 @@
     }
 
     .wish-loot-type {
-      font-size: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
       color: var(--loot-accent, var(--gold-akasha));
       letter-spacing: 0.05em;
       text-transform: uppercase;
@@ -822,7 +974,9 @@
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    /* --- QUIZ MODAL TERMINAL --- */
+    /* ==========================================================================
+       9. QUIZ MODAL TERMINAL
+       ========================================================================== */
     .quiz-modal {
       position: fixed;
       inset: 0;
@@ -874,7 +1028,8 @@
     }
 
     .quiz-modal-badge {
-      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -893,12 +1048,12 @@
     }
 
     .quiz-modal-close-btn {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-muted);
+      color: var(--anatomy-muted);
       cursor: pointer;
       display: grid;
       place-items: center;
@@ -910,7 +1065,6 @@
       color: #fff;
     }
 
-    /* Progress bar */
     .quiz-progress-track {
       height: 4px;
       background: rgba(255, 255, 255, 0.06);
@@ -924,7 +1078,6 @@
       transition: width 0.3s ease;
     }
 
-    /* Quiz Body */
     .quiz-body-view {
       padding: 32px;
       display: flex;
@@ -935,8 +1088,9 @@
     .quiz-progress-meta {
       display: flex;
       justify-content: space-between;
-      font-size: 0.85rem;
-      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--anatomy-muted);
     }
 
     .quiz-question-box {
@@ -982,6 +1136,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       display: grid;
       place-items: center;
+      font-family: var(--font-mono);
       font-size: 0.8rem;
       font-weight: 700;
       color: var(--gold-akasha);
@@ -1003,7 +1158,6 @@
       color: #ff9d85 !important;
     }
 
-    /* Feedback Banner */
     .quiz-feedback-box {
       border-radius: 14px;
       padding: 18px 22px;
@@ -1045,11 +1199,12 @@
       background: linear-gradient(135deg, var(--gold-akasha) 0%, var(--gold-dark) 100%);
       color: #0c0e14;
       font-weight: 800;
+      font-family: var(--font-mono);
       padding: 12px 28px;
       border-radius: 10px;
       border: none;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       transition: all 0.2s ease;
       margin-left: auto;
     }
@@ -1085,7 +1240,7 @@
     .results-percent-badge {
       font-size: 1.1rem;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--anatomy-strong);
     }
 
     .results-rewards-row {
@@ -1102,8 +1257,9 @@
       align-items: center;
       gap: 8px;
       font-weight: 700;
+      font-family: var(--font-mono);
       color: var(--gold-akasha);
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .results-rank-badge {
@@ -1112,7 +1268,8 @@
       background: rgba(245, 212, 122, 0.15);
       border: 1px solid var(--gold-akasha);
       color: var(--gold-akasha);
-      font-size: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -1139,13 +1296,31 @@
       justify-content: center;
     }
 
-    /* --- FOOTER --- */
+    .btn-action-alt {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--anatomy-text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-action-alt:hover {
+      border-color: var(--gold-akasha);
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       10. FOOTER
+       ========================================================================== */
     .genshin-footer {
       border-top: 1px solid var(--border-celestial);
       padding: 60px 5vw 40px;
-      background: #06080d;
+      background: #05070c;
       text-align: center;
-      color: var(--text-dim);
+      color: var(--anatomy-muted);
       font-size: 0.85rem;
     }
     .genshin-footer a {
@@ -1154,46 +1329,30 @@
     .footer-quote {
       font-family: var(--font-serif);
       font-style: italic;
-      color: var(--text-muted);
+      color: var(--anatomy-text);
       font-size: 1rem;
       margin-bottom: 16px;
     }
 
-    /* --- RESPONSIVE ADJUSTMENTS --- */
+    /* ==========================================================================
+       11. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
     @media (max-width: 768px) {
-      .genshin-nav {
-        padding: 12px 4vw;
-      }
-      .nav-tagline {
-        display: none;
-      }
-      .hero-genshin {
-        padding: 60px 4vw 40px;
-      }
-      .hero-actions {
-        flex-direction: column;
-        width: 100%;
-      }
-      .btn-celestial-primary, .btn-celestial-secondary {
-        width: 100%;
-        justify-content: center;
-      }
-      .regions-grid {
-        grid-template-columns: 1fr;
-      }
-      .lore-levels-wrap {
-        padding: 24px 16px;
-      }
-      .quiz-dialog-header {
-        padding: 18px 20px;
-      }
-      .quiz-body-view {
-        padding: 20px;
-      }
+      .genshin-nav { padding: 12px 4vw; }
+      .nav-tagline { display: none; }
+      .hero-genshin { padding: 40px 4vw 20px; }
+      .iso-plate { padding: 52px 14px 44px; }
+      .astrolabe-controls-bar { flex-direction: column; align-items: stretch; }
+      .element-pills-row { justify-content: center; }
+      .regions-grid { grid-template-columns: 1fr; }
+      .lore-levels-wrap { padding: 24px 16px; }
+      .quiz-dialog-header { padding: 18px 20px; }
+      .quiz-body-view { padding: 20px; }
+      .iso-plate-corner[data-corner="title"] { display: none; }
     }
   </style>
 </head>
-<body>
+<body class="iso">
 
   <!-- SITE NAVIGATION HEADER -->
   <header class="genshin-nav" role="banner">
@@ -1201,14 +1360,14 @@
       <img src="../assets/images/genshin_wordmark.svg" alt="Genshin Impact" class="nav-brand-logo">
       <span>ГЕНШИНОВЕДЕНИЕ</span>
     </a>
-    <span class="nav-tagline">Интерактивная кафедра лора Тейвата</span>
+    <span class="nav-tagline">Академическая обсерватория лора Тейвата</span>
 
     <div class="nav-actions">
       <div class="primo-pill" id="primo-counter" title="Ваши Камни Истока">
         1600 ✦
       </div>
       <a href="../index.html#gaming" class="btn-return">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
@@ -1221,47 +1380,84 @@
   </header>
 
   <main id="main">
-    <!-- HERO SECTION -->
+    <!-- HERO SECTION WITH ANATOMY ISOMETRIC CENTERPIECE -->
     <section class="hero-genshin" aria-labelledby="hero-title">
-      <div class="hero-backdrop" aria-hidden="true"></div>
-      
-      <div class="hero-content">
-        <div class="hero-pill-badge">
-          ✦ Академическая игромания // 7 Королевств Тейвата
+      <div class="shell">
+        <div class="hero-eyebrow">
+          ✦ АКАДЕМИЧЕСКАЯ ИГРОМАНИЯ // МОДЕЛЬ АКАША-07
         </div>
 
-        <img src="../assets/images/genshin_logo_ru.png" alt="Genshin Impact — Геншин Импакт" class="hero-logo-img">
-        
         <h1 id="hero-title" class="hero-title">
           Кафедра Геншиноведения
         </h1>
 
         <p class="hero-desc">
-          Добро пожаловать в высшую обсерваторию хроник Тейвата. Здесь сходятся законы <strong>Селестии</strong>, 
-          шёпот корней <strong>Ирминсуля</strong>, интриги <strong>11 Предвестников Фатуи</strong> и тайны павшей цивилизации <strong>Каэнри'ах</strong>.
-          Пройдите испытания каждого из 7 регионов, подтвердите уровень знаний и совершите молитву в симуляторе судьбы!
+          Добро пожаловать в высшую обсерваторию хроник Тейвата. Перед вами — физическая <strong>Астролябия Ирминсуля</strong>,
+          калибрующая элементальные частоты Семи Архонтов. Вращайте верньер, выбирайте королевства,
+          совершайте молитвы созвездий через спусковой плунжер и сдавайте каноничные академические экзамены!
         </p>
-
-        <div class="hero-actions">
-          <button class="btn-celestial-primary" id="btn-make-wish" type="button">
-            <span>Совершить Молитву</span>
-            <span style="font-size: 0.85em; opacity: 0.85;">(✦ 160)</span>
-          </button>
-          <a href="#regions" class="btn-celestial-secondary">
-            <span>Выбрать регион для экзамена ↓</span>
-          </a>
-          <a href="#general-lore" class="btn-celestial-secondary">
-            <span>Хардкорный лор Дайнслейфа</span>
-          </a>
+        <!-- POST-IRONIC ACADEMIC ACCREDITATION BADGES -->
+        <div class="hero-badges-row">
+          <span class="academic-badge"><span class="badge-dot" style="background: var(--dendro); box-shadow: 0 0 8px var(--dendro);"></span>Одобрено Министерством Просвещения Сумеру (ГОСТ-Ирминсуль 3.8)</span>
+          <span class="academic-badge"><span class="badge-dot" style="background: var(--electro); box-shadow: 0 0 8px var(--electro);"></span>Слив реальных КИМов от Скарамуччи</span>
+          <span class="academic-badge"><span class="badge-dot" style="background: var(--pyro); box-shadow: 0 0 8px var(--pyro);"></span>Шанс отчисления в Разлом: 50/50</span>
         </div>
 
-        <div class="wish-quickbar">
-          <span>Сделано молитв: <strong id="wish-count-display">0</strong></span>
-          <span>•</span>
-          <span>Всего вопросов в базе: <strong>100 каноничных</strong></span>
-          <span>•</span>
-          <span>Награда: <strong>до 200 ✦ за тест</strong></span>
-        </div>
+        <!-- ANATOMY FIGURE CARD (Rule 8: Framed Card with Corners & Live Readout) -->
+        <figure class="iso-figure" id="astrolabe-figure">
+          <div class="iso-plate">
+            <div class="iso-plate-corners" aria-hidden="true">
+              <span class="iso-plate-corner" data-corner="fig">Fig 1</span>
+              <span class="iso-plate-corner" data-corner="title">Teyvat Celestial Orrery · Akasha Model-07</span>
+              <span class="iso-plate-corner" data-corner="hint">Совет: Нажмите на элемент или спустите плунжер для молитвы</span>
+              <span class="iso-plate-corner" data-corner="readout" id="astrolabe-readout">λ = 510.4 nm [АНЕМО · МОНДШТАДТ] // 1600 ✦ READY</span>
+            </div>
+
+            <!-- Precomputed Precision Isometric SVG Mount -->
+            <div id="astrolabe-svg-stage">
+              <svg xmlns="http://www.w3.org/2000/svg" class="iso-svg" viewBox="0 0 840 480" role="img" aria-label="Астролябия Тейвата: прецизионный резонансный прибор Ирминсуля для измерения частот Семи Архонтов и активации Молитв созвездий."><path class="iso-halo" d="M174.9 257.6L175.2 255.9L176.3 254.3L177.9 252.8L180.1 251.6L341.1 173.8L343.7 172.8L346.7 172L350 171.6L353.3 171.4L356.7 171.6L359.9 172.1L362.8 173L365.4 174.1L660.3 326.7L662.4 328.1L663.9 329.6L664.9 331.2L665.1 332.9L665.1 350.3L664.8 351.9L663.7 353.5L662.1 355L659.9 356.3L498.9 434L496.3 435.1L493.3 435.8L490 436.3L486.7 436.4L483.3 436.2L480.1 435.7L477.2 434.9L474.6 433.8L179.7 281.1L177.6 279.8L176.1 278.3L175.1 276.7L174.9 275Z" style="filter:blur(6px); opacity:0.65;"/><g class="iso-solid"><path class="iso-fill" d="M339.7 209.5L339.7 208L340.4 206.6L341.7 205.4L343.6 204.2L345.8 203.4L348.5 202.8L351.3 202.5L354.2 202.5L357 202.8L359.6 203.5L361.8 204.4L363.6 205.5L364.8 206.9L365.4 208.3L365.4 211L365.3 212.4L364.6 213.9L363.3 215.1L361.5 216.3L359.2 217.1L356.6 217.7L353.7 218L350.9 218L348 217.7L345.5 217L343.2 216.1L341.5 215L340.3 213.6L339.7 212.2Z"/><path class="iso-shade" data-shade="0" d="M361.5 216.3L359.2 217.1L359.2 214.4L361.5 213.5ZM365.4 211L365.3 212.4L365.3 209.7L365.4 208.3ZM365.3 212.4L364.6 213.9L364.6 211.1L365.3 209.7ZM364.6 213.9L363.3 215.1L363.3 212.4L364.6 211.1ZM363.3 215.1L361.5 216.3L361.5 213.5L363.3 212.4Z"/><path class="iso-shade" data-shade="1" d="M359.2 217.1L356.6 217.7L356.6 215L359.2 214.4ZM356.6 217.7L353.7 218L353.7 215.3L356.6 215Z"/><path class="iso-shade" data-shade="2" d="M353.7 218L350.9 218L350.9 215.3L353.7 215.3ZM350.9 218L348 217.7L348 214.9L350.9 215.3ZM348 217.7L345.5 217L345.5 214.3L348 214.9Z"/><path class="iso-shade" data-shade="3" d="M345.5 217L343.2 216.1L343.2 213.4L345.5 214.3ZM343.2 216.1L341.5 215L341.5 212.2L343.2 213.4ZM341.5 215L340.3 213.6L340.3 210.9L341.5 212.2ZM340.3 213.6L339.7 212.2L339.7 209.5L340.3 210.9Z"/><path class="iso-top" d="M361.5 213.5L359.2 214.4L356.6 215L353.7 215.3L350.9 215.3L348 214.9L345.5 214.3L343.2 213.4L341.5 212.2L340.3 210.9L339.7 209.5L339.7 208L340.4 206.6L341.7 205.4L343.6 204.2L345.8 203.4L348.5 202.8L351.3 202.5L354.2 202.5L357 202.8L359.6 203.5L361.8 204.4L363.6 205.5L364.8 206.9L365.4 208.3L365.3 209.7L364.6 211.1L363.3 212.4Z"/><path class="iso-line iso-crease" data-tone="faint" d="M365.4 208.3L365.3 209.7L364.6 211.1L363.3 212.4L361.5 213.5L359.2 214.4L356.6 215L353.7 215.3L350.9 215.3L348 214.9L345.5 214.3L343.2 213.4L341.5 212.2L340.3 210.9L339.7 209.5"/><path class="iso-line iso-edge" data-tone="lo" d="M339.7 209.5L339.7 208L340.4 206.6L341.7 205.4L343.6 204.2L345.8 203.4L348.5 202.8L351.3 202.5L354.2 202.5L357 202.8L359.6 203.5L361.8 204.4L363.6 205.5L364.8 206.9L365.4 208.3M365.4 211L365.3 212.4L364.6 213.9L363.3 215.1L361.5 216.3L359.2 217.1L356.6 217.7L353.7 218L350.9 218L348 217.7L345.5 217L343.2 216.1L341.5 215L340.3 213.6L339.7 212.2M339.7 209.5L339.7 212.2M365.4 208.3L365.4 211"/></g><g class="iso-solid"><path class="iso-fill" d="M342.5 204.6L342.6 203.5L343.1 202.4L344.1 201.4L345.5 200.6L347.3 199.9L349.4 199.4L351.6 199.2L353.8 199.2L356 199.5L358 200L359.7 200.7L361.1 201.6L362.1 202.6L362.5 203.7L362.5 208.4L362.5 209.5L361.9 210.6L360.9 211.6L359.5 212.5L357.7 213.2L355.7 213.6L353.5 213.9L351.2 213.9L349 213.6L347 213.1L345.3 212.4L343.9 211.5L343 210.5L342.5 209.4Z"/><path class="iso-shade" data-shade="0" d="M359.5 212.5L357.7 213.2L357.7 208.5L359.5 207.8ZM362.5 208.4L362.5 209.5L362.5 204.8L362.5 203.7ZM362.5 209.5L361.9 210.6L361.9 205.9L362.5 204.8ZM361.9 210.6L360.9 211.6L360.9 206.9L361.9 205.9ZM360.9 211.6L359.5 212.5L359.5 207.8L360.9 206.9Z"/><path class="iso-shade" data-shade="1" d="M357.7 213.2L355.7 213.6L355.7 208.9L357.7 208.5ZM355.7 213.6L353.5 213.9L353.5 209.2L355.7 208.9Z"/><path class="iso-shade" data-shade="2" d="M353.5 213.9L351.2 213.9L351.2 209.1L353.5 209.2ZM351.2 213.9L349 213.6L349 208.9L351.2 209.1ZM349 213.6L347 213.1L347 208.4L349 208.9Z"/><path class="iso-shade" data-shade="3" d="M347 213.1L345.3 212.4L345.3 207.6L347 208.4ZM345.3 212.4L343.9 211.5L343.9 206.8L345.3 207.6ZM343.9 211.5L343 210.5L343 205.7L343.9 206.8ZM343 210.5L342.5 209.4L342.5 204.6L343 205.7Z"/><path class="iso-top" d="M359.5 207.8L357.7 208.5L355.7 208.9L353.5 209.2L351.2 209.1L349 208.9L347 208.4L345.3 207.6L343.9 206.8L343 205.7L342.5 204.6L342.6 203.5L343.1 202.4L344.1 201.4L345.5 200.6L347.3 199.9L349.4 199.4L351.6 199.2L353.8 199.2L356 199.5L358 200L359.7 200.7L361.1 201.6L362.1 202.6L362.5 203.7L362.5 204.8L361.9 205.9L360.9 206.9Z"/><path class="iso-line iso-crease" data-tone="faint" d="M362.5 203.7L362.5 204.8L361.9 205.9L360.9 206.9L359.5 207.8L357.7 208.5L355.7 208.9L353.5 209.2L351.2 209.1L349 208.9L347 208.4L345.3 207.6L343.9 206.8L343 205.7L342.5 204.6"/><path class="iso-line iso-edge" data-tone="mid" d="M342.5 204.6L342.6 203.5L343.1 202.4L344.1 201.4L345.5 200.6L347.3 199.9L349.4 199.4L351.6 199.2L353.8 199.2L356 199.5L358 200L359.7 200.7L361.1 201.6L362.1 202.6L362.5 203.7M362.5 208.4L362.5 209.5L361.9 210.6L360.9 211.6L359.5 212.5L357.7 213.2L355.7 213.6L353.5 213.9L351.2 213.9L349 213.6L347 213.1L345.3 212.4L343.9 211.5L343 210.5L342.5 209.4M342.5 204.6L342.5 209.4M362.5 203.7L362.5 208.4"/></g><path class="iso-line" data-tone="lo" d="M359.5 212L359.5 208.3M357.4 212.8L357.4 209M355 213.3L355 209.5M352.3 213.4L352.3 209.7M349.8 213.2L349.8 209.5M347.4 212.7L347.4 209M345.3 211.9L345.3 208.1M343.7 210.8L343.7 207.1M342.8 209.6L342.8 205.9M362.2 209.8L362.2 206M361.1 211L361.1 207.2"/><g class="iso-solid"><path class="iso-fill" d="M207.6 273.3L207.7 271.8L208.4 270.4L209.6 269.1L211.5 268L213.8 267.1L216.4 266.5L219.2 266.2L222.1 266.2L224.9 266.6L227.5 267.2L229.7 268.2L231.5 269.3L232.7 270.6L233.3 272L233.3 274.8L233.3 276.2L232.6 277.6L231.3 278.9L229.4 280L227.1 280.9L224.5 281.5L221.7 281.8L218.8 281.8L216 281.4L213.4 280.8L211.2 279.9L209.4 278.7L208.2 277.4L207.6 276Z"/><path class="iso-shade" data-shade="0" d="M229.4 280L227.1 280.9L227.1 278.2L229.4 277.3ZM233.3 274.8L233.3 276.2L233.3 273.5L233.3 272ZM233.3 276.2L232.6 277.6L232.6 274.9L233.3 273.5ZM232.6 277.6L231.3 278.9L231.3 276.2L232.6 274.9ZM231.3 278.9L229.4 280L229.4 277.3L231.3 276.2Z"/><path class="iso-shade" data-shade="1" d="M227.1 280.9L224.5 281.5L224.5 278.8L227.1 278.2ZM224.5 281.5L221.7 281.8L221.7 279.1L224.5 278.8Z"/><path class="iso-shade" data-shade="2" d="M221.7 281.8L218.8 281.8L218.8 279L221.7 279.1ZM218.8 281.8L216 281.4L216 278.7L218.8 279ZM216 281.4L213.4 280.8L213.4 278.1L216 278.7Z"/><path class="iso-shade" data-shade="3" d="M213.4 280.8L211.2 279.9L211.2 277.1L213.4 278.1ZM211.2 279.9L209.4 278.7L209.4 276L211.2 277.1ZM209.4 278.7L208.2 277.4L208.2 274.7L209.4 276ZM208.2 277.4L207.6 276L207.6 273.3L208.2 274.7Z"/><path class="iso-top" d="M229.4 277.3L227.1 278.2L224.5 278.8L221.7 279.1L218.8 279L216 278.7L213.4 278.1L211.2 277.1L209.4 276L208.2 274.7L207.6 273.3L207.7 271.8L208.4 270.4L209.6 269.1L211.5 268L213.8 267.1L216.4 266.5L219.2 266.2L222.1 266.2L224.9 266.6L227.5 267.2L229.7 268.2L231.5 269.3L232.7 270.6L233.3 272L233.3 273.5L232.6 274.9L231.3 276.2Z"/><path class="iso-line iso-crease" data-tone="faint" d="M233.3 272L233.3 273.5L232.6 274.9L231.3 276.2L229.4 277.3L227.1 278.2L224.5 278.8L221.7 279.1L218.8 279L216 278.7L213.4 278.1L211.2 277.1L209.4 276L208.2 274.7L207.6 273.3"/><path class="iso-line iso-edge" data-tone="lo" d="M207.6 273.3L207.7 271.8L208.4 270.4L209.6 269.1L211.5 268L213.8 267.1L216.4 266.5L219.2 266.2L222.1 266.2L224.9 266.6L227.5 267.2L229.7 268.2L231.5 269.3L232.7 270.6L233.3 272M233.3 274.8L233.3 276.2L232.6 277.6L231.3 278.9L229.4 280L227.1 280.9L224.5 281.5L221.7 281.8L218.8 281.8L216 281.4L213.4 280.8L211.2 279.9L209.4 278.7L208.2 277.4L207.6 276M207.6 273.3L207.6 276M233.3 272L233.3 274.8"/></g><g class="iso-solid"><path class="iso-fill" d="M210.5 268.4L210.5 267.3L211 266.2L212.1 265.2L213.5 264.3L215.3 263.6L217.3 263.2L219.5 262.9L221.8 263L223.9 263.2L225.9 263.7L227.7 264.4L229.1 265.3L230 266.4L230.5 267.5L230.5 272.2L230.4 273.3L229.9 274.4L228.9 275.4L227.4 276.3L225.7 276.9L223.6 277.4L221.4 277.6L219.2 277.6L217 277.4L215 276.9L213.2 276.1L211.9 275.2L210.9 274.2L210.5 273.1Z"/><path class="iso-shade" data-shade="0" d="M227.4 276.3L225.7 276.9L225.7 272.2L227.4 271.5ZM230.5 272.2L230.4 273.3L230.4 268.6L230.5 267.5ZM230.4 273.3L229.9 274.4L229.9 269.7L230.4 268.6ZM229.9 274.4L228.9 275.4L228.9 270.7L229.9 269.7ZM228.9 275.4L227.4 276.3L227.4 271.5L228.9 270.7Z"/><path class="iso-shade" data-shade="1" d="M225.7 276.9L223.6 277.4L223.6 272.7L225.7 272.2ZM223.6 277.4L221.4 277.6L221.4 272.9L223.6 272.7Z"/><path class="iso-shade" data-shade="2" d="M221.4 277.6L219.2 277.6L219.2 272.9L221.4 272.9ZM219.2 277.6L217 277.4L217 272.6L219.2 272.9ZM217 277.4L215 276.9L215 272.1L217 272.6Z"/><path class="iso-shade" data-shade="3" d="M215 276.9L213.2 276.1L213.2 271.4L215 272.1ZM213.2 276.1L211.9 275.2L211.9 270.5L213.2 271.4ZM211.9 275.2L210.9 274.2L210.9 269.5L211.9 270.5ZM210.9 274.2L210.5 273.1L210.5 268.4L210.9 269.5Z"/><path class="iso-top" d="M227.4 271.5L225.7 272.2L223.6 272.7L221.4 272.9L219.2 272.9L217 272.6L215 272.1L213.2 271.4L211.9 270.5L210.9 269.5L210.5 268.4L210.5 267.3L211 266.2L212.1 265.2L213.5 264.3L215.3 263.6L217.3 263.2L219.5 262.9L221.8 263L223.9 263.2L225.9 263.7L227.7 264.4L229.1 265.3L230 266.4L230.5 267.5L230.4 268.6L229.9 269.7L228.9 270.7Z"/><path class="iso-line iso-crease" data-tone="faint" d="M230.5 267.5L230.4 268.6L229.9 269.7L228.9 270.7L227.4 271.5L225.7 272.2L223.6 272.7L221.4 272.9L219.2 272.9L217 272.6L215 272.1L213.2 271.4L211.9 270.5L210.9 269.5L210.5 268.4"/><path class="iso-line iso-edge" data-tone="mid" d="M210.5 268.4L210.5 267.3L211 266.2L212.1 265.2L213.5 264.3L215.3 263.6L217.3 263.2L219.5 262.9L221.8 263L223.9 263.2L225.9 263.7L227.7 264.4L229.1 265.3L230 266.4L230.5 267.5M230.5 272.2L230.4 273.3L229.9 274.4L228.9 275.4L227.4 276.3L225.7 276.9L223.6 277.4L221.4 277.6L219.2 277.6L217 277.4L215 276.9L213.2 276.1L211.9 275.2L210.9 274.2L210.5 273.1M210.5 268.4L210.5 273.1M230.5 267.5L230.5 272.2"/></g><path class="iso-line" data-tone="lo" d="M227.4 275.8L227.4 272M225.3 276.5L225.3 272.8M222.9 277L222.9 273.3M220.3 277.2L220.3 273.4M217.7 277L217.7 273.3M215.3 276.5L215.3 272.7M213.2 275.6L213.2 271.9M211.7 274.6L211.7 270.9M210.7 273.4L210.7 269.6M230.1 273.5L230.1 269.8M229.1 274.7L229.1 271"/><g class="iso-solid"><path class="iso-fill" d="M606.7 347.7L606.7 346.3L607.4 344.9L608.7 343.6L610.6 342.5L612.9 341.6L615.5 341L618.3 340.7L621.2 340.7L624 341.1L626.6 341.7L628.8 342.7L630.6 343.8L631.8 345.1L632.4 346.5L632.4 349.3L632.3 350.7L631.6 352.1L630.4 353.4L628.5 354.5L626.2 355.4L623.6 356L620.8 356.3L617.9 356.3L615.1 355.9L612.5 355.3L610.3 354.4L608.5 353.2L607.3 351.9L606.7 350.5Z"/><path class="iso-shade" data-shade="0" d="M628.5 354.5L626.2 355.4L626.2 352.7L628.5 351.8ZM632.4 349.3L632.3 350.7L632.3 348L632.4 346.5ZM632.3 350.7L631.6 352.1L631.6 349.4L632.3 348ZM631.6 352.1L630.4 353.4L630.4 350.7L631.6 349.4ZM630.4 353.4L628.5 354.5L628.5 351.8L630.4 350.7Z"/><path class="iso-shade" data-shade="1" d="M626.2 355.4L623.6 356L623.6 353.3L626.2 352.7ZM623.6 356L620.8 356.3L620.8 353.6L623.6 353.3Z"/><path class="iso-shade" data-shade="2" d="M620.8 356.3L617.9 356.3L617.9 353.5L620.8 353.6ZM617.9 356.3L615.1 355.9L615.1 353.2L617.9 353.5ZM615.1 355.9L612.5 355.3L612.5 352.5L615.1 353.2Z"/><path class="iso-shade" data-shade="3" d="M612.5 355.3L610.3 354.4L610.3 351.6L612.5 352.5ZM610.3 354.4L608.5 353.2L608.5 350.5L610.3 351.6ZM608.5 353.2L607.3 351.9L607.3 349.2L608.5 350.5ZM607.3 351.9L606.7 350.5L606.7 347.7L607.3 349.2Z"/><path class="iso-top" d="M628.5 351.8L626.2 352.7L623.6 353.3L620.8 353.6L617.9 353.5L615.1 353.2L612.5 352.5L610.3 351.6L608.5 350.5L607.3 349.2L606.7 347.7L606.7 346.3L607.4 344.9L608.7 343.6L610.6 342.5L612.9 341.6L615.5 341L618.3 340.7L621.2 340.7L624 341.1L626.6 341.7L628.8 342.7L630.6 343.8L631.8 345.1L632.4 346.5L632.3 348L631.6 349.4L630.4 350.7Z"/><path class="iso-line iso-crease" data-tone="faint" d="M632.4 346.5L632.3 348L631.6 349.4L630.4 350.7L628.5 351.8L626.2 352.7L623.6 353.3L620.8 353.6L617.9 353.5L615.1 353.2L612.5 352.5L610.3 351.6L608.5 350.5L607.3 349.2L606.7 347.7"/><path class="iso-line iso-edge" data-tone="lo" d="M606.7 347.7L606.7 346.3L607.4 344.9L608.7 343.6L610.6 342.5L612.9 341.6L615.5 341L618.3 340.7L621.2 340.7L624 341.1L626.6 341.7L628.8 342.7L630.6 343.8L631.8 345.1L632.4 346.5M632.4 349.3L632.3 350.7L631.6 352.1L630.4 353.4L628.5 354.5L626.2 355.4L623.6 356L620.8 356.3L617.9 356.3L615.1 355.9L612.5 355.3L610.3 354.4L608.5 353.2L607.3 351.9L606.7 350.5M606.7 347.7L606.7 350.5M632.4 346.5L632.4 349.3"/></g><g class="iso-solid"><path class="iso-fill" d="M609.5 342.9L609.6 341.8L610.1 340.7L611.1 339.7L612.6 338.8L614.3 338.1L616.4 337.6L618.6 337.4L620.8 337.4L623 337.7L625 338.2L626.8 338.9L628.1 339.8L629.1 340.8L629.5 341.9L629.5 346.7L629.5 347.8L629 348.9L627.9 349.9L626.5 350.7L624.7 351.4L622.7 351.9L620.5 352.1L618.2 352.1L616.1 351.8L614.1 351.3L612.3 350.6L610.9 349.7L610 348.7L609.5 347.6Z"/><path class="iso-shade" data-shade="0" d="M626.5 350.7L624.7 351.4L624.7 346.7L626.5 346ZM629.5 346.7L629.5 347.8L629.5 343.1L629.5 341.9ZM629.5 347.8L629 348.9L629 344.2L629.5 343.1ZM629 348.9L627.9 349.9L627.9 345.2L629 344.2ZM627.9 349.9L626.5 350.7L626.5 346L627.9 345.2Z"/><path class="iso-shade" data-shade="1" d="M624.7 351.4L622.7 351.9L622.7 347.2L624.7 346.7ZM622.7 351.9L620.5 352.1L620.5 347.4L622.7 347.2Z"/><path class="iso-shade" data-shade="2" d="M620.5 352.1L618.2 352.1L618.2 347.4L620.5 347.4ZM618.2 352.1L616.1 351.8L616.1 347.1L618.2 347.4ZM616.1 351.8L614.1 351.3L614.1 346.6L616.1 347.1Z"/><path class="iso-shade" data-shade="3" d="M614.1 351.3L612.3 350.6L612.3 345.9L614.1 346.6ZM612.3 350.6L610.9 349.7L610.9 345L612.3 345.9ZM610.9 349.7L610 348.7L610 344L610.9 345ZM610 348.7L609.5 347.6L609.5 342.9L610 344Z"/><path class="iso-top" d="M626.5 346L624.7 346.7L622.7 347.2L620.5 347.4L618.2 347.4L616.1 347.1L614.1 346.6L612.3 345.9L610.9 345L610 344L609.5 342.9L609.6 341.8L610.1 340.7L611.1 339.7L612.6 338.8L614.3 338.1L616.4 337.6L618.6 337.4L620.8 337.4L623 337.7L625 338.2L626.8 338.9L628.1 339.8L629.1 340.8L629.5 341.9L629.5 343.1L629 344.2L627.9 345.2Z"/><path class="iso-line iso-crease" data-tone="faint" d="M629.5 341.9L629.5 343.1L629 344.2L627.9 345.2L626.5 346L624.7 346.7L622.7 347.2L620.5 347.4L618.2 347.4L616.1 347.1L614.1 346.6L612.3 345.9L610.9 345L610 344L609.5 342.9"/><path class="iso-line iso-edge" data-tone="mid" d="M609.5 342.9L609.6 341.8L610.1 340.7L611.1 339.7L612.6 338.8L614.3 338.1L616.4 337.6L618.6 337.4L620.8 337.4L623 337.7L625 338.2L626.8 338.9L628.1 339.8L629.1 340.8L629.5 341.9M629.5 346.7L629.5 347.8L629 348.9L627.9 349.9L626.5 350.7L624.7 351.4L622.7 351.9L620.5 352.1L618.2 352.1L616.1 351.8L614.1 351.3L612.3 350.6L610.9 349.7L610 348.7L609.5 347.6M609.5 342.9L609.5 347.6M629.5 341.9L629.5 346.7"/></g><path class="iso-line" data-tone="lo" d="M626.5 350.3L626.5 346.5M624.4 351L624.4 347.3M622 351.5L622 347.8M619.4 351.7L619.4 347.9M616.8 351.5L616.8 347.7M614.4 350.9L614.4 347.2M612.3 350.1L612.3 346.4M610.8 349.1L610.8 345.3M609.8 347.9L609.8 344.1M629.2 348L629.2 344.3M628.1 349.2L628.1 345.5"/><g class="iso-solid"><path class="iso-fill" d="M474.6 411.5L474.7 410.1L475.4 408.7L476.7 407.4L478.5 406.3L480.8 405.4L483.4 404.8L486.3 404.5L489.1 404.5L492 404.8L494.5 405.5L496.8 406.4L498.5 407.6L499.7 408.9L500.3 410.3L500.3 413L500.3 414.5L499.6 415.9L498.3 417.2L496.4 418.3L494.2 419.2L491.5 419.8L488.7 420.1L485.8 420L483 419.7L480.4 419L478.2 418.1L476.4 417L475.2 415.7L474.6 414.2Z"/><path class="iso-shade" data-shade="0" d="M496.4 418.3L494.2 419.2L494.2 416.4L496.4 415.5ZM500.3 413L500.3 414.5L500.3 411.7L500.3 410.3ZM500.3 414.5L499.6 415.9L499.6 413.1L500.3 411.7ZM499.6 415.9L498.3 417.2L498.3 414.4L499.6 413.1ZM498.3 417.2L496.4 418.3L496.4 415.5L498.3 414.4Z"/><path class="iso-shade" data-shade="1" d="M494.2 419.2L491.5 419.8L491.5 417L494.2 416.4ZM491.5 419.8L488.7 420.1L488.7 417.3L491.5 417Z"/><path class="iso-shade" data-shade="2" d="M488.7 420.1L485.8 420L485.8 417.3L488.7 417.3ZM485.8 420L483 419.7L483 417L485.8 417.3ZM483 419.7L480.4 419L480.4 416.3L483 417Z"/><path class="iso-shade" data-shade="3" d="M480.4 419L478.2 418.1L478.2 415.4L480.4 416.3ZM478.2 418.1L476.4 417L476.4 414.2L478.2 415.4ZM476.4 417L475.2 415.7L475.2 412.9L476.4 414.2ZM475.2 415.7L474.6 414.2L474.6 411.5L475.2 412.9Z"/><path class="iso-top" d="M496.4 415.5L494.2 416.4L491.5 417L488.7 417.3L485.8 417.3L483 417L480.4 416.3L478.2 415.4L476.4 414.2L475.2 412.9L474.6 411.5L474.7 410.1L475.4 408.7L476.7 407.4L478.5 406.3L480.8 405.4L483.4 404.8L486.3 404.5L489.1 404.5L492 404.8L494.5 405.5L496.8 406.4L498.5 407.6L499.7 408.9L500.3 410.3L500.3 411.7L499.6 413.1L498.3 414.4Z"/><path class="iso-line iso-crease" data-tone="faint" d="M500.3 410.3L500.3 411.7L499.6 413.1L498.3 414.4L496.4 415.5L494.2 416.4L491.5 417L488.7 417.3L485.8 417.3L483 417L480.4 416.3L478.2 415.4L476.4 414.2L475.2 412.9L474.6 411.5"/><path class="iso-line iso-edge" data-tone="lo" d="M474.6 411.5L474.7 410.1L475.4 408.7L476.7 407.4L478.5 406.3L480.8 405.4L483.4 404.8L486.3 404.5L489.1 404.5L492 404.8L494.5 405.5L496.8 406.4L498.5 407.6L499.7 408.9L500.3 410.3M500.3 413L500.3 414.5L499.6 415.9L498.3 417.2L496.4 418.3L494.2 419.2L491.5 419.8L488.7 420.1L485.8 420L483 419.7L480.4 419L478.2 418.1L476.4 417L475.2 415.7L474.6 414.2M474.6 411.5L474.6 414.2M500.3 410.3L500.3 413"/></g><g class="iso-solid"><path class="iso-fill" d="M477.5 406.7L477.5 405.5L478.1 404.4L479.1 403.4L480.5 402.6L482.3 401.9L484.3 401.4L486.5 401.2L488.8 401.2L491 401.5L493 402L494.7 402.7L496.1 403.6L497 404.6L497.5 405.7L497.5 410.4L497.4 411.6L496.9 412.6L495.9 413.6L494.5 414.5L492.7 415.2L490.6 415.7L488.4 415.9L486.2 415.9L484 415.6L482 415.1L480.3 414.4L478.9 413.5L477.9 412.5L477.5 411.4Z"/><path class="iso-shade" data-shade="0" d="M494.5 414.5L492.7 415.2L492.7 410.5L494.5 409.8ZM497.5 410.4L497.4 411.6L497.4 406.8L497.5 405.7ZM497.4 411.6L496.9 412.6L496.9 407.9L497.4 406.8ZM496.9 412.6L495.9 413.6L495.9 408.9L496.9 407.9ZM495.9 413.6L494.5 414.5L494.5 409.8L495.9 408.9Z"/><path class="iso-shade" data-shade="1" d="M492.7 415.2L490.6 415.7L490.6 410.9L492.7 410.5ZM490.6 415.7L488.4 415.9L488.4 411.2L490.6 410.9Z"/><path class="iso-shade" data-shade="2" d="M488.4 415.9L486.2 415.9L486.2 411.2L488.4 411.2ZM486.2 415.9L484 415.6L484 410.9L486.2 411.2ZM484 415.6L482 415.1L482 410.4L484 410.9Z"/><path class="iso-shade" data-shade="3" d="M482 415.1L480.3 414.4L480.3 409.7L482 410.4ZM480.3 414.4L478.9 413.5L478.9 408.8L480.3 409.7ZM478.9 413.5L477.9 412.5L477.9 407.8L478.9 408.8ZM477.9 412.5L477.5 411.4L477.5 406.7L477.9 407.8Z"/><path class="iso-top" d="M494.5 409.8L492.7 410.5L490.6 410.9L488.4 411.2L486.2 411.2L484 410.9L482 410.4L480.3 409.7L478.9 408.8L477.9 407.8L477.5 406.7L477.5 405.5L478.1 404.4L479.1 403.4L480.5 402.6L482.3 401.9L484.3 401.4L486.5 401.2L488.8 401.2L491 401.5L493 402L494.7 402.7L496.1 403.6L497 404.6L497.5 405.7L497.4 406.8L496.9 407.9L495.9 408.9Z"/><path class="iso-line iso-crease" data-tone="faint" d="M497.5 405.7L497.4 406.8L496.9 407.9L495.9 408.9L494.5 409.8L492.7 410.5L490.6 410.9L488.4 411.2L486.2 411.2L484 410.9L482 410.4L480.3 409.7L478.9 408.8L477.9 407.8L477.5 406.7"/><path class="iso-line iso-edge" data-tone="mid" d="M477.5 406.7L477.5 405.5L478.1 404.4L479.1 403.4L480.5 402.6L482.3 401.9L484.3 401.4L486.5 401.2L488.8 401.2L491 401.5L493 402L494.7 402.7L496.1 403.6L497 404.6L497.5 405.7M497.5 410.4L497.4 411.6L496.9 412.6L495.9 413.6L494.5 414.5L492.7 415.2L490.6 415.7L488.4 415.9L486.2 415.9L484 415.6L482 415.1L480.3 414.4L478.9 413.5L477.9 412.5L477.5 411.4M477.5 406.7L477.5 411.4M497.5 405.7L497.5 410.4"/></g><path class="iso-line" data-tone="lo" d="M494.5 414L494.5 410.3M492.3 414.8L492.3 411.1M489.9 415.3L489.9 411.5M487.3 415.4L487.3 411.7M484.7 415.2L484.7 411.5M482.3 414.7L482.3 411M480.3 413.9L480.3 410.2M478.7 412.8L478.7 409.1M477.7 411.6L477.7 407.9M497.1 411.8L497.1 408.1M496.1 413L496.1 409.3"/><g class="iso-solid"><path class="iso-fill" d="M174.9 250.1L175.1 248.8L175.8 247.5L176.9 246.3L178.3 245.1L180.1 244.1L341.1 166.4L343.1 165.5L345.5 164.8L348 164.3L350.6 164.1L353.3 164L356 164.1L358.6 164.4L361.1 165L363.4 165.7L365.4 166.6L660.3 319.3L662 320.3L663.4 321.5L664.4 322.8L665 324.1L665.1 325.4L665.1 342.8L664.9 344.2L664.2 345.5L663.1 346.7L661.7 347.8L659.9 348.9L498.9 426.6L496.9 427.4L494.5 428.1L492 428.6L489.4 428.9L486.7 429L484 428.9L481.4 428.5L478.9 428L476.6 427.3L474.6 426.4L179.7 273.7L178 272.6L176.6 271.5L175.6 270.2L175 268.9L174.9 267.5Z"/><path class="iso-shade" data-shade="0" d="M665.1 342.8L664.9 344.2L664.9 326.8L665.1 325.4ZM664.9 344.2L664.2 345.5L664.2 328.1L664.9 326.8ZM664.2 345.5L663.1 346.7L663.1 329.3L664.2 328.1ZM663.1 346.7L661.7 347.8L661.7 330.5L663.1 329.3ZM661.7 347.8L659.9 348.9L659.9 331.5L661.7 330.5ZM659.9 348.9L498.9 426.6L498.9 409.2L659.9 331.5ZM498.9 426.6L496.9 427.4L496.9 410L498.9 409.2ZM496.9 427.4L494.5 428.1L494.5 410.7L496.9 410Z"/><path class="iso-shade" data-shade="1" d="M494.5 428.1L492 428.6L492 411.2L494.5 410.7ZM492 428.6L489.4 428.9L489.4 411.5L492 411.2ZM489.4 428.9L486.7 429L486.7 411.6L489.4 411.5Z"/><path class="iso-shade" data-shade="2" d="M486.7 429L484 428.9L484 411.5L486.7 411.6ZM484 428.9L481.4 428.5L481.4 411.1L484 411.5ZM481.4 428.5L478.9 428L478.9 410.6L481.4 411.1Z"/><path class="iso-shade" data-shade="3" d="M478.9 428L476.6 427.3L476.6 409.9L478.9 410.6ZM476.6 427.3L474.6 426.4L474.6 409L476.6 409.9ZM474.6 426.4L179.7 273.7L179.7 256.3L474.6 409ZM179.7 273.7L178 272.6L178 255.2L179.7 256.3ZM178 272.6L176.6 271.5L176.6 254.1L178 255.2ZM176.6 271.5L175.6 270.2L175.6 252.8L176.6 254.1ZM175.6 270.2L175 268.9L175 251.5L175.6 252.8ZM175 268.9L174.9 267.5L174.9 250.1L175 251.5Z"/><path class="iso-top" d="M660.3 319.3L662 320.3L663.4 321.5L664.4 322.8L665 324.1L665.1 325.4L664.9 326.8L664.2 328.1L663.1 329.3L661.7 330.5L659.9 331.5L498.9 409.2L496.9 410L494.5 410.7L492 411.2L489.4 411.5L486.7 411.6L484 411.5L481.4 411.1L478.9 410.6L476.6 409.9L474.6 409L179.7 256.3L178 255.2L176.6 254.1L175.6 252.8L175 251.5L174.9 250.1L175.1 248.8L175.8 247.5L176.9 246.3L178.3 245.1L180.1 244.1L341.1 166.4L343.1 165.5L345.5 164.8L348 164.3L350.6 164.1L353.3 164L356 164.1L358.6 164.4L361.1 165L363.4 165.7L365.4 166.6Z"/><path class="iso-line iso-crease" data-tone="faint" d="M665.1 325.4L664.9 326.8L664.2 328.1L663.1 329.3L661.7 330.5L659.9 331.5L498.9 409.2L496.9 410L494.5 410.7L492 411.2L489.4 411.5L486.7 411.6L484 411.5L481.4 411.1L478.9 410.6L476.6 409.9L474.6 409L179.7 256.3L178 255.2L176.6 254.1L175.6 252.8L175 251.5L174.9 250.1"/><path class="iso-line iso-bevel" data-tone="faint" d="M665.1 325.4L662.1 326.5L661.5 327.6L660.6 328.6L659.4 329.6L657.8 330.5L497 408.1L495.2 408.9L493.3 409.4L491.2 409.8L489 410.1L486.7 410.2L484.5 410.1L482.3 409.8L480.2 409.3L478.4 408.7L476.6 407.9L181.8 255.3L180.3 254.4L179.2 253.4L178.3 252.4L177.9 251.3L174.9 250.1"/><path class="iso-line iso-edge" data-tone="mid" d="M174.9 250.1L175.1 248.8L175.8 247.5L176.9 246.3L178.3 245.1L180.1 244.1L341.1 166.4L343.1 165.5L345.5 164.8L348 164.3L350.6 164.1L353.3 164L356 164.1L358.6 164.4L361.1 165L363.4 165.7L365.4 166.6L660.3 319.3L662 320.3L663.4 321.5L664.4 322.8L665 324.1L665.1 325.4M665.1 342.8L664.9 344.2L664.2 345.5L663.1 346.7L661.7 347.8L659.9 348.9L498.9 426.6L496.9 427.4L494.5 428.1L492 428.6L489.4 428.9L486.7 429L484 428.9L481.4 428.5L478.9 428L476.6 427.3L474.6 426.4L179.7 273.7L178 272.6L176.6 271.5L175.6 270.2L175 268.9L174.9 267.5M665.1 325.4L665.1 342.8M174.9 250.1L174.9 267.5"/></g><path class="iso-line" data-tone="lo" d="M654.1 322.3L655.2 322.9L655.9 323.7L656.4 324.5L656.5 325.3L656.3 326.2L655.8 327L655 327.7L653.9 328.4L493 406.1L491.6 406.6L490.1 407L488.5 407.2L486.8 407.3L485.2 407.2L483.6 406.9L482.1 406.5L480.8 406L185.9 253.3L184.8 252.6L184.1 251.9L183.6 251.1L183.5 250.2L183.7 249.4L184.2 248.6L185 247.8L186.1 247.2L347 169.5L348.4 169L349.9 168.6L351.5 168.3L353.2 168.3L354.8 168.4L356.4 168.6L357.9 169L359.2 169.6Z"/><path class="iso-line" data-tone="lo" d="M356 174.1L354.6 174.6L352.9 174.7L351.3 174.5L349.9 174.1L349 173.4L348.7 172.5L349.1 171.7L350 171L351.4 170.6L353.1 170.4L354.7 170.6L356.1 171.1L357 171.8L357.3 172.6L357 173.4ZM650.9 326.8L649.5 327.3L647.9 327.4L646.2 327.2L644.8 326.8L643.9 326.1L643.6 325.2L644 324.4L644.9 323.7L646.4 323.3L648 323.1L649.7 323.3L651 323.8L651.9 324.5L652.2 325.3L651.9 326.1ZM195.1 251.8L193.6 252.3L192 252.4L190.3 252.3L189 251.8L188.1 251.1L187.8 250.3L188.1 249.4L189.1 248.7L190.5 248.3L192.1 248.1L193.8 248.3L195.2 248.8L196.1 249.5L196.4 250.3L196 251.1ZM490 404.5L488.6 405L486.9 405.1L485.3 405L483.9 404.5L483 403.8L482.7 403L483 402.1L484 401.4L485.4 401L487.1 400.8L488.7 401L490.1 401.5L491 402.2L491.3 403L490.9 403.8Z"/><g class="iso-dots" data-tone="hi"><circle cx="353" cy="172.6" r="0.6"/><circle cx="647.9" cy="325.3" r="0.6"/><circle cx="192.1" cy="250.3" r="0.6"/><circle cx="487" cy="403" r="0.6"/></g><g class="iso-solid"><path class="iso-fill" d="M197.8 254.9L198 254.5L198.5 254.2L204.7 251.2L205.4 251L206.2 250.9L207 251L207.7 251.2L483.7 394.1L484.2 394.5L484.3 394.9L484.3 395.9L484.1 396.3L483.7 396.6L477.5 399.6L476.8 399.8L475.9 399.9L475.1 399.8L474.4 399.6L198.4 256.7L198 256.3L197.8 255.9Z"/><path class="iso-shade" data-shade="0" d="M484.3 395.9L484.1 396.3L484.1 395.3L484.3 394.9ZM484.1 396.3L483.7 396.6L483.7 395.6L484.1 395.3ZM483.7 396.6L477.5 399.6L477.5 398.6L483.7 395.6ZM477.5 399.6L476.8 399.8L476.8 398.8L477.5 398.6Z"/><path class="iso-shade" data-shade="1" d="M476.8 399.8L475.9 399.9L475.9 398.9L476.8 398.8Z"/><path class="iso-shade" data-shade="2" d="M475.9 399.9L475.1 399.8L475.1 398.8L475.9 398.9Z"/><path class="iso-shade" data-shade="3" d="M475.1 399.8L474.4 399.6L474.4 398.6L475.1 398.8ZM474.4 399.6L198.4 256.7L198.4 255.7L474.4 398.6ZM198.4 256.7L198 256.3L198 255.3L198.4 255.7ZM198 256.3L197.8 255.9L197.8 254.9L198 255.3Z"/><path class="iso-top" d="M483.7 394.1L484.2 394.5L484.3 394.9L484.1 395.3L483.7 395.6L477.5 398.6L476.8 398.8L475.9 398.9L475.1 398.8L474.4 398.6L198.4 255.7L198 255.3L197.8 254.9L198 254.5L198.5 254.2L204.7 251.2L205.4 251L206.2 250.9L207 251L207.7 251.2Z"/><path class="iso-line iso-edge" data-tone="lo" d="M197.8 254.9L198 254.5L198.5 254.2L204.7 251.2L205.4 251L206.2 250.9L207 251L207.7 251.2L483.7 394.1L484.2 394.5L484.3 394.9M484.3 395.9L484.1 396.3L483.7 396.6L477.5 399.6L476.8 399.8L475.9 399.9L475.1 399.8L474.4 399.6L198.4 256.7L198 256.3L197.8 255.9M484.3 394.9L484.3 395.9M197.8 254.9L197.8 255.9"/></g><path class="iso-line" data-tone="lo" d="M215.2 256.1L212.6 257.3M225.1 261.3L222.5 262.5M230.1 263.8L227.5 265.1M235.1 266.4L232.5 267.7M240.1 269L237.5 270.2M250 274.1L247.5 275.4M255 276.7L252.4 278M260 279.3L257.4 280.6M265 281.9L262.4 283.1M274.9 287L272.4 288.3M279.9 289.6L277.3 290.9M284.9 292.2L282.3 293.4M289.9 294.8L287.3 296M299.8 299.9L297.3 301.2M304.8 302.5L302.2 303.8M309.8 305.1L307.2 306.3M314.8 307.7L312.2 308.9M324.8 312.8L322.2 314.1M329.7 315.4L327.2 316.7M334.7 318L332.1 319.2M339.7 320.6L337.1 321.8M349.7 325.7L347.1 327M354.6 328.3L352.1 329.6M359.6 330.9L357 332.1M364.6 333.5L362 334.7M374.6 338.6L372 339.9M379.6 341.2L377 342.5M384.5 343.8L382 345M389.5 346.4L386.9 347.6M399.5 351.5L396.9 352.8M404.5 354.1L401.9 355.4M409.4 356.7L406.9 357.9M414.4 359.3L411.8 360.5M424.4 364.4L421.8 365.7M429.4 367L426.8 368.2M434.4 369.6L431.8 370.8M439.3 372.2L436.8 373.4M449.3 377.3L446.7 378.6M454.3 379.9L451.7 381.1M459.3 382.5L456.7 383.7M464.2 385.1L461.7 386.3M474.2 390.2L471.6 391.5"/><path class="iso-line" data-tone="mid" d="M220.1 258.7L215.5 260.9M245 271.6L240.4 273.8M270 284.5L265.3 286.7M294.9 297.4L290.2 299.6M319.8 310.3L315.1 312.5M344.7 323.2L340 325.4M369.6 336.1L364.9 338.3M394.5 348.9L389.9 351.2M419.4 361.8L414.8 364.1M444.3 374.7L439.7 377M469.2 387.6L464.6 389.9"/><g class="iso-dots" data-tone="mid"><circle cx="204.6" cy="254.2" r="0.5"/><circle cx="477.6" cy="395.6" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M436.3 234.8L436.3 234.1L437.1 233.4L457.7 223.5L459 223.1L460.5 223.1L461.8 223.5L547.4 267.9L548.2 268.5L548.2 269.8L548.1 270.5L547.4 271.1L526.7 281.1L525.4 281.5L524 281.5L522.7 281.1L437 236.7L436.3 236.1Z"/><path class="iso-shade" data-shade="0" d="M548.2 269.8L548.1 270.5L548.1 269.3L548.2 268.5ZM548.1 270.5L547.4 271.1L547.4 269.9L548.1 269.3ZM547.4 271.1L526.7 281.1L526.7 279.9L547.4 269.9Z"/><path class="iso-shade" data-shade="1" d="M526.7 281.1L525.4 281.5L525.4 280.2L526.7 279.9Z"/><path class="iso-shade" data-shade="2" d="M525.4 281.5L524 281.5L524 280.2L525.4 280.2Z"/><path class="iso-shade" data-shade="3" d="M524 281.5L522.7 281.1L522.7 279.8L524 280.2ZM522.7 281.1L437 236.7L437 235.5L522.7 279.8ZM437 236.7L436.3 236.1L436.3 234.8L437 235.5Z"/><path class="iso-top" d="M547.4 267.9L548.2 268.5L548.1 269.3L547.4 269.9L526.7 279.9L525.4 280.2L524 280.2L522.7 279.8L437 235.5L436.3 234.8L436.3 234.1L437.1 233.4L457.7 223.5L459 223.1L460.5 223.1L461.8 223.5Z"/><path class="iso-line iso-crease" data-tone="lo" d="M548.2 268.5L548.1 269.3L547.4 269.9L526.7 279.9L525.4 280.2L524 280.2L522.7 279.8L437 235.5L436.3 234.8"/><path class="iso-line iso-edge" data-tone="hi" d="M436.3 234.8L436.3 234.1L437.1 233.4L457.7 223.5L459 223.1L460.5 223.1L461.8 223.5L547.4 267.9L548.2 268.5M548.2 269.8L548.1 270.5L547.4 271.1L526.7 281.1L525.4 281.5L524 281.5L522.7 281.1L437 236.7L436.3 236.1M548.2 268.5L548.2 269.8M436.3 234.8L436.3 236.1"/></g><path class="iso-line" data-tone="faint" d="M545.4 268.9L524.7 278.8L439.1 234.5L459.7 224.5Z"/><path class="iso-line" data-tone="lo" data-free="" d="M460.5 230.1L534.2 268.3"/><path class="iso-line" data-tone="lo" data-free="" d="M459.3 234.6L525.1 268.7"/><path class="iso-line" data-tone="lo" data-free="" d="M460.2 240.2L514 268.1"/><g class="iso-dots" data-tone="mid"><circle cx="451.4" cy="230.5" r="0.45"/><circle cx="533.1" cy="272.8" r="0.45"/></g><g class="iso-solid"><path class="iso-fill" d="M330.6 197.1L330.7 196.5L331.2 196.1L335.4 194.1L336.3 193.8L337.4 193.8L338.4 194.1L594.5 326.7L595 327.2L595 332.1L595 332.7L594.4 333.2L590.3 335.2L589.3 335.4L588.2 335.4L587.2 335.1L331.2 202.6L330.6 202.1Z"/><path class="iso-shade" data-shade="0" d="M595 332.1L595 332.7L595 327.7L595 327.2ZM595 332.7L594.4 333.2L594.4 328.2L595 327.7ZM594.4 333.2L590.3 335.2L590.3 330.2L594.4 328.2Z"/><path class="iso-shade" data-shade="1" d="M590.3 335.2L589.3 335.4L589.3 330.5L590.3 330.2Z"/><path class="iso-shade" data-shade="2" d="M589.3 335.4L588.2 335.4L588.2 330.5L589.3 330.5Z"/><path class="iso-shade" data-shade="3" d="M588.2 335.4L587.2 335.1L587.2 330.2L588.2 330.5ZM587.2 335.1L331.2 202.6L331.2 197.6L587.2 330.2ZM331.2 202.6L330.6 202.1L330.6 197.1L331.2 197.6Z"/><path class="iso-top" d="M594.5 326.7L595 327.2L595 327.7L594.4 328.2L590.3 330.2L589.3 330.5L588.2 330.5L587.2 330.2L331.2 197.6L330.6 197.1L330.7 196.5L331.2 196.1L335.4 194.1L336.3 193.8L337.4 193.8L338.4 194.1Z"/><path class="iso-line iso-crease" data-tone="faint" d="M595 327.2L595 327.7L594.4 328.2L590.3 330.2L589.3 330.5L588.2 330.5L587.2 330.2L331.2 197.6L330.6 197.1"/><path class="iso-line iso-bevel" data-tone="faint" d="M595 327.2L594.3 327.6L593.8 328L589.9 329.9L589.1 330.1L588.4 330.1L587.7 329.9L331.8 197.4L330.6 197.1"/><path class="iso-line iso-edge" data-tone="mid" d="M330.6 197.1L330.7 196.5L331.2 196.1L335.4 194.1L336.3 193.8L337.4 193.8L338.4 194.1L594.5 326.7L595 327.2M595 332.1L595 332.7L594.4 333.2L590.3 335.2L589.3 335.4L588.2 335.4L587.2 335.1L331.2 202.6L330.6 202.1M595 327.2L595 332.1M330.6 197.1L330.6 202.1"/></g><g class="iso-dots" data-tone="mid"><circle cx="341.3" cy="199.2" r="0.5"/><circle cx="584.4" cy="325.1" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M248.1 237L248.1 236.4L248.7 235.9L252.8 233.9L253.8 233.7L254.9 233.7L255.9 234L511.9 366.5L512.5 367L512.5 372L512.4 372.6L511.9 373L507.7 375L506.8 375.3L505.7 375.3L504.7 375L248.6 242.4L248.1 241.9Z"/><path class="iso-shade" data-shade="0" d="M512.5 372L512.4 372.6L512.4 367.6L512.5 367ZM512.4 372.6L511.9 373L511.9 368.1L512.4 367.6ZM511.9 373L507.7 375L507.7 370.1L511.9 368.1Z"/><path class="iso-shade" data-shade="1" d="M507.7 375L506.8 375.3L506.8 370.3L507.7 370.1Z"/><path class="iso-shade" data-shade="2" d="M506.8 375.3L505.7 375.3L505.7 370.3L506.8 370.3Z"/><path class="iso-shade" data-shade="3" d="M505.7 375.3L504.7 375L504.7 370L505.7 370.3ZM504.7 375L248.6 242.4L248.6 237.4L504.7 370ZM248.6 242.4L248.1 241.9L248.1 237L248.6 237.4Z"/><path class="iso-top" d="M511.9 366.5L512.5 367L512.4 367.6L511.9 368.1L507.7 370.1L506.8 370.3L505.7 370.3L504.7 370L248.6 237.4L248.1 237L248.1 236.4L248.7 235.9L252.8 233.9L253.8 233.7L254.9 233.7L255.9 234Z"/><path class="iso-line iso-crease" data-tone="faint" d="M512.5 367L512.4 367.6L511.9 368.1L507.7 370.1L506.8 370.3L505.7 370.3L504.7 370L248.6 237.4L248.1 237"/><path class="iso-line iso-bevel" data-tone="faint" d="M512.5 367L511.8 367.5L511.3 367.8L507.3 369.8L506.6 370L505.8 370L505.1 369.7L249.2 237.2L248.1 237"/><path class="iso-line iso-edge" data-tone="mid" d="M248.1 237L248.1 236.4L248.7 235.9L252.8 233.9L253.8 233.7L254.9 233.7L255.9 234L511.9 366.5L512.5 367M512.5 372L512.4 372.6L511.9 373L507.7 375L506.8 375.3L505.7 375.3L504.7 375L248.6 242.4L248.1 241.9M512.5 367L512.5 372M248.1 237L248.1 241.9"/></g><g class="iso-dots" data-tone="mid"><circle cx="258.7" cy="239.1" r="0.5"/><circle cx="501.8" cy="364.9" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M238.3 228.4L238.5 227.8L239.1 227.4L333 182L334 181.7L335.1 181.6L336.2 181.7L337.1 182.1L340.1 183.6L340.7 184.1L340.9 184.6L340.9 195.8L340.6 196.3L340 196.8L246.1 242.1L245.2 242.4L244.1 242.5L243 242.4L242.1 242.1L239.1 240.6L238.5 240.1L238.3 239.5Z"/><path class="iso-shade" data-shade="0" d="M340.9 195.8L340.6 196.3L340.6 185.2L340.9 184.6ZM340.6 196.3L340 196.8L340 185.6L340.6 185.2ZM340 196.8L246.1 242.1L246.1 231L340 185.6ZM246.1 242.1L245.2 242.4L245.2 231.3L246.1 231Z"/><path class="iso-shade" data-shade="1" d="M245.2 242.4L244.1 242.5L244.1 231.4L245.2 231.3Z"/><path class="iso-shade" data-shade="2" d="M244.1 242.5L243 242.4L243 231.2L244.1 231.4Z"/><path class="iso-shade" data-shade="3" d="M243 242.4L242.1 242.1L242.1 230.9L243 231.2ZM242.1 242.1L239.1 240.6L239.1 229.4L242.1 230.9ZM239.1 240.6L238.5 240.1L238.5 228.9L239.1 229.4ZM238.5 240.1L238.3 239.5L238.3 228.4L238.5 228.9Z"/><path class="iso-top" d="M340.1 183.6L340.7 184.1L340.9 184.6L340.6 185.2L340 185.6L246.1 231L245.2 231.3L244.1 231.4L243 231.2L242.1 230.9L239.1 229.4L238.5 228.9L238.3 228.4L238.5 227.8L239.1 227.4L333 182L334 181.7L335.1 181.6L336.2 181.7L337.1 182.1Z"/><path class="iso-line iso-crease" data-tone="faint" d="M340.9 184.6L340.6 185.2L340 185.6L246.1 231L245.2 231.3L244.1 231.4L243 231.2L242.1 230.9L239.1 229.4L238.5 228.9L238.3 228.4"/><path class="iso-line iso-bevel" data-tone="faint" d="M340.9 184.6L339.6 184.9L339.1 185.3L245.4 230.5L244.7 230.7L244.1 230.8L243.4 230.7L242.8 230.5L240 229L239.5 228.7L238.3 228.4"/><path class="iso-line iso-edge" data-tone="mid" d="M238.3 228.4L238.5 227.8L239.1 227.4L333 182L334 181.7L335.1 181.6L336.2 181.7L337.1 182.1L340.1 183.6L340.7 184.1L340.9 184.6M340.9 195.8L340.6 196.3L340 196.8L246.1 242.1L245.2 242.4L244.1 242.5L243 242.4L242.1 242.1L239.1 240.6L238.5 240.1L238.3 239.5M340.9 184.6L340.9 195.8M238.3 228.4L238.3 239.5"/></g><g class="iso-dots" data-tone="hi"><circle cx="330.3" cy="186.8" r="0.6"/><circle cx="243.7" cy="228.7" r="0.6"/></g><g class="iso-solid"><path class="iso-fill" d="M504.3 366.1L504.5 365.5L505.2 365.1L599 319.8L600 319.5L601.1 319.4L602.2 319.5L603.1 319.8L606.1 321.3L606.7 321.8L606.9 322.4L606.9 333.5L606.7 334.1L606 334.5L512.1 379.9L511.2 380.2L510.1 380.3L509 380.2L508.1 379.8L505.1 378.3L504.5 377.8L504.3 377.3Z"/><path class="iso-shade" data-shade="0" d="M606.9 333.5L606.7 334.1L606.7 322.9L606.9 322.4ZM606.7 334.1L606 334.5L606 323.4L606.7 322.9ZM606 334.5L512.1 379.9L512.1 368.7L606 323.4ZM512.1 379.9L511.2 380.2L511.2 369L512.1 368.7Z"/><path class="iso-shade" data-shade="1" d="M511.2 380.2L510.1 380.3L510.1 369.1L511.2 369Z"/><path class="iso-shade" data-shade="2" d="M510.1 380.3L509 380.2L509 369L510.1 369.1Z"/><path class="iso-shade" data-shade="3" d="M509 380.2L508.1 379.8L508.1 368.7L509 369ZM508.1 379.8L505.1 378.3L505.1 367.1L508.1 368.7ZM505.1 378.3L504.5 377.8L504.5 366.6L505.1 367.1ZM504.5 377.8L504.3 377.3L504.3 366.1L504.5 366.6Z"/><path class="iso-top" d="M606.1 321.3L606.7 321.8L606.9 322.4L606.7 322.9L606 323.4L512.1 368.7L511.2 369L510.1 369.1L509 369L508.1 368.7L505.1 367.1L504.5 366.6L504.3 366.1L504.5 365.5L505.2 365.1L599 319.8L600 319.5L601.1 319.4L602.2 319.5L603.1 319.8Z"/><path class="iso-line iso-crease" data-tone="faint" d="M606.9 322.4L606.7 322.9L606 323.4L512.1 368.7L511.2 369L510.1 369.1L509 369L508.1 368.7L505.1 367.1L504.5 366.6L504.3 366.1"/><path class="iso-line iso-bevel" data-tone="faint" d="M606.9 322.4L605.6 322.7L605.1 323L511.4 368.2L510.8 368.5L510.1 368.5L509.5 368.5L508.8 368.2L506 366.8L505.6 366.4L504.3 366.1"/><path class="iso-line iso-edge" data-tone="mid" d="M504.3 366.1L504.5 365.5L505.2 365.1L599 319.8L600 319.5L601.1 319.4L602.2 319.5L603.1 319.8L606.1 321.3L606.7 321.8L606.9 322.4M606.9 333.5L606.7 334.1L606 334.5L512.1 379.9L511.2 380.2L510.1 380.3L509 380.2L508.1 379.8L505.1 378.3L504.5 377.8L504.3 377.3M606.9 322.4L606.9 333.5M504.3 366.1L504.3 377.3"/></g><g class="iso-dots" data-tone="hi"><circle cx="596.3" cy="324.5" r="0.6"/><circle cx="509.7" cy="366.4" r="0.6"/></g><g class="iso-solid"><path class="iso-fill" d="M327.7 231.4L328.2 229.2L329.6 227L331.8 225.1L334.7 223.3L338.2 221.9L342.2 220.9L346.5 220.3L351 220.1L355.5 220.4L359.8 221.1L363.7 222.2L367.1 223.6L369.9 225.4L372 227.4L373.2 229.6L373.6 231.8L373.6 241.7L373 244L371.7 246.1L369.5 248.1L366.6 249.8L363 251.2L359 252.2L354.7 252.8L350.2 253L345.7 252.7L341.5 252.1L337.5 251L334.1 249.5L331.3 247.7L329.3 245.7L328 243.6L327.7 241.3Z"/><path class="iso-shade" data-shade="0" d="M366.6 249.8L363 251.2L363 241.2L366.6 239.8ZM373.6 241.7L373 244L373 234L373.6 231.8ZM373 244L371.7 246.1L371.7 236.2L373 234ZM371.7 246.1L369.5 248.1L369.5 238.1L371.7 236.2ZM369.5 248.1L366.6 249.8L366.6 239.8L369.5 238.1Z"/><path class="iso-shade" data-shade="1" d="M363 251.2L359 252.2L359 242.3L363 241.2ZM359 252.2L354.7 252.8L354.7 242.9L359 242.3ZM354.7 252.8L350.2 253L350.2 243.1L354.7 242.9Z"/><path class="iso-shade" data-shade="2" d="M350.2 253L345.7 252.7L345.7 242.8L350.2 243.1ZM345.7 252.7L341.5 252.1L341.5 242.1L345.7 242.8ZM341.5 252.1L337.5 251L337.5 241L341.5 242.1Z"/><path class="iso-shade" data-shade="3" d="M337.5 251L334.1 249.5L334.1 239.6L337.5 241ZM334.1 249.5L331.3 247.7L331.3 237.8L334.1 239.6ZM331.3 247.7L329.3 245.7L329.3 235.8L331.3 237.8ZM329.3 245.7L328 243.6L328 233.6L329.3 235.8ZM328 243.6L327.7 241.3L327.7 231.4L328 233.6Z"/><path class="iso-top" d="M366.6 239.8L363 241.2L359 242.3L354.7 242.9L350.2 243.1L345.7 242.8L341.5 242.1L337.5 241L334.1 239.6L331.3 237.8L329.3 235.8L328 233.6L327.7 231.4L328.2 229.2L329.6 227L331.8 225.1L334.7 223.3L338.2 221.9L342.2 220.9L346.5 220.3L351 220.1L355.5 220.4L359.8 221.1L363.7 222.2L367.1 223.6L369.9 225.4L372 227.4L373.2 229.6L373.6 231.8L373 234L371.7 236.2L369.5 238.1Z"/><path class="iso-line iso-crease" data-tone="faint" d="M373.6 231.8L373 234L371.7 236.2L369.5 238.1L366.6 239.8L363 241.2L359 242.3L354.7 242.9L350.2 243.1L345.7 242.8L341.5 242.1L337.5 241L334.1 239.6L331.3 237.8L329.3 235.8L328 233.6L327.7 231.4"/><path class="iso-line iso-edge" data-tone="mid" d="M327.7 231.4L328.2 229.2L329.6 227L331.8 225.1L334.7 223.3L338.2 221.9L342.2 220.9L346.5 220.3L351 220.1L355.5 220.4L359.8 221.1L363.7 222.2L367.1 223.6L369.9 225.4L372 227.4L373.2 229.6L373.6 231.8M373.6 241.7L373 244L371.7 246.1L369.5 248.1L366.6 249.8L363 251.2L359 252.2L354.7 252.8L350.2 253L345.7 252.7L341.5 252.1L337.5 251L334.1 249.5L331.3 247.7L329.3 245.7L328 243.6L327.7 241.3M327.7 231.4L327.7 241.3M373.6 231.8L373.6 241.7"/></g><path class="iso-line" data-tone="lo" d="M373.6 231.6L373.3 233.4L372.4 235.1L371.1 236.8L369.2 238.3L366.8 239.7L364.1 240.9L361 241.8L357.7 242.5L354.2 242.9L350.6 243.1L347 242.9L343.5 242.5L340.2 241.8L337.1 240.9L334.4 239.7L332 238.3L330.2 236.8L328.8 235.1L327.9 233.4L327.7 231.6"/><g class="iso-dots" data-tone="lo"><circle cx="362.6" cy="237.8" r="0.5"/><circle cx="350.3" cy="240.2" r="0.5"/><circle cx="338.2" cy="237.6" r="0.5"/><circle cx="333.4" cy="231.4" r="0.5"/><circle cx="338.7" cy="225.4" r="0.5"/><circle cx="350.9" cy="223" r="0.5"/><circle cx="363" cy="225.6" r="0.5"/><circle cx="367.8" cy="231.7" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M339.1 67.5L339.4 66.4L340.1 65.3L341.2 64.4L342.6 63.5L344.4 62.8L346.4 62.3L348.6 62L350.8 61.9L353 62L355.2 62.4L357.2 62.9L358.9 63.6L360.3 64.5L361.3 65.5L361.9 66.6L362.1 67.7L362.1 231.7L361.8 232.8L361.1 233.9L360 234.9L358.6 235.7L356.8 236.4L354.8 236.9L352.7 237.2L350.4 237.3L348.2 237.2L346 236.9L344.1 236.3L342.4 235.6L341 234.7L339.9 233.7L339.3 232.6L339.1 231.5Z"/><path class="iso-shade" data-shade="0" d="M358.6 235.7L356.8 236.4L356.8 72.5L358.6 71.8ZM362.1 231.7L361.8 232.8L361.8 68.8L362.1 67.7ZM361.8 232.8L361.1 233.9L361.1 69.9L361.8 68.8ZM361.1 233.9L360 234.9L360 70.9L361.1 69.9ZM360 234.9L358.6 235.7L358.6 71.8L360 70.9Z"/><path class="iso-shade" data-shade="1" d="M356.8 236.4L354.8 236.9L354.8 73L356.8 72.5ZM354.8 236.9L352.7 237.2L352.7 73.3L354.8 73ZM352.7 237.2L350.4 237.3L350.4 73.4L352.7 73.3Z"/><path class="iso-shade" data-shade="2" d="M350.4 237.3L348.2 237.2L348.2 73.2L350.4 73.4ZM348.2 237.2L346 236.9L346 72.9L348.2 73.2ZM346 236.9L344.1 236.3L344.1 72.3L346 72.9Z"/><path class="iso-shade" data-shade="3" d="M344.1 236.3L342.4 235.6L342.4 71.6L344.1 72.3ZM342.4 235.6L341 234.7L341 70.7L342.4 71.6ZM341 234.7L339.9 233.7L339.9 69.7L341 70.7ZM339.9 233.7L339.3 232.6L339.3 68.7L339.9 69.7ZM339.3 232.6L339.1 231.5L339.1 67.5L339.3 68.7Z"/><path class="iso-top" d="M358.6 71.8L356.8 72.5L354.8 73L352.7 73.3L350.4 73.4L348.2 73.2L346 72.9L344.1 72.3L342.4 71.6L341 70.7L339.9 69.7L339.3 68.7L339.1 67.5L339.4 66.4L340.1 65.3L341.2 64.4L342.6 63.5L344.4 62.8L346.4 62.3L348.6 62L350.8 61.9L353 62L355.2 62.4L357.2 62.9L358.9 63.6L360.3 64.5L361.3 65.5L361.9 66.6L362.1 67.7L361.8 68.8L361.1 69.9L360 70.9Z"/><path class="iso-line iso-edge" data-tone="mid" d="M339.1 67.5L339.4 66.4L340.1 65.3L341.2 64.4L342.6 63.5L344.4 62.8L346.4 62.3L348.6 62L350.8 61.9L353 62L355.2 62.4L357.2 62.9L358.9 63.6L360.3 64.5L361.3 65.5L361.9 66.6L362.1 67.7M362.1 231.7L361.8 232.8L361.1 233.9L360 234.9L358.6 235.7L356.8 236.4L354.8 236.9L352.7 237.2L350.4 237.3L348.2 237.2L346 236.9L344.1 236.3L342.4 235.6L341 234.7L339.9 233.7L339.3 232.6L339.1 231.5M339.1 67.5L339.1 231.5M362.1 67.7L362.1 231.7"/></g><path class="iso-line" data-tone="faint" d="M362.1 198.1L361.9 199L361.5 199.8L360.8 200.7L359.9 201.4L358.7 202.1L357.4 202.7L355.8 203.2L354.2 203.5L352.4 203.7L350.6 203.8L348.8 203.7L347.1 203.5L345.4 203.2L343.9 202.7L342.5 202.1L341.3 201.4L340.4 200.7L339.7 199.8L339.3 199L339.1 198.1M362.1 160.8L361.9 161.7L361.5 162.6L360.8 163.4L359.9 164.2L358.7 164.8L357.4 165.4L355.8 165.9L354.2 166.2L352.4 166.5L350.6 166.5L348.8 166.5L347.1 166.2L345.4 165.9L343.9 165.4L342.5 164.8L341.3 164.2L340.4 163.4L339.7 162.6L339.3 161.7L339.1 160.8M362.1 98.7L361.9 99.6L361.5 100.5L360.8 101.3L359.9 102.1L358.7 102.7L357.4 103.3L355.8 103.8L354.2 104.1L352.4 104.4L350.6 104.4L348.8 104.4L347.1 104.1L345.4 103.8L343.9 103.3L342.5 102.7L341.3 102.1L340.4 101.3L339.7 100.5L339.3 99.6L339.1 98.7"/><g class="iso-solid"><path class="iso-fill" d="M328.7 113.8L328.7 113L329.3 112.1L330.4 111.4L346.9 103.4L348.4 102.9L350.1 102.6L351.9 102.7L353.6 102.9L355 103.5L371 111.7L372 112.5L372.5 113.3L372.5 133.2L372.5 134.1L371.9 135L370.8 135.7L354.3 143.6L352.8 144.2L351.1 144.4L349.3 144.4L347.6 144.1L346.2 143.6L330.3 135.3L329.2 134.6L328.7 133.7Z"/><path class="iso-shade" data-shade="0" d="M372.5 133.2L372.5 134.1L372.5 114.2L372.5 113.3ZM372.5 134.1L371.9 135L371.9 115.1L372.5 114.2ZM371.9 135L370.8 135.7L370.8 115.8L371.9 115.1ZM370.8 135.7L354.3 143.6L354.3 123.8L370.8 115.8ZM354.3 143.6L352.8 144.2L352.8 124.3L354.3 123.8Z"/><path class="iso-shade" data-shade="1" d="M352.8 144.2L351.1 144.4L351.1 124.5L352.8 124.3Z"/><path class="iso-shade" data-shade="2" d="M351.1 144.4L349.3 144.4L349.3 124.5L351.1 124.5ZM349.3 144.4L347.6 144.1L347.6 124.2L349.3 124.5Z"/><path class="iso-shade" data-shade="3" d="M347.6 144.1L346.2 143.6L346.2 123.7L347.6 124.2ZM346.2 143.6L330.3 135.3L330.3 115.4L346.2 123.7ZM330.3 135.3L329.2 134.6L329.2 114.7L330.3 115.4ZM329.2 134.6L328.7 133.7L328.7 113.8L329.2 114.7Z"/><path class="iso-top" d="M371 111.7L372 112.5L372.5 113.3L372.5 114.2L371.9 115.1L370.8 115.8L354.3 123.8L352.8 124.3L351.1 124.5L349.3 124.5L347.6 124.2L346.2 123.7L330.3 115.4L329.2 114.7L328.7 113.8L328.7 113L329.3 112.1L330.4 111.4L346.9 103.4L348.4 102.9L350.1 102.6L351.9 102.7L353.6 102.9L355 103.5Z"/><path class="iso-line iso-crease" data-tone="faint" d="M372.5 113.3L372.5 114.2L371.9 115.1L370.8 115.8L354.3 123.8L352.8 124.3L351.1 124.5L349.3 124.5L347.6 124.2L346.2 123.7L330.3 115.4L329.2 114.7L328.7 113.8"/><path class="iso-line iso-bevel" data-tone="faint" d="M372.5 113.3L371.1 114.1L370.6 114.7L369.7 115.3L353.4 123.2L352.2 123.6L350.9 123.8L349.6 123.8L348.3 123.6L347.2 123.2L331.4 115L330.5 114.4L328.7 113.8"/><path class="iso-line iso-edge" data-tone="mid" d="M328.7 113.8L328.7 113L329.3 112.1L330.4 111.4L346.9 103.4L348.4 102.9L350.1 102.6L351.9 102.7L353.6 102.9L355 103.5L371 111.7L372 112.5L372.5 113.3M372.5 133.2L372.5 134.1L371.9 135L370.8 135.7L354.3 143.6L352.8 144.2L351.1 144.4L349.3 144.4L347.6 144.1L346.2 143.6L330.3 135.3L329.2 134.6L328.7 133.7M372.5 113.3L372.5 133.2M328.7 113.8L328.7 133.7"/></g><g class="iso-dots" data-tone="mid"><circle cx="350.9" cy="105.5" r="0.5"/><circle cx="366.8" cy="113.7" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M357.2 126.2L357.6 125.4L358.5 124.7L362.6 122.7L364 122.3L365.7 122.1L367.3 122.3L368.7 122.8L453.4 166.6L454.3 167.3L454.6 168.2L454.6 175.6L454.3 176.4L453.3 177.1L449.2 179.1L447.8 179.6L446.1 179.7L444.5 179.5L443.1 179.1L358.4 135.2L357.5 134.5L357.2 133.7Z"/><path class="iso-shade" data-shade="0" d="M454.6 175.6L454.3 176.4L454.3 169L454.6 168.2ZM454.3 176.4L453.3 177.1L453.3 169.7L454.3 169ZM453.3 177.1L449.2 179.1L449.2 171.7L453.3 169.7ZM449.2 179.1L447.8 179.6L447.8 172.1L449.2 171.7Z"/><path class="iso-shade" data-shade="1" d="M447.8 179.6L446.1 179.7L446.1 172.3L447.8 172.1Z"/><path class="iso-shade" data-shade="2" d="M446.1 179.7L444.5 179.5L444.5 172.1L446.1 172.3Z"/><path class="iso-shade" data-shade="3" d="M444.5 179.5L443.1 179.1L443.1 171.6L444.5 172.1ZM443.1 179.1L358.4 135.2L358.4 127.8L443.1 171.6ZM358.4 135.2L357.5 134.5L357.5 127.1L358.4 127.8ZM357.5 134.5L357.2 133.7L357.2 126.2L357.5 127.1Z"/><path class="iso-top" d="M453.4 166.6L454.3 167.3L454.6 168.2L454.3 169L453.3 169.7L449.2 171.7L447.8 172.1L446.1 172.3L444.5 172.1L443.1 171.6L358.4 127.8L357.5 127.1L357.2 126.2L357.6 125.4L358.5 124.7L362.6 122.7L364 122.3L365.7 122.1L367.3 122.3L368.7 122.8Z"/><path class="iso-line iso-crease" data-tone="lo" d="M454.6 168.2L454.3 169L453.3 169.7L449.2 171.7L447.8 172.1L446.1 172.3L444.5 172.1L443.1 171.6L358.4 127.8L357.5 127.1L357.2 126.2"/><path class="iso-line iso-bevel" data-tone="lo" d="M454.6 168.2L453.2 168.7L452.4 169.3L448.5 171.2L447.3 171.6L446.1 171.7L444.9 171.6L443.8 171.2L359.3 127.4L358.6 126.8L357.2 126.2"/><path class="iso-line iso-edge" data-tone="hi" d="M357.2 126.2L357.6 125.4L358.5 124.7L362.6 122.7L364 122.3L365.7 122.1L367.3 122.3L368.7 122.8L453.4 166.6L454.3 167.3L454.6 168.2M454.6 175.6L454.3 176.4L453.3 177.1L449.2 179.1L447.8 179.6L446.1 179.7L444.5 179.5L443.1 179.1L358.4 135.2L357.5 134.5L357.2 133.7M454.6 168.2L454.6 175.6M357.2 126.2L357.2 133.7"/></g><g class="iso-dots" data-tone="mid"><circle cx="366.6" cy="126.8" r="0.5"/><circle cx="445.3" cy="167.6" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M337.7 60.1L338 58.8L338.8 57.6L340 56.5L341.6 55.5L343.6 54.8L345.9 54.2L348.3 53.8L350.8 53.7L353.3 53.9L355.8 54.3L358 54.9L359.9 55.7L361.5 56.7L362.6 57.8L363.3 59L363.5 60.3L363.5 67.7L363.2 69L362.4 70.2L361.2 71.3L359.6 72.3L357.6 73.1L355.3 73.6L352.9 74L350.4 74.1L347.9 73.9L345.5 73.6L343.3 72.9L341.3 72.1L339.8 71.1L338.6 70L337.9 68.8L337.7 67.5Z"/><path class="iso-shade" data-shade="0" d="M359.6 72.3L357.6 73.1L357.6 65.6L359.6 64.8ZM363.5 67.7L363.2 69L363.2 61.5L363.5 60.3ZM363.2 69L362.4 70.2L362.4 62.8L363.2 61.5ZM362.4 70.2L361.2 71.3L361.2 63.9L362.4 62.8ZM361.2 71.3L359.6 72.3L359.6 64.8L361.2 63.9Z"/><path class="iso-shade" data-shade="1" d="M357.6 73.1L355.3 73.6L355.3 66.2L357.6 65.6ZM355.3 73.6L352.9 74L352.9 66.5L355.3 66.2ZM352.9 74L350.4 74.1L350.4 66.6L352.9 66.5Z"/><path class="iso-shade" data-shade="2" d="M350.4 74.1L347.9 73.9L347.9 66.5L350.4 66.6ZM347.9 73.9L345.5 73.6L345.5 66.1L347.9 66.5ZM345.5 73.6L343.3 72.9L343.3 65.5L345.5 66.1Z"/><path class="iso-shade" data-shade="3" d="M343.3 72.9L341.3 72.1L341.3 64.7L343.3 65.5ZM341.3 72.1L339.8 71.1L339.8 63.7L341.3 64.7ZM339.8 71.1L338.6 70L338.6 62.5L339.8 63.7ZM338.6 70L337.9 68.8L337.9 61.3L338.6 62.5ZM337.9 68.8L337.7 67.5L337.7 60.1L337.9 61.3Z"/><path class="iso-top" d="M359.6 64.8L357.6 65.6L355.3 66.2L352.9 66.5L350.4 66.6L347.9 66.5L345.5 66.1L343.3 65.5L341.3 64.7L339.8 63.7L338.6 62.5L337.9 61.3L337.7 60.1L338 58.8L338.8 57.6L340 56.5L341.6 55.5L343.6 54.8L345.9 54.2L348.3 53.8L350.8 53.7L353.3 53.9L355.8 54.3L358 54.9L359.9 55.7L361.5 56.7L362.6 57.8L363.3 59L363.5 60.3L363.2 61.5L362.4 62.8L361.2 63.9Z"/><path class="iso-line iso-crease" data-tone="faint" d="M363.5 60.3L363.2 61.5L362.4 62.8L361.2 63.9L359.6 64.8L357.6 65.6L355.3 66.2L352.9 66.5L350.4 66.6L347.9 66.5L345.5 66.1L343.3 65.5L341.3 64.7L339.8 63.7L338.6 62.5L337.9 61.3L337.7 60.1"/><path class="iso-line iso-edge" data-tone="hi" d="M337.7 60.1L338 58.8L338.8 57.6L340 56.5L341.6 55.5L343.6 54.8L345.9 54.2L348.3 53.8L350.8 53.7L353.3 53.9L355.8 54.3L358 54.9L359.9 55.7L361.5 56.7L362.6 57.8L363.3 59L363.5 60.3M363.5 67.7L363.2 69L362.4 70.2L361.2 71.3L359.6 72.3L357.6 73.1L355.3 73.6L352.9 74L350.4 74.1L347.9 73.9L345.5 73.6L343.3 72.9L341.3 72.1L339.8 71.1L338.6 70L337.9 68.8L337.7 67.5M337.7 60.1L337.7 67.5M363.5 60.3L363.5 67.7"/></g><path class="iso-line" data-tone="lo" d="M359.6 71.8L359.6 65.3M357.6 72.6L357.6 66.1M355.3 73.1L355.3 66.7M352.9 73.5L352.9 67M350.4 73.6L350.4 67.1M347.9 73.4L347.9 67M345.5 73.1L345.5 66.6M343.3 72.4L343.3 66M341.3 71.6L341.3 65.2M339.8 70.6L339.8 64.2M338.6 69.5L338.6 63M337.9 68.3L337.9 61.8M363.2 68.5L363.2 62M362.4 69.7L362.4 63.2M361.2 70.8L361.2 64.4"/><g class="iso-dots" data-tone="lit"><circle cx="350.6" cy="60.2" r="0.7"/></g><g id="astrolabe-carriage" data-part="carriage"><path class="iso-halo" d="M362.3 279.6L415.9 253.7L477.7 285.7L477.7 285.9L424.1 311.8L362.3 279.8Z" style="filter:blur(5px); opacity:0.6;"/><g class="iso-solid"><path class="iso-fill" d="M356.6 269.8L356.8 269L357.4 268.4L358.3 267.8L412 241.9L413.2 241.4L414.6 241.1L416 241.1L417.5 241.2L418.9 241.5L420.1 241.9L481.8 273.9L482.7 274.5L483.3 275.2L483.4 276L483.4 285.9L483.2 286.6L482.6 287.3L481.7 287.9L428 313.8L426.8 314.3L425.4 314.5L424 314.6L422.5 314.5L421.1 314.2L419.9 313.8L358.2 281.8L357.3 281.2L356.7 280.5L356.6 279.7Z"/><path class="iso-shade" data-shade="0" d="M483.4 285.9L483.2 286.6L483.2 276.7L483.4 276ZM483.2 286.6L482.6 287.3L482.6 277.4L483.2 276.7ZM482.6 287.3L481.7 287.9L481.7 278L482.6 277.4ZM481.7 287.9L428 313.8L428 303.9L481.7 278ZM428 313.8L426.8 314.3L426.8 304.3L428 303.9Z"/><path class="iso-shade" data-shade="1" d="M426.8 314.3L425.4 314.5L425.4 304.6L426.8 304.3ZM425.4 314.5L424 314.6L424 304.7L425.4 304.6Z"/><path class="iso-shade" data-shade="2" d="M424 314.6L422.5 314.5L422.5 304.6L424 304.7ZM422.5 314.5L421.1 314.2L421.1 304.3L422.5 304.6Z"/><path class="iso-shade" data-shade="3" d="M421.1 314.2L419.9 313.8L419.9 303.8L421.1 304.3ZM419.9 313.8L358.2 281.8L358.2 271.8L419.9 303.8ZM358.2 281.8L357.3 281.2L357.3 271.2L358.2 271.8ZM357.3 281.2L356.7 280.5L356.7 270.5L357.3 271.2ZM356.7 280.5L356.6 279.7L356.6 269.8L356.7 270.5Z"/><path class="iso-top" d="M481.8 273.9L482.7 274.5L483.3 275.2L483.4 276L483.2 276.7L482.6 277.4L481.7 278L428 303.9L426.8 304.3L425.4 304.6L424 304.7L422.5 304.6L421.1 304.3L419.9 303.8L358.2 271.8L357.3 271.2L356.7 270.5L356.6 269.8L356.8 269L357.4 268.4L358.3 267.8L412 241.9L413.2 241.4L414.6 241.1L416 241.1L417.5 241.2L418.9 241.5L420.1 241.9Z"/><path class="iso-line iso-crease" data-tone="faint" d="M483.4 276L483.2 276.7L482.6 277.4L481.7 278L428 303.9L426.8 304.3L425.4 304.6L424 304.7L422.5 304.6L421.1 304.3L419.9 303.8L358.2 271.8L357.3 271.2L356.7 270.5L356.6 269.8"/><path class="iso-line iso-bevel" data-tone="faint" d="M483.4 276L482.1 276.5L481.6 277.1L480.8 277.6L427.3 303.4L426.3 303.8L425.2 304L424 304.1L422.8 304L421.7 303.8L420.7 303.4L359 271.5L358.3 270.9L357.8 270.4L356.6 269.8"/><path class="iso-line iso-edge" data-tone="mid" d="M356.6 269.8L356.8 269L357.4 268.4L358.3 267.8L412 241.9L413.2 241.4L414.6 241.1L416 241.1L417.5 241.2L418.9 241.5L420.1 241.9L481.8 273.9L482.7 274.5L483.3 275.2L483.4 276M483.4 285.9L483.2 286.6L482.6 287.3L481.7 287.9L428 313.8L426.8 314.3L425.4 314.5L424 314.6L422.5 314.5L421.1 314.2L419.9 313.8L358.2 281.8L357.3 281.2L356.7 280.5L356.6 279.7M483.4 276L483.4 285.9M356.6 269.8L356.6 279.7"/></g><path class="iso-line" data-tone="lo" d="M478.7 275.4L478.9 275.5L479 275.7L479.1 275.8L479.1 275.9L479.1 276.1L479 276.2L478.9 276.3L478.7 276.4L425.1 302.3L424.8 302.4L424.6 302.5L424.3 302.5L424 302.5L423.8 302.5L423.5 302.5L423.2 302.4L423 302.3L361.3 270.3L361.1 270.2L361 270.1L360.9 270L360.9 269.8L360.9 269.7L361 269.6L361.1 269.4L361.3 269.3L414.9 243.4L415.2 243.3L415.4 243.3L415.7 243.2L416 243.2L416.2 243.2L416.5 243.3L416.8 243.3L417 243.4Z"/><g class="iso-dots" data-tone="lo"><circle cx="415.8" cy="248" r="0.5"/><circle cx="469.6" cy="275.8" r="0.5"/><circle cx="370.4" cy="269.9" r="0.5"/><circle cx="424.2" cy="297.8" r="0.5"/></g><g class="iso-solid"><path class="iso-fill" d="M387.9 245.9L387.9 244.4L388.5 242.9L389.6 241.5L391.1 240.2L393.1 239.1L395.4 238.1L398.1 237.4L400.9 236.9L403.9 236.7L406.9 236.7L409.8 237L412.6 237.5L415.2 238.3L417.4 239.3L419.3 240.5L420.8 241.8L421.8 243.2L422.2 244.7L422.2 264.5L422.2 266L421.6 267.5L420.5 268.9L419 270.2L417 271.3L414.7 272.3L412.1 273L409.2 273.5L406.3 273.7L403.3 273.7L400.3 273.4L397.5 272.9L394.9 272.1L392.7 271.1L390.8 270L389.3 268.6L388.4 267.2L387.9 265.7Z"/><path class="iso-shade" data-shade="0" d="M417 271.3L414.7 272.3L414.7 252.4L417 251.5ZM422.2 264.5L422.2 266L422.2 246.2L422.2 244.7ZM422.2 266L421.6 267.5L421.6 247.6L422.2 246.2ZM421.6 267.5L420.5 268.9L420.5 249L421.6 247.6ZM420.5 268.9L419 270.2L419 250.3L420.5 249ZM419 270.2L417 271.3L417 251.5L419 250.3Z"/><path class="iso-shade" data-shade="1" d="M414.7 272.3L412.1 273L412.1 253.1L414.7 252.4ZM412.1 273L409.2 273.5L409.2 253.6L412.1 253.1ZM409.2 273.5L406.3 273.7L406.3 253.8L409.2 253.6Z"/><path class="iso-shade" data-shade="2" d="M406.3 273.7L403.3 273.7L403.3 253.8L406.3 253.8ZM403.3 273.7L400.3 273.4L400.3 253.5L403.3 253.8ZM400.3 273.4L397.5 272.9L397.5 253L400.3 253.5Z"/><path class="iso-shade" data-shade="3" d="M397.5 272.9L394.9 272.1L394.9 252.2L397.5 253ZM394.9 272.1L392.7 271.1L392.7 251.2L394.9 252.2ZM392.7 271.1L390.8 270L390.8 250.1L392.7 251.2ZM390.8 270L389.3 268.6L389.3 248.8L390.8 250.1ZM389.3 268.6L388.4 267.2L388.4 247.3L389.3 248.8ZM388.4 267.2L387.9 265.7L387.9 245.9L388.4 247.3Z"/><path class="iso-top" d="M417 251.5L414.7 252.4L412.1 253.1L409.2 253.6L406.3 253.8L403.3 253.8L400.3 253.5L397.5 253L394.9 252.2L392.7 251.2L390.8 250.1L389.3 248.8L388.4 247.3L387.9 245.9L387.9 244.4L388.5 242.9L389.6 241.5L391.1 240.2L393.1 239.1L395.4 238.1L398.1 237.4L400.9 236.9L403.9 236.7L406.9 236.7L409.8 237L412.6 237.5L415.2 238.3L417.4 239.3L419.3 240.5L420.8 241.8L421.8 243.2L422.2 244.7L422.2 246.2L421.6 247.6L420.5 249L419 250.3Z"/><path class="iso-line iso-crease" data-tone="lo" d="M422.2 244.7L422.2 246.2L421.6 247.6L420.5 249L419 250.3L417 251.5L414.7 252.4L412.1 253.1L409.2 253.6L406.3 253.8L403.3 253.8L400.3 253.5L397.5 253L394.9 252.2L392.7 251.2L390.8 250.1L389.3 248.8L388.4 247.3L387.9 245.9"/><path class="iso-line iso-bevel" data-tone="lo" d="M422.2 244.7L420.7 246.1L420.2 247.4L419.2 248.7L417.8 249.9L416 250.9L413.9 251.8L411.5 252.5L408.9 252.9L406.2 253.1L403.4 253.1L400.7 252.8L398.1 252.4L395.8 251.6L393.7 250.7L392 249.7L390.6 248.5L389.7 247.2L387.9 245.9"/><path class="iso-line iso-edge" data-tone="hi" d="M387.9 245.9L387.9 244.4L388.5 242.9L389.6 241.5L391.1 240.2L393.1 239.1L395.4 238.1L398.1 237.4L400.9 236.9L403.9 236.7L406.9 236.7L409.8 237L412.6 237.5L415.2 238.3L417.4 239.3L419.3 240.5L420.8 241.8L421.8 243.2L422.2 244.7M422.2 264.5L422.2 266L421.6 267.5L420.5 268.9L419 270.2L417 271.3L414.7 272.3L412.1 273L409.2 273.5L406.3 273.7L403.3 273.7L400.3 273.4L397.5 272.9L394.9 272.1L392.7 271.1L390.8 270L389.3 268.6L388.4 267.2L387.9 265.7M387.9 245.9L387.9 265.7M422.2 244.7L422.2 264.5"/></g><path class="iso-line" data-tone="lo" d="M417 255.9L417 252M414.7 256.9L414.7 252.9M412.1 257.6L412.1 253.6M409.2 258.1L409.2 254.1M406.3 258.3L406.3 254.3M403.3 258.3L403.3 254.3M400.3 258L400.3 254M397.5 257.5L397.5 253.5M394.9 256.7L394.9 252.7M392.7 255.7L392.7 251.7M390.8 254.5L390.8 250.6M389.3 253.2L389.3 249.3M388.4 251.8L388.4 247.8M421.6 252.1L421.6 248.1M420.5 253.5L420.5 249.5M419 254.8L419 250.8"/><path class="iso-line" data-tone="mid" d="M415 250.4L412.8 251.3L410.3 251.9L407.6 252.3L404.8 252.4L402 252.3L399.3 251.8L396.9 251.2L394.7 250.2L393 249.1L391.7 247.9L390.9 246.5L390.7 245.1L391 243.7L391.9 242.4L393.3 241.2L395.1 240.1L397.3 239.2L399.8 238.6L402.5 238.2L405.3 238.1L408.1 238.3L410.8 238.7L413.2 239.4L415.4 240.3L417.1 241.4L418.4 242.6L419.2 244L419.4 245.4L419.1 246.8L418.2 248.1L416.8 249.4Z"/><g class="iso-solid" data-lit=""><path class="iso-fill" d="M396.5 227.8L396.8 226.7L397.7 225.7L399.1 224.8L400.9 224.1L403 223.7L405.2 223.6L407.4 223.7L409.5 224.2L411.2 224.9L412.6 225.8L413.4 226.8L413.7 227.9L413.7 245.3L413.3 246.5L412.4 247.5L411 248.4L409.2 249L407.1 249.4L404.9 249.6L402.7 249.4L400.6 249L398.9 248.3L397.5 247.4L396.7 246.3L396.5 245.2Z"/><path class="iso-shade" data-shade="0" d="M411 248.4L409.2 249L409.2 231.6L411 231ZM413.7 245.3L413.3 246.5L413.3 229.1L413.7 227.9ZM413.3 246.5L412.4 247.5L412.4 230.1L413.3 229.1ZM412.4 247.5L411 248.4L411 231L412.4 230.1Z"/><path class="iso-shade" data-shade="1" d="M409.2 249L407.1 249.4L407.1 232L409.2 231.6ZM407.1 249.4L404.9 249.6L404.9 232.2L407.1 232Z"/><path class="iso-shade" data-shade="2" d="M404.9 249.6L402.7 249.4L402.7 232L404.9 232.2ZM402.7 249.4L400.6 249L400.6 231.6L402.7 232Z"/><path class="iso-shade" data-shade="3" d="M400.6 249L398.9 248.3L398.9 230.9L400.6 231.6ZM398.9 248.3L397.5 247.4L397.5 230L398.9 230.9ZM397.5 247.4L396.7 246.3L396.7 228.9L397.5 230ZM396.7 246.3L396.5 245.2L396.5 227.8L396.7 228.9Z"/><path class="iso-top" d="M411 231L409.2 231.6L407.1 232L404.9 232.2L402.7 232L400.6 231.6L398.9 230.9L397.5 230L396.7 228.9L396.5 227.8L396.8 226.7L397.7 225.7L399.1 224.8L400.9 224.1L403 223.7L405.2 223.6L407.4 223.7L409.5 224.2L411.2 224.9L412.6 225.8L413.4 226.8L413.7 227.9L413.3 229.1L412.4 230.1Z"/><path class="iso-line iso-crease" data-tone="faint" d="M413.7 227.9L413.3 229.1L412.4 230.1L411 231L409.2 231.6L407.1 232L404.9 232.2L402.7 232L400.6 231.6L398.9 230.9L397.5 230L396.7 228.9L396.5 227.8"/><path class="iso-line iso-edge" data-tone="hi" d="M396.5 227.8L396.8 226.7L397.7 225.7L399.1 224.8L400.9 224.1L403 223.7L405.2 223.6L407.4 223.7L409.5 224.2L411.2 224.9L412.6 225.8L413.4 226.8L413.7 227.9M413.7 245.3L413.3 246.5L412.4 247.5L411 248.4L409.2 249L407.1 249.4L404.9 249.6L402.7 249.4L400.6 249L398.9 248.3L397.5 247.4L396.7 246.3L396.5 245.2M396.5 227.8L396.5 245.2M413.7 227.9L413.7 245.3"/></g><g class="iso-dots" data-tone="lit"><circle cx="405.1" cy="227.9" r="0.8"/></g><g class="iso-solid"><path class="iso-fill" d="M451.7 295.6L452.3 294.9L455.4 293.4L457 293.1L458.5 293.4L460.5 294.5L461.1 295.2L461.1 300.2L460.4 300.9L457.3 302.4L455.8 302.7L454.3 302.4L452.3 301.4L451.7 300.6Z"/><path class="iso-shade" data-shade="0" d="M461.1 300.2L460.4 300.9L460.4 296L461.1 295.2ZM460.4 300.9L457.3 302.4L457.3 297.5L460.4 296Z"/><path class="iso-shade" data-shade="1" d="M457.3 302.4L455.8 302.7L455.8 297.8L457.3 297.5Z"/><path class="iso-shade" data-shade="2" d="M455.8 302.7L454.3 302.4L454.3 297.4L455.8 297.8Z"/><path class="iso-shade" data-shade="3" d="M454.3 302.4L452.3 301.4L452.3 296.4L454.3 297.4ZM452.3 301.4L451.7 300.6L451.7 295.6L452.3 296.4Z"/><path class="iso-top" d="M460.5 294.5L461.1 295.2L460.4 296L457.3 297.5L455.8 297.8L454.3 297.4L452.3 296.4L451.7 295.6L452.3 294.9L455.4 293.4L457 293.1L458.5 293.4Z"/><path class="iso-line iso-crease" data-tone="faint" d="M461.1 295.2L460.4 296L457.3 297.5L455.8 297.8L454.3 297.4L452.3 296.4L451.7 295.6"/><path class="iso-line iso-edge" data-tone="mid" d="M451.7 295.6L452.3 294.9L455.4 293.4L457 293.1L458.5 293.4L460.5 294.5L461.1 295.2M461.1 300.2L460.4 300.9L457.3 302.4L455.8 302.7L454.3 302.4L452.3 301.4L451.7 300.6M461.1 295.2L461.1 300.2M451.7 295.6L451.7 300.6"/></g><g class="iso-solid"><path class="iso-fill" d="M455.4 295.7L455.6 294.9L456.3 294.1L457.4 293.5L458.7 293L460.3 292.7L462 292.6L463.6 292.7L465.2 293L466.5 293.5L467.5 294.2L468.1 295L468.3 295.8L468.3 304.5L468.1 305.4L467.4 306.1L466.3 306.8L465 307.3L463.4 307.6L461.7 307.7L460.1 307.6L458.5 307.2L457.2 306.7L456.2 306L455.6 305.3L455.4 304.4Z"/><path class="iso-shade" data-shade="0" d="M466.3 306.8L465 307.3L465 298.6L466.3 298.1ZM468.3 304.5L468.1 305.4L468.1 296.7L468.3 295.8ZM468.1 305.4L467.4 306.1L467.4 297.4L468.1 296.7ZM467.4 306.1L466.3 306.8L466.3 298.1L467.4 297.4Z"/><path class="iso-shade" data-shade="1" d="M465 307.3L463.4 307.6L463.4 298.9L465 298.6ZM463.4 307.6L461.7 307.7L461.7 299L463.4 298.9Z"/><path class="iso-shade" data-shade="2" d="M461.7 307.7L460.1 307.6L460.1 298.9L461.7 299ZM460.1 307.6L458.5 307.2L458.5 298.6L460.1 298.9Z"/><path class="iso-shade" data-shade="3" d="M458.5 307.2L457.2 306.7L457.2 298L458.5 298.6ZM457.2 306.7L456.2 306L456.2 297.4L457.2 298ZM456.2 306L455.6 305.3L455.6 296.6L456.2 297.4ZM455.6 305.3L455.4 304.4L455.4 295.7L455.6 296.6Z"/><path class="iso-top" d="M466.3 298.1L465 298.6L463.4 298.9L461.7 299L460.1 298.9L458.5 298.6L457.2 298L456.2 297.4L455.6 296.6L455.4 295.7L455.6 294.9L456.3 294.1L457.4 293.5L458.7 293L460.3 292.7L462 292.6L463.6 292.7L465.2 293L466.5 293.5L467.5 294.2L468.1 295L468.3 295.8L468.1 296.7L467.4 297.4Z"/><path class="iso-line iso-crease" data-tone="faint" d="M468.3 295.8L468.1 296.7L467.4 297.4L466.3 298.1L465 298.6L463.4 298.9L461.7 299L460.1 298.9L458.5 298.6L457.2 298L456.2 297.4L455.6 296.6L455.4 295.7"/><path class="iso-line iso-edge" data-tone="hi" d="M455.4 295.7L455.6 294.9L456.3 294.1L457.4 293.5L458.7 293L460.3 292.7L462 292.6L463.6 292.7L465.2 293L466.5 293.5L467.5 294.2L468.1 295L468.3 295.8M468.3 304.5L468.1 305.4L467.4 306.1L466.3 306.8L465 307.3L463.4 307.6L461.7 307.7L460.1 307.6L458.5 307.2L457.2 306.7L456.2 306L455.6 305.3L455.4 304.4M455.4 295.7L455.4 304.4M468.3 295.8L468.3 304.5"/></g><path class="iso-line" data-tone="lo" d="M466.3 306.3L466.3 298.6M465 306.8L465 299.1M463.4 307.1L463.4 299.4M461.7 307.2L461.7 299.5M460.1 307.1L460.1 299.4M458.5 306.7L458.5 299M457.2 306.2L457.2 298.5M456.2 305.5L456.2 297.8M455.6 304.8L455.6 297.1M468.1 304.9L468.1 297.2M467.4 305.6L467.4 297.9"/></g><g class="iso-solid"><path class="iso-fill" d="M446 223.2L446 222.3L446.4 221.3L447.3 220.5L448.5 219.7L450.1 219.1L451.8 218.7L453.7 218.5L455.6 218.6L457.5 218.8L459.2 219.2L460.7 219.8L461.9 220.6L462.7 221.5L463.1 222.4L463.1 284.5L463.1 285.5L462.6 286.4L461.7 287.3L460.5 288L459 288.6L457.2 289L455.3 289.2L453.4 289.2L451.5 289L449.8 288.5L448.3 287.9L447.2 287.2L446.3 286.3L446 285.3Z"/><path class="iso-shade" data-shade="0" d="M460.5 288L459 288.6L459 226.5L460.5 225.9ZM463.1 284.5L463.1 285.5L463.1 223.4L463.1 222.4ZM463.1 285.5L462.6 286.4L462.6 224.3L463.1 223.4ZM462.6 286.4L461.7 287.3L461.7 225.2L462.6 224.3ZM461.7 287.3L460.5 288L460.5 225.9L461.7 225.2Z"/><path class="iso-shade" data-shade="1" d="M459 288.6L457.2 289L457.2 226.9L459 226.5ZM457.2 289L455.3 289.2L455.3 227.1L457.2 226.9Z"/><path class="iso-shade" data-shade="2" d="M455.3 289.2L453.4 289.2L453.4 227.1L455.3 227.1ZM453.4 289.2L451.5 289L451.5 226.9L453.4 227.1ZM451.5 289L449.8 288.5L449.8 226.4L451.5 226.9Z"/><path class="iso-shade" data-shade="3" d="M449.8 288.5L448.3 287.9L448.3 225.8L449.8 226.4ZM448.3 287.9L447.2 287.2L447.2 225L448.3 225.8ZM447.2 287.2L446.3 286.3L446.3 224.2L447.2 225ZM446.3 286.3L446 285.3L446 223.2L446.3 224.2Z"/><path class="iso-top" d="M460.5 225.9L459 226.5L457.2 226.9L455.3 227.1L453.4 227.1L451.5 226.9L449.8 226.4L448.3 225.8L447.2 225L446.3 224.2L446 223.2L446 222.3L446.4 221.3L447.3 220.5L448.5 219.7L450.1 219.1L451.8 218.7L453.7 218.5L455.6 218.6L457.5 218.8L459.2 219.2L460.7 219.8L461.9 220.6L462.7 221.5L463.1 222.4L463.1 223.4L462.6 224.3L461.7 225.2Z"/><path class="iso-line iso-edge" data-tone="mid" d="M446 223.2L446 222.3L446.4 221.3L447.3 220.5L448.5 219.7L450.1 219.1L451.8 218.7L453.7 218.5L455.6 218.6L457.5 218.8L459.2 219.2L460.7 219.8L461.9 220.6L462.7 221.5L463.1 222.4M463.1 284.5L463.1 285.5L462.6 286.4L461.7 287.3L460.5 288L459 288.6L457.2 289L455.3 289.2L453.4 289.2L451.5 289L449.8 288.5L448.3 287.9L447.2 287.2L446.3 286.3L446 285.3M446 223.2L446 285.3M463.1 222.4L463.1 284.5"/></g><path class="iso-line" data-tone="lo" d="M463.1 260.1L463 260.9L462.5 261.7L461.7 262.5L460.6 263.1L459.3 263.7L457.8 264.1L456.2 264.3L454.5 264.4L452.8 264.3L451.2 264.1L449.7 263.7L448.4 263.1L447.4 262.5L446.6 261.7L446.1 260.9L445.9 260.1"/><g class="iso-solid"><path class="iso-fill" d="M400 207.4L400.4 204.8L401.3 202.1L402.6 199.5L404.5 197L406.9 194.6L409.7 192.4L413 190.3L416.7 188.3L420.7 186.5L425 185L429.7 183.7L434.5 182.6L439.6 181.7L444.8 181.1L450.1 180.7L455.5 180.7L460.8 180.8L466.1 181.3L471.2 182L476.3 182.9L481 184.1L485.6 185.5L489.8 187.2L493.7 189L497.2 191L500.4 193.2L503 195.5L505.2 197.9L506.9 200.5L508.2 203.1L508.8 205.7L509 208.4L509 223.3L508.7 226L507.8 228.6L506.4 231.2L504.5 233.7L502.1 236.1L499.3 238.4L496 240.5L492.4 242.4L488.4 244.2L484 245.7L479.4 247.1L474.5 248.2L469.4 249L464.2 249.6L458.9 250L453.6 250.1L448.2 249.9L443 249.4L437.8 248.8L432.8 247.8L428 246.6L423.5 245.2L419.2 243.6L415.3 241.7L411.8 239.7L408.7 237.6L406 235.2L403.8 232.8L402.1 230.3L400.9 227.7L400.2 225L400 222.3Z"/><path class="iso-shade" data-shade="0" d="M492.4 242.4L488.4 244.2L488.4 229.3L492.4 227.5ZM488.4 244.2L484 245.7L484 230.8L488.4 229.3ZM509 223.3L508.7 226L508.7 211.1L509 208.4ZM508.7 226L507.8 228.6L507.8 213.7L508.7 211.1ZM507.8 228.6L506.4 231.2L506.4 216.3L507.8 213.7ZM506.4 231.2L504.5 233.7L504.5 218.8L506.4 216.3ZM504.5 233.7L502.1 236.1L502.1 221.2L504.5 218.8ZM502.1 236.1L499.3 238.4L499.3 223.4L502.1 221.2ZM499.3 238.4L496 240.5L496 225.6L499.3 223.4ZM496 240.5L492.4 242.4L492.4 227.5L496 225.6Z"/><path class="iso-shade" data-shade="1" d="M484 245.7L479.4 247.1L479.4 232.2L484 230.8ZM479.4 247.1L474.5 248.2L474.5 233.3L479.4 232.2ZM474.5 248.2L469.4 249L469.4 234.1L474.5 233.3ZM469.4 249L464.2 249.6L464.2 234.7L469.4 234.1ZM464.2 249.6L458.9 250L458.9 235.1L464.2 234.7ZM458.9 250L453.6 250.1L453.6 235.2L458.9 235.1Z"/><path class="iso-shade" data-shade="2" d="M453.6 250.1L448.2 249.9L448.2 235L453.6 235.2ZM448.2 249.9L443 249.4L443 234.5L448.2 235ZM443 249.4L437.8 248.8L437.8 233.8L443 234.5ZM437.8 248.8L432.8 247.8L432.8 232.9L437.8 233.8ZM432.8 247.8L428 246.6L428 231.7L432.8 232.9Z"/><path class="iso-shade" data-shade="3" d="M428 246.6L423.5 245.2L423.5 230.3L428 231.7ZM423.5 245.2L419.2 243.6L419.2 228.7L423.5 230.3ZM419.2 243.6L415.3 241.7L415.3 226.8L419.2 228.7ZM415.3 241.7L411.8 239.7L411.8 224.8L415.3 226.8ZM411.8 239.7L408.7 237.6L408.7 222.7L411.8 224.8ZM408.7 237.6L406 235.2L406 220.3L408.7 222.7ZM406 235.2L403.8 232.8L403.8 217.9L406 220.3ZM403.8 232.8L402.1 230.3L402.1 215.4L403.8 217.9ZM402.1 230.3L400.9 227.7L400.9 212.8L402.1 215.4ZM400.9 227.7L400.2 225L400.2 210.1L400.9 212.8ZM400.2 225L400 222.3L400 207.4L400.2 210.1Z"/><path class="iso-top" d="M492.4 227.5L488.4 229.3L484 230.8L479.4 232.2L474.5 233.3L469.4 234.1L464.2 234.7L458.9 235.1L453.6 235.2L448.2 235L443 234.5L437.8 233.8L432.8 232.9L428 231.7L423.5 230.3L419.2 228.7L415.3 226.8L411.8 224.8L408.7 222.7L406 220.3L403.8 217.9L402.1 215.4L400.9 212.8L400.2 210.1L400 207.4L400.4 204.8L401.3 202.1L402.6 199.5L404.5 197L406.9 194.6L409.7 192.4L413 190.3L416.7 188.3L420.7 186.5L425 185L429.7 183.7L434.5 182.6L439.6 181.7L444.8 181.1L450.1 180.7L455.5 180.7L460.8 180.8L466.1 181.3L471.2 182L476.3 182.9L481 184.1L485.6 185.5L489.8 187.2L493.7 189L497.2 191L500.4 193.2L503 195.5L505.2 197.9L506.9 200.5L508.2 203.1L508.8 205.7L509 208.4L508.7 211.1L507.8 213.7L506.4 216.3L504.5 218.8L502.1 221.2L499.3 223.4L496 225.6Z"/><path class="iso-line iso-crease" data-tone="lo" d="M509 208.4L508.7 211.1L507.8 213.7L506.4 216.3L504.5 218.8L502.1 221.2L499.3 223.4L496 225.6L492.4 227.5L488.4 229.3L484 230.8L479.4 232.2L474.5 233.3L469.4 234.1L464.2 234.7L458.9 235.1L453.6 235.2L448.2 235L443 234.5L437.8 233.8L432.8 232.9L428 231.7L423.5 230.3L419.2 228.7L415.3 226.8L411.8 224.8L408.7 222.7L406 220.3L403.8 217.9L402.1 215.4L400.9 212.8L400.2 210.1L400 207.4"/><path class="iso-line iso-bevel" data-tone="lo" d="M509 208.4L506.9 211L506.1 213.5L504.8 216L502.9 218.4L500.6 220.8L497.9 223L494.7 225L491.2 226.9L487.3 228.6L483.1 230.1L478.6 231.4L473.9 232.5L469 233.3L463.9 233.9L458.8 234.2L453.6 234.3L448.4 234.1L443.3 233.7L438.3 233L433.5 232.1L428.8 231L424.4 229.6L420.3 228L416.5 226.2L413.1 224.3L410.1 222.2L407.5 219.9L405.4 217.6L403.7 215.1L402.6 212.6L401.9 210L400 207.4"/><path class="iso-line iso-edge" data-tone="hi" d="M400 207.4L400.4 204.8L401.3 202.1L402.6 199.5L404.5 197L406.9 194.6L409.7 192.4L413 190.3L416.7 188.3L420.7 186.5L425 185L429.7 183.7L434.5 182.6L439.6 181.7L444.8 181.1L450.1 180.7L455.5 180.7L460.8 180.8L466.1 181.3L471.2 182L476.3 182.9L481 184.1L485.6 185.5L489.8 187.2L493.7 189L497.2 191L500.4 193.2L503 195.5L505.2 197.9L506.9 200.5L508.2 203.1L508.8 205.7L509 208.4M509 223.3L508.7 226L507.8 228.6L506.4 231.2L504.5 233.7L502.1 236.1L499.3 238.4L496 240.5L492.4 242.4L488.4 244.2L484 245.7L479.4 247.1L474.5 248.2L469.4 249L464.2 249.6L458.9 250L453.6 250.1L448.2 249.9L443 249.4L437.8 248.8L432.8 247.8L428 246.6L423.5 245.2L419.2 243.6L415.3 241.7L411.8 239.7L408.7 237.6L406 235.2L403.8 232.8L402.1 230.3L400.9 227.7L400.2 225L400 222.3M400 207.4L400 222.3M509 208.4L509 223.3"/></g><path class="iso-line" data-tone="lo" d="M492.4 232L492.4 228M488.8 233.6L488.8 229.6M485 235L485 231M480.9 236.2L480.9 232.2M476.7 237.3L476.7 233.3M472.3 238.2L472.3 234.2M467.7 238.8L467.7 234.9M463 239.3L463 235.3M458.3 239.6L458.3 235.6M453.6 239.6L453.6 235.7M448.8 239.5L448.8 235.5M444.1 239.1L444.1 235.2M439.5 238.6L439.5 234.6M435 237.8L435 233.9M430.6 236.9L430.6 232.9M426.4 235.7L426.4 231.8M422.5 234.4L422.5 230.5M418.8 233L418.8 229M415.3 231.3L415.3 227.3M412.2 229.5L412.2 225.6M409.3 227.6L409.3 223.6M406.8 225.6L406.8 221.6M404.7 223.5L404.7 219.5M403 221.3L403 217.3M401.6 219L401.6 215M400.7 216.6L400.7 212.7M508 217.6L508 213.6M506.9 219.9L506.9 215.9M505.4 222.2L505.4 218.2M503.5 224.3L503.5 220.4M501.2 226.4L501.2 222.4M498.6 228.4L498.6 224.4M495.7 230.3L495.7 226.3"/><path class="iso-line" data-tone="faint" d="M509 212.9L508.9 215L508.4 217.1L507.5 219.2L506.4 221.3L504.9 223.3L503.1 225.3L501 227.1L498.6 228.9L496 230.6L493.1 232.2L489.9 233.6L486.6 234.9L483 236.1L479.3 237.2L475.4 238.1L471.4 238.8L467.2 239.4L463 239.8L458.8 240L454.5 240.1L450.2 240L446 239.8L441.8 239.4L437.7 238.8L433.7 238.1L429.8 237.2L426 236.1L422.5 234.9L419.1 233.6L416 232.2L413.1 230.6L410.4 228.9L408 227.1L406 225.3L404.2 223.3L402.7 221.3L401.5 219.2L400.7 217.1L400.2 215L400 212.9"/><path class="iso-line" data-tone="lo" d="M489.4 226L485.7 227.6L481.7 229L477.4 230.3L472.9 231.3L468.2 232.1L463.5 232.6L458.6 232.9L453.6 233L448.7 232.8L443.9 232.4L439.1 231.8L434.5 230.9L430.1 229.8L425.9 228.5L422 227L418.4 225.3L415.2 223.5L412.3 221.5L409.8 219.4L407.8 217.1L406.2 214.8L405.1 212.4L404.5 209.9L404.3 207.5L404.7 205L405.5 202.6L406.7 200.2L408.5 197.9L410.7 195.7L413.3 193.6L416.3 191.7L419.6 189.9L423.4 188.2L427.4 186.8L431.6 185.6L436.1 184.6L440.8 183.8L445.6 183.2L450.5 182.9L455.4 182.8L460.3 183L465.2 183.4L469.9 184L474.5 184.9L479 186L483.1 187.3L487 188.8L490.6 190.5L493.9 192.3L496.7 194.3L499.2 196.5L501.2 198.7L502.8 201L503.9 203.4L504.6 205.9L504.7 208.4L504.4 210.8L503.6 213.2L502.3 215.6L500.6 217.9L498.4 220.1L495.8 222.2L492.8 224.2Z"/><path class="iso-line" data-tone="mid" d="M485.4 223.9L482.1 225.3L478.6 226.6L474.8 227.7L470.8 228.6L466.7 229.3L462.4 229.8L458.1 230.1L453.7 230.1L449.4 230L445.1 229.6L440.9 229.1L436.8 228.3L432.9 227.3L429.2 226.2L425.7 224.8L422.5 223.4L419.7 221.7L417.1 219.9L414.9 218L413.1 216.1L411.8 214L410.8 211.9L410.2 209.7L410.1 207.5L410.4 205.3L411.1 203.2L412.2 201.1L413.7 199L415.7 197.1L418 195.2L420.6 193.5L423.6 191.9L426.9 190.5L430.5 189.2L434.2 188.1L438.2 187.2L442.4 186.5L446.6 186L450.9 185.8L455.3 185.7L459.6 185.8L464 186.2L468.2 186.8L472.2 187.5L476.2 188.5L479.9 189.6L483.3 191L486.5 192.5L489.4 194.1L491.9 195.9L494.1 197.8L495.9 199.8L497.3 201.8L498.3 204L498.8 206.1L499 208.3L498.7 210.5L498 212.6L496.8 214.7L495.3 216.8L493.4 218.7L491.1 220.6L488.4 222.3Z"/><path class="iso-line" data-tone="lo" d="M462.5 212L460.1 212.9L457.3 213.5L454.3 213.6L451.4 213.4L448.6 212.8L446.3 211.9L444.5 210.7L443.4 209.3L443 207.8L443.5 206.3L444.7 205L446.5 203.8L449 202.9L451.7 202.3L454.7 202.2L457.7 202.4L460.4 203L462.8 203.9L464.6 205.1L465.7 206.5L466 208L465.5 209.5L464.4 210.9Z"/><path class="iso-line" data-tone="lo" d="M486.9 194.9L489.1 194M489.1 196.4L491.5 195.6M491 198L493.6 197.3M492.7 199.6L495.3 199.1M494 201.4L496.7 200.9M495 203.2L497.8 202.9M495.7 205L498.5 204.8M496.1 206.9L498.9 206.8M496.1 208.7L498.9 208.8M495.1 212.4L497.9 212.8M494.1 214.2L496.9 214.7M492.8 216L495.5 216.5M491.2 217.7L493.8 218.3M489.3 219.3L491.7 220.1M487.2 220.8L489.4 221.7M484.7 222.2L486.8 223.2M482 223.5L483.9 224.6M479.1 224.7L480.8 225.8M472.8 226.6L474 227.9M469.3 227.3L470.3 228.7M465.8 227.9L466.6 229.3M462.1 228.4L462.7 229.8M458.5 228.6L458.7 230M454.7 228.7L454.7 230.1M451 228.6L450.8 230.1M447.3 228.4L446.8 229.8M443.7 228L442.9 229.4M436.7 226.7L435.4 228M433.4 225.8L431.9 227.1M430.2 224.8L428.6 226M427.3 223.6L425.4 224.7M424.6 222.4L422.5 223.4M422.1 221L419.9 221.9M419.9 219.5L417.5 220.3M418 217.9L415.5 218.5M416.4 216.2L413.7 216.8M414 212.6L411.2 213M413.3 210.8L410.5 211M413 208.9L410.1 209M413 207.1L410.1 207M413.3 205.2L410.4 205M413.9 203.4L411.1 203.1M414.9 201.6L412.2 201.1M416.2 199.8L413.5 199.3M417.8 198.1L415.3 197.5M421.9 195L419.6 194.1M424.3 193.6L422.2 192.6M427 192.3L425.1 191.2M429.9 191.1L428.2 190M433 190.1L431.5 188.9M436.3 189.2L435 187.9M439.7 188.5L438.7 187.1M443.3 187.9L442.5 186.5M446.9 187.5L446.4 186.1M454.3 187.1L454.3 185.7M458 187.2L458.3 185.8M461.7 187.4L462.2 186M465.4 187.8L466.1 186.5M468.9 188.4L469.9 187.1M472.4 189.1L473.6 187.8M475.7 190L477.1 188.8M478.8 191L480.5 189.9M481.7 192.2L483.6 191.1"/><path class="iso-line" data-tone="mid" d="M481.9 194.7L486.5 192.5M492.2 210.4L498.6 210.8M474.2 224.2L477.5 226.9M441.3 225.7L439.1 228.8M418.4 213.9L412.3 214.9M422.7 197.5L417.3 195.8M450.9 189L450.3 185.8"/><g class="iso-dots" data-tone="hi"><circle cx="481.4" cy="221.8" r="0.7"/></g><g class="iso-dots" data-tone="hi"><circle cx="449.5" cy="227.1" r="0.7"/></g><g class="iso-dots" data-tone="hi"><circle cx="421.4" cy="217.9" r="0.7"/></g><g class="iso-dots" data-tone="hi"><circle cx="418.2" cy="201.2" r="0.7"/></g><g class="iso-dots" data-tone="hi"><circle cx="442.4" cy="189.5" r="0.7"/></g><g class="iso-dots" data-tone="hi"><circle cx="475.7" cy="191.7" r="0.7"/></g><g class="iso-dots" data-tone="hi"><circle cx="493.1" cy="206.1" r="0.7"/></g><g class="iso-solid"><path class="iso-fill" d="M447.4 203.3L447.4 202.5L447.8 201.7L448.5 201L449.5 200.4L450.8 199.9L452.3 199.5L453.8 199.4L455.4 199.4L457 199.6L458.4 199.9L459.7 200.5L460.7 201.1L461.3 201.8L461.7 202.6L461.7 207.6L461.6 208.4L461.2 209.2L460.5 209.9L459.5 210.5L458.2 211L456.8 211.3L455.2 211.5L453.6 211.5L452 211.3L450.6 210.9L449.4 210.4L448.4 209.8L447.7 209L447.4 208.3Z"/><path class="iso-shade" data-shade="0" d="M459.5 210.5L458.2 211L458.2 206L459.5 205.5ZM461.7 207.6L461.6 208.4L461.6 203.4L461.7 202.6ZM461.6 208.4L461.2 209.2L461.2 204.2L461.6 203.4ZM461.2 209.2L460.5 209.9L460.5 204.9L461.2 204.2ZM460.5 209.9L459.5 210.5L459.5 205.5L460.5 204.9Z"/><path class="iso-shade" data-shade="1" d="M458.2 211L456.8 211.3L456.8 206.3L458.2 206ZM456.8 211.3L455.2 211.5L455.2 206.5L456.8 206.3Z"/><path class="iso-shade" data-shade="2" d="M455.2 211.5L453.6 211.5L453.6 206.5L455.2 206.5ZM453.6 211.5L452 211.3L452 206.3L453.6 206.5ZM452 211.3L450.6 210.9L450.6 205.9L452 206.3Z"/><path class="iso-shade" data-shade="3" d="M450.6 210.9L449.4 210.4L449.4 205.4L450.6 205.9ZM449.4 210.4L448.4 209.8L448.4 204.8L449.4 205.4ZM448.4 209.8L447.7 209L447.7 204.1L448.4 204.8ZM447.7 209L447.4 208.3L447.4 203.3L447.7 204.1Z"/><path class="iso-top" d="M459.5 205.5L458.2 206L456.8 206.3L455.2 206.5L453.6 206.5L452 206.3L450.6 205.9L449.4 205.4L448.4 204.8L447.7 204.1L447.4 203.3L447.4 202.5L447.8 201.7L448.5 201L449.5 200.4L450.8 199.9L452.3 199.5L453.8 199.4L455.4 199.4L457 199.6L458.4 199.9L459.7 200.5L460.7 201.1L461.3 201.8L461.7 202.6L461.6 203.4L461.2 204.2L460.5 204.9Z"/><path class="iso-line iso-crease" data-tone="faint" d="M461.7 202.6L461.6 203.4L461.2 204.2L460.5 204.9L459.5 205.5L458.2 206L456.8 206.3L455.2 206.5L453.6 206.5L452 206.3L450.6 205.9L449.4 205.4L448.4 204.8L447.7 204.1L447.4 203.3"/><path class="iso-line iso-edge" data-tone="hi" d="M447.4 203.3L447.4 202.5L447.8 201.7L448.5 201L449.5 200.4L450.8 199.9L452.3 199.5L453.8 199.4L455.4 199.4L457 199.6L458.4 199.9L459.7 200.5L460.7 201.1L461.3 201.8L461.7 202.6M461.7 207.6L461.6 208.4L461.2 209.2L460.5 209.9L459.5 210.5L458.2 211L456.8 211.3L455.2 211.5L453.6 211.5L452 211.3L450.6 210.9L449.4 210.4L448.4 209.8L447.7 209L447.4 208.3M447.4 203.3L447.4 208.3M461.7 202.6L461.7 207.6"/></g><path class="iso-line" data-tone="lo" d="M459.5 205.5L458.2 206L456.8 206.3L455.2 206.5L453.6 206.5L452 206.3L450.6 205.9L449.4 205.4L448.4 204.8L447.7 204.1L447.4 203.3L447.4 202.5L447.8 201.7L448.5 201L449.5 200.4L450.8 199.9L452.3 199.5L453.8 199.4L455.4 199.4L457 199.6L458.4 199.9L459.7 200.5L460.7 201.1L461.3 201.8L461.7 202.6L461.6 203.4L461.2 204.2L460.5 204.9Z"/><path id="astrolabe-needle" data-part="needle" class="iso-line" data-tone="lit" data-free="start" d="M445.6 198.1L487.4 219.7" style="stroke-width:1.6; filter:drop-shadow(0 0 6px var(--gnosis-glow, #f5d47a));"/><g id="astrolabe-plunger" data-part="plunger" style="cursor:pointer;"><g class="iso-solid"><path class="iso-fill" d="M554.8 319.6L555.3 318.5L556.6 317.6L577.2 307.6L579.1 307L581.3 306.8L583.5 307.1L585.3 307.7L605.2 318L606.4 318.9L606.8 320.1L606.8 330L606.4 331.1L605.1 332L584.5 342L582.6 342.6L580.4 342.8L578.2 342.5L576.4 341.9L556.4 331.6L555.2 330.6L554.8 329.5Z"/><path class="iso-shade" data-shade="0" d="M606.8 330L606.4 331.1L606.4 321.1L606.8 320.1ZM606.4 331.1L605.1 332L605.1 322.1L606.4 321.1ZM605.1 332L584.5 342L584.5 332L605.1 322.1ZM584.5 342L582.6 342.6L582.6 332.6L584.5 332Z"/><path class="iso-shade" data-shade="1" d="M582.6 342.6L580.4 342.8L580.4 332.8L582.6 332.6Z"/><path class="iso-shade" data-shade="2" d="M580.4 342.8L578.2 342.5L578.2 332.6L580.4 332.8Z"/><path class="iso-shade" data-shade="3" d="M578.2 342.5L576.4 341.9L576.4 332L578.2 332.6ZM576.4 341.9L556.4 331.6L556.4 321.6L576.4 332ZM556.4 331.6L555.2 330.6L555.2 320.7L556.4 321.6ZM555.2 330.6L554.8 329.5L554.8 319.6L555.2 320.7Z"/><path class="iso-top" d="M605.2 318L606.4 318.9L606.8 320.1L606.4 321.1L605.1 322.1L584.5 332L582.6 332.6L580.4 332.8L578.2 332.6L576.4 332L556.4 321.6L555.2 320.7L554.8 319.6L555.3 318.5L556.6 317.6L577.2 307.6L579.1 307L581.3 306.8L583.5 307.1L585.3 307.7Z"/><path class="iso-line iso-crease" data-tone="faint" d="M606.8 320.1L606.4 321.1L605.1 322.1L584.5 332L582.6 332.6L580.4 332.8L578.2 332.6L576.4 332L556.4 321.6L555.2 320.7L554.8 319.6"/><path class="iso-line iso-bevel" data-tone="faint" d="M606.8 320.1L605.1 320.9L604 321.6L583.6 331.5L582.1 332L580.4 332.1L578.8 331.9L577.3 331.4L557.5 321.2L556.5 320.4L554.8 319.6"/><path class="iso-line iso-edge" data-tone="mid" d="M554.8 319.6L555.3 318.5L556.6 317.6L577.2 307.6L579.1 307L581.3 306.8L583.5 307.1L585.3 307.7L605.2 318L606.4 318.9L606.8 320.1M606.8 330L606.4 331.1L605.1 332L584.5 342L582.6 342.6L580.4 342.8L578.2 342.5L576.4 341.9L556.4 331.6L555.2 330.6L554.8 329.5M606.8 320.1L606.8 330M554.8 319.6L554.8 329.5"/></g><g class="iso-dots" data-tone="mid"><circle cx="581.1" cy="310.7" r="0.45"/><circle cx="599.1" cy="320" r="0.45"/><circle cx="562.6" cy="319.7" r="0.45"/><circle cx="580.5" cy="328.9" r="0.45"/></g><g class="iso-solid"><path class="iso-fill" d="M570.8 297.9L570.9 296.8L571.4 295.7L572.4 294.7L573.9 293.9L575.6 293.2L577.7 292.7L579.9 292.5L582.1 292.5L584.3 292.8L586.3 293.3L588.1 294L589.4 294.9L590.4 295.9L590.8 297L590.8 319.3L590.8 320.5L590.2 321.6L589.2 322.6L587.8 323.4L586 324.1L584 324.6L581.8 324.8L579.5 324.8L577.4 324.5L575.3 324L573.6 323.3L572.2 322.4L571.3 321.4L570.8 320.3Z"/><path class="iso-shade" data-shade="0" d="M587.8 323.4L586 324.1L586 301.8L587.8 301.1ZM590.8 319.3L590.8 320.5L590.8 298.1L590.8 297ZM590.8 320.5L590.2 321.6L590.2 299.2L590.8 298.1ZM590.2 321.6L589.2 322.6L589.2 300.2L590.2 299.2ZM589.2 322.6L587.8 323.4L587.8 301.1L589.2 300.2Z"/><path class="iso-shade" data-shade="1" d="M586 324.1L584 324.6L584 302.2L586 301.8ZM584 324.6L581.8 324.8L581.8 302.5L584 302.2Z"/><path class="iso-shade" data-shade="2" d="M581.8 324.8L579.5 324.8L579.5 302.4L581.8 302.5ZM579.5 324.8L577.4 324.5L577.4 302.2L579.5 302.4ZM577.4 324.5L575.3 324L575.3 301.7L577.4 302.2Z"/><path class="iso-shade" data-shade="3" d="M575.3 324L573.6 323.3L573.6 301L575.3 301.7ZM573.6 323.3L572.2 322.4L572.2 300.1L573.6 301ZM572.2 322.4L571.3 321.4L571.3 299L572.2 300.1ZM571.3 321.4L570.8 320.3L570.8 297.9L571.3 299Z"/><path class="iso-top" d="M587.8 301.1L586 301.8L584 302.2L581.8 302.5L579.5 302.4L577.4 302.2L575.3 301.7L573.6 301L572.2 300.1L571.3 299L570.8 297.9L570.9 296.8L571.4 295.7L572.4 294.7L573.9 293.9L575.6 293.2L577.7 292.7L579.9 292.5L582.1 292.5L584.3 292.8L586.3 293.3L588.1 294L589.4 294.9L590.4 295.9L590.8 297L590.8 298.1L590.2 299.2L589.2 300.2Z"/><path class="iso-line iso-crease" data-tone="lo" d="M590.8 297L590.8 298.1L590.2 299.2L589.2 300.2L587.8 301.1L586 301.8L584 302.2L581.8 302.5L579.5 302.4L577.4 302.2L575.3 301.7L573.6 301L572.2 300.1L571.3 299L570.8 297.9"/><path class="iso-line iso-edge" data-tone="hi" d="M570.8 297.9L570.9 296.8L571.4 295.7L572.4 294.7L573.9 293.9L575.6 293.2L577.7 292.7L579.9 292.5L582.1 292.5L584.3 292.8L586.3 293.3L588.1 294L589.4 294.9L590.4 295.9L590.8 297M590.8 319.3L590.8 320.5L590.2 321.6L589.2 322.6L587.8 323.4L586 324.1L584 324.6L581.8 324.8L579.5 324.8L577.4 324.5L575.3 324L573.6 323.3L572.2 322.4L571.3 321.4L570.8 320.3M570.8 297.9L570.8 320.3M590.8 297L590.8 319.3"/></g><path class="iso-line" data-tone="mid" d="M590.9 297.5L590.7 298.3L590.3 299.2L589.5 300L588.5 300.7L587.3 301.3L585.9 301.8L584.3 302.2L582.6 302.4L580.8 302.5L579.1 302.4L577.4 302.2L575.8 301.8L574.4 301.3L573.1 300.7L572.1 300L571.4 299.2L570.9 298.3L570.8 297.5"/><g class="iso-solid" data-lit=""><path class="iso-fill" d="M576.5 252.7L576.7 252.2L577.1 251.6L577.8 251.2L578.7 250.9L579.8 250.7L580.9 250.6L582 250.7L583 250.9L583.9 251.3L584.6 251.7L585 252.2L585.1 252.8L585.1 297.5L585 298.1L584.5 298.6L583.8 299L582.9 299.3L581.9 299.6L580.8 299.6L579.6 299.5L578.6 299.3L577.7 299L577.1 298.5L576.7 298L576.5 297.4Z"/><path class="iso-shade" data-shade="0" d="M583.8 299L582.9 299.3L582.9 254.6L583.8 254.3ZM585.1 297.5L585 298.1L585 253.3L585.1 252.8ZM585 298.1L584.5 298.6L584.5 253.9L585 253.3ZM584.5 298.6L583.8 299L583.8 254.3L584.5 253.9Z"/><path class="iso-shade" data-shade="1" d="M582.9 299.3L581.9 299.6L581.9 254.8L582.9 254.6ZM581.9 299.6L580.8 299.6L580.8 254.9L581.9 254.8Z"/><path class="iso-shade" data-shade="2" d="M580.8 299.6L579.6 299.5L579.6 254.8L580.8 254.9ZM579.6 299.5L578.6 299.3L578.6 254.6L579.6 254.8Z"/><path class="iso-shade" data-shade="3" d="M578.6 299.3L577.7 299L577.7 254.2L578.6 254.6ZM577.7 299L577.1 298.5L577.1 253.8L577.7 254.2ZM577.1 298.5L576.7 298L576.7 253.3L577.1 253.8ZM576.7 298L576.5 297.4L576.5 252.7L576.7 253.3Z"/><path class="iso-top" d="M583.8 254.3L582.9 254.6L581.9 254.8L580.8 254.9L579.6 254.8L578.6 254.6L577.7 254.2L577.1 253.8L576.7 253.3L576.5 252.7L576.7 252.2L577.1 251.6L577.8 251.2L578.7 250.9L579.8 250.7L580.9 250.6L582 250.7L583 250.9L583.9 251.3L584.6 251.7L585 252.2L585.1 252.8L585 253.3L584.5 253.9Z"/><path class="iso-line iso-edge" data-tone="hi" d="M576.5 252.7L576.7 252.2L577.1 251.6L577.8 251.2L578.7 250.9L579.8 250.7L580.9 250.6L582 250.7L583 250.9L583.9 251.3L584.6 251.7L585 252.2L585.1 252.8M585.1 297.5L585 298.1L584.5 298.6L583.8 299L582.9 299.3L581.9 299.6L580.8 299.6L579.6 299.5L578.6 299.3L577.7 299L577.1 298.5L576.7 298L576.5 297.4M576.5 252.7L576.5 297.4M585.1 252.8L585.1 297.5"/></g><path class="iso-line" data-tone="hi" d="M586.3 300.3L584.3 300.8L581.9 301L579.5 300.8L577.1 300.2L575.2 299.2L573.7 298L573 296.7L573.1 295.2L573.9 293.9L575.4 292.7L577.4 291.8L579.7 291.2L582.2 291.1L584.5 291.3L586.5 291.8L587.9 292.6L588.6 293.6L588.6 294.7L587.8 295.6L586.3 296.4L584.3 297L581.9 297.1L579.5 296.9L577.1 296.3L575.2 295.4L573.7 294.2L573 292.8L573.1 291.4L573.9 290L575.4 288.8L577.4 287.9L579.7 287.4L582.2 287.2L584.5 287.4L586.5 288L587.9 288.8L588.6 289.8L588.6 290.8L587.8 291.8L586.3 292.6L584.3 293.1L581.9 293.3L579.5 293L577.1 292.4L575.2 291.5L573.7 290.3L573 288.9L573.1 287.5L573.9 286.1L575.4 285L577.4 284.1L579.7 283.5L582.2 283.3L584.5 283.5L586.5 284.1L587.9 284.9L588.6 285.9L588.6 286.9L587.8 287.9L586.3 288.7L584.3 289.2L581.9 289.4L579.5 289.2L577.1 288.6L575.2 287.6L573.7 286.4L573 285.1L573.1 283.6L573.9 282.3L575.4 281.1L577.4 280.2L579.7 279.6L582.2 279.5L584.5 279.7L586.5 280.2L587.9 281.1L588.6 282L588.6 283.1L587.8 284.1L586.3 284.8L584.3 285.4L581.9 285.5L579.5 285.3L577.1 284.7L575.2 283.8L573.7 282.6L573 281.2L573.1 279.8L573.9 278.4L575.4 277.2L577.4 276.3L579.7 275.8L582.2 275.6L584.5 275.8L586.5 276.4L587.9 277.2L588.6 278.2L588.6 279.2L587.8 280.2L586.3 281L584.3 281.5L581.9 281.7L579.5 281.4L577.1 280.9L575.2 279.9L573.7 278.7L573 277.3L573.1 275.9L573.9 274.6L575.4 273.4L577.4 272.5L579.7 271.9L582.2 271.7L584.5 272L586.5 272.5L587.9 273.3L588.6 274.3L588.6 275.3L587.8 276.3L586.3 277.1L584.3 277.6L581.9 277.8L579.5 277.6L577.1 277L575.2 276.1L573.7 274.8L573 273.5L573.1 272L573.9 270.7L575.4 269.5L577.4 268.6L579.7 268.1L582.2 267.9L584.5 268.1L586.5 268.6L587.9 269.5L588.6 270.4L588.6 271.5L587.8 272.5L586.3 273.3L584.3 273.8L581.9 273.9L579.5 273.7L577.1 273.1L575.2 272.2L573.7 271L573 269.6L573.1 268.2L573.9 266.8L575.4 265.6L577.4 264.7L579.7 264.2L582.2 264L584.5 264.2L586.5 264.8L587.9 265.6L588.6 266.6L588.6 267.6L587.8 268.6L586.3 269.4L584.3 269.9L581.9 270.1L579.5 269.9L577.1 269.3L575.2 268.3L573.7 267.1L573 265.7L573.1 264.3L573.9 263L575.4 261.8L577.4 260.9L579.7 260.3L582.2 260.2L584.5 260.4L586.5 260.9L587.9 261.7L588.6 262.7L588.6 263.8L587.8 264.7L586.3 265.5"/><g class="iso-solid"><path class="iso-fill" d="M569.4 247.7L569.6 246.6L570.3 245.5L571.4 244.5L572.9 243.7L574.6 243L576.6 242.4L578.8 242.1L581 242L583.3 242.2L585.4 242.5L587.4 243.1L589.1 243.8L590.5 244.7L591.5 245.7L592.1 246.8L592.3 247.9L592.3 257.8L592 258.9L591.4 260L590.3 261L588.8 261.8L587 262.5L585 263.1L582.9 263.4L580.6 263.5L578.4 263.3L576.3 263L574.3 262.4L572.6 261.7L571.2 260.8L570.2 259.8L569.5 258.7L569.4 257.6Z"/><path class="iso-shade" data-shade="0" d="M588.8 261.8L587 262.5L587 252.6L588.8 251.9ZM592.3 257.8L592 258.9L592 249L592.3 247.9ZM592 258.9L591.4 260L591.4 250.1L592 249ZM591.4 260L590.3 261L590.3 251L591.4 250.1ZM590.3 261L588.8 261.8L588.8 251.9L590.3 251Z"/><path class="iso-shade" data-shade="1" d="M587 262.5L585 263.1L585 253.1L587 252.6ZM585 263.1L582.9 263.4L582.9 253.4L585 253.1ZM582.9 263.4L580.6 263.5L580.6 253.5L582.9 253.4Z"/><path class="iso-shade" data-shade="2" d="M580.6 263.5L578.4 263.3L578.4 253.4L580.6 253.5ZM578.4 263.3L576.3 263L576.3 253L578.4 253.4ZM576.3 263L574.3 262.4L574.3 252.5L576.3 253Z"/><path class="iso-shade" data-shade="3" d="M574.3 262.4L572.6 261.7L572.6 251.8L574.3 252.5ZM572.6 261.7L571.2 260.8L571.2 250.9L572.6 251.8ZM571.2 260.8L570.2 259.8L570.2 249.9L571.2 250.9ZM570.2 259.8L569.5 258.7L569.5 248.8L570.2 249.9ZM569.5 258.7L569.4 257.6L569.4 247.7L569.5 248.8Z"/><path class="iso-top" d="M588.8 251.9L587 252.6L585 253.1L582.9 253.4L580.6 253.5L578.4 253.4L576.3 253L574.3 252.5L572.6 251.8L571.2 250.9L570.2 249.9L569.5 248.8L569.4 247.7L569.6 246.6L570.3 245.5L571.4 244.5L572.9 243.7L574.6 243L576.6 242.4L578.8 242.1L581 242L583.3 242.2L585.4 242.5L587.4 243.1L589.1 243.8L590.5 244.7L591.5 245.7L592.1 246.8L592.3 247.9L592 249L591.4 250.1L590.3 251Z"/><path class="iso-line iso-crease" data-tone="faint" d="M592.3 247.9L592 249L591.4 250.1L590.3 251L588.8 251.9L587 252.6L585 253.1L582.9 253.4L580.6 253.5L578.4 253.4L576.3 253L574.3 252.5L572.6 251.8L571.2 250.9L570.2 249.9L569.5 248.8L569.4 247.7"/><path class="iso-line iso-bevel" data-tone="faint" d="M592.3 247.9L590.9 248.9L590.3 249.8L589.3 250.7L588 251.5L586.4 252.1L584.6 252.6L582.7 252.9L580.7 252.9L578.6 252.8L576.7 252.5L574.9 252L573.4 251.4L572.1 250.6L571.2 249.7L570.7 248.7L569.4 247.7"/><path class="iso-line iso-edge" data-tone="hi" d="M569.4 247.7L569.6 246.6L570.3 245.5L571.4 244.5L572.9 243.7L574.6 243L576.6 242.4L578.8 242.1L581 242L583.3 242.2L585.4 242.5L587.4 243.1L589.1 243.8L590.5 244.7L591.5 245.7L592.1 246.8L592.3 247.9M592.3 257.8L592 258.9L591.4 260L590.3 261L588.8 261.8L587 262.5L585 263.1L582.9 263.4L580.6 263.5L578.4 263.3L576.3 263L574.3 262.4L572.6 261.7L571.2 260.8L570.2 259.8L569.5 258.7L569.4 257.6M569.4 247.7L569.4 257.6M592.3 247.9L592.3 257.8"/></g><path class="iso-line" data-tone="lo" d="M588.8 261.3L588.8 254.9M587 262L587 255.6M585 262.6L585 256.1M582.9 262.9L582.9 256.4M580.6 263L580.6 256.5M578.4 262.8L578.4 256.4M576.3 262.5L576.3 256M574.3 261.9L574.3 255.5M572.6 261.2L572.6 254.7M571.2 260.3L571.2 253.9M570.2 259.3L570.2 252.9M569.5 258.2L569.5 251.8M592 258.4L592 252M591.4 259.5L591.4 253M590.3 260.5L590.3 254"/><g class="iso-dots" data-tone="lit"><circle cx="580.8" cy="247.8" r="0.7"/></g></g></svg>
+            </div>
+
+            <!-- Tactile Interactive Control Strip -->
+            <div class="astrolabe-controls-bar">
+              <div class="element-pills-row" id="astrolabe-pills-row">
+                <button class="element-pill-btn active" data-element-idx="0" style="--pill-color: var(--anemo);" type="button">🍃 Мондштадт</button>
+                <button class="element-pill-btn" data-element-idx="1" style="--pill-color: var(--geo);" type="button">🔶 Ли Юэ</button>
+                <button class="element-pill-btn" data-element-idx="2" style="--pill-color: var(--electro);" type="button">⚡ Инадзума</button>
+                <button class="element-pill-btn" data-element-idx="3" style="--pill-color: var(--dendro);" type="button">🌿 Сумеру</button>
+                <button class="element-pill-btn" data-element-idx="4" style="--pill-color: var(--hydro);" type="button">💧 Фонтейн</button>
+                <button class="element-pill-btn" data-element-idx="5" style="--pill-color: var(--pyro);" type="button">🔥 Натлан</button>
+                <button class="element-pill-btn" data-element-idx="6" style="--pill-color: var(--cryo);" type="button">❄️ Снежная</button>
+              </div>
+
+              <div class="vernier-slider-wrap">
+                <span>Верньер:</span>
+                <input type="range" id="astrolabe-vernier" min="0" max="6" step="0.01" value="0" aria-label="Верньер настройки астролябии">
+              </div>
+
+              <button class="btn-plunger-trigger" id="btn-make-wish" type="button" title="Спустить плунжер и совершить молитву">
+                <span>Спустить плунжер</span>
+                <span style="opacity: 0.85;">(✦ 160)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Figure Caption & Swatches -->
+          <figcaption class="iso-legend">
+            <div class="iso-keys">
+              <span class="iso-key"><span class="iso-swatch" style="background:#0b0e17; border-color:#2c3547;"></span> Базовая плита на ножках</span>
+              <span class="iso-key"><span class="iso-swatch" style="background:#0f1420; border-color:#5b6982;"></span> Направляющие рельсы и мачта</span>
+              <span class="iso-key"><span class="iso-swatch" style="background:#141a27; border-color:#e2e8f5;"></span> Диск 7 частот Архонтов</span>
+              <span class="iso-key"><span class="iso-swatch" style="background:#f5d47a; border-color:#ffe9a6;"></span> Кристалл Сердца Бога (Lit)</span>
+              <span class="iso-key"><span class="iso-swatch" style="background:#ef5a38; border-color:#ff9d85;"></span> Плунжер со стальной пружиной</span>
+            </div>
+            <p class="iso-caption">
+              Астролябия Тейвата предназначена для калибровки резонанса между наземными экспедициями и ветвями древа Ирминсуль. 
+              Вращение диска наводит оптическую линзу на одно из семи королевств Семи Архонтов, открывая прямой доступ к экзаменам Кафедры 
+              и высвобождая молитвы созвездий при спуске плунжера.
+            </p>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
@@ -1273,13 +1469,13 @@
           <h2 id="regions-heading" class="section-title">Академические тесты по 7 регионам</h2>
           <p class="section-subtitle">
             Каждый тест содержит 10 вопросов, составленных строго по канону из фолиантов Тейвата.
-            Выберите регион, чтобы открыть экзаменационный терминал.
+            Нажатие на карточку региона автоматически наводит Астролябию и открывает экзаменационный терминал.
           </p>
         </div>
 
         <div class="regions-grid">
           <!-- 1. МОНДШТАДТ -->
-          <div class="region-card" data-quiz-cat="mondstadt" 
+          <div class="region-card" data-quiz-cat="mondstadt" data-elem-idx="0"
                style="--region-color: var(--anemo); --region-color-fade: rgba(79, 227, 193, 0.12); --region-color-glow: rgba(79, 227, 193, 0.3);">
             <div>
               <div class="region-head">
@@ -1288,6 +1484,7 @@
               </div>
               <h3 class="region-title">Мондштадт</h3>
               <div class="region-archon">✦ Барбатос (Венти) · Бог Свободы</div>
+              <div class="region-satire-badge">📜 Зачёт автоматом за бокал одуванчикового вина</div>
               <p class="region-desc">
                 Город ветров и одуванчиков. История Ордо Фавониус, дракона Двалина, Волка Севера Андриуса и истоков аристократии Лоуренсов.
               </p>
@@ -1299,13 +1496,13 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Базовый</span>
+              <span class="region-q-count">10 вопросов · 510.4 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
 
           <!-- 2. ЛИ ЮЭ -->
-          <div class="region-card" data-quiz-cat="liyue" 
+          <div class="region-card" data-quiz-cat="liyue" data-elem-idx="1"
                style="--region-color: var(--geo); --region-color-fade: rgba(229, 176, 66, 0.12); --region-color-glow: rgba(229, 176, 66, 0.3);">
             <div>
               <div class="region-head">
@@ -1314,8 +1511,9 @@
               </div>
               <h3 class="region-title">Ли Юэ</h3>
               <div class="region-archon">✦ Моракс (Чжун Ли) · Властелин Камня</div>
+              <div class="region-satire-badge">📜 Контракт с деканатом не подлежит расторжению</div>
               <p class="region-desc">
-                Гавань контрактов, Нефритовый дворец Нин Гуан, Адепты Заоблачного предела, битва при Осиале и древнее сокровище Гуйли.
+                Гавань контрактов, Нефритовый дворец Нин Гуан, Адепты Заоблачного предела, битва при Осиале и сокровище Гуйли.
               </p>
               <div class="region-topics">
                 <span class="topic-tag">Цисин</span>
@@ -1325,13 +1523,13 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Базовый</span>
+              <span class="region-q-count">10 вопросов · 589.2 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
 
           <!-- 3. ИНАДЗУМА -->
-          <div class="region-card" data-quiz-cat="inazuma" 
+          <div class="region-card" data-quiz-cat="inazuma" data-elem-idx="2"
                style="--region-color: var(--electro); --region-color-fade: rgba(191, 111, 251, 0.12); --region-color-glow: rgba(191, 111, 251, 0.3);">
             <div>
               <div class="region-head">
@@ -1351,13 +1549,13 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Средний</span>
+              <span class="region-q-count">10 вопросов · 425.0 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
 
           <!-- 4. СУМЕРУ -->
-          <div class="region-card" data-quiz-cat="sumeru" 
+          <div class="region-card" data-quiz-cat="sumeru" data-elem-idx="3"
                style="--region-color: var(--dendro); --region-color-fade: rgba(88, 199, 52, 0.12); --region-color-glow: rgba(88, 199, 52, 0.3);">
             <div>
               <div class="region-head">
@@ -1367,7 +1565,7 @@
               <h3 class="region-title">Сумеру</h3>
               <div class="region-archon">✦ Нахида · Малая владычица Кусанали</div>
               <p class="region-desc">
-                Тропические леса и бескрайние пески Дешрета. Шесть даршанов Академии, сеть Акаши, спасение Ирминсуля от запретного знания.
+                Тропические леса и пески Дешрета. Шесть даршанов Академии, сеть Акаши, очищение Ирминсуля от запретного знания.
               </p>
               <div class="region-topics">
                 <span class="topic-tag">Ирминсуль</span>
@@ -1377,13 +1575,13 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Средний</span>
+              <span class="region-q-count">10 вопросов · 542.1 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
 
           <!-- 5. ФОНТЕЙН -->
-          <div class="region-card" data-quiz-cat="fontaine" 
+          <div class="region-card" data-quiz-cat="fontaine" data-elem-idx="4"
                style="--region-color: var(--hydro); --region-color-fade: rgba(56, 152, 236, 0.12); --region-color-glow: rgba(56, 152, 236, 0.3);">
             <div>
               <div class="region-head">
@@ -1403,13 +1601,13 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Продвинутый</span>
+              <span class="region-q-count">10 вопросов · 468.5 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
 
           <!-- 6. НАТЛАН -->
-          <div class="region-card" data-quiz-cat="natlan" 
+          <div class="region-card" data-quiz-cat="natlan" data-elem-idx="5"
                style="--region-color: var(--pyro); --region-color-fade: rgba(239, 90, 56, 0.12); --region-color-glow: rgba(239, 90, 56, 0.3);">
             <div>
               <div class="region-head">
@@ -1429,13 +1627,13 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Продвинутый</span>
+              <span class="region-q-count">10 вопросов · 650.0 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
 
           <!-- 7. СНЕЖНАЯ & КАЭНРИ'АХ -->
-          <div class="region-card" data-quiz-cat="snezhnaya" 
+          <div class="region-card" data-quiz-cat="snezhnaya" data-elem-idx="6"
                style="--region-color: var(--cryo); --region-color-fade: rgba(124, 232, 255, 0.12); --region-color-glow: rgba(124, 232, 255, 0.3);">
             <div>
               <div class="region-head">
@@ -1445,7 +1643,7 @@
               <h3 class="region-title">Снежная, Каэнри'ах и Селестия</h3>
               <div class="region-archon">✦ Царица · Фатуи и Небесный Порядок</div>
               <p class="region-desc">
-                Заполярный дворец Заполярного дворца, сбор Сердец Бога, 500 лет со дня Катаклизма и проклятие бессмертия Дайнслейфа.
+                Заполярный дворец, сбор Сердец Бога, 500 лет со дня Катаклизма и проклятие бессмертия Дайнслейфа.
               </p>
               <div class="region-topics">
                 <span class="topic-tag">Предвестники Фатуи</span>
@@ -1455,7 +1653,7 @@
               </div>
             </div>
             <div class="region-foot">
-              <span class="region-q-count">10 вопросов · Экспертный</span>
+              <span class="region-q-count">10 вопросов · 488.0 nm</span>
               <span class="region-btn-action">Сдать экзамен →</span>
             </div>
           </div>
@@ -1463,11 +1661,11 @@
 
         <!-- 3 GENERAL LORE LEVELS SECTION -->
         <div id="general-lore" class="lore-levels-wrap">
-          <div class="section-head" style="margin-bottom: 24px;">
+          <div class="section-head" style="margin-bottom: 20px;">
             <div class="section-eyebrow">✦ Три ступени посвящения</div>
             <h3 class="section-title">Общий лор Тейвата по уровням сложности</h3>
             <p class="section-subtitle">
-              От базовых основ странствий до глубочайших метафизических тайн Ирминсуля, Сошедших и истинного облика мира.
+              От базовых странствий с Паймон до фундаментальных тайн Изначального Фанета, Четырех Теней и Четырех Сошедших.
             </p>
           </div>
 
@@ -1478,8 +1676,9 @@
                 <span class="lore-level-pill lvl-1">Уровень 1 · Базовый</span>
                 <h4 class="lore-card-title">Путешественник</h4>
                 <div class="lore-card-mentor">Наставник: Паймон</div>
+              <div class="lore-satire-badge">🎓 Бакалавриат · В поисках близнеца и хотя бы тройки</div>
                 <p class="lore-card-desc">
-                  Основы мира: Глаза Бога, Сердца Бога, элементы, элементальные реакции и главные вехи первых приключений.
+                  Основы мира: Глаза Бога, Сердца Бога, элементы, элементальные реакции и ключевые вехи первых странствий.
                 </p>
               </div>
               <div class="region-foot">
@@ -1494,8 +1693,9 @@
                 <span class="lore-level-pill lvl-2">Уровень 2 · Продвинутый</span>
                 <h4 class="lore-card-title">Учёный Академии Сумеру</h4>
                 <div class="lore-card-mentor">Наставник: Нахида & Аль-Хайтам</div>
+              <div class="lore-satire-badge">🎓 Магистратура · Защита диссертации в 6 Даршанах</div>
                 <p class="lore-card-desc">
-                  Глубокие хроники Войны Архонтов, создание Моры, природа Драконьих Суверенов и структура древа памяти Ирминсуль.
+                  Хроники Войны Архонтов, создание Моры, происхождение Драконьих Суверенов и кристаллическая структура Ирминсуля.
                 </p>
               </div>
               <div class="region-foot">
@@ -1510,8 +1710,9 @@
                 <span class="lore-level-pill lvl-3">Уровень 3 · Хардкор</span>
                 <h4 class="lore-card-title">Хранитель Ветвей Дайнслейф</h4>
                 <div class="lore-card-mentor">Наставник: Дайнслейф & Пьеро</div>
+              <div class="lore-satire-badge">🎓 Докторантура Каэнри'ах · Грех против Небесного Порядка</div>
                 <p class="lore-card-desc">
-                  Истинные тайны: Первый Престол (Изначальный), Четыре Тени, Четверо Сошедших, грешники Каэнри'ах и Фальшивое Небо.
+                  Тайны Мироздания: Первый Престол (Изначальный), Четыре Тени, Четверо Сошедших, грешники Каэнри'ах и Фальшивое Небо.
                 </p>
               </div>
               <div class="region-foot">
@@ -1644,7 +1845,7 @@
       <blockquote class="wish-loot-quote" id="wish-loot-quote">
         «Контракт не может быть нарушен.»
       </blockquote>
-      <button class="btn-celestial-primary" id="btn-close-wish" type="button" style="width: 100%; justify-content: center;">
+      <button class="btn-plunger-trigger" id="btn-close-wish" type="button" style="width: 100%; justify-content: center; padding: 14px 24px; font-size: 1rem;">
         Принять благословение ✦
       </button>
     </div>
@@ -1653,7 +1854,6 @@
   <!-- QUIZ MODAL TERMINAL -->
   <div class="quiz-modal" id="quiz-modal" role="dialog" aria-modal="true" aria-label="Терминал тестирования">
     <div class="quiz-dialog">
-      <!-- Modal Header -->
       <div class="quiz-dialog-header">
         <div class="quiz-head-info">
           <span class="quiz-modal-badge" id="quiz-modal-badge">Мондштадт</span>
@@ -1662,12 +1862,10 @@
         <button class="quiz-modal-close-btn" id="quiz-modal-close" type="button" aria-label="Закрыть тест">✕</button>
       </div>
 
-      <!-- Progress bar -->
       <div class="quiz-progress-track">
         <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
       </div>
 
-      <!-- Active Quiz View -->
       <div class="quiz-body-view" id="quiz-body-view">
         <div class="quiz-progress-meta">
           <span id="quiz-progress-text">Вопрос 1 из 10</span>
@@ -1679,10 +1877,9 @@
         </div>
 
         <div class="quiz-options-grid" id="quiz-options-container">
-          <!-- Dynamically populated by js/genshin.js -->
+          <!-- Dynamically populated -->
         </div>
 
-        <!-- Feedback & Lore explanation banner -->
         <div class="quiz-feedback-box" id="quiz-feedback-box">
           <div id="quiz-feedback-status"></div>
           <div class="quiz-explanation-text" id="quiz-explanation-text"></div>
@@ -1695,7 +1892,6 @@
         </div>
       </div>
 
-      <!-- Final Results View -->
       <div class="quiz-results-view" id="quiz-results-view">
         <div class="results-score-big" id="results-score-text">10 из 10</div>
         <div class="results-percent-badge" id="results-percent-text">100% правильных ответов</div>
@@ -1717,10 +1913,10 @@
         </blockquote>
 
         <div class="results-btns-row">
-          <button class="btn-celestial-secondary" id="results-retake-btn" type="button">
+          <button class="btn-action-alt" id="results-retake-btn" type="button">
             Пройти снова
           </button>
-          <button class="btn-celestial-primary" id="results-finish-btn" type="button">
+          <button class="btn-plunger-trigger" id="results-finish-btn" type="button" style="padding: 12px 28px;">
             Завершить экзамен
           </button>
         </div>
