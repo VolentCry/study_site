@@ -690,6 +690,58 @@
 
         .page-footer a { color: #f0c2c2; text-decoration: none; }
 
+                /* Mobile Navigation Floating Dock */
+        .mobile-nav-dock {
+            display: none;
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 600;
+            background: rgba(30, 48, 73, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 9999px;
+            padding: 0.35rem 0.55rem;
+            box-shadow: 0 12px 36px rgba(15, 25, 40, 0.45);
+            gap: 0.35rem;
+            max-width: calc(100vw - 24px);
+            box-sizing: border-box;
+        }
+        .mobile-dock-item {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.4rem 0.75rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            gap: 0.25rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            white-space: nowrap;
+        }
+        .mobile-dock-icon {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            fill: none;
+            display: block;
+            transition: transform 0.2s, stroke 0.2s;
+        }
+        .mobile-dock-item:hover, .mobile-dock-item:active {
+            background: rgba(183, 70, 78, 0.28);
+            color: #fff;
+        }
+        .mobile-dock-item:hover .mobile-dock-icon {
+            transform: translateY(-2px);
+            stroke: var(--vermilion, #e5b5b8);
+        }
+
         @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 720px) {
@@ -704,9 +756,9 @@
 
             .brand-class { display: none; }
 
-            .nav-links { gap: 15px; }
-
-            .nav-links a { font-size: 11px; }
+            .nav-links { display: none !important; }
+            .mobile-nav-dock { display: flex; }
+            body { padding-bottom: 74px; }
 
             .hero { min-height: 490px; height: 64svh; }
 
@@ -748,7 +800,9 @@
 
             .brand { margin-right: auto; }
 
-            .nav-links { width: 100%; justify-content: flex-end; gap: 20px; padding: 0 2px 2px; }
+            .nav-links { display: none !important; }
+            .mobile-dock-item { padding: 0.35rem 0.55rem; font-size: 0.68rem; }
+            .mobile-dock-icon { width: 16px; height: 16px; }
 
             .hero { min-height: 480px; height: 62svh; }
 
@@ -874,6 +928,34 @@
 
         </div>
 
+    </nav>
+
+    <!-- FLOATING DOCK FOR MOBILE VISITORS -->
+    <nav class="mobile-nav-dock" aria-label="Мобильная навигация">
+        <a href="../tasks/tasks.html" class="mobile-dock-item">
+            <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <span>Задачи</span>
+        </a>
+        <a href="#trainers" class="mobile-dock-item">
+            <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" fill-opacity="0.2"/>
+            </svg>
+            <span>Тренажёры</span>
+        </a>
+        <a href="maths/math_tests.html" class="mobile-dock-item">
+            <svg class="mobile-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+            <span>Тестирования</span>
+        </a>
     </nav>
 
 

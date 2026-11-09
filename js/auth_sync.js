@@ -20,9 +20,9 @@
     const StudyTheme = {
         get() {
             try {
-                return localStorage.getItem('profileTheme') || localStorage.getItem('site_theme') || 'dark';
+                return localStorage.getItem('profileTheme') || localStorage.getItem('site_theme') || 'light';
             } catch (e) {
-                return 'dark';
+                return 'light';
             }
         },
         set(th, sync = true) {
@@ -676,7 +676,7 @@
             localStorage.setItem('totalSolvedTasks', String(totalSolvedTasks));
         } catch (e) {}
         const avatarFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
-        const theme = localStorage.getItem('profileTheme') || 'dark';
+        const theme = localStorage.getItem('profileTheme') || 'light';
         let userName = localStorage.getItem('studyUserName') || localStorage.getItem('loggedInUser');
         if ((!userName || userName === 'Ученик') && currentUser) {
             userName = currentUser.displayName || currentUser.username;

@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;var h=(window.location.hash||'').toLowerCase();var s=sessionStorage.getItem('profileActiveTab');if(h==='#ranks'||h.indexOf('achieve')!==-1||h.indexOf('medal')!==-1||s==='ranks'||s==='achievements'){document.documentElement.classList.add('hide-profile-hero');}}catch(e){}})();</script>
+    <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t);document.documentElement.dataset.theme=t;var h=(window.location.hash||'').toLowerCase();var s=sessionStorage.getItem('profileActiveTab');if(h==='#ranks'||h.indexOf('achieve')!==-1||h.indexOf('medal')!==-1||s==='ranks'||s==='achievements'){document.documentElement.classList.add('hide-profile-hero');}}catch(e){}})();</script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный профиль исследователя · НЕШкола</title>
@@ -145,6 +145,10 @@
             color: #0f172a;
             border-color: rgba(15, 23, 42, 0.16);
         }
+        [data-theme="light"] .profile-tabs-nav {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: rgba(15, 23, 42, 0.12);
+        }
         [data-theme="light"] .profile-tab-btn {
             color: #475569;
             border-color: transparent;
@@ -155,7 +159,40 @@
         }
         [data-theme="light"] .profile-tab-btn.active {
             background: var(--accent);
-            color: #ffffff;
+            color: #ffffff !important;
+        }
+        [data-theme="light"] .profile-tab-dropdown-menu {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.14);
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.04);
+        }
+        [data-theme="light"] .profile-tab-dropdown-item {
+            color: #334155;
+        }
+        [data-theme="light"] .profile-tab-dropdown-item svg {
+            color: #64748b;
+        }
+        [data-theme="light"] .profile-tab-dropdown-item:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        [data-theme="light"] .profile-tab-dropdown-item:hover svg {
+            color: #0f172a;
+        }
+        [data-theme="light"] .profile-tab-dropdown-item.active {
+            background: rgba(234, 88, 12, 0.1);
+            color: var(--accent);
+            border-color: rgba(234, 88, 12, 0.22);
+        }
+        [data-theme="light"] .profile-tab-dropdown-item.active svg {
+            color: var(--accent);
+        }
+        [data-theme="light"] .profile-tab-dropdown-trigger:not(.active) {
+            color: #475569;
+        }
+        [data-theme="light"] .profile-tab-dropdown-trigger:not(.active):hover {
+            color: #0f172a;
+            background: rgba(15, 23, 42, 0.05);
         }
         [data-theme="light"] .nav-btn {
             background: #ffffff;
@@ -632,6 +669,136 @@
             filter: brightness(1.08);
             transform: translateY(-1px);
             box-shadow: 0 4px 18px var(--accent-glow);
+        }
+
+        /* PROFILE TAB DROPDOWN (СЕРИИ И ЗВАНИЯ, МЕДАЛИ) */
+        .profile-tab-dropdown {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .profile-tab-dropdown-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .profile-tab-dropdown-trigger .dropdown-arrow {
+            transition: transform 0.22s var(--ease-out);
+            opacity: 0.75;
+            flex-shrink: 0;
+        }
+
+        .profile-tab-dropdown.open .profile-tab-dropdown-trigger .dropdown-arrow {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
+
+        .profile-tab-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 195px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out), visibility 0.2s;
+        }
+
+        .profile-tab-dropdown.open .profile-tab-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .profile-tab-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.55rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted-bright);
+            font-family: var(--f-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            white-space: nowrap;
+        }
+
+        .profile-tab-dropdown-item svg {
+            flex-shrink: 0;
+            color: var(--muted);
+            transition: color 0.16s ease;
+        }
+
+        .profile-tab-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+
+        .profile-tab-dropdown-item:hover svg {
+            color: #ffffff;
+        }
+
+        .profile-tab-dropdown-item.active {
+            background: rgba(255, 119, 40, 0.16);
+            color: var(--accent);
+            border-color: rgba(255, 119, 40, 0.25);
+            font-weight: 700;
+        }
+
+        .profile-tab-dropdown-item.active svg {
+            color: var(--accent);
+        }
+
+        .profile-tab-dropdown-item .dropdown-item-check {
+            margin-left: auto;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .profile-tab-dropdown-item.active .dropdown-item-check {
+            opacity: 1;
+        }
+
+        .d-none-mobile {
+            display: inline;
+        }
+        .d-only-mobile {
+            display: none;
+        }
+        @media (max-width: 480px) {
+            .d-none-mobile {
+                display: none !important;
+            }
+            .d-only-mobile {
+                display: inline !important;
+            }
         }
 
         .profile-tab-btn:focus-visible,
@@ -3804,24 +3971,6 @@
             border: 1px solid var(--line);
         }
 
-        @media (max-width: 480px) {
-            .profile-tabs-nav {
-                display: flex;
-                width: 100%;
-                overflow-x: auto;
-                justify-content: flex-start;
-                scrollbar-width: none;
-                -webkit-overflow-scrolling: touch;
-            }
-            .profile-tabs-nav::-webkit-scrollbar {
-                display: none;
-            }
-            .profile-tab-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-                flex-shrink: 0;
-            }
-        }
 
         /* UTILITIES */
         .hidden { display: none !important; }
@@ -3898,9 +4047,10 @@
                     "tabs  tabs";
                 align-items: center;
                 height: auto;
-                padding: 0.75rem 0 0.5rem;
-                row-gap: 0.65rem;
-                column-gap: 0.5rem;
+                padding-top: 0.75rem;
+                padding-bottom: 0.65rem;
+                row-gap: 0.75rem;
+                column-gap: 0.75rem;
             }
             .brand {
                 grid-area: brand;
@@ -3917,20 +4067,17 @@
             }
             .profile-tabs-nav {
                 grid-area: tabs;
-                width: 100%;
-                display: flex;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
+                justify-self: center;
+                width: auto;
+                max-width: 100%;
+                display: inline-flex;
+                overflow: visible;
                 gap: 4px;
                 padding: 4px;
                 border-radius: var(--r-pill);
                 background: rgba(255, 255, 255, 0.05);
                 border: 1px solid var(--line);
                 box-sizing: border-box;
-            }
-            .profile-tabs-nav::-webkit-scrollbar {
-                display: none;
             }
             .profile-tab-btn {
                 flex-shrink: 0;
@@ -3971,6 +4118,21 @@
             }
             .brand {
                 font-size: 0.95rem;
+            }
+            .profile-tabs-nav {
+                justify-content: center;
+                gap: 4px;
+                padding: 3px;
+                overflow: visible;
+            }
+            .profile-tab-btn {
+                padding: 0.36rem 0.6rem;
+                font-size: 0.78rem;
+                gap: 0.35rem;
+            }
+            .profile-tab-dropdown-menu {
+                right: 0;
+                min-width: 175px;
             }
         }
 
@@ -4642,20 +4804,37 @@
             <div class="profile-tabs-nav" role="tablist" aria-label="Вкладки профиля">
                 <button type="button" class="profile-tab-btn active" id="tab-btn-study" role="tab" aria-selected="true" aria-controls="tab-content-study">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span>Учёба и расписание</span>
+                    <span>Учёба<span class="d-none-mobile"> и расписание</span></span>
                 </button>
                 <button type="button" class="profile-tab-btn" id="tab-btn-overview" role="tab" aria-selected="false" aria-controls="tab-content-overview">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
-                    <span>Прогресс и навыки</span>
+                    <span>Прогресс<span class="d-none-mobile"> и навыки</span></span>
                 </button>
-                <button type="button" class="profile-tab-btn" id="tab-btn-ranks" role="tab" aria-selected="false" aria-controls="tab-content-ranks">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
-                    <span>Серии и звания</span>
-                </button>
-                <button type="button" class="profile-tab-btn" id="tab-btn-achievements" role="tab" aria-selected="false" aria-controls="tab-content-achievements">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/></svg>
-                    <span>Медали</span>
-                </button>
+
+                <!-- ВЫПАДАЮЩИЙ СПИСОК: СЕРИИ И ЗВАНИЯ, МЕДАЛИ -->
+                <div class="profile-tab-dropdown" id="profile-tab-dropdown">
+                    <button type="button" class="profile-tab-btn profile-tab-dropdown-trigger" id="tab-btn-dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Дополнительные разделы: Серии и звания, Медали">
+                        <span class="dropdown-trigger-icon" id="profile-dropdown-icon" aria-hidden="true">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+                        </span>
+                        <span class="dropdown-trigger-label" id="profile-dropdown-label">Ещё</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="profile-tab-dropdown-menu" id="profile-tab-dropdown-menu" role="menu" aria-label="Дополнительные разделы">
+                        <button type="button" class="profile-tab-dropdown-item" id="tab-btn-ranks" role="tab" aria-selected="false" aria-controls="tab-content-ranks">
+                            <svg class="dropdown-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
+                            <span class="dropdown-item-text">Серии и звания</span>
+                            <span class="dropdown-item-check" aria-hidden="true">✓</span>
+                        </button>
+                        <button type="button" class="profile-tab-dropdown-item" id="tab-btn-achievements" role="tab" aria-selected="false" aria-controls="tab-content-achievements">
+                            <svg class="dropdown-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/></svg>
+                            <span class="dropdown-item-text">Медали</span>
+                            <span class="dropdown-item-check" aria-hidden="true">✓</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="header-actions">
@@ -5130,15 +5309,15 @@
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                             <span>Тема оформления</span>
                         </h3>
-                        <span class="settings-badge" id="theme-mode-badge">Тёмная тема</span>
+                        <span class="settings-badge" id="theme-mode-badge">Светлая тема</span>
                     </div>
                     <div class="theme-toggle-row">
                         <div class="theme-toggle-info">
                             <span class="theme-toggle-label">Режим отображения</span>
-                            <span class="theme-toggle-desc" id="theme-toggle-desc">Тёмный космический интерфейс</span>
+                            <span class="theme-toggle-desc" id="theme-toggle-desc">Светлый контрастный интерфейс</span>
                         </div>
                         <label class="theme-switch" for="settings-theme-toggle" title="Переключить тему">
-                            <input type="checkbox" id="settings-theme-toggle" role="switch" aria-checked="false" aria-label="Переключить между светлой и тёмной темой">
+                            <input type="checkbox" id="settings-theme-toggle" role="switch" aria-checked="true" checked aria-label="Переключить между светлой и тёмной темой">
                             <span class="theme-slider">
                                 <span class="theme-slider-icon dark-icon" aria-hidden="true">🌙</span>
                                 <span class="theme-slider-icon light-icon" aria-hidden="true">☀️</span>
@@ -5275,6 +5454,11 @@
             const tabBtnOverview = document.getElementById('tab-btn-overview');
             const tabBtnRanks = document.getElementById('tab-btn-ranks');
             const tabBtnAchievements = document.getElementById('tab-btn-achievements') || document.getElementById('achievements-open');
+            const tabBtnDropdownTrigger = document.getElementById('tab-btn-dropdown-trigger');
+            const tabDropdown = document.getElementById('profile-tab-dropdown');
+            const dropdownLabel = document.getElementById('profile-dropdown-label');
+            const dropdownIcon = document.getElementById('profile-dropdown-icon');
+            const dropdownMenu = document.getElementById('profile-tab-dropdown-menu');
             const tabContentStudy = document.getElementById('tab-content-study');
             const tabContentOverview = document.getElementById('tab-content-overview');
             const tabContentRanks = document.getElementById('tab-content-ranks');
@@ -5615,6 +5799,17 @@
                 applyFilters();
             }
 
+            function toggleDropdown(forceState) {
+                if (!tabDropdown || !tabBtnDropdownTrigger) return;
+                const willOpen = (typeof forceState === 'boolean') ? forceState : !tabDropdown.classList.contains('open');
+                tabDropdown.classList.toggle('open', willOpen);
+                tabBtnDropdownTrigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            }
+
+            function closeDropdown() {
+                toggleDropdown(false);
+            }
+
             function switchTab(tabName) {
                 const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements];
                 const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements];
@@ -5636,11 +5831,21 @@
                     if (content) content.classList.add('hidden');
                 });
 
+                closeDropdown();
+
+                const isSecondary = (tabName === 'ranks' || tabName === 'achievements');
+                if (tabBtnDropdownTrigger) {
+                    tabBtnDropdownTrigger.classList.toggle('active', isSecondary);
+                    tabBtnDropdownTrigger.setAttribute('aria-selected', isSecondary ? 'true' : 'false');
+                }
+
                 if (tabName === 'overview') {
                     if (tabBtnOverview) {
                         tabBtnOverview.classList.add('active');
                         tabBtnOverview.setAttribute('aria-selected', 'true');
                     }
+                    if (dropdownLabel) dropdownLabel.textContent = 'Ещё';
+                    if (dropdownIcon) dropdownIcon.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>';
                     if (tabContentOverview) tabContentOverview.classList.remove('hidden');
                     try {
                         sessionStorage.setItem('profileActiveTab', 'overview');
@@ -5651,6 +5856,8 @@
                         tabBtnRanks.classList.add('active');
                         tabBtnRanks.setAttribute('aria-selected', 'true');
                     }
+                    if (dropdownLabel) dropdownLabel.innerHTML = '<span class="d-none-mobile">Серии и звания</span><span class="d-only-mobile">Звания</span>';
+                    if (dropdownIcon) dropdownIcon.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>';
                     if (tabContentRanks) tabContentRanks.classList.remove('hidden');
 
                     if (window.TrainerTracker && trainerRanksContainer) {
@@ -5666,6 +5873,8 @@
                         tabBtnAchievements.classList.add('active');
                         tabBtnAchievements.setAttribute('aria-selected', 'true');
                     }
+                    if (dropdownLabel) dropdownLabel.textContent = 'Медали';
+                    if (dropdownIcon) dropdownIcon.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/></svg>';
                     if (tabContentAchievements) tabContentAchievements.classList.remove('hidden');
 
                     if (typeof window.renderProfileAchievementsPage === 'function') {
@@ -5681,6 +5890,8 @@
                         tabBtnStudy.classList.add('active');
                         tabBtnStudy.setAttribute('aria-selected', 'true');
                     }
+                    if (dropdownLabel) dropdownLabel.textContent = 'Ещё';
+                    if (dropdownIcon) dropdownIcon.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>';
                     if (tabContentStudy) tabContentStudy.classList.remove('hidden');
                     loadStudyData();
                     try {
@@ -5700,6 +5911,49 @@
             if (heroMedalsBtn) heroMedalsBtn.addEventListener('click', () => {
                 switchTab('achievements');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            if (tabBtnDropdownTrigger) {
+                tabBtnDropdownTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown();
+                });
+                tabBtnDropdownTrigger.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleDropdown(true);
+                        const firstItem = dropdownMenu?.querySelector('.profile-tab-dropdown-item');
+                        if (firstItem) firstItem.focus();
+                    } else if (e.key === 'Escape') {
+                        closeDropdown();
+                    }
+                });
+            }
+
+            if (dropdownMenu) {
+                dropdownMenu.addEventListener('keydown', (e) => {
+                    const items = Array.from(dropdownMenu.querySelectorAll('.profile-tab-dropdown-item'));
+                    const curIndex = items.indexOf(document.activeElement);
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = items[(curIndex + 1) % items.length];
+                        if (next) next.focus();
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = items[(curIndex - 1 + items.length) % items.length];
+                        if (prev) prev.focus();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeDropdown();
+                        if (tabBtnDropdownTrigger) tabBtnDropdownTrigger.focus();
+                    }
+                });
+            }
+
+            document.addEventListener('click', (e) => {
+                if (tabDropdown && !tabDropdown.contains(e.target)) {
+                    closeDropdown();
+                }
             });
 
             window.addEventListener('hashchange', () => {
@@ -6423,7 +6677,7 @@
                 }
             }
 
-            const initialTheme = window.StudyTheme ? window.StudyTheme.get() : (localStorage.getItem('profileTheme') || 'dark');
+            const initialTheme = window.StudyTheme ? window.StudyTheme.get() : (localStorage.getItem('profileTheme') || 'light');
             applyProfileTheme(initialTheme);
 
             if (settingsThemeToggle) {
@@ -6797,7 +7051,7 @@
                 if (settingsNameStatus) {
                     settingsNameStatus.textContent = '';
                 }
-                const curTheme = window.StudyTheme ? window.StudyTheme.get() : (document.documentElement.dataset.theme || 'dark');
+                const curTheme = window.StudyTheme ? window.StudyTheme.get() : (document.documentElement.dataset.theme || 'light');
                 applyProfileTheme(curTheme);
 
                 const currentFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
