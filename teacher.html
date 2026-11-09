@@ -820,6 +820,8 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            width: 100%;
+            min-width: 0;
         }
         .lesson-card {
             background: var(--surface-card);
@@ -827,42 +829,91 @@
             border-radius: var(--r);
             padding: 1.25rem 1.5rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 1.25rem;
             transition: all 0.2s var(--ease-out);
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
         }
         .lesson-card:hover {
             border-color: var(--line-active);
             transform: translateY(-2px);
         }
+        .lesson-card-completed {
+            border-left: 3px solid var(--accent-emerald);
+        }
         .lesson-time-box {
             min-width: 140px;
+            flex-shrink: 0;
         }
         .lesson-time-main {
             font-family: var(--f-display);
             font-size: 1.15rem;
             font-weight: 700;
             color: var(--accent-cyan);
+            line-height: 1.2;
         }
         .lesson-time-sub {
             font-size: 0.82rem;
             color: var(--muted);
+            margin-top: 2px;
         }
         .lesson-info {
             flex: 1;
+            min-width: 0;
         }
         .lesson-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 0.4rem;
+            min-width: 0;
+        }
+        .lesson-title-text {
             font-size: 1.05rem;
             font-weight: 700;
-            margin-bottom: 0.35rem;
             color: var(--ink);
+            word-break: break-word;
+            line-height: 1.35;
         }
         .lesson-badges-row {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
+            min-width: 0;
+            margin-top: 0.35rem;
+        }
+        .lesson-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+        .lesson-status-badge.status-completed,
+        .lesson-status-badge.badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .lesson-status-badge.status-past {
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .lesson-status-badge.status-planned {
+            color: var(--accent-cyan);
+            background: rgba(44, 230, 214, 0.1);
+            border: 1px solid rgba(44, 230, 214, 0.25);
         }
         .lesson-class-badge {
             display: inline-flex;
@@ -875,6 +926,29 @@
             background: rgba(255, 119, 40, 0.15);
             color: var(--accent);
             border: 1px solid rgba(255, 119, 40, 0.3);
+            max-width: 100%;
+            word-break: break-word;
+        }
+        .lesson-student-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        .lesson-student-badge.student-individual {
+            background: rgba(251, 191, 36, 0.14);
+            color: var(--accent-gold);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+        }
+        .lesson-student-badge.student-all {
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .lesson-hw-badge {
             display: inline-flex;
@@ -887,6 +961,30 @@
             background: rgba(16, 185, 129, 0.15);
             color: var(--accent-emerald);
             border: 1px solid rgba(16, 185, 129, 0.3);
+            text-decoration: none;
+            max-width: 100%;
+            word-break: break-word;
+            transition: all 0.15s ease;
+        }
+        .lesson-hw-badge:hover {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: var(--accent-emerald);
+            transform: translateY(-1px);
+        }
+        .lesson-notes {
+            display: block;
+            width: 100%;
+            font-size: 0.8rem;
+            color: var(--muted);
+            word-break: break-word;
+            line-height: 1.4;
+            margin-top: 2px;
+        }
+        .lesson-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         /* --- CONSTRUCTOR STYLES --- */
@@ -1323,9 +1421,90 @@
                 align-items: flex-start;
                 gap: 12px;
             }
+            .schedule-hero > div:last-child {
+                width: 100%;
+            }
             .schedule-hero .btn {
                 width: 100%;
                 justify-content: center;
+            }
+            .lessons-timeline {
+                gap: 0.85rem;
+            }
+            .lesson-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.85rem;
+                padding: 1rem 1.15rem;
+                border-radius: var(--r-md);
+            }
+            .lesson-time-box {
+                min-width: 0;
+                width: 100%;
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                gap: 8px;
+                flex-wrap: wrap;
+                padding-bottom: 0.65rem;
+                border-bottom: 1px solid var(--line);
+            }
+            .lesson-time-main {
+                font-size: 1.05rem;
+            }
+            .lesson-time-sub {
+                font-size: 0.8rem;
+                margin-top: 0;
+            }
+            .lesson-info {
+                width: 100%;
+                min-width: 0;
+            }
+            .lesson-title {
+                gap: 6px;
+                margin-bottom: 0.35rem;
+            }
+            .lesson-title-text {
+                font-size: 1rem;
+            }
+            .lesson-badges-row {
+                gap: 6px;
+                margin-top: 0.4rem;
+            }
+            .lesson-class-badge,
+            .lesson-student-badge,
+            .lesson-hw-badge {
+                font-size: 0.72rem;
+                padding: 3px 8px;
+            }
+            .lesson-actions {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 0.25rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid var(--line);
+            }
+            .lesson-actions .btn-toggle-lesson-complete {
+                flex: 1;
+                min-width: 0;
+                justify-content: center;
+                min-height: 40px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                padding: 0 12px;
+            }
+            .lesson-actions .btn-edit-lesson,
+            .lesson-actions .btn-delete-lesson {
+                min-height: 40px;
+                min-width: 42px;
+                padding: 0 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.95rem;
+                flex-shrink: 0;
             }
             .classes-grid {
                 grid-template-columns: 1fr;
@@ -3569,21 +3748,21 @@
 
                         let hwBadgeHtml = '';
                         if (hwId && hwTitle) {
-                            hwBadgeHtml = `<a href="homework.html?id=${hwId}" target="_blank" class="lesson-hw-badge" title="Смотреть домашнее задание с ответами" style="text-decoration:none; cursor:pointer;">👀 Д/З: ${escapeHtml(hwTitle)} ↗</a>`;
+                            hwBadgeHtml = `<a href="homework.html?id=${hwId}" target="_blank" class="lesson-hw-badge" title="Смотреть домашнее задание с ответами">👀 Д/З: ${escapeHtml(hwTitle)} ↗</a>`;
                         }
 
                         let studentBadgeHtml = '';
                         if (les.student_id && (les.student_name || les.student_username)) {
-                            studentBadgeHtml = `<span class="lesson-student-badge" style="background:rgba(251, 191, 36, 0.14); color:var(--accent-gold); border:1px solid rgba(251, 191, 36, 0.35); padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:700;">👤 Индивидуально: ${escapeHtml(les.student_name || les.student_username)}</span>`;
+                            studentBadgeHtml = `<span class="lesson-student-badge student-individual">👤 Индивидуально: ${escapeHtml(les.student_name || les.student_username)}</span>`;
                         } else {
-                            studentBadgeHtml = `<span style="font-size:0.75rem; color:var(--muted); background:rgba(255, 255, 255, 0.05); padding:2px 8px; border-radius:9999px;">👥 Весь класс</span>`;
+                            studentBadgeHtml = `<span class="lesson-student-badge student-all">👥 Весь класс</span>`;
                         }
 
                         const isPast = d && (d.getTime() < Date.now() - 3600000);
                         const isCompleted = !!(les.isCompleted || les.is_completed);
                         const statusBadge = isCompleted
-                            ? '<span class="badge badge-success" style="font-size:0.75rem;">✅ Проведено</span>'
-                            : (isPast ? '<span style="font-size:0.75rem; color:var(--muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:9999px;">Прошедший</span>' : '<span style="font-size:0.75rem; color:var(--accent-cyan); background:rgba(44,230,214,0.1); padding:2px 8px; border-radius:9999px;">Запланирован</span>');
+                            ? '<span class="lesson-status-badge status-completed">✅ Проведено</span>'
+                            : (isPast ? '<span class="lesson-status-badge status-past">Прошедший</span>' : '<span class="lesson-status-badge status-planned">Запланирован</span>');
 
                         return `
                             <div class="lesson-card ${isCompleted ? 'lesson-card-completed' : ''}" id="lesson-card-${les.id}" style="${isPast && !isCompleted ? 'opacity:0.8;' : ''}">
@@ -3592,22 +3771,22 @@
                                     <div class="lesson-time-sub">${dateStr}</div>
                                 </div>
                                 <div class="lesson-info">
-                                    <div class="lesson-title" style="display:flex; align-items:center; gap:8px;">
-                                        <span>${escapeHtml(les.title)}</span>
+                                    <div class="lesson-title">
+                                        <span class="lesson-title-text">${escapeHtml(les.title)}</span>
                                         ${statusBadge}
                                     </div>
                                     <div class="lesson-badges-row">
                                         <span class="lesson-class-badge">🏫 ${escapeHtml(cName)}</span>
                                         ${studentBadgeHtml}
                                         ${hwBadgeHtml}
-                                        ${notes ? `<span style="font-size:0.8rem; color:var(--muted);">${escapeHtml(notes)}</span>` : ''}
+                                        ${notes ? `<span class="lesson-notes">${escapeHtml(notes)}</span>` : ''}
                                     </div>
                                 </div>
-                                <div style="display:flex; align-items:center; gap:8px;">
+                                <div class="lesson-actions">
                                     <button type="button" class="btn btn-sm ${isCompleted ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-complete" data-lesson-id="${les.id}" data-completed="${isCompleted ? '1' : '0'}" title="${isCompleted ? 'Снять отметку о проведении' : 'Отметить как проведённое занятие'}">
                                         ${isCompleted ? '✓ Проведено' : '⏳ Провести'}
                                     </button>
-                                    <button type="button" class="btn btn-secondary btn-sm btn-edit-lesson" data-lesson-id="${les.id}" title="Редактировать занятие" style="padding:0.25rem 0.55rem; font-size:0.85rem;">
+                                    <button type="button" class="btn btn-secondary btn-sm btn-edit-lesson" data-lesson-id="${les.id}" title="Редактировать занятие">
                                         ✏️
                                     </button>
                                     <button type="button" class="btn btn-danger-outline btn-sm btn-delete-lesson" data-lesson-id="${les.id}" title="Отменить занятие">

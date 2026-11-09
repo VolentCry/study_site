@@ -25,3 +25,5 @@ config.env
 *.sqlite3
 instruction.txt
 other/error_log.txt
+
+other/
