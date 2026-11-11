@@ -2513,6 +2513,68 @@ def update_methodical_plan(plan_id: int, teacher_id: int, data: Dict[str, Any], 
         conn.close()
 
 
+def attach_student_to_methodical_plan(plan_id: int, teacher_id: int, student_id: int, student_name: str, copy_as_new: bool = False, is_admin: bool = False) -> Optional[int]:
+    """Привязка ученика к существующему плану или создание персональной копии."""
+    conn = get_db_connection()
+    now_iso = datetime.now().isoformat()
+    try:
+        cursor = conn.cursor()
+        with conn:
+            cursor = conn.cursor()
+            if is_admin:
+                cursor.execute("SELECT * FROM methodical_plans WHERE id = ?", (plan_id,))
+            else:
+                cursor.execute("SELECT * FROM methodical_plans WHERE id = ? AND teacher_id = ?", (plan_id, teacher_id))
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            clean_name = (student_name or 'Ученик').strip()
+            new_title = f"Методический план · {clean_name}"
+
+            if copy_as_new:
+                cursor.execute(
+                    """
+                    INSERT INTO methodical_plans (
+                        teacher_id, student_id, student_name, title, academic_year, subject,
+                        tags_json, goals, topics_json, monthly_counts_json, monthly_lessons_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        teacher_id,
+                        student_id,
+                        clean_name,
+                        new_title,
+                        row['academic_year'],
+                        row['subject'],
+                        row['tags_json'],
+                        row['goals'],
+                        row['topics_json'],
+                        row['monthly_counts_json'],
+                        '{}',
+                        now_iso,
+                        now_iso
+                    )
+                )
+                return cursor.lastrowid
+            else:
+                cursor.execute(
+                    """
+                    UPDATE methodical_plans SET
+                        student_id = ?,
+                        student_name = ?,
+                        title = ?,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (student_id, clean_name, new_title, now_iso, plan_id)
+                )
+                return plan_id
+    finally:
+        conn.close()
+
+
 def toggle_methodical_lesson(plan_id: int, month: str, lesson_index: int, is_conducted: bool, user_id: int, is_teacher: bool) -> bool:
     """Быстрое переключение статуса проведения урока в методическом плане."""
     conn = get_db_connection()

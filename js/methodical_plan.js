@@ -19,6 +19,8 @@
     let isTeacherUser = false;
     let currentUser = null;
     let isEditing = false;
+    let currentActiveStudentId = null;
+    let currentActiveStudentName = null;
 
     // Месяцы учебного года по умолчанию
     const ACADEMIC_MONTHS = [
@@ -601,6 +603,41 @@
                 color: #0f172a !important;
                 border: 1px solid rgba(15, 23, 42, 0.14) !important;
             }
+
+            /* ATTACH METHODICAL PLAN MODAL */
+            .attach-plan-dialog {
+                max-width: 680px !important;
+                width: 94vw !important;
+            }
+            .attach-plan-card {
+                transition: all 0.16s ease;
+            }
+            .attach-plan-card:hover {
+                border-color: var(--accent, #ea580c) !important;
+                transform: translateY(-1px);
+            }
+            .attach-plan-card.selected {
+                border-color: var(--accent, #ea580c) !important;
+                box-shadow: 0 0 0 1px var(--accent, #ea580c);
+            }
+            [data-theme="light"] .attach-plan-dialog {
+                background: #ffffff !important;
+                border-color: rgba(15, 23, 42, 0.12) !important;
+                color: #0f172a !important;
+                box-shadow: 0 25px 60px rgba(15, 23, 42, 0.18) !important;
+            }
+            [data-theme="light"] .attach-plan-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .attach-plan-card:hover {
+                background: #f1f5f9 !important;
+                border-color: #ea580c !important;
+            }
+            [data-theme="light"] .attach-plan-card.selected {
+                background: rgba(234, 88, 12, 0.08) !important;
+                border-color: #ea580c !important;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -664,6 +701,9 @@
                         <select id="plan-select-dropdown" class="form-select form-select-sm" style="max-width:220px; font-size:0.85rem; display:none;">
                             <option value="">Выберите план...</option>
                         </select>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-plan-attach-existing" style="display:none;" title="Привязать созданный ранее план к этому ученику">
+                            🔗 Привязать план
+                        </button>
                         <button type="button" class="btn btn-secondary btn-sm" id="btn-plan-new" style="display:none;" title="Создать новый методический план">
                             ➕ Новый
                         </button>
@@ -783,6 +823,8 @@
 
     // Загрузка доступных планов
     async function loadPlansList(preselectStudentId = null, preselectStudentName = null) {
+        currentActiveStudentId = preselectStudentId ? parseInt(preselectStudentId, 10) : null;
+        currentActiveStudentName = preselectStudentName || null;
         try {
             // Для учителя всегда загружаем полный список планов, чтобы в выпадающем списке можно было переключаться между всеми учениками
             let url = '/api/methodical-plans';
@@ -1122,6 +1164,17 @@
         if (btnTmpl) btnTmpl.style.display = canEdit ? 'inline-block' : 'none';
 
         const p = currentPlan;
+        const targetStudentId = p.studentId || currentActiveStudentId;
+        const targetStudentName = p.studentName || currentActiveStudentName || 'Ученик';
+
+        const btnAttach = document.getElementById('btn-plan-attach-existing');
+        if (btnAttach) {
+            btnAttach.style.display = (canEdit && targetStudentId) ? 'inline-block' : 'none';
+            btnAttach.onclick = () => {
+                openAttachModal(targetStudentId, targetStudentName);
+            };
+        }
+
         const tags = Array.isArray(p.tags) ? p.tags : ['#Репетиторство', '#Обучение'];
 
         // Вычисляем общие часы
@@ -1135,6 +1188,17 @@
         const pct = totalPlanned > 0 ? Math.round((totalConducted / totalPlanned) * 1000) / 10 : 0;
 
         body.innerHTML = `
+            ${(p.id === null && targetStudentId) ? `
+                <div class="plan-draft-banner" style="background:rgba(2, 132, 199, 0.08); border:1px solid rgba(2, 132, 199, 0.28); border-radius:12px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div style="font-size:0.88rem; color:var(--ink);">
+                        💡 Для ученика <strong>${escapeHtml(targetStudentName)}</strong> создаётся новый план. Вы можете заполнить его или привязать уже созданный ранее план.
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-banner-attach-plan" style="white-space:nowrap;">
+                        🔗 Привязать уже созданный план
+                    </button>
+                </div>
+            ` : ''}
+
             <!-- 1. HERO IDENTITY -->
             <div class="plan-hero-card">
                 <div class="plan-tags-row">
@@ -1288,6 +1352,13 @@
 
         renderMonthlyScheduleBlocks(canEdit);
         attachPlanEventListeners(canEdit);
+
+        const btnBannerAttach = document.getElementById('btn-banner-attach-plan');
+        if (btnBannerAttach) {
+            btnBannerAttach.onclick = () => {
+                openAttachModal(targetStudentId, targetStudentName);
+            };
+        }
     }
 
     // Отрисовка блоков расписания по месяцам с таблицами [x]
@@ -1479,6 +1550,289 @@
             .replace(/"/g, '&quot;');
     }
 
+    // Создание модального окна привязки плана
+    function ensureAttachModalExists() {
+        if (document.getElementById('modal-attach-plan')) return;
+
+        const dialog = document.createElement('dialog');
+        dialog.id = 'modal-attach-plan';
+        dialog.className = 'plan-dialog attach-plan-dialog';
+        dialog.style.maxWidth = '680px';
+        dialog.style.width = '94vw';
+        dialog.innerHTML = `
+            <div class="plan-modal-wrap" style="max-height:88vh;">
+                <div class="plan-modal-header">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:1.3rem;">🔗</span>
+                        <div>
+                            <h3 style="font-size:1.15rem; font-weight:800; margin:0;">Привязать методический план</h3>
+                            <div style="font-size:0.8rem; color:var(--muted);" id="attach-modal-student-sub">Выбор методического плана для ученика</div>
+                        </div>
+                    </div>
+                    <button type="button" class="modal-close" id="btn-attach-plan-close" style="font-size:1.1rem; padding:4px 8px; border:none; background:transparent; color:var(--muted); cursor:pointer;">✕</button>
+                </div>
+
+                <div class="plan-modal-body" id="attach-modal-body" style="padding:20px; overflow-y:auto; max-height:60vh;">
+                    <div style="text-align:center; padding:2rem; color:var(--muted);">Загрузка доступных планов...</div>
+                </div>
+
+                <div class="plan-modal-footer" style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-top:1px solid var(--line, rgba(255,255,255,0.08));">
+                    <button type="button" class="btn btn-secondary" id="btn-attach-plan-cancel">Отмена</button>
+                    <button type="button" class="btn btn-emerald" id="btn-attach-plan-submit" disabled>
+                        🔗 Привязать выбранный план
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        document.getElementById('btn-attach-plan-close')?.addEventListener('click', () => dialog.close());
+        document.getElementById('btn-attach-plan-cancel')?.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) dialog.close();
+        });
+    }
+
+    // Открытие окна привязки плана к ученику
+    async function openAttachModal(studentId, studentName) {
+        injectStyles();
+        ensureAttachModalExists();
+        await fetchUserRole();
+
+        const dialog = document.getElementById('modal-attach-plan');
+        if (!dialog) return;
+
+        const cleanStudentId = studentId ? parseInt(studentId, 10) : null;
+        const cleanStudentName = (studentName || 'Ученик').trim();
+
+        const subEl = document.getElementById('attach-modal-student-sub');
+        if (subEl) {
+            subEl.textContent = `Ученик: ${cleanStudentName} (ID: #${cleanStudentId || '—'})`;
+        }
+
+        const bodyEl = document.getElementById('attach-modal-body');
+        const submitBtn = document.getElementById('btn-attach-plan-submit');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔗 Привязать выбранный план';
+        }
+
+        if (typeof dialog.showModal === 'function') {
+            if (!dialog.open) dialog.showModal();
+        } else {
+            dialog.setAttribute('open', 'true');
+        }
+
+        bodyEl.innerHTML = '<div style="text-align:center; padding:2.5rem; color:var(--muted);">Загрузка методических планов...</div>';
+
+        try {
+            const res = await fetch('/api/methodical-plans', { cache: 'no-store' });
+            if (!res.ok) throw new Error('Не удалось получить список планов');
+            const data = await res.json();
+            const plans = data.plans || [];
+
+            if (!plans.length) {
+                bodyEl.innerHTML = `
+                    <div style="text-align:center; padding:2.5rem 1rem; color:var(--muted);">
+                        <div style="font-size:2.5rem; margin-bottom:10px;">📋</div>
+                        <h4 style="font-size:1.05rem; font-weight:700; color:var(--ink); margin-bottom:6px;">Нет созданных методических планов</h4>
+                        <p style="font-size:0.88rem; max-width:420px; margin:0 auto 16px;">
+                            У вас ещё нет ни одного методического плана. Вы можете открыть методический план ученика и заполнить его по шаблону ОГЭ.
+                        </p>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-attach-create-fresh">
+                            ➕ Создать новый план для этого ученика
+                        </button>
+                    </div>
+                `;
+                document.getElementById('btn-attach-create-fresh')?.addEventListener('click', () => {
+                    dialog.close();
+                    openMethodicalPlanModal(cleanStudentId, cleanStudentName);
+                });
+                return;
+            }
+
+            let selectedPlanId = null;
+
+            function renderCards() {
+                bodyEl.innerHTML = `
+                    <p style="font-size:0.86rem; color:var(--muted); margin-bottom:14px;">
+                        Выберите методический план, который хотите закрепить за учеником <strong>${escapeHtml(cleanStudentName)}</strong>:
+                    </p>
+                    <div class="attach-plans-list" style="display:flex; flex-direction:column; gap:8px;">
+                        ${plans.map(p => {
+                            const isCurrentStudent = (cleanStudentId && (p.studentId === cleanStudentId || (p.student_id && p.student_id === cleanStudentId)));
+                            const isOtherStudent = p.studentId && !isCurrentStudent;
+                            const isSelected = selectedPlanId === p.id;
+                            const topicCount = Array.isArray(p.topics) ? p.topics.length : 0;
+                            const plannedCount = p.totalPlanned || 0;
+
+                            let statusBadge = '';
+                            if (isCurrentStudent) {
+                                statusBadge = '<span class="badge badge-success" style="font-size:0.75rem;">✅ Уже закреплён за этим учеником</span>';
+                            } else if (isOtherStudent) {
+                                statusBadge = `<span class="badge badge-warning" style="font-size:0.75rem; background:rgba(234, 88, 12, 0.14); color:#ea580c; border:1px solid rgba(234, 88, 12, 0.28);">👤 Закреплён: ${escapeHtml(p.studentName || 'Другой ученик')}</span>`;
+                            } else {
+                                statusBadge = '<span class="badge badge-secondary" style="font-size:0.75rem;">🌐 Общий / без ученика</span>';
+                            }
+
+                            return `
+                                <div class="attach-plan-card ${isSelected ? 'selected' : ''}" data-plan-id="${p.id}" style="padding:12px 14px; border-radius:10px; border:1px solid ${isSelected ? 'var(--accent, #ea580c)' : 'var(--line, rgba(255,255,255,0.1))'}; background:${isSelected ? 'rgba(234, 88, 12, 0.08)' : 'rgba(255,255,255,0.03)'}; cursor:pointer; display:flex; align-items:flex-start; gap:12px; transition:all 0.15s ease;">
+                                    <input type="radio" name="attachPlanRadio" value="${p.id}" ${isSelected ? 'checked' : ''} style="margin-top:4px; accent-color:var(--accent, #ea580c); cursor:pointer;">
+                                    <div style="flex:1; min-width:0;">
+                                        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                                            <div style="font-weight:700; font-size:0.95rem; color:var(--ink);">${escapeHtml(p.title || 'Методический план')}</div>
+                                            <div>${statusBadge}</div>
+                                        </div>
+                                        <div style="font-size:0.8rem; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap;">
+                                            <span>📚 Предмет: <strong>${escapeHtml(p.subject || 'Математика')}</strong></span>
+                                            <span>🗓️ Год: <strong>${escapeHtml(p.academicYear || '2026-2027')}</strong></span>
+                                            <span>📑 Тем: <strong>${topicCount}</strong></span>
+                                            <span>⏱️ Занятий: <strong>${plannedCount}</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div id="attach-conflict-box" style="margin-top:14px;"></div>
+                `;
+
+                // Add click listeners to cards
+                bodyEl.querySelectorAll('.attach-plan-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const pid = parseInt(card.getAttribute('data-plan-id'), 10);
+                        if (pid) {
+                            selectedPlanId = pid;
+                            onPlanSelected(pid);
+                        }
+                    });
+                });
+            }
+
+            function onPlanSelected(pid) {
+                renderCards();
+                const selPlan = plans.find(p => p.id === pid);
+                const conflictBox = document.getElementById('attach-conflict-box');
+                const isOtherStudent = selPlan && selPlan.studentId && selPlan.studentId !== cleanStudentId;
+
+                if (conflictBox) {
+                    if (isOtherStudent) {
+                        conflictBox.innerHTML = `
+                            <div style="padding:12px 14px; border-radius:10px; background:rgba(234, 88, 12, 0.08); border:1px solid rgba(234, 88, 12, 0.3);">
+                                <div style="font-size:0.85rem; font-weight:700; color:var(--ink); margin-bottom:6px;">
+                                    ⚠️ Этот план сейчас закреплён за: <u>${escapeHtml(selPlan.studentName || 'Другой ученик')}</u>
+                                </div>
+                                <div style="font-size:0.83rem; color:var(--muted); margin-bottom:8px;">
+                                    Выберите способ привязки:
+                                </div>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.84rem; color:var(--ink); margin-bottom:6px; cursor:pointer;">
+                                    <input type="radio" name="attachModeChoice" value="copy" checked style="accent-color:var(--accent, #ea580c);">
+                                    <span><strong>Создать персональную копию</strong> для ${escapeHtml(cleanStudentName)} (сохранит текущий план ${escapeHtml(selPlan.studentName)})</span>
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.84rem; color:var(--ink); cursor:pointer;">
+                                    <input type="radio" name="attachModeChoice" value="move" style="accent-color:var(--accent, #ea580c);">
+                                    <span><strong>Перепривязать этот план напрямую</strong> (план перейдёт к ${escapeHtml(cleanStudentName)})</span>
+                                </label>
+                            </div>
+                        `;
+                    } else {
+                        conflictBox.innerHTML = `
+                            <div style="padding:10px 14px; border-radius:10px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.25); font-size:0.84rem; color:var(--ink);">
+                                ✅ Этот план будет закреплён за учеником <strong>${escapeHtml(cleanStudentName)}</strong>.
+                            </div>
+                        `;
+                    }
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = isOtherStudent ? '🔗 Привязать план' : '🔗 Закрепить план';
+                }
+            }
+
+            renderCards();
+
+            // Submit handler
+            if (submitBtn) {
+                submitBtn.onclick = async () => {
+                    if (!selectedPlanId) return;
+                    const modeEl = document.querySelector('input[name="attachModeChoice"]:checked');
+                    const copyAsNew = modeEl ? (modeEl.value === 'copy') : false;
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Привязка...';
+
+                    try {
+                        // 1. Загружаем полные данные выбранного плана
+                        const detailRes = await fetch(`/api/methodical-plans/${selectedPlanId}`, { cache: 'no-store' });
+                        if (!detailRes.ok) throw new Error('Не удалось загрузить данные плана');
+                        const detailData = await detailRes.json();
+                        const basePlan = detailData.plan;
+                        if (!basePlan) throw new Error('План не найден');
+
+                        const newTitle = `Методический план · ${cleanStudentName}`;
+
+                        if (copyAsNew) {
+                            // Создаем персональную копию для ученика
+                            const copyPayload = {
+                                studentId: cleanStudentId,
+                                studentName: cleanStudentName,
+                                title: newTitle,
+                                academicYear: basePlan.academicYear || '2026-2027',
+                                subject: basePlan.subject || 'Математика',
+                                tags: basePlan.tags || ['#Репетиторство', '#Обучение'],
+                                goals: basePlan.goals || '',
+                                legend: basePlan.legend || '',
+                                topics: basePlan.topics || [],
+                                monthlyCounts: basePlan.monthlyCounts || {},
+                                monthlyLessons: {}
+                            };
+                            const postRes = await fetch('/api/methodical-plans', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(copyPayload)
+                            });
+                            const postData = await postRes.json();
+                            if (!postRes.ok || !postData.success) {
+                                throw new Error(postData.error || 'Не удалось создать копию плана');
+                            }
+                        } else {
+                            // Перепривязываем существующий план напрямую
+                            const updatePayload = {
+                                ...basePlan,
+                                studentId: cleanStudentId,
+                                studentName: cleanStudentName,
+                                title: newTitle
+                            };
+                            const putRes = await fetch(`/api/methodical-plans/${selectedPlanId}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(updatePayload)
+                            });
+                            const putData = await putRes.json();
+                            if (!putRes.ok || !putData.success) {
+                                throw new Error(putData.error || 'Не удалось привязать план');
+                            }
+                        }
+
+                        dialog.close();
+                        showToast(`План успешно ${copyAsNew ? 'скопирован и привязан' : 'привязан'} к ученику ${cleanStudentName}!`);
+
+                        // Открываем привязанный план для ученика
+                        await openMethodicalPlanModal(cleanStudentId, cleanStudentName);
+                    } catch (err) {
+                        alert('Ошибка привязки: ' + err.message);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '🔗 Привязать выбранный план';
+                    }
+                };
+            }
+
+        } catch (e) {
+            bodyEl.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger, #ef4444);">Ошибка загрузки: ${escapeHtml(e.message)}</div>`;
+        }
+    }
+
     // Открытие модального окна методического плана
     async function openMethodicalPlanModal(studentId = null, studentName = null) {
         injectStyles();
@@ -1504,6 +1858,9 @@
         open: (studentId = null, studentName = null) => openMethodicalPlanModal(studentId, studentName),
         openModal: (studentId = null, studentName = null) => openMethodicalPlanModal(studentId, studentName),
         openForStudent: (studentId, studentName) => openMethodicalPlanModal(studentId, studentName),
+        openAttachModal: (studentId, studentName) => openAttachModal(studentId, studentName),
+        openLinkModal: (studentId, studentName) => openAttachModal(studentId, studentName),
+        attach: (studentId, studentName) => openAttachModal(studentId, studentName),
         loadTemplate: getOgeMathTemplate
     };
 

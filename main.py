@@ -733,6 +733,49 @@ def api_update_methodical_plan(plan_id: int):
     return jsonify({'success': True, 'plan': plan})
 
 
+@app.route('/api/methodical-plans/<int:plan_id>/attach-student', methods=['POST'])
+def api_attach_student_to_plan(plan_id: int):
+    """Привязка ученика к методическому плану."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    student_id = payload.get('studentId') or payload.get('student_id')
+    if not student_id or not str(student_id).isdigit():
+        return jsonify({'success': False, 'error': 'Не указан ID ученика.'}), 400
+
+    student_id = int(student_id)
+    student = db.get_user_by_id(student_id)
+    if not student:
+        return jsonify({'success': False, 'error': 'Ученик не найден.'}), 404
+
+    student_name = payload.get('studentName') or student.get('display_name') or student.get('username') or 'Ученик'
+    copy_as_new = bool(payload.get('copyAsNew', False))
+    is_admin = teacher.get('role') == 'admin'
+
+    target_plan_id = db.attach_student_to_methodical_plan(
+        plan_id=plan_id,
+        teacher_id=teacher['id'],
+        student_id=student_id,
+        student_name=student_name,
+        copy_as_new=copy_as_new,
+        is_admin=is_admin
+    )
+
+    if not target_plan_id:
+        return jsonify({'success': False, 'error': 'План не найден или нет прав на изменение.'}), 404
+
+    plan = db.get_methodical_plan_by_id(target_plan_id)
+    return jsonify({
+        'success': True,
+        'planId': target_plan_id,
+        'plan': plan,
+        'copied': copy_as_new,
+        'message': f"План успешно {'скопирован и привязан' if copy_as_new else 'привязан'} к ученику {student_name}!"
+    })
+
+
 @app.route('/api/methodical-plans/<int:plan_id>/toggle-lesson', methods=['PATCH', 'POST'])
 def api_toggle_methodical_lesson(plan_id: int):
     """Быстрая отметка урока в методическом плане как проведённого."""

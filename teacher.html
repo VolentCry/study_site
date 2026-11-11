@@ -2161,9 +2161,14 @@
                     <div style="font-family:var(--f-display); font-size:1.25rem; font-weight:800; word-break:break-word;" id="dossier-name">Имя Ученика</div>
                     <div style="font-size:0.85rem; color:var(--muted); word-break:break-word;" id="dossier-sub">@username · ID: #0</div>
                 </div>
-                <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-plan" style="margin-left:auto; flex-shrink:0;" title="Открыть методический план этого ученика">
-                    📋 Методический план
-                </button>
+                <div class="dossier-hud-actions" style="margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-plan" title="Открыть методический план этого ученика">
+                        📋 Методический план
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-link-plan" title="Привязать уже созданный методический план к этому ученику">
+                        🔗 Привязать план
+                    </button>
+                </div>
             </div>
 
             <!-- KPI Summary Grid -->
@@ -3457,6 +3462,7 @@
 
             // --- Student Dossier Modal Logic ---
             const dossierModal = document.getElementById('student-dossier-modal');
+            window.openStudentDossier = openStudentDossier;
 
             async function openStudentDossier(studentId) {
                 try {
@@ -3479,6 +3485,17 @@
                                 window.MethodicalPlanManager.openForStudent(u.id, u.displayName || u.username);
                             } else if (window.MethodicalPlan) {
                                 window.MethodicalPlan.open(u.id, u.displayName || u.username);
+                            }
+                        };
+                    }
+
+                    const dossierLinkPlanBtn = document.getElementById('dossier-btn-link-plan');
+                    if (dossierLinkPlanBtn) {
+                        dossierLinkPlanBtn.onclick = () => {
+                            if (window.MethodicalPlanManager && window.MethodicalPlanManager.openAttachModal) {
+                                window.MethodicalPlanManager.openAttachModal(u.id, u.displayName || u.username);
+                            } else if (window.MethodicalPlan && window.MethodicalPlan.openAttachModal) {
+                                window.MethodicalPlan.openAttachModal(u.id, u.displayName || u.username);
                             }
                         };
                     }
