@@ -213,6 +213,41 @@
         .auth-pwd-toggle:hover {
             color: var(--ink, #fff);
         }
+        /* Role Segmented Picker */
+        .auth-role-picker {
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            padding: 4px;
+            border-radius: 12px;
+        }
+        .auth-role-btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted, #94a3b8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .auth-role-btn:hover {
+            color: var(--ink, #fff);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .auth-role-btn.active {
+            background: var(--surface-hover, rgba(255, 255, 255, 0.14));
+            color: var(--ink, #fff);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
         /* Notice block */
         .auth-progress-save-hint {
             display: flex;
@@ -575,6 +610,19 @@
             background: #f1f5f9;
             border-color: rgba(15, 23, 42, 0.12);
         }
+        [data-theme="light"] .auth-role-picker {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        [data-theme="light"] .auth-role-btn {
+            color: #475569;
+        }
+        [data-theme="light"] .auth-role-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #94a3b8;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
         [data-theme="light"] .auth-close-btn {
             background: rgba(15, 23, 42, 0.05);
             border-color: rgba(15, 23, 42, 0.1);
@@ -884,13 +932,39 @@
         }
     }
 
-    async function apiRegister(username, password, displayName, localData) {
+    async function apiRegister(username, password, displayName, localData, role = 'student', parentCode = null) {
+        const payload = { username, password, displayName, localData, role };
+        if (parentCode) payload.parentCode = parentCode;
         const res = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, displayName, localData })
+            body: JSON.stringify(payload)
         });
         return await safeParseJson(res, 'Ошибка при регистрации');
+    }
+
+    async function apiLinkStudent(parentCode) {
+        const res = await fetch(`${API_BASE}/parent/link-student`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parentCode })
+        });
+        return await safeParseJson(res, 'Не удалось привязать ученика');
+    }
+
+    async function apiUnlinkStudent(studentId) {
+        const res = await fetch(`${API_BASE}/parent/unlink-student`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ studentId })
+        });
+        return await safeParseJson(res, 'Не удалось отвязать ученика');
+    }
+
+    async function apiGetParentDashboard(studentId = null) {
+        const url = studentId ? `${API_BASE}/parent/dashboard?studentId=${studentId}` : `${API_BASE}/parent/dashboard`;
+        const res = await fetch(url, { cache: 'no-store' });
+        return await safeParseJson(res, 'Не удалось загрузить данные кабинета');
     }
 
     async function apiLogin(username, password) {
@@ -971,6 +1045,18 @@
                 </div>
 
                 <form class="auth-form" id="auth-form">
+                    <div class="auth-field hidden" id="auth-field-role" style="display: none;">
+                        <label class="auth-label">Выберите роль:</label>
+                        <div class="auth-role-picker" role="radiogroup" aria-label="Роль пользователя">
+                            <button type="button" class="auth-role-btn active" id="auth-role-student" data-role="student" role="radio" aria-checked="true">
+                                🎓 Ученик
+                            </button>
+                            <button type="button" class="auth-role-btn" id="auth-role-parent" data-role="parent" role="radio" aria-checked="false">
+                                👨‍👩‍👧 Родитель
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="auth-field">
                         <label class="auth-label" for="auth-input-username">Имя пользователя (Логин)</label>
                         <div class="auth-input-wrap">
@@ -985,13 +1071,21 @@
                         </div>
                     </div>
 
-
-
                     <div class="auth-field">
                         <label class="auth-label" for="auth-input-password">Пароль</label>
                         <div class="auth-input-wrap">
                             <input class="auth-input" type="password" id="auth-input-password" name="password" required autocomplete="current-password" placeholder="Минимум 6 символов">
                             <button type="button" class="auth-pwd-toggle" id="auth-pwd-toggle" title="Показать/скрыть пароль" aria-label="Показать пароль">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="auth-field hidden" id="auth-field-parent-code" style="display: none;">
+                        <label class="auth-label" for="auth-input-parent-code">Код ребёнка (необязательно)</label>
+                        <div class="auth-input-wrap">
+                            <input class="auth-input" type="text" id="auth-input-parent-code" name="parentCode" placeholder="STU-XXXXX" maxlength="15" autocomplete="off" style="text-transform: uppercase; font-family: monospace; font-weight: 700; letter-spacing: 0.05em;">
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--muted, #94a3b8); margin-top: 4px; line-height: 1.35;">
+                            Индивидуальный код из профиля ученика (раздел «Настройки»). Вы также сможете ввести его позже в профиле.
                         </div>
                     </div>
 
@@ -1025,11 +1119,60 @@
         // Tab Switching
         const tabLogin = dialog.querySelector('#auth-tab-login');
         const tabRegister = dialog.querySelector('#auth-tab-register');
+        const fieldRole = dialog.querySelector('#auth-field-role');
+        const fieldParentCode = dialog.querySelector('#auth-field-parent-code');
+        const roleBtnStudent = dialog.querySelector('#auth-role-student');
+        const roleBtnParent = dialog.querySelector('#auth-role-parent');
         const fieldDisplayName = dialog.querySelector('#auth-field-display-name');
         const registerHint = dialog.querySelector('#auth-register-hint');
         const titleEl = dialog.querySelector('#auth-modal-title');
         const submitText = dialog.querySelector('#auth-submit-text');
         const errorBox = dialog.querySelector('#auth-error-box');
+
+        function setRegisterRole(role) {
+            if (role === 'parent') {
+                if (roleBtnParent) {
+                    roleBtnParent.classList.add('active');
+                    roleBtnParent.setAttribute('aria-checked', 'true');
+                }
+                if (roleBtnStudent) {
+                    roleBtnStudent.classList.remove('active');
+                    roleBtnStudent.setAttribute('aria-checked', 'false');
+                }
+                if (fieldParentCode) {
+                    fieldParentCode.classList.remove('hidden');
+                    fieldParentCode.style.display = 'flex';
+                }
+                if (registerHint) {
+                    registerHint.classList.add('hidden');
+                    registerHint.style.display = 'none';
+                }
+            } else {
+                if (roleBtnStudent) {
+                    roleBtnStudent.classList.add('active');
+                    roleBtnStudent.setAttribute('aria-checked', 'true');
+                }
+                if (roleBtnParent) {
+                    roleBtnParent.classList.remove('active');
+                    roleBtnParent.setAttribute('aria-checked', 'false');
+                }
+                if (fieldParentCode) {
+                    fieldParentCode.classList.add('hidden');
+                    fieldParentCode.style.display = 'none';
+                }
+                if (registerHint) {
+                    registerHint.classList.remove('hidden');
+                    registerHint.style.display = 'flex';
+                }
+            }
+        }
+
+        if (roleBtnStudent) {
+            roleBtnStudent.addEventListener('click', () => setRegisterRole('student'));
+        }
+        if (roleBtnParent) {
+            roleBtnParent.addEventListener('click', () => setRegisterRole('parent'));
+        }
 
         function switchMode(mode) {
             errorBox.classList.add('hidden');
@@ -1039,17 +1182,29 @@
                 tabLogin.setAttribute('aria-selected', 'false');
                 tabRegister.classList.add('active');
                 tabRegister.setAttribute('aria-selected', 'true');
+                if (fieldRole) {
+                    fieldRole.classList.remove('hidden');
+                    fieldRole.style.display = 'flex';
+                }
                 fieldDisplayName.classList.remove('hidden');
                 fieldDisplayName.style.display = 'flex';
-                registerHint.classList.remove('hidden');
-                registerHint.style.display = 'flex';
                 titleEl.textContent = 'Создание аккаунта';
                 submitText.textContent = 'Зарегистрироваться';
+                // По умолчанию роль Ученик
+                setRegisterRole('student');
             } else {
                 tabRegister.classList.remove('active');
                 tabRegister.setAttribute('aria-selected', 'false');
                 tabLogin.classList.add('active');
                 tabLogin.setAttribute('aria-selected', 'true');
+                if (fieldRole) {
+                    fieldRole.classList.add('hidden');
+                    fieldRole.style.display = 'none';
+                }
+                if (fieldParentCode) {
+                    fieldParentCode.classList.add('hidden');
+                    fieldParentCode.style.display = 'none';
+                }
                 fieldDisplayName.classList.add('hidden');
                 fieldDisplayName.style.display = 'none';
                 registerHint.classList.add('hidden');
@@ -1089,13 +1244,36 @@
 
             try {
                 if (isReg) {
-                    const localData = collectLocalState();
-                    const res = await apiRegister(username, password, displayName, localData);
+                    const activeRoleBtn = dialog.querySelector('.auth-role-btn.active');
+                    const role = (activeRoleBtn && activeRoleBtn.dataset.role === 'parent') ? 'parent' : 'student';
+                    let parentCode = null;
+                    if (role === 'parent') {
+                        const pCodeInput = dialog.querySelector('#auth-input-parent-code');
+                        parentCode = pCodeInput ? pCodeInput.value.trim().toUpperCase() : null;
+                    }
+                    const localData = role === 'student' ? collectLocalState() : null;
+                    const res = await apiRegister(username, password, displayName, localData, role, parentCode);
                     currentUser = res.user;
                     const authDisplayName = res.user.displayName || res.user.username;
                     localStorage.setItem('studyUserName', authDisplayName);
                     localStorage.setItem('loggedInUser', authDisplayName);
-                    showToast(`Добро пожаловать, ${authDisplayName}!`, 'success');
+                    if (role === 'parent') {
+                        showToast(`Добро пожаловать в кабинет родителя, ${authDisplayName}!`, 'success');
+                    } else {
+                        showToast(`Добро пожаловать, ${authDisplayName}!`, 'success');
+                    }
+                    dialog.close();
+                    form.reset();
+                    updateUIForAuthState();
+                    if (role === 'parent') {
+                        // Перезагрузка или переход в профиль для отрисовки родительского кабинета
+                        if (window.location.pathname.endsWith('profile.html')) {
+                            window.location.reload();
+                        } else {
+                            window.location.href = getSiteRootUrl('profile.html');
+                        }
+                        return;
+                    }
                 } else {
                     const res = await apiLogin(username, password);
                     currentUser = res.user;
@@ -1108,11 +1286,14 @@
                     localStorage.setItem('studyUserName', authDisplayName);
                     localStorage.setItem('loggedInUser', authDisplayName);
                     showToast(`Вы вошли как ${authDisplayName}`, 'success');
+                    dialog.close();
+                    form.reset();
+                    updateUIForAuthState();
+                    if (currentUser && currentUser.role === 'parent' && window.location.pathname.endsWith('profile.html')) {
+                        window.location.reload();
+                        return;
+                    }
                 }
-
-                dialog.close();
-                form.reset();
-                updateUIForAuthState();
             } catch (err) {
                 errorBox.textContent = err.message || 'Произошла непредвиденная ошибка';
                 errorBox.classList.remove('hidden');
@@ -1425,11 +1606,35 @@
 
         if (currentUser) {
             if (badge) badge.textContent = 'В сети';
+            const roleLabels = {
+                student: 'Ученик',
+                parent: 'Родитель',
+                teacher: 'Преподаватель',
+                admin: 'Администратор'
+            };
+            const roleName = roleLabels[currentUser.role] || 'Ученик';
+            const parentCodeHtml = (currentUser.parentCode && currentUser.role === 'student') ? `
+                <div class="cloud-parent-code-block" style="margin-top:12px; margin-bottom:14px; padding:12px; background:rgba(255,255,255,0.04); border:1px solid var(--line, rgba(255,255,255,0.12)); border-radius:12px;">
+                    <div style="font-size:0.75rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Индивидуальный код для родителей:</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                        <span id="cloud-student-parent-code" style="font-family:monospace; font-size:1.15rem; font-weight:800; color:var(--accent, #6366f1); letter-spacing:0.06em;">${escapeHtml(currentUser.parentCode)}</span>
+                        <button type="button" id="cloud-copy-code-btn" class="settings-btn settings-btn-secondary" style="padding:4px 10px; font-size:0.8rem; min-height:32px;">
+                            Скопировать
+                        </button>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">Передайте этот код родителям, чтобы они могли видеть ваше расписание и домашки.</div>
+                </div>
+            ` : '';
+
             card.innerHTML = `
                 <div style="margin-bottom:14px;">
-                    <div style="font-weight:800; font-size:1.05rem; color:var(--ink);">${escapeHtml(currentUser.displayName || currentUser.username)}</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                        <div style="font-weight:800; font-size:1.05rem; color:var(--ink);">${escapeHtml(currentUser.displayName || currentUser.username)}</div>
+                        <span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:6px; background:rgba(99,102,241,0.15); color:var(--accent, #6366f1);">${roleName}</span>
+                    </div>
                     <div style="font-size:0.82rem; color:var(--muted); margin-top:2px;">Логин: @${escapeHtml(currentUser.username)} · ID: #${currentUser.id}</div>
                 </div>
+                ${parentCodeHtml}
                 <div>
                     <button type="button" id="cloud-logout-btn" class="settings-btn settings-btn-secondary" style="width:100%; justify-content:center; color:var(--danger, #ff4757); border-color:rgba(255, 71, 87, 0.35); min-height:44px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1437,6 +1642,24 @@
                     </button>
                 </div>
             `;
+
+            const copyBtn = card.querySelector('#cloud-copy-code-btn');
+            if (copyBtn && currentUser.parentCode) {
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(currentUser.parentCode);
+                        copyBtn.textContent = 'Скопировано! ✓';
+                        copyBtn.style.color = 'var(--emerald, #10b981)';
+                        setTimeout(() => {
+                            copyBtn.textContent = 'Скопировать';
+                            copyBtn.style.color = '';
+                        }, 2000);
+                        showToast('Код для родителей скопирован в буфер', 'success');
+                    } catch (e) {
+                        prompt('Скопируйте код для родителей:', currentUser.parentCode);
+                    }
+                });
+            }
 
             const logoutBtn = card.querySelector('#cloud-logout-btn');
             if (logoutBtn) {
@@ -1446,6 +1669,9 @@
                         currentUser = null;
                         updateUIForAuthState();
                         showToast('Вы вышли из аккаунта', 'success');
+                        if (window.location.pathname.endsWith('profile.html')) {
+                            window.location.reload();
+                        }
                     }
                 });
             }
@@ -1717,6 +1943,9 @@
         getUser: () => currentUser,
         isAuthorized: () => !!currentUser,
         updateCloudSettingsCard,
+        linkStudent: apiLinkStudent,
+        unlinkStudent: apiUnlinkStudent,
+        getParentDashboard: apiGetParentDashboard,
         logout,
         theme: StudyTheme,
         login,

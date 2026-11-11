@@ -5083,6 +5083,597 @@
             }
         }
 
+        /* ==========================================================================
+           PARENT DASHBOARD STYLES (КАБИНЕТ РОДИТЕЛЯ)
+           ========================================================================== */
+        .parent-dashboard-container {
+            margin: 20px 0 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .parent-hero-card {
+            background: var(--surface-card, #151b2b);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            border-radius: var(--r-lg, 20px);
+            padding: 26px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .parent-hero-info {
+            flex: 1;
+            min-width: 280px;
+        }
+        .parent-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent, #6366f1);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 0.02em;
+        }
+        .parent-badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent, #6366f1);
+            box-shadow: 0 0 8px var(--accent, #6366f1);
+        }
+        .parent-hero-title {
+            font-family: var(--f-display, system-ui, sans-serif);
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--ink, #fff);
+            margin: 0 0 8px 0;
+            letter-spacing: -0.02em;
+        }
+        .parent-hero-desc {
+            font-size: 0.92rem;
+            color: var(--muted, #94a3b8);
+            margin: 0;
+            max-width: 620px;
+            line-height: 1.5;
+        }
+        .parent-child-box {
+            min-width: 280px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            border-radius: 14px;
+            padding: 16px 20px;
+        }
+        .parent-child-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .parent-child-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .parent-child-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        }
+        .parent-child-name {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--ink, #fff);
+        }
+        .parent-child-sub {
+            font-size: 0.8rem;
+            color: var(--muted, #94a3b8);
+            margin-top: 2px;
+        }
+        .parent-child-code-badge {
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent, #6366f1);
+            letter-spacing: 0.04em;
+        }
+
+        /* KPI Grid (3 Columns) */
+        .parent-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .parent-kpi-card {
+            background: var(--surface-card, #151b2b);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            border-radius: var(--r, 16px);
+            padding: 20px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .parent-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.5);
+        }
+        .parent-kpi-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .kpi-completed .parent-kpi-icon-wrap {
+            background: rgba(16, 185, 129, 0.14);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .kpi-paid .parent-kpi-icon-wrap {
+            background: rgba(14, 165, 233, 0.14);
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.25);
+        }
+        .kpi-unpaid .parent-kpi-icon-wrap {
+            background: rgba(245, 158, 11, 0.14);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .kpi-unpaid.has-unpaid {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: linear-gradient(145deg, var(--surface-card, #151b2b) 0%, rgba(245, 158, 11, 0.06) 100%);
+        }
+        .parent-kpi-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .parent-kpi-label {
+            font-size: 0.82rem;
+            color: var(--muted, #94a3b8);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .parent-kpi-value {
+            font-family: var(--f-display, system-ui, sans-serif);
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--ink, #fff);
+            line-height: 1.1;
+        }
+        .parent-kpi-hint {
+            font-size: 0.78rem;
+            color: var(--muted, #94a3b8);
+        }
+
+        /* Sections Stack */
+        .parent-sections-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .parent-section-card {
+            background: var(--surface-card, #151b2b);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            border-radius: var(--r-lg, 18px);
+            padding: 24px 26px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+        }
+        .parent-section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.1));
+        }
+        .parent-section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .parent-section-icon {
+            font-size: 1.45rem;
+            line-height: 1;
+        }
+        .parent-section-title {
+            font-family: var(--f-display, system-ui, sans-serif);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--ink, #fff);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+        .parent-section-sub {
+            font-size: 0.82rem;
+            color: var(--muted, #94a3b8);
+            margin: 3px 0 0 0;
+        }
+        .parent-badge-count {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--ink, #fff);
+        }
+        .parent-readonly-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--muted, #94a3b8);
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        /* Schedule items in parent dashboard */
+        .parent-schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .parent-lesson-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            transition: background 0.15s ease;
+        }
+        .parent-lesson-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .parent-lesson-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 220px;
+        }
+        .parent-lesson-title {
+            font-weight: 800;
+            font-size: 0.98rem;
+            color: var(--ink, #fff);
+        }
+        .parent-lesson-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.82rem;
+            color: var(--muted, #94a3b8);
+        }
+        .parent-lesson-time {
+            color: var(--accent, #6366f1);
+            font-weight: 700;
+        }
+        .parent-lesson-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .parent-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .status-conducted {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .status-planned {
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--muted, #94a3b8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        .status-paid {
+            background: rgba(14, 165, 233, 0.15);
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        .status-unpaid {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* Homework cards in parent dashboard */
+        .parent-hw-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 14px;
+        }
+        .parent-hw-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .parent-hw-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .parent-hw-title {
+            font-weight: 800;
+            font-size: 0.96rem;
+            color: var(--ink, #fff);
+            line-height: 1.35;
+        }
+        .parent-hw-subject {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--accent, #6366f1);
+            white-space: nowrap;
+        }
+        .parent-hw-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--muted, #94a3b8);
+            margin-top: 4px;
+        }
+        .parent-hw-score {
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        /* Readonly Methodical Plan View */
+        .parent-plan-container {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .parent-plan-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .parent-plan-title {
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--ink, #fff);
+            margin: 0;
+        }
+        .parent-plan-details-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--muted, #94a3b8);
+        }
+        .parent-plan-progress-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .parent-plan-progress-bar {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+        .parent-plan-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 0.3s ease;
+        }
+        .parent-months-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .parent-month-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .parent-month-head {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--ink, #fff);
+        }
+        .parent-month-badge {
+            font-size: 0.78rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--muted, #94a3b8);
+        }
+        .parent-month-lessons {
+            padding: 10px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .parent-plan-lesson-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .parent-plan-lesson-row:last-child {
+            border-bottom: none;
+        }
+        .parent-plan-lesson-name {
+            color: var(--ink, #fff);
+            line-height: 1.35;
+        }
+
+        /* Empty State */
+        .parent-empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--muted, #94a3b8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Student Parent Code in Settings */
+        .student-parent-code-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+            border-radius: 14px;
+            margin-top: 10px;
+        }
+        .student-code-display {
+            font-family: monospace;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent, #6366f1);
+            letter-spacing: 0.08em;
+            user-select: all;
+        }
+
+        /* Light Theme Overrides for Parent Dashboard */
+        [data-theme="light"] .parent-hero-card,
+        [data-theme="light"] .parent-kpi-card,
+        [data-theme="light"] .parent-section-card {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="light"] .parent-child-box {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        [data-theme="light"] .parent-lesson-item {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        [data-theme="light"] .parent-lesson-item:hover {
+            background: #f1f5f9;
+        }
+        [data-theme="light"] .parent-hw-card {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        [data-theme="light"] .parent-plan-summary {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        [data-theme="light"] .parent-month-card {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+        [data-theme="light"] .parent-month-head {
+            background: #f1f5f9;
+        }
+        [data-theme="light"] .parent-plan-lesson-row {
+            border-bottom-color: #f1f5f9;
+        }
+        [data-theme="light"] .parent-plan-progress-bar {
+            background: #e2e8f0;
+        }
+        [data-theme="light"] .student-parent-code-box {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        [data-theme="light"] .parent-badge-count {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #0f172a;
+        }
+        [data-theme="light"] .kpi-unpaid.has-unpaid {
+            background: linear-gradient(145deg, #ffffff 0%, rgba(245, 158, 11, 0.08) 100%);
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 860px) {
+            .parent-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            .parent-hero-card {
+                padding: 20px;
+            }
+        }
+        @media (max-width: 600px) {
+            .parent-hw-grid {
+                grid-template-columns: 1fr;
+            }
+            .parent-lesson-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .parent-lesson-badges {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -5166,6 +5757,124 @@
 
     <!-- MAIN LANDMARK -->
     <main id="main" class="shell">
+        <!-- PARENT DASHBOARD VIEW (Отображается только для роли 'parent') -->
+        <section id="parent-dashboard-view" class="parent-dashboard-container hidden" aria-label="Кабинет родителя">
+            <!-- PARENT HERO CARD -->
+            <div class="parent-hero-card">
+                <div class="parent-hero-info">
+                    <div class="parent-badge-pill">
+                        <span class="parent-badge-dot"></span>
+                        <span>Кабинет родителя</span>
+                    </div>
+                    <h1 class="parent-hero-title" id="parent-greeting-title">Личный кабинет родителя</h1>
+                    <p class="parent-hero-desc" id="parent-hero-desc">
+                        Здесь отображаются расписание вашего ребёнка, его домашние задания, методический план и сводная статистика занятий.
+                    </p>
+                </div>
+
+                <!-- CHILD LINK STATUS / SELECTOR -->
+                <div class="parent-child-box" id="parent-child-box">
+                    <div style="font-size:0.85rem; color:var(--muted); text-align:center;">Загрузка данных ребёнка...</div>
+                </div>
+            </div>
+
+            <!-- SUMMARY KPI METRICS: ПРОЙДЕНО / ОПЛАЧЕНО / НЕ ОПЛАЧЕНО -->
+            <div class="parent-kpi-grid" id="parent-kpi-grid">
+                <div class="parent-kpi-card kpi-completed">
+                    <div class="parent-kpi-icon-wrap" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="parent-kpi-content">
+                        <span class="parent-kpi-label">Пройдено занятий</span>
+                        <div class="parent-kpi-value" id="kpi-completed-count">0</div>
+                        <span class="parent-kpi-hint">Проведённые уроки</span>
+                    </div>
+                </div>
+
+                <div class="parent-kpi-card kpi-paid">
+                    <div class="parent-kpi-icon-wrap" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    </div>
+                    <div class="parent-kpi-content">
+                        <span class="parent-kpi-label">Оплачено занятий</span>
+                        <div class="parent-kpi-value" id="kpi-paid-count">0</div>
+                        <span class="parent-kpi-hint">Успешно внесены</span>
+                    </div>
+                </div>
+
+                <div class="parent-kpi-card kpi-unpaid" id="kpi-unpaid-card">
+                    <div class="parent-kpi-icon-wrap" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="parent-kpi-content">
+                        <span class="parent-kpi-label">Не оплачено</span>
+                        <div class="parent-kpi-value" id="kpi-unpaid-count">0</div>
+                        <span class="parent-kpi-hint" id="kpi-unpaid-hint">К оплате</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD SECTIONS -->
+            <div class="parent-sections-stack">
+                <!-- 1. РАСПИСАНИЕ РЕБЁНКА -->
+                <div class="parent-section-card">
+                    <div class="parent-section-head">
+                        <div class="parent-section-title-wrap">
+                            <span class="parent-section-icon" aria-hidden="true">📅</span>
+                            <div>
+                                <h2 class="parent-section-title">Расписание занятий</h2>
+                                <p class="parent-section-sub">Все запланированные и прошедшие уроки ребёнка</p>
+                            </div>
+                        </div>
+                        <span class="parent-badge-count" id="parent-lessons-counter">0 уроков</span>
+                    </div>
+
+                    <div id="parent-schedule-content" class="parent-schedule-content">
+                        <div class="parent-empty-state">Загрузка расписания занятий...</div>
+                    </div>
+                </div>
+
+                <!-- 2. ДОМАШНИЕ ЗАДАНИЯ РЕБЁНКА -->
+                <div class="parent-section-card">
+                    <div class="parent-section-head">
+                        <div class="parent-section-title-wrap">
+                            <span class="parent-section-icon" aria-hidden="true">📚</span>
+                            <div>
+                                <h2 class="parent-section-title">Домашние задания ребёнка</h2>
+                                <p class="parent-section-sub">Задания, сроки сдачи, статусы выполнения и оценки</p>
+                            </div>
+                        </div>
+                        <span class="parent-badge-count" id="parent-hw-counter">0 заданий</span>
+                    </div>
+
+                    <div id="parent-homeworks-content" class="parent-homeworks-content">
+                        <div class="parent-empty-state">Загрузка домашних заданий...</div>
+                    </div>
+                </div>
+
+                <!-- 3. МЕТОДИЧЕСКИЙ ПЛАН (ТОЛЬКО ДЛЯ ЧТЕНИЯ) -->
+                <div class="parent-section-card">
+                    <div class="parent-section-head">
+                        <div class="parent-section-title-wrap">
+                            <span class="parent-section-icon" aria-hidden="true">📋</span>
+                            <div>
+                                <h2 class="parent-section-title">Методический план</h2>
+                                <p class="parent-section-sub">Темы, распределение часов по месяцам и проведённые уроки (режим просмотра)</p>
+                            </div>
+                        </div>
+                        <span class="parent-readonly-pill">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <span>Только для чтения</span>
+                        </span>
+                    </div>
+
+                    <div id="parent-plan-content" class="parent-plan-content">
+                        <div class="parent-empty-state">Загрузка методического плана...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- HERO IDENTITY HUD CARD -->
         <section class="profile-hero" aria-label="Карточка исследователя">
             <div class="hero-hud-card">
@@ -5708,6 +6417,28 @@
                     </div>
                 </div>
 
+                <!-- 3. ИНДИВИДУАЛЬНЫЙ КОД ДЛЯ РОДИТЕЛЕЙ (ТОЛЬКО ДЛЯ УЧЕНИКА) -->
+                <div class="settings-divider" id="student-parent-code-divider"></div>
+                <div class="settings-section" id="student-parent-code-section">
+                    <div class="settings-section-head">
+                        <h3 class="settings-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent, #6366f1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Код для родителей</span>
+                        </h3>
+                        <span class="settings-badge" id="student-parent-code-badge">Доступ</span>
+                    </div>
+                    <p class="settings-section-desc">
+                        Передайте этот индивидуальный код родителям. Они смогут ввести его при регистрации или в своём кабинете, чтобы видеть ваше расписание, домашние задания и методический план:
+                    </p>
+                    <div class="student-parent-code-box">
+                        <div class="student-code-display" id="settings-student-parent-code">STU-—————</div>
+                        <button type="button" class="settings-btn settings-btn-primary" id="settings-copy-parent-code-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>Скопировать код</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="settings-divider"></div>
 
                 <!-- 4. RESET DANGER ZONE -->
@@ -6179,6 +6910,7 @@
             }
 
             function switchTab(tabName) {
+                if (isParentUser()) return;
                 const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements, tabBtnUpgrade];
                 const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements, tabContentUpgrade];
 
@@ -6820,8 +7552,434 @@
                         : (hash === '#overview' || storedTab === 'overview')
                             ? 'overview'
                             : 'study';
-            switchTab(initialTab);
+
+            checkAndApplyRoleView().then(() => {
+                if (!isParentUser()) {
+                    switchTab(initialTab);
+                }
+            });
         });
+
+        // =========================================================================
+        // PARENT DASHBOARD & CHILD INTEGRATION
+        // =========================================================================
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatDateTimeStr(isoStr) {
+            if (!isoStr) return '—';
+            try {
+                const d = new Date(isoStr);
+                if (isNaN(d.getTime())) return isoStr;
+                const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+                const day = d.getDate();
+                const m = months[d.getMonth()];
+                const y = d.getFullYear();
+                const hh = String(d.getHours()).padStart(2, '0');
+                const mm = String(d.getMinutes()).padStart(2, '0');
+                return `${day} ${m} ${y}, ${hh}:${mm}`;
+            } catch(e) {
+                return isoStr;
+            }
+        }
+
+        function isParentUser() {
+            if (window.AuthSync && typeof window.AuthSync.getUser === 'function') {
+                const u = window.AuthSync.getUser();
+                if (u && u.role === 'parent') return true;
+            }
+            return false;
+        }
+
+        function updateStudentParentCodeSettings(user) {
+            const section = document.getElementById('student-parent-code-section');
+            const divider = document.getElementById('student-parent-code-divider');
+            const codeEl = document.getElementById('settings-student-parent-code');
+            const copyBtn = document.getElementById('settings-copy-parent-code-btn');
+
+            if (!user || user.role === 'parent') {
+                if (section) section.style.display = 'none';
+                if (divider) divider.style.display = 'none';
+                return;
+            }
+
+            if (section) section.style.display = '';
+            if (divider) divider.style.display = '';
+
+            const pCode = user.parentCode || user.parent_code;
+            if (codeEl) {
+                codeEl.textContent = pCode || 'STU-—————';
+            }
+
+            if (copyBtn && pCode && !copyBtn.dataset.bound) {
+                copyBtn.dataset.bound = 'true';
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(pCode);
+                        const span = copyBtn.querySelector('span');
+                        if (span) span.textContent = 'Скопировано! ✓';
+                        copyBtn.style.color = '#10b981';
+                        setTimeout(() => {
+                            if (span) span.textContent = 'Скопировать код';
+                            copyBtn.style.color = '';
+                        }, 2000);
+                        if (window.AuthSync && typeof window.AuthSync.showToast === 'function') {
+                            window.AuthSync.showToast('Код для родителей скопирован', 'success');
+                        }
+                    } catch(e) {
+                        prompt('Скопируйте код для родителей:', pCode);
+                    }
+                });
+            }
+        }
+
+        async function checkAndApplyRoleView() {
+            let u = window.AuthSync && typeof window.AuthSync.getUser === 'function' ? window.AuthSync.getUser() : null;
+            if (!u) {
+                try {
+                    const res = await fetch('/api/auth/me', { cache: 'no-store' });
+                    const data = await res.json();
+                    if (data.loggedIn && data.user) {
+                        u = data.user;
+                    }
+                } catch(e) {}
+            }
+
+            const tabsNav = document.querySelector('.profile-tabs-nav');
+            const heroSection = document.querySelector('.profile-hero');
+            const parentDashboard = document.getElementById('parent-dashboard-view');
+            const studentContents = [
+                document.getElementById('tab-content-study'),
+                document.getElementById('tab-content-overview'),
+                document.getElementById('tab-content-ranks'),
+                document.getElementById('tab-content-achievements'),
+                document.getElementById('tab-content-upgrade')
+            ];
+
+            if (u && u.role === 'parent') {
+                if (tabsNav) tabsNav.style.display = 'none';
+                if (heroSection) heroSection.style.display = 'none';
+                document.documentElement.classList.add('hide-profile-hero');
+                studentContents.forEach(c => { if (c) c.classList.add('hidden'); });
+
+                if (parentDashboard) {
+                    parentDashboard.classList.remove('hidden');
+                }
+                initParentDashboard(u);
+            } else {
+                if (tabsNav) tabsNav.style.display = '';
+                if (heroSection) heroSection.style.display = '';
+                if (parentDashboard) parentDashboard.classList.add('hidden');
+                updateStudentParentCodeSettings(u);
+            }
+        }
+
+        async function initParentDashboard(user) {
+            const greetingTitle = document.getElementById('parent-greeting-title');
+            const childBox = document.getElementById('parent-child-box');
+            const kpiCompleted = document.getElementById('kpi-completed-count');
+            const kpiPaid = document.getElementById('kpi-paid-count');
+            const kpiUnpaid = document.getElementById('kpi-unpaid-count');
+            const kpiUnpaidCard = document.getElementById('kpi-unpaid-card');
+            const lessonsCounter = document.getElementById('parent-lessons-counter');
+            const scheduleContent = document.getElementById('parent-schedule-content');
+            const hwCounter = document.getElementById('parent-hw-counter');
+            const hwContent = document.getElementById('parent-homeworks-content');
+            const planContent = document.getElementById('parent-plan-content');
+
+            if (greetingTitle && user) {
+                greetingTitle.textContent = `Кабинет родителя · ${user.displayName || user.username}`;
+            }
+
+            try {
+                const res = await fetch('/api/parent/dashboard', { cache: 'no-store' });
+                const data = await res.json();
+
+                if (!data.success || !data.dashboard) {
+                    if (scheduleContent) scheduleContent.innerHTML = `<div class="parent-empty-state">Ошибка загрузки данных кабинета.</div>`;
+                    return;
+                }
+
+                const dash = data.dashboard;
+
+                // 1. KPI CARDS
+                if (dash.kpi) {
+                    if (kpiCompleted) kpiCompleted.textContent = dash.kpi.completedLessons || 0;
+                    if (kpiPaid) kpiPaid.textContent = dash.kpi.paidLessons || 0;
+                    if (kpiUnpaid) {
+                        const unpaid = dash.kpi.unpaidLessons || 0;
+                        kpiUnpaid.textContent = unpaid;
+                        if (kpiUnpaidCard) {
+                            kpiUnpaidCard.classList.toggle('has-unpaid', unpaid > 0);
+                        }
+                    }
+                }
+
+                // 2. CHILD BOX
+                if (childBox) {
+                    if (dash.linked && dash.student) {
+                        const s = dash.student;
+                        const initial = (s.displayName || s.username || 'У').charAt(0).toUpperCase();
+                        childBox.innerHTML = `
+                            <div class="parent-child-status">
+                                <div class="parent-child-meta">
+                                    <div class="parent-child-avatar">${escapeHtml(initial)}</div>
+                                    <div>
+                                        <div class="parent-child-name">${escapeHtml(s.displayName || s.username)}</div>
+                                        <div class="parent-child-sub">@${escapeHtml(s.username)} · Код: <span class="parent-child-code-badge">${escapeHtml(s.parentCode || '')}</span></div>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-change-child" class="settings-btn settings-btn-secondary" style="padding:6px 12px; font-size:0.8rem; min-height:auto;">
+                                    Привязать ещё код
+                                </button>
+                            </div>
+                            <div id="parent-inline-link-form" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--line);">
+                                <div style="font-size:0.82rem; color:var(--muted); margin-bottom:6px;">Введите код ребёнка STU-XXXXX:</div>
+                                <div style="display:flex; gap:8px;">
+                                    <input type="text" id="parent-inline-code-input" class="settings-name-input" placeholder="STU-XXXXX" style="text-transform:uppercase; font-family:monospace; font-weight:700;">
+                                    <button type="button" id="parent-inline-link-btn" class="settings-btn settings-btn-primary">Привязать</button>
+                                </div>
+                                <div id="parent-inline-link-msg" style="font-size:0.78rem; margin-top:4px;"></div>
+                            </div>
+                        `;
+
+                        const changeBtn = childBox.querySelector('#btn-change-child');
+                        const inlineForm = childBox.querySelector('#parent-inline-link-form');
+                        if (changeBtn && inlineForm) {
+                            changeBtn.addEventListener('click', () => {
+                                inlineForm.classList.toggle('hidden');
+                            });
+                        }
+                        bindParentInlineLinkForm(childBox);
+                    } else {
+                        childBox.innerHTML = `
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <div style="font-weight:700; font-size:0.92rem; color:var(--ink);">Привяжите аккаунт ребёнка</div>
+                                <div style="font-size:0.8rem; color:var(--muted);">Введите индивидуальный код STU-XXXXX из профиля ребёнка:</div>
+                                <div style="display:flex; gap:8px; margin-top:4px;">
+                                    <input type="text" id="parent-inline-code-input" class="settings-name-input" placeholder="Например: STU-83H75" style="text-transform:uppercase; font-family:monospace; font-weight:700;">
+                                    <button type="button" id="parent-inline-link-btn" class="settings-btn settings-btn-primary">Привязать</button>
+                                </div>
+                                <div id="parent-inline-link-msg" style="font-size:0.78rem; margin-top:4px;"></div>
+                            </div>
+                        `;
+                        bindParentInlineLinkForm(childBox);
+                    }
+                }
+
+                // 3. SCHEDULE
+                if (lessonsCounter) {
+                    lessonsCounter.textContent = `${(dash.lessons || []).length} занятий`;
+                }
+                if (scheduleContent) {
+                    const lessons = dash.lessons || [];
+                    if (lessons.length === 0) {
+                        scheduleContent.innerHTML = `<div class="parent-empty-state">У ребёнка пока нет добавленных занятий в расписании.</div>`;
+                    } else {
+                        scheduleContent.innerHTML = `
+                            <div class="parent-schedule-list">
+                                ${lessons.map(les => {
+                                    const dateStr = formatDateTimeStr(les.scheduledAt);
+                                    const isComp = les.isCompleted;
+                                    const isPaid = les.isPaid;
+                                    return `
+                                        <div class="parent-lesson-item">
+                                            <div class="parent-lesson-main">
+                                                <div class="parent-lesson-title">${escapeHtml(les.title || 'Занятие')}</div>
+                                                <div class="parent-lesson-meta">
+                                                    <span class="parent-lesson-time">🕒 ${dateStr} (${les.durationMin || 60} мин)</span>
+                                                    ${les.className ? `<span>Группа: ${escapeHtml(les.className)}</span>` : ''}
+                                                    ${les.teacherName ? `<span>Преподаватель: ${escapeHtml(les.teacherName)}</span>` : ''}
+                                                </div>
+                                            </div>
+                                            <div class="parent-lesson-badges">
+                                                <span class="parent-status-pill ${isComp ? 'status-conducted' : 'status-planned'}">
+                                                    ${isComp ? '✅ Проведено' : '⏳ Запланировано'}
+                                                </span>
+                                                <span class="parent-status-pill ${isPaid ? 'status-paid' : 'status-unpaid'}">
+                                                    ${isPaid ? '💳 Оплачено' : '⏳ Не оплачено'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                    }
+                }
+
+                // 4. HOMEWORKS
+                if (hwCounter) {
+                    hwCounter.textContent = `${(dash.homeworks || []).length} заданий`;
+                }
+                if (hwContent) {
+                    const homeworks = dash.homeworks || [];
+                    if (homeworks.length === 0) {
+                        hwContent.innerHTML = `<div class="parent-empty-state">Домашних заданий для ребёнка пока не назначено.</div>`;
+                    } else {
+                        const statusLabels = {
+                            submitted: 'Сдано',
+                            checked: 'Проверено',
+                            draft: 'Черновик',
+                            not_started: 'Не начато'
+                        };
+                        hwContent.innerHTML = `
+                            <div class="parent-hw-grid">
+                                ${homeworks.map(hw => {
+                                    const sub = hw.submission || {};
+                                    const st = sub.status || 'not_started';
+                                    const stLabel = statusLabels[st] || st;
+                                    const dStr = hw.deadlineAt ? formatDateTimeStr(hw.deadlineAt) : 'Без дедлайна';
+                                    return `
+                                        <div class="parent-hw-card">
+                                            <div class="parent-hw-head">
+                                                <div class="parent-hw-title">${escapeHtml(hw.title)}</div>
+                                                <span class="parent-hw-subject">${escapeHtml(hw.subject || 'Предмет')}</span>
+                                            </div>
+                                            <div class="parent-hw-meta">
+                                                <span>Срок: ${dStr}</span>
+                                                <span class="parent-status-pill ${st === 'checked' ? 'status-conducted' : (st === 'submitted' ? 'status-paid' : 'status-planned')}">${stLabel}</span>
+                                            </div>
+                                            ${st === 'checked' ? `
+                                                <div style="font-size:0.82rem; padding:8px 10px; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                                    Балл: <strong class="parent-hw-score">${sub.score || 0} / ${sub.maxScore || 0}</strong>
+                                                    ${sub.teacherFeedback ? `<div style="margin-top:4px; color:var(--muted); font-size:0.78rem;">Отзыв: «${escapeHtml(sub.teacherFeedback)}»</div>` : ''}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                    }
+                }
+
+                // 5. READ-ONLY METHODICAL PLAN
+                if (planContent) {
+                    const plans = dash.methodicalPlans || [];
+                    if (plans.length === 0) {
+                        planContent.innerHTML = `<div class="parent-empty-state">Преподаватель ещё не составил методический план для ребёнка.</div>`;
+                    } else {
+                        const plan = plans[0];
+                        const pct = plan.conductedPercent || 0;
+                        const monthlyLessons = plan.monthlyLessons || {};
+                        const monthlyCounts = plan.monthlyCounts || {};
+                        const months = Object.keys(monthlyLessons);
+
+                        planContent.innerHTML = `
+                            <div class="parent-plan-container">
+                                <div class="parent-plan-summary">
+                                    <h3 class="parent-plan-title">${escapeHtml(plan.title)}</h3>
+                                    <div class="parent-plan-details-row">
+                                        <span>Предмет: <strong style="color:var(--ink);">${escapeHtml(plan.subject)}</strong></span>
+                                        <span>Учебный год: <strong style="color:var(--ink);">${escapeHtml(plan.academicYear)}</strong></span>
+                                        ${plan.teacherName ? `<span>Преподаватель: <strong style="color:var(--ink);">${escapeHtml(plan.teacherName)}</strong></span>` : ''}
+                                    </div>
+                                    <div class="parent-plan-progress-wrap">
+                                        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                                            <span>Пройдено уроков: <strong>${plan.totalConducted || 0} из ${plan.totalPlanned || 0}</strong></span>
+                                            <strong style="color:#10b981;">${pct}%</strong>
+                                        </div>
+                                        <div class="parent-plan-progress-bar">
+                                            <div class="parent-plan-progress-fill" style="width: ${Math.min(100, Math.max(0, pct))}%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="parent-months-accordion">
+                                    ${months.map(m => {
+                                        const list = monthlyLessons[m] || [];
+                                        const plannedCount = monthlyCounts[m] || list.length || 0;
+                                        const condCount = list.filter(l => l.isConducted).length;
+                                        return `
+                                            <div class="parent-month-card">
+                                                <div class="parent-month-head">
+                                                    <span>${escapeHtml(m)}</span>
+                                                    <span class="parent-month-badge">Пройдено: ${condCount} / ${plannedCount}</span>
+                                                </div>
+                                                <div class="parent-month-lessons">
+                                                    ${list.length === 0 ? `<div style="font-size:0.8rem; color:var(--muted); padding:4px 0;">Уроки не запланированы</div>` : ''}
+                                                    ${list.map((item, idx) => `
+                                                        <div class="parent-plan-lesson-row">
+                                                            <span class="parent-plan-lesson-name">
+                                                                <strong style="color:var(--muted); margin-right:6px;">${idx + 1}.</strong>
+                                                                ${escapeHtml(item.title || 'Урок')}
+                                                            </span>
+                                                            <span class="parent-status-pill ${item.isConducted ? 'status-conducted' : 'status-planned'}" style="font-size:0.75rem; padding:2px 8px;">
+                                                                ${item.isConducted ? '✅ Проведено' : '🕒 Запланировано'}
+                                                            </span>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading parent dashboard', e);
+                if (scheduleContent) scheduleContent.innerHTML = `<div class="parent-empty-state">Ошибка загрузки данных кабинета. Попробуйте обновить страницу.</div>`;
+            }
+        }
+
+        function bindParentInlineLinkForm(container) {
+            const input = container.querySelector('#parent-inline-code-input');
+            const btn = container.querySelector('#parent-inline-link-btn');
+            const msg = container.querySelector('#parent-inline-link-msg');
+            if (!btn || !input) return;
+
+            btn.addEventListener('click', async () => {
+                const code = input.value.trim().toUpperCase();
+                if (!code) {
+                    if (msg) {
+                        msg.textContent = 'Введите код ребёнка вида STU-XXXXX';
+                        msg.style.color = 'var(--danger, #ef4444)';
+                    }
+                    return;
+                }
+                btn.disabled = true;
+                btn.textContent = 'Привязка...';
+                if (msg) msg.textContent = '';
+                try {
+                    const res = await fetch('/api/parent/link-student', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ parentCode: code })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        if (window.AuthSync && typeof window.AuthSync.showToast === 'function') {
+                            window.AuthSync.showToast('Ребёнок успешно привязан!', 'success');
+                        }
+                        const curUser = window.AuthSync ? window.AuthSync.getUser() : null;
+                        initParentDashboard(curUser);
+                    } else {
+                        if (msg) {
+                            msg.textContent = data.error || 'Ошибка привязки';
+                            msg.style.color = 'var(--danger, #ef4444)';
+                        }
+                    }
+                } catch(e) {
+                    if (msg) {
+                        msg.textContent = 'Ошибка сети при привязке';
+                        msg.style.color = 'var(--danger, #ef4444)';
+                    }
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Привязать';
+                }
+            });
+        }
 
         // --- 2. USERNAME INLINE EDITOR ---
         const USERNAME_KEY = 'studyUserName';
@@ -6864,6 +8022,7 @@
                 const sInput = document.getElementById('settings-name-input');
                 if (sInput) sInput.value = name;
             }
+            checkAndApplyRoleView();
         });
 
         // --- 3. EXPORT / IMPORT SYNC SYSTEM ---
@@ -7444,6 +8603,8 @@
                 if (window.AuthSync && typeof window.AuthSync.updateCloudSettingsCard === 'function') {
                     window.AuthSync.updateCloudSettingsCard();
                 }
+
+                updateStudentParentCodeSettings(window.AuthSync ? window.AuthSync.getUser() : null);
 
                 if (importStatusMsg) {
                     importStatusMsg.textContent = '';

@@ -9,6 +9,8 @@ import re
 import json
 import sqlite3
 import hmac
+import random
+import string
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, Any, Tuple, List, Set
@@ -16,6 +18,25 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / 'study_site.db'
+
+# Символы для генерации индивидуального кода ученика для родителей (без легко путаемых O/0, I/1/L)
+PARENT_CODE_CHARS = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
+
+
+def generate_parent_code(length: int = 5) -> str:
+    """Генерация индивидуального кода ученика для родителей вида STU-XXXXX."""
+    chars = ''.join(random.choices(PARENT_CODE_CHARS, k=length))
+    return f"STU-{chars}"
+
+
+def generate_unique_parent_code(cursor: sqlite3.Cursor) -> str:
+    """Генерация уникального индивидуального кода ученика, отсутствующего в БД."""
+    for _ in range(100):
+        code = generate_parent_code(5)
+        cursor.execute("SELECT 1 FROM users WHERE parent_code = ?", (code,))
+        if not cursor.fetchone():
+            return code
+    return generate_parent_code(8)
 
 
 def load_env_file() -> None:
@@ -96,6 +117,17 @@ def init_db() -> None:
             if 'role' not in cols:
                 conn.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student';")
                 conn.execute("UPDATE users SET role = 'student' WHERE role IS NULL;")
+
+            # Миграция: parent_code для индивидуального кода ученика
+            if 'parent_code' not in cols:
+                conn.execute("ALTER TABLE users ADD COLUMN parent_code TEXT;")
+            conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_parent_code ON users(parent_code) WHERE parent_code IS NOT NULL;")
+
+            # Заполняем parent_code для существующих учеников без кода
+            cursor.execute("SELECT id FROM users WHERE (role = 'student' OR role IS NULL) AND (parent_code IS NULL OR parent_code = '');")
+            for s_row in cursor.fetchall():
+                pcode = generate_unique_parent_code(cursor)
+                cursor.execute("UPDATE users SET parent_code = ? WHERE id = ?", (pcode, s_row['id']))
 
             # 2. Таблица игрового прогресса пользователя
             conn.execute('''
@@ -245,6 +277,10 @@ def init_db() -> None:
             if 'is_completed' not in lesson_cols:
                 conn.execute("ALTER TABLE lessons ADD COLUMN is_completed INTEGER DEFAULT 0;")
 
+            # Миграция: is_paid в lessons для учёта оплаты занятий
+            if 'is_paid' not in lesson_cols:
+                conn.execute("ALTER TABLE lessons ADD COLUMN is_paid INTEGER DEFAULT 0;")
+
             # 8. Таблица методических планов занятий
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS methodical_plans (
@@ -271,6 +307,25 @@ def init_db() -> None:
             ''')
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_methodical_plans_student ON methodical_plans(student_id);
+            ''')
+
+            # 9. Таблица привязки родителей к ученикам
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS parent_student_links (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    parent_id INTEGER NOT NULL,
+                    student_id INTEGER NOT NULL,
+                    linked_at TEXT NOT NULL,
+                    FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+                    UNIQUE(parent_id, student_id)
+                );
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_parent_links_parent ON parent_student_links(parent_id);
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_parent_links_student ON parent_student_links(student_id);
             ''')
 
             # Auto-heal: recalculate user_xp and total_solved for records with metrics
@@ -349,19 +404,23 @@ def create_user(
     display_name_clean = (display_name or username_clean).strip()[:30]
     password_hash = generate_password_hash(password, method='pbkdf2:sha256')
     now_iso = datetime.now(timezone.utc).isoformat()
-    clean_role = role if role in ('student', 'teacher', 'admin') else 'student'
+    clean_role = role if role in ('student', 'teacher', 'admin', 'parent') else 'student'
 
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
+            parent_code = None
+            if clean_role == 'student':
+                parent_code = generate_unique_parent_code(cursor)
+
             cursor.execute(
                 '''
-                INSERT INTO users (username, display_name, password_hash, created_at, last_login, role)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO users (username, display_name, password_hash, created_at, last_login, role, parent_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ''',
-                (username_clean, display_name_clean, password_hash, now_iso, now_iso, clean_role)
+                (username_clean, display_name_clean, password_hash, now_iso, now_iso, clean_role, parent_code)
             )
             user_id = cursor.lastrowid
 
@@ -401,6 +460,8 @@ def create_user(
             'username': username_clean,
             'display_name': display_name_clean,
             'role': clean_role,
+            'parent_code': parent_code,
+            'parentCode': parent_code,
             'created_at': now_iso,
             'last_login': now_iso
         }
@@ -440,7 +501,7 @@ def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     try:
         cursor = conn.cursor()
         cursor.execute(
-            'SELECT id, username, display_name, password_hash, created_at, last_login, role FROM users WHERE username = ? COLLATE NOCASE',
+            'SELECT id, username, display_name, password_hash, created_at, last_login, role, parent_code FROM users WHERE username = ? COLLATE NOCASE',
             (username_clean,)
         )
         row = cursor.fetchone()
@@ -460,6 +521,8 @@ def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
             'username': row['username'],
             'display_name': row['display_name'],
             'role': row['role'] or 'student',
+            'parent_code': row['parent_code'],
+            'parentCode': row['parent_code'],
             'created_at': row['created_at'],
             'last_login': now_iso
         }
@@ -473,7 +536,7 @@ def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
     try:
         cursor = conn.cursor()
         cursor.execute(
-            'SELECT id, username, display_name, created_at, last_login, role FROM users WHERE id = ?',
+            'SELECT id, username, display_name, created_at, last_login, role, parent_code FROM users WHERE id = ?',
             (user_id,)
         )
         row = cursor.fetchone()
@@ -482,6 +545,7 @@ def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
         res = dict(row)
         if not res.get('role'):
             res['role'] = 'student'
+        res['parentCode'] = res.get('parent_code')
         return res
     finally:
         conn.close()
@@ -495,7 +559,7 @@ def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
     try:
         cursor = conn.cursor()
         cursor.execute(
-            'SELECT id, username, display_name, created_at, last_login, role FROM users WHERE username = ? COLLATE NOCASE',
+            'SELECT id, username, display_name, created_at, last_login, role, parent_code FROM users WHERE username = ? COLLATE NOCASE',
             (username.strip(),)
         )
         row = cursor.fetchone()
@@ -504,20 +568,29 @@ def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
         res = dict(row)
         if not res.get('role'):
             res['role'] = 'student'
+        res['parentCode'] = res.get('parent_code')
         return res
     finally:
         conn.close()
 
 
 def set_user_role(user_id: int, role: str) -> bool:
-    """Устанавливает роль пользователя ('student', 'teacher', 'admin')."""
-    if role not in ('student', 'teacher', 'admin'):
+    """Устанавливает роль пользователя ('student', 'teacher', 'admin', 'parent')."""
+    if role not in ('student', 'teacher', 'admin', 'parent'):
         raise ValueError("Некорректная роль пользователя.")
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
+            if role == 'student':
+                # Убеждаемся, что у ученика есть parent_code
+                cursor.execute("SELECT parent_code FROM users WHERE id = ?", (user_id,))
+                urow = cursor.fetchone()
+                if not urow or not urow['parent_code']:
+                    pcode = generate_unique_parent_code(cursor)
+                    cursor.execute('UPDATE users SET role = ?, parent_code = ? WHERE id = ?', (role, pcode, user_id))
+                    return cursor.rowcount > 0
             cursor.execute('UPDATE users SET role = ? WHERE id = ?', (role, user_id))
             return cursor.rowcount > 0
     finally:
@@ -2029,6 +2102,8 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
                 'homework_deadline': r['homework_deadline'],
                 'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
                 'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
+                'isPaid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False,
+                'is_paid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False,
                 'studentId': r['student_id'],
                 'student_id': r['student_id'],
                 'studentName': r['student_name'] or '',
@@ -2037,6 +2112,8 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
                 'student_username': r['student_username'] or '',
                 'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
                 'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
+                'isPaid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False,
+                'is_paid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False,
                 'createdAt': r['created_at'],
                 'created_at': r['created_at']
             })
@@ -2271,6 +2348,29 @@ def toggle_lesson_completed(lesson_id: int, teacher_id: Optional[int] = None, is
                     cursor.execute("UPDATE lessons SET is_completed = ? WHERE id = ? AND teacher_id = ?", (val, lesson_id, teacher_id))
                 else:
                     cursor.execute("UPDATE lessons SET is_completed = ? WHERE id = ?", (val, lesson_id))
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def toggle_lesson_paid(lesson_id: int, teacher_id: Optional[int] = None, is_paid: Optional[bool] = None) -> bool:
+    """Переключение или установка статуса оплаты занятия в расписании."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        with conn:
+            cursor = conn.cursor()
+            if is_paid is None:
+                if teacher_id:
+                    cursor.execute("UPDATE lessons SET is_paid = CASE WHEN is_paid = 1 THEN 0 ELSE 1 END WHERE id = ? AND teacher_id = ?", (lesson_id, teacher_id))
+                else:
+                    cursor.execute("UPDATE lessons SET is_paid = CASE WHEN is_paid = 1 THEN 0 ELSE 1 END WHERE id = ?", (lesson_id,))
+            else:
+                val = 1 if is_paid else 0
+                if teacher_id:
+                    cursor.execute("UPDATE lessons SET is_paid = ? WHERE id = ? AND teacher_id = ?", (val, lesson_id, teacher_id))
+                else:
+                    cursor.execute("UPDATE lessons SET is_paid = ? WHERE id = ?", (val, lesson_id))
             return cursor.rowcount > 0
     finally:
         conn.close()
@@ -2709,3 +2809,208 @@ def update_user_display_name(user_id: int, display_name: str) -> bool:
             return cursor.rowcount > 0
     finally:
         conn.close()
+
+
+# ============================================================================
+# ФУНКЦИИ: РОДИТЕЛИ И СВЯЗЬ С УЧЕНИКАМИ
+# ============================================================================
+
+def get_student_by_parent_code(code: str) -> Optional[Dict[str, Any]]:
+    """Поиск ученика по индивидуальному коду для родителей (регистронезависимо)."""
+    if not code:
+        return None
+    clean_code = str(code).strip().upper()
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT id, username, display_name, role, parent_code, created_at
+            FROM users
+            WHERE UPPER(parent_code) = ? AND (role = 'student' OR role IS NULL)
+            """,
+            (clean_code,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        res = dict(row)
+        res['role'] = 'student'
+        res['parentCode'] = res.get('parent_code')
+        return res
+    finally:
+        conn.close()
+
+
+def link_parent_to_student(parent_id: int, student_id: int) -> bool:
+    """Привязывает родителя к ученику в таблице parent_student_links."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO parent_student_links (parent_id, student_id, linked_at)
+                VALUES (?, ?, ?)
+                """,
+                (parent_id, student_id, now_iso)
+            )
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def unlink_parent_student(parent_id: int, student_id: int) -> bool:
+    """Отвязывает родителя от ученика."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM parent_student_links WHERE parent_id = ? AND student_id = ?",
+                (parent_id, student_id)
+            )
+            return cursor.rowcount > 0
+    finally:
+        conn.close()
+
+
+def get_linked_students_for_parent(parent_id: int) -> List[Dict[str, Any]]:
+    """Возвращает список всех учеников, привязанных к родителю."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT s.id, s.username, s.display_name, s.parent_code, l.linked_at
+            FROM parent_student_links l
+            JOIN users s ON l.student_id = s.id
+            WHERE l.parent_id = ?
+            ORDER BY l.id ASC
+            """,
+            (parent_id,)
+        )
+        res = []
+        for r in cursor.fetchall():
+            res.append({
+                'id': r['id'],
+                'username': r['username'],
+                'displayName': r['display_name'],
+                'parentCode': r['parent_code'],
+                'linkedAt': r['linked_at']
+            })
+        return res
+    finally:
+        conn.close()
+
+
+def get_parent_dashboard_data(parent_id: int, student_id: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Формирует полный набор данных для кабинета родителя:
+    - Привязанные ученики и текущий выбранный ребёнок
+    - Сводная статистика (KPI): количество пройденных, оплаченных и неоплаченных занятий
+    - Полное расписание ребёнка (все занятия)
+    - Список домашних заданий ребёнка
+    - Методические планы ребёнка (строго для чтения)
+    """
+    linked_students = get_linked_students_for_parent(parent_id)
+    if not linked_students:
+        return {
+            'linked': False,
+            'students': [],
+            'student': None,
+            'kpi': {
+                'totalLessons': 0,
+                'completedLessons': 0,
+                'paidLessons': 0,
+                'unpaidLessons': 0
+            },
+            'lessons': [],
+            'homeworks': [],
+            'methodicalPlans': []
+        }
+
+    # Выбираем указанного ученика или первого из списка
+    active_student = None
+    if student_id:
+        active_student = next((s for s in linked_students if s['id'] == student_id), None)
+    if not active_student:
+        active_student = linked_students[0]
+
+    sid = active_student['id']
+
+    # 1. Расписание и статистика занятий
+    conn = get_db_connection()
+    lessons_list = []
+    completed_count = 0
+    paid_count = 0
+    unpaid_count = 0
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT l.*, c.name as class_name, u.display_name as teacher_name,
+                   h.title as homework_title, h.deadline_at as homework_deadline
+            FROM lessons l
+            JOIN classes c ON l.class_id = c.id
+            JOIN class_members cm ON c.id = cm.class_id
+            JOIN users u ON l.teacher_id = u.id
+            LEFT JOIN homeworks h ON l.homework_id = h.id
+            WHERE cm.student_id = ?
+              AND (l.student_id IS NULL OR l.student_id = ?)
+            ORDER BY l.scheduled_at DESC
+            """,
+            (sid, sid)
+        )
+        for r in cursor.fetchall():
+            is_comp = bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False
+            is_pd = bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False
+
+            if is_comp:
+                completed_count += 1
+            if is_pd:
+                paid_count += 1
+            if is_comp and not is_pd:
+                unpaid_count += 1
+
+            lessons_list.append({
+                'id': r['id'],
+                'classId': r['class_id'],
+                'className': r['class_name'],
+                'teacherName': r['teacher_name'],
+                'title': r['title'],
+                'description': r['description'] or '',
+                'scheduledAt': r['scheduled_at'],
+                'durationMin': r['duration_min'] or 60,
+                'isCompleted': is_comp,
+                'isPaid': is_pd,
+                'homeworkTitle': r['homework_title'] or '',
+                'homeworkDeadline': r['homework_deadline'] or ''
+            })
+    finally:
+        conn.close()
+
+    # 2. Домашние задания ученика
+    homeworks_list = get_student_homeworks(sid)
+
+    # 3. Методические планы ученика (без возможности редактирования)
+    plans_list = get_methodical_plans(student_id=sid)
+
+    return {
+        'linked': True,
+        'students': linked_students,
+        'student': active_student,
+        'kpi': {
+            'totalLessons': len(lessons_list),
+            'completedLessons': completed_count,
+            'paidLessons': paid_count,
+            'unpaidLessons': unpaid_count
+        },
+        'lessons': lessons_list,
+        'homeworks': homeworks_list,
+        'methodicalPlans': plans_list
+    }

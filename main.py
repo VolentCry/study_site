@@ -70,6 +70,17 @@ def check_teacher_auth():
     return user, None
 
 
+def check_parent_auth():
+    """Проверяет авторизацию родителя. Возвращает (parent_user, None) или (None, (json_response, status_code))."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return None, (jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401)
+    user = db.get_user_by_id(user_id)
+    if not user or user.get('role') != 'parent':
+        return None, (jsonify({'success': False, 'error': 'Доступ разрешён только родителям.'}), 403)
+    return user, None
+
+
 def get_authenticated_teacher():
     """Возвращает данные учителя, если текущая сессия авторизована и имеет роль учителя или администратора."""
     user_id = session.get('user_id')
@@ -97,34 +108,47 @@ def api_auth_me():
         session.clear()
         return jsonify({'loggedIn': False})
 
+    role = user.get('role', 'student')
+    user_resp = {
+        'id': user['id'],
+        'username': user['username'],
+        'displayName': user['display_name'],
+        'role': role,
+        'createdAt': user['created_at'],
+        'lastLogin': user['last_login'],
+        'parentCode': user.get('parent_code') or user.get('parentCode')
+    }
+    if role == 'parent':
+        user_resp['linkedStudents'] = db.get_linked_students_for_parent(user['id'])
+
     return jsonify({
         'loggedIn': True,
-        'user': {
-            'id': user['id'],
-            'username': user['username'],
-            'displayName': user['display_name'],
-            'role': user.get('role', 'student'),
-            'createdAt': user['created_at'],
-            'lastLogin': user['last_login']
-        }
+        'user': user_resp
     })
 
 
 @app.route('/api/auth/register', methods=['POST'])
 def api_auth_register():
-    """Регистрация нового пользователя."""
+    """Регистрация нового пользователя (Ученик или Родитель)."""
     payload = request.get_json(silent=True) or {}
     username = str(payload.get('username', '')).strip()
     password = str(payload.get('password', ''))
     display_name = str(payload.get('displayName', '')).strip() or None
     local_data = payload.get('localData')
+    requested_role = str(payload.get('role', 'student')).strip().lower()
+    parent_code = str(payload.get('parentCode', '')).strip().upper() if payload.get('parentCode') else None
 
     if not username or not password:
         return jsonify({'success': False, 'error': 'Заполните логин и пароль.'}), 400
 
-    # Регистрация всегда создаёт аккаунты с ролью ученика (student).
-    # Регистрация с кодом учителя отключена.
-    role = 'student'
+    role = 'parent' if requested_role == 'parent' else 'student'
+
+    # Если родитель указал код ребёнка, проверяем существование ученика перед регистрацией
+    student_to_link = None
+    if role == 'parent' and parent_code:
+        student_to_link = db.get_student_by_parent_code(parent_code)
+        if not student_to_link:
+            return jsonify({'success': False, 'error': f'Ученик с кодом {parent_code} не найден. Проверьте правильность кода ребёнка.'}), 400
 
     try:
         user = db.create_user(
@@ -139,20 +163,29 @@ def api_auth_register():
     except Exception as e:
         return jsonify({'success': False, 'error': 'Внутренняя ошибка сервера при регистрации.'}), 500
 
+    # Если регистрировался родитель с кодом ребёнка — привязываем
+    if role == 'parent' and student_to_link:
+        db.link_parent_to_student(user['id'], student_to_link['id'])
+
     # Авторизуем пользователя в сессии
     session.permanent = True
     session['user_id'] = user['id']
     session['role'] = user.get('role', 'student')
 
+    user_resp = {
+        'id': user['id'],
+        'username': user['username'],
+        'displayName': user['display_name'],
+        'role': user.get('role', 'student'),
+        'parentCode': user.get('parent_code') or user.get('parentCode'),
+        'createdAt': user['created_at']
+    }
+    if role == 'parent':
+        user_resp['linkedStudents'] = db.get_linked_students_for_parent(user['id'])
+
     return jsonify({
         'success': True,
-        'user': {
-            'id': user['id'],
-            'username': user['username'],
-            'displayName': user['display_name'],
-            'role': user.get('role', 'student'),
-            'createdAt': user['created_at']
-        }
+        'user': user_resp
     })
 
 
@@ -175,15 +208,21 @@ def api_auth_login():
     session['role'] = user.get('role', 'student')
 
     user_data = db.get_user_data(user['id'])
+    role = user.get('role', 'student')
+
+    user_resp = {
+        'id': user['id'],
+        'username': user['username'],
+        'displayName': user['display_name'],
+        'role': role,
+        'parentCode': user.get('parent_code') or user.get('parentCode')
+    }
+    if role == 'parent':
+        user_resp['linkedStudents'] = db.get_linked_students_for_parent(user['id'])
 
     return jsonify({
         'success': True,
-        'user': {
-            'id': user['id'],
-            'username': user['username'],
-            'displayName': user['display_name'],
-            'role': user.get('role', 'student')
-        },
+        'user': user_resp,
         'data': user_data
     })
 
@@ -644,6 +683,100 @@ def api_teacher_toggle_lesson_conducted(lesson_id: int):
     return jsonify({'success': ok})
 
 
+@app.route('/api/teacher/lessons/<int:lesson_id>/toggle-payment', methods=['POST'])
+def api_teacher_toggle_lesson_payment(lesson_id: int):
+    """Отметка занятия как оплаченного / неоплаченного учителем."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    tid = None if teacher.get('role') == 'admin' else teacher['id']
+    payload = request.get_json(silent=True) or {}
+    is_paid = payload.get('isPaid')
+    if is_paid is not None:
+        is_paid = bool(is_paid)
+
+    ok = db.toggle_lesson_paid(lesson_id, tid, is_paid)
+    if not ok:
+        return jsonify({'success': False, 'error': 'Занятие не найдено или нет прав на изменение.'}), 404
+
+    # Получаем актуальный статус оплаты
+    conn = db.get_db_connection()
+    current_status = False
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT is_paid FROM lessons WHERE id = ?", (lesson_id,))
+        r = cur.fetchone()
+        if r:
+            current_status = bool(r['is_paid'])
+    finally:
+        conn.close()
+
+    return jsonify({'success': True, 'lessonId': lesson_id, 'isPaid': current_status})
+
+
+# ============================================================================
+# API МАРШРУТЫ: КАБИНЕТ РОДИТЕЛЯ
+# ============================================================================
+
+@app.route('/api/parent/link-student', methods=['POST'])
+def api_parent_link_student():
+    """Привязка ребёнка родителем по индивидуальному коду (STU-XXXXX)."""
+    parent, err = check_parent_auth()
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    code = str(payload.get('parentCode', '')).strip().upper()
+    if not code:
+        return jsonify({'success': False, 'error': 'Введите индивидуальный код ребёнка.'}), 400
+
+    student = db.get_student_by_parent_code(code)
+    if not student:
+        return jsonify({'success': False, 'error': f'Ученик с кодом {code} не найден. Проверьте правильность кода.'}), 404
+
+    db.link_parent_to_student(parent['id'], student['id'])
+    return jsonify({
+        'success': True,
+        'student': {
+            'id': student['id'],
+            'username': student['username'],
+            'displayName': student['display_name'],
+            'parentCode': student.get('parent_code')
+        }
+    })
+
+
+@app.route('/api/parent/unlink-student', methods=['POST'])
+def api_parent_unlink_student():
+    """Отвязка ребёнка из кабинета родителя."""
+    parent, err = check_parent_auth()
+    if err:
+        return err
+
+    payload = request.get_json(silent=True) or {}
+    student_id = payload.get('studentId')
+    if not student_id:
+        return jsonify({'success': False, 'error': 'Не указан ID ученика.'}), 400
+
+    db.unlink_parent_student(parent['id'], int(student_id))
+    return jsonify({'success': True})
+
+
+@app.route('/api/parent/dashboard', methods=['GET'])
+def api_parent_dashboard():
+    """Сводные данные для кабинета родителя: расписание, домашки, методический план, KPI."""
+    parent, err = check_parent_auth()
+    if err:
+        return err
+
+    sid_arg = request.args.get('studentId') or request.args.get('student_id')
+    student_id = int(sid_arg) if sid_arg and str(sid_arg).isdigit() else None
+
+    dashboard = db.get_parent_dashboard_data(parent['id'], student_id=student_id)
+    return jsonify({'success': True, 'dashboard': dashboard})
+
+
 # ============================================================================
 # API МАРШРУТЫ: МЕТОДИЧЕСКИЕ ПЛАНЫ
 # ============================================================================
@@ -669,6 +802,16 @@ def api_get_methodical_plans():
         student_id = request.args.get('studentId') or request.args.get('student_id')
         sid = int(student_id) if student_id and str(student_id).isdigit() else None
         plans = db.get_methodical_plans(teacher_id=user['id'], student_id=sid)
+    elif user.get('role') == 'parent':
+        student_id = request.args.get('studentId') or request.args.get('student_id')
+        sid = int(student_id) if student_id and str(student_id).isdigit() else None
+        linked = db.get_linked_students_for_parent(user['id'])
+        if sid and any(s['id'] == sid for s in linked):
+            plans = db.get_methodical_plans(student_id=sid)
+        elif linked:
+            plans = db.get_methodical_plans(student_id=linked[0]['id'])
+        else:
+            plans = []
     else:
         plans = db.get_methodical_plans(student_id=user['id'])
 

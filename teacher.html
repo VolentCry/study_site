@@ -3777,6 +3777,7 @@
 
                         const isPast = d && (d.getTime() < Date.now() - 3600000);
                         const isCompleted = !!(les.isCompleted || les.is_completed);
+                        const isPaid = !!(les.isPaid || les.is_paid);
                         const statusBadge = isCompleted
                             ? '<span class="lesson-status-badge status-completed">✅ Проведено</span>'
                             : (isPast ? '<span class="lesson-status-badge status-past">Прошедший</span>' : '<span class="lesson-status-badge status-planned">Запланирован</span>');
@@ -3802,6 +3803,9 @@
                                 <div class="lesson-actions">
                                     <button type="button" class="btn btn-sm ${isCompleted ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-complete" data-lesson-id="${les.id}" data-completed="${isCompleted ? '1' : '0'}" title="${isCompleted ? 'Снять отметку о проведении' : 'Отметить как проведённое занятие'}">
                                         ${isCompleted ? '✓ Проведено' : '⏳ Провести'}
+                                    </button>
+                                    <button type="button" class="btn btn-sm ${isPaid ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-paid" data-lesson-id="${les.id}" data-paid="${isPaid ? '1' : '0'}" title="${isPaid ? 'Снять отметку об оплате' : 'Отметить как оплаченное занятие'}">
+                                        ${isPaid ? '💳 Оплачено' : '💳 Не оплачено'}
                                     </button>
                                     <button type="button" class="btn btn-secondary btn-sm btn-edit-lesson" data-lesson-id="${les.id}" title="Редактировать занятие">
                                         ✏️
@@ -3834,6 +3838,30 @@
                                 }
                             } catch(e) {
                                 alert('Ошибка сети при обновлении статуса занятия');
+                            }
+                        });
+                    });
+
+                    // Attach payment toggle listeners
+                    lessonsTimelineContainer.querySelectorAll('.btn-toggle-lesson-paid').forEach(b => {
+                        b.addEventListener('click', async () => {
+                            const lid = b.getAttribute('data-lesson-id');
+                            const wasPaid = b.getAttribute('data-paid') === '1';
+                            try {
+                                const res = await fetch(`/api/teacher/lessons/${lid}/toggle-payment`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ isPaid: !wasPaid })
+                                });
+                                const d = await res.json();
+                                if (d.success) {
+                                    showToast(!wasPaid ? 'Занятие отмечено как оплаченное!' : 'Отметка об оплате снята');
+                                    loadSchedule();
+                                } else {
+                                    alert(d.error || 'Ошибка обновления статуса оплаты');
+                                }
+                            } catch(e) {
+                                alert('Ошибка сети при обновлении статуса оплаты');
                             }
                         });
                     });
