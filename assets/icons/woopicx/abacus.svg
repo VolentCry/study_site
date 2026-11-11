@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+    <defs>
+      <linearGradient id="woodFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#92400e"/>
+        <stop offset="50%" stop-color="#78350f"/>
+        <stop offset="100%" stop-color="#451a03"/>
+      </linearGradient>
+      <radialGradient id="beadAmber" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="50%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#b45309"/>
+      </radialGradient>
+      <radialGradient id="beadCoral" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#fecaca"/>
+        <stop offset="50%" stop-color="#ef4444"/>
+        <stop offset="100%" stop-color="#991b1b"/>
+      </radialGradient>
+      <radialGradient id="beadJade" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#bbf7d0"/>
+        <stop offset="50%" stop-color="#22c55e"/>
+        <stop offset="100%" stop-color="#14532d"/>
+      </radialGradient>
+      <radialGradient id="beadCyan" cx="35%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#bae6fd"/>
+        <stop offset="50%" stop-color="#0ea5e9"/>
+        <stop offset="100%" stop-color="#0369a1"/>
+      </radialGradient>
+      <filter id="shadowAbacus" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.3"/>
+      </filter>
+    </defs>
+    <ellipse cx="64" cy="116" rx="38" ry="6" fill="#0f172a" opacity="0.2"/>
+    <g filter="url(#shadowAbacus)">
+      <!-- Outer Frame -->
+      <rect x="20" y="24" width="88" height="84" rx="10" fill="url(#woodFrame)"/>
+      <rect x="28" y="32" width="72" height="68" rx="4" fill="#1e1b18"/>
+      <!-- Brass Rods -->
+      <line x1="42" y1="32" x2="42" y2="100" stroke="#ca8a04" stroke-width="3"/>
+      <line x1="64" y1="32" x2="64" y2="100" stroke="#ca8a04" stroke-width="3"/>
+      <line x1="86" y1="32" x2="86" y2="100" stroke="#ca8a04" stroke-width="3"/>
+      <!-- Middle divider -->
+      <rect x="22" y="58" width="84" height="6" fill="url(#woodFrame)"/>
+      <!-- Upper Beads -->
+      <ellipse cx="42" cy="44" rx="8" ry="6" fill="url(#beadCoral)"/>
+      <ellipse cx="64" cy="48" rx="8" ry="6" fill="url(#beadAmber)"/>
+      <ellipse cx="86" cy="44" rx="8" ry="6" fill="url(#beadCyan)"/>
+      <!-- Lower Beads -->
+      <ellipse cx="42" cy="72" rx="8" ry="6" fill="url(#beadJade)"/>
+      <ellipse cx="42" cy="85" rx="8" ry="6" fill="url(#beadJade)"/>
+      <ellipse cx="64" cy="80" rx="8" ry="6" fill="url(#beadAmber)"/>
+      <ellipse cx="86" cy="72" rx="8" ry="6" fill="url(#beadCoral)"/>
+      <ellipse cx="86" cy="85" rx="8" ry="6" fill="url(#beadCoral)"/>
+    </g>
+  </svg>

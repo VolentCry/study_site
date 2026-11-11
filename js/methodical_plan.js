@@ -38,16 +38,20 @@
         style.textContent = `
             /* --- METHODICAL PLAN STYLES --- */
             .plan-dialog {
+                margin: auto !important;
+                position: fixed !important;
+                inset: 0 !important;
                 width: 96vw;
                 max-width: 1040px;
                 max-height: 92vh;
-                background: var(--bg-card, #161a23);
+                background: var(--surface-card, var(--bg-card, #161a23));
                 color: var(--ink, #f1f5f9);
                 border: 1px solid var(--line, rgba(255,255,255,0.12));
                 border-radius: 16px;
                 padding: 0;
                 box-shadow: 0 25px 60px rgba(0,0,0,0.6);
                 overflow: hidden;
+                z-index: 1000;
             }
             .plan-dialog::backdrop {
                 background: rgba(0, 0, 0, 0.78);
@@ -424,19 +428,197 @@
                     color: #000000 !important;
                 }
             }
+
+            /* --- LIGHT THEME STYLES --- */
+            [data-theme="light"] .plan-dialog,
+            html[data-theme="light"] .plan-dialog,
+            [data-theme="light"] #modal-methodical-plan {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                border: 1px solid rgba(15, 23, 42, 0.14) !important;
+                box-shadow: 0 25px 60px rgba(15, 23, 42, 0.18) !important;
+            }
+            [data-theme="light"] .plan-dialog::backdrop,
+            [data-theme="light"] #modal-methodical-plan::backdrop {
+                background: rgba(15, 23, 42, 0.55) !important;
+            }
+            [data-theme="light"] .plan-modal-header {
+                background: #f8fafc !important;
+                border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .plan-modal-header h3 {
+                color: #0f172a !important;
+            }
+            [data-theme="light"] #plan-modal-sub {
+                color: #64748b !important;
+            }
+            [data-theme="light"] .plan-modal-footer {
+                background: #f8fafc !important;
+                border-top: 1px solid rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .plan-hero-card {
+                background: #f8fafc !important;
+                border: 1px solid rgba(15, 23, 42, 0.12) !important;
+            }
+            [data-theme="light"] .plan-title-input {
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .plan-title-input:hover,
+            [data-theme="light"] .plan-title-input:focus {
+                background: #ffffff !important;
+                border-color: #10b981 !important;
+            }
+            [data-theme="light"] .plan-kpi-card {
+                background: #f8fafc !important;
+                border: 1px solid rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .plan-kpi-lbl {
+                color: #64748b !important;
+            }
+            [data-theme="light"] .plan-section {
+                background: #ffffff !important;
+                border: 1px solid rgba(15, 23, 42, 0.12) !important;
+            }
+            [data-theme="light"] .plan-section-title {
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .topic-item-row {
+                background: #f8fafc !important;
+                border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            }
+            [data-theme="light"] .topic-item-row:hover {
+                background: #f1f5f9 !important;
+            }
+            [data-theme="light"] .topic-item-row.part2-highlight {
+                background: #faf5ff !important;
+                border-color: #d8b4fe !important;
+            }
+            [data-theme="light"] .topic-title-input {
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .topic-title-input:hover,
+            [data-theme="light"] .topic-title-input:focus {
+                background: #ffffff !important;
+                border-color: rgba(15, 23, 42, 0.25) !important;
+            }
+            [data-theme="light"] .topic-hours-input {
+                color: #64748b !important;
+            }
+            [data-theme="light"] .topic-hours-input:hover,
+            [data-theme="light"] .topic-hours-input:focus {
+                background: #ffffff !important;
+                border-color: rgba(15, 23, 42, 0.25) !important;
+            }
+            [data-theme="light"] .topic-part-toggle {
+                border-color: rgba(15, 23, 42, 0.2) !important;
+                color: #64748b !important;
+            }
+            [data-theme="light"] .topic-part-toggle.active {
+                background: #8b5cf6 !important;
+                color: #ffffff !important;
+                border-color: #8b5cf6 !important;
+            }
+            [data-theme="light"] .month-counts-grid .month-count-box {
+                background: #f8fafc !important;
+                border: 1px solid rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .month-count-name {
+                color: #64748b !important;
+            }
+            [data-theme="light"] .month-count-input {
+                background: #ffffff !important;
+                border: 1px solid rgba(15, 23, 42, 0.18) !important;
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .month-total-banner {
+                background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.08)) !important;
+                border-color: rgba(16, 185, 129, 0.3) !important;
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .month-block {
+                background: #f8fafc !important;
+                border: 1px solid rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .month-block-title {
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .lesson-title-input {
+                background: #ffffff !important;
+                border: 1px solid rgba(15, 23, 42, 0.14) !important;
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .lesson-title-input:focus {
+                border-color: #10b981 !important;
+            }
+            [data-theme="light"] .conducted-tracking-table {
+                background: #ffffff !important;
+                border: 1px solid rgba(15, 23, 42, 0.12) !important;
+            }
+            [data-theme="light"] .conducted-tracking-table th {
+                background: #f1f5f9 !important;
+                color: #475569 !important;
+                border: 1px solid rgba(15, 23, 42, 0.1) !important;
+            }
+            [data-theme="light"] .conducted-tracking-table td {
+                background: #ffffff !important;
+                border: 1px solid rgba(15, 23, 42, 0.08) !important;
+                color: #0f172a !important;
+            }
+            [data-theme="light"] .lesson-checkbox-btn {
+                background: #f1f5f9 !important;
+                border-color: rgba(15, 23, 42, 0.2) !important;
+                color: #64748b !important;
+            }
+            [data-theme="light"] .lesson-checkbox-btn:hover {
+                border-color: #10b981 !important;
+                background: #e2e8f0 !important;
+            }
+            [data-theme="light"] .lesson-checkbox-btn.checked {
+                background: #10b981 !important;
+                border-color: #10b981 !important;
+                color: #ffffff !important;
+            }
+            [data-theme="light"] .lesson-idx-badge {
+                color: #64748b !important;
+            }
+            [data-theme="light"] .plan-dialog .form-input,
+            [data-theme="light"] .plan-dialog .form-textarea,
+            [data-theme="light"] .plan-dialog .form-select {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                border: 1px solid rgba(15, 23, 42, 0.16) !important;
+            }
+            [data-theme="light"] .plan-dialog .btn-secondary {
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+                border: 1px solid rgba(15, 23, 42, 0.15) !important;
+            }
+            [data-theme="light"] .plan-dialog .btn-secondary:hover {
+                background: #e2e8f0 !important;
+            }
+            [data-theme="light"] .plan-dialog .modal-close {
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+                border: 1px solid rgba(15, 23, 42, 0.14) !important;
+            }
         `;
         document.head.appendChild(style);
     }
 
     // Получение текущего пользователя и роли
     async function fetchUserRole() {
+        if (window.location.pathname.includes('teacher') || document.querySelector('.teacher-dashboard')) {
+            isTeacherUser = true;
+        }
         try {
             const res = await fetch('/api/auth/me', { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 if (data.loggedIn && data.user) {
                     currentUser = data.user;
-                    isTeacherUser = (data.user.role === 'teacher' || data.user.role === 'admin');
+                    if (data.user.role === 'teacher' || data.user.role === 'admin') {
+                        isTeacherUser = true;
+                    }
                 }
             }
         } catch (e) {

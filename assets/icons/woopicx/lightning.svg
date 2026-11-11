@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+    <defs>
+      <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fffbeb"/>
+        <stop offset="20%" stop-color="#fde047"/>
+        <stop offset="60%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#d97706"/>
+      </linearGradient>
+      <linearGradient id="boltRim" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#b45309"/>
+        <stop offset="100%" stop-color="#78350f"/>
+      </linearGradient>
+      <filter id="shadowBolt" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#b45309" flood-opacity="0.35"/>
+      </filter>
+    </defs>
+    <ellipse cx="64" cy="116" rx="30" ry="6" fill="#0f172a" opacity="0.2"/>
+    <g filter="url(#shadowBolt)">
+      <!-- 3D Extrusion Back -->
+      <path d="M 72 14 L 38 64 L 64 64 L 52 114 L 98 54 L 72 54 Z" fill="url(#boltRim)" transform="translate(2, 4)"/>
+      <!-- Main Bolt Front -->
+      <path d="M 72 14 L 38 64 L 64 64 L 52 114 L 98 54 L 72 54 Z" fill="url(#boltGrad)" stroke="#fde047" stroke-width="2" stroke-linejoin="round"/>
+      <!-- Specular Highlight Line -->
+      <path d="M 69 22 L 44 60 L 64 60 L 57 100" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+      <!-- Sparkle -->
+      <circle cx="70" cy="24" r="3" fill="#ffffff"/>
+    </g>
+  </svg>

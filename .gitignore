@@ -8,6 +8,7 @@ package-lock.json
 *.png
 *.pdf
 !assets/images/*_math_hero.jpg
+!assets/icons/**
 
 scratch/
 

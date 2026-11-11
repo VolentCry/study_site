@@ -2,16 +2,21 @@
    МЕТОДИЧЕСКИЙ ПЛАН И УЧЁТ ЗАНЯТИЙ (СТИЛИ)
    ========================================================================== */
 
-.mp-modal {
+.mp-modal,
+.plan-dialog {
+    margin: auto !important;
+    position: fixed !important;
+    inset: 0 !important;
     border: 1px solid var(--line, rgba(255, 255, 255, 0.1));
     border-radius: var(--r, 16px);
-    background: var(--bg-card, #131722);
+    background: var(--surface-card, var(--bg-card, #131722));
     color: var(--ink, #f1f5f9);
     padding: 0;
-    max-width: 960px;
-    width: 95vw;
-    max-height: 90vh;
+    max-width: 1040px;
+    width: 96vw;
+    max-height: 92vh;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
 }
 
 .mp-modal::backdrop {
@@ -633,4 +638,227 @@
         color: #000 !important;
         background: transparent !important;
     }
+}
+
+/* --- LIGHT THEME STYLES --- */
+[data-theme="light"] .mp-modal,
+[data-theme="light"] .plan-dialog,
+html[data-theme="light"] .mp-modal,
+html[data-theme="light"] .plan-dialog,
+[data-theme="light"] #modal-methodical-plan {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(15, 23, 42, 0.14) !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.18) !important;
+}
+
+[data-theme="light"] .mp-modal::backdrop,
+[data-theme="light"] .plan-dialog::backdrop,
+[data-theme="light"] #modal-methodical-plan::backdrop {
+    background: rgba(15, 23, 42, 0.55) !important;
+}
+
+[data-theme="light"] .plan-modal-header,
+[data-theme="light"] .mp-header {
+    background: #f8fafc !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .plan-modal-header h3,
+[data-theme="light"] .mp-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] #plan-modal-sub,
+[data-theme="light"] .mp-subtitle {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .plan-modal-footer {
+    background: #f8fafc !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .plan-hero-card,
+[data-theme="light"] .mp-overview-card {
+    background: #f8fafc !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+}
+
+[data-theme="light"] .plan-title-input {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .plan-title-input:hover,
+[data-theme="light"] .plan-title-input:focus {
+    background: #ffffff !important;
+    border-color: #10b981 !important;
+}
+
+[data-theme="light"] .plan-kpi-card,
+[data-theme="light"] .mp-stat-card {
+    background: #f8fafc !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .plan-kpi-lbl,
+[data-theme="light"] .mp-stat-label {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .plan-section,
+[data-theme="light"] .mp-section {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+}
+
+[data-theme="light"] .plan-section-title,
+[data-theme="light"] .mp-section-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .topic-item-row,
+[data-theme="light"] .mp-topic-item {
+    background: #f8fafc !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+[data-theme="light"] .topic-item-row:hover,
+[data-theme="light"] .mp-topic-item:hover {
+    background: #f1f5f9 !important;
+}
+
+[data-theme="light"] .topic-item-row.part2-highlight,
+[data-theme="light"] .mp-topic-item.part-2 {
+    background: #faf5ff !important;
+    border-color: #d8b4fe !important;
+}
+
+[data-theme="light"] .topic-title-input {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .topic-title-input:hover,
+[data-theme="light"] .topic-title-input:focus {
+    background: #ffffff !important;
+    border-color: rgba(15, 23, 42, 0.25) !important;
+}
+
+[data-theme="light"] .topic-hours-input {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .topic-hours-input:hover,
+[data-theme="light"] .topic-hours-input:focus {
+    background: #ffffff !important;
+    border-color: rgba(15, 23, 42, 0.25) !important;
+}
+
+[data-theme="light"] .month-counts-grid .month-count-box,
+[data-theme="light"] .mp-month-card {
+    background: #f8fafc !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .month-count-name {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .month-count-input {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.18) !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .month-total-banner {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.08)) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .month-block {
+    background: #f8fafc !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .month-block-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .lesson-title-input {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.14) !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .lesson-title-input:focus {
+    border-color: #10b981 !important;
+}
+
+[data-theme="light"] .conducted-tracking-table,
+[data-theme="light"] .mp-tracking-table {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+}
+
+[data-theme="light"] .conducted-tracking-table th,
+[data-theme="light"] .mp-tracking-table th {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .conducted-tracking-table td,
+[data-theme="light"] .mp-tracking-table td {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .lesson-checkbox-btn,
+[data-theme="light"] .mp-check-btn {
+    background: #f1f5f9 !important;
+    border-color: rgba(15, 23, 42, 0.2) !important;
+    color: #64748b !important;
+}
+
+[data-theme="light"] .lesson-checkbox-btn:hover,
+[data-theme="light"] .mp-check-btn:hover {
+    border-color: #10b981 !important;
+    background: #e2e8f0 !important;
+}
+
+[data-theme="light"] .lesson-checkbox-btn.checked,
+[data-theme="light"] .mp-check-btn.checked {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .lesson-idx-badge {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .plan-dialog .form-input,
+[data-theme="light"] .plan-dialog .form-textarea,
+[data-theme="light"] .plan-dialog .form-select {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(15, 23, 42, 0.16) !important;
+}
+
+[data-theme="light"] .plan-dialog .btn-secondary {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+}
+
+[data-theme="light"] .plan-dialog .btn-secondary:hover {
+    background: #e2e8f0 !important;
+}
+
+[data-theme="light"] .plan-dialog .modal-close {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(15, 23, 42, 0.14) !important;
 }

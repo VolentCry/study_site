@@ -171,11 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const correctAnswers = attempts.filter(attempt => attempt.correct).length;
         const accuracy = attempts.length ? correctAnswers / attempts.length : 0;
         const testKeys = [
-            { key: 'arithmetic', name: 'Мастер арифметики', icon: '🪓' },
-            { key: 'equations', name: 'Укротитель уравнений', icon: '📜' },
-            { key: 'geometry', name: 'Геометр', icon: '🧱' },
-            { key: 'rounding', name: 'Точность до десятых', icon: '🔢' },
-            { key: 'primes', name: 'Искатель простых чисел', icon: '💎' }
+            { key: 'arithmetic', name: 'Мастер арифметики', icon: 'abacus' },
+            { key: 'equations', name: 'Укротитель уравнений', icon: 'scroll' },
+            { key: 'geometry', name: 'Геометр', icon: 'cube' },
+            { key: 'rounding', name: 'Точность до десятых', icon: 'chart-bar' },
+            { key: 'primes', name: 'Искатель простых чисел', icon: 'diamond' }
         ];
         const completedTests = new Set();
         testKeys.forEach(({ key }) => {
@@ -192,11 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         return [
-            { name: 'Первый шаг', description: 'Реши свою первую задачу правильно.', icon: '🥉', earned: solvedCount >= 1 },
-            { name: 'Ученик', description: 'Реши правильно 10 разных задач.', icon: '🔟', earned: solvedCount >= 10 },
-            { name: 'Знаток', description: 'Реши правильно 50 разных задач.', icon: '🏆', earned: solvedCount >= 50 },
-            { name: 'Верные ответы', description: 'Дай 10 правильных ответов.', icon: '✨', earned: correctAnswers >= 10 },
-            { name: 'Меткость', description: 'Ответь правильно минимум на 80% из 10 проверенных вопросов.', icon: '🎯', earned: attempts.length >= 10 && accuracy >= 0.8 },
+            { name: 'Первый шаг', description: 'Реши свою первую задачу правильно.', icon: 'rocket', earned: solvedCount >= 1 },
+            { name: 'Ученик', description: 'Реши правильно 10 разных задач.', icon: 'star', earned: solvedCount >= 10 },
+            { name: 'Знаток', description: 'Реши правильно 50 разных задач.', icon: 'trophy', earned: solvedCount >= 50 },
+            { name: 'Верные ответы', description: 'Дай 10 правильных ответов.', icon: 'sparkles', earned: correctAnswers >= 10 },
+            { name: 'Меткость', description: 'Ответь правильно минимум на 80% из 10 проверенных вопросов.', icon: 'target', earned: attempts.length >= 10 && accuracy >= 0.8 },
             ...testKeys.map(test => ({
                 name: test.name,
                 description: 'Пройди все 15 вопросов этого тестирования.',
@@ -223,15 +223,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const solvedCount = countSolvedTasks(attempts);
 
         // Calculate collector rank tier
-        let tier = 'Новичок 🥉';
+        let tierName = 'Новичок';
+        let tierIcon = 'medal-bronze';
         if (earnedCount === totalCount) {
-            tier = 'Легенда наград 👑';
+            tierName = 'Легенда наград';
+            tierIcon = 'crown';
         } else if (earnedCount >= 7) {
-            tier = 'Мастер трофеев 🥇';
+            tierName = 'Мастер трофеев';
+            tierIcon = 'medal-gold';
         } else if (earnedCount >= 4) {
-            tier = 'Знаток наград 🥈';
+            tierName = 'Знаток наград';
+            tierIcon = 'medal-silver';
         } else if (earnedCount >= 1) {
-            tier = 'Искатель наград 🥉';
+            tierName = 'Искатель наград';
+            tierIcon = 'medal-bronze';
         }
 
         // Summary metrics
@@ -245,7 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statSolved) statSolved.textContent = String(solvedCount);
 
         const statTier = document.getElementById('ach-stat-tier');
-        if (statTier) statTier.textContent = tier;
+        if (statTier) {
+            statTier.innerHTML = `${tierName} <img src="assets/icons/woopicx/${tierIcon}.png" class="woopicx-icon inline-tier-icon" alt="" aria-hidden="true" width="22" height="22" loading="lazy" />`;
+        }
 
         // Hero badge sync
         const heroMedalsCount = document.getElementById('hero-medals-count');
@@ -298,7 +305,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const iconWrap = document.createElement('div');
                     iconWrap.className = 'achievement-icon-wrap';
                     iconWrap.setAttribute('aria-hidden', 'true');
-                    iconWrap.textContent = achievement.icon;
+
+                    const iconImg = document.createElement('img');
+                    iconImg.src = `assets/icons/woopicx/${achievement.icon}.png`;
+                    iconImg.alt = '';
+                    iconImg.className = 'woopicx-icon achievement-3d-icon';
+                    iconImg.width = 36;
+                    iconImg.height = 36;
+                    iconImg.loading = 'lazy';
+                    iconWrap.appendChild(iconImg);
 
                     const details = document.createElement('div');
                     details.className = 'achievement-details';

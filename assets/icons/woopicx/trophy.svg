@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+    <defs>
+      <linearGradient id="pedestalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#475569"/>
+        <stop offset="50%" stop-color="#334155"/>
+        <stop offset="100%" stop-color="#1e293b"/>
+      </linearGradient>
+      <linearGradient id="goldStem" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ca8a04"/>
+        <stop offset="35%" stop-color="#fef08a"/>
+        <stop offset="70%" stop-color="#eab308"/>
+        <stop offset="100%" stop-color="#a16207"/>
+      </linearGradient>
+      <linearGradient id="goldCup" x1="0%" y1="0%" x2="100%" y2="50%">
+        <stop offset="0%" stop-color="#fef9c3"/>
+        <stop offset="25%" stop-color="#facc15"/>
+        <stop offset="65%" stop-color="#eab308"/>
+        <stop offset="100%" stop-color="#b45309"/>
+      </linearGradient>
+      <radialGradient id="innerGlow" cx="50%" cy="30%" r="50%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.8"/>
+        <stop offset="60%" stop-color="#fef08a" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="shadowTrophy" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.3"/>
+      </filter>
+    </defs>
+    <!-- Ambient Shadow -->
+    <ellipse cx="64" cy="116" rx="36" ry="6" fill="#0f172a" opacity="0.25"/>
+    <g filter="url(#shadowTrophy)">
+      <!-- Handles -->
+      <path d="M 38 42 C 18 42 16 66 38 72" fill="none" stroke="url(#goldStem)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 90 42 C 110 42 112 66 90 72" fill="none" stroke="url(#goldStem)" stroke-width="8" stroke-linecap="round"/>
+      <!-- Pedestal base -->
+      <rect x="40" y="102" width="48" height="12" rx="4" fill="url(#pedestalGrad)"/>
+      <rect x="46" y="94" width="36" height="9" rx="3" fill="#64748b"/>
+      <rect x="52" y="105" width="24" height="6" rx="2" fill="#fbbf24"/>
+      <!-- Stem -->
+      <path d="M 57 82 L 71 82 L 68 95 L 60 95 Z" fill="url(#goldStem)"/>
+      <ellipse cx="64" cy="82" rx="14" ry="4" fill="#ca8a04"/>
+      <!-- Cup Body -->
+      <path d="M 36 34 C 36 74 50 82 64 82 C 78 82 92 74 92 34 Z" fill="url(#goldCup)"/>
+      <!-- Cup rim -->
+      <ellipse cx="64" cy="34" rx="28" ry="7" fill="#fde047"/>
+      <ellipse cx="64" cy="34" rx="24" ry="5.5" fill="#ca8a04"/>
+      <ellipse cx="64" cy="33" rx="22" ry="4.5" fill="#b45309"/>
+      <!-- Cup Highlights -->
+      <path d="M 42 38 C 42 66 52 74 64 74" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+      <!-- Embossed Star on Cup -->
+      <polygon points="64,48 67,55 74,56 69,61 70,68 64,64 58,68 59,61 54,56 61,55" fill="#fef9c3"/>
+      <!-- Sparkle -->
+      <polygon points="88,28 90,34 96,36 90,38 88,44 86,38 80,36 86,34" fill="#ffffff" opacity="0.9"/>
+    </g>
+  </svg>

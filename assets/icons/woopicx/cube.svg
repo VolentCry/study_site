@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+    <defs>
+      <linearGradient id="cubeTop" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#67e8f9"/>
+        <stop offset="100%" stop-color="#06b6d4"/>
+      </linearGradient>
+      <linearGradient id="cubeLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0891b2"/>
+        <stop offset="100%" stop-color="#0e7490"/>
+      </linearGradient>
+      <linearGradient id="cubeRight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0369a1"/>
+        <stop offset="100%" stop-color="#1e3a8a"/>
+      </linearGradient>
+      <filter id="shadowCube" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.3"/>
+      </filter>
+    </defs>
+    <ellipse cx="64" cy="116" rx="36" ry="6" fill="#0f172a" opacity="0.2"/>
+    <g filter="url(#shadowCube)">
+      <!-- Top Face -->
+      <polygon points="64,18 106,42 64,66 22,42" fill="url(#cubeTop)"/>
+      <!-- Left Face -->
+      <polygon points="22,42 64,66 64,110 22,86" fill="url(#cubeLeft)"/>
+      <!-- Right Face -->
+      <polygon points="64,66 106,42 106,86 64,110" fill="url(#cubeRight)"/>
+      <!-- Grid / Coordinate lines on top -->
+      <line x1="43" y1="30" x2="85" y2="54" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+      <line x1="85" y1="30" x2="43" y2="54" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+      <!-- Highlights on vertices -->
+      <circle cx="64" cy="18" r="3" fill="#ffffff"/>
+      <line x1="22" y1="42" x2="64" y2="66" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+    </g>
+  </svg>

@@ -3823,6 +3823,260 @@
             }
         }
 
+        /* TAB 4: UPGRADE / ПРОКАЧКА */
+        .upgrade-page-container {
+            width: 100%;
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .upgrade-placeholder-card {
+            position: relative;
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            padding: 3.5rem 2rem 3rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .upgrade-placeholder-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff7728, #f59e0b, #06b6d4, #ff7728);
+            background-size: 200% 100%;
+            animation: upgradeGlowShift 6s ease infinite;
+        }
+
+        @keyframes upgradeGlowShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .upgrade-placeholder-glow {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 480px;
+            height: 280px;
+            background: radial-gradient(ellipse at center, rgba(255, 119, 40, 0.16) 0%, rgba(245, 158, 11, 0.06) 45%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .upgrade-placeholder-icon-wrap {
+            position: relative;
+            z-index: 1;
+            width: 82px;
+            height: 82px;
+            border-radius: 22px;
+            background: rgba(255, 119, 40, 0.12);
+            border: 1px solid rgba(255, 119, 40, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            margin-bottom: 1.4rem;
+            box-shadow: 0 10px 28px rgba(255, 119, 40, 0.22);
+            animation: upgradePulseIcon 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes upgradePulseIcon {
+            0% { transform: scale(1); box-shadow: 0 8px 24px rgba(255, 119, 40, 0.2); }
+            100% { transform: scale(1.04); box-shadow: 0 12px 32px rgba(255, 119, 40, 0.35); }
+        }
+
+        .upgrade-badge-pill {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.95rem;
+            border-radius: var(--r-pill);
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.36);
+            color: #f59e0b;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 1rem;
+        }
+
+        .upgrade-badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #f59e0b;
+            box-shadow: 0 0 8px #f59e0b;
+            animation: upgradeBadgeBlink 1.8s ease-in-out infinite;
+        }
+
+        @keyframes upgradeBadgeBlink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.85); }
+        }
+
+        .upgrade-placeholder-title {
+            position: relative;
+            z-index: 1;
+            font-family: var(--f-head);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 0.65rem 0;
+            letter-spacing: -0.01em;
+        }
+
+        .upgrade-placeholder-desc {
+            position: relative;
+            z-index: 1;
+            font-size: 0.96rem;
+            line-height: 1.65;
+            color: var(--muted-bright);
+            max-width: 580px;
+            margin: 0 0 2.25rem 0;
+        }
+
+        .upgrade-features-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .upgrade-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 1rem 1.15rem;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--line);
+            text-align: left;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .upgrade-feature-item:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 119, 40, 0.3);
+        }
+
+        .upgrade-feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 119, 40, 0.12);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .upgrade-feature-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            min-width: 0;
+        }
+
+        .upgrade-feature-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .upgrade-feature-hint {
+            font-size: 0.76rem;
+            color: var(--muted);
+            line-height: 1.35;
+        }
+
+        @media (max-width: 720px) {
+            .upgrade-placeholder-card {
+                padding: 2.25rem 1.25rem 2rem;
+            }
+            .upgrade-features-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            .upgrade-placeholder-title {
+                font-size: 1.45rem;
+            }
+            .upgrade-placeholder-desc {
+                font-size: 0.9rem;
+                margin-bottom: 1.75rem;
+            }
+        }
+
+        /* Light theme overrides for Upgrade tab */
+        [data-theme="light"] .upgrade-placeholder-card {
+            background: #ffffff;
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        }
+        [data-theme="light"] .upgrade-placeholder-title {
+            color: #0f172a;
+        }
+        [data-theme="light"] .upgrade-placeholder-desc {
+            color: #475569;
+        }
+        [data-theme="light"] .upgrade-placeholder-glow {
+            background: radial-gradient(ellipse at center, rgba(234, 88, 12, 0.1) 0%, rgba(245, 158, 11, 0.04) 45%, transparent 70%);
+        }
+        [data-theme="light"] .upgrade-placeholder-icon-wrap {
+            background: rgba(234, 88, 12, 0.08);
+            border-color: rgba(234, 88, 12, 0.22);
+            color: #ea580c;
+            box-shadow: 0 8px 22px rgba(234, 88, 12, 0.14);
+        }
+        [data-theme="light"] .upgrade-badge-pill {
+            background: rgba(217, 119, 6, 0.1);
+            border-color: rgba(217, 119, 6, 0.28);
+            color: #b45309;
+        }
+        [data-theme="light"] .upgrade-badge-dot {
+            background: #d97706;
+            box-shadow: 0 0 6px rgba(217, 119, 6, 0.6);
+        }
+        [data-theme="light"] .upgrade-feature-item {
+            background: #f8fafc;
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+        [data-theme="light"] .upgrade-feature-item:hover {
+            border-color: rgba(234, 88, 12, 0.35);
+            background: #f1f5f9;
+        }
+        [data-theme="light"] .upgrade-feature-icon {
+            background: rgba(234, 88, 12, 0.08);
+            color: #ea580c;
+        }
+        [data-theme="light"] .upgrade-feature-name {
+            color: #0f172a;
+        }
+        [data-theme="light"] .upgrade-feature-hint {
+            color: #64748b;
+        }
+
         /* HERO MEDALS BADGE */
         .role-medals-badge {
             display: inline-flex;
@@ -3969,6 +4223,61 @@
             background: rgba(255, 255, 255, 0.05);
             color: var(--muted);
             border: 1px solid var(--line);
+        }
+
+        /* --- WOOPICX 3D ICONS STANDARD --- */
+        .woopicx-icon {
+            display: inline-block;
+            vertical-align: middle;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.16));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .woopicx-icon.inline-icon {
+            width: 18px;
+            height: 18px;
+            vertical-align: -2px;
+            margin-right: 4px;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.14));
+        }
+
+        .woopicx-icon.summary-icon {
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+        }
+
+        .trainer-summary-item:hover .woopicx-icon.summary-icon {
+            transform: translateY(-2px) scale(1.1);
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+        }
+
+        .woopicx-icon.inline-tier-icon {
+            width: 22px;
+            height: 22px;
+            vertical-align: -3px;
+            margin-left: 5px;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+        }
+
+        .woopicx-icon.achievement-3d-icon {
+            width: 36px;
+            height: 36px;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.22));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+        }
+
+        .achievement-item:hover .achievement-3d-icon {
+            transform: translateY(-2px) scale(1.14);
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        .achievement-item.is-locked .achievement-3d-icon {
+            filter: grayscale(0.65) opacity(0.6) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
         }
 
 
@@ -4813,7 +5122,7 @@
 
                 <!-- ВЫПАДАЮЩИЙ СПИСОК: СЕРИИ И ЗВАНИЯ, МЕДАЛИ -->
                 <div class="profile-tab-dropdown" id="profile-tab-dropdown">
-                    <button type="button" class="profile-tab-btn profile-tab-dropdown-trigger" id="tab-btn-dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Дополнительные разделы: Серии и звания, Медали">
+                    <button type="button" class="profile-tab-btn profile-tab-dropdown-trigger" id="tab-btn-dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Дополнительные разделы: Серии и звания, Медали, Прокачка">
                         <span class="dropdown-trigger-icon" id="profile-dropdown-icon" aria-hidden="true">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
                         </span>
@@ -4831,6 +5140,11 @@
                         <button type="button" class="profile-tab-dropdown-item" id="tab-btn-achievements" role="tab" aria-selected="false" aria-controls="tab-content-achievements">
                             <svg class="dropdown-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/></svg>
                             <span class="dropdown-item-text">Медали</span>
+                            <span class="dropdown-item-check" aria-hidden="true">✓</span>
+                        </button>
+                        <button type="button" class="profile-tab-dropdown-item" id="tab-btn-upgrade" role="tab" aria-selected="false" aria-controls="tab-content-upgrade">
+                            <svg class="dropdown-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            <span class="dropdown-item-text">Прокачка</span>
                             <span class="dropdown-item-check" aria-hidden="true">✓</span>
                         </button>
                     </div>
@@ -4871,7 +5185,8 @@
                         <span class="role-tag">Статус: Исследователь</span>
                         <span class="solved-counter-badge">Решено задач: <strong id="tasks-count">0</strong></span>
                         <button type="button" class="role-medals-badge" id="hero-medals-btn" title="Перейти ко всем медалям">
-                            <span>🏆 Медали:</span>
+                            <img src="assets/icons/woopicx/trophy.png" class="woopicx-icon inline-icon" alt="" aria-hidden="true" width="18" height="18" loading="lazy">
+                            <span>Медали:</span>
                             <strong id="hero-medals-count">0 / 10</strong>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                         </button>
@@ -5083,28 +5398,28 @@
                     <div class="trainer-summary-item">
                         <span class="trainer-summary-label">Открыто медалей</span>
                         <div class="trainer-summary-val">
-                            <span style="color: var(--accent-gold);">🏆</span>
+                            <img src="assets/icons/woopicx/trophy.png" class="woopicx-icon summary-icon" alt="" aria-hidden="true" width="28" height="28" loading="lazy">
                             <span id="ach-stat-earned-total">0 / 10</span>
                         </div>
                     </div>
                     <div class="trainer-summary-item">
                         <span class="trainer-summary-label">Прогресс коллекции</span>
                         <div class="trainer-summary-val">
-                            <span style="color: var(--accent);">⚡</span>
+                            <img src="assets/icons/woopicx/lightning.png" class="woopicx-icon summary-icon" alt="" aria-hidden="true" width="28" height="28" loading="lazy">
                             <span id="ach-stat-percent">0%</span>
                         </div>
                     </div>
                     <div class="trainer-summary-item">
                         <span class="trainer-summary-label">Задач решено</span>
                         <div class="trainer-summary-val">
-                            <span style="color: #2ed573;">✅</span>
+                            <img src="assets/icons/woopicx/checkmark.png" class="woopicx-icon summary-icon" alt="" aria-hidden="true" width="28" height="28" loading="lazy">
                             <span id="ach-stat-solved">0</span>
                         </div>
                     </div>
                     <div class="trainer-summary-item">
                         <span class="trainer-summary-label">Ранг коллекционера</span>
                         <div class="trainer-summary-val" style="font-size: 1.15rem;">
-                            <span id="ach-stat-tier">Новичок 🥉</span>
+                            <span id="ach-stat-tier">Новичок <img src="assets/icons/woopicx/medal-bronze.png" class="woopicx-icon inline-tier-icon" alt="" aria-hidden="true" width="22" height="22" loading="lazy"></span>
                         </div>
                     </div>
                 </div>
@@ -5116,6 +5431,57 @@
                 </div>
 
                 <ul id="achievements-full-grid" class="achievements-full-grid"></ul>
+            </div>
+        </div>
+
+        <!-- TAB 4: UPGRADE / ПРОКАЧКА -->
+        <div id="tab-content-upgrade" class="section-wrap hidden" role="tabpanel" aria-labelledby="tab-btn-upgrade">
+            <div class="upgrade-page-container">
+                <div class="upgrade-placeholder-card">
+                    <div class="upgrade-placeholder-glow" aria-hidden="true"></div>
+                    <div class="upgrade-placeholder-icon-wrap" aria-hidden="true">
+                        <svg class="upgrade-lightning-icon" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <div class="upgrade-badge-pill">
+                        <span class="upgrade-badge-dot" aria-hidden="true"></span>
+                        <span>Скоро открытие</span>
+                    </div>
+                    <h2 class="upgrade-placeholder-title">Раздел «Прокачка»</h2>
+                    <p class="upgrade-placeholder-desc">
+                        Здесь готовится система развития твоего персонажа-исследователя: прокачка рангов, ветки умений, множители опыта за серии решений и уникальные бустеры.
+                    </p>
+                    <div class="upgrade-features-grid">
+                        <div class="upgrade-feature-item">
+                            <div class="upgrade-feature-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <div class="upgrade-feature-text">
+                                <span class="upgrade-feature-name">Очки опыта</span>
+                                <span class="upgrade-feature-hint">За каждое верное решение</span>
+                            </div>
+                        </div>
+                        <div class="upgrade-feature-item">
+                            <div class="upgrade-feature-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </div>
+                            <div class="upgrade-feature-text">
+                                <span class="upgrade-feature-name">Древо навыков</span>
+                                <span class="upgrade-feature-hint">Пассивные бонусы исследователя</span>
+                            </div>
+                        </div>
+                        <div class="upgrade-feature-item">
+                            <div class="upgrade-feature-icon" aria-hidden="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            </div>
+                            <div class="upgrade-feature-text">
+                                <span class="upgrade-feature-name">Бустеры серии</span>
+                                <span class="upgrade-feature-hint">Умножение очков за комбо</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -5454,6 +5820,7 @@
             const tabBtnOverview = document.getElementById('tab-btn-overview');
             const tabBtnRanks = document.getElementById('tab-btn-ranks');
             const tabBtnAchievements = document.getElementById('tab-btn-achievements') || document.getElementById('achievements-open');
+            const tabBtnUpgrade = document.getElementById('tab-btn-upgrade');
             const tabBtnDropdownTrigger = document.getElementById('tab-btn-dropdown-trigger');
             const tabDropdown = document.getElementById('profile-tab-dropdown');
             const dropdownLabel = document.getElementById('profile-dropdown-label');
@@ -5463,6 +5830,7 @@
             const tabContentOverview = document.getElementById('tab-content-overview');
             const tabContentRanks = document.getElementById('tab-content-ranks');
             const tabContentAchievements = document.getElementById('tab-content-achievements');
+            const tabContentUpgrade = document.getElementById('tab-content-upgrade');
             const trainerRanksContainer = document.getElementById('trainer-ranks-container');
             const ranksOpenBtn = document.getElementById('ranks-open-btn');
             const heroMedalsBtn = document.getElementById('hero-medals-btn');
@@ -5811,11 +6179,11 @@
             }
 
             function switchTab(tabName) {
-                const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements];
-                const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements];
+                const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements, tabBtnUpgrade];
+                const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements, tabContentUpgrade];
 
                 const profileHero = document.querySelector('.profile-hero');
-                const isHeroHidden = (tabName === 'ranks' || tabName === 'achievements');
+                const isHeroHidden = (tabName === 'ranks' || tabName === 'achievements' || tabName === 'upgrade');
                 document.documentElement.classList.toggle('hide-profile-hero', isHeroHidden);
                 if (profileHero) {
                     profileHero.classList.toggle('hidden', isHeroHidden);
@@ -5833,7 +6201,7 @@
 
                 closeDropdown();
 
-                const isSecondary = (tabName === 'ranks' || tabName === 'achievements');
+                const isSecondary = (tabName === 'ranks' || tabName === 'achievements' || tabName === 'upgrade');
                 if (tabBtnDropdownTrigger) {
                     tabBtnDropdownTrigger.classList.toggle('active', isSecondary);
                     tabBtnDropdownTrigger.setAttribute('aria-selected', isSecondary ? 'true' : 'false');
@@ -5884,6 +6252,18 @@
                         sessionStorage.setItem('profileActiveTab', 'achievements');
                         history.replaceState(null, '', '#achievements');
                     } catch (e) {}
+                } else if (tabName === 'upgrade') {
+                    if (tabBtnUpgrade) {
+                        tabBtnUpgrade.classList.add('active');
+                        tabBtnUpgrade.setAttribute('aria-selected', 'true');
+                    }
+                    if (dropdownLabel) dropdownLabel.textContent = 'Прокачка';
+                    if (dropdownIcon) dropdownIcon.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+                    if (tabContentUpgrade) tabContentUpgrade.classList.remove('hidden');
+                    try {
+                        sessionStorage.setItem('profileActiveTab', 'upgrade');
+                        history.replaceState(null, '', '#upgrade');
+                    } catch (e) {}
                 } else {
                     // Default tab: study
                     if (tabBtnStudy) {
@@ -5907,6 +6287,7 @@
             if (tabBtnOverview) tabBtnOverview.addEventListener('click', () => switchTab('overview'));
             if (tabBtnRanks) tabBtnRanks.addEventListener('click', () => switchTab('ranks'));
             if (tabBtnAchievements) tabBtnAchievements.addEventListener('click', () => switchTab('achievements'));
+            if (tabBtnUpgrade) tabBtnUpgrade.addEventListener('click', () => switchTab('upgrade'));
             if (ranksOpenBtn) ranksOpenBtn.addEventListener('click', () => switchTab('ranks'));
             if (heroMedalsBtn) heroMedalsBtn.addEventListener('click', () => {
                 switchTab('achievements');
@@ -5960,6 +6341,7 @@
                 const hash = (window.location.hash || '').toLowerCase();
                 if (hash === '#ranks') switchTab('ranks');
                 else if (hash.includes('achieve') || hash.includes('medal')) switchTab('achievements');
+                else if (hash === '#upgrade' || hash.includes('prokachka')) switchTab('upgrade');
                 else if (hash === '#overview') switchTab('overview');
                 else if (hash === '#study') switchTab('study');
             });
@@ -6433,9 +6815,11 @@
                 ? 'ranks' 
                 : (hash.includes('achieve') || hash.includes('medal') || storedTab === 'achievements')
                     ? 'achievements'
-                    : (hash === '#overview' || storedTab === 'overview')
-                        ? 'overview'
-                        : 'study';
+                    : (hash === '#upgrade' || hash.includes('prokachka') || storedTab === 'upgrade')
+                        ? 'upgrade'
+                        : (hash === '#overview' || storedTab === 'overview')
+                            ? 'overview'
+                            : 'study';
             switchTab(initialTab);
         });
 
