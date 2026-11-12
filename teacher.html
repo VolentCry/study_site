@@ -845,6 +845,49 @@
         .lesson-card-completed {
             border-left: 3px solid var(--accent-emerald);
         }
+        /* Сегодняшние уроки: подсветка оранжевым градиентом слева направо до середины карточки */
+        .lesson-card-today {
+            background: linear-gradient(90deg, rgba(255, 119, 40, 0.22) 0%, rgba(255, 119, 40, 0.12) 22%, rgba(255, 119, 40, 0.03) 42%, rgba(255, 119, 40, 0) 52%), var(--surface-card);
+            border-color: rgba(255, 119, 40, 0.35);
+            box-shadow: 0 4px 18px rgba(255, 119, 40, 0.08);
+        }
+        .lesson-card-today:not(.lesson-card-completed) {
+            border-left: 3px solid var(--accent);
+        }
+        .lesson-card-today:hover {
+            border-color: rgba(255, 119, 40, 0.6);
+            box-shadow: 0 6px 24px rgba(255, 119, 40, 0.14);
+        }
+        .lesson-card-today .lesson-time-main {
+            color: var(--accent);
+        }
+        .lesson-today-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: var(--r-pill, 9999px);
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            vertical-align: middle;
+            margin-right: 4px;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        /* Светлая тема для сегодняшних уроков */
+        [data-theme="light"] .lesson-card-today {
+            background: linear-gradient(90deg, rgba(234, 88, 12, 0.16) 0%, rgba(234, 88, 12, 0.08) 22%, rgba(234, 88, 12, 0.02) 42%, rgba(234, 88, 12, 0) 52%), var(--surface-card);
+            border-color: rgba(234, 88, 12, 0.35);
+            box-shadow: 0 4px 18px rgba(234, 88, 12, 0.07);
+        }
+        [data-theme="light"] .lesson-card-today:hover {
+            border-color: rgba(234, 88, 12, 0.6);
+            box-shadow: 0 6px 24px rgba(234, 88, 12, 0.12);
+        }
         .lesson-time-box {
             min-width: 140px;
             flex-shrink: 0;
@@ -3751,11 +3794,18 @@
                         return da - db;
                     });
 
+                    const now = new Date();
                     lessonsTimelineContainer.innerHTML = lessons.map(les => {
                         const rawDate = les.starts_at || les.scheduled_at || les.scheduledAt;
                         const d = rawDate ? new Date(rawDate) : null;
+                        const isToday = !!(d && (
+                            d.getFullYear() === now.getFullYear() &&
+                            d.getMonth() === now.getMonth() &&
+                            d.getDate() === now.getDate()
+                        ));
                         const dateStr = d ? d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'short' }) : '—';
                         const timeStr = d ? d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
+                        const todayBadge = isToday ? '<span class="lesson-today-pill">Сегодня</span> ' : '';
 
                         const hwId = les.homework_id || les.homeworkId;
                         const hwTitle = les.homework_title || les.homeworkTitle;
@@ -3783,10 +3833,10 @@
                             : (isPast ? '<span class="lesson-status-badge status-past">Прошедший</span>' : '<span class="lesson-status-badge status-planned">Запланирован</span>');
 
                         return `
-                            <div class="lesson-card ${isCompleted ? 'lesson-card-completed' : ''}" id="lesson-card-${les.id}" style="${isPast && !isCompleted ? 'opacity:0.8;' : ''}">
+                            <div class="lesson-card ${isToday ? 'lesson-card-today' : ''} ${isCompleted ? 'lesson-card-completed' : ''}" id="lesson-card-${les.id}" style="${isPast && !isCompleted ? 'opacity:0.8;' : ''}">
                                 <div class="lesson-time-box">
                                     <div class="lesson-time-main">${timeStr}</div>
-                                    <div class="lesson-time-sub">${dateStr}</div>
+                                    <div class="lesson-time-sub">${todayBadge}${dateStr}</div>
                                 </div>
                                 <div class="lesson-info">
                                     <div class="lesson-title">
