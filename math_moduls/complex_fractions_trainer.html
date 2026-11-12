@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Сложные вычисления (Дроби) · 5 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+      --f-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* DARK THEME */
+    [data-theme="dark"] {
+      --paper: #0b0f19;
+      --paper-light: #121826;
+      --paper-card: #182032;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --indigo: #38bdf8;
+      --indigo-soft: rgba(56,189,248,0.12);
+      --indigo-dark: #f8fafc;
+      --vermilion: #f97316;
+      --vermilion-light: rgba(249,115,22,0.15);
+      --vermilion-border: rgba(249,115,22,0.35);
+      --gold: #fbbf24;
+      --green: #10b981;
+      --green-light: rgba(16,185,129,0.15);
+      --line: rgba(255,255,255,0.12);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 16px 40px rgba(0,0,0,0.5);
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--paper-light); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-card); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo-dark); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-card);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      max-width: 960px; margin: 0 auto; width: 100%; padding: 36px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title {
+      font: 900 clamp(26px, 4.2vw, 38px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 720px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px; box-shadow: var(--shadow-md);
+      display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center;
+      position: relative;
+    }
+    .problem-meta {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; color: var(--muted); font-weight: 600;
+    }
+    .problem-tag {
+      display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
+      border-radius: 999px; background: rgba(38,63,97,.08); color: var(--indigo);
+      font-weight: 700;
+    }
+
+    /* MATH EXPRESSION DISPLAY */
+    .math-expr-display {
+      font-size: clamp(22px, 3.8vw, 32px);
+      line-height: 1.6;
+      color: var(--indigo-dark);
+      padding: 16px 20px;
+      user-select: text;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+    .math-expr {
+      display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .math-bracket {
+      font-size: 1.35em; font-weight: 300; opacity: 0.85; line-height: 1; user-select: none;
+    }
+
+    /* FRACTIONS */
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 0.2rem; font-family: var(--f-mono); font-size: 0.9em;
+    }
+    .fraction .num {
+      border-bottom: 2px solid currentColor; padding-bottom: 2px;
+    }
+    .fraction .den {
+      padding-top: 2px;
+    }
+    .fraction.multistory {
+      padding: 0 0.4rem; font-size: 0.85em;
+    }
+    .fraction.multistory > .num {
+      border-bottom: 2.5px solid currentColor; padding-bottom: 4px;
+    }
+    .fraction.multistory > .den {
+      padding-top: 4px;
+    }
+
+    /* CONTROLS & INPUT */
+    .answer-form {
+      display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 420px;
+    }
+    .input-row {
+      display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;
+    }
+    .answer-input {
+      width: 200px; height: 50px; font-size: 22px; font-weight: 700; font-family: var(--f-mono);
+      text-align: center; border: 2px solid var(--line); border-radius: var(--r-md);
+      background: var(--paper-light); color: var(--ink); outline: none; transition: all .2s;
+    }
+    .answer-input:focus {
+      border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(38,63,97,.15);
+    }
+    .answer-input.correct {
+      border-color: var(--green); background: var(--green-light); color: var(--green);
+    }
+    .answer-input.wrong {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+    }
+
+    .btn-action {
+      height: 50px; padding: 0 24px; border-radius: var(--r-md); font-size: 15px; font-weight: 700;
+      transition: all .2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit {
+      background: var(--indigo); color: #fff;
+    }
+    .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-next {
+      background: var(--green); color: #fff;
+    }
+    .btn-next:hover { opacity: 0.92; transform: translateY(-1px); }
+
+    /* FEEDBACK & SOLUTION */
+    .feedback-banner {
+      width: 100%; border-radius: var(--r-md); padding: 14px 18px; display: none;
+      align-items: center; justify-content: space-between; font-weight: 700; font-size: 14px;
+    }
+    .feedback-banner.correct {
+      display: flex; background: var(--green-light); color: var(--green); border: 1px solid rgba(46,125,50,.3);
+    }
+    .feedback-banner.wrong {
+      display: flex; background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);
+    }
+
+    .solution-drawer {
+      width: 100%; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 18px 22px; text-align: left; display: none;
+      flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6;
+    }
+    .solution-drawer.open { display: flex; }
+    .solution-title {
+      font-weight: 800; font-size: 14px; color: var(--indigo); display: flex; align-items: center; gap: 6px;
+    }
+    .solution-step {
+      padding-left: 10px; border-left: 2px solid var(--indigo); margin-bottom: 6px;
+    }
+
+    .hint-box {
+      font-size: 13px; color: var(--muted); background: rgba(200,149,108,.12);
+      padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--gold);
+      display: none; width: 100%; text-align: left;
+    }
+    .hint-box.open { display: block; }
+
+    @media (max-width: 640px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .input-row { flex-direction: column; width: 100%; }
+      .answer-input { width: 100%; }
+      .btn-action { width: 100%; }
+      .nav-task-switcher { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="site-nav">
+    <a href="../pages/math_5.html" class="brand">
+      <span class="brand-mark">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">5 класс · Математика</span>
+      </div>
+    </a>
+    <div class="nav-task-switcher">
+      <a href="powers_trainer.html" class="task-pill">№1 Степени</a>
+      <a href="powers_compare_trainer.html" class="task-pill">№2 Сравнение</a>
+      <a href="complex_fractions_trainer.html" class="task-pill active">№3 Дроби</a>
+      <a href="complex_fractions_powers_trainer.html" class="task-pill">№4 Дроби и степени</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">👤 Профиль <span class="xp-counter" id="user-xp-badge">XP +0</span></a>
+      <a href="../pages/math_5.html" class="nav-btn">← 5 класс</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="trainer-shell">
+    <header class="trainer-header">
+      <div class="trainer-kicker">Математика · 5 класс</div>
+      <h1 class="trainer-title">Сложные вычисления (Дроби)</h1>
+      <p class="trainer-subtitle">
+        Многоэтажные дроби, скобки со смешанными числами, вынесение общего множителя и перевод в десятичные дроби.
+      </p>
+    </header>
+
+    <!-- STATS -->
+    <div class="stats-dashboard">
+      <div class="stat-box">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-solved">0</span>
+          <span class="stat-label">Решено верно</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">📈</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-accuracy">100%</span>
+          <span class="stat-label">Точность</span>
+        </div>
+      </div>
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Серия побед</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">👑</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank" style="font-size:13px; font-weight:800;">Новичок</span>
+          <span class="stat-label">Звание</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY FILTER -->
+    <div class="category-filter">
+      <button type="button" class="cat-btn active" data-type="complex_fractions_all">Все типы</button>
+      <button type="button" class="cat-btn" data-type="complex_fractions_brackets">Смешанные дроби в скобках</button>
+      <button type="button" class="cat-btn" data-type="complex_fractions_multistory">Многоэтажные дроби</button>
+      <button type="button" class="cat-btn" data-type="complex_fractions_distributive">Вынесение множителя</button>
+      <button type="button" class="cat-btn" data-type="complex_fractions_mixed">Цепочки действий</button>
+    </div>
+
+    <!-- PROBLEM CARD -->
+    <div class="problem-card">
+      <div class="problem-meta">
+        <span class="problem-tag" id="problem-tag">Вычислите значение выражения</span>
+        <button type="button" id="btn-toggle-hint" style="color:var(--gold); font-size:12px; font-weight:700;">💡 Подсказка</button>
+      </div>
+
+      <div class="hint-box" id="hint-box"></div>
+
+      <!-- MATH FORMULA DISPLAY -->
+      <div class="math-expr-display" id="math-display">
+        <div class="math-expr">Загрузка задания...</div>
+      </div>
+
+      <!-- ANSWER FORM -->
+      <form class="answer-form" id="answer-form" onsubmit="return false;">
+        <div class="input-row">
+          <input 
+            type="text" 
+            class="answer-input" 
+            id="answer-input" 
+            placeholder="Ответ" 
+            autocomplete="off" 
+            inputmode="decimal"
+          />
+          <button type="button" class="btn-action btn-submit" id="btn-submit">Проверить</button>
+          <button type="button" class="btn-action btn-next" id="btn-next" style="display:none;">Следующее →</button>
+        </div>
+      </form>
+
+      <!-- FEEDBACK BANNER -->
+      <div class="feedback-banner" id="feedback-banner">
+        <span id="feedback-text"></span>
+        <button type="button" id="btn-toggle-solution" style="text-decoration:underline; font-size:13px;">Решение ▾</button>
+      </div>
+
+      <!-- SOLUTION DRAWER -->
+      <div class="solution-drawer" id="solution-drawer">
+        <div class="solution-title">📖 Пошаговое решение:</div>
+        <div id="solution-steps-container"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/complex_fractions_trainer.js"></script>
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentType = 'complex_fractions_all';
+      let currentTask = null;
+      window.getCurrentTask = () => currentTask;
+      let solvedCount = 0;
+      let totalAttempts = 0;
+      let currentStreak = 0;
+
+      const mathDisplay = document.getElementById('math-display');
+      const answerInput = document.getElementById('answer-input');
+      const btnSubmit = document.getElementById('btn-submit');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const feedbackText = document.getElementById('feedback-text');
+      const solutionDrawer = document.getElementById('solution-drawer');
+      const solutionStepsContainer = document.getElementById('solution-steps-container');
+      const btnToggleSolution = document.getElementById('btn-toggle-solution');
+      const hintBox = document.getElementById('hint-box');
+      const btnToggleHint = document.getElementById('btn-toggle-hint');
+
+      const statSolved = document.getElementById('stat-solved');
+      const statAccuracy = document.getElementById('stat-accuracy');
+      const statStreak = document.getElementById('stat-streak');
+      const statRank = document.getElementById('stat-rank');
+
+      function updateStatsUI() {
+        statSolved.textContent = solvedCount;
+        statAccuracy.textContent = totalAttempts > 0 ? Math.round((solvedCount / totalAttempts) * 100) + '%' : '100%';
+        statStreak.textContent = currentStreak;
+
+        if (window.TrainerTracker && typeof window.TrainerTracker.getTrainerRank === 'function') {
+          const r = window.TrainerTracker.getTrainerRank('complex_fractions', solvedCount);
+          if (r && r.title) statRank.textContent = r.title;
+        } else {
+          if (solvedCount >= 25) statRank.textContent = 'Магистр дробей 👑';
+          else if (solvedCount >= 15) statRank.textContent = 'Мастер вычислений 💎';
+          else if (solvedCount >= 8) statRank.textContent = 'Знаток 🥇';
+          else if (solvedCount >= 3) statRank.textContent = 'Ученик 🥈';
+          else statRank.textContent = 'Новичок 🥉';
+        }
+      }
+
+      function loadNewTask() {
+        currentTask = window.ComplexFractionsTrainer.generateTask(currentType);
+        mathDisplay.innerHTML = currentTask.questionHtml;
+        answerInput.value = '';
+        answerInput.className = 'answer-input';
+        answerInput.disabled = false;
+        answerInput.focus();
+
+        btnSubmit.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
+
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.style.display = 'none';
+        solutionDrawer.className = 'solution-drawer';
+        solutionDrawer.style.display = 'none';
+        hintBox.className = 'hint-box';
+        hintBox.style.display = 'none';
+        hintBox.textContent = currentTask.hint || 'Приведи дроби к удобному виду и соблюдай порядок действий.';
+
+        solutionStepsContainer.innerHTML = (currentTask.solutionSteps || []).map(s => `<div class="solution-step">${s}</div>`).join('');
+      }
+
+      function handleCheck() {
+        if (!currentTask) return;
+        const raw = answerInput.value;
+        const res = window.ComplexFractionsTrainer.checkAnswer(currentTask, raw);
+
+        totalAttempts++;
+        if (res.isCorrect) {
+          solvedCount++;
+          currentStreak++;
+          answerInput.className = 'answer-input correct';
+          answerInput.disabled = true;
+          feedbackBanner.className = 'feedback-banner correct';
+          feedbackBanner.style.display = 'flex';
+          feedbackText.textContent = `Правильно! +15 XP (Ответ: ${res.displayAnswer})`;
+          btnSubmit.style.display = 'none';
+          btnNext.style.display = 'inline-flex';
+          btnNext.focus();
+
+          if (window.TrainerTracker && typeof window.TrainerTracker.recordSolve === 'function') {
+            window.TrainerTracker.recordSolve('complex_fractions', 15);
+          }
+          if (window.AuthSync && typeof window.AuthSync.scheduleSync === 'function') {
+            window.AuthSync.scheduleSync(1000);
+          }
+        } else {
+          currentStreak = 0;
+          answerInput.className = 'answer-input wrong';
+          feedbackBanner.className = 'feedback-banner wrong';
+          feedbackBanner.style.display = 'flex';
+          feedbackText.textContent = res.error || `Неверно. Правильный ответ: ${res.displayAnswer}`;
+          btnSubmit.style.display = 'none';
+          btnNext.style.display = 'inline-flex';
+          solutionDrawer.style.display = 'flex';
+          btnNext.focus();
+        }
+        updateStatsUI();
+      }
+
+      btnSubmit.addEventListener('click', handleCheck);
+      btnNext.addEventListener('click', loadNewTask);
+
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (btnSubmit.style.display !== 'none') handleCheck();
+          else if (btnNext.style.display !== 'none') loadNewTask();
+        }
+      });
+
+      btnToggleHint.addEventListener('click', () => {
+        hintBox.style.display = hintBox.style.display === 'block' ? 'none' : 'block';
+      });
+
+      btnToggleSolution.addEventListener('click', () => {
+        solutionDrawer.style.display = solutionDrawer.style.display === 'flex' ? 'none' : 'flex';
+      });
+
+      // Category buttons
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentType = btn.getAttribute('data-type');
+          loadNewTask();
+        });
+      });
+
+      // Initial task
+      loadNewTask();
+      updateStatsUI();
+    });
+  </script>
+</body>
+</html>

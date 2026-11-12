@@ -44,7 +44,7 @@
             shortName: 'Сравнение степеней',
             subject: 'Математика',
             category: 'Степени',
-            classNum: '4-5 класс',
+            classNum: '5 класс',
             url: '../math_moduls/powers_compare_trainer.html',
             profileUrl: 'math_moduls/powers_compare_trainer.html',
             icon: '⚖️',
@@ -64,13 +64,53 @@
             shortName: 'Степени чисел',
             subject: 'Математика',
             category: 'Степени',
-            classNum: '4-5 класс',
+            classNum: '5 класс',
             url: '../math_moduls/powers_trainer.html',
             profileUrl: 'math_moduls/powers_trainer.html',
             icon: '⚡',
             description: 'Возведение в степень, решение уравнений со степенью и порядок действий в примерах.',
             rankTiers: [
                 { min: 25, title: 'Повелитель степеней 👑' },
+        {
+            id: 'complex_fractions',
+            name: 'Сложные вычисления (Дроби)',
+            shortName: 'Сложные дроби',
+            subject: 'Математика',
+            category: 'Дроби',
+            classNum: '5 класс',
+            url: '../math_moduls/complex_fractions_trainer.html',
+            profileUrl: 'math_moduls/complex_fractions_trainer.html',
+            icon: '➗',
+            description: 'Многоэтажные дроби, скобки со смешанными числами, вынесение общего множителя и перевод в десятичные дроби.',
+            rankTiers: [
+                { min: 30, title: 'Магистр дробей 👑' },
+                { min: 20, title: 'Архимаг вычислений 🧙' },
+                { min: 14, title: 'Мастер сложных дробей 💎' },
+                { min: 8,  title: 'Знаток вычислений 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
+            id: 'complex_fractions_powers',
+            name: 'Сложные вычисления (Дроби, степени)',
+            shortName: 'Дроби и степени',
+            subject: 'Математика',
+            category: 'Степени',
+            classNum: '5 класс',
+            url: '../math_moduls/complex_fractions_powers_trainer.html',
+            profileUrl: 'math_moduls/complex_fractions_powers_trainer.html',
+            icon: '⚡',
+            description: 'Вычисления со степенями обыкновенных и десятичных дробей, степени 10, многоэтажные дроби и вынесение общего множителя.',
+            rankTiers: [
+                { min: 30, title: 'Повелитель степеней и дробей 👑' },
+                { min: 20, title: 'Архимаг тождеств 🧙' },
+                { min: 14, title: 'Мастер степенных вычислений 💎' },
+                { min: 8,  title: 'Знаток степеней 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
                 { min: 18, title: 'Архимаг математики 🧙' },
                 { min: 12, title: 'Мастер степеней 💎' },
                 { min: 7,  title: 'Знаток степеней 🥇' },
@@ -441,6 +481,8 @@
                 else if (path.includes('equations_trainer_easy')) trainerId = 'equations_easy';
                 else if (path.includes('powers_compare')) trainerId = 'powers_compare';
                 else if (path.includes('powers_trainer')) trainerId = 'powers_trainer';
+                else if (path.includes('complex_fractions_powers')) trainerId = 'complex_fractions_powers';
+                else if (path.includes('complex_fractions')) trainerId = 'complex_fractions';
 
                 if (!trainerId) return;
 

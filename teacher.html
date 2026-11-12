@@ -2019,7 +2019,19 @@
                                             <option value="oge20_inequalities">ОГЭ №20 · Неравенства (дробно-рациональные, метод интервалов)</option>
                                             <option value="oge20_systems">ОГЭ №20 · Системы уравнений (нелинейные, симметричные)</option>
                                         </optgroup>
-                                        <optgroup label="Математика 4–5 класс (Степени чисел)">
+                                        <optgroup label="Математика 5 класс (Сложные вычисления и дроби)">
+                                            <option value="complex_fractions_all">Сложные вычисления (Дроби) · Все прототипы</option>
+                                            <option value="complex_fractions_brackets">Сложные вычисления (Дроби) · Смешанные дроби в скобках</option>
+                                            <option value="complex_fractions_multistory">Сложные вычисления (Дроби) · Многоэтажные дроби с десятичными</option>
+                                            <option value="complex_fractions_distributive">Сложные вычисления (Дроби) · Вынесение общего множителя</option>
+                                            <option value="complex_fractions_mixed">Сложные вычисления (Дроби) · Арифметические цепочки</option>
+                                            <option value="complex_fractions_powers_all">Сложные вычисления (Дроби, степени) · Все прототипы</option>
+                                            <option value="complex_fractions_powers_brackets">Сложные вычисления (Дроби, степени) · Степени в скобках</option>
+                                            <option value="complex_fractions_powers_multistory">Сложные вычисления (Дроби, степени) · Многоэтажные дроби</option>
+                                            <option value="complex_fractions_powers_base10">Сложные вычисления (Дроби, степени) · Степени 10</option>
+                                            <option value="complex_fractions_powers_distributive">Сложные вычисления (Дроби, степени) · Группировка со степенями</option>
+                                        </optgroup>
+                                        <optgroup label="Математика 5 класс (Степени чисел)">
                                             <option value="powers_all">Степени · Все прототипы вперемешку</option>
                                             <option value="powers_calculate">Степени · Возведение числа в степень</option>
                                             <option value="powers_equations">Степени · Уравнения со степенями</option>
@@ -2469,6 +2481,8 @@
     <script src="js/oge_task_20_trainer.js"></script>
     <script src="js/powers_trainer.js"></script>
     <script src="js/powers_compare_trainer.js"></script>
+    <script src="js/complex_fractions_trainer.js"></script>
+    <script src="js/complex_fractions_powers_trainer.js"></script>
     <script src="js/auth_sync.js?v=1.1"></script>
     <script src="js/methodical_plan.js"></script>
     <!-- Bank of Tasks & Physics Tests -->
@@ -4331,6 +4345,14 @@
                         } else if (type.startsWith('powers_')) {
                             if (window.PowersTrainer) {
                                 t = window.PowersTrainer.generateTask(type);
+                            }
+                        } else if (type.startsWith('complex_fractions_powers')) {
+                            if (window.ComplexFractionsPowersTrainer) {
+                                t = window.ComplexFractionsPowersTrainer.generateTask(type);
+                            }
+                        } else if (type.startsWith('complex_fractions')) {
+                            if (window.ComplexFractionsTrainer) {
+                                t = window.ComplexFractionsTrainer.generateTask(type);
                             }
                         }
 
