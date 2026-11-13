@@ -1062,29 +1062,29 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
     """
     Получает подробнейшее досье ученика:
     - Персональная информация и уровень
-    - Статистика верных ответов и успеваемости
-    - Список выполненных заданий из журнала попыток (metrics_json)
+    - Статистика верных ответов и успеваемости (включая как внеурочные задания/тренажёры, так и домашние работы)
+    - Список выполненных заданий из журнала попыток и домашних заданий
     - Рекорды и звания в тренажерах
     """
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         cursor.execute(
-            '''
+            """
             SELECT u.id, u.username, u.display_name, u.role, u.created_at, u.last_login,
                    d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved,
                    d.metrics_json, d.trainer_records_json, d.updated_at
             FROM users u
             LEFT JOIN user_data d ON u.id = d.user_id
             WHERE u.id = ?
-            ''',
+            """,
             (student_id,)
         )
         row = cursor.fetchone()
         if not row:
             return None
 
-        # Разбор истории решений
+        # Разбор истории решений вне уроков (тренажёры, тесты)
         try:
             metrics = json.loads(row['metrics_json'] or '[]')
             if not isinstance(metrics, list):
@@ -1099,21 +1099,89 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
         except Exception:
             trainer_records = {}
 
-        # Сортируем историю заданий по убыванию времени
+        # Извлечение выполненных заданий из сданных домашних работ
+        cursor.execute(
+            """
+            SELECT hs.id, hs.homework_id, hs.status, hs.answers_json, hs.score, hs.max_score,
+                   hs.submitted_at, hs.created_at,
+                   h.title as hw_title, h.subject as hw_subject, h.tasks_json
+            FROM homework_submissions hs
+            JOIN homeworks h ON hs.homework_id = h.id
+            WHERE hs.student_id = ? AND hs.status IN ('submitted', 'checked')
+            ORDER BY COALESCE(hs.submitted_at, hs.created_at) DESC
+            """,
+            (student_id,)
+        )
+        hw_rows = cursor.fetchall()
+        hw_task_items = []
+        for hw_row in hw_rows:
+            try:
+                hw_tasks = json.loads(hw_row['tasks_json'] or '[]')
+            except Exception:
+                hw_tasks = []
+            try:
+                hw_answers = json.loads(hw_row['answers_json'] or '{}')
+            except Exception:
+                hw_answers = {}
+
+            sub_time = hw_row['submitted_at'] or hw_row['created_at']
+            hw_id = hw_row['homework_id']
+            hw_title = hw_row['hw_title'] or 'Домашнее задание'
+            hw_subj = hw_row['hw_subject'] or 'Математика'
+
+            for idx, t in enumerate(hw_tasks):
+                t_id = str(t.get('taskId') or t.get('id') or f'hw_{hw_id}_task_{idx + 1}')
+                ans_rec = (
+                    hw_answers.get(str(idx)) or
+                    hw_answers.get(t_id) or
+                    hw_answers.get(t.get('taskId')) or
+                    hw_answers.get(t.get('id')) or
+                    {}
+                )
+                is_correct = bool(ans_rec.get('isCorrect'))
+                skill_name = (
+                    t.get('catName') or
+                    t.get('skill') or
+                    t.get('category') or
+                    t.get('title') or
+                    (t.get('text')[:40] if t.get('text') else None) or
+                    f'Д/З: {hw_title} (№{idx + 1})'
+                )
+
+                hw_task_items.append({
+                    'timestamp': sub_time,
+                    'subject': hw_subj,
+                    'taskId': f'/homework.html?id={hw_id}',
+                    'rawTaskId': t_id,
+                    'skill': skill_name,
+                    'correct': is_correct,
+                    'source': 'homework',
+                    'homeworkTitle': hw_title,
+                    'homeworkId': hw_id
+                })
+
+        # Объединяем внеурочные задания (metrics) и задания из домашних работ
+        all_attempts = []
+        for m in metrics:
+            m_copy = dict(m)
+            m_copy['source'] = m_copy.get('source') or 'trainer'
+            all_attempts.append(m_copy)
+        all_attempts.extend(hw_task_items)
+
+        # Сортируем объединённую историю заданий по убыванию времени
         def parse_ts(item):
-            ts = item.get('timestamp') or ''
-            return ts
+            return item.get('timestamp') or ''
 
-        sorted_metrics = sorted(metrics, key=parse_ts, reverse=True)
+        sorted_tasks = sorted(all_attempts, key=parse_ts, reverse=True)
 
-        # Вычисляем агрегированную статистику
-        total_attempts = len(metrics)
-        correct_attempts = sum(1 for m in metrics if m.get('correct'))
+        # Вычисляем агрегированную статистику по всем выполненным заданиям
+        total_attempts = len(all_attempts)
+        correct_attempts = sum(1 for m in all_attempts if m.get('correct'))
         accuracy = round((correct_attempts / total_attempts * 100), 1) if total_attempts > 0 else 0.0
 
         # Статистика по предметам
         subject_stats: Dict[str, Dict[str, int]] = {}
-        for m in metrics:
+        for m in all_attempts:
             subj = str(m.get('subject') or 'Общие задания')
             if subj not in subject_stats:
                 subject_stats[subj] = {'total': 0, 'correct': 0}
@@ -1133,13 +1201,13 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
 
         # Классы ученика
         cursor.execute(
-            '''
+            """
             SELECT c.id, c.name, c.teacher_id, u.display_name as teacher_name
             FROM class_members cm
             JOIN classes c ON cm.class_id = c.id
             JOIN users u ON c.teacher_id = u.id
             WHERE cm.student_id = ?
-            ''',
+            """,
             (student_id,)
         )
         enrolled_classes = []
@@ -1152,8 +1220,10 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
             })
 
         calc_xp, calc_solved = compute_user_metrics_xp(metrics, row['bonus_xp'])
+        # Учитываем решённые домашние задания в общем счётчике решённых задач
+        hw_correct_count = sum(1 for hw_item in hw_task_items if hw_item.get('correct'))
         final_xp = max(int(row['user_xp'] or 0), calc_xp)
-        final_solved = max(int(row['total_solved'] or 0), calc_solved)
+        final_solved = max(int(row['total_solved'] or 0), calc_solved + hw_correct_count, correct_attempts)
 
         return {
             'user': {
@@ -1176,12 +1246,11 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
                 'subjectBreakdown': subject_breakdown
             },
             'classes': enrolled_classes,
-            'recentTasks': sorted_metrics[:60],  # последние 60 выполненных заданий
+            'recentTasks': sorted_tasks[:60],  # последние 60 выполненных заданий (внеурочных и домашних)
             'trainerRecords': trainer_records
         }
     finally:
         conn.close()
-
 
 def get_recent_activity_feed(
     teacher_id: Optional[int] = None,
