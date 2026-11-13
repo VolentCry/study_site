@@ -1745,6 +1745,17 @@
                         };
                         t = window.OgeTask11Trainer.generateTask(catMap[type] || 'mixed_all');
                     }
+                } else if (type.startsWith('oge13_')) {
+                    if (window.OgeTask13Trainer) {
+                        const catMap = {
+                            'oge13_all': 'mixed_all',
+                            'oge13_linear': 'linear',
+                            'oge13_systems': 'systems',
+                            'oge13_quadratic': 'quadratic',
+                            'oge13_special': 'no_solution_or_all'
+                        };
+                        t = window.OgeTask13Trainer.generateTask(catMap[type] || 'mixed_all');
+                    }
                 } else if (type.startsWith('oge18_')) {
                     if (window.OgeTask18Trainer) {
                         const catMap = {
@@ -2377,7 +2388,7 @@
             gradingHwGrid.querySelectorAll('.btn-delete-hw').forEach(b => {
                 b.addEventListener('click', async () => {
                     const hwId = b.getAttribute('data-hw-id');
-                    if (!confirm('Вы действительно хотите удалить это домашнее задание и все результаты учеников?')) return;
+                    if (!confirm('Вы действительно хотите удалить это домашнее задание? (История и прогресс сданных работ сохранятся в досье учеников)')) return;
                     try {
                         const delRes = await fetch(`/api/teacher/homeworks/${hwId}`, { method: 'DELETE' });
                         const delData = await delRes.json();

@@ -380,6 +380,26 @@
             ]
         },
         {
+            id: 'oge_task_13',
+            name: 'ОГЭ №13 · Неравенства и системы',
+            shortName: 'ОГЭ Задание 13',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_13_trainer.html',
+            profileUrl: 'math_moduls/oge_task_13_trainer.html',
+            icon: '⚡',
+            description: 'Линейные и квадратные неравенства, системы неравенств, метод интервалов, числовая прямая и штриховка.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель интервалов 👑' },
+                { min: 18, title: 'Магистр неравенств 🧙' },
+                { min: 12, title: 'Аналитик систем 💎' },
+                { min: 7,  title: 'Знаток штриховок 🥇' },
+                { min: 4,  title: 'Практик ОГЭ 🥈' },
+                { min: 1,  title: 'Ученик 🥉' }
+            ]
+        },
+        {
             id: 'oge_task_18',
             name: 'ОГЭ №18 · Геометрия на клетках',
             shortName: 'ОГЭ Задание 18',

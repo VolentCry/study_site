@@ -241,8 +241,13 @@ def init_db() -> None:
             hw_cols = [row['name'] for row in cursor.fetchall()]
             if 'student_id' not in hw_cols:
                 conn.execute("ALTER TABLE homeworks ADD COLUMN student_id INTEGER REFERENCES users(id) ON DELETE SET NULL;")
+            if 'is_deleted' not in hw_cols:
+                conn.execute("ALTER TABLE homeworks ADD COLUMN is_deleted INTEGER DEFAULT 0;")
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_homeworks_student ON homeworks(student_id);
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_homeworks_deleted ON homeworks(is_deleted);
             ''')
 
             # 7. Таблица сданных решений учеников
@@ -1586,7 +1591,7 @@ def get_teacher_homeworks(teacher_id: int) -> List[Dict[str, Any]]:
             FROM homeworks h
             JOIN classes c ON h.class_id = c.id
             LEFT JOIN users su ON h.student_id = su.id
-            WHERE h.teacher_id = ?
+            WHERE h.teacher_id = ? AND (h.is_deleted IS NULL OR h.is_deleted = 0)
             ORDER BY h.created_at DESC
             """,
             (teacher_id,)
@@ -1637,7 +1642,7 @@ def get_student_homeworks(student_id: int) -> List[Dict[str, Any]]:
             JOIN class_members cm ON c.id = cm.class_id
             JOIN users u ON h.teacher_id = u.id
             LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
-            WHERE cm.student_id = ? AND (h.student_id IS NULL OR h.student_id = ?)
+            WHERE cm.student_id = ? AND (h.student_id IS NULL OR h.student_id = ?) AND (h.is_deleted IS NULL OR h.is_deleted = 0)
             ORDER BY (h.deadline_at IS NULL), h.deadline_at ASC, h.created_at DESC
             """,
             (student_id, student_id, student_id)
@@ -1675,16 +1680,19 @@ def get_student_homeworks(student_id: int) -> List[Dict[str, Any]]:
 
 
 def delete_homework(homework_id: int, teacher_id: Optional[int] = None) -> bool:
-    """Удаляет домашнее задание."""
+    """Мягко удаляет домашнее задание (помечает is_deleted = 1), сохраняя сданные работы для досье учеников."""
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
             if teacher_id:
-                cursor.execute("DELETE FROM homeworks WHERE id = ? AND teacher_id = ?", (homework_id, teacher_id))
+                cursor.execute("UPDATE homeworks SET is_deleted = 1 WHERE id = ? AND teacher_id = ?", (homework_id, teacher_id))
             else:
-                cursor.execute("DELETE FROM homeworks WHERE id = ?", (homework_id,))
+                cursor.execute("UPDATE homeworks SET is_deleted = 1 WHERE id = ?", (homework_id,))
+            
+            # Также отвязываем удалённое Д/З от запланированных уроков в расписании
+            cursor.execute("UPDATE lessons SET homework_id = NULL WHERE homework_id = ?", (homework_id,))
             return cursor.rowcount > 0
     finally:
         conn.close()
@@ -2287,7 +2295,7 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 SELECT h.*, c.name as class_name
                 FROM homeworks h
                 JOIN classes c ON h.class_id = c.id
-                WHERE h.teacher_id = ? AND h.deadline_at LIKE ?
+                WHERE h.teacher_id = ? AND (h.is_deleted IS NULL OR h.is_deleted = 0) AND h.deadline_at LIKE ?
                 ORDER BY h.deadline_at ASC
                 """,
                 (user_id, f"{month_prefix}%")
@@ -2300,7 +2308,7 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 JOIN classes c ON h.class_id = c.id
                 JOIN class_members cm ON c.id = cm.class_id
                 LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
-                WHERE cm.student_id = ? AND (h.student_id IS NULL OR h.student_id = ?) AND h.deadline_at LIKE ?
+                WHERE cm.student_id = ? AND (h.student_id IS NULL OR h.student_id = ?) AND (h.is_deleted IS NULL OR h.is_deleted = 0) AND h.deadline_at LIKE ?
                 ORDER BY h.deadline_at ASC
                 """,
                 (user_id, user_id, user_id, f"{month_prefix}%")

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр ОГЭ №13 · Неравенства и системы неравенств · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-divider {
+      width: 1px; height: 16px; background: var(--line); margin: 0 4px; display: inline-block;
+    }
+    .nav-task-part-badge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--vermilion); letter-spacing: .08em; padding: 0 2px;
+    }
+    .task-pill.task-pill-part2 {
+      border: 1px dashed rgba(183,70,78,.4); color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .task-pill.task-pill-part2:hover {
+      background: var(--vermilion); color: #fff;
+    }
+    .task-pill.task-pill-part2.active {
+      background: var(--vermilion); color: #fff; border-style: solid; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active {
+      background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--indigo); text-decoration: none;
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: 999px;
+      transition: all .2s ease;
+    }
+    .nav-btn:hover { border-color: var(--indigo); background: #fff; transform: translateY(-1px); }
+
+    .xp-counter {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700;
+      color: var(--gold); background: var(--gold-light); border: 1px solid rgba(200,149,108,.3);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN CONTAINER */
+    .trainer-shell {
+      flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 32px 20px 60px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .trainer-header { text-align: center; max-width: 720px; margin: 0 auto; }
+    .trainer-kicker {
+      font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--vermilion); margin-bottom: 6px;
+    }
+    .trainer-title {
+      font-family: 'Zen Old Mincho', serif; font-size: 32px; font-weight: 700;
+      color: var(--indigo); line-height: 1.2; margin-bottom: 8px;
+    }
+    .trainer-subtitle { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .stat-box {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+      box-shadow: var(--shadow-sm); transition: transform .2s ease;
+    }
+    .stat-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-icon { font-size: 24px; line-height: 1; }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font-size: 18px; font-weight: 800; color: var(--indigo); line-height: 1.1; }
+    .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+    .streak-box .stat-num { color: var(--vermilion); }
+
+    /* CATEGORIES BAR */
+    .category-filter {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    }
+    .cat-btn {
+      padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 999px;
+      background: var(--paper-card); border: 1px solid var(--line); color: var(--muted);
+      transition: all .2s ease;
+    }
+    .cat-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 4px 12px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); display: flex; flex-direction: column;
+      gap: 24px; position: relative; overflow: hidden;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px; font-size: 11px; font-weight: 800;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--vermilion);
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px; font-size: 11px; font-weight: 700;
+      color: var(--muted);
+    }
+
+    .task-display {
+      margin-top: 20px; text-align: center; display: flex; flex-direction: column;
+      align-items: center; gap: 16px;
+    }
+    .task-statement {
+      font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.5; max-width: 680px;
+    }
+    .task-math-highlight {
+      font-family: 'DM Sans', serif; font-size: 26px; font-weight: 700; color: var(--indigo-dark);
+      background: rgba(38,63,97,.04); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 16px 28px; margin: 4px 0 12px; letter-spacing: .02em; display: inline-block;
+    }
+
+    /* 4 OPTIONS GRID */
+    .options-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+      width: 100%; max-width: 720px; margin: 0 auto;
+    }
+    .option-card {
+      background: var(--paper-light); border: 2px solid var(--line); border-radius: var(--r-md);
+      padding: 12px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+      transition: all .2s ease; user-select: none; min-height: 80px;
+    }
+    .option-card:hover {
+      border-color: var(--indigo); transform: translateY(-2px); box-shadow: var(--shadow-sm);
+    }
+    .option-card.selected {
+      border-color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .option-num-badge {
+      width: 32px; height: 32px; border-radius: 10px; background: rgba(38,63,97,.08);
+      color: var(--indigo); font-weight: 800; font-size: 15px; display: grid; place-items: center;
+      flex-shrink: 0; transition: all .2s ease;
+    }
+    .option-card.selected .option-num-badge {
+      background: var(--vermilion); color: #fff;
+    }
+    .option-card.correct {
+      border-color: var(--green) !important; background: var(--green-light) !important;
+    }
+    .option-card.correct .option-num-badge {
+      background: var(--green) !important; color: #fff !important;
+    }
+    .option-card.wrong {
+      border-color: var(--vermilion) !important; background: var(--vermilion-light) !important;
+    }
+    .option-card.wrong .option-num-badge {
+      background: var(--vermilion) !important; color: #fff !important;
+    }
+    .option-content {
+      flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0;
+    }
+    .option-content svg {
+      max-width: 100%; height: auto;
+    }
+
+    /* ANSWER CONTROL ROW */
+    .answer-row {
+      display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px;
+    }
+    .answer-input-wrap {
+      position: relative; width: 140px;
+    }
+    .answer-input {
+      width: 100%; height: 50px; font-size: 20px; font-weight: 800; text-align: center;
+      border: 2px solid var(--line); border-radius: var(--r-md); background: #fff;
+      color: var(--indigo); transition: all .2s ease; outline: none;
+    }
+    .answer-input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(38,63,97,.12); }
+    .answer-input.input-correct {
+      border-color: var(--green); background: var(--green-light); color: var(--green);
+    }
+    .answer-input.input-wrong {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+    }
+
+    .btn-action {
+      height: 50px; padding: 0 28px; font-size: 15px; font-weight: 700; border-radius: var(--r-md);
+      transition: all .2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-check {
+      background: var(--vermilion); color: #fff; box-shadow: 0 4px 14px rgba(183,70,78,.3);
+    }
+    .btn-check:hover { background: #9f3840; transform: translateY(-1px); }
+    .btn-next {
+      background: var(--indigo); color: #fff; box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+
+    /* FEEDBACK & SOLUTION SPOILER */
+    .feedback-banner {
+      border-radius: var(--r-md); padding: 14px 20px; font-size: 15px; font-weight: 600;
+      line-height: 1.4; display: none; text-align: center;
+    }
+    .feedback-banner.correct {
+      background: var(--green-light); border: 1px solid rgba(46,125,50,.3); color: var(--green);
+      display: block;
+    }
+    .feedback-banner.wrong {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
+      display: block;
+    }
+
+    .solution-spoiler {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      overflow: hidden; display: none;
+    }
+    .spoiler-header {
+      padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; background: rgba(38,63,97,.04); border-bottom: 1px solid var(--line);
+      font-size: 13px; font-weight: 700; color: var(--indigo);
+    }
+    .spoiler-body {
+      padding: 16px 20px; font-size: 14px; color: var(--ink); line-height: 1.6;
+    }
+    .solution-step {
+      margin-bottom: 8px; padding-left: 12px; border-left: 2px solid var(--gold);
+    }
+    .solution-step:last-child { margin-bottom: 0; }
+    .solution-step code {
+      font-family: 'DM Sans', sans-serif; font-weight: 700; background: rgba(38,63,97,.06);
+      padding: 2px 6px; border-radius: 4px; color: var(--indigo-dark);
+    }
+
+    /* KEYBOARD HINT */
+    .keyboard-hint {
+      text-align: center; font-size: 12px; color: var(--muted); margin-top: -6px;
+    }
+    .kbd-key {
+      display: inline-block; background: #fff; border: 1px solid var(--line); border-radius: 4px;
+      padding: 1px 5px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.06); color: var(--indigo);
+    }
+
+    @media (max-width: 768px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .options-grid { grid-template-columns: 1fr; }
+      .problem-card { padding: 24px 16px; }
+      .task-math-highlight { font-size: 20px; padding: 12px 16px; }
+      .nav-task-switcher { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAV -->
+  <header class="site-nav">
+    <a href="../index.html" class="brand">
+      <div class="brand-mark">Н</div>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER NAV -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <span class="nav-task-part-badge" style="color:var(--muted);">Ч. 1:</span>
+      <a href="oge_task_6_trainer.html" class="task-pill">№6</a>
+      <a href="oge_task_7_trainer.html" class="task-pill">№7</a>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10</a>
+      <a href="oge_task_11_trainer.html" class="task-pill">№11</a>
+      <span class="task-pill active" aria-current="page">№13</span>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <span class="nav-task-divider" aria-hidden="true"></span>
+      <span class="nav-task-part-badge">Ч. 2:</span>
+      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20 (2 б.)</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="trainer-shell">
+
+    <!-- HEADER BLOCK -->
+    <section class="trainer-header">
+      <div class="trainer-kicker">ОГЭ 2026 · Задание №13 · Алгебра</div>
+      <h1 class="trainer-title">Неравенства и системы</h1>
+      <p class="trainer-subtitle">
+        Линейные, квадратные неравенства, системы неравенств, метод интервалов, смена знаков и выбор верных числовых лучей.
+      </p>
+    </section>
+
+    <!-- STATS DASHBOARD -->
+    <section class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Рекорд серии</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Всего решено</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">👑</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank">Новичок 🥉</span>
+          <span class="stat-label">Текущий ранг</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORY FILTER BUTTONS -->
+    <nav class="category-filter" aria-label="Выбор категории прототипов">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">⚡ Все типы (экзамен)</button>
+      <button type="button" class="cat-btn" data-cat="linear">📏 Линейные неравенства</button>
+      <button type="button" class="cat-btn" data-cat="systems">🔗 Системы неравенств</button>
+      <button type="button" class="cat-btn" data-cat="quadratic">📈 Квадратные неравенства</button>
+      <button type="button" class="cat-btn" data-cat="no_solution_or_all">🚫 Без решений / любое x</button>
+    </nav>
+
+    <!-- MAIN PROBLEM CARD -->
+    <article class="problem-card">
+      <div class="card-top-tag" id="task-badge">Задание №13 · ОГЭ</div>
+      <div class="card-help-badge" id="task-cat-badge">Неравенства</div>
+
+      <!-- TASK CONTAINER -->
+      <div class="task-display">
+        <div id="task-container">
+          <!-- Генерируемое задание -->
+        </div>
+      </div>
+
+      <!-- 4 OPTIONS GRID -->
+      <div class="options-grid" id="options-grid" role="radiogroup" aria-label="Варианты ответов">
+        <!-- 4 интерактивные карточки -->
+      </div>
+
+      <!-- ANSWER ROW -->
+      <div class="answer-row">
+        <div class="answer-input-wrap">
+          <input type="text" id="answer-input" class="answer-input" placeholder="№" maxlength="1" autocomplete="off" inputmode="numeric" />
+        </div>
+        <button type="button" class="btn-action btn-check" id="btn-check">Ответить</button>
+        <button type="button" class="btn-action btn-next" id="btn-next" style="display:none;">Следующее →</button>
+      </div>
+
+      <div class="keyboard-hint">
+        Выберите карточку кликом или клавишами <span class="kbd-key">1</span> <span class="kbd-key">2</span> <span class="kbd-key">3</span> <span class="kbd-key">4</span>, подтверждение — <span class="kbd-key">Enter</span>
+      </div>
+
+      <!-- FEEDBACK BANNER -->
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <!-- SOLUTION SPOILER -->
+      <div class="solution-spoiler" id="solution-spoiler">
+        <div class="spoiler-header" id="spoiler-toggle">
+          <span>💡 Подробный пошаговый разбор</span>
+          <span id="spoiler-arrow">▾</span>
+        </div>
+        <div class="spoiler-body" id="solution-steps"></div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="../js/oge_task_13_trainer.js"></script>
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script>
+    (function () {
+      const TRAINER_ID = 'oge_task_13';
+
+      let currentCategory = 'mixed_all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+
+      let streak = 0;
+      let maxStreak = 0;
+      let totalSolved = 0;
+
+      // DOM Elements
+      const taskContainer = document.getElementById('task-container');
+      const optionsGrid = document.getElementById('options-grid');
+      const answerInput = document.getElementById('answer-input');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const solutionSpoiler = document.getElementById('solution-spoiler');
+      const solutionSteps = document.getElementById('solution-steps');
+      const spoilerToggle = document.getElementById('spoiler-toggle');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+
+      // Local storage restore
+      try {
+        const saved = JSON.parse(localStorage.getItem('oge13_trainer_stats') || '{}');
+        streak = saved.streak || 0;
+        maxStreak = saved.maxStreak || 0;
+        totalSolved = saved.totalSolved || 0;
+      } catch (e) {}
+
+      function saveStats() {
+        try {
+          localStorage.setItem('oge13_trainer_stats', JSON.stringify({ streak, maxStreak, totalSolved }));
+        } catch (e) {}
+      }
+
+      function updateDashboard() {
+        statStreak.textContent = streak;
+        statMaxStreak.textContent = maxStreak;
+        statTotal.textContent = totalSolved;
+        if (window.TrainerRankTracker) {
+          statRank.textContent = window.TrainerRankTracker.getRankForStreak(TRAINER_ID, streak);
+        }
+      }
+
+      function selectOption(optionNumber) {
+        if (hasAnsweredCurrent) return;
+        const cards = optionsGrid.querySelectorAll('.option-card');
+        cards.forEach((card, idx) => {
+          if (idx + 1 === optionNumber) {
+            card.classList.add('selected');
+            card.setAttribute('aria-checked', 'true');
+          } else {
+            card.classList.remove('selected');
+            card.setAttribute('aria-checked', 'false');
+          }
+        });
+        answerInput.value = optionNumber;
+        answerInput.className = 'answer-input';
+      }
+
+      function renderCurrentTask() {
+        hasAnsweredCurrent = false;
+        answerInput.value = '';
+        answerInput.className = 'answer-input';
+        answerInput.disabled = false;
+        btnCheck.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.style.display = 'none';
+        solutionSpoiler.style.display = 'none';
+
+        taskCatBadge.textContent = currentTask.catName || 'Неравенства';
+        taskContainer.innerHTML = currentTask.questionHtml;
+
+        optionsGrid.innerHTML = '';
+        currentTask.options.forEach((optContent, idx) => {
+          const card = document.createElement('div');
+          card.className = 'option-card';
+          card.setAttribute('role', 'radio');
+          card.setAttribute('tabindex', '0');
+          card.innerHTML = `
+            <div class="option-num-badge">${idx + 1}</div>
+            <div class="option-content">${optContent}</div>
+          `;
+          card.addEventListener('click', () => selectOption(idx + 1));
+          card.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              selectOption(idx + 1);
+            }
+          });
+          optionsGrid.appendChild(card);
+        });
+
+        // Solution steps
+        solutionSteps.innerHTML = currentTask.solutionSteps.map(s => `<div class="solution-step">${s}</div>`).join('');
+        setTimeout(() => answerInput.focus(), 50);
+      }
+
+      function loadNewTask() {
+        currentTask = window.OgeTask13Trainer.generateTask(currentCategory);
+        renderCurrentTask();
+      }
+
+      function checkAnswer() {
+        if (hasAnsweredCurrent) return;
+        const raw = answerInput.value.trim();
+        if (!raw) {
+          answerInput.focus();
+          return;
+        }
+
+        hasAnsweredCurrent = true;
+        answerInput.disabled = true;
+        btnCheck.style.display = 'none';
+        btnNext.style.display = 'inline-flex';
+        btnNext.focus();
+
+        const isCorrect = window.OgeTask13Trainer.checkAnswer(raw, currentTask.answer);
+        const cards = optionsGrid.querySelectorAll('.option-card');
+        const correctIdx = currentTask.correctOptionIndex;
+
+        cards.forEach((card, idx) => {
+          if (idx === correctIdx) {
+            card.classList.add('correct');
+          } else if (idx + 1 === parseInt(raw, 10)) {
+            card.classList.add('wrong');
+          }
+        });
+
+        if (isCorrect) {
+          streak++;
+          if (streak > maxStreak) maxStreak = streak;
+          totalSolved++;
+          saveStats();
+          updateDashboard();
+
+          answerInput.className = 'answer-input input-correct';
+          feedbackBanner.className = 'feedback-banner correct';
+          feedbackBanner.innerHTML = `🎉 <strong>Верно!</strong> Ответ: <strong>${currentTask.answer}</strong>. Отличная работа!`;
+
+          // Track XP in profile
+          if (window.TrainerRankTracker) {
+            window.TrainerRankTracker.addSessionSolved(TRAINER_ID);
+          }
+        } else {
+          streak = 0;
+          saveStats();
+          updateDashboard();
+
+          answerInput.className = 'answer-input input-wrong';
+          feedbackBanner.className = 'feedback-banner wrong';
+          feedbackBanner.innerHTML = `❌ <strong>Неверно.</strong> Правильный ответ: <strong>${currentTask.answer}</strong>. Посмотрите разбор ниже.`;
+        }
+
+        solutionSpoiler.style.display = 'block';
+      }
+
+      // Event Listeners
+      btnCheck.addEventListener('click', checkAnswer);
+      btnNext.addEventListener('click', loadNewTask);
+
+      spoilerToggle.addEventListener('click', () => {
+        const body = solutionSteps;
+        const arrow = document.getElementById('spoiler-arrow');
+        if (body.style.display === 'none') {
+          body.style.display = 'block';
+          arrow.textContent = '▴';
+        } else {
+          body.style.display = 'none';
+          arrow.textContent = '▾';
+        }
+      });
+
+      // Keyboard handling
+      window.addEventListener('keydown', (e) => {
+        if (['1', '2', '3', '4'].includes(e.key) && !hasAnsweredCurrent) {
+          selectOption(parseInt(e.key, 10));
+        } else if (e.key === 'Enter') {
+          if (hasAnsweredCurrent) {
+            loadNewTask();
+          } else {
+            checkAnswer();
+          }
+        }
+      });
+
+      answerInput.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if ([1, 2, 3, 4].includes(val)) {
+          selectOption(val);
+        }
+      });
+
+      // Category filter buttons
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat');
+          loadNewTask();
+        });
+      });
+
+      // Init
+      updateDashboard();
+      loadNewTask();
+
+      // Timed mode check
+      if (window.TrainerTimedMode) {
+        window.TrainerTimedMode.init({
+          trainerId: TRAINER_ID,
+          title: 'ОГЭ №13: Неравенства',
+          durationSec: 600,
+          onFinish: function(res) {
+            console.log('Timed mode completed', res);
+          }
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>
