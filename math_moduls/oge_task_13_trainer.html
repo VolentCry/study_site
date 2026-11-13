@@ -536,7 +536,11 @@
         solutionSpoiler.style.display = 'none';
 
         taskCatBadge.textContent = currentTask.catName || 'Неравенства';
+        // В самом интерактивном тренажёре варианты выводятся как интерактивные кликабельные кнопки options-grid,
+        // поэтому скрываем дублирующий встроенный статический блок .oge13-embedded-options
         taskContainer.innerHTML = currentTask.questionHtml;
+        const embeddedOptBlock = taskContainer.querySelector('.oge13-embedded-options');
+        if (embeddedOptBlock) embeddedOptBlock.style.display = 'none';
 
         optionsGrid.innerHTML = '';
         currentTask.options.forEach((optContent, idx) => {

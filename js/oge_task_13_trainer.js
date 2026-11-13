@@ -646,6 +646,35 @@
       if (!task.text && task.questionHtml) {
         task.text = task.questionHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       }
+
+      // Встраиваем 4 варианта ответа в questionHtml, чтобы в ДЗ, личном кабинете ученика
+      // и на панели учителя варианты ответов (числовые прямые или текст) отображались всегда!
+      if (task.options && task.options.length) {
+        const isSvg = task.optionsType === 'svg';
+        const optionsCardsHtml = task.options.map((opt, idx) => `
+          <div class="oge13-opt-card" style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:rgba(38,63,97,0.04); border:1px solid rgba(38,63,97,0.14); border-radius:10px;">
+            <span style="display:inline-grid; place-items:center; width:26px; height:26px; border-radius:8px; background:rgba(38,63,97,0.1); color:var(--indigo, #263f61); font-weight:800; font-size:13px; flex-shrink:0;">${idx + 1}</span>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow-x:auto;">${opt}</div>
+          </div>
+        `).join('');
+
+        const gridCols = isSvg ? 'repeat(auto-fit, minmax(240px, 1fr))' : 'repeat(auto-fit, minmax(200px, 1fr))';
+        const optionsBlockHtml = `
+          <div class="oge13-embedded-options" style="margin-top:14px; width:100%;">
+            <div style="font-weight:700; font-size:0.88rem; color:var(--muted, #697383); margin-bottom:8px; text-align:left;">Варианты ответа:</div>
+            <div style="display:grid; grid-template-columns:${gridCols}; gap:10px;">
+              ${optionsCardsHtml}
+            </div>
+          </div>
+        `;
+
+        task.questionHtml = `
+          <div class="oge13-task-wrap">
+            ${task.questionHtml}
+            ${optionsBlockHtml}
+          </div>
+        `;
+      }
     }
     return task;
   }
