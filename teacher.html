@@ -629,71 +629,6 @@
         .badge-success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
         .badge-wrong { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 
-        /* --- LIVE FEED TIMELINE --- */
-        .feed-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-        }
-        .feed-item {
-            background: var(--surface-card);
-            border: 1px solid var(--line);
-            border-radius: var(--r);
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            transition: all 0.2s;
-        }
-        .feed-item:hover {
-            border-color: var(--line-active);
-            transform: translateX(3px);
-        }
-        .feed-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .feed-status-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-        .feed-status-icon.correct { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-        .feed-status-icon.wrong { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-        .feed-meta {
-            display: flex;
-            flex-direction: column;
-        }
-        .feed-action-text {
-            font-weight: 700;
-            color: var(--ink);
-        }
-        .feed-action-text a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        .feed-action-text a:hover {
-            text-decoration: underline;
-        }
-        .feed-sub-text {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-top: 0.15rem;
-        }
-        .feed-time {
-            font-size: 0.8rem;
-            color: var(--muted);
-            white-space: nowrap;
-            font-family: var(--f-mono);
-        }
-
         /* --- MODAL DIALOGS --- */
         dialog.admin-modal {
             margin: auto;
@@ -1716,9 +1651,6 @@
                 <button type="button" class="teacher-tab-btn" id="tab-btn-users" role="tab" aria-selected="false" aria-controls="pane-users">
                     <span>👥 Все пользователи</span>
                 </button>
-                <button type="button" class="teacher-tab-btn" id="tab-btn-feed" role="tab" aria-selected="false" aria-controls="pane-feed">
-                    <span>⚡ Живая лента</span>
-                </button>
             </nav>
 
             <!-- PANE 1: МОИ КЛАССЫ -->
@@ -1861,23 +1793,6 @@
                             <!-- Список всех пользователей -->
                         </tbody>
                     </table>
-                </div>
-            </section>
-
-            <!-- PANE 3: ЖИВАЯ ЛЕНТА ЗАДАНИЙ -->
-            <section id="pane-feed" class="tab-pane hidden" role="tabpanel">
-                <div class="section-toolbar">
-                    <div style="display:flex; gap:8px;">
-                        <button type="button" class="btn btn-secondary btn-sm feed-scope-btn active" data-scope="all">Все ученики</button>
-                        <button type="button" class="btn btn-secondary btn-sm feed-scope-btn" data-scope="my">Только мои классы</button>
-                    </div>
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-feed">
-                        🔄 Обновить ленту
-                    </button>
-                </div>
-
-                <div class="feed-list" id="feed-items-container">
-                    <!-- Лента заданий -->
                 </div>
             </section>
 
@@ -2498,7 +2413,6 @@
             let allUsersCache = [];
             let activeClassId = null;
             let currentTab = 'classes';
-            let feedScope = 'all';
 
             // --- Theme handling ---
             const themeBtn = document.getElementById('theme-toggle-btn');
@@ -2619,8 +2533,7 @@
                 { id: 'schedule', btn: document.getElementById('tab-btn-schedule'), pane: document.getElementById('pane-schedule') },
                 { id: 'constructor', btn: document.getElementById('tab-btn-constructor'), pane: document.getElementById('pane-constructor') },
                 { id: 'grading', btn: document.getElementById('tab-btn-grading'), pane: document.getElementById('pane-grading') },
-                { id: 'users', btn: document.getElementById('tab-btn-users'), pane: document.getElementById('pane-users') },
-                { id: 'feed', btn: document.getElementById('tab-btn-feed'), pane: document.getElementById('pane-feed') }
+                { id: 'users', btn: document.getElementById('tab-btn-users'), pane: document.getElementById('pane-users') }
             ];
 
             function switchTab(targetId) {
@@ -2641,7 +2554,6 @@
                 if (targetId === 'constructor') loadConstructor();
                 if (targetId === 'grading') loadGrading();
                 if (targetId === 'users') loadAllUsers();
-                if (targetId === 'feed') loadActivityFeed();
             }
 
             tabBtns.forEach(t => {
@@ -3193,8 +3105,6 @@
             window.addEventListener('focus', () => {
                 if (currentTab === 'users') {
                     loadAllUsers();
-                } else if (currentTab === 'feed') {
-                    loadActivityFeed();
                 } else if (currentTab === 'classes' && activeClassId) {
                     loadSingleClass(activeClassId);
                 }
@@ -3204,8 +3114,6 @@
                 if (document.hidden) return;
                 if (currentTab === 'users') {
                     loadAllUsers();
-                } else if (currentTab === 'feed') {
-                    loadActivityFeed();
                 } else if (currentTab === 'classes' && activeClassId) {
                     loadSingleClass(activeClassId);
                 }
@@ -3442,80 +3350,6 @@
                     alert('Ошибка изменения роли: ' + e.message);
                 }
             }
-
-            // --- Live Activity Feed Logic ---
-            async function loadActivityFeed() {
-                const container = document.getElementById('feed-items-container');
-                if (!container) return;
-
-                container.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--muted);">Загрузка ленты активности...</div>';
-                try {
-                    const res = await fetch(`/api/teacher/feed?scope=${feedScope}&limit=60`, { cache: 'no-store' });
-                    const d = await res.json();
-                    if (!d.success) return;
-
-                    const feed = d.feed || [];
-                    if (!feed.length) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="empty-icon">📝</div>
-                                <div style="font-weight:700;">Пока нет зафиксированных решений заданий</div>
-                                <p style="font-size:0.85rem; margin-top:4px;">Когда ученики решают задания в тренажёрах или тестах, они появляются здесь в реальном времени.</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    container.innerHTML = feed.map(item => {
-                        const isCorrect = !!item.correct;
-                        const iconClass = isCorrect ? 'correct' : 'wrong';
-                        const iconSymbol = isCorrect ? '✅' : '❌';
-                        const statusLabel = isCorrect ? 'верно решил' : 'ошибся в';
-                        const taskLink = item.taskId ? `<a href="${escapeHtml(item.taskId)}" target="_blank">${escapeHtml(item.skill || item.taskId)}</a>` : escapeHtml(item.skill || 'Задание');
-
-                        return `
-                            <div class="feed-item">
-                                <div class="feed-left">
-                                    <div class="feed-status-icon ${iconClass}">
-                                        ${iconSymbol}
-                                    </div>
-                                    <div class="feed-meta">
-                                        <div class="feed-action-text">
-                                            <span style="cursor:pointer; text-decoration:underline;" class="feed-open-dossier" data-id="${item.studentId}">
-                                                ${escapeHtml(item.studentName)}
-                                            </span>
-                                            ${statusLabel} ${taskLink}
-                                        </div>
-                                        <div class="feed-sub-text">
-                                            Предмет: <strong>${escapeHtml(item.subject)}</strong> · Логин: @${escapeHtml(item.username)}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="feed-time">
-                                    ${formatRelativeTime(item.timestamp)}
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    container.querySelectorAll('.feed-open-dossier').forEach(el => {
-                        el.addEventListener('click', () => openStudentDossier(parseInt(el.getAttribute('data-id'))));
-                    });
-                } catch(e) {
-                    container.innerHTML = '<div style="color:var(--danger); padding:2rem; text-align:center;">Ошибка загрузки ленты.</div>';
-                }
-            }
-
-            document.querySelectorAll('.feed-scope-btn').forEach(b => {
-                b.addEventListener('click', () => {
-                    document.querySelectorAll('.feed-scope-btn').forEach(btn => btn.classList.remove('active'));
-                    b.classList.add('active');
-                    feedScope = b.getAttribute('data-scope') || 'all';
-                    loadActivityFeed();
-                });
-            });
-
-            document.getElementById('btn-refresh-feed')?.addEventListener('click', () => loadActivityFeed());
 
             // --- Student Dossier Modal Logic ---
             const dossierModal = document.getElementById('student-dossier-modal');
