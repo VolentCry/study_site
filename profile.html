@@ -771,17 +771,22 @@
                         <!-- Battle Question Field -->
                         <div class="tower-question-box" id="tower-question-container">
                             <div style="font-size: 0.85rem; color: var(--muted-bright); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em;" id="tower-stage-kicker">
-                                Реши задачу быстрее 3 сек для критического удара 200%!
+                                Страж этажа ждёт вашего вызова!
                             </div>
-                            <div id="tower-problem-text">Загрузка задачи...</div>
+                            <div id="tower-problem-text">Нажмите «Начать», чтобы вступить в бой!</div>
                         </div>
 
-                        <!-- Answer Input Row -->
+                        <!-- Answer Input Row & Controls -->
                         <div class="tower-input-row">
-                            <input type="text" id="tower-user-answer" class="form-input tower-answer-input" placeholder="Введите ответ..." autocomplete="off">
-                            <button type="button" class="btn btn-emerald" id="btn-tower-submit-answer" style="height: 48px; font-weight: 800; padding: 0 1.5rem;">
-                                ⚔️ Атаковать!
+                            <button type="button" class="btn btn-emerald" id="btn-tower-start" style="height: 48px; font-weight: 800; padding: 0 2rem; font-size: 1.05rem;">
+                                ▶️ Начать
                             </button>
+                            <div id="tower-active-controls" class="tower-active-controls" style="display: none;">
+                                <input type="text" id="tower-user-answer" class="form-input tower-answer-input" placeholder="Введите ответ..." autocomplete="off">
+                                <button type="button" class="btn btn-emerald" id="btn-tower-submit-answer" style="height: 48px; font-weight: 800; padding: 0 1.5rem;">
+                                    ⚔️ Атаковать!
+                                </button>
+                            </div>
                             <button type="button" class="btn btn-secondary btn-sm" id="btn-tower-restart" style="height: 48px;" title="Начать забег с 1-го этажа">
                                 🔄 Заново
                             </button>

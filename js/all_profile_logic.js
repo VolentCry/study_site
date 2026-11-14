@@ -364,6 +364,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function switchTab(tabName) {
         if (isParentUser()) return;
+        if (tabName !== 'upgrade' && typeof window.stopTowerBattle === 'function') {
+            window.stopTowerBattle();
+        }
         const buttons = [tabBtnStudy, tabBtnOverview, tabBtnRanks, tabBtnAchievements, tabBtnUpgrade];
         const contents = [tabContentStudy, tabContentOverview, tabContentRanks, tabContentAchievements, tabContentUpgrade];
 
@@ -2610,6 +2613,9 @@ initLevelProgressModal();
         subnavBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetKey = btn.getAttribute('data-upgrade-tab');
+                if (targetKey !== 'tower') {
+                    stopTowerBattle();
+                }
                 subnavBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
@@ -3044,6 +3050,7 @@ initLevelProgressModal();
     let towerQuestionStartTime = Date.now();
     let towerTimerInterval = null;
     let towerTimeLeft = 15;
+    let isTowerBattleActive = false;
 
     const MONSTER_ROSTER = [
         { title: 'Гоблин-счетовод', icon: '👾' },
@@ -3217,16 +3224,106 @@ initLevelProgressModal();
             mHpBar.style.width = `${mPct}%`;
         }
 
-        // Generate question if missing
+        const startBtn = document.getElementById('btn-tower-start');
+        const activeControls = document.getElementById('tower-active-controls');
+        const kicker = document.getElementById('tower-stage-kicker');
+        const probText = document.getElementById('tower-problem-text');
+
+        if (!isTowerBattleActive) {
+            if (startBtn) {
+                startBtn.style.display = 'inline-flex';
+                if (!startBtn.textContent || startBtn.textContent.trim() === '' || startBtn.textContent.includes('Атаковать')) {
+                    startBtn.textContent = `▶️ Начать бой (${state.floor} этаж)`;
+                }
+            }
+            if (activeControls) activeControls.style.display = 'none';
+
+            if (kicker) {
+                kicker.textContent = currentTowerQuestion
+                    ? 'Битва приостановлена · Страж ждёт продолжения'
+                    : 'Страж этажа ждёт вашего вызова!';
+            }
+            if (probText) {
+                probText.textContent = currentTowerQuestion
+                    ? `Нажмите «Начать», чтобы продолжить бой на ${state.floor} этаже!`
+                    : `Нажмите «Начать», чтобы бросить вызов стражу ${state.floor} этажа!`;
+            }
+
+            towerTimeLeft = 15;
+            updateTowerTimerUI();
+        } else {
+            if (startBtn) startBtn.style.display = 'none';
+            if (activeControls) activeControls.style.display = 'flex';
+
+            if (!currentTowerQuestion) {
+                currentTowerQuestion = generateTowerQuestion(state.floor);
+                towerQuestionStartTime = Date.now();
+                startTowerTimer();
+            }
+
+            if (kicker) kicker.textContent = 'Реши задачу быстрее 3 сек для критического удара 200%!';
+            if (probText) probText.textContent = currentTowerQuestion.prompt;
+        }
+    }
+
+    function startTowerBattle() {
+        isTowerBattleActive = true;
+        const state = getTowerState();
+
+        if (!currentTowerMonster) {
+            currentTowerMonster = spawnTowerMonster(state.floor);
+        }
         if (!currentTowerQuestion) {
             currentTowerQuestion = generateTowerQuestion(state.floor);
-            towerQuestionStartTime = Date.now();
-            startTowerTimer();
         }
 
+        towerQuestionStartTime = Date.now();
+        startTowerTimer();
+
+        const startBtn = document.getElementById('btn-tower-start');
+        const activeControls = document.getElementById('tower-active-controls');
+        const kicker = document.getElementById('tower-stage-kicker');
         const probText = document.getElementById('tower-problem-text');
+        const answerInput = document.getElementById('tower-user-answer');
+
+        if (startBtn) startBtn.style.display = 'none';
+        if (activeControls) activeControls.style.display = 'flex';
+        if (kicker) kicker.textContent = 'Реши задачу быстрее 3 сек для критического удара 200%!';
         if (probText) probText.textContent = currentTowerQuestion.prompt;
+
+        renderTowerArena();
+        if (answerInput) {
+            answerInput.focus();
+        }
     }
+
+    function stopTowerBattle() {
+        if (towerTimerInterval) {
+            clearInterval(towerTimerInterval);
+            towerTimerInterval = null;
+        }
+        isTowerBattleActive = false;
+
+        const startBtn = document.getElementById('btn-tower-start');
+        const activeControls = document.getElementById('tower-active-controls');
+        const kicker = document.getElementById('tower-stage-kicker');
+        const probText = document.getElementById('tower-problem-text');
+        const state = getTowerState();
+
+        if (startBtn) {
+            startBtn.style.display = 'inline-flex';
+            startBtn.textContent = `▶️ Начать бой (${state.floor} этаж)`;
+        }
+        if (activeControls) {
+            activeControls.style.display = 'none';
+        }
+        if (kicker) kicker.textContent = 'Битва приостановлена';
+        if (probText) probText.textContent = 'Нажмите «Начать», чтобы продолжить бой!';
+
+        towerTimeLeft = 15;
+        updateTowerTimerUI();
+    }
+    window.stopTowerBattle = stopTowerBattle;
 
     function startTowerTimer() {
         if (towerTimerInterval) clearInterval(towerTimerInterval);
@@ -3234,10 +3331,16 @@ initLevelProgressModal();
         updateTowerTimerUI();
 
         towerTimerInterval = setInterval(() => {
+            if (!isTowerBattleActive) {
+                clearInterval(towerTimerInterval);
+                towerTimerInterval = null;
+                return;
+            }
             towerTimeLeft--;
             updateTowerTimerUI();
             if (towerTimeLeft <= 0) {
                 clearInterval(towerTimerInterval);
+                towerTimerInterval = null;
                 handleTowerTimeout();
             }
         }, 1000);
@@ -3254,6 +3357,7 @@ initLevelProgressModal();
     }
 
     function handleTowerSubmit() {
+        if (!isTowerBattleActive) return;
         const input = document.getElementById('tower-user-answer');
         if (!input || !currentTowerQuestion || !currentTowerMonster) return;
 
@@ -3294,6 +3398,9 @@ initLevelProgressModal();
             if (currentTowerMonster.currentHp <= 0) {
                 // Monster Defeated!
                 clearInterval(towerTimerInterval);
+                towerTimerInterval = null;
+                isTowerBattleActive = false; // Next floor requires clicking Start!
+
                 const shardsWon = currentTowerMonster.isBoss ? (25 + state.floor * 5) : (6 + Math.floor(state.floor * 1.5));
                 const xpWon = currentTowerMonster.isBoss ? (60 + state.floor * 12) : (15 + state.floor * 3);
 
@@ -3309,6 +3416,14 @@ initLevelProgressModal();
                 showHubToast(`🏆 Победа над ${currentTowerMonster.title}! +${shardsWon} 💎, +${xpWon} XP!`, 'success');
                 currentTowerMonster = null;
                 currentTowerQuestion = null;
+
+                towerTimeLeft = 15;
+                updateTowerTimerUI();
+
+                const startBtn = document.getElementById('btn-tower-start');
+                if (startBtn) {
+                    startBtn.textContent = `▶️ Начать бой (${state.floor} этаж)`;
+                }
 
                 setTimeout(() => {
                     renderTowerArena();
@@ -3327,11 +3442,13 @@ initLevelProgressModal();
     }
 
     function handleTowerTimeout() {
+        if (!isTowerBattleActive) return;
         showHubToast('⏱️ Время вышло! Страж атакует!', 'info');
         handleMonsterAttack();
     }
 
     function handleMonsterAttack() {
+        if (!isTowerBattleActive) return;
         const state = getTowerState();
         if (!currentTowerMonster) return;
 
@@ -3347,6 +3464,9 @@ initLevelProgressModal();
             if (state.heroHp <= 0) {
                 // Hero fallen!
                 clearInterval(towerTimerInterval);
+                towerTimerInterval = null;
+                isTowerBattleActive = false;
+
                 alert(`💀 Вы пали на ${state.floor} этаже! Забег завершён.\nРекорд башни: ${state.bestFloor} этаж.\nВсе накопленные 💎 осколки и прокачанные характеристики сохранены!`);
 
                 state.floor = 1;
@@ -3356,6 +3476,14 @@ initLevelProgressModal();
 
                 currentTowerMonster = null;
                 currentTowerQuestion = null;
+
+                const startBtn = document.getElementById('btn-tower-start');
+                if (startBtn) {
+                    startBtn.textContent = '▶️ Начать забег (1 этаж)';
+                }
+                towerTimeLeft = 15;
+                updateTowerTimerUI();
+
                 renderTowerArena();
                 return;
             } else {
@@ -3371,6 +3499,17 @@ initLevelProgressModal();
     }
 
     function initTowerUpgrades() {
+        const startBtn = document.getElementById('btn-tower-start');
+        if (startBtn) {
+            startBtn.addEventListener('click', startTowerBattle);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopTowerBattle();
+            }
+        });
+
         const upgradeBtns = [
             { id: 'btn-upgrade-atk', cost: 20, apply: s => { s.heroAtk += 5; } },
             { id: 'btn-upgrade-hp', cost: 20, apply: s => { s.heroMaxHp += 25; s.heroHp = Math.min(s.heroMaxHp, s.heroHp + 25); } },
@@ -3400,7 +3539,7 @@ initLevelProgressModal();
         if (restartBtn) {
             restartBtn.addEventListener('click', () => {
                 if (confirm('Начать забег с 1 этажа? Все заработанные 💎 осколки и прокачанные навыки останутся с вами!')) {
-                    clearInterval(towerTimerInterval);
+                    stopTowerBattle();
                     const state = getTowerState();
                     state.floor = 1;
                     state.heroHp = state.heroMaxHp;
