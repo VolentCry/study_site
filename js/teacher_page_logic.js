@@ -1959,6 +1959,14 @@
                     if (window.ComplexFractionsTrainer) {
                         t = window.ComplexFractionsTrainer.generateTask(type);
                     }
+                } else if (type.startsWith('divisibility_')) {
+                    if (window.DivisibilityTrainer) {
+                        t = window.DivisibilityTrainer.generateTask(type);
+                    }
+                } else if (type.startsWith('extract_whole_adv_')) {
+                    if (window.ExtractWholeAdvancedTrainer) {
+                        t = window.ExtractWholeAdvancedTrainer.generateTask(type);
+                    }
                 }
 
                 if (!t) break;

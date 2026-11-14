@@ -398,6 +398,39 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // 4b. Представление целого числа в виде неправильной дроби
+    function generateWholeToImproperProblem() {
+        const whole = getRandomInt(2, 9);
+        const den = getRandomInt(2, 9);
+        const num = whole * den;
+
+        let stepsHtml = `
+            <p><strong>Шаг 1:</strong> Любое целое число можно представить как дробь с единицей в знаменателе:<br>
+            <code>${whole} = ${whole}/1</code>.</p>
+            <p><strong>Шаг 2:</strong> Чтобы получить знаменатель <strong>${den}</strong>, умножим числитель и знаменатель на <strong>${den}</strong>:<br>
+            <code>(${whole} × ${den}) / (1 × ${den}) = ${num} / ${den}</code>.</p>
+            <p><strong>Шаг 3:</strong> Числитель неправильной дроби равен <code>${whole} × ${den} = ${num}</code>.</p>
+            <p><strong>Ответ:</strong> <strong>${num}/${den}</strong>.</p>
+        `;
+
+        return {
+            type: 'whole_to_improper',
+            category: 'whole_to_improper',
+            promptText: `Представьте целое число в виде неправильной дроби со знаменателем ${den}:`,
+            whole: whole,
+            targetNum: num,
+            targetDen: den,
+            solution: stepsHtml,
+            hint: `Умножь целое число ${whole} на знаменатель ${den}: ${whole} × ${den} = ?`,
+            visualData: {
+                type: 'bar_whole_to_improper',
+                whole: whole,
+                den: den,
+                num: num
+            }
+        };
+    }
+
     // 5. Перевод в десятичную дробь
     function generateToDecimalProblem() {
         const decimalConfigs = [
@@ -610,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'diff_denom',
                 'reduce',
                 'extract_whole',
+                'whole_to_improper',
                 'to_decimal',
                 'mul_div',
                 'compare'
@@ -629,6 +663,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'extract_whole':
                 currentProblem = generateExtractWholeProblem();
+                break;
+            case 'whole_to_improper':
+                currentProblem = generateWholeToImproperProblem();
                 break;
             case 'to_decimal':
                 currentProblem = generateToDecimalProblem();
@@ -691,6 +728,26 @@ document.addEventListener('DOMContentLoaded', () => {
             // Блок ввода целой части и дроби
             problemContainerEl.appendChild(createMixedInputBlock());
             setupMixedInputListeners();
+        } else if (prob.type === 'whole_to_improper') {
+            // Отображаем целое число = дробь со знаменателем
+            const wholeSpan = document.createElement('span');
+            wholeSpan.className = 'math-whole';
+            wholeSpan.style.fontSize = '34px';
+            wholeSpan.textContent = String(prob.whole);
+            problemContainerEl.appendChild(wholeSpan);
+
+            const eqSpan = document.createElement('span');
+            eqSpan.className = 'operator-sign';
+            eqSpan.textContent = '=';
+            problemContainerEl.appendChild(eqSpan);
+
+            problemContainerEl.appendChild(createFractionInputBlock());
+            const denInput = document.getElementById('input-denominator');
+            if (denInput) {
+                denInput.value = prob.targetDen;
+                denInput.title = `Знаменатель: ${prob.targetDen}`;
+            }
+            setupFractionInputListeners();
         } else if (prob.type === 'to_decimal') {
             // Отображаем исходную дробь или смешанное число
             if (prob.isMixed) {
@@ -992,6 +1049,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
+        } else if (vData.type === 'bar_whole_to_improper') {
+            let wholeStrips = '';
+            for (let i = 0; i < vData.whole; i++) {
+                wholeStrips += `
+                    <div class="visual-strip-row">
+                        <span class="visual-strip-tag">Целая ${i + 1} (${vData.den}/${vData.den}):</span>
+                        ${createSvgFractionStrip(vData.den, vData.den, '#10b981')}
+                    </div>
+                `;
+            }
+            html = `
+                <div class="visual-card">
+                    <div class="visual-label">Представление целого числа ${vData.whole} со знаменателем ${vData.den}:</div>
+                    ${wholeStrips}
+                    <div style="font-size: 0.9rem; color: #93c5fd; margin-top: 4px;">
+                        Каждая единица — это <strong>${vData.den}/${vData.den}</strong>. Всего ${vData.whole} × ${vData.den} = <strong>${vData.num}/${vData.den}</strong> долей.
+                    </div>
+                </div>
+            `;
         } else if (vData.type === 'bar_to_decimal') {
             html = `
                 <div class="visual-card">
@@ -1105,7 +1181,54 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (currentProblem.type === 'whole_to_improper') {
+            checkWholeToImproperAnswer();
+            return;
+        }
+
         checkFractionCalculationAnswer();
+    }
+
+    // 1b. Проверка представления целого числа в виде неправильной дроби
+    function checkWholeToImproperAnswer() {
+        const numInput = document.getElementById('input-numerator');
+        const denInput = document.getElementById('input-denominator');
+        if (!numInput || !denInput) return;
+
+        const numVal = parseInt(numInput.value.trim(), 10);
+        const denVal = parseInt(denInput.value.trim(), 10);
+
+        if (isNaN(numVal) || isNaN(denVal)) {
+            feedbackEl.textContent = 'Пожалуйста, заполни числитель и знаменатель!';
+            feedbackEl.className = 'trainer-feedback warning';
+            if (isNaN(numVal)) numInput.classList.add('incorrect-val');
+            if (isNaN(denVal)) denInput.classList.add('incorrect-val');
+            playSound('incorrect');
+            return;
+        }
+
+        if (denVal <= 0) {
+            feedbackEl.textContent = 'Знаменатель должен быть натуральным числом (больше 0)!';
+            feedbackEl.className = 'trainer-feedback warning';
+            denInput.classList.add('incorrect-val');
+            playSound('incorrect');
+            return;
+        }
+
+        const targetNum = currentProblem.targetNum;
+        const targetDen = currentProblem.targetDen;
+        const whole = currentProblem.whole;
+
+        if (numVal === targetNum && denVal === targetDen) {
+            handleSuccess(true, numVal, denVal, targetNum, targetDen);
+        } else if (numVal / denVal === whole) {
+            feedbackEl.textContent = `Дробь ${numVal}/${denVal} равна ${whole}, но в условии требовался знаменатель ${targetDen}!`;
+            feedbackEl.className = 'trainer-feedback warning';
+            denInput.classList.add('warning-val');
+            playSound('incorrect');
+        } else {
+            handleFailure();
+        }
     }
 
     // 1. Проверка обычной дроби (+, -, *, /, reduce)

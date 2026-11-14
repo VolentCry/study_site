@@ -99,6 +99,26 @@
             ]
         },
         {
+            id: 'extract_whole_advanced',
+            name: 'Выделение целой части в дробях (слож.)',
+            shortName: 'Выделение целой части (слож.)',
+            subject: 'Математика',
+            category: 'Дроби',
+            classNum: '5 класс',
+            url: '../math_moduls/extract_whole_advanced_trainer.html',
+            profileUrl: 'math_moduls/extract_whole_advanced_trainer.html',
+            icon: '🍰',
+            description: 'Выделение целой части из крупных неправильных дробей (3- и 4-значные числа) и перевод в десятичные дроби.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг дробей 👑' },
+                { min: 20, title: 'Мастер смешанных чисел 🧙' },
+                { min: 14, title: 'Эксперт по долям 💎' },
+                { min: 8,  title: 'Знаток вычислений 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'complex_fractions',
             name: 'Сложные вычисления (Дроби)',
             shortName: 'Сложные дроби',
@@ -523,6 +543,7 @@
                 else if (path.includes('powers_trainer')) trainerId = 'powers_trainer';
                 else if (path.includes('complex_fractions_powers')) trainerId = 'complex_fractions_powers';
                 else if (path.includes('complex_fractions')) trainerId = 'complex_fractions';
+                else if (path.includes('extract_whole_advanced')) trainerId = 'extract_whole_advanced';
                 else if (path.includes('divisibility')) trainerId = 'divisibility';
 
                 if (!trainerId) return;

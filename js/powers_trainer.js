@@ -795,6 +795,83 @@
     };
   }
 
+  // --- 4. СТЕПЕНИ 10 (POWERS OF TEN) ---
+
+  function genPowersOfTen() {
+    const isDecimal = Math.random() < 0.6; // 60% десятичные, 40% целые
+    const k = randInt(2, 5); // 10^2 .. 10^5
+    const tenPower = Math.pow(10, k);
+
+    let coeff, displayCoeff, ans, solutionSteps, hint;
+
+    if (isDecimal) {
+      const decimalType = pickRandom(['one_digit', 'two_digits', 'lead_zero']);
+      if (decimalType === 'one_digit') {
+        const intPart = pickRandom([randInt(1, 9), randInt(11, 45)]);
+        const fracPart = randInt(1, 9);
+        coeff = Number(`${intPart}.${fracPart}`);
+        displayCoeff = `${intPart},${fracPart}`;
+      } else if (decimalType === 'two_digits') {
+        const intPart = randInt(0, 9);
+        const fracPart = randInt(11, 99);
+        coeff = Number(`${intPart}.${fracPart}`);
+        displayCoeff = `${intPart},${fracPart}`;
+      } else {
+        const zeros = k >= 4 ? '00' : '0';
+        const num = randInt(2, 9);
+        coeff = Number(`0.${zeros}${num}`);
+        displayCoeff = `0,${zeros}${num}`;
+      }
+
+      ans = Math.round(coeff * tenPower);
+      const prompt = `Вычислите значение выражения со степенью 10:`;
+      const questionHtml = `<div class="math-expr"><span class="expr-line">${displayCoeff} × 10<sup>${k}</sup> = ?</span></div>`;
+
+      solutionSteps = [
+        `Степень 10<sup>${k}</sup> равна единице с ${k} нулями: <strong>10<sup>${k}</sup> = ${tenPower}</strong>.`,
+        `При умножении десятичной дроби на 10, 100, 1000... запятая переносится вправо на столько знаков, сколько нулей (на ${k} знака):`,
+        `<code>${displayCoeff} × ${tenPower} = <strong>${ans}</strong></code>.`
+      ];
+      hint = `Степень 10<sup>${k}</sup> — это ${tenPower}. При умножении перенеси запятую вправо на ${k} знака (дописывая нули при необходимости).`;
+
+      return {
+        category: 'powers_ten',
+        catName: 'Степени 10',
+        prompt,
+        questionHtml,
+        answer: ans,
+        displayAnswer: String(ans),
+        solutionSteps,
+        hint
+      };
+    } else {
+      coeff = pickRandom([randInt(11, 99), randInt(105, 450), randInt(2, 9)]);
+      displayCoeff = String(coeff);
+      ans = coeff * tenPower;
+
+      const prompt = `Вычислите произведение целого числа и степени 10:`;
+      const questionHtml = `<div class="math-expr"><span class="expr-line">${displayCoeff} × 10<sup>${k}</sup> = ?</span></div>`;
+
+      solutionSteps = [
+        `Степень 10<sup>${k}</sup> — это единица с ${k} нулями: <strong>10<sup>${k}</sup> = ${tenPower}</strong>.`,
+        `Чтобы умножить целое число на 10<sup>${k}</sup>, достаточно приписать к числу ${displayCoeff} ровно ${k} нуля:`,
+        `<code>${displayCoeff} × ${tenPower} = <strong>${ans}</strong></code>.`
+      ];
+      hint = `10<sup>${k}</sup> = ${tenPower}. Просто припиши к числу ${displayCoeff} ровно ${k} нуля.`;
+
+      return {
+        category: 'powers_ten',
+        catName: 'Степени 10',
+        prompt,
+        questionHtml,
+        answer: ans,
+        displayAnswer: String(ans),
+        solutionSteps,
+        hint
+      };
+    }
+  }
+
   // --- ЕДИНЫЙ ГЕНЕРАТОР ПО РЕЖИМАМ ---
 
   function generateTask(mode) {
@@ -811,11 +888,15 @@
       case 'expressions':
         return genPowerExpression();
 
+      case 'powers_ten':
+      case 'ten':
+        return genPowersOfTen();
+
       case 'powers_all':
       case 'mixed_all':
       case 'mixed':
       default:
-        return pickRandom([genCalculatePower, genPowerEquation, genPowerExpression])();
+        return pickRandom([genCalculatePower, genPowerEquation, genPowerExpression, genPowersOfTen])();
     }
   }
 
@@ -850,6 +931,7 @@
     checkAnswer,
     genCalculatePower,
     genPowerEquation,
-    genPowerExpression
+    genPowerExpression,
+    genPowersOfTen
   };
 }));

@@ -534,6 +534,7 @@
 
   <!-- SCRIPTS -->
   <script src="../js/trainer_rank_tracker.js?v=2.2"></script>
+  <script src="../js/divisibility_trainer.js"></script>
   <script>
     (function initDivisibilityTrainer() {
       const TRAINER_ID = 'divisibility';
@@ -616,6 +617,9 @@
 
       // Task Generator
       function generateTask(category) {
+        if (window.DivisibilityTrainer) {
+          return window.DivisibilityTrainer.generateTask(category);
+        }
         let divisor;
         if (category === 'all') {
           divisor = ALLOWED_DIVISORS[Math.floor(Math.random() * ALLOWED_DIVISORS.length)];
