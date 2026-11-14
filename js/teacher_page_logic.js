@@ -1967,6 +1967,10 @@
                     if (window.ExtractWholeAdvancedTrainer) {
                         t = window.ExtractWholeAdvancedTrainer.generateTask(type);
                     }
+                } else if (type.startsWith('monomials_')) {
+                    if (window.MonomialsTrainer) {
+                        t = window.MonomialsTrainer.generateTask(type);
+                    }
                 }
 
                 if (!t) break;

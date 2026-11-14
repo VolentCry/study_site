@@ -39,6 +39,26 @@
             ]
         },
         {
+            id: 'monomials',
+            name: 'Одночлены (7 класс)',
+            shortName: 'Одночлены',
+            subject: 'Математика',
+            category: 'Алгебра',
+            classNum: '7 класс',
+            url: '../math_moduls/monomials_trainer.html',
+            profileUrl: 'math_moduls/monomials_trainer.html',
+            icon: '📐',
+            description: 'Сложение, вычитание, умножение, деление и возведение одночленов в степень.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг одночленов 👑' },
+                { min: 20, title: 'Мастер тождеств 🧙' },
+                { min: 14, title: 'Эксперт алгебры 💎' },
+                { min: 8,  title: 'Знаток одночленов 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'powers_compare',
             name: 'Сравнение степеней (<, >, =)',
             shortName: 'Сравнение степеней',

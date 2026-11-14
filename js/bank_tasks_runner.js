@@ -701,6 +701,13 @@
       if (task.acceptedAnswers.some(a => normalizeVal(a) === u)) return true;
     }
 
+    // Алгебраическое сравнение одночленов (например, -14a^3b^4 == -14b^4a^3)
+    if (window.MonomialsTrainer && typeof window.MonomialsTrainer.areMonomialsEqual === 'function') {
+      if (task.type === 'monomials' || (task.taskId && String(task.taskId).startsWith('monomials')) || (task.id && String(task.id).startsWith('monomials'))) {
+        if (window.MonomialsTrainer.areMonomialsEqual(u, c)) return true;
+      }
+    }
+
     // Числовое сравнение с плавающей точкой
     const fu = parseFloat(u);
     const fc = parseFloat(c);
