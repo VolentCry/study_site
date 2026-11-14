@@ -1852,8 +1852,12 @@ function initSettingsModal() {
             }
         } catch(e) {}
 
+        let peakXp = parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || 0;
+        peakXp = Math.max(peakXp, earnedXp);
+        localStorage.setItem('study_peak_xp', String(peakXp));
+
         const xpPerLevel = 100;
-        const level = Math.floor(earnedXp / xpPerLevel) + 1;
+        const level = Math.floor(peakXp / xpPerLevel) + 1;
 
         // Max streak in any trainer
         let maxTrainerStreak = 0;
@@ -2276,14 +2280,19 @@ function initLevelProgressModal() {
             }
         }
 
+        let peakXp = parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || 0;
+        peakXp = Math.max(peakXp, earnedXp);
+        localStorage.setItem('study_peak_xp', String(peakXp));
+
         const xpPerLevel = 100;
-        const level = Math.floor(earnedXp / xpPerLevel) + 1;
-        const currentLevelXp = earnedXp % xpPerLevel;
+        const level = Math.floor(peakXp / xpPerLevel) + 1;
+        const currentLevelXp = peakXp % xpPerLevel;
         const remainingXp = xpPerLevel - currentLevelXp;
         const currentRank = RANKS[Math.min(Math.max(level - 1, 0), RANKS.length - 1)];
 
         return {
             earnedXp,
+            peakXp,
             level,
             currentLevelXp,
             xpPerLevel,
@@ -2298,10 +2307,10 @@ function initLevelProgressModal() {
 
         if (orbNum) orbNum.textContent = data.level;
         if (currentTitle) currentTitle.textContent = `Уровень ${data.level} · ${data.currentRank.title}`;
-        if (totalXp) totalXp.textContent = `${data.earnedXp} XP`;
+        if (totalXp) totalXp.textContent = `${data.peakXp} XP (Баланс: ${data.earnedXp} XP)`;
         if (barLabel) {
             if (data.level >= 10) {
-                barLabel.textContent = `Максимальный ранг достигнут · ${data.earnedXp} XP`;
+                barLabel.textContent = `Максимальный ранг достигнут · Рекорд: ${data.peakXp} XP`;
             } else {
                 barLabel.textContent = `${data.currentLevelXp} / ${data.xpPerLevel} XP до Уровня ${data.level + 1} (осталось ${data.remainingXp} XP)`;
             }
@@ -2522,11 +2531,35 @@ initLevelProgressModal();
         const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
         localStorage.setItem('studyBonusXp', String(curBonus + delta));
 
+        let peakXp = parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || 0;
+        if (newXp > peakXp) {
+            peakXp = newXp;
+            localStorage.setItem('study_peak_xp', String(peakXp));
+        }
+
         const elements = ['experience-total', 'profile-exp-badge', 'hero-xp-val', 'upgrade-user-xp', 'roulette-balance-display'];
         elements.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.textContent = `${newXp} XP`;
         });
+
+        const xpPerLevel = 100;
+        const level = Math.floor(peakXp / xpPerLevel) + 1;
+        const currentLevelXp = peakXp % xpPerLevel;
+        const levelNames = ['Новичок', 'Ученик', 'Исследователь', 'Знаток', 'Мастер', 'Эксперт', 'Архитектор', 'Профессор', 'Квантовый разум', 'Легенда космоса'];
+        const levelName = levelNames[Math.min(level - 1, levelNames.length - 1)];
+
+        const expHeading = document.getElementById('experience-heading');
+        if (expHeading) expHeading.textContent = `Уровень ${level} · ${levelName}`;
+        const expProgress = document.getElementById('experience-progress');
+        if (expProgress) expProgress.style.width = `${currentLevelXp}%`;
+        const expBar = document.getElementById('experience-progressbar');
+        if (expBar) expBar.setAttribute('aria-valuenow', String(currentLevelXp));
+        const expDetail = document.getElementById('experience-detail');
+        if (expDetail) {
+            expDetail.textContent =
+                `${currentLevelXp} из ${xpPerLevel} XP до Уровня ${level + 1} (рекорд: ${peakXp} XP) · осталось ${xpPerLevel - currentLevelXp} XP. За задачу: 2 XP за ошибочный ответ или 10 XP за верный.`;
+        }
 
         syncHubDataToServer();
         return newXp;
@@ -2587,12 +2620,14 @@ initLevelProgressModal();
             const boosts = getBoostsInventory();
             const tower = getTowerState();
             const xp = getUserTotalXp();
+            const peak = parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || xp;
             const bonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
             await fetch('/api/user/sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userXP: xp,
+                    peakXp: peak,
                     bonusXp: bonus,
                     boostsInventory: boosts,
                     towerStats: tower
@@ -2945,9 +2980,9 @@ initLevelProgressModal();
     // --- SECTION 2: BOOST STORE & INVENTORY ---
     const BOOST_CATALOG = {
         streak_shield: { id: 'streak_shield', title: 'Щит серии', icon: '🛡️', price: 60, desc: 'Спасает комбо в любом тренажёре.' },
-        hw_pass: { id: 'hw_pass', title: 'Отказ от Д/З', icon: '📜', price: 250, desc: 'Автоматический 100% зачёт домашнего задания.' },
+        hw_pass: { id: 'hw_pass', title: 'Отказ от Д/З', icon: '📜', price: 400, desc: 'Автоматический 100% зачёт домашнего задания.' },
         double_xp: { id: 'double_xp', title: 'Эликсир мудрости', icon: '⚡', price: 100, desc: 'Удваивает XP в тренажёрах на 30 мин.' },
-        hint: { id: 'hint', title: 'Шпионская подсказка', icon: '🔍', price: 40, desc: 'Открывает разбор задачи без штрафа.' },
+        hint: { id: 'hint', title: 'Шпионская подсказка', icon: '🔍', price: 50, desc: 'Открывает разбор задачи без штрафа.' },
         time_freeze: { id: 'time_freeze', title: 'Заморозка времени', icon: '⏱️', price: 50, desc: 'Останавливает таймер на 60 сек.' }
     };
 

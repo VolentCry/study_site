@@ -143,18 +143,35 @@ document.addEventListener('DOMContentLoaded', () => {
             xpByTask.set(taskKey, Math.max(xpByTask.get(taskKey) || 0, taskXp));
         });
         const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
-        const earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0) + bonusXp;
-        const level = Math.floor(earnedXp / xpPerLevel) + 1;
-        const currentLevelXp = earnedXp % xpPerLevel;
-        const levelNames = ['Новичок', 'Ученик', 'Исследователь', 'Знаток', 'Мастер', 'Эксперт'];
-        const levelName = levelNames[level - 1] || 'Легенда';
+        let earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0) + bonusXp;
 
-        document.getElementById('experience-heading').textContent = `Уровень ${level} · ${levelName}`;
-        document.getElementById('experience-total').textContent = `${earnedXp} XP`;
-        document.getElementById('experience-progress').style.width = `${currentLevelXp}%`;
-        document.getElementById('experience-progressbar').setAttribute('aria-valuenow', String(currentLevelXp));
-        document.getElementById('experience-detail').textContent =
-            `${currentLevelXp} из ${xpPerLevel} XP до следующего уровня · осталось ${xpPerLevel - currentLevelXp} XP. За задачу: 2 XP за ошибочный ответ или 10 XP за верный; повторные проверки не суммируются.`;
+        const directXp = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
+        if (directXp > earnedXp) earnedXp = directXp;
+
+        // Фиксация опыта уровня на максимальном когда-либо достигнутом значении (peak XP)
+        let peakXp = parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || 0;
+        peakXp = Math.max(peakXp, earnedXp, directXp);
+        localStorage.setItem('study_peak_xp', String(peakXp));
+
+        // Уровень и прогресс до следующего уровня рассчитываются исключительно по пиковому опыту!
+        const level = Math.floor(peakXp / xpPerLevel) + 1;
+        const currentLevelXp = peakXp % xpPerLevel;
+        const levelNames = ['Новичок', 'Ученик', 'Исследователь', 'Знаток', 'Мастер', 'Эксперт', 'Архитектор', 'Профессор', 'Квантовый разум', 'Легенда космоса'];
+        const levelName = levelNames[Math.min(level - 1, levelNames.length - 1)];
+
+        const expHeading = document.getElementById('experience-heading');
+        if (expHeading) expHeading.textContent = `Уровень ${level} · ${levelName}`;
+        const expTotal = document.getElementById('experience-total');
+        if (expTotal) expTotal.textContent = `${earnedXp} XP`;
+        const expProgress = document.getElementById('experience-progress');
+        if (expProgress) expProgress.style.width = `${currentLevelXp}%`;
+        const expBar = document.getElementById('experience-progressbar');
+        if (expBar) expBar.setAttribute('aria-valuenow', String(currentLevelXp));
+        const expDetail = document.getElementById('experience-detail');
+        if (expDetail) {
+            expDetail.textContent =
+                `${currentLevelXp} из ${xpPerLevel} XP до Уровня ${level + 1} (рекорд: ${peakXp} XP) · осталось ${xpPerLevel - currentLevelXp} XP. За задачу: 2 XP за ошибочный ответ или 10 XP за верный.`;
+        }
 
         try {
             localStorage.setItem('user_xp', String(earnedXp));

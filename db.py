@@ -259,6 +259,8 @@ def init_db() -> None:
                 conn.execute("ALTER TABLE user_data ADD COLUMN boosts_inventory_json TEXT DEFAULT '{}';")
             if 'tower_stats_json' not in ud_cols:
                 conn.execute("ALTER TABLE user_data ADD COLUMN tower_stats_json TEXT DEFAULT '{}';")
+            if 'peak_xp' not in ud_cols:
+                conn.execute("ALTER TABLE user_data ADD COLUMN peak_xp INTEGER DEFAULT 0;")
 
             # 7. Таблица сданных решений учеников
             conn.execute('''
@@ -690,7 +692,7 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
             SELECT u.id, u.username, u.display_name, u.role,
                    d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved,
                    d.theme, d.metrics_json, d.trainer_records_json, d.claimed_gifts_json,
-                   d.boosts_inventory_json, d.tower_stats_json, d.updated_at
+                   d.boosts_inventory_json, d.tower_stats_json, d.peak_xp, d.updated_at
             FROM users u
             LEFT JOIN user_data d ON u.id = d.user_id
             WHERE u.id = ?
@@ -729,6 +731,8 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
         calc_xp, calc_solved = compute_user_metrics_xp(metrics, row['bonus_xp'])
         final_xp = int(row['user_xp'] or 0) if row['user_xp'] is not None else calc_xp
         final_solved = max(int(row['total_solved'] or 0), calc_solved)
+        raw_peak = int(row['peak_xp'] or 0) if 'peak_xp' in row.keys() and row['peak_xp'] is not None else 0
+        final_peak = max(raw_peak, final_xp)
 
         return {
             'userId': row['id'],
@@ -737,6 +741,7 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
             'role': row['role'] or 'student',
             'avatarFrame': row['avatar_frame'] or 'orbit',
             'userXP': final_xp,
+            'peakXp': final_peak,
             'bonusXp': row['bonus_xp'] or 0,
             'totalSolvedTasks': final_solved,
             'theme': row['theme'] or 'dark',
@@ -801,14 +806,20 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
                 if clean_name and clean_name != 'Ученик':
                     conn.execute('UPDATE users SET display_name = ? WHERE id = ?', (clean_name, user_id))
 
+            cursor.execute("SELECT peak_xp FROM user_data WHERE user_id = ?", (user_id,))
+            cur_row = cursor.fetchone()
+            prev_peak = int(cur_row['peak_xp'] or 0) if cur_row and cur_row['peak_xp'] is not None else 0
+            incoming_peak = int(payload.get('peakXp') or payload.get('peak_xp') or 0)
+            final_peak = max(prev_peak, incoming_peak, user_xp)
+
             conn.execute(
                 '''
                 INSERT INTO user_data (
                     user_id, avatar_frame, user_xp, bonus_xp, total_solved,
                     theme, metrics_json, trainer_records_json, claimed_gifts_json,
-                    boosts_inventory_json, tower_stats_json, updated_at
+                    boosts_inventory_json, tower_stats_json, peak_xp, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
                     avatar_frame = excluded.avatar_frame,
                     user_xp = excluded.user_xp,
@@ -820,12 +831,13 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
                     claimed_gifts_json = excluded.claimed_gifts_json,
                     boosts_inventory_json = excluded.boosts_inventory_json,
                     tower_stats_json = excluded.tower_stats_json,
+                    peak_xp = MAX(COALESCE(user_data.peak_xp, 0), excluded.peak_xp),
                     updated_at = excluded.updated_at
                 ''',
                 (
                     user_id, avatar_frame, user_xp, bonus_xp, total_solved,
                     theme, metrics_json, trainer_records_json, claimed_gifts_json,
-                    boosts_inventory_json, tower_stats_json, now_iso
+                    boosts_inventory_json, tower_stats_json, final_peak, now_iso
                 )
             )
         return now_iso

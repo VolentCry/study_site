@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр «Проверка на делимость» · 5 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --emerald: #10b981;
+      --emerald-light: #ecfdf5;
+      --emerald-border: rgba(16,185,129,.3);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 12% 18%, rgba(229,181,184,.14) 0%, transparent 35%),
+        radial-gradient(circle at 88% 82%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN CONTAINER */
+    .trainer-shell {
+      max-width: 900px; margin: 0 auto; width: 100%; padding: 32px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title {
+      font: 900 clamp(28px, 4.5vw, 42px)/1.2 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px;
+    }
+    .trainer-subtitle {
+      max-width: 680px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 17px/1.2 'Zen Old Mincho', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px; box-shadow: var(--shadow-md);
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .card-top-row {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .task-cat-badge {
+      font-size: 11px; font-weight: 700; color: var(--muted); background: rgba(38,63,97,.06);
+      padding: 4px 12px; border-radius: 999px; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .task-help-btn {
+      font-size: 12px; font-weight: 700; color: var(--indigo); display: inline-flex;
+      align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px;
+      border: 1px solid var(--line); background: var(--paper-light); transition: all .2s;
+    }
+    .task-help-btn:hover { border-color: var(--vermilion); color: var(--vermilion); }
+
+    /* QUESTION PROMPT */
+    .question-prompt {
+      font: 700 22px/1.3 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 20px;
+    }
+    .divisor-badge {
+      display: inline-block; padding: 2px 14px; background: var(--vermilion-light);
+      color: var(--vermilion); border: 1px solid var(--vermilion-border);
+      border-radius: 8px; font-weight: 900; margin: 0 4px; font-size: 1.15em;
+    }
+
+    /* NUMBER DISPLAY */
+    .number-display-wrap {
+      width: 100%; max-width: 440px; margin: 0 auto 32px;
+      padding: 24px 20px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(38,63,97,.04) 0%, rgba(38,63,97,.08) 100%);
+      border: 2px solid var(--line);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: inset 0 2px 6px rgba(38,63,97,.03);
+    }
+    .number-kicker {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .number-val {
+      font: 900 clamp(42px, 7vw, 64px)/1 'Zen Old Mincho', monospace;
+      color: var(--indigo-dark); letter-spacing: 0.05em;
+    }
+
+    /* BINARY CHOICE BUTTONS (ДА / НЕТ) */
+    .choices-row {
+      display: flex; gap: 16px; width: 100%; max-width: 440px; margin-bottom: 24px;
+    }
+    .btn-choice {
+      flex: 1; height: 68px; border-radius: 14px;
+      border: 2px solid var(--line); background: var(--paper-light);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; cursor: pointer; transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none; box-shadow: var(--shadow-sm);
+    }
+    .btn-choice:hover:not(:disabled) {
+      transform: translateY(-2px); box-shadow: var(--shadow-md);
+    }
+    .btn-choice:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    .btn-choice.btn-yes:hover:not(:disabled) {
+      border-color: var(--emerald); background: var(--emerald-light);
+    }
+    .btn-choice.btn-no:hover:not(:disabled) {
+      border-color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .btn-choice.selected.btn-yes {
+      border-color: var(--emerald); background: var(--emerald-light);
+      color: #065f46; box-shadow: 0 4px 16px rgba(16,185,129,.28);
+      transform: translateY(-2px);
+    }
+    .btn-choice.selected.btn-no {
+      border-color: var(--vermilion); background: var(--vermilion-light);
+      color: var(--vermilion); box-shadow: 0 4px 16px rgba(183,70,78,.25);
+      transform: translateY(-2px);
+    }
+    .btn-choice.correct {
+      border-color: var(--green) !important; background: var(--green-light) !important;
+      color: var(--green) !important; font-weight: 900;
+    }
+    .btn-choice.wrong {
+      border-color: var(--vermilion) !important; background: var(--vermilion-light) !important;
+      color: var(--vermilion) !important;
+    }
+
+    .choice-text {
+      font-size: 22px; font-weight: 800; line-height: 1.1;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .choice-hint {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      letter-spacing: .02em;
+    }
+    .btn-choice.selected .choice-hint { color: inherit; }
+
+    /* ACTION CONTROLS */
+    .action-controls-row {
+      display: flex; align-items: center; gap: 12px; justify-content: center;
+      width: 100%; max-width: 440px; margin-bottom: 16px;
+    }
+    .btn-check, .btn-next {
+      height: 52px; padding: 0 32px; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; transition: all .2s ease;
+    }
+    .btn-check {
+      background: var(--vermilion); color: #fff; box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover:not(:disabled) {
+      background: #d3525b; transform: translateY(-1px);
+    }
+    .btn-check:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-next {
+      background: var(--indigo); color: #fff; box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover {
+      background: #19273c; transform: translateY(-1px);
+    }
+
+    /* FEEDBACK BANNER */
+    .feedback-banner {
+      width: 100%; max-width: 580px; padding: 14px 18px; border-radius: 12px;
+      font-size: 14px; font-weight: 600; text-align: center; margin-top: 12px;
+      display: none; animation: fadeIn .3s ease;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success {
+      background: var(--green-light); color: var(--green); border: 1px solid rgba(46,125,50,.25);
+    }
+    .feedback-banner.error {
+      background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);
+    }
+
+    /* SOLUTION ACCORDION */
+    .solution-panel {
+      width: 100%; max-width: 580px; margin-top: 16px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 18px 22px; text-align: left;
+      display: none;
+    }
+    .solution-panel.active { display: block; animation: fadeIn .3s ease; }
+    .solution-heading {
+      font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--indigo); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .solution-rule {
+      font-size: 13px; line-height: 1.6; color: var(--ink); margin-bottom: 8px;
+    }
+    .solution-math {
+      font-family: monospace; font-size: 14px; font-weight: 700; color: var(--vermilion);
+      background: #fff; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line);
+      display: inline-block; margin-top: 4px;
+    }
+
+    /* THEORY DRAWER */
+    .theory-drawer {
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 22px 26px; box-shadow: var(--shadow-sm);
+    }
+    .theory-header {
+      display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    }
+    .theory-title {
+      font: 700 18px 'Zen Old Mincho', serif; color: var(--indigo);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .theory-toggle-icon { font-size: 14px; transition: transform .2s ease; }
+    .theory-body { margin-top: 16px; display: none; }
+    .theory-drawer.open .theory-body { display: block; }
+    .theory-drawer.open .theory-toggle-icon { transform: rotate(180deg); }
+
+    .rules-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    }
+    .rule-card {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+    }
+    .rule-card-head {
+      display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13px;
+      color: var(--vermilion); margin-bottom: 4px;
+    }
+    .rule-card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .rule-card-example { font-size: 11px; font-weight: 700; color: var(--indigo); margin-top: 4px; }
+
+    /* MILESTONE TOAST */
+    .milestone-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--indigo-dark); color: #fff; padding: 14px 22px;
+      border-radius: 12px; font-weight: 700; font-size: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid var(--gold);
+      transform: translateY(100px); opacity: 0; transition: all .35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+    .milestone-toast.active { transform: translateY(0); opacity: 1; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .rules-grid { grid-template-columns: 1fr; }
+      .problem-card { padding: 24px 18px; }
+      .number-val { font-size: 46px; }
+      .btn-choice { height: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE NAV -->
+  <header class="site-nav">
+    <a class="brand" href="../pages/math_5.html">
+      <span class="brand-mark">数</span>
+      <div class="brand-text">
+        <span class="brand-name">Математика</span>
+        <span class="brand-sub">5 класс · Тренажёры</span>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <span class="xp-counter" id="xp-counter">⚡ 0 XP</span>
+      <a class="nav-btn" href="../profile.html">Мой профиль</a>
+      <a class="nav-btn" href="../pages/math_5.html">← В 5 класс</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+
+    <!-- HEADER -->
+    <div class="trainer-header">
+      <span class="trainer-kicker">Интерактивный тренажёр · 5 класс</span>
+      <h1 class="trainer-title">Проверка на делимость</h1>
+      <p class="trainer-subtitle">
+        Определяй делимость чисел на 2, 3, 4, 5, 7, 9 и 10 без деления в столбик с помощью признаков делимости!
+      </p>
+    </div>
+
+    <!-- STATS DASHBOARD -->
+    <div class="stats-dashboard">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Лучшая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">✓</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total-solved">0</span>
+          <span class="stat-label">Всего решено</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank" style="font-size: 14px;">Начинающий</span>
+          <span class="stat-label">Звание</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY FILTER PILLS -->
+    <div class="category-filter" role="tablist">
+      <button type="button" class="cat-btn active" data-cat="all">Все делители (Случайный)</button>
+      <button type="button" class="cat-btn" data-cat="2">На 2</button>
+      <button type="button" class="cat-btn" data-cat="3">На 3</button>
+      <button type="button" class="cat-btn" data-cat="4">На 4</button>
+      <button type="button" class="cat-btn" data-cat="5">На 5</button>
+      <button type="button" class="cat-btn" data-cat="7">На 7</button>
+      <button type="button" class="cat-btn" data-cat="9">На 9</button>
+      <button type="button" class="cat-btn" data-cat="10">На 10</button>
+    </div>
+
+    <!-- PROBLEM CARD -->
+    <div class="problem-card">
+      <div class="card-top-row">
+        <span class="task-cat-badge" id="task-cat-badge">Делимость на 3</span>
+        <button type="button" class="task-help-btn" id="btn-toggle-solution">
+          💡 Разбор правила
+        </button>
+      </div>
+
+      <!-- Main Question -->
+      <h2 class="question-prompt" id="question-prompt">
+        Делится ли данное число на <span class="divisor-badge" id="divisor-val">3</span>?
+      </h2>
+
+      <!-- Number Display -->
+      <div class="number-display-wrap">
+        <span class="number-kicker">Проверяемое число:</span>
+        <span class="number-val" id="number-val">4 812</span>
+      </div>
+
+      <!-- Binary Choice (Да / Нет) -->
+      <div class="choices-row">
+        <button type="button" class="btn-choice btn-yes" id="btn-choice-yes" data-answer="yes">
+          <span class="choice-text">✓ Да</span>
+          <span class="choice-hint">[1 / Y / ←]</span>
+        </button>
+        <button type="button" class="btn-choice btn-no" id="btn-choice-no" data-answer="no">
+          <span class="choice-text">✕ Нет</span>
+          <span class="choice-hint">[2 / N / →]</span>
+        </button>
+      </div>
+
+      <!-- Action Row -->
+      <div class="action-controls-row">
+        <button type="button" class="btn-check" id="btn-check" disabled>
+          Проверить ответ (Enter)
+        </button>
+        <button type="button" class="btn-next" id="btn-next" style="display: none;">
+          Следующее число → (Enter)
+        </button>
+      </div>
+
+      <!-- Feedback Banner -->
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <!-- Solution Explanation -->
+      <div class="solution-panel" id="solution-panel">
+        <div class="solution-heading">📖 Правило и пошаговый разбор</div>
+        <div class="solution-rule" id="solution-rule-text"></div>
+        <div class="solution-math" id="solution-math-text"></div>
+      </div>
+    </div>
+
+    <!-- THEORY ACCORDION -->
+    <div class="theory-drawer" id="theory-drawer">
+      <div class="theory-header" id="theory-header">
+        <h3 class="theory-title">
+          <span>📚 Справочник: Признаки делимости (2, 3, 4, 5, 7, 9, 10)</span>
+        </h3>
+        <span class="theory-toggle-icon">▼</span>
+      </div>
+      <div class="theory-body">
+        <div class="rules-grid">
+          <div class="rule-card">
+            <div class="rule-card-head">⚡ Делимость на 2</div>
+            <div class="rule-card-desc">Число делится на 2, если его последняя цифра чётная: <strong>0, 2, 4, 6 или 8</strong>.</div>
+            <div class="rule-card-example">Пример: 348 делится на 2 (заканчивается на 8).</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-head">⚡ Делимость на 3</div>
+            <div class="rule-card-desc">Число делится на 3, если <strong>сумма всех его цифр</strong> делится на 3.</div>
+            <div class="rule-card-example">Пример: 531 → 5+3+1 = 9. 9:3 = 3, делится!</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-head">⚡ Делимость на 4</div>
+            <div class="rule-card-desc">Число делится на 4, если <strong>две последние цифры</strong> образуют число, делящееся на 4 (или 00).</div>
+            <div class="rule-card-example">Пример: 1 324 → 24 делится на 4. Значит, 1 324 делится на 4.</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-head">⚡ Делимость на 5</div>
+            <div class="rule-card-desc">Число делится на 5, если его последняя цифра <strong>0 или 5</strong>.</div>
+            <div class="rule-card-example">Пример: 845 и 920 делятся на 5.</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-head">⚡ Делимость на 7</div>
+            <div class="rule-card-desc">Число делится на 7, если разность числа без последней цифры и удвоенной последней цифры делится на 7.</div>
+            <div class="rule-card-example">Пример: 364 → 36 - 2×4 = 28. 28:7 = 4, делится!</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-head">⚡ Делимость на 9</div>
+            <div class="rule-card-desc">Число делится на 9, если <strong>сумма всех его цифр</strong> делится на 9.</div>
+            <div class="rule-card-example">Пример: 2 835 → 2+8+3+5 = 18. 18:9 = 2, делится!</div>
+          </div>
+          <div class="rule-card" style="grid-column: 1 / -1;">
+            <div class="rule-card-head">⚡ Делимость на 10</div>
+            <div class="rule-card-desc">Число делится на 10, если его последняя цифра — <strong>0</strong>.</div>
+            <div class="rule-card-example">Пример: 5 780 делится на 10.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js?v=2.2"></script>
+  <script>
+    (function initDivisibilityTrainer() {
+      const TRAINER_ID = 'divisibility';
+      const ALLOWED_DIVISORS = [2, 3, 4, 5, 7, 9, 10];
+
+      let currentCategory = 'all';
+      let currentTask = null;
+      let selectedAnswer = null;
+      let hasAnsweredCurrent = false;
+      let streak = 0;
+
+      // Web Audio Synthesizer
+      let audioCtx = null;
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      function playTone(freq, type, duration) {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      function playSuccessSound() {
+        playTone(523.25, 'sine', 0.12);
+        setTimeout(() => playTone(659.25, 'sine', 0.14), 80);
+        setTimeout(() => playTone(783.99, 'sine', 0.28), 160);
+      }
+
+      function playErrorSound() {
+        playTone(280, 'sawtooth', 0.15);
+        setTimeout(() => playTone(210, 'sawtooth', 0.25), 100);
+      }
+
+      function playRankUpSound() {
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => playTone(freq, 'triangle', 0.3), idx * 100);
+        });
+      }
+
+      function showToast(text) {
+        const toast = document.getElementById('milestone-toast');
+        if (!toast) return;
+        toast.textContent = text;
+        toast.classList.add('active');
+        clearTimeout(window.__divToastTimer);
+        window.__divToastTimer = setTimeout(() => {
+          toast.classList.remove('active');
+        }, 3400);
+      }
+
+      // Format thousands helper (e.g. 14812 -> "14 812")
+      function formatNumber(num) {
+        return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      }
+
+      // Sum of digits helper
+      function getDigitsSum(num) {
+        return String(num).split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
+      }
+
+      // Task Generator
+      function generateTask(category) {
+        let divisor;
+        if (category === 'all') {
+          divisor = ALLOWED_DIVISORS[Math.floor(Math.random() * ALLOWED_DIVISORS.length)];
+        } else {
+          divisor = parseInt(category, 10);
+          if (!ALLOWED_DIVISORS.includes(divisor)) {
+            divisor = ALLOWED_DIVISORS[Math.floor(Math.random() * ALLOWED_DIVISORS.length)];
+          }
+        }
+
+        // Target: ~50% Yes, ~50% No
+        const isDivisible = Math.random() < 0.5;
+        let number = 0;
+
+        if (divisor === 2) {
+          // 2 to 4 digits
+          const base = Math.floor(Math.random() * 900) + 10; // 10..909
+          const evenDigits = [0, 2, 4, 6, 8];
+          const oddDigits = [1, 3, 5, 7, 9];
+          const last = isDivisible 
+            ? evenDigits[Math.floor(Math.random() * evenDigits.length)]
+            : oddDigits[Math.floor(Math.random() * oddDigits.length)];
+          number = base * 10 + last;
+        } else if (divisor === 3) {
+          if (isDivisible) {
+            const mult = Math.floor(Math.random() * 1200) + 15;
+            number = mult * 3;
+          } else {
+            const mult = Math.floor(Math.random() * 1200) + 15;
+            const remainder = Math.random() < 0.5 ? 1 : 2;
+            number = mult * 3 + remainder;
+          }
+        } else if (divisor === 4) {
+          // Digits: 100 to 9999
+          const mult = Math.floor(Math.random() * 800) + 15;
+          if (isDivisible) {
+            number = mult * 4;
+          } else {
+            // Pick a remainder 1, 2, or 3 (2 is especially good because it's even but not div by 4!)
+            const rems = [1, 2, 2, 3];
+            const rem = rems[Math.floor(Math.random() * rems.length)];
+            number = mult * 4 + rem;
+          }
+        } else if (divisor === 5) {
+          const base = Math.floor(Math.random() * 900) + 10;
+          if (isDivisible) {
+            const last = Math.random() < 0.5 ? 0 : 5;
+            number = base * 10 + last;
+          } else {
+            const non5Digits = [1, 2, 3, 4, 6, 7, 8, 9];
+            const last = non5Digits[Math.floor(Math.random() * non5Digits.length)];
+            number = base * 10 + last;
+          }
+        } else if (divisor === 7) {
+          const mult = Math.floor(Math.random() * 400) + 7;
+          if (isDivisible) {
+            number = mult * 7;
+          } else {
+            const rem = Math.floor(Math.random() * 6) + 1;
+            number = mult * 7 + rem;
+          }
+        } else if (divisor === 9) {
+          if (isDivisible) {
+            const mult = Math.floor(Math.random() * 600) + 8;
+            number = mult * 9;
+          } else {
+            // Tricky: sometimes make sum of digits 6 or 12 or 15 (div by 3 but not by 9!)
+            const mult = Math.floor(Math.random() * 600) + 8;
+            const rems = [1, 2, 3, 4, 5, 6, 7, 8];
+            const rem = rems[Math.floor(Math.random() * rems.length)];
+            number = mult * 9 + rem;
+          }
+        } else if (divisor === 10) {
+          const base = Math.floor(Math.random() * 900) + 10;
+          if (isDivisible) {
+            number = base * 10;
+          } else {
+            const non0Digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const last = non0Digits[Math.floor(Math.random() * non0Digits.length)];
+            number = base * 10 + last;
+          }
+        }
+
+        // Guarantee accurate answer verification
+        const answer = (number % divisor === 0) ? 'yes' : 'no';
+
+        // Build detailed explanation
+        const digits = String(number).split('');
+        const lastDigit = parseInt(digits[digits.length - 1], 10);
+        const last2 = number % 100;
+        const last2Str = last2 < 10 ? ('0' + last2) : String(last2);
+        const sumDigits = getDigitsSum(number);
+
+        let ruleText = '';
+        let mathText = '';
+
+        if (divisor === 2) {
+          ruleText = `Число делится на 2, если его последняя цифра чётная (0, 2, 4, 6, 8). Последняя цифра числа ${formatNumber(number)} — ${lastDigit}.`;
+          mathText = (answer === 'yes') 
+            ? `${lastDigit} — чётная цифра → ${formatNumber(number)} делится на 2` 
+            : `${lastDigit} — нечётная цифра → ${formatNumber(number)} НЕ делится на 2`;
+        } else if (divisor === 3) {
+          ruleText = `Число делится на 3, если сумма его цифр делится на 3. Сумма цифр: ${digits.join(' + ')} = ${sumDigits}.`;
+          mathText = (answer === 'yes')
+            ? `${sumDigits} : 3 = ${sumDigits / 3} → делится на 3`
+            : `${sumDigits} : 3 = ${Math.floor(sumDigits / 3)} (остаток ${sumDigits % 3}) → НЕ делится на 3`;
+        } else if (divisor === 4) {
+          ruleText = `Число делится на 4, если две его последние цифры образуют число, делящееся на 4 (или 00). Две последние цифры: ${last2Str}.`;
+          mathText = (answer === 'yes')
+            ? `${last2} : 4 = ${last2 / 4} → делится на 4`
+            : `${last2} : 4 = ${Math.floor(last2 / 4)} (остаток ${last2 % 4}) → НЕ делится на 4`;
+        } else if (divisor === 5) {
+          ruleText = `Число делится на 5, если его последняя цифра 0 или 5. Последняя цифра: ${lastDigit}.`;
+          mathText = (answer === 'yes')
+            ? `Оканчивается на ${lastDigit} → делится на 5`
+            : `Оканчивается на ${lastDigit} (не 0 и не 5) → НЕ делится на 5`;
+        } else if (divisor === 7) {
+          ruleText = `Проверка делимости на 7: ${formatNumber(number)} : 7 = ${Math.floor(number / 7)}${number % 7 === 0 ? ' (нацело)' : ' (остаток ' + (number % 7) + ')'}.`;
+          mathText = (answer === 'yes')
+            ? `${formatNumber(number)} = 7 × ${number / 7} → делится на 7`
+            : `${formatNumber(number)} = 7 × ${Math.floor(number / 7)} + ${number % 7} → НЕ делится на 7`;
+        } else if (divisor === 9) {
+          ruleText = `Число делится на 9, если сумма его цифр делится на 9. Сумма цифр: ${digits.join(' + ')} = ${sumDigits}.`;
+          mathText = (answer === 'yes')
+            ? `${sumDigits} : 9 = ${sumDigits / 9} → делится на 9`
+            : `${sumDigits} : 9 = ${Math.floor(sumDigits / 9)} (остаток ${sumDigits % 9}) → НЕ делится на 9`;
+        } else if (divisor === 10) {
+          ruleText = `Число делится на 10, если его последняя цифра равна 0. Последняя цифра: ${lastDigit}.`;
+          mathText = (answer === 'yes')
+            ? `Оканчивается на 0 → делится на 10`
+            : `Оканчивается на ${lastDigit} → НЕ делится на 10`;
+        }
+
+        return {
+          divisor,
+          number,
+          answer,
+          ruleText,
+          mathText
+        };
+      }
+
+      // UI Elements
+      const divisorValEl = document.getElementById('divisor-val');
+      const numberValEl = document.getElementById('number-val');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+      const btnYes = document.getElementById('btn-choice-yes');
+      const btnNo = document.getElementById('btn-choice-no');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionRuleText = document.getElementById('solution-rule-text');
+      const solutionMathText = document.getElementById('solution-math-text');
+      const btnToggleSolution = document.getElementById('btn-toggle-solution');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotalSolved = document.getElementById('stat-total-solved');
+      const statRank = document.getElementById('stat-rank');
+      const xpCounter = document.getElementById('xp-counter');
+
+      function syncStats() {
+        if (!window.TrainerTracker) return;
+        const records = TrainerTracker.getTrainerRecords();
+        const rec = records[TRAINER_ID] || { maxStreak: 0, maxRank: 'Начинающий 🥉', totalSolved: 0 };
+
+        if (statStreak) statStreak.textContent = streak;
+        if (statMaxStreak) statMaxStreak.textContent = rec.maxStreak || streak;
+        if (statTotalSolved) statTotalSolved.textContent = rec.totalSolved || 0;
+        if (statRank) statRank.textContent = rec.maxRank || 'Начинающий 🥉';
+
+        try {
+          const userXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+          if (xpCounter) xpCounter.textContent = `⚡ ${userXp} XP`;
+        } catch (e) {}
+      }
+
+      function loadNewTask() {
+        hasAnsweredCurrent = false;
+        selectedAnswer = null;
+
+        currentTask = generateTask(currentCategory);
+
+        if (divisorValEl) divisorValEl.textContent = currentTask.divisor;
+        if (numberValEl) numberValEl.textContent = formatNumber(currentTask.number);
+        if (taskCatBadge) taskCatBadge.textContent = `Делимость на ${currentTask.divisor}`;
+
+        // Reset choice buttons
+        [btnYes, btnNo].forEach(btn => {
+          btn.classList.remove('selected', 'correct', 'wrong');
+          btn.disabled = false;
+        });
+
+        // Reset action buttons
+        btnCheck.style.display = 'inline-flex';
+        btnCheck.disabled = true;
+        btnNext.style.display = 'none';
+
+        // Reset feedback & solution
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.textContent = '';
+        solutionPanel.classList.remove('active');
+
+        if (solutionRuleText) solutionRuleText.textContent = currentTask.ruleText;
+        if (solutionMathText) solutionMathText.textContent = currentTask.mathText;
+      }
+
+      function selectAnswer(ans) {
+        if (hasAnsweredCurrent) return;
+        selectedAnswer = ans;
+
+        btnYes.classList.toggle('selected', ans === 'yes');
+        btnNo.classList.toggle('selected', ans === 'no');
+
+        btnCheck.disabled = false;
+      }
+
+      function checkAnswer() {
+        if (hasAnsweredCurrent || !selectedAnswer || !currentTask) return;
+        hasAnsweredCurrent = true;
+
+        const isCorrect = (selectedAnswer === currentTask.answer);
+
+        btnCheck.style.display = 'none';
+        btnNext.style.display = 'inline-flex';
+        btnNext.focus();
+
+        btnYes.disabled = true;
+        btnNo.disabled = true;
+
+        if (isCorrect) {
+          streak++;
+          playSuccessSound();
+
+          const selectedBtn = (selectedAnswer === 'yes') ? btnYes : btnNo;
+          selectedBtn.classList.add('correct');
+
+          feedbackBanner.className = 'feedback-banner success show';
+          feedbackBanner.innerHTML = `🎉 <strong>Верно!</strong> Число ${formatNumber(currentTask.number)} ${currentTask.answer === 'yes' ? 'делится' : 'НЕ делится'} на ${currentTask.divisor}! (+15 XP)`;
+
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+            const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10);
+            localStorage.setItem('studyBonusXp', String(curBonus + 15));
+          } catch (e) {}
+
+          if (window.TrainerTracker) {
+            const res = TrainerTracker.recordAttempt(TRAINER_ID, true);
+            syncStats();
+
+            if (res && res.rankChanged) {
+              playRankUpSound();
+              showToast('🎖️ Поздравляем! Новое звание: ' + res.rankTitle);
+            } else if (res && res.currentStreak > 0 && res.currentStreak % 5 === 0) {
+              showToast(`🔥 Отличный результат! Серия ${res.currentStreak} правильных ответов подряд!`);
+            }
+          }
+        } else {
+          streak = 0;
+          playErrorSound();
+
+          const wrongBtn = (selectedAnswer === 'yes') ? btnYes : btnNo;
+          const correctBtn = (currentTask.answer === 'yes') ? btnYes : btnNo;
+
+          wrongBtn.classList.add('wrong');
+          correctBtn.classList.add('correct');
+
+          feedbackBanner.className = 'feedback-banner error show';
+          feedbackBanner.innerHTML = `❌ <strong>Ошибка.</strong> Число ${formatNumber(currentTask.number)} ${currentTask.answer === 'yes' ? 'делится' : 'НЕ делится'} на ${currentTask.divisor}. Смотрите разбор правила ниже.`;
+
+          if (window.TrainerTracker) {
+            TrainerTracker.recordAttempt(TRAINER_ID, false);
+            syncStats();
+          }
+
+          solutionPanel.classList.add('active');
+        }
+      }
+
+      // Event Listeners for Choice Buttons
+      btnYes.addEventListener('click', () => selectAnswer('yes'));
+      btnNo.addEventListener('click', () => selectAnswer('no'));
+
+      btnCheck.addEventListener('click', checkAnswer);
+      btnNext.addEventListener('click', loadNewTask);
+
+      btnToggleSolution.addEventListener('click', () => {
+        solutionPanel.classList.toggle('active');
+      });
+
+      // Category filters
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat');
+          loadNewTask();
+        });
+      });
+
+      // Theory Accordion
+      const theoryDrawer = document.getElementById('theory-drawer');
+      const theoryHeader = document.getElementById('theory-header');
+      if (theoryHeader && theoryDrawer) {
+        theoryHeader.addEventListener('click', () => {
+          theoryDrawer.classList.toggle('open');
+        });
+      }
+
+      // Keyboard Controls
+      window.addEventListener('keydown', (e) => {
+        if (e.target && e.target.tagName === 'INPUT') return;
+
+        if (e.key === '1' || e.key === 'y' || e.key === 'Y' || e.key === 'ArrowLeft' || e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'В') {
+          selectAnswer('yes');
+        } else if (e.key === '2' || e.key === 'n' || e.key === 'N' || e.key === 'ArrowRight' || e.key === 'т' || e.key === 'Т') {
+          selectAnswer('no');
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!hasAnsweredCurrent) {
+            if (selectedAnswer) checkAnswer();
+          } else {
+            loadNewTask();
+          }
+        }
+      });
+
+      // Initial Load
+      syncStats();
+      loadNewTask();
+    })();
+  </script>
+</body>
+</html>

@@ -71,6 +71,33 @@
             description: 'Возведение в степень, решение уравнений со степенью и порядок действий в примерах.',
             rankTiers: [
                 { min: 25, title: 'Повелитель степеней 👑' },
+                { min: 18, title: 'Архимаг степеней 🧙' },
+                { min: 12, title: 'Мастер вычислений 💎' },
+                { min: 7,  title: 'Знаток степеней 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
+            id: 'divisibility',
+            name: 'Проверка на делимость (2, 3, 4, 5, 7, 9, 10)',
+            shortName: 'Признаки делимости',
+            subject: 'Математика',
+            category: 'Делимость',
+            classNum: '5 класс',
+            url: '../math_moduls/divisibility_trainer.html',
+            profileUrl: 'math_moduls/divisibility_trainer.html',
+            icon: '🔢',
+            description: 'Быстрая проверка делимости чисел на 2, 3, 4, 5, 7, 9 и 10 без деления в столбик.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг делимости 👑' },
+                { min: 20, title: 'Мастер признаков делимости 🧙' },
+                { min: 14, title: 'Эксперт по числам 💎' },
+                { min: 8,  title: 'Знаток делимости 🥇' },
+                { min: 4,  title: 'Быстрый счетовод 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
         {
             id: 'complex_fractions',
             name: 'Сложные вычисления (Дроби)',
@@ -108,13 +135,6 @@
                 { min: 14, title: 'Мастер степенных вычислений 💎' },
                 { min: 8,  title: 'Знаток степеней 🥇' },
                 { min: 4,  title: 'Практик 🥈' },
-                { min: 1,  title: 'Начинающий 🥉' }
-            ]
-        },
-                { min: 18, title: 'Архимаг математики 🧙' },
-                { min: 12, title: 'Мастер степеней 💎' },
-                { min: 7,  title: 'Знаток степеней 🥇' },
-                { min: 4,  title: 'Точный счетовод 🥈' },
                 { min: 1,  title: 'Начинающий 🥉' }
             ]
         },
@@ -503,6 +523,7 @@
                 else if (path.includes('powers_trainer')) trainerId = 'powers_trainer';
                 else if (path.includes('complex_fractions_powers')) trainerId = 'complex_fractions_powers';
                 else if (path.includes('complex_fractions')) trainerId = 'complex_fractions';
+                else if (path.includes('divisibility')) trainerId = 'divisibility';
 
                 if (!trainerId) return;
 

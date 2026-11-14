@@ -718,9 +718,26 @@
             parseInt(localStorage.getItem('totalSolvedTasks') || '0', 10) || 0,
             calculatedSolved
         );
+        const peakXp = Math.max(
+            parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || 0,
+            userXP
+        );
+
+        let boostsInventory = {};
+        try {
+            const raw = localStorage.getItem('study_boosts_inventory');
+            boostsInventory = raw ? JSON.parse(raw) : {};
+        } catch (e) {}
+
+        let towerStats = {};
+        try {
+            const raw = localStorage.getItem('study_tower_state');
+            towerStats = raw ? JSON.parse(raw) : {};
+        } catch (e) {}
 
         try {
             localStorage.setItem('user_xp', String(userXP));
+            localStorage.setItem('study_peak_xp', String(peakXp));
             localStorage.setItem('totalSolvedTasks', String(totalSolvedTasks));
         } catch (e) {}
         const avatarFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
@@ -739,12 +756,15 @@
             userName,
             avatarFrame,
             userXP,
+            peakXp,
             bonusXp,
             totalSolvedTasks,
             theme,
             metrics,
             trainerRecords,
-            claimedGifts
+            claimedGifts,
+            boostsInventory,
+            towerStats
         };
     }
 
@@ -824,6 +844,36 @@
         const localBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
         const serverBonus = parseInt(data.bonusXp || 0, 10);
         localStorage.setItem('studyBonusXp', String(Math.max(localBonus, serverBonus)));
+
+        // Peak XP & level preservation
+        if (typeof data.peakXp === 'number' || typeof data.peak_xp === 'number') {
+            const serverPeak = typeof data.peakXp === 'number' ? data.peakXp : data.peak_xp;
+            const curPeak = parseInt(localStorage.getItem('study_peak_xp') || '0', 10) || 0;
+            const finalPeak = Math.max(curPeak, serverPeak);
+            localStorage.setItem('study_peak_xp', String(finalPeak));
+        }
+
+        // Boosts inventory & Tower state
+        if (data.boostsInventory && typeof data.boostsInventory === 'object') {
+            try {
+                const localRaw = localStorage.getItem('study_boosts_inventory');
+                const localBoosts = localRaw ? JSON.parse(localRaw) : {};
+                const merged = Object.assign({}, localBoosts, data.boostsInventory);
+                localStorage.setItem('study_boosts_inventory', JSON.stringify(merged));
+            } catch (e) {
+                localStorage.setItem('study_boosts_inventory', JSON.stringify(data.boostsInventory));
+            }
+        }
+        if (data.towerStats && typeof data.towerStats === 'object') {
+            try {
+                const localRaw = localStorage.getItem('study_tower_state');
+                const localTower = localRaw ? JSON.parse(localRaw) : {};
+                const merged = Object.assign({}, localTower, data.towerStats);
+                localStorage.setItem('study_tower_state', JSON.stringify(merged));
+            } catch (e) {
+                localStorage.setItem('study_tower_state', JSON.stringify(data.towerStats));
+            }
+        }
 
         // Avatar frame
         if (data.avatarFrame && typeof data.avatarFrame === 'string') {
