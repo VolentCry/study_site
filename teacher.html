@@ -308,6 +308,25 @@
                     </div>
                 </div>
 
+                <!-- Индикатор режима редактирования существующего Д/З -->
+                <div id="hw-edit-mode-banner" class="hw-edit-mode-banner" style="display: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.4rem;">✏️</span>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <strong style="color: var(--ink); font-size: 1rem;">Режим редактирования Д/З</strong>
+                                <span class="badge" style="background: rgba(255, 119, 40, 0.2); color: var(--accent); font-weight: 800;" id="hw-edit-mode-badge">ID: #0</span>
+                            </div>
+                            <div id="hw-edit-mode-subtitle" style="font-size: 0.82rem; color: var(--muted);">Измените состав задач, название или параметры и сохраните результат</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-edit-hw">
+                            ✕ Отменить редактирование
+                        </button>
+                    </div>
+                </div>
+
                 <div class="constructor-grid">
                     <!-- Левая колонка: Настройки Д/З и генераторы -->
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -729,6 +748,15 @@
                     <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">
                         Для индивидуального урока (репетиторство) выберите конкретного ученика или оставьте «Всему классу».
                     </div>
+                </div>
+                <div class="form-group" id="lesson-methodical-plan-topic-group" style="display:none;">
+                    <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>📋 Выбрать тему из метод. плана</span>
+                        <span class="badge" style="font-size:0.7rem; background:rgba(38,63,97,0.1); color:var(--accent); font-weight:700;">Автозаполнение</span>
+                    </label>
+                    <select id="lesson-plan-topic-select" class="form-select">
+                        <option value="">-- Выберите тему из методического плана --</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Тема / Название урока *</label>

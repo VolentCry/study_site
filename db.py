@@ -243,12 +243,22 @@ def init_db() -> None:
                 conn.execute("ALTER TABLE homeworks ADD COLUMN student_id INTEGER REFERENCES users(id) ON DELETE SET NULL;")
             if 'is_deleted' not in hw_cols:
                 conn.execute("ALTER TABLE homeworks ADD COLUMN is_deleted INTEGER DEFAULT 0;")
+            if 'updated_at' not in hw_cols:
+                conn.execute("ALTER TABLE homeworks ADD COLUMN updated_at TEXT;")
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_homeworks_student ON homeworks(student_id);
             ''')
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_homeworks_deleted ON homeworks(is_deleted);
             ''')
+
+            # Миграция: инвентарь бустов и данные игрового режима в user_data
+            cursor.execute('PRAGMA table_info(user_data);')
+            ud_cols = [row['name'] for row in cursor.fetchall()]
+            if 'boosts_inventory_json' not in ud_cols:
+                conn.execute("ALTER TABLE user_data ADD COLUMN boosts_inventory_json TEXT DEFAULT '{}';")
+            if 'tower_stats_json' not in ud_cols:
+                conn.execute("ALTER TABLE user_data ADD COLUMN tower_stats_json TEXT DEFAULT '{}';")
 
             # 7. Таблица сданных решений учеников
             conn.execute('''
@@ -679,7 +689,8 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
             '''
             SELECT u.id, u.username, u.display_name, u.role,
                    d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved,
-                   d.theme, d.metrics_json, d.trainer_records_json, d.claimed_gifts_json, d.updated_at
+                   d.theme, d.metrics_json, d.trainer_records_json, d.claimed_gifts_json,
+                   d.boosts_inventory_json, d.tower_stats_json, d.updated_at
             FROM users u
             LEFT JOIN user_data d ON u.id = d.user_id
             WHERE u.id = ?
@@ -705,8 +716,18 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
         except Exception:
             claimed_gifts = {}
 
+        try:
+            boosts_inventory = json.loads(row['boosts_inventory_json'] or '{}')
+        except Exception:
+            boosts_inventory = {}
+
+        try:
+            tower_stats = json.loads(row['tower_stats_json'] or '{}')
+        except Exception:
+            tower_stats = {}
+
         calc_xp, calc_solved = compute_user_metrics_xp(metrics, row['bonus_xp'])
-        final_xp = max(int(row['user_xp'] or 0), calc_xp)
+        final_xp = int(row['user_xp'] or 0) if row['user_xp'] is not None else calc_xp
         final_solved = max(int(row['total_solved'] or 0), calc_solved)
 
         return {
@@ -722,6 +743,8 @@ def get_user_data(user_id: int) -> Optional[Dict[str, Any]]:
             'metrics': metrics,
             'trainerRecords': trainer_records,
             'claimedGifts': claimed_gifts,
+            'boostsInventory': boosts_inventory,
+            'towerStats': tower_stats,
             'updatedAt': row['updated_at']
         }
     finally:
@@ -749,7 +772,11 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
     calc_xp, calc_solved = compute_user_metrics_xp(metrics, bonus_xp)
     raw_user_xp = int(payload.get('userXP', 0) or 0)
     raw_total_solved = int(payload.get('totalSolvedTasks', 0) or 0)
-    user_xp = max(raw_user_xp, calc_xp)
+    # Если передан явный userXP (например, после ставки в рулетке или покупки буста)
+    if 'userXP' in payload or 'user_xp' in payload:
+        user_xp = max(0, raw_user_xp)
+    else:
+        user_xp = max(raw_user_xp, calc_xp)
     total_solved = max(raw_total_solved, calc_solved)
 
     trainer_records = payload.get('trainerRecords', {})
@@ -757,6 +784,12 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
 
     claimed_gifts = payload.get('claimedGifts', {})
     claimed_gifts_json = json.dumps(claimed_gifts if isinstance(claimed_gifts, dict) else {}, ensure_ascii=False)
+
+    boosts_inventory = payload.get('boostsInventory') or payload.get('boosts_inventory') or {}
+    boosts_inventory_json = json.dumps(boosts_inventory if isinstance(boosts_inventory, dict) else {}, ensure_ascii=False)
+
+    tower_stats = payload.get('towerStats') or payload.get('tower_stats') or {}
+    tower_stats_json = json.dumps(tower_stats if isinstance(tower_stats, dict) else {}, ensure_ascii=False)
 
     conn = get_db_connection()
     try:
@@ -772,9 +805,10 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
                 '''
                 INSERT INTO user_data (
                     user_id, avatar_frame, user_xp, bonus_xp, total_solved,
-                    theme, metrics_json, trainer_records_json, claimed_gifts_json, updated_at
+                    theme, metrics_json, trainer_records_json, claimed_gifts_json,
+                    boosts_inventory_json, tower_stats_json, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
                     avatar_frame = excluded.avatar_frame,
                     user_xp = excluded.user_xp,
@@ -784,11 +818,14 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
                     metrics_json = excluded.metrics_json,
                     trainer_records_json = excluded.trainer_records_json,
                     claimed_gifts_json = excluded.claimed_gifts_json,
+                    boosts_inventory_json = excluded.boosts_inventory_json,
+                    tower_stats_json = excluded.tower_stats_json,
                     updated_at = excluded.updated_at
                 ''',
                 (
                     user_id, avatar_frame, user_xp, bonus_xp, total_solved,
-                    theme, metrics_json, trainer_records_json, claimed_gifts_json, now_iso
+                    theme, metrics_json, trainer_records_json, claimed_gifts_json,
+                    boosts_inventory_json, tower_stats_json, now_iso
                 )
             )
         return now_iso
@@ -1435,6 +1472,148 @@ def create_homework(
                 'tasksCount': len(tasks),
                 'deadlineAt': deadline_at,
                 'createdAt': now_iso
+            }
+    finally:
+        conn.close()
+
+
+def update_homework(
+    homework_id: int,
+    teacher_id: Optional[int],
+    title: str,
+    subject: str,
+    tasks: List[Dict[str, Any]],
+    description: str = '',
+    deadline_at: Optional[str] = None,
+    student_id: Optional[int] = None
+) -> Dict[str, Any]:
+    """Обновляет существующее домашнее задание учителя."""
+    title_clean = str(title).strip()
+    if not title_clean:
+        raise ValueError("Название домашнего задания не может быть пустым.")
+    if not tasks:
+        raise ValueError("Домашнее задание должно содержать хотя бы одну задачу.")
+
+    # Deduplicate tasks defensively
+    unique_tasks = []
+    seen_fps = set()
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        raw_text = str(t.get('questionHtml') or t.get('text') or '')
+        clean_text = re.sub(r'<[^>]*>', ' ', raw_text)
+        clean_text = re.sub(r'\s+', ' ', clean_text).strip().lower()
+        ans = str(t.get('answer') if t.get('answer') is not None else t.get('displayAnswer') or '').strip().lower()
+        mult_match = re.search(r'(\d+)\s*[\u00d7*xX]\s*(\d+)', clean_text)
+        if mult_match and 'multiplication' in str(t.get('category', '')).lower():
+            n1, n2 = sorted([int(mult_match.group(1)), int(mult_match.group(2))])
+            fp = f"mult:{n1}x{n2}"
+        else:
+            fp = f"{t.get('category', '')}:{clean_text}|ans:{ans}"
+        if fp not in seen_fps:
+            seen_fps.add(fp)
+            unique_tasks.append(t)
+    tasks = unique_tasks or tasks
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    tasks_json = json.dumps(tasks, ensure_ascii=False)
+
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        with conn:
+            if teacher_id is not None:
+                cursor.execute(
+                    "SELECT id, class_id FROM homeworks WHERE id = ? AND teacher_id = ? AND (is_deleted IS NULL OR is_deleted = 0)",
+                    (homework_id, teacher_id)
+                )
+            else:
+                cursor.execute(
+                    "SELECT id, class_id FROM homeworks WHERE id = ? AND (is_deleted IS NULL OR is_deleted = 0)",
+                    (homework_id,)
+                )
+            row = cursor.fetchone()
+            if not row:
+                raise ValueError("Домашнее задание не найдено или у вас нет прав на его редактирование.")
+
+            cursor.execute(
+                """
+                UPDATE homeworks
+                SET title = ?, description = ?, subject = ?, tasks_json = ?, deadline_at = ?, student_id = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (title_clean, description.strip(), subject.strip(), tasks_json, deadline_at, student_id, now_iso, homework_id)
+            )
+
+            return {
+                'id': homework_id,
+                'title': title_clean,
+                'description': description.strip(),
+                'subject': subject.strip(),
+                'tasksCount': len(tasks),
+                'deadlineAt': deadline_at,
+                'studentId': student_id,
+                'updatedAt': now_iso
+            }
+    finally:
+        conn.close()
+
+
+def waive_homework_submission(homework_id: int, student_id: int) -> Dict[str, Any]:
+    """Отмечает домашнее задание как освобождённое по бусту прокачки «Отказ от Д/З» (100% зачёт)."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        with conn:
+            cursor.execute(
+                "SELECT id, tasks_json FROM homeworks WHERE id = ? AND (is_deleted IS NULL OR is_deleted = 0)",
+                (homework_id,)
+            )
+            hw = cursor.fetchone()
+            if not hw:
+                raise ValueError("Домашнее задание не найдено.")
+            try:
+                tasks = json.loads(hw['tasks_json'] or '[]')
+            except Exception:
+                tasks = []
+            max_score = len(tasks)
+
+            cursor.execute(
+                "SELECT id, status FROM homework_submissions WHERE homework_id = ? AND student_id = ?",
+                (homework_id, student_id)
+            )
+            sub = cursor.fetchone()
+            feedback_text = 'Официально освобождён от выполнения (буст «Отказ от Д/З» 📜)'
+            if sub:
+                cursor.execute(
+                    """
+                    UPDATE homework_submissions
+                    SET status = 'waived', score = ?, max_score = ?, teacher_feedback = ?, submitted_at = ?
+                    WHERE id = ?
+                    """,
+                    (max_score, max_score, feedback_text, now_iso, sub['id'])
+                )
+                sub_id = sub['id']
+            else:
+                cursor.execute(
+                    """
+                    INSERT INTO homework_submissions (
+                        homework_id, student_id, status, answers_json, score, max_score, teacher_feedback, submitted_at, created_at
+                    )
+                    VALUES (?, ?, 'waived', '{}', ?, ?, ?, ?, ?)
+                    """,
+                    (homework_id, student_id, max_score, max_score, feedback_text, now_iso, now_iso)
+                )
+                sub_id = cursor.lastrowid
+
+            return {
+                'id': sub_id,
+                'homeworkId': homework_id,
+                'studentId': student_id,
+                'status': 'waived',
+                'score': max_score,
+                'maxScore': max_score
             }
     finally:
         conn.close()

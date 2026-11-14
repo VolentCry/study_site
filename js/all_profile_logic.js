@@ -449,6 +449,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('profileActiveTab', 'upgrade');
                 history.replaceState(null, '', '#upgrade');
             } catch (e) {}
+            if (typeof window.initUpgradeHub === 'function') {
+                window.initUpgradeHub();
+            }
         } else {
             // Default tab: study
             if (tabBtnStudy) {
@@ -950,8 +953,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const status = sub.status || 'not_started';
             let statusBadge = '';
             let actionBtn = '';
+            let passBtn = '';
 
-            if (status === 'checked') {
+            if (status !== 'checked' && status !== 'submitted' && status !== 'waived') {
+                try {
+                    const rawInv = localStorage.getItem('study_boosts_inventory');
+                    const inv = rawInv ? JSON.parse(rawInv) : {};
+                    if (inv && inv.hw_pass > 0) {
+                        passBtn = `<button type="button" class="btn btn-secondary btn-sm btn-use-hw-pass" data-hw-id="${h.id}" style="margin-right:8px; font-size:0.8rem; padding:0.4rem 0.8rem; background:rgba(255, 119, 40, 0.1); border-color:rgba(255,119,40,0.3); color:var(--accent); font-weight:700;">📜 Отказ от Д/З</button>`;
+                    }
+                } catch(e) {}
+            }
+
+            if (status === 'waived') {
+                statusBadge = `<span class="badge" style="background:rgba(255, 119, 40, 0.15); color:var(--accent); font-weight:700; border:1px solid rgba(255,119,40,0.3);">📜 Освобождён бустом (100%)</span>`;
+                actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Смотреть задание</a>`;
+            } else if (status === 'checked') {
                 statusBadge = `<span class="badge badge-status status-checked">Оценка: ${sub.score}/${sub.maxScore || sub.max_score || h.tasksCount || 0}</span>`;
                 actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Результаты и разбор</a>`;
             } else if (status === 'submitted') {
@@ -986,12 +1003,39 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${statusBadge}
                     </div>
-                    <div style="display:flex; justify-content:flex-end;">
+                    <div style="display:flex; justify-content:flex-end; align-items:center;">
+                        ${passBtn}
                         ${actionBtn}
                     </div>
                 </div>
             `;
         }).join('');
+
+        studentHomeworksList.querySelectorAll('.btn-use-hw-pass').forEach(b => {
+            b.addEventListener('click', async () => {
+                const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
+                if (!confirm('Использовать 1 билет «Отказ от Д/З» для автоматического 100% зачёта этого домашнего задания?')) return;
+                try {
+                    const res = await fetch(`/api/homework/${hwId}/waive`, { method: 'POST' });
+                    const d = await res.json();
+                    if (d.success) {
+                        try {
+                            const rawInv = localStorage.getItem('study_boosts_inventory');
+                            const inv = rawInv ? JSON.parse(rawInv) : {};
+                            inv.hw_pass = Math.max(0, (inv.hw_pass || 0) - 1);
+                            localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+                            window.dispatchEvent(new CustomEvent('study-boost-consumed', { detail: { boostId: 'hw_pass' } }));
+                        } catch(e) {}
+                        alert('📜 Домашнее задание успешно зачтено бустом «Отказ от Д/З»!');
+                        await fetchStudentHomeworks();
+                    } else {
+                        alert(d.error || 'Ошибка при применении буста');
+                    }
+                } catch(e) {
+                    alert('Ошибка сети');
+                }
+            });
+        });
     }
 
     const storedTab = sessionStorage.getItem('profileActiveTab');
@@ -2343,3 +2387,1104 @@ function initLevelProgressModal() {
     }
 }
 initLevelProgressModal();
+
+// =========================================================================
+// 8. HUB «ПРОКАЧКА»: РУЛЕТКА ОПЫТА, МАГАЗИН БУСТОВ И БАШНЯ ЗНАНИЙ (RPG)
+// =========================================================================
+(function initUpgradeHubModule() {
+    let audioCtx = null;
+    function getAudioContext() {
+        if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+
+    function playTickSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(640, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.04);
+            gain.gain.setValueAtTime(0.09, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.04);
+        } catch (e) {}
+    }
+
+    function playWinSound(isJackpot) {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const notes = isJackpot ? [523.25, 659.25, 783.99, 1046.5] : [440, 554.37, 659.25];
+            notes.forEach((freq, idx) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.14, ctx.currentTime + idx * 0.09);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.09 + 0.38);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + idx * 0.09);
+                osc.stop(ctx.currentTime + idx * 0.09 + 0.38);
+            });
+        } catch (e) {}
+    }
+
+    function playHitSound(isCrit) {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = isCrit ? 'sawtooth' : 'triangle';
+            osc.frequency.setValueAtTime(isCrit ? 360 : 220, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.12);
+        } catch (e) {}
+    }
+
+    function playShieldSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.22);
+            gain.gain.setValueAtTime(0.16, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.22);
+        } catch (e) {}
+    }
+
+    // --- Data Storage Helpers ---
+    function getUserTotalXp() {
+        let earnedXp = 0;
+        try {
+            const rawAttempts = localStorage.getItem('studyMetrics');
+            const attempts = rawAttempts ? JSON.parse(rawAttempts) : [];
+            const xpByTask = new Map();
+            if (Array.isArray(attempts)) {
+                attempts.forEach(attempt => {
+                    const taskKey = `${attempt.subject}:${attempt.taskId}`;
+                    const taskXp = attempt.correct ? 10 : 2;
+                    xpByTask.set(taskKey, Math.max(xpByTask.get(taskKey) || 0, taskXp));
+                });
+            }
+            const bonusXp = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+            earnedXp = [...xpByTask.values()].reduce((total, taskXp) => total + taskXp, 0) + bonusXp;
+        } catch (e) {
+            earnedXp = 0;
+        }
+        try {
+            const directXp = parseInt(localStorage.getItem('user_xp') || '0', 10) || 0;
+            if (directXp > earnedXp) earnedXp = directXp;
+        } catch (e) {}
+        const totalEl = document.getElementById('experience-total');
+        if (totalEl && totalEl.textContent) {
+            const match = totalEl.textContent.match(/(\d+)/);
+            if (match) {
+                const domXp = parseInt(match[1], 10);
+                if (!isNaN(domXp) && domXp > earnedXp) earnedXp = domXp;
+            }
+        }
+        return earnedXp;
+    }
+
+    function modifyUserXp(delta) {
+        const curXp = getUserTotalXp();
+        const newXp = Math.max(0, curXp + delta);
+        localStorage.setItem('user_xp', String(newXp));
+        const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+        localStorage.setItem('studyBonusXp', String(curBonus + delta));
+
+        const elements = ['experience-total', 'profile-exp-badge', 'hero-xp-val', 'upgrade-user-xp', 'roulette-balance-display'];
+        elements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = `${newXp} XP`;
+        });
+
+        syncHubDataToServer();
+        return newXp;
+    }
+
+    function getBoostsInventory() {
+        try {
+            const raw = localStorage.getItem('study_boosts_inventory');
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveBoostsInventory(inv) {
+        localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+        syncHubDataToServer();
+    }
+
+    function getTowerState() {
+        try {
+            const raw = localStorage.getItem('study_tower_state');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                return {
+                    floor: parsed.floor || 1,
+                    heroHp: parsed.heroHp !== undefined ? parsed.heroHp : 100,
+                    heroMaxHp: parsed.heroMaxHp || 100,
+                    heroAtk: parsed.heroAtk || 25,
+                    heroCrit: parsed.heroCrit || 15,
+                    heroShield: parsed.heroShield || 1,
+                    currentShield: parsed.currentShield !== undefined ? parsed.currentShield : (parsed.heroShield || 1),
+                    shards: parsed.shards || 0,
+                    bestFloor: parsed.bestFloor || 1
+                };
+            }
+        } catch (e) {}
+        return {
+            floor: 1,
+            heroHp: 100,
+            heroMaxHp: 100,
+            heroAtk: 25,
+            heroCrit: 15,
+            heroShield: 1,
+            currentShield: 1,
+            shards: 0,
+            bestFloor: 1
+        };
+    }
+
+    function saveTowerState(state) {
+        localStorage.setItem('study_tower_state', JSON.stringify(state));
+        syncHubDataToServer();
+    }
+
+    async function syncHubDataToServer() {
+        try {
+            const boosts = getBoostsInventory();
+            const tower = getTowerState();
+            const xp = getUserTotalXp();
+            const bonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+            await fetch('/api/user/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userXP: xp,
+                    bonusXp: bonus,
+                    boostsInventory: boosts,
+                    towerStats: tower
+                })
+            });
+        } catch (e) {}
+    }
+
+    // --- Sub-navigation ---
+    function initSubnav() {
+        const subnavBtns = document.querySelectorAll('.upgrade-subnav-btn');
+        const sections = {
+            roulette: document.getElementById('upgrade-tab-roulette'),
+            store: document.getElementById('upgrade-tab-store'),
+            tower: document.getElementById('upgrade-tab-tower')
+        };
+
+        subnavBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetKey = btn.getAttribute('data-upgrade-tab');
+                subnavBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                Object.keys(sections).forEach(key => {
+                    const sec = sections[key];
+                    if (sec) {
+                        sec.style.display = (key === targetKey) ? 'block' : 'none';
+                    }
+                });
+
+                if (targetKey === 'roulette') {
+                    drawRouletteWheel();
+                } else if (targetKey === 'store') {
+                    renderInventoryView();
+                } else if (targetKey === 'tower') {
+                    renderTowerArena();
+                }
+            });
+        });
+    }
+
+    // --- SECTION 1: ROULETTE LOGIC ---
+    const ROULETTE_SECTORS = [
+        { label: '0x', mult: 0, color: '#dc2626', bg1: '#7f1d1d', bg2: '#b91c1c', icon: '💀 0x' },
+        { label: '1.5x', mult: 1.5, color: '#10b981', bg1: '#047857', bg2: '#059669', icon: '⚡ 1.5x' },
+        { label: '0.5x', mult: 0.5, color: '#3b82f6', bg1: '#1d4ed8', bg2: '#2563eb', icon: '🛡️ 0.5x' },
+        { label: '2.0x', mult: 2.0, color: '#8b5cf6', bg1: '#6d28d9', bg2: '#7c3aed', icon: '🔥 2.0x' },
+        { label: '1.2x', mult: 1.2, color: '#06b6d4', bg1: '#0e7490', bg2: '#0891b2', icon: '✨ 1.2x' },
+        { label: '3.0x', mult: 3.0, color: '#f59e0b', bg1: '#b45309', bg2: '#d97706', icon: '⭐ 3.0x' },
+        { label: 'БУСТ', mult: 'boost', color: '#ff7728', bg1: '#c2410c', bg2: '#ea580c', icon: '🎁 БУСТ' },
+        { label: '5.0x', mult: 5.0, color: '#ec4899', bg1: '#be185d', bg2: '#db2777', icon: '👑 5.0x' }
+    ];
+
+    let rouletteWheelAngle = 0;
+    let isRouletteSpinning = false;
+    let lastTickSector = -1;
+
+    function drawRouletteWheel() {
+        const canvas = document.getElementById('roulette-wheel-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = width / 2 - 14;
+        const totalSectors = ROULETTE_SECTORS.length;
+        const arc = (2 * Math.PI) / totalSectors;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw sectors with rotation
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rouletteWheelAngle);
+
+        for (let i = 0; i < totalSectors; i++) {
+            const s = ROULETTE_SECTORS[i];
+            const startAngle = i * arc;
+            const endAngle = startAngle + arc;
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius, startAngle, endAngle);
+            ctx.closePath();
+
+            const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, radius);
+            grad.addColorStop(0, s.bg1);
+            grad.addColorStop(1, s.bg2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Divider stroke
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label text & icon
+            ctx.save();
+            ctx.rotate(startAngle + arc / 2);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 4;
+            ctx.fillText(s.icon, radius - 20, 5);
+            ctx.restore();
+        }
+
+        // Outer golden rim
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#f59e0b';
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+
+        // Decorative rivets/dots around rim
+        for (let r = 0; r < 24; r++) {
+            const dotAngle = (r * 2 * Math.PI) / 24;
+            const dx = (radius - 3) * Math.cos(dotAngle);
+            const dy = (radius - 3) * Math.sin(dotAngle);
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2.5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff7ed';
+            ctx.fill();
+        }
+
+        ctx.restore();
+
+        // Center hub
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.beginPath();
+        ctx.arc(0, 0, 28, 0, 2 * Math.PI);
+        const hubGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 28);
+        hubGrad.addColorStop(0, '#334155');
+        hubGrad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = hubGrad;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#f59e0b';
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function initRoulette() {
+        const balanceEl = document.getElementById('roulette-balance-display');
+        const betInput = document.getElementById('roulette-bet-input');
+        const spinBtn = document.getElementById('btn-spin-roulette');
+        const freeSpinCard = document.getElementById('roulette-free-spin-card');
+        const freeSpinIndicator = document.getElementById('roulette-free-spin-indicator');
+        const freeSpinBtn = document.getElementById('btn-use-free-spin');
+        const chipsBtns = document.querySelectorAll('.roulette-chip-btn');
+
+        if (balanceEl) balanceEl.textContent = `${getUserTotalXp()} XP`;
+
+        // Check first entry welcome spin
+        if (!localStorage.getItem('study_has_received_welcome_spin')) {
+            localStorage.setItem('study_has_received_welcome_spin', 'true');
+            localStorage.setItem('study_free_spin_available', 'true');
+        }
+
+        const isFreeAvailable = localStorage.getItem('study_free_spin_available') === 'true';
+        if (freeSpinCard) freeSpinCard.style.display = isFreeAvailable ? 'flex' : 'none';
+        if (freeSpinIndicator) freeSpinIndicator.style.display = isFreeAvailable ? 'block' : 'none';
+
+        chipsBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                chipsBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const val = btn.getAttribute('data-bet');
+                if (val === 'all') {
+                    if (betInput) betInput.value = Math.max(10, getUserTotalXp());
+                } else {
+                    if (betInput) betInput.value = parseInt(val, 10);
+                }
+            });
+        });
+
+        if (freeSpinBtn) {
+            freeSpinBtn.addEventListener('click', () => {
+                startRouletteSpin(true);
+            });
+        }
+
+        if (spinBtn) {
+            spinBtn.addEventListener('click', () => {
+                startRouletteSpin(false);
+            });
+        }
+
+        drawRouletteWheel();
+    }
+
+    function startRouletteSpin(isFree) {
+        if (isRouletteSpinning) return;
+
+        const currentXp = getUserTotalXp();
+        const betInput = document.getElementById('roulette-bet-input');
+        let bet = isFree ? 50 : parseInt(betInput ? betInput.value : '10', 10);
+
+        if (!isFree) {
+            if (isNaN(bet) || bet < 10) {
+                alert('Минимальная ставка — 10 XP!');
+                return;
+            }
+            if (bet > currentXp) {
+                alert(`Недостаточно опыта! У вас ${currentXp} XP, а ставка ${bet} XP.`);
+                return;
+            }
+            modifyUserXp(-bet);
+        }
+
+        isRouletteSpinning = true;
+        const spinBtn = document.getElementById('btn-spin-roulette');
+        const freeSpinBtn = document.getElementById('btn-use-free-spin');
+        if (spinBtn) spinBtn.disabled = true;
+        if (freeSpinBtn) freeSpinBtn.disabled = true;
+
+        // Weighted odds: 0x(14%), 0.5x(16%), 1.2x(22%), 1.5x(18%), 2.0x(14%), 3.0x(8%), 5.0x(4%), БУСТ(4%)
+        const weights = [14, 18, 16, 14, 22, 8, 4, 4];
+        const totalWeight = weights.reduce((a, b) => a + b, 0);
+        let rand = Math.random() * totalWeight;
+        let winIndex = 0;
+        for (let i = 0; i < weights.length; i++) {
+            if (rand < weights[i]) {
+                winIndex = i;
+                break;
+            }
+            rand -= weights[i];
+        }
+
+        const arc = (2 * Math.PI) / ROULETTE_SECTORS.length;
+        const winCenter = winIndex * arc + arc / 2;
+        const neededFinalAngle = (3 * Math.PI / 2 - winCenter);
+
+        let delta = (neededFinalAngle - (rouletteWheelAngle % (2 * Math.PI)));
+        while (delta < 0) delta += 2 * Math.PI;
+        const totalRotation = (7 + Math.floor(Math.random() * 2)) * (2 * Math.PI) + delta;
+
+        const startAngle = rouletteWheelAngle;
+        const targetAngle = startAngle + totalRotation;
+        const duration = 4200;
+        const startTime = performance.now();
+
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+
+        function animate(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(1, elapsed / duration);
+            const eased = easeOutCubic(progress);
+
+            rouletteWheelAngle = startAngle + totalRotation * eased;
+
+            // Tick sound detection
+            const currentSector = Math.floor(((3 * Math.PI / 2 - (rouletteWheelAngle % (2 * Math.PI)) + 4 * Math.PI) % (2 * Math.PI)) / arc);
+            if (currentSector !== lastTickSector) {
+                playTickSound();
+                lastTickSector = currentSector;
+            }
+
+            drawRouletteWheel();
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                rouletteWheelAngle = targetAngle;
+                drawRouletteWheel();
+                finishRouletteSpin(winIndex, bet, isFree);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    function finishRouletteSpin(winIndex, bet, isFree) {
+        isRouletteSpinning = false;
+        const spinBtn = document.getElementById('btn-spin-roulette');
+        const freeSpinBtn = document.getElementById('btn-use-free-spin');
+        if (spinBtn) spinBtn.disabled = false;
+        if (freeSpinBtn) freeSpinBtn.disabled = false;
+
+        if (isFree) {
+            localStorage.removeItem('study_free_spin_available');
+            const freeSpinCard = document.getElementById('roulette-free-spin-card');
+            const freeSpinIndicator = document.getElementById('roulette-free-spin-indicator');
+            if (freeSpinCard) freeSpinCard.style.display = 'none';
+            if (freeSpinIndicator) freeSpinIndicator.style.display = 'none';
+        }
+
+        const sector = ROULETTE_SECTORS[winIndex];
+        let historyLabel = '';
+
+        if (sector.mult === 'boost') {
+            const boostPool = ['streak_shield', 'hw_pass', 'double_xp', 'hint', 'time_freeze'];
+            const awardedId = boostPool[Math.floor(Math.random() * boostPool.length)];
+            const inv = getBoostsInventory();
+            inv[awardedId] = (inv[awardedId] || 0) + 1;
+            saveBoostsInventory(inv);
+
+            const boostTitles = {
+                streak_shield: '🛡️ Щит серии',
+                hw_pass: '📜 Отказ от Д/З',
+                double_xp: '⚡ Эликсир мудрости',
+                hint: '🔍 Шпионская подсказка',
+                time_freeze: '⏱️ Заморозка времени'
+            };
+
+            playWinSound(true);
+            showHubToast(`🎉 ДЖЕКПОТ! Вы выиграли редкий буст: ${boostTitles[awardedId]}!`, 'success');
+            historyLabel = `<span class="badge" style="background:rgba(255,119,40,0.2); color:var(--accent);">🎁 ${boostTitles[awardedId]}</span>`;
+        } else if (typeof sector.mult === 'number' && sector.mult > 0) {
+            const payout = Math.round(bet * sector.mult);
+            modifyUserXp(payout);
+            playWinSound(sector.mult >= 2.0);
+            showHubToast(`🎉 ВЫИГРЫШ (${sector.icon})! Получено: +${payout} XP!`, 'success');
+            historyLabel = `<span class="badge" style="background:rgba(16,185,129,0.2); color:#10b981;">+${payout} XP (${sector.icon})</span>`;
+        } else {
+            // 0x loss
+            showHubToast(isFree ? '💀 В бесплатном спине выпало 0x. Ничего страшного!' : '💀 Выпало 0x! Попробуйте ещё раз, удача рядом!', 'info');
+            historyLabel = `<span class="badge" style="background:rgba(239,68,68,0.2); color:#ef4444;">💀 0x (-${bet} XP)</span>`;
+        }
+
+        // Record history (keep last 8)
+        const histContainer = document.getElementById('roulette-history-list');
+        if (histContainer) {
+            if (histContainer.textContent.includes('Пока нет')) {
+                histContainer.innerHTML = '';
+            }
+            const item = document.createElement('div');
+            item.innerHTML = historyLabel;
+            histContainer.insertBefore(item.firstElementChild, histContainer.firstChild);
+            while (histContainer.children.length > 8) {
+                histContainer.removeChild(histContainer.lastChild);
+            }
+        }
+
+        renderInventoryView();
+    }
+
+    // --- SECTION 2: BOOST STORE & INVENTORY ---
+    const BOOST_CATALOG = {
+        streak_shield: { id: 'streak_shield', title: 'Щит серии', icon: '🛡️', price: 60, desc: 'Спасает комбо в любом тренажёре.' },
+        hw_pass: { id: 'hw_pass', title: 'Отказ от Д/З', icon: '📜', price: 250, desc: 'Автоматический 100% зачёт домашнего задания.' },
+        double_xp: { id: 'double_xp', title: 'Эликсир мудрости', icon: '⚡', price: 100, desc: 'Удваивает XP в тренажёрах на 30 мин.' },
+        hint: { id: 'hint', title: 'Шпионская подсказка', icon: '🔍', price: 40, desc: 'Открывает разбор задачи без штрафа.' },
+        time_freeze: { id: 'time_freeze', title: 'Заморозка времени', icon: '⏱️', price: 50, desc: 'Останавливает таймер на 60 сек.' }
+    };
+
+    function initStore() {
+        const buyBtns = document.querySelectorAll('.btn-buy-boost');
+        buyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const boostId = btn.getAttribute('data-boost-id');
+                const price = parseInt(btn.getAttribute('data-boost-price'), 10);
+                const curXp = getUserTotalXp();
+
+                if (curXp < price) {
+                    alert(`Недостаточно XP! Стоимость ${price} XP, у вас ${curXp} XP.`);
+                    return;
+                }
+
+                modifyUserXp(-price);
+
+                if (boostId === 'double_xp') {
+                    const until = Math.max(Date.now(), parseInt(localStorage.getItem('study_buff_double_xp_until') || '0', 10)) + 30 * 60 * 1000;
+                    localStorage.setItem('study_buff_double_xp_until', String(until));
+                    showHubToast('⚡ Эликсир мудрости активирован! 30 минут 2x XP!', 'success');
+                } else {
+                    const inv = getBoostsInventory();
+                    inv[boostId] = (inv[boostId] || 0) + 1;
+                    saveBoostsInventory(inv);
+                    const b = BOOST_CATALOG[boostId];
+                    showHubToast(`🎒 Куплено: ${b ? b.title : boostId}!`, 'success');
+                }
+
+                renderInventoryView();
+            });
+        });
+
+        renderInventoryView();
+        startBuffTimer();
+    }
+
+    function renderInventoryView() {
+        const wrap = document.getElementById('boost-inventory-items-wrap');
+        const badgeCount = document.getElementById('upgrade-boosts-count');
+        const inv = getBoostsInventory();
+
+        let totalItems = 0;
+        Object.keys(inv).forEach(k => { totalItems += (inv[k] || 0); });
+        if (badgeCount) badgeCount.textContent = `${totalItems} шт.`;
+
+        if (!wrap) return;
+
+        const boostKeys = Object.keys(BOOST_CATALOG);
+        wrap.innerHTML = boostKeys.map(k => {
+            const b = BOOST_CATALOG[k];
+            const qty = inv[k] || 0;
+            const isZero = (qty === 0);
+
+            let actionHtml = '';
+            if (k === 'hw_pass' && qty > 0) {
+                actionHtml = `<button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px; font-size:0.75rem;" onclick="if(window.switchProfileTab){window.switchProfileTab('study');}">Использовать в Д/З</button>`;
+            }
+
+            return `
+                <div class="boost-inventory-item" style="opacity: ${isZero ? 0.45 : 1};">
+                    <div class="boost-inv-icon">${b.icon}</div>
+                    <div style="flex:1;">
+                        <div style="font-weight: 800; font-size: 0.9rem; display: flex; justify-content: space-between;">
+                            <span>${b.title}</span>
+                            <span class="badge" style="background: rgba(255,119,40,0.2); color: var(--accent);">${qty} шт.</span>
+                        </div>
+                        <div style="font-size: 0.76rem; color: var(--muted-bright); margin-top: 2px;">${b.desc}</div>
+                        ${actionHtml}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    let buffInterval = null;
+    function startBuffTimer() {
+        if (buffInterval) clearInterval(buffInterval);
+        buffInterval = setInterval(() => {
+            const until = parseInt(localStorage.getItem('study_buff_double_xp_until') || '0', 10);
+            const indicator = document.getElementById('active-buff-indicator');
+            const timerText = document.getElementById('buff-timer-text');
+
+            if (until > Date.now()) {
+                const diffSec = Math.floor((until - Date.now()) / 1000);
+                const m = Math.floor(diffSec / 60);
+                const s = diffSec % 60;
+                if (indicator) indicator.style.display = 'block';
+                if (timerText) timerText.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+            } else {
+                if (indicator) indicator.style.display = 'none';
+            }
+        }, 1000);
+    }
+
+    // --- SECTION 3: TOWER OF KNOWLEDGE (RPG ROGUELIKE) ---
+    let currentTowerMonster = null;
+    let currentTowerQuestion = null;
+    let towerQuestionStartTime = Date.now();
+    let towerTimerInterval = null;
+    let towerTimeLeft = 15;
+
+    const MONSTER_ROSTER = [
+        { title: 'Гоблин-счетовод', icon: '👾' },
+        { title: 'Мышь-процентщик', icon: '🦇' },
+        { title: 'Волк-алгебраист', icon: '🐺' },
+        { title: 'Каменный Монолит', icon: '🗿' },
+        { title: 'Змей-логарифм', icon: '🐍' },
+        { title: 'Тёмный Пифагор', icon: '🧙‍♂️' },
+        { title: 'Вампир Уравнений', icon: '🧛' }
+    ];
+
+    const BOSS_ROSTER = [
+        { title: 'Дракон Простых Чисел', icon: '🐉' },
+        { title: 'Архимаг Факториалов', icon: '👑' },
+        { title: 'Повелитель Бесконечности', icon: '🌌' },
+        { title: 'Сфинкс Стереометрии', icon: '🦁' },
+        { title: 'Титан Математического Анализа', icon: '⚡' }
+    ];
+
+    function spawnTowerMonster(floor) {
+        const isBoss = (floor % 5 === 0);
+        let mInfo;
+        if (isBoss) {
+            const idx = Math.floor((floor / 5 - 1)) % BOSS_ROSTER.length;
+            mInfo = BOSS_ROSTER[idx];
+        } else {
+            const idx = (floor - 1) % MONSTER_ROSTER.length;
+            mInfo = MONSTER_ROSTER[idx];
+        }
+
+        const maxHp = isBoss 
+            ? Math.round((70 + floor * 26) * 1.8) 
+            : (45 + floor * 16);
+        const atk = isBoss
+            ? (16 + Math.floor(floor * 3.5))
+            : (10 + Math.floor(floor * 2));
+
+        return {
+            title: isBoss ? `👑 [БОСС] ${mInfo.title}` : mInfo.title,
+            icon: mInfo.icon,
+            isBoss: isBoss,
+            maxHp: maxHp,
+            currentHp: maxHp,
+            atk: atk
+        };
+    }
+
+    function generateTowerQuestion(floor) {
+        const types = [];
+        if (floor <= 3) {
+            types.push('add_sub', 'mult_div');
+        } else if (floor <= 7) {
+            types.push('add_sub', 'mult_div', 'power', 'linear', 'percent');
+        } else {
+            types.push('mult_div', 'power', 'linear', 'percent', 'fraction_mult', 'two_step');
+        }
+        const type = types[Math.floor(Math.random() * types.length)];
+        let prompt = '';
+        let answer = 0;
+
+        if (type === 'add_sub') {
+            const isAdd = Math.random() > 0.4;
+            const a = Math.floor(Math.random() * (35 + floor * 4)) + 12;
+            const b = Math.floor(Math.random() * (35 + floor * 4)) + 8;
+            if (isAdd) {
+                prompt = `${a} + ${b} = ?`;
+                answer = a + b;
+            } else {
+                const big = Math.max(a, b);
+                const small = Math.min(a, b);
+                prompt = `${big} - ${small} = ?`;
+                answer = big - small;
+            }
+        } else if (type === 'mult_div') {
+            const isMult = Math.random() > 0.4;
+            const a = Math.floor(Math.random() * 9) + 3;
+            const b = Math.floor(Math.random() * 9) + 3;
+            if (isMult) {
+                prompt = `${a} × ${b} = ?`;
+                answer = a * b;
+            } else {
+                const prod = a * b;
+                prompt = `${prod} : ${a} = ?`;
+                answer = b;
+            }
+        } else if (type === 'power') {
+            const isSquare = Math.random() > 0.5;
+            if (isSquare) {
+                const base = Math.floor(Math.random() * 8) + 4;
+                prompt = `${base}² = ?`;
+                answer = base * base;
+            } else {
+                const base = Math.floor(Math.random() * 10) + 4;
+                const sq = base * base;
+                prompt = `√${sq} = ?`;
+                answer = base;
+            }
+        } else if (type === 'linear') {
+            const x = Math.floor(Math.random() * 10) + 2;
+            const a = Math.floor(Math.random() * 4) + 2;
+            const b = Math.floor(Math.random() * 15) + 3;
+            const c = a * x + b;
+            prompt = `${a}x + ${b} = ${c} (x = ?)`;
+            answer = x;
+        } else if (type === 'percent') {
+            const pcts = [10, 20, 25, 50];
+            const pct = pcts[Math.floor(Math.random() * pcts.length)];
+            const mult = Math.floor(Math.random() * 8) + 2;
+            const val = mult * (100 / (pct === 25 ? 25 : (pct === 50 ? 50 : 10)));
+            prompt = `${pct}% от ${val} = ?`;
+            answer = Math.round((pct / 100) * val);
+        } else if (type === 'fraction_mult') {
+            const den = [3, 4, 5][Math.floor(Math.random() * 3)];
+            const num = Math.floor(Math.random() * (den - 1)) + 1;
+            const k = Math.floor(Math.random() * 6) + 2;
+            const total = den * k;
+            prompt = `(${num}/${den}) × ${total} = ?`;
+            answer = num * k;
+        } else {
+            const a = Math.floor(Math.random() * 8) + 3;
+            const b = Math.floor(Math.random() * 8) + 2;
+            const c = Math.floor(Math.random() * 4) + 2;
+            prompt = `(${a} + ${b}) × ${c} = ?`;
+            answer = (a + b) * c;
+        }
+
+        return { prompt, answer: String(answer) };
+    }
+
+    function renderTowerArena() {
+        const state = getTowerState();
+
+        const currentFloorEl = document.getElementById('tower-current-floor');
+        const shardsEl = document.getElementById('tower-shards-count');
+        const recordEl = document.getElementById('upgrade-tower-record');
+        if (currentFloorEl) currentFloorEl.textContent = state.floor;
+        if (shardsEl) shardsEl.textContent = state.shards;
+        if (recordEl) recordEl.textContent = `${state.bestFloor} этаж`;
+
+        // Hero stats
+        const heroHpText = document.getElementById('tower-hero-hp-text');
+        const heroHpBar = document.getElementById('tower-hero-hp-bar');
+        const heroAtkEl = document.getElementById('tower-hero-atk');
+        const heroCritEl = document.getElementById('tower-hero-crit');
+        const heroDefEl = document.getElementById('tower-hero-def');
+
+        if (heroHpText) heroHpText.textContent = `${state.heroHp} / ${state.heroMaxHp} HP`;
+        if (heroHpBar) {
+            const pct = Math.max(0, Math.min(100, Math.round((state.heroHp / state.heroMaxHp) * 100)));
+            heroHpBar.style.width = `${pct}%`;
+        }
+        if (heroAtkEl) heroAtkEl.textContent = state.heroAtk;
+        if (heroCritEl) heroCritEl.textContent = `${state.heroCrit}%`;
+        if (heroDefEl) heroDefEl.textContent = `${state.currentShield} (базовый ${state.heroShield})`;
+
+        // Spawn monster if missing
+        if (!currentTowerMonster) {
+            currentTowerMonster = spawnTowerMonster(state.floor);
+        }
+
+        const mTitle = document.getElementById('tower-monster-title');
+        const mIcon = document.getElementById('tower-monster-icon');
+        const mHpText = document.getElementById('tower-monster-hp-text');
+        const mHpBar = document.getElementById('tower-monster-hp-bar');
+
+        if (mTitle) mTitle.textContent = currentTowerMonster.title;
+        if (mIcon) mIcon.textContent = currentTowerMonster.icon;
+        if (mHpText) mHpText.textContent = `${currentTowerMonster.currentHp} / ${currentTowerMonster.maxHp} HP`;
+        if (mHpBar) {
+            const mPct = Math.max(0, Math.min(100, Math.round((currentTowerMonster.currentHp / currentTowerMonster.maxHp) * 100)));
+            mHpBar.style.width = `${mPct}%`;
+        }
+
+        // Generate question if missing
+        if (!currentTowerQuestion) {
+            currentTowerQuestion = generateTowerQuestion(state.floor);
+            towerQuestionStartTime = Date.now();
+            startTowerTimer();
+        }
+
+        const probText = document.getElementById('tower-problem-text');
+        if (probText) probText.textContent = currentTowerQuestion.prompt;
+    }
+
+    function startTowerTimer() {
+        if (towerTimerInterval) clearInterval(towerTimerInterval);
+        towerTimeLeft = 15;
+        updateTowerTimerUI();
+
+        towerTimerInterval = setInterval(() => {
+            towerTimeLeft--;
+            updateTowerTimerUI();
+            if (towerTimeLeft <= 0) {
+                clearInterval(towerTimerInterval);
+                handleTowerTimeout();
+            }
+        }, 1000);
+    }
+
+    function updateTowerTimerUI() {
+        const secEl = document.getElementById('tower-timer-sec');
+        const barEl = document.getElementById('tower-timer-bar');
+        if (secEl) secEl.textContent = `${towerTimeLeft}с`;
+        if (barEl) {
+            const pct = Math.max(0, Math.min(100, Math.round((towerTimeLeft / 15) * 100)));
+            barEl.style.width = `${pct}%`;
+        }
+    }
+
+    function handleTowerSubmit() {
+        const input = document.getElementById('tower-user-answer');
+        if (!input || !currentTowerQuestion || !currentTowerMonster) return;
+
+        const raw = input.value.trim().replace(',', '.');
+        if (!raw) return;
+
+        input.value = '';
+        const state = getTowerState();
+        const timeSpent = (Date.now() - towerQuestionStartTime) / 1000;
+
+        if (raw === currentTowerQuestion.answer) {
+            // Correct answer!
+            const isCrit = (timeSpent <= 3.0) || (Math.random() * 100 < state.heroCrit);
+            const dmg = isCrit ? (state.heroAtk * 2) : state.heroAtk;
+            currentTowerMonster.currentHp -= dmg;
+            playHitSound(isCrit);
+
+            const arenaBox = document.getElementById('tower-arena-box');
+            if (arenaBox) {
+                const flash = document.createElement('div');
+                flash.style.position = 'absolute';
+                flash.style.top = '10px';
+                flash.style.right = '20px';
+                flash.style.fontWeight = '900';
+                flash.style.fontSize = '1.3rem';
+                flash.style.color = isCrit ? '#f59e0b' : '#10b981';
+                flash.textContent = isCrit ? `💥 КРИТ! -${dmg}` : `⚔️ -${dmg}`;
+                flash.style.transition = 'all 0.8s ease-out';
+                arenaBox.style.position = 'relative';
+                arenaBox.appendChild(flash);
+                setTimeout(() => {
+                    flash.style.opacity = '0';
+                    flash.style.transform = 'translateY(-20px)';
+                    setTimeout(() => flash.remove(), 800);
+                }, 50);
+            }
+
+            if (currentTowerMonster.currentHp <= 0) {
+                // Monster Defeated!
+                clearInterval(towerTimerInterval);
+                const shardsWon = currentTowerMonster.isBoss ? (25 + state.floor * 5) : (6 + Math.floor(state.floor * 1.5));
+                const xpWon = currentTowerMonster.isBoss ? (60 + state.floor * 12) : (15 + state.floor * 3);
+
+                state.shards += shardsWon;
+                state.floor += 1;
+                state.bestFloor = Math.max(state.bestFloor, state.floor);
+                state.currentShield = state.heroShield; // refresh shield on new floor
+
+                saveTowerState(state);
+                modifyUserXp(xpWon);
+                playWinSound(true);
+
+                showHubToast(`🏆 Победа над ${currentTowerMonster.title}! +${shardsWon} 💎, +${xpWon} XP!`, 'success');
+                currentTowerMonster = null;
+                currentTowerQuestion = null;
+
+                setTimeout(() => {
+                    renderTowerArena();
+                }, 800);
+            } else {
+                // Next question for same monster
+                currentTowerQuestion = generateTowerQuestion(state.floor);
+                towerQuestionStartTime = Date.now();
+                startTowerTimer();
+                renderTowerArena();
+            }
+        } else {
+            // Wrong answer!
+            handleMonsterAttack();
+        }
+    }
+
+    function handleTowerTimeout() {
+        showHubToast('⏱️ Время вышло! Страж атакует!', 'info');
+        handleMonsterAttack();
+    }
+
+    function handleMonsterAttack() {
+        const state = getTowerState();
+        if (!currentTowerMonster) return;
+
+        if (state.currentShield > 0) {
+            state.currentShield -= 1;
+            saveTowerState(state);
+            playShieldSound();
+            showHubToast(`🛡️ Щит заблокировал удар монстра! Осталось щитов: ${state.currentShield}`, 'info');
+        } else {
+            state.heroHp -= currentTowerMonster.atk;
+            playHitSound(false);
+
+            if (state.heroHp <= 0) {
+                // Hero fallen!
+                clearInterval(towerTimerInterval);
+                alert(`💀 Вы пали на ${state.floor} этаже! Забег завершён.\nРекорд башни: ${state.bestFloor} этаж.\nВсе накопленные 💎 осколки и прокачанные характеристики сохранены!`);
+
+                state.floor = 1;
+                state.heroHp = state.heroMaxHp;
+                state.currentShield = state.heroShield;
+                saveTowerState(state);
+
+                currentTowerMonster = null;
+                currentTowerQuestion = null;
+                renderTowerArena();
+                return;
+            } else {
+                saveTowerState(state);
+                showHubToast(`💥 Монстр нанёс вам ${currentTowerMonster.atk} урона!`, 'info');
+            }
+        }
+
+        currentTowerQuestion = generateTowerQuestion(state.floor);
+        towerQuestionStartTime = Date.now();
+        startTowerTimer();
+        renderTowerArena();
+    }
+
+    function initTowerUpgrades() {
+        const upgradeBtns = [
+            { id: 'btn-upgrade-atk', cost: 20, apply: s => { s.heroAtk += 5; } },
+            { id: 'btn-upgrade-hp', cost: 20, apply: s => { s.heroMaxHp += 25; s.heroHp = Math.min(s.heroMaxHp, s.heroHp + 25); } },
+            { id: 'btn-upgrade-crit', cost: 30, apply: s => { s.heroCrit += 5; } },
+            { id: 'btn-upgrade-shield', cost: 25, apply: s => { s.heroShield += 1; s.currentShield += 1; } }
+        ];
+
+        upgradeBtns.forEach(u => {
+            const btn = document.getElementById(u.id);
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const state = getTowerState();
+                if (state.shards < u.cost) {
+                    alert(`Недостаточно осколков 💎! Нужно ${u.cost} 💎, у вас ${state.shards} 💎.`);
+                    return;
+                }
+                state.shards -= u.cost;
+                u.apply(state);
+                saveTowerState(state);
+                playWinSound(false);
+                showHubToast('⚡ Характеристика улучшена!', 'success');
+                renderTowerArena();
+            });
+        });
+
+        const restartBtn = document.getElementById('btn-tower-restart');
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                if (confirm('Начать забег с 1 этажа? Все заработанные 💎 осколки и прокачанные навыки останутся с вами!')) {
+                    clearInterval(towerTimerInterval);
+                    const state = getTowerState();
+                    state.floor = 1;
+                    state.heroHp = state.heroMaxHp;
+                    state.currentShield = state.heroShield;
+                    saveTowerState(state);
+                    currentTowerMonster = null;
+                    currentTowerQuestion = null;
+                    renderTowerArena();
+                }
+            });
+        }
+
+        const submitBtn = document.getElementById('btn-tower-submit-answer');
+        const answerInput = document.getElementById('tower-user-answer');
+        if (submitBtn) submitBtn.addEventListener('click', handleTowerSubmit);
+        if (answerInput) {
+            answerInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleTowerSubmit();
+                }
+            });
+        }
+    }
+
+    // --- Toast Helper for Upgrade Hub ---
+    function showHubToast(message, type) {
+        let toast = document.getElementById('upgrade-hub-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'upgrade-hub-toast';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '24px';
+            toast.style.right = '24px';
+            toast.style.zIndex = '9999';
+            toast.style.padding = '12px 18px';
+            toast.style.borderRadius = '12px';
+            toast.style.fontWeight = '700';
+            toast.style.fontSize = '0.92rem';
+            toast.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3)';
+            toast.style.transition = 'all 0.3s ease';
+            document.body.appendChild(toast);
+        }
+
+        toast.style.background = (type === 'success') ? '#065f46' : '#1e293b';
+        toast.style.color = (type === 'success') ? '#6ee7b7' : '#f1f5f9';
+        toast.style.border = (type === 'success') ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.15)';
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+
+        clearTimeout(window.__hubToastTimer);
+        window.__hubToastTimer = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(12px)';
+        }, 3600);
+    }
+
+    // --- Master Initializer ---
+    function initUpgradeHub() {
+        const hubWrap = document.getElementById('tab-content-upgrade');
+        if (!hubWrap) return;
+
+        const xpEl = document.getElementById('upgrade-user-xp');
+        if (xpEl) xpEl.textContent = `${getUserTotalXp()} XP`;
+
+        const state = getTowerState();
+        const recordEl = document.getElementById('upgrade-tower-record');
+        if (recordEl) recordEl.textContent = `${state.bestFloor} этаж`;
+
+        initSubnav();
+        initRoulette();
+        initStore();
+        initTowerUpgrades();
+        renderTowerArena();
+    }
+
+    window.initUpgradeHub = initUpgradeHub;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const storedTab = sessionStorage.getItem('profileActiveTab');
+        const hash = (window.location.hash || '').toLowerCase();
+        if (hash === '#upgrade' || hash.includes('prokachka') || storedTab === 'upgrade') {
+            initUpgradeHub();
+        }
+    });
+})();

@@ -1082,12 +1082,92 @@
     const lessonTargetClass = document.getElementById('lesson-target-class');
     const lessonTargetStudent = document.getElementById('lesson-target-student');
     const lessonAttachHw = document.getElementById('lesson-attach-hw');
+    const lessonPlanTopicGroup = document.getElementById('lesson-methodical-plan-topic-group');
+    const lessonPlanTopicSelect = document.getElementById('lesson-plan-topic-select');
+    const lessonInputTitle = document.getElementById('lesson-input-title');
+
+    async function updateLessonMethodicalPlanTopics() {
+        if (!lessonPlanTopicGroup || !lessonPlanTopicSelect) return;
+        const studentIdVal = lessonTargetStudent ? lessonTargetStudent.value : '';
+        if (!studentIdVal) {
+            lessonPlanTopicGroup.style.display = 'none';
+            lessonPlanTopicSelect.innerHTML = '<option value="">-- Выберите тему из методического плана --</option>';
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/methodical-plans?student_id=${studentIdVal}`, { cache: 'no-store' });
+            const data = await res.json();
+            if (data.success && Array.isArray(data.plans) && data.plans.length > 0) {
+                let optionsHtml = '<option value="">-- Выберите тему для автозаполнения --</option>';
+                data.plans.forEach(plan => {
+                    const planTitle = escapeHtml(plan.title || 'Метод. план');
+                    // Monthly lessons
+                    const monthly = plan.monthlyLessons || {};
+                    let hasLessons = false;
+                    let lessonsGroup = `<optgroup label="📅 ${planTitle} · Уроки по календарю">`;
+                    Object.entries(monthly).forEach(([month, lessons]) => {
+                        if (Array.isArray(lessons)) {
+                            lessons.forEach(les => {
+                                if (les && les.title && les.title.trim()) {
+                                    hasLessons = true;
+                                    const doneMark = les.isConducted ? '✓ ' : '';
+                                    lessonsGroup += `<option value="${escapeHtml(les.title.trim())}">${escapeHtml(month)}: Урок ${les.num || ''} — ${doneMark}${escapeHtml(les.title.trim())}</option>`;
+                                }
+                            });
+                        }
+                    });
+                    lessonsGroup += `</optgroup>`;
+                    if (hasLessons) optionsHtml += lessonsGroup;
+
+                    // Topics list
+                    const topics = plan.topics || [];
+                    if (Array.isArray(topics) && topics.length > 0) {
+                        optionsHtml += `<optgroup label="📚 ${planTitle} · Разделы курса">`;
+                        topics.forEach(top => {
+                            if (top && top.title && top.title.trim()) {
+                                optionsHtml += `<option value="${escapeHtml(top.title.trim())}">${top.num ? `№${top.num}. ` : ''}${escapeHtml(top.title.trim())}</option>`;
+                            }
+                        });
+                        optionsHtml += `</optgroup>`;
+                    }
+                });
+
+                lessonPlanTopicSelect.innerHTML = optionsHtml;
+                lessonPlanTopicGroup.style.display = 'block';
+            } else {
+                lessonPlanTopicGroup.style.display = 'none';
+                lessonPlanTopicSelect.innerHTML = '<option value="">-- У ученика нет прикреплённого плана --</option>';
+            }
+        } catch(e) {
+            console.error('Error fetching student methodical plan topics', e);
+            lessonPlanTopicGroup.style.display = 'none';
+        }
+    }
+
+    if (lessonTargetStudent) {
+        lessonTargetStudent.addEventListener('change', updateLessonMethodicalPlanTopics);
+    }
+    if (lessonPlanTopicSelect && lessonInputTitle) {
+        lessonPlanTopicSelect.addEventListener('change', () => {
+            const val = lessonPlanTopicSelect.value;
+            if (val) {
+                lessonInputTitle.value = val;
+                lessonInputTitle.classList.remove('lesson-plan-topic-highlight');
+                void lessonInputTitle.offsetWidth; // trigger reflow
+                lessonInputTitle.classList.add('lesson-plan-topic-highlight');
+                lessonInputTitle.focus();
+            }
+        });
+    }
 
     if (btnOpenCreateLesson) {
         btnOpenCreateLesson.addEventListener('click', async () => {
             document.getElementById('lesson-edit-id').value = '';
             document.getElementById('modal-lesson-title').textContent = 'Запланировать занятие';
             document.getElementById('btn-submit-lesson').textContent = 'Сохранить занятие';
+            if (lessonPlanTopicGroup) lessonPlanTopicGroup.style.display = 'none';
+            if (lessonPlanTopicSelect) lessonPlanTopicSelect.innerHTML = '<option value="">-- Выберите тему из методического плана --</option>';
             await populateLessonModalSelects();
             formCreateLesson.reset();
             document.getElementById('lesson-edit-id').value = '';
@@ -1395,6 +1475,7 @@
                         } catch(e) {}
                     }
                     lessonTargetStudent.value = targetStudentId ? String(targetStudentId) : '';
+                    await updateLessonMethodicalPlanTopics();
 
                     document.getElementById('lesson-input-title').value = les.title || '';
 
@@ -1456,6 +1537,87 @@
     const btnClearDraftTasks = document.getElementById('btn-clear-draft-tasks');
     const btnPublishHomework = document.getElementById('btn-publish-homework');
     const btnAddManualTask = document.getElementById('btn-add-manual-task');
+
+    let editingHomeworkId = null;
+    const hwEditModeBanner = document.getElementById('hw-edit-mode-banner');
+    const hwEditModeBadge = document.getElementById('hw-edit-mode-badge');
+    const hwEditModeSubtitle = document.getElementById('hw-edit-mode-subtitle');
+    const btnCancelEditHw = document.getElementById('btn-cancel-edit-hw');
+
+    async function startEditingHomework(hwId) {
+        try {
+            showToast('Загрузка задания для редактирования...');
+            const res = await fetch(`/api/teacher/homeworks/${hwId}`, { cache: 'no-store' });
+            const data = await res.json();
+            if (!data.success || !data.homework) {
+                alert(data.error || 'Не удалось загрузить данные домашнего задания');
+                return;
+            }
+            const hw = data.homework;
+            editingHomeworkId = hw.id;
+
+            switchTab('constructor');
+
+            if (hwTargetClass) {
+                hwTargetClass.value = String(hw.class_id || hw.classId || '');
+                const cid = hwTargetClass.value;
+                if (cid && hwTargetStudent) {
+                    try {
+                        const sRes = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
+                        const sData = await sRes.json();
+                        if (sData.success && sData.class && Array.isArray(sData.class.students)) {
+                            hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>' +
+                                sData.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                        }
+                    } catch(e) {}
+                }
+                if (hwTargetStudent) {
+                    hwTargetStudent.value = (hw.student_id || hw.studentId) ? String(hw.student_id || hw.studentId) : '';
+                }
+            }
+
+            if (hwInputTitle) hwInputTitle.value = hw.title || '';
+            if (hwInputSubject) hwInputSubject.value = hw.subject || 'Математика';
+            if (hwInputDeadline) {
+                const dl = hw.deadline_at || hw.deadlineAt;
+                hwInputDeadline.value = dl ? dl.slice(0, 16) : '';
+            }
+            if (hwInputDesc) hwInputDesc.value = hw.description || '';
+
+            constructorDraftTasks = Array.isArray(hw.tasks) ? JSON.parse(JSON.stringify(hw.tasks)) : [];
+            renderConstructorDraft();
+
+            if (hwEditModeBanner) hwEditModeBanner.style.display = 'flex';
+            if (hwEditModeBadge) hwEditModeBadge.textContent = `ID: #${hw.id}`;
+            if (hwEditModeSubtitle) hwEditModeSubtitle.textContent = `«${escapeHtml(hw.title)}» (${escapeHtml(hw.class_name || '')})`;
+            if (btnPublishHomework) {
+                btnPublishHomework.textContent = '💾 Сохранить изменения в задании';
+            }
+
+            showToast(`Редактирование Д/З #${hw.id}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch(err) {
+            console.error('Error starting homework edit', err);
+            alert('Ошибка сети при загрузке домашнего задания.');
+        }
+    }
+
+    function cancelEditingHomework() {
+        editingHomeworkId = null;
+        if (hwEditModeBanner) hwEditModeBanner.style.display = 'none';
+        if (btnPublishHomework) {
+            btnPublishHomework.textContent = '🚀 Опубликовать домашнее задание';
+        }
+        if (hwInputTitle) hwInputTitle.value = '';
+        if (hwInputDesc) hwInputDesc.value = '';
+        loadDraftFromStorage();
+        renderConstructorDraft();
+        showToast('Режим редактирования отменён');
+    }
+
+    if (btnCancelEditHw) {
+        btnCancelEditHw.addEventListener('click', cancelEditingHomework);
+    }
 
     // Bank of Tasks elements
     const bankTopicSelect = document.getElementById('bank-topic-select');
@@ -1889,42 +2051,67 @@
             }
 
             btnPublishHomework.disabled = true;
-            btnPublishHomework.textContent = 'Публикация...';
+            btnPublishHomework.textContent = editingHomeworkId ? 'Сохранение изменений...' : 'Публикация...';
 
             try {
-                const res = await fetch('/api/teacher/homeworks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        class_id: parseInt(classId, 10),
-                        student_id: studentId,
-                        title,
-                        subject,
-                        description: desc,
-                        deadline,
-                        tasks: constructorDraftTasks
-                    })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast('Домашнее задание успешно опубликовано!');
-                    constructorDraftTasks = [];
-                    saveDraftToStorage();
-                    hwInputTitle.value = '';
-                    hwInputDesc.value = '';
-                    if (hwTargetStudent) {
-                        hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
+                if (editingHomeworkId) {
+                    const res = await fetch(`/api/teacher/homeworks/${editingHomeworkId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title,
+                            subject,
+                            description: desc,
+                            deadline,
+                            student_id: studentId,
+                            tasks: constructorDraftTasks
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        showToast('✓ Домашнее задание успешно обновлено!');
+                        cancelEditingHomework();
+                        switchTab('grading');
+                        loadGrading();
+                    } else {
+                        alert(data.error || 'Ошибка при обновлении домашнего задания');
                     }
-                    renderConstructorDraft();
-                    switchTab('grading');
                 } else {
-                    alert(data.error || 'Ошибка при создании домашнего задания');
+                    const res = await fetch('/api/teacher/homeworks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            class_id: parseInt(classId, 10),
+                            student_id: studentId,
+                            title,
+                            subject,
+                            description: desc,
+                            deadline,
+                            tasks: constructorDraftTasks
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        showToast('Домашнее задание успешно опубликовано!');
+                        constructorDraftTasks = [];
+                        saveDraftToStorage();
+                        hwInputTitle.value = '';
+                        hwInputDesc.value = '';
+                        if (hwTargetStudent) {
+                            hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
+                        }
+                        renderConstructorDraft();
+                        switchTab('grading');
+                        loadGrading();
+                    } else {
+                        alert(data.error || 'Ошибка при создании домашнего задания');
+                    }
                 }
             } catch(err) {
                 console.error('SERVER ERR:', err); alert('ERR: ' + err.message);
             } finally {
                 btnPublishHomework.disabled = false;
-                btnPublishHomework.textContent = '🚀 Опубликовать домашнее задание';
+                btnPublishHomework.textContent = editingHomeworkId ? '💾 Сохранить изменения в задании' : '🚀 Опубликовать домашнее задание';
             }
         });
     }
@@ -2363,8 +2550,11 @@
                                 <button type="button" class="btn btn-emerald btn-sm btn-view-submissions" data-hw-id="${h.id}">
                                     👥 Сданные работы (${subCount})
                                 </button>
+                                <button type="button" class="btn btn-secondary btn-sm btn-edit-hw" data-hw-id="${h.id}" title="Редактировать условия, состав задач и параметры задания">
+                                    ✏️ Редактировать
+                                </button>
                                 <a href="homework.html?id=${h.id}" target="_blank" class="btn btn-secondary btn-sm" title="Смотреть домашнее задание с ответами" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                                    👀 Смотреть задание
+                                    👀 Смотреть
                                 </a>
                             </div>
                             <button type="button" class="btn btn-danger-outline btn-sm btn-delete-hw" data-hw-id="${h.id}" title="Удалить Д/З">
@@ -2381,6 +2571,14 @@
                     const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
                     const foundHw = homeworks.find(h => h.id === hwId);
                     if (foundHw) openSubmissionsModal(foundHw);
+                });
+            });
+
+            // Edit HW buttons
+            gradingHwGrid.querySelectorAll('.btn-edit-hw').forEach(b => {
+                b.addEventListener('click', async () => {
+                    const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
+                    await startEditingHomework(hwId);
                 });
             });
 
@@ -2444,7 +2642,9 @@
 
             submissionsTableBody.innerHTML = subs.map((s, sIdx) => {
                 let statusBadge = '';
-                if (s.status === 'checked') {
+                if (s.status === 'waived') {
+                    statusBadge = `<span class="badge" style="background:rgba(255, 119, 40, 0.15); color:var(--accent); font-weight:700;">📜 Освобождён</span>`;
+                } else if (s.status === 'checked') {
                     statusBadge = `<span class="badge badge-status status-checked">Проверено</span>`;
                 } else if (s.status === 'submitted') {
                     statusBadge = `<span class="badge badge-status status-submitted">Сдано</span>`;
@@ -2453,7 +2653,7 @@
                 }
 
                 const maxSc = s.maxScore || s.max_score || (hw.tasks ? hw.tasks.length : (hw.tasksCount || 0));
-                const scoreDisplay = s.status === 'checked' 
+                const scoreDisplay = (s.status === 'checked' || s.status === 'waived') 
                     ? `<strong>${s.score}</strong> / ${maxSc}` 
                     : (s.status === 'submitted' ? `<span style="color:var(--accent-gold); font-weight:700;">${s.score} / ${maxSc}</span> (авто)` : '—');
                 const submitTime = (s.submittedAt || s.submitted_at) ? formatDateTime(s.submittedAt || s.submitted_at) : '—';

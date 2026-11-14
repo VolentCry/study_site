@@ -599,14 +599,41 @@
             sessionStreaks[trainerId] = 0;
         }
 
+        let shieldUsed = false;
         if (isCorrect) {
             sessionStreaks[trainerId]++;
         } else {
-            sessionStreaks[trainerId] = 0;
+            // Проверка наличия буста «Щит серии»
+            try {
+                const rawInv = localStorage.getItem('study_boosts_inventory');
+                const inv = rawInv ? JSON.parse(rawInv) : {};
+                if (inv && inv.streak_shield > 0 && sessionStreaks[trainerId] > 0) {
+                    inv.streak_shield--;
+                    localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+                    shieldUsed = true;
+                    showGiftToast(`🛡️ «Щит серии» защитил комбо! Ваша серия ${sessionStreaks[trainerId]} 🔥 сохранена! (Осталось щитов: ${inv.streak_shield})`, 'info');
+                    window.dispatchEvent(new CustomEvent('study-boost-consumed', { detail: { boostId: 'streak_shield', remaining: inv.streak_shield } }));
+                } else {
+                    sessionStreaks[trainerId] = 0;
+                }
+            } catch (e) {
+                sessionStreaks[trainerId] = 0;
+            }
         }
 
         const streak = sessionStreaks[trainerId];
-        const record = saveTrainerRecord(trainerId, streak, isCorrect);
+        const record = saveTrainerRecord(trainerId, streak, isCorrect || shieldUsed);
+
+        // Проверка действия временного буста 2x XP
+        let doubleXpActive = false;
+        try {
+            const doubleUntil = parseInt(localStorage.getItem('study_buff_double_xp_until') || '0', 10);
+            if (doubleUntil > Date.now() && isCorrect) {
+                doubleXpActive = true;
+                const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10) || 0;
+                localStorage.setItem('studyBonusXp', String(curBonus + 10)); // Дополнительные +10 XP за 2x
+            }
+        } catch(e) {}
 
         // Автоматическая запись попытки в журнал заданий и автосинхронизация
         try {
@@ -619,7 +646,7 @@
                 subject: config ? (config.subject || 'Математика') : 'Математика',
                 skill: config ? (config.shortName || config.name || trainerId) : trainerId,
                 taskId: config ? (config.profileUrl || config.url || window.location.pathname) : window.location.pathname,
-                correct: !!isCorrect
+                correct: !!(isCorrect || shieldUsed)
             });
             if (metrics.length > 300) {
                 metrics.splice(0, metrics.length - 300);
@@ -632,7 +659,7 @@
             }
 
             window.dispatchEvent(new CustomEvent('study-task-solved', {
-                detail: { trainerId, isCorrect, streak }
+                detail: { trainerId, isCorrect: isCorrect || shieldUsed, streak, shieldUsed, doubleXpActive }
             }));
         } catch (e) {
             // Ignore storage warnings
@@ -641,8 +668,24 @@
         return {
             currentStreak: streak,
             maxStreak: record.maxStreak,
-            maxRank: record.maxRank
+            maxRank: record.maxRank,
+            shieldUsed
         };
+    }
+
+    function skipWithShield(trainerId) {
+        try {
+            const rawInv = localStorage.getItem('study_boosts_inventory');
+            const inv = rawInv ? JSON.parse(rawInv) : {};
+            if (inv && inv.streak_shield > 0) {
+                inv.streak_shield--;
+                localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+                showGiftToast(`🛡️ Задание пропущено со «Щитом серии»! Комбо сохранено! (Осталось: ${inv.streak_shield})`, 'success');
+                window.dispatchEvent(new CustomEvent('study-boost-consumed', { detail: { boostId: 'streak_shield', remaining: inv.streak_shield } }));
+                return true;
+            }
+        } catch(e) {}
+        return false;
     }
 
     function setSessionStreak(trainerId, streak) {
@@ -924,6 +967,7 @@
         getTrainerRecords,
         saveTrainerRecord,
         recordAttempt,
+        skipWithShield,
         setSessionStreak,
         renderRanksSection
     };

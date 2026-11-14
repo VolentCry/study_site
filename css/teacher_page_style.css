@@ -959,11 +959,26 @@ dialog.admin-modal::backdrop {
         grid-template-columns: 1fr;
     }
 }
-.constructor-box {
-    background: var(--surface-card);
-    border: 1px solid var(--line);
+.hw-edit-mode-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(255, 119, 40, 0.12), rgba(255, 174, 0, 0.08));
+    border: 1px solid rgba(255, 119, 40, 0.4);
     border-radius: var(--r);
-    padding: 1.5rem;
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 12px rgba(255, 119, 40, 0.08);
+}
+
+.lesson-plan-topic-highlight {
+    animation: flashHighlight 1.2s ease-out;
+}
+@keyframes flashHighlight {
+    0% { background-color: rgba(255, 119, 40, 0.25); border-color: var(--accent); }
+    100% { background-color: transparent; border-color: var(--line); }
 }
 .constructor-section-title {
     font-family: var(--f-display);

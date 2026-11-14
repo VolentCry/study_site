@@ -1012,9 +1012,9 @@ def api_teacher_homeworks():
         return jsonify({'success': False, 'error': 'Ошибка при создании домашнего задания.'}), 500
 
 
-@app.route('/api/teacher/homeworks/<int:homework_id>', methods=['GET', 'DELETE'])
+@app.route('/api/teacher/homeworks/<int:homework_id>', methods=['GET', 'PUT', 'DELETE'])
 def api_teacher_homework_detail(homework_id: int):
-    """Получение подробностей или удаление домашнего задания."""
+    """Получение подробностей, обновление или удаление домашнего задания."""
     teacher, err = check_teacher_auth()
     if err:
         return err
@@ -1023,6 +1023,45 @@ def api_teacher_homework_detail(homework_id: int):
         tid = None if teacher.get('role') == 'admin' else teacher['id']
         ok = db.delete_homework(homework_id, tid)
         return jsonify({'success': ok})
+
+    if request.method == 'PUT':
+        tid = None if teacher.get('role') == 'admin' else teacher['id']
+        payload = request.get_json(silent=True) or {}
+        title = payload.get('title')
+        subject = payload.get('subject', 'math')
+        tasks = payload.get('tasks', [])
+        description = payload.get('description', '')
+        deadline_at = payload.get('deadlineAt') or payload.get('deadline') or payload.get('deadline_at')
+        student_id = payload.get('studentId') or payload.get('student_id')
+        if student_id:
+            try:
+                student_id = int(student_id)
+            except (ValueError, TypeError):
+                student_id = None
+        else:
+            student_id = None
+
+        if not title:
+            return jsonify({'success': False, 'error': 'Название домашней работы не может быть пустым.'}), 400
+        if not isinstance(tasks, list) or len(tasks) == 0:
+            return jsonify({'success': False, 'error': 'Добавьте хотя бы одно задание в домашнюю работу.'}), 400
+
+        try:
+            hw = db.update_homework(
+                homework_id=homework_id,
+                teacher_id=tid,
+                title=str(title),
+                subject=str(subject),
+                tasks=tasks,
+                description=str(description or ''),
+                deadline_at=str(deadline_at) if deadline_at else None,
+                student_id=student_id
+            )
+            return jsonify({'success': True, 'homework': hw})
+        except ValueError as e:
+            return jsonify({'success': False, 'error': str(e)}), 400
+        except Exception as e:
+            return jsonify({'success': False, 'error': 'Ошибка при обновлении домашнего задания: ' + str(e)}), 500
 
     hw = db.get_homework_by_id(homework_id, role=teacher.get('role', 'teacher'))
     if not hw:
@@ -1142,6 +1181,23 @@ def api_student_submit_homework(homework_id: int):
         return jsonify({'success': False, 'error': str(e)}), 400
     except Exception as e:
         return jsonify({'success': False, 'error': 'Ошибка сервера при отправке домашней работы.'}), 500
+
+
+@app.route('/api/student/homeworks/<int:homework_id>/waive', methods=['POST'])
+@app.route('/api/homework/<int:homework_id>/waive', methods=['POST'])
+def api_student_waive_homework(homework_id: int):
+    """Использование буста «Отказ от Д/З» для авто-зачёта домашней работы со 100% оценкой."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    try:
+        res = db.waive_homework_submission(homework_id, user_id)
+        return jsonify({'success': True, 'submission': res})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка при списании домашнего задания: ' + str(e)}), 500
 
 
 # ============================================================================

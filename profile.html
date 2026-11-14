@@ -486,51 +486,335 @@
         <!-- TAB 4: UPGRADE / ПРОКАЧКА -->
         <div id="tab-content-upgrade" class="section-wrap hidden" role="tabpanel" aria-labelledby="tab-btn-upgrade">
             <div class="upgrade-page-container">
-                <div class="upgrade-placeholder-card">
-                    <div class="upgrade-placeholder-glow" aria-hidden="true"></div>
-                    <div class="upgrade-placeholder-icon-wrap" aria-hidden="true">
-                        <svg class="upgrade-lightning-icon" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                        </svg>
+
+                <!-- Header Hero Banner with Real-time XP & Level -->
+                <div class="upgrade-header-hero">
+                    <div class="upgrade-header-info">
+                        <h2>
+                            <span>🌟 Центр Прокачки</span>
+                            <span class="badge" style="background: rgba(255, 119, 40, 0.2); color: var(--accent); font-size: 0.78rem; font-weight: 800;">BETA</span>
+                        </h2>
+                        <p>Испытай удачу в рулетке, покупай мощные бустеры и покоряй этажи Башни Знаний!</p>
                     </div>
-                    <div class="upgrade-badge-pill">
-                        <span class="upgrade-badge-dot" aria-hidden="true"></span>
-                        <span>Скоро открытие</span>
+                    <div class="upgrade-stats-strip">
+                        <div class="upgrade-stat-pill">
+                            <span>⚡ Опыт:</span>
+                            <strong id="upgrade-user-xp">0 XP</strong>
+                        </div>
+                        <div class="upgrade-stat-pill">
+                            <span>🎒 Бусты:</span>
+                            <strong id="upgrade-boosts-count">0 шт.</strong>
+                        </div>
+                        <div class="upgrade-stat-pill">
+                            <span>🏰 Рекорд башни:</span>
+                            <strong id="upgrade-tower-record">1 этаж</strong>
+                        </div>
                     </div>
-                    <h2 class="upgrade-placeholder-title">Раздел «Прокачка»</h2>
-                    <p class="upgrade-placeholder-desc">
-                        Здесь готовится система развития твоего персонажа-исследователя: прокачка рангов, ветки умений, множители опыта за серии решений и уникальные бустеры.
-                    </p>
-                    <div class="upgrade-features-grid">
-                        <div class="upgrade-feature-item">
-                            <div class="upgrade-feature-icon" aria-hidden="true">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                            </div>
-                            <div class="upgrade-feature-text">
-                                <span class="upgrade-feature-name">Очки опыта</span>
-                                <span class="upgrade-feature-hint">За каждое верное решение</span>
-                            </div>
+                </div>
+
+                <!-- Sub-nav Pills -->
+                <div class="upgrade-subnav" role="tablist">
+                    <button type="button" class="upgrade-subnav-btn active" data-upgrade-tab="roulette">
+                        🎡 Рулетка Опыта
+                    </button>
+                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="store">
+                        🛒 Магазин Бустов
+                    </button>
+                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="tower">
+                        🏰 Башня Знаний (RPG)
+                    </button>
+                </div>
+
+                <!-- SECTION 1: ROULETTE / КОЛЕСО ФОРТУНЫ -->
+                <div id="upgrade-tab-roulette" class="upgrade-section-card">
+                    <div class="upgrade-section-title">
+                        <span>🎡 Колесо Фортуны</span>
+                        <div id="roulette-free-spin-indicator" style="display: none;">
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.4);">
+                                🎁 Доступен 1 бесплатный спин!
+                            </span>
                         </div>
-                        <div class="upgrade-feature-item">
-                            <div class="upgrade-feature-icon" aria-hidden="true">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            </div>
-                            <div class="upgrade-feature-text">
-                                <span class="upgrade-feature-name">Древо навыков</span>
-                                <span class="upgrade-feature-hint">Пассивные бонусы исследователя</span>
-                            </div>
+                    </div>
+
+                    <div class="roulette-board">
+                        <div class="roulette-wheel-wrap">
+                            <div class="roulette-pointer" id="roulette-pointer"></div>
+                            <canvas id="roulette-wheel-canvas" width="360" height="360" class="roulette-wheel-canvas"></canvas>
+                            <div class="roulette-center-cap">🎯</div>
                         </div>
-                        <div class="upgrade-feature-item">
-                            <div class="upgrade-feature-icon" aria-hidden="true">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+
+                        <div class="roulette-panel">
+                            <div id="roulette-free-spin-card" class="roulette-free-spin-box" style="display: none;">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 0.95rem; color: #10b981;">🎁 Бесплатный приветственный спин!</div>
+                                    <div style="font-size: 0.8rem; color: var(--muted-bright);">Крутите без риска и выиграйте XP или редкий буст!</div>
+                                </div>
+                                <button type="button" class="btn btn-emerald btn-sm" id="btn-use-free-spin">
+                                    Бесплатный спин
+                                </button>
                             </div>
-                            <div class="upgrade-feature-text">
-                                <span class="upgrade-feature-name">Бустеры серии</span>
-                                <span class="upgrade-feature-hint">Умножение очков за комбо</span>
+
+                            <div class="roulette-bet-box">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <label class="form-label" style="margin: 0; font-weight: 700;">Размер ставки (XP):</label>
+                                    <span style="font-size: 0.82rem; color: var(--muted-bright);">Баланс: <strong style="color: var(--accent);" id="roulette-balance-display">0 XP</strong></span>
+                                </div>
+
+                                <div class="roulette-chips-row">
+                                    <button type="button" class="roulette-chip-btn active" data-bet="10">10 XP</button>
+                                    <button type="button" class="roulette-chip-btn" data-bet="25">25 XP</button>
+                                    <button type="button" class="roulette-chip-btn" data-bet="50">50 XP</button>
+                                    <button type="button" class="roulette-chip-btn" data-bet="100">100 XP</button>
+                                    <button type="button" class="roulette-chip-btn" data-bet="all">Всё (All-in)</button>
+                                </div>
+
+                                <div class="roulette-input-row">
+                                    <input type="number" id="roulette-bet-input" class="form-input" min="10" step="5" value="10" style="font-weight: 800; font-size: 1.1rem; text-align: center;">
+                                    <button type="button" class="btn btn-emerald roulette-spin-btn" id="btn-spin-roulette">
+                                        🎡 КРУТИТЬ
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                <div style="font-size: 0.8rem; color: var(--muted); font-weight: 700;">Секторы колеса:</div>
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem;">
+                                    <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">💀 0x</span>
+                                    <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">🛡️ 0.5x</span>
+                                    <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">✨ 1.2x</span>
+                                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">⚡ 1.5x</span>
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">🔥 2.0x</span>
+                                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">⭐ 3.0x</span>
+                                    <span class="badge" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">👑 5.0x</span>
+                                    <span class="badge" style="background: rgba(255, 119, 40, 0.2); color: var(--accent);">🎁 БУСТ</span>
+                                </div>
+                            </div>
+
+                            <div class="roulette-history">
+                                <span>История спинов:</span>
+                                <div id="roulette-history-list" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <span style="color: var(--muted); font-size: 0.78rem;">Пока нет спинов</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- SECTION 2: BOOST STORE & INVENTORY -->
+                <div id="upgrade-tab-store" class="upgrade-section-card" style="display: none;">
+                    <div class="upgrade-section-title">
+                        <span>🛒 Магазин полезных бустов</span>
+                        <span style="font-size: 0.88rem; color: var(--muted-bright);">Оплата накопленным опытом (XP)</span>
+                    </div>
+
+                    <div class="boost-store-grid">
+                        <!-- Boost 1: Streak Shield -->
+                        <div class="boost-card">
+                            <div class="boost-card-top">
+                                <div class="boost-card-icon">🛡️</div>
+                                <div>
+                                    <h3 class="boost-card-title">Щит серии</h3>
+                                    <p class="boost-card-desc">Спасает победную серию в любом тренажёре при ошибке или позволяет пропустить трудную задачу без потери комбо.</p>
+                                </div>
+                            </div>
+                            <div class="boost-card-bottom">
+                                <div class="boost-card-price">⚡ 60 XP</div>
+                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="streak_shield" data-boost-price="60">
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Boost 2: Homework Pass -->
+                        <div class="boost-card">
+                            <div class="boost-card-top">
+                                <div class="boost-card-icon">📜</div>
+                                <div>
+                                    <h3 class="boost-card-title">Отказ от Д/З</h3>
+                                    <p class="boost-card-desc">Автоматический 100% зачёт одного выданного домашнего задания. В журнале учителя отобразится статус «Освобождён по бусту 📜».</p>
+                                </div>
+                            </div>
+                            <div class="boost-card-bottom">
+                                <div class="boost-card-price">⚡ 250 XP</div>
+                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hw_pass" data-boost-price="250">
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Boost 3: 2x XP Potion -->
+                        <div class="boost-card">
+                            <div class="boost-card-top">
+                                <div class="boost-card-icon">⚡</div>
+                                <div>
+                                    <h3 class="boost-card-title">Эликсир мудрости</h3>
+                                    <p class="boost-card-desc">Удваивает весь получаемый опыт (2x XP) за решение задач в тренажёрах на 30 минут!</p>
+                                </div>
+                            </div>
+                            <div class="boost-card-bottom">
+                                <div class="boost-card-price">⚡ 100 XP</div>
+                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="double_xp" data-boost-price="100">
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Boost 4: Spy Hint -->
+                        <div class="boost-card">
+                            <div class="boost-card-top">
+                                <div class="boost-card-icon">🔍</div>
+                                <div>
+                                    <h3 class="boost-card-title">Шпионская подсказка</h3>
+                                    <p class="boost-card-desc">Открывает подробный пошаговый разбор любой задачи в тренажёре без штрафа к попытке.</p>
+                                </div>
+                            </div>
+                            <div class="boost-card-bottom">
+                                <div class="boost-card-price">⚡ 40 XP</div>
+                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hint" data-boost-price="40">
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Boost 5: Time Freeze -->
+                        <div class="boost-card">
+                            <div class="boost-card-top">
+                                <div class="boost-card-icon">⏱️</div>
+                                <div>
+                                    <h3 class="boost-card-title">Заморозка времени</h3>
+                                    <p class="boost-card-desc">Останавливает таймер на 60 секунд в режимах на время («Сыграть на 10 минут» и спринтах).</p>
+                                </div>
+                            </div>
+                            <div class="boost-card-bottom">
+                                <div class="boost-card-price">⚡ 50 XP</div>
+                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="time_freeze" data-boost-price="50">
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Container -->
+                    <div class="boost-inventory-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                <span>🎒 Мой инвентарь бустов</span>
+                            </h3>
+                            <div id="active-buff-indicator" style="font-size: 0.82rem; font-weight: 700; color: #10b981; display: none;">
+                                ⚡ Буст 2x XP активен: <span id="buff-timer-text">30:00</span>
+                            </div>
+                        </div>
+
+                        <div class="boost-inventory-grid" id="boost-inventory-items-wrap">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: TOWER OF KNOWLEDGE (RPG ROGUELIKE) -->
+                <div id="upgrade-tab-tower" class="upgrade-section-card" style="display: none;">
+                    <div class="upgrade-section-title">
+                        <span>🏰 Башня Знаний · Пошаговый RPG-рогалик</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6; font-weight: 800;">
+                                Этаж <span id="tower-current-floor">1</span>
+                            </span>
+                            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; font-weight: 800;">
+                                💎 <span id="tower-shards-count">0</span> осколков
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="tower-arena" id="tower-arena-box">
+                        <!-- Combatants Header -->
+                        <div class="tower-combat-row">
+                            <!-- Hero Stats -->
+                            <div class="tower-unit-card hero">
+                                <div class="tower-unit-header">
+                                    <div class="tower-unit-name">🧙‍♂️ Герой-Исследователь</div>
+                                    <div style="font-size: 0.82rem; font-weight: 800; color: #10b981;" id="tower-hero-hp-text">100 / 100 HP</div>
+                                </div>
+                                <div class="tower-hp-track">
+                                    <div class="tower-hp-fill hero" id="tower-hero-hp-bar" style="width: 100%;"></div>
+                                </div>
+                                <div style="display: flex; gap: 0.75rem; font-size: 0.78rem; color: var(--muted-bright); margin-top: 4px; flex-wrap: wrap;">
+                                    <span>⚔️ Урон: <strong style="color:var(--text);" id="tower-hero-atk">25</strong></span>
+                                    <span>🎯 Крит: <strong style="color:var(--text);" id="tower-hero-crit">15%</strong></span>
+                                    <span>🛡️ Щит: <strong style="color:var(--text);" id="tower-hero-def">1</strong></span>
+                                </div>
+                            </div>
+
+                            <!-- Monster Stats -->
+                            <div class="tower-unit-card monster" id="tower-monster-card">
+                                <div class="tower-unit-header">
+                                    <div class="tower-unit-name">
+                                        <span id="tower-monster-icon">👾</span>
+                                        <span id="tower-monster-title">Гоблин-счетовод</span>
+                                    </div>
+                                    <div style="font-size: 0.82rem; font-weight: 800; color: #ef4444;" id="tower-monster-hp-text">60 / 60 HP</div>
+                                </div>
+                                <div class="tower-hp-track">
+                                    <div class="tower-hp-fill monster" id="tower-monster-hp-bar" style="width: 100%;"></div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #eab308; font-weight: 700;">
+                                        <span>Атака стража:</span>
+                                        <span id="tower-timer-sec">15с</span>
+                                    </div>
+                                    <div class="tower-timer-track">
+                                        <div class="tower-timer-fill" id="tower-timer-bar" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Battle Question Field -->
+                        <div class="tower-question-box" id="tower-question-container">
+                            <div style="font-size: 0.85rem; color: var(--muted-bright); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em;" id="tower-stage-kicker">
+                                Реши задачу быстрее 3 сек для критического удара 200%!
+                            </div>
+                            <div id="tower-problem-text">Загрузка задачи...</div>
+                        </div>
+
+                        <!-- Answer Input Row -->
+                        <div class="tower-input-row">
+                            <input type="text" id="tower-user-answer" class="form-input tower-answer-input" placeholder="Введите ответ..." autocomplete="off">
+                            <button type="button" class="btn btn-emerald" id="btn-tower-submit-answer" style="height: 48px; font-weight: 800; padding: 0 1.5rem;">
+                                ⚔️ Атаковать!
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-tower-restart" style="height: 48px;" title="Начать забег с 1-го этажа">
+                                🔄 Заново
+                            </button>
+                        </div>
+
+                        <!-- Upgrade Skills Strip -->
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--text); margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+                                <span>⚡ Лагерь прокачки характеристик:</span>
+                                <span style="color: #f59e0b;">Осколки 💎 зарабатываются победами над монстрами</span>
+                            </div>
+                            <div class="tower-upgrades-bar">
+                                <button type="button" class="tower-upgrade-btn" id="btn-upgrade-atk" data-cost="20">
+                                    <span>⚔️ +5 к Атаке</span>
+                                    <strong style="color: #f59e0b;">20 💎</strong>
+                                </button>
+                                <button type="button" class="tower-upgrade-btn" id="btn-upgrade-hp" data-cost="20">
+                                    <span>❤️ +25 к Макс. HP</span>
+                                    <strong style="color: #f59e0b;">20 💎</strong>
+                                </button>
+                                <button type="button" class="tower-upgrade-btn" id="btn-upgrade-crit" data-cost="30">
+                                    <span>🎯 +5% к Криту</span>
+                                    <strong style="color: #f59e0b;">30 💎</strong>
+                                </button>
+                                <button type="button" class="tower-upgrade-btn" id="btn-upgrade-shield" data-cost="25">
+                                    <span>🛡️ +1 Щит блока</span>
+                                    <strong style="color: #f59e0b;">25 💎</strong>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>

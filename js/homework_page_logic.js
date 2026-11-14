@@ -211,7 +211,16 @@
             bottomBar.style.display = 'none';
         }
 
-        if (status === 'checked') {
+        if (status === 'waived') {
+            statusBadge.className = 'badge badge-status status-checked';
+            statusBadge.textContent = 'Освобождён бустом прокачки 📜';
+            scoreWrap.style.display = 'block';
+            const maxScore = (sub.max_score != null) ? sub.max_score : ((sub.maxScore != null) ? sub.maxScore : hwData.tasks.length);
+            scoreEl.textContent = `${sub.score || maxScore} / ${maxScore} (100%)`;
+            feedbackBanner.style.display = 'flex';
+            feedbackText.textContent = sub.teacher_feedback || 'Официально освобождён от выполнения по игровому бусту «Отказ от Д/З» 📜';
+            bottomBar.style.display = 'none';
+        } else if (status === 'checked') {
             statusBadge.className = 'badge badge-status status-checked';
             statusBadge.textContent = isTeacher ? `Проверено (ученик: ${escapeHtml(hwData.studentName || hwData.student_name || 'Ученик')})` : 'Проверено';
             scoreWrap.style.display = 'block';
