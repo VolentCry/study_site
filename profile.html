@@ -483,238 +483,435 @@
             </div>
         </div>
 
-        <!-- TAB 4: UPGRADE / ПРОКАЧКА -->
+        <!-- TAB 4: UPGRADE / ПРОКАЧКА (НЕЙРО-ЛАБОРАТОРИЯ ИССЛЕДОВАТЕЛЯ) -->
         <div id="tab-content-upgrade" class="section-wrap hidden" role="tabpanel" aria-labelledby="tab-btn-upgrade">
             <div class="upgrade-page-container">
 
-                <!-- Header Hero Banner with Real-time XP & Level -->
-                <div class="upgrade-header-hero">
+                <!-- 1. LAB HERO TERMINAL BANNER -->
+                <div class="upgrade-header-hero lab-hero">
                     <div class="upgrade-header-info">
-                        <h2>
-                            <span>🌟 Центр Прокачки</span>
-                            <span class="badge" style="background: rgba(255, 119, 40, 0.2); color: var(--accent); font-size: 0.78rem; font-weight: 800;">BETA</span>
-                        </h2>
-                        <p>Испытай удачу в рулетке, покупай мощные бустеры и покоряй этажи Башни Знаний!</p>
+                        <div class="lab-hero-kicker">
+                            <span class="lab-status-beacon" aria-hidden="true"></span>
+                            <span>Терминал Нейро-Прокачки</span>
+                            <span class="lab-tech-pill">v2.4 QUANTUM</span>
+                        </div>
+                        <h2>Лаборатория Исследователя</h2>
+                        <p>Синтезируйте энергию в квантовом коллайдере, открывайте модули когнитивного превосходства и настраивайте свой цифровой аватар.</p>
                     </div>
                     <div class="upgrade-stats-strip">
                         <div class="upgrade-stat-pill">
-                            <span>⚡ Опыт:</span>
+                            <span class="stat-pill-label">⚡ Энергия XP:</span>
                             <strong id="upgrade-user-xp">0 XP</strong>
                         </div>
-                        <div class="upgrade-stat-pill">
-                            <span>🎒 Бусты:</span>
-                            <strong id="upgrade-boosts-count">0 шт.</strong>
+                        <div class="upgrade-stat-pill" id="collider-core-status-pill">
+                            <span class="stat-pill-label">⚛️ Ядро:</span>
+                            <strong id="collider-core-status-text" style="color: var(--accent-emerald);">Готово</strong>
                         </div>
                         <div class="upgrade-stat-pill">
-                            <span>🏰 Рекорд башни:</span>
+                            <span class="stat-pill-label">🎒 Модули:</span>
+                            <strong id="upgrade-boosts-count">0 шт.</strong>
+                        </div>
+                        <div class="upgrade-stat-pill d-none-mobile">
+                            <span class="stat-pill-label">🏰 Полигон:</span>
                             <strong id="upgrade-tower-record">1 этаж</strong>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sub-nav Pills -->
-                <div class="upgrade-subnav" role="tablist">
-                    <button type="button" class="upgrade-subnav-btn active" data-upgrade-tab="roulette">
-                        🎡 Рулетка Опыта
+                <!-- 2. HIGH-TECH SUBNAV -->
+                <div class="upgrade-subnav" role="tablist" aria-label="Разделы Лаборатории">
+                    <button type="button" class="upgrade-subnav-btn active" data-upgrade-tab="collider" role="tab" aria-selected="true">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>
+                        <span>Квантовый Коллайдер</span>
                     </button>
-                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="store">
-                        🛒 Магазин Бустов
+                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="techtree" role="tab" aria-selected="false">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v6m0 0l-4 4m4-4l4 4m-4 10v-6m-4-2H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2zm12 0h-4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z"/></svg>
+                        <span>Древо Модулей</span>
                     </button>
-                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="tower">
-                        🏰 Башня Знаний (RPG)
+                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="holocabinet" role="tab" aria-selected="false">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="12" r="11" stroke-dasharray="3 3"/></svg>
+                        <span>Голо-Мастерская</span>
+                    </button>
+                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="inventory" role="tab" aria-selected="false">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        <span>Инвентарь & Бусты</span>
+                    </button>
+                    <button type="button" class="upgrade-subnav-btn" data-upgrade-tab="tower" role="tab" aria-selected="false">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        <span>Кибер-Полигон</span>
                     </button>
                 </div>
 
-                <!-- SECTION 1: ROULETTE / КОЛЕСО ФОРТУНЫ -->
-                <div id="upgrade-tab-roulette" class="upgrade-section-card">
+                <!-- SECTION 1: QUANTUM COLLIDER (RE-IMAGINED SCI-FI WHEEL) -->
+                <div id="upgrade-tab-collider" class="upgrade-section-card lab-card">
                     <div class="upgrade-section-title">
-                        <span>🎡 Колесо Фортуны</span>
-                        <div id="roulette-free-spin-indicator" style="display: none;">
-                            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.4);">
-                                🎁 Доступен 1 бесплатный спин!
-                            </span>
+                        <div class="title-with-pill">
+                            <span class="icon-wrap" aria-hidden="true">⚛️</span>
+                            <div>
+                                <h3>Квантовый Коллайдер Частиц</h3>
+                                <span class="section-subtext">Ежедневный синтез энергии, артефактов и редких исследовательских перков</span>
+                            </div>
+                        </div>
+                        <div id="roulette-free-spin-indicator" class="collider-free-badge" style="display: none;">
+                            <span class="pulse-dot"></span>
+                            <span>Суточная калибровка: БЕСПЛАТНО</span>
                         </div>
                     </div>
 
-                    <div class="roulette-board">
-                        <div class="roulette-wheel-wrap">
-                            <div class="roulette-pointer" id="roulette-pointer"></div>
-                            <canvas id="roulette-wheel-canvas" width="360" height="360" class="roulette-wheel-canvas"></canvas>
-                            <div class="roulette-center-cap">🎯</div>
+                    <div class="collider-stage">
+                        <!-- WHEEL GYROSCOPE CONTAINER -->
+                        <div class="collider-gyro-wrap">
+                            <div class="collider-reticle" id="roulette-pointer" aria-hidden="true">
+                                <div class="reticle-core"></div>
+                                <div class="reticle-laser"></div>
+                            </div>
+                            <div class="collider-canvas-holder">
+                                <canvas id="roulette-wheel-canvas" width="380" height="380" class="collider-canvas"></canvas>
+                                <div class="collider-center-emitter" aria-hidden="true">
+                                    <div class="plasma-core"></div>
+                                    <div class="plasma-rings"></div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="roulette-panel">
-                            <div id="roulette-free-spin-card" class="roulette-free-spin-box" style="display: none;">
-                                <div>
-                                    <div style="font-weight: 800; font-size: 0.95rem; color: #10b981;">🎁 Бесплатный приветственный спин!</div>
-                                    <div style="font-size: 0.8rem; color: var(--muted-bright);">Крутите без риска и выиграйте XP или редкий буст!</div>
+                        <!-- CONTROL & SECTOR SPECIFICATION PANEL -->
+                        <div class="collider-controls-panel">
+                            <!-- DAILY CALIBRATION CARD -->
+                            <div id="roulette-free-spin-card" class="collider-daily-banner" style="display: none;">
+                                <div class="daily-banner-icon" aria-hidden="true">🎁</div>
+                                <div class="daily-banner-body">
+                                    <strong>Суточная калибровка ядра готова!</strong>
+                                    <p>Запустите импульс без расхода XP. Следующая калибровка будет доступна через 24 часа.</p>
                                 </div>
-                                <button type="button" class="btn btn-emerald btn-sm" id="btn-use-free-spin">
-                                    Бесплатный спин
+                                <button type="button" class="btn btn-emerald" id="btn-use-free-spin">
+                                    Бесплатный импульс
                                 </button>
                             </div>
 
-                            <div class="roulette-bet-box">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <label class="form-label" style="margin: 0; font-weight: 700;">Размер ставки (XP):</label>
-                                    <span style="font-size: 0.82rem; color: var(--muted-bright);">Баланс: <strong style="color: var(--accent);" id="roulette-balance-display">0 XP</strong></span>
+                            <!-- STANDARD CALIBRATION BOX -->
+                            <div class="collider-action-card">
+                                <div class="action-card-head">
+                                    <span class="action-card-label">Калибровка за опыт</span>
+                                    <span class="action-balance-label">Баланс: <strong id="roulette-balance-display">0 XP</strong></span>
+                                </div>
+                                <div class="collider-trigger-row">
+                                    <div class="cost-tag">
+                                        <span>Расход:</span>
+                                        <strong>30 XP</strong>
+                                    </div>
+                                    <button type="button" class="btn btn-emerald btn-lg collider-spin-btn" id="btn-spin-roulette">
+                                        <span class="spin-icon">⚡</span>
+                                        <span>Запустить Коллайдер</span>
+                                    </button>
+                                </div>
+                                <span class="collider-note">Никаких потерь в ноль: каждая калибровка гарантированно приносит полезный ресурс.</span>
+                            </div>
+
+                            <!-- SECTOR LEGEND TABLE -->
+                            <div class="collider-sectors-spec">
+                                <span class="spec-heading">Диаграмма квантовых состояний:</span>
+                                <div class="sectors-grid-pills">
+                                    <div class="sector-spec-pill pill-xp">
+                                        <span class="pill-dot"></span>
+                                        <span class="pill-name">Импульсы XP</span>
+                                        <span class="pill-val">+15 / +45 / +100 XP</span>
+                                    </div>
+                                    <div class="sector-spec-pill pill-shield">
+                                        <span class="pill-dot"></span>
+                                        <span class="pill-name">Квантовый щит</span>
+                                        <span class="pill-val">Защита серии</span>
+                                    </div>
+                                    <div class="sector-spec-pill pill-chrono">
+                                        <span class="pill-dot"></span>
+                                        <span class="pill-name">Хроно-стазис</span>
+                                        <span class="pill-val">+60с в спринте</span>
+                                    </div>
+                                    <div class="sector-spec-pill pill-hint">
+                                        <span class="pill-dot"></span>
+                                        <span class="pill-name">Нейро-сканер</span>
+                                        <span class="pill-val">Подсказка задачи</span>
+                                    </div>
+                                    <div class="sector-spec-pill pill-crystal">
+                                        <span class="pill-dot"></span>
+                                        <span class="pill-name">Кристалл</span>
+                                        <span class="pill-val">+50 XP & Осколок</span>
+                                    </div>
+                                    <div class="sector-spec-pill pill-supernova">
+                                        <span class="pill-dot"></span>
+                                        <span class="pill-name">👑 Сверхновая</span>
+                                        <span class="pill-val">+250 XP & 2x XP</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- LOG OF RECENT SYNTHESES -->
+                            <div class="collider-history-box">
+                                <span class="history-label">Журнал последних синтезов:</span>
+                                <div id="roulette-history-list" class="collider-history-tags">
+                                    <span class="empty-history">Пока нет записей калибровки</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: TECH TREE / ДРЕВО МОДУЛЕЙ -->
+                <div id="upgrade-tab-techtree" class="upgrade-section-card lab-card" style="display: none;">
+                    <div class="upgrade-section-title">
+                        <div class="title-with-pill">
+                            <span class="icon-wrap" aria-hidden="true">🧬</span>
+                            <div>
+                                <h3>Древо Исследовательских Аугментаций</h3>
+                                <span class="section-subtext">Интегрируйте модули в костюм исследователя для ощутимого преимущества в тренажёрах</span>
+                            </div>
+                        </div>
+                        <div class="techtree-summary-pill">
+                            <span>Доступно:</span>
+                            <strong id="techtree-user-xp">0 XP</strong>
+                        </div>
+                    </div>
+
+                    <!-- TECH TREE BRANCHES CONTAINER -->
+                    <div class="techtree-branches-grid">
+                        <!-- BRANCH 1: CHRONO & FOCUS -->
+                        <div class="techtree-branch-col">
+                            <div class="branch-col-header chrono-branch">
+                                <span class="branch-icon" aria-hidden="true">⏱️</span>
+                                <div>
+                                    <h4 class="branch-name">Концентрация и Время</h4>
+                                    <span class="branch-tagline">Управление ритмом мысли и таймерами</span>
+                                </div>
+                            </div>
+
+                            <div class="branch-cards-stack">
+                                <!-- Module 1: Time Freeze -->
+                                <div class="techtree-card" data-module-id="time_freeze">
+                                    <div class="techtree-card-badge">УРОВЕНЬ I</div>
+                                    <div class="techtree-card-body">
+                                        <div class="techtree-icon-box">⏱️</div>
+                                        <div class="techtree-card-details">
+                                            <h5 class="techtree-module-title">Хроно-стазис</h5>
+                                            <p class="techtree-module-desc">Останавливает таймер на 60 секунд в режимах на время («Спринт 10 минут»).</p>
+                                        </div>
+                                    </div>
+                                    <div class="techtree-card-footer">
+                                        <span class="techtree-price">⚡ 50 XP</span>
+                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="time_freeze" data-boost-price="50">
+                                            Синтезировать
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div class="roulette-chips-row">
-                                    <button type="button" class="roulette-chip-btn active" data-bet="10">10 XP</button>
-                                    <button type="button" class="roulette-chip-btn" data-bet="25">25 XP</button>
-                                    <button type="button" class="roulette-chip-btn" data-bet="50">50 XP</button>
-                                    <button type="button" class="roulette-chip-btn" data-bet="100">100 XP</button>
-                                    <button type="button" class="roulette-chip-btn" data-bet="all">Всё (All-in)</button>
+                                <div class="techtree-connector" aria-hidden="true">
+                                    <span class="connector-line"></span>
+                                    <span class="connector-node"></span>
                                 </div>
 
-                                <div class="roulette-input-row">
-                                    <input type="number" id="roulette-bet-input" class="form-input" min="10" step="5" value="10" style="font-weight: 800; font-size: 1.1rem; text-align: center;">
-                                    <button type="button" class="btn btn-emerald roulette-spin-btn" id="btn-spin-roulette">
-                                        🎡 КРУТИТЬ
+                                <!-- Module 2: Zen Focus -->
+                                <div class="techtree-card" data-module-id="zen_focus">
+                                    <div class="techtree-card-badge">УРОВЕНЬ II</div>
+                                    <div class="techtree-card-body">
+                                        <div class="techtree-icon-box">🎧</div>
+                                        <div class="techtree-card-details">
+                                            <h5 class="techtree-module-title">Дзен-Режим Фокуса</h5>
+                                            <p class="techtree-module-desc">Генератор фонового космического эмбиента для максимального погружения при решении задач.</p>
+                                        </div>
+                                    </div>
+                                    <div class="techtree-card-footer">
+                                        <span class="techtree-price">Встроенный модуль</span>
+                                        <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-zen">
+                                            🔊 Слушать эмбиент
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BRANCH 2: NEURO-LOGIC -->
+                        <div class="techtree-branch-col">
+                            <div class="branch-col-header logic-branch">
+                                <span class="branch-icon" aria-hidden="true">🧠</span>
+                                <div>
+                                    <h4 class="branch-name">Интеллект и Аналитика</h4>
+                                    <span class="branch-tagline">Инструменты глубокой декомпозиции задач</span>
+                                </div>
+                            </div>
+
+                            <div class="branch-cards-stack">
+                                <!-- Module 1: Hint -->
+                                <div class="techtree-card" data-module-id="hint">
+                                    <div class="techtree-card-badge">УРОВЕНЬ I</div>
+                                    <div class="techtree-card-body">
+                                        <div class="techtree-icon-box">🔍</div>
+                                        <div class="techtree-card-details">
+                                            <h5 class="techtree-module-title">Нейро-сканер шага</h5>
+                                            <p class="techtree-module-desc">Открывает пошаговую математическую подсказку в любом тренажёре без штрафа к попытке.</p>
+                                        </div>
+                                    </div>
+                                    <div class="techtree-card-footer">
+                                        <span class="techtree-price">⚡ 50 XP</span>
+                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hint" data-boost-price="50">
+                                            Синтезировать
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="techtree-connector" aria-hidden="true">
+                                    <span class="connector-line"></span>
+                                    <span class="connector-node"></span>
+                                </div>
+
+                                <!-- Module 2: Homework Assistance -->
+                                <div class="techtree-card" data-module-id="hw_pass">
+                                    <div class="techtree-card-badge">УРОВЕНЬ II</div>
+                                    <div class="techtree-card-body">
+                                        <div class="techtree-icon-box">📜</div>
+                                        <div class="techtree-card-details">
+                                            <h5 class="techtree-module-title">Академический зачёт</h5>
+                                            <p class="techtree-module-desc">Официальный 100% зачёт домашнего задания со статусом в журнале учителя «Освобождён за успехи в тренажерах».</p>
+                                        </div>
+                                    </div>
+                                    <div class="techtree-card-footer">
+                                        <span class="techtree-price">⚡ 400 XP</span>
+                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hw_pass" data-boost-price="400">
+                                            Синтезировать
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BRANCH 3: OVERCLOCK & ENERGY -->
+                        <div class="techtree-branch-col">
+                            <div class="branch-col-header energy-branch">
+                                <span class="branch-icon" aria-hidden="true">⚡</span>
+                                <div>
+                                    <h4 class="branch-name">Энергия и Серии</h4>
+                                    <span class="branch-tagline">Множители прогресса и защита победных серий</span>
+                                </div>
+                            </div>
+
+                            <div class="branch-cards-stack">
+                                <!-- Module 1: Streak Shield -->
+                                <div class="techtree-card" data-module-id="streak_shield">
+                                    <div class="techtree-card-badge">УРОВЕНЬ I</div>
+                                    <div class="techtree-card-body">
+                                        <div class="techtree-icon-box">🛡️</div>
+                                        <div class="techtree-card-details">
+                                            <h5 class="techtree-module-title">Квантовый щит серии</h5>
+                                            <p class="techtree-module-desc">Спасает победную серию в тренажёре при единичной случайной ошибке.</p>
+                                        </div>
+                                    </div>
+                                    <div class="techtree-card-footer">
+                                        <span class="techtree-price">⚡ 60 XP</span>
+                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="streak_shield" data-boost-price="60">
+                                            Синтезировать
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="techtree-connector" aria-hidden="true">
+                                    <span class="connector-line"></span>
+                                    <span class="connector-node"></span>
+                                </div>
+
+                                <!-- Module 2: 2x XP -->
+                                <div class="techtree-card" data-module-id="double_xp">
+                                    <div class="techtree-card-badge">УРОВЕНЬ II</div>
+                                    <div class="techtree-card-body">
+                                        <div class="techtree-icon-box">⚡</div>
+                                        <div class="techtree-card-details">
+                                            <h5 class="techtree-module-title">Катализатор Сверхновой (2x XP)</h5>
+                                            <p class="techtree-module-desc">Удваивает весь получаемый опыт в тренажёрах на 30 минут активной сессии!</p>
+                                        </div>
+                                    </div>
+                                    <div class="techtree-card-footer">
+                                        <span class="techtree-price">⚡ 100 XP</span>
+                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="double_xp" data-boost-price="100">
+                                            Синтезировать
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: HOLOCABINET / ГОЛО-МАСТЕРСКАЯ АВАТАРА -->
+                <div id="upgrade-tab-holocabinet" class="upgrade-section-card lab-card" style="display: none;">
+                    <div class="upgrade-section-title">
+                        <div class="title-with-pill">
+                            <span class="icon-wrap" aria-hidden="true">🛰️</span>
+                            <div>
+                                <h3>Голо-Мастерская Цифрового Образа</h3>
+                                <span class="section-subtext">Кастомизация орбит и неоновых ореолов вашего исследовательского аватара</span>
+                            </div>
+                        </div>
+                        <div class="holocabinet-active-badge">
+                            <span>Текущая орбита:</span>
+                            <strong id="holo-active-frame-name">Классическая орбита</strong>
+                        </div>
+                    </div>
+
+                    <div class="holocabinet-layout">
+                        <!-- LIVE AVATAR STAGE -->
+                        <div class="holo-stage-card">
+                            <span class="holo-stage-label">Голографический визор</span>
+                            <div class="holo-preview-wrap">
+                                <div class="avatar-wrap holo-live-avatar" id="holo-preview-avatar" data-frame="orbit">
+                                    <div class="avatar-ring" aria-hidden="true"></div>
+                                    <div class="avatar-placeholder" id="holo-preview-letter">У</div>
+                                </div>
+                            </div>
+                            <div class="holo-preview-meta">
+                                <h4 id="holo-selected-frame-title">Классическая орбита</h4>
+                                <p id="holo-selected-frame-desc">Базовый стабилизатор исследователя НЕШколы. Открыт по умолчанию с 1-го уровня.</p>
+                                <div class="holo-action-wrap">
+                                    <button type="button" class="btn btn-emerald" id="btn-holo-equip-frame">
+                                        ✓ Надеть на профиль
                                     </button>
                                 </div>
                             </div>
+                        </div>
 
-                            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                                <div style="font-size: 0.8rem; color: var(--muted); font-weight: 700;">Секторы колеса:</div>
-                                <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.78rem;">
-                                    <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">💀 0x</span>
-                                    <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">🛡️ 0.5x</span>
-                                    <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">✨ 1.2x</span>
-                                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">⚡ 1.5x</span>
-                                    <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">🔥 2.0x</span>
-                                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">⭐ 3.0x</span>
-                                    <span class="badge" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">👑 5.0x</span>
-                                    <span class="badge" style="background: rgba(255, 119, 40, 0.2); color: var(--accent);">🎁 БУСТ</span>
-                                </div>
-                            </div>
-
-                            <div class="roulette-history">
-                                <span>История спинов:</span>
-                                <div id="roulette-history-list" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                    <span style="color: var(--muted); font-size: 0.78rem;">Пока нет спинов</span>
-                                </div>
-                            </div>
+                        <!-- FRAMES CATALOG GRID -->
+                        <div class="holo-frames-grid" id="holo-frames-list">
+                            <!-- Populated dynamically / synchronised with FRAME_CONFIG -->
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION 2: BOOST STORE & INVENTORY -->
-                <div id="upgrade-tab-store" class="upgrade-section-card" style="display: none;">
+                <!-- SECTION 4: INVENTORY & ACTIVE BUFFS -->
+                <div id="upgrade-tab-inventory" class="upgrade-section-card lab-card" style="display: none;">
                     <div class="upgrade-section-title">
-                        <span>🛒 Магазин полезных бустов</span>
-                        <span style="font-size: 0.88rem; color: var(--muted-bright);">Оплата накопленным опытом (XP)</span>
-                    </div>
-
-                    <div class="boost-store-grid">
-                        <!-- Boost 1: Streak Shield -->
-                        <div class="boost-card">
-                            <div class="boost-card-top">
-                                <div class="boost-card-icon">🛡️</div>
-                                <div>
-                                    <h3 class="boost-card-title">Щит серии</h3>
-                                    <p class="boost-card-desc">Спасает победную серию в любом тренажёре при ошибке или позволяет пропустить трудную задачу без потери комбо.</p>
-                                </div>
-                            </div>
-                            <div class="boost-card-bottom">
-                                <div class="boost-card-price">⚡ 60 XP</div>
-                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="streak_shield" data-boost-price="60">
-                                    Купить
-                                </button>
+                        <div class="title-with-pill">
+                            <span class="icon-wrap" aria-hidden="true">🎒</span>
+                            <div>
+                                <h3>Бортовой Инвентарь Модулей</h3>
+                                <span class="section-subtext">Ваши накопленные артефакты, заряды и статус активных временных усилителей</span>
                             </div>
                         </div>
-
-                        <!-- Boost 2: Homework Pass -->
-                        <div class="boost-card">
-                            <div class="boost-card-top">
-                                <div class="boost-card-icon">📜</div>
-                                <div>
-                                    <h3 class="boost-card-title">Отказ от Д/З</h3>
-                                    <p class="boost-card-desc">Автоматический 100% зачёт одного выданного домашнего задания. В журнале учителя отобразится статус «Освобождён по бусту 📜».</p>
-                                </div>
-                            </div>
-                            <div class="boost-card-bottom">
-                                <div class="boost-card-price">⚡ 400 XP</div>
-                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hw_pass" data-boost-price="400">
-                                    Купить
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Boost 3: 2x XP Potion -->
-                        <div class="boost-card">
-                            <div class="boost-card-top">
-                                <div class="boost-card-icon">⚡</div>
-                                <div>
-                                    <h3 class="boost-card-title">Эликсир мудрости</h3>
-                                    <p class="boost-card-desc">Удваивает весь получаемый опыт (2x XP) за решение задач в тренажёрах на 30 минут!</p>
-                                </div>
-                            </div>
-                            <div class="boost-card-bottom">
-                                <div class="boost-card-price">⚡ 100 XP</div>
-                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="double_xp" data-boost-price="100">
-                                    Купить
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Boost 4: Spy Hint -->
-                        <div class="boost-card">
-                            <div class="boost-card-top">
-                                <div class="boost-card-icon">🔍</div>
-                                <div>
-                                    <h3 class="boost-card-title">Шпионская подсказка</h3>
-                                    <p class="boost-card-desc">Открывает подробный пошаговый разбор любой задачи в тренажёре без штрафа к попытке.</p>
-                                </div>
-                            </div>
-                            <div class="boost-card-bottom">
-                                <div class="boost-card-price">⚡ 50 XP</div>
-                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hint" data-boost-price="50">
-                                    Купить
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Boost 5: Time Freeze -->
-                        <div class="boost-card">
-                            <div class="boost-card-top">
-                                <div class="boost-card-icon">⏱️</div>
-                                <div>
-                                    <h3 class="boost-card-title">Заморозка времени</h3>
-                                    <p class="boost-card-desc">Останавливает таймер на 60 секунд в режимах на время («Сыграть на 10 минут» и спринтах).</p>
-                                </div>
-                            </div>
-                            <div class="boost-card-bottom">
-                                <div class="boost-card-price">⚡ 50 XP</div>
-                                <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="time_freeze" data-boost-price="50">
-                                    Купить
-                                </button>
-                            </div>
+                        <div id="active-buff-indicator" class="active-buff-pill" style="display: none;">
+                            <span class="pulse-dot"></span>
+                            <span>⚡ 2x XP активен: <strong id="buff-timer-text">30:00</strong></span>
                         </div>
                     </div>
 
-                    <!-- Inventory Container -->
-                    <div class="boost-inventory-box">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                            <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 6px;">
-                                <span>🎒 Мой инвентарь бустов</span>
-                            </h3>
-                            <div id="active-buff-indicator" style="font-size: 0.82rem; font-weight: 700; color: #10b981; display: none;">
-                                ⚡ Буст 2x XP активен: <span id="buff-timer-text">30:00</span>
-                            </div>
-                        </div>
-
-                        <div class="boost-inventory-grid" id="boost-inventory-items-wrap">
-                            <!-- Populated dynamically -->
-                        </div>
+                    <div class="boost-inventory-grid" id="boost-inventory-items-wrap">
+                        <!-- Populated dynamically via JS -->
                     </div>
                 </div>
 
-                <!-- SECTION 3: TOWER OF KNOWLEDGE (RPG ROGUELIKE) -->
-                <div id="upgrade-tab-tower" class="upgrade-section-card" style="display: none;">
+                <!-- SECTION 5: CYBER-POLYGON (PRESERVED ROGUELIKE BATTLE ARENA) -->
+                <div id="upgrade-tab-tower" class="upgrade-section-card lab-card" style="display: none;">
                     <div class="upgrade-section-title">
-                        <span>🏰 Башня Знаний · Пошаговый RPG-рогалик</span>
+                        <div class="title-with-pill">
+                            <span class="icon-wrap" aria-hidden="true">🏰</span>
+                            <div>
+                                <h3>Кибер-Полигон Знаний · RPG-симулятор</h3>
+                                <span class="section-subtext">Тактические дуэли с аномалиями и проверка скорости математических вычислений</span>
+                            </div>
+                        </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6; font-weight: 800;">
                                 Этаж <span id="tower-current-floor">1</span>

@@ -2636,12 +2636,14 @@ initLevelProgressModal();
         } catch (e) {}
     }
 
-    // --- Sub-navigation ---
+    // --- Sub-navigation (Нейро-Лаборатория) ---
     function initSubnav() {
         const subnavBtns = document.querySelectorAll('.upgrade-subnav-btn');
         const sections = {
-            roulette: document.getElementById('upgrade-tab-roulette'),
-            store: document.getElementById('upgrade-tab-store'),
+            collider: document.getElementById('upgrade-tab-collider'),
+            techtree: document.getElementById('upgrade-tab-techtree'),
+            holocabinet: document.getElementById('upgrade-tab-holocabinet'),
+            inventory: document.getElementById('upgrade-tab-inventory'),
             tower: document.getElementById('upgrade-tab-tower')
         };
 
@@ -2651,8 +2653,12 @@ initLevelProgressModal();
                 if (targetKey !== 'tower') {
                     stopTowerBattle();
                 }
-                subnavBtns.forEach(b => b.classList.remove('active'));
+                subnavBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
 
                 Object.keys(sections).forEach(key => {
                     const sec = sections[key];
@@ -2661,9 +2667,14 @@ initLevelProgressModal();
                     }
                 });
 
-                if (targetKey === 'roulette') {
-                    drawRouletteWheel();
-                } else if (targetKey === 'store') {
+                if (targetKey === 'collider') {
+                    drawColliderWheel();
+                    updateColliderStatusUI();
+                } else if (targetKey === 'techtree') {
+                    updateTechTreeUI();
+                } else if (targetKey === 'holocabinet') {
+                    renderHolocabinet();
+                } else if (targetKey === 'inventory') {
                     renderInventoryView();
                 } else if (targetKey === 'tower') {
                     renderTowerArena();
@@ -2672,23 +2683,61 @@ initLevelProgressModal();
         });
     }
 
-    // --- SECTION 1: ROULETTE LOGIC ---
-    const ROULETTE_SECTORS = [
-        { label: '0x', mult: 0, color: '#dc2626', bg1: '#7f1d1d', bg2: '#b91c1c', icon: '💀 0x' },
-        { label: '1.5x', mult: 1.5, color: '#10b981', bg1: '#047857', bg2: '#059669', icon: '⚡ 1.5x' },
-        { label: '0.5x', mult: 0.5, color: '#3b82f6', bg1: '#1d4ed8', bg2: '#2563eb', icon: '🛡️ 0.5x' },
-        { label: '2.0x', mult: 2.0, color: '#8b5cf6', bg1: '#6d28d9', bg2: '#7c3aed', icon: '🔥 2.0x' },
-        { label: '1.2x', mult: 1.2, color: '#06b6d4', bg1: '#0e7490', bg2: '#0891b2', icon: '✨ 1.2x' },
-        { label: '3.0x', mult: 3.0, color: '#f59e0b', bg1: '#b45309', bg2: '#d97706', icon: '⭐ 3.0x' },
-        { label: 'БУСТ', mult: 'boost', color: '#ff7728', bg1: '#c2410c', bg2: '#ea580c', icon: '🎁 БУСТ' },
-        { label: '5.0x', mult: 5.0, color: '#ec4899', bg1: '#be185d', bg2: '#db2777', icon: '👑 5.0x' }
+    // ==========================================================================
+    // SECTION 1: QUANTUM COLLIDER (РУЛЕТКА 2.0 - КВАНТОВЫЙ КОЛЛАЙДЕР)
+    // ==========================================================================
+    const COLLIDER_SECTORS = [
+        { id: 'xp_15', label: '+15 XP', type: 'xp', value: 15, bg1: '#0a192f', bg2: '#1d4ed8', border: '#3b82f6', icon: '⚡ +15 XP', title: 'Импульс энергии (+15 XP)' },
+        { id: 'shield', label: 'Щит', type: 'boost', boostId: 'streak_shield', bg1: '#2a1106', bg2: '#c2410c', border: '#ff7728', icon: '🛡️ ЩИТ', title: 'Квантовый щит серии' },
+        { id: 'xp_45', label: '+45 XP', type: 'xp', value: 45, bg1: '#042729', bg2: '#0891b2', border: '#06b6d4', icon: '⚡ +45 XP', title: 'Резонансный импульс (+45 XP)' },
+        { id: 'time_freeze', label: 'Стазис', type: 'boost', boostId: 'time_freeze', bg1: '#261a04', bg2: '#b45309', border: '#f59e0b', icon: '⏱️ СТАЗИС', title: 'Хроно-стазис (+60с таймер)' },
+        { id: 'xp_100', label: '+100 XP', type: 'xp', value: 100, bg1: '#043427', bg2: '#059669', border: '#10b981', icon: '⚡ +100 XP', title: 'Сгусток плазмы (+100 XP)' },
+        { id: 'hint', label: 'Сканер', type: 'boost', boostId: 'hint', bg1: '#08212e', bg2: '#0284c7', border: '#38bdf8', icon: '🔍 СКАНЕР', title: 'Нейро-сканер шага' },
+        { id: 'crystal', label: 'Кристалл', type: 'crystal', value: 50, bg1: '#1e0b42', bg2: '#7c3aed', border: '#8b5cf6', icon: '💎 +50 XP', title: 'Квантовый кристалл (+50 XP)' },
+        { id: 'supernova', label: 'Сверхновая', type: 'supernova', value: 250, bg1: '#380419', bg2: '#be185d', border: '#ec4899', icon: '👑 250 XP', title: '👑 Вспышка Сверхновой (+250 XP & 2x XP)' }
     ];
 
-    let rouletteWheelAngle = 0;
-    let isRouletteSpinning = false;
-    let lastTickSector = -1;
+    let colliderWheelAngle = 0;
+    let isColliderSpinning = false;
+    let lastColliderTickSector = -1;
 
-    function drawRouletteWheel() {
+    function isDailySpinReady() {
+        const lastTs = parseInt(localStorage.getItem('study_last_free_spin_ts') || '0', 10);
+        if (!lastTs) return true;
+        return (Date.now() - lastTs) >= 24 * 60 * 60 * 1000;
+    }
+
+    function updateColliderStatusUI() {
+        const balanceEl = document.getElementById('roulette-balance-display');
+        const userXpEl = document.getElementById('upgrade-user-xp');
+        const curXp = getUserTotalXp();
+        if (balanceEl) balanceEl.textContent = `${curXp} XP`;
+        if (userXpEl) userXpEl.textContent = `${curXp} XP`;
+
+        const freeSpinCard = document.getElementById('roulette-free-spin-card');
+        const freeSpinIndicator = document.getElementById('roulette-free-spin-indicator');
+        const coreStatusText = document.getElementById('collider-core-status-text');
+
+        const isFreeReady = isDailySpinReady();
+
+        if (freeSpinCard) freeSpinCard.style.display = isFreeReady ? 'flex' : 'none';
+        if (freeSpinIndicator) freeSpinIndicator.style.display = isFreeReady ? 'inline-flex' : 'none';
+
+        if (coreStatusText) {
+            if (isFreeReady) {
+                coreStatusText.textContent = 'Готово к синтезу';
+                coreStatusText.style.color = 'var(--accent-emerald)';
+            } else {
+                const lastTs = parseInt(localStorage.getItem('study_last_free_spin_ts') || '0', 10);
+                const remainingMs = Math.max(0, (lastTs + 24 * 60 * 60 * 1000) - Date.now());
+                const hoursLeft = Math.ceil(remainingMs / (1000 * 60 * 60));
+                coreStatusText.textContent = `Зарядка (~${hoursLeft}ч)`;
+                coreStatusText.style.color = 'var(--accent-gold)';
+            }
+        }
+    }
+
+    function drawColliderWheel() {
         const canvas = document.getElementById('roulette-wheel-canvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -2699,18 +2748,18 @@ initLevelProgressModal();
         const cx = width / 2;
         const cy = height / 2;
         const radius = width / 2 - 14;
-        const totalSectors = ROULETTE_SECTORS.length;
+        const totalSectors = COLLIDER_SECTORS.length;
         const arc = (2 * Math.PI) / totalSectors;
 
         ctx.clearRect(0, 0, width, height);
 
-        // Draw sectors with rotation
+        // Rotating wheel body
         ctx.save();
         ctx.translate(cx, cy);
-        ctx.rotate(rouletteWheelAngle);
+        ctx.rotate(colliderWheelAngle);
 
         for (let i = 0; i < totalSectors; i++) {
-            const s = ROULETTE_SECTORS[i];
+            const s = COLLIDER_SECTORS[i];
             const startAngle = i * arc;
             const endAngle = startAngle + arc;
 
@@ -2719,15 +2768,23 @@ initLevelProgressModal();
             ctx.arc(0, 0, radius, startAngle, endAngle);
             ctx.closePath();
 
-            const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, radius);
+            // Sci-Fi radial gradient
+            const grad = ctx.createRadialGradient(0, 0, 15, 0, 0, radius);
             grad.addColorStop(0, s.bg1);
             grad.addColorStop(1, s.bg2);
             ctx.fillStyle = grad;
             ctx.fill();
 
-            // Divider stroke
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
-            ctx.lineWidth = 2;
+            // Fine divider line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Inner glowing sector border
+            ctx.beginPath();
+            ctx.arc(0, 0, radius - 4, startAngle + 0.05, endAngle - 0.05);
+            ctx.strokeStyle = s.border;
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             // Label text & icon
@@ -2735,127 +2792,111 @@ initLevelProgressModal();
             ctx.rotate(startAngle + arc / 2);
             ctx.textAlign = 'right';
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
-            ctx.shadowColor = 'rgba(0,0,0,0.6)';
-            ctx.shadowBlur = 4;
-            ctx.fillText(s.icon, radius - 20, 5);
+            ctx.font = 'bold 13.5px "JetBrains Mono", system-ui, sans-serif';
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 6;
+            ctx.fillText(s.icon, radius - 24, 5);
             ctx.restore();
         }
 
-        // Outer golden rim
+        // Outer Dark Titanium Precision Ring
         ctx.beginPath();
         ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-        ctx.lineWidth = 6;
-        ctx.strokeStyle = '#f59e0b';
-        ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
-        ctx.shadowBlur = 10;
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = '#1e293b';
         ctx.stroke();
 
-        // Decorative rivets/dots around rim
-        for (let r = 0; r < 24; r++) {
-            const dotAngle = (r * 2 * Math.PI) / 24;
-            const dx = (radius - 3) * Math.cos(dotAngle);
-            const dy = (radius - 3) * Math.sin(dotAngle);
+        // Outer Neon Accent Glow Ring
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 2, 0, 2 * Math.PI);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(44, 230, 214, 0.65)';
+        ctx.shadowColor = 'rgba(44, 230, 214, 0.5)';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Telemetry Rivets / Division Ticks
+        for (let r = 0; r < 32; r++) {
+            const dotAngle = (r * 2 * Math.PI) / 32;
+            const isMajor = (r % 4 === 0);
+            const rOffset = isMajor ? 5 : 3;
+            const dx1 = (radius - 1) * Math.cos(dotAngle);
+            const dy1 = (radius - 1) * Math.sin(dotAngle);
+            const dx2 = (radius - 1 - rOffset) * Math.cos(dotAngle);
+            const dy2 = (radius - 1 - rOffset) * Math.sin(dotAngle);
+
             ctx.beginPath();
-            ctx.arc(dx, dy, 2.5, 0, 2 * Math.PI);
-            ctx.fillStyle = '#fff7ed';
-            ctx.fill();
+            ctx.moveTo(dx1, dy1);
+            ctx.lineTo(dx2, dy2);
+            ctx.lineWidth = isMajor ? 2 : 1;
+            ctx.strokeStyle = isMajor ? '#2ce6d6' : 'rgba(255,255,255,0.4)';
+            ctx.stroke();
         }
 
         ctx.restore();
 
-        // Center hub
+        // Center Plasma Core Socket
         ctx.save();
         ctx.translate(cx, cy);
         ctx.beginPath();
-        ctx.arc(0, 0, 28, 0, 2 * Math.PI);
-        const hubGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 28);
-        hubGrad.addColorStop(0, '#334155');
-        hubGrad.addColorStop(1, '#0f172a');
-        ctx.fillStyle = hubGrad;
+        ctx.arc(0, 0, 32, 0, 2 * Math.PI);
+        const socketGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, 32);
+        socketGrad.addColorStop(0, '#1e293b');
+        socketGrad.addColorStop(1, '#090c13');
+        ctx.fillStyle = socketGrad;
         ctx.fill();
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = 'rgba(44, 230, 214, 0.7)';
         ctx.stroke();
         ctx.restore();
     }
 
-    function initRoulette() {
-        const balanceEl = document.getElementById('roulette-balance-display');
-        const betInput = document.getElementById('roulette-bet-input');
-        const spinBtn = document.getElementById('btn-spin-roulette');
-        const freeSpinCard = document.getElementById('roulette-free-spin-card');
-        const freeSpinIndicator = document.getElementById('roulette-free-spin-indicator');
+    function initCollider() {
         const freeSpinBtn = document.getElementById('btn-use-free-spin');
-        const chipsBtns = document.querySelectorAll('.roulette-chip-btn');
-
-        if (balanceEl) balanceEl.textContent = `${getUserTotalXp()} XP`;
-
-        // Check first entry welcome spin
-        if (!localStorage.getItem('study_has_received_welcome_spin')) {
-            localStorage.setItem('study_has_received_welcome_spin', 'true');
-            localStorage.setItem('study_free_spin_available', 'true');
-        }
-
-        const isFreeAvailable = localStorage.getItem('study_free_spin_available') === 'true';
-        if (freeSpinCard) freeSpinCard.style.display = isFreeAvailable ? 'flex' : 'none';
-        if (freeSpinIndicator) freeSpinIndicator.style.display = isFreeAvailable ? 'block' : 'none';
-
-        chipsBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                chipsBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const val = btn.getAttribute('data-bet');
-                if (val === 'all') {
-                    if (betInput) betInput.value = Math.max(10, getUserTotalXp());
-                } else {
-                    if (betInput) betInput.value = parseInt(val, 10);
-                }
-            });
-        });
+        const spinBtn = document.getElementById('btn-spin-roulette');
 
         if (freeSpinBtn) {
             freeSpinBtn.addEventListener('click', () => {
-                startRouletteSpin(true);
+                startColliderSpin(true);
             });
         }
 
         if (spinBtn) {
             spinBtn.addEventListener('click', () => {
-                startRouletteSpin(false);
+                startColliderSpin(false);
             });
         }
 
-        drawRouletteWheel();
+        updateColliderStatusUI();
+        drawColliderWheel();
     }
 
-    function startRouletteSpin(isFree) {
-        if (isRouletteSpinning) return;
+    function startColliderSpin(isFree) {
+        if (isColliderSpinning) return;
 
         const currentXp = getUserTotalXp();
-        const betInput = document.getElementById('roulette-bet-input');
-        let bet = isFree ? 50 : parseInt(betInput ? betInput.value : '10', 10);
+        const cost = 30;
 
         if (!isFree) {
-            if (isNaN(bet) || bet < 10) {
-                alert('Минимальная ставка — 10 XP!');
+            if (currentXp < cost) {
+                alert(`Недостаточно энергии XP! Стоимость калибровки — ${cost} XP, у вас ${currentXp} XP.`);
                 return;
             }
-            if (bet > currentXp) {
-                alert(`Недостаточно опыта! У вас ${currentXp} XP, а ставка ${bet} XP.`);
-                return;
-            }
-            modifyUserXp(-bet);
+            modifyUserXp(-cost);
         }
 
-        isRouletteSpinning = true;
+        isColliderSpinning = true;
         const spinBtn = document.getElementById('btn-spin-roulette');
         const freeSpinBtn = document.getElementById('btn-use-free-spin');
+        const reticle = document.getElementById('roulette-pointer');
+
         if (spinBtn) spinBtn.disabled = true;
         if (freeSpinBtn) freeSpinBtn.disabled = true;
 
-        // Weighted odds: 0x(14%), 0.5x(16%), 1.2x(22%), 1.5x(18%), 2.0x(14%), 3.0x(8%), 5.0x(4%), БУСТ(4%)
-        const weights = [14, 18, 16, 14, 22, 8, 4, 4];
+        // Balanced weights: no 0x loss!
+        // [xp_15(26%), shield(14%), xp_45(20%), time_freeze(12%), xp_100(12%), hint(10%), crystal(4%), supernova(2%)]
+        const weights = [26, 14, 20, 12, 12, 10, 4, 2];
         const totalWeight = weights.reduce((a, b) => a + b, 0);
         let rand = Math.random() * totalWeight;
         let winIndex = 0;
@@ -2867,100 +2908,100 @@ initLevelProgressModal();
             rand -= weights[i];
         }
 
-        const arc = (2 * Math.PI) / ROULETTE_SECTORS.length;
+        const arc = (2 * Math.PI) / COLLIDER_SECTORS.length;
         const winCenter = winIndex * arc + arc / 2;
         const neededFinalAngle = (3 * Math.PI / 2 - winCenter);
 
-        let delta = (neededFinalAngle - (rouletteWheelAngle % (2 * Math.PI)));
+        let delta = (neededFinalAngle - (colliderWheelAngle % (2 * Math.PI)));
         while (delta < 0) delta += 2 * Math.PI;
-        const totalRotation = (7 + Math.floor(Math.random() * 2)) * (2 * Math.PI) + delta;
+        const totalRotation = (8 + Math.floor(Math.random() * 2)) * (2 * Math.PI) + delta;
 
-        const startAngle = rouletteWheelAngle;
+        const startAngle = colliderWheelAngle;
         const targetAngle = startAngle + totalRotation;
-        const duration = 4200;
+        const duration = 4300;
         const startTime = performance.now();
 
-        function easeOutCubic(t) {
-            return 1 - Math.pow(1 - t, 3);
+        function easeOutQuart(t) {
+            return 1 - Math.pow(1 - t, 4);
         }
 
         function animate(now) {
             const elapsed = now - startTime;
             const progress = Math.min(1, elapsed / duration);
-            const eased = easeOutCubic(progress);
+            const eased = easeOutQuart(progress);
 
-            rouletteWheelAngle = startAngle + totalRotation * eased;
+            colliderWheelAngle = startAngle + totalRotation * eased;
 
-            // Tick sound detection
-            const currentSector = Math.floor(((3 * Math.PI / 2 - (rouletteWheelAngle % (2 * Math.PI)) + 4 * Math.PI) % (2 * Math.PI)) / arc);
-            if (currentSector !== lastTickSector) {
+            // Reticle tick reaction & audio
+            const currentSector = Math.floor(((3 * Math.PI / 2 - (colliderWheelAngle % (2 * Math.PI)) + 4 * Math.PI) % (2 * Math.PI)) / arc);
+            if (currentSector !== lastColliderTickSector) {
                 playTickSound();
-                lastTickSector = currentSector;
+                if (reticle) {
+                    reticle.classList.add('tick');
+                    setTimeout(() => reticle.classList.remove('tick'), 45);
+                }
+                lastColliderTickSector = currentSector;
             }
 
-            drawRouletteWheel();
+            drawColliderWheel();
 
             if (progress < 1) {
                 requestAnimationFrame(animate);
             } else {
-                rouletteWheelAngle = targetAngle;
-                drawRouletteWheel();
-                finishRouletteSpin(winIndex, bet, isFree);
+                colliderWheelAngle = targetAngle;
+                drawColliderWheel();
+                finishColliderSpin(winIndex, isFree);
             }
         }
 
         requestAnimationFrame(animate);
     }
 
-    function finishRouletteSpin(winIndex, bet, isFree) {
-        isRouletteSpinning = false;
+    function finishColliderSpin(winIndex, isFree) {
+        isColliderSpinning = false;
         const spinBtn = document.getElementById('btn-spin-roulette');
         const freeSpinBtn = document.getElementById('btn-use-free-spin');
         if (spinBtn) spinBtn.disabled = false;
         if (freeSpinBtn) freeSpinBtn.disabled = false;
 
         if (isFree) {
-            localStorage.removeItem('study_free_spin_available');
-            const freeSpinCard = document.getElementById('roulette-free-spin-card');
-            const freeSpinIndicator = document.getElementById('roulette-free-spin-indicator');
-            if (freeSpinCard) freeSpinCard.style.display = 'none';
-            if (freeSpinIndicator) freeSpinIndicator.style.display = 'none';
+            localStorage.setItem('study_last_free_spin_ts', String(Date.now()));
+            updateColliderStatusUI();
         }
 
-        const sector = ROULETTE_SECTORS[winIndex];
+        const sector = COLLIDER_SECTORS[winIndex];
         let historyLabel = '';
 
-        if (sector.mult === 'boost') {
-            const boostPool = ['streak_shield', 'hw_pass', 'double_xp', 'hint', 'time_freeze'];
-            const awardedId = boostPool[Math.floor(Math.random() * boostPool.length)];
+        if (sector.type === 'xp') {
+            modifyUserXp(sector.value);
+            playWinSound(sector.value >= 45);
+            showHubToast(`⚡ Синтез успешен: получено +${sector.value} XP!`, 'success');
+            historyLabel = `<span class="badge" style="background:rgba(44,230,214,0.18); color:var(--accent-cyan);">⚡ +${sector.value} XP</span>`;
+        } else if (sector.type === 'boost') {
             const inv = getBoostsInventory();
-            inv[awardedId] = (inv[awardedId] || 0) + 1;
+            inv[sector.boostId] = (inv[sector.boostId] || 0) + 1;
             saveBoostsInventory(inv);
-
-            const boostTitles = {
-                streak_shield: '🛡️ Щит серии',
-                hw_pass: '📜 Отказ от Д/З',
-                double_xp: '⚡ Эликсир мудрости',
-                hint: '🔍 Шпионская подсказка',
-                time_freeze: '⏱️ Заморозка времени'
-            };
-
             playWinSound(true);
-            showHubToast(`🎉 ДЖЕКПОТ! Вы выиграли редкий буст: ${boostTitles[awardedId]}!`, 'success');
-            historyLabel = `<span class="badge" style="background:rgba(255,119,40,0.2); color:var(--accent);">🎁 ${boostTitles[awardedId]}</span>`;
-        } else if (typeof sector.mult === 'number' && sector.mult > 0) {
-            const payout = Math.round(bet * sector.mult);
-            modifyUserXp(payout);
-            playWinSound(sector.mult >= 2.0);
-            showHubToast(`🎉 ВЫИГРЫШ (${sector.icon})! Получено: +${payout} XP!`, 'success');
-            historyLabel = `<span class="badge" style="background:rgba(16,185,129,0.2); color:#10b981;">+${payout} XP (${sector.icon})</span>`;
-        } else {
-            // 0x loss
-            showHubToast(isFree ? '💀 В бесплатном спине выпало 0x. Ничего страшного!' : '💀 Выпало 0x! Попробуйте ещё раз, удача рядом!', 'info');
-            historyLabel = `<span class="badge" style="background:rgba(239,68,68,0.2); color:#ef4444;">💀 0x (-${bet} XP)</span>`;
+            showHubToast(`🎒 Получен модуль: ${sector.title}!`, 'success');
+            historyLabel = `<span class="badge" style="background:rgba(255,119,40,0.18); color:var(--accent);">${sector.icon}</span>`;
+        } else if (sector.type === 'crystal') {
+            modifyUserXp(sector.value);
+            const tower = getTowerState();
+            tower.shards += 15;
+            saveTowerState(tower);
+            playWinSound(true);
+            showHubToast(`💎 Квантовый кристалл: +${sector.value} XP и 15 осколков полигона!`, 'success');
+            historyLabel = `<span class="badge" style="background:rgba(139,92,246,0.22); color:#8b5cf6;">💎 Кристалл</span>`;
+        } else if (sector.type === 'supernova') {
+            modifyUserXp(sector.value);
+            const until = Math.max(Date.now(), parseInt(localStorage.getItem('study_buff_double_xp_until') || '0', 10)) + 30 * 60 * 1000;
+            localStorage.setItem('study_buff_double_xp_until', String(until));
+            playWinSound(true);
+            showHubToast(`👑 СВЕРХНОВАЯ! +${sector.value} XP и 30 минут 2x XP!`, 'success');
+            historyLabel = `<span class="badge" style="background:rgba(236,72,153,0.25); color:#ec4899;">👑 Сверхновая</span>`;
         }
 
-        // Record history (keep last 8)
+        // Record history log
         const histContainer = document.getElementById('roulette-history-list');
         if (histContainer) {
             if (histContainer.textContent.includes('Пока нет')) {
@@ -2974,19 +3015,89 @@ initLevelProgressModal();
             }
         }
 
+        updateColliderStatusUI();
         renderInventoryView();
     }
 
-    // --- SECTION 2: BOOST STORE & INVENTORY ---
+    // ==========================================================================
+    // SECTION 2: TECH TREE (ДРЕВО МОДУЛЕЙ И АУГМЕНТАЦИЙ)
+    // ==========================================================================
     const BOOST_CATALOG = {
-        streak_shield: { id: 'streak_shield', title: 'Щит серии', icon: '🛡️', price: 60, desc: 'Спасает комбо в любом тренажёре.' },
-        hw_pass: { id: 'hw_pass', title: 'Отказ от Д/З', icon: '📜', price: 400, desc: 'Автоматический 100% зачёт домашнего задания.' },
-        double_xp: { id: 'double_xp', title: 'Эликсир мудрости', icon: '⚡', price: 100, desc: 'Удваивает XP в тренажёрах на 30 мин.' },
-        hint: { id: 'hint', title: 'Шпионская подсказка', icon: '🔍', price: 50, desc: 'Открывает разбор задачи без штрафа.' },
-        time_freeze: { id: 'time_freeze', title: 'Заморозка времени', icon: '⏱️', price: 50, desc: 'Останавливает таймер на 60 сек.' }
+        streak_shield: { id: 'streak_shield', title: 'Квантовый щит', icon: '🛡️', price: 60, desc: 'Спасает комбо верных ответов в любом тренажёре.' },
+        hw_pass: { id: 'hw_pass', title: 'Академический зачёт', icon: '📜', price: 400, desc: '100% зачёт одного домашнего задания.' },
+        double_xp: { id: 'double_xp', title: 'Катализатор Сверхновой', icon: '⚡', price: 100, desc: 'Удваивает XP в тренажёрах на 30 мин.' },
+        hint: { id: 'hint', title: 'Нейро-сканер', icon: '🔍', price: 50, desc: 'Открывает разбор задачи без штрафа.' },
+        time_freeze: { id: 'time_freeze', title: 'Хроно-стазис', icon: '⏱️', price: 50, desc: 'Останавливает таймер на 60 сек.' }
     };
 
-    function initStore() {
+    let zenAudioCtx = null;
+    let zenOsc1 = null;
+    let zenOsc2 = null;
+    let zenGain = null;
+    let isZenActive = false;
+
+    function toggleZenAmbient() {
+        const btn = document.getElementById('btn-toggle-zen');
+        if (!isZenActive) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                zenAudioCtx = new AudioCtx();
+
+                zenOsc1 = zenAudioCtx.createOscillator();
+                zenOsc2 = zenAudioCtx.createOscillator();
+                zenGain = zenAudioCtx.createGain();
+
+                zenOsc1.type = 'sine';
+                zenOsc1.frequency.setValueAtTime(108, zenAudioCtx.currentTime); // Deep warm cosmic root (A2)
+                zenOsc2.type = 'triangle';
+                zenOsc2.frequency.setValueAtTime(216, zenAudioCtx.currentTime); // Octave overtone
+
+                zenGain.gain.setValueAtTime(0.001, zenAudioCtx.currentTime);
+                zenGain.gain.exponentialRampToValueAtTime(0.08, zenAudioCtx.currentTime + 1.5);
+
+                zenOsc1.connect(zenGain);
+                zenOsc2.connect(zenGain);
+                zenGain.connect(zenAudioCtx.destination);
+
+                zenOsc1.start();
+                zenOsc2.start();
+                isZenActive = true;
+
+                if (btn) {
+                    btn.classList.add('active');
+                    btn.textContent = '⏸️ Пауза эмбиента';
+                }
+                showHubToast('🎧 Дзен-режим активен: космический звуковой генератор запущен', 'info');
+            } catch (e) {}
+        } else {
+            try {
+                if (zenGain && zenAudioCtx) {
+                    zenGain.gain.exponentialRampToValueAtTime(0.001, zenAudioCtx.currentTime + 0.6);
+                    setTimeout(() => {
+                        try {
+                            if (zenOsc1) zenOsc1.stop();
+                            if (zenOsc2) zenOsc2.stop();
+                            if (zenAudioCtx) zenAudioCtx.close();
+                        } catch(err) {}
+                    }, 650);
+                }
+                isZenActive = false;
+                if (btn) {
+                    btn.classList.remove('active');
+                    btn.textContent = '🔊 Слушать эмбиент';
+                }
+                showHubToast('Дзен-эмбиент приостановлен', 'info');
+            } catch (e) {}
+        }
+    }
+
+    function updateTechTreeUI() {
+        const xpEl = document.getElementById('techtree-user-xp');
+        if (xpEl) xpEl.textContent = `${getUserTotalXp()} XP`;
+    }
+
+    function initTechTree() {
         const buyBtns = document.querySelectorAll('.btn-buy-boost');
         buyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2995,7 +3106,7 @@ initLevelProgressModal();
                 const curXp = getUserTotalXp();
 
                 if (curXp < price) {
-                    alert(`Недостаточно XP! Стоимость ${price} XP, у вас ${curXp} XP.`);
+                    alert(`Недостаточно энергии XP! Стоимость модуля: ${price} XP, у вас ${curXp} XP.`);
                     return;
                 }
 
@@ -3004,19 +3115,232 @@ initLevelProgressModal();
                 if (boostId === 'double_xp') {
                     const until = Math.max(Date.now(), parseInt(localStorage.getItem('study_buff_double_xp_until') || '0', 10)) + 30 * 60 * 1000;
                     localStorage.setItem('study_buff_double_xp_until', String(until));
-                    showHubToast('⚡ Эликсир мудрости активирован! 30 минут 2x XP!', 'success');
+                    showHubToast('⚡ Катализатор активирован! 30 минут 2x XP!', 'success');
                 } else {
                     const inv = getBoostsInventory();
                     inv[boostId] = (inv[boostId] || 0) + 1;
                     saveBoostsInventory(inv);
                     const b = BOOST_CATALOG[boostId];
-                    showHubToast(`🎒 Куплено: ${b ? b.title : boostId}!`, 'success');
+                    showHubToast(`🧬 Модуль интегрирован: ${b ? b.title : boostId}!`, 'success');
                 }
 
+                updateTechTreeUI();
                 renderInventoryView();
             });
         });
 
+        const zenBtn = document.getElementById('btn-toggle-zen');
+        if (zenBtn) {
+            zenBtn.addEventListener('click', toggleZenAmbient);
+        }
+
+        updateTechTreeUI();
+    }
+
+    // ==========================================================================
+    // SECTION 3: HOLOCABINET (АУГМЕНТАЦИИ И КАСТОМИЗАЦИЯ АВАТАРА)
+    // ==========================================================================
+    const HOLO_FRAMES = [
+        {
+            id: 'orbit',
+            name: 'Классическая орбита',
+            desc: 'Базовый гироскопический стабилизатор исследователя НЕШколы. Открыт по умолчанию.',
+            price: 0,
+            reqLabel: 'Доступна сразу',
+            checkUnlocked: () => true
+        },
+        {
+            id: 'neon',
+            name: 'Квантовый неон',
+            desc: 'Светящийся бирюзово-фиолетовый ореол, полученный за точность и регулярность вычислений.',
+            price: 150,
+            reqLabel: '10 верных ответов или 150 XP',
+            checkUnlocked: (stats) => stats.correctCount >= 10 || (localStorage.getItem('study_unlocked_frame_neon') === 'true')
+        },
+        {
+            id: 'emerald',
+            name: 'Изумрудный кристалл',
+            desc: 'Кристаллизованная матрица устойчивости, выдаваемая за длинные серии побед в тренажерах.',
+            price: 250,
+            reqLabel: 'Серия 15 или 250 XP',
+            checkUnlocked: (stats) => stats.maxTrainerStreak >= 15 || (localStorage.getItem('study_unlocked_frame_emerald') === 'true')
+        },
+        {
+            id: 'solar',
+            name: 'Золотая сингулярность',
+            desc: 'Янтарный плазменный диск, подтверждающий исключительную математическую концентрацию.',
+            price: 400,
+            reqLabel: 'Серия 25 или 400 XP',
+            checkUnlocked: (stats) => stats.maxTrainerStreak >= 25 || (localStorage.getItem('study_unlocked_frame_solar') === 'true')
+        },
+        {
+            id: 'cosmic',
+            name: 'Гравитационный разлом',
+            desc: 'Глубокий пурпурно-космический вихрь искажения пространства для опытных исследователей.',
+            price: 600,
+            reqLabel: '5 уровень или 600 XP',
+            checkUnlocked: (stats) => stats.level >= 5 || (localStorage.getItem('study_unlocked_frame_cosmic') === 'true')
+        },
+        {
+            id: 'gargantua',
+            name: 'Чёрная дыра Гаргантюа',
+            desc: 'Легендарное релятивистское кольцо с фотонной сферой. Абсолютный статус высшего разума.',
+            price: 1000,
+            reqLabel: '9 уровень или 1000 XP',
+            checkUnlocked: (stats) => stats.level >= 9 || (localStorage.getItem('study_unlocked_frame_gargantua') === 'true')
+        }
+    ];
+
+    let selectedHoloFrameId = localStorage.getItem('profileAvatarFrame') || 'orbit';
+
+    function getLocalUnlockStats() {
+        let correctCount = 0;
+        let maxTrainerStreak = 0;
+        try {
+            const raw = localStorage.getItem('studyMetrics');
+            const attempts = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(attempts)) {
+                attempts.forEach(a => { if (a && a.correct) correctCount++; });
+            }
+        } catch (e) {}
+        try {
+            const rawTrackers = localStorage.getItem('study_trainer_trackers');
+            if (rawTrackers) {
+                const trackers = JSON.parse(rawTrackers);
+                Object.values(trackers).forEach(t => {
+                    if (t && typeof t.streak === 'number' && t.streak > maxTrainerStreak) {
+                        maxTrainerStreak = t.streak;
+                    }
+                });
+            }
+        } catch (e) {}
+        const xp = getUserTotalXp();
+        const level = Math.floor(xp / 100) + 1;
+        return { correctCount, maxTrainerStreak, level, xp };
+    }
+
+    function renderHolocabinet() {
+        const grid = document.getElementById('holo-frames-list');
+        const activeFrame = localStorage.getItem('profileAvatarFrame') || 'orbit';
+        const activeBadgeName = document.getElementById('holo-active-frame-name');
+        const curConfig = HOLO_FRAMES.find(f => f.id === activeFrame) || HOLO_FRAMES[0];
+        if (activeBadgeName) activeBadgeName.textContent = curConfig.name;
+
+        updateHolocabinetStage(selectedHoloFrameId);
+
+        if (!grid) return;
+        const stats = getLocalUnlockStats();
+
+        grid.innerHTML = HOLO_FRAMES.map(f => {
+            const isUnlocked = f.checkUnlocked(stats);
+            const isEquipped = (f.id === activeFrame);
+            const isSelected = (f.id === selectedHoloFrameId);
+
+            return `
+                <div class="holo-frame-item ${isEquipped ? 'active' : ''} ${!isUnlocked ? 'is-locked' : ''} ${isSelected ? 'selected' : ''}" data-frame-choice="${f.id}">
+                    <div class="avatar-wrap" data-frame="${f.id}" style="width: 58px; height: 58px; pointer-events: none;">
+                        <div class="avatar-ring" aria-hidden="true"></div>
+                        <div class="avatar-placeholder" style="width: 48px; height: 48px; font-size: 1.25rem;">У</div>
+                    </div>
+                    <div style="flex:1;">
+                        <h5 class="holo-frame-name">${f.name}</h5>
+                        <div class="holo-frame-req">${f.reqLabel}</div>
+                    </div>
+                    <span class="holo-frame-status ${isUnlocked ? 'status-unlocked' : 'status-locked'}">
+                        ${isEquipped ? '✓ Надето' : (isUnlocked ? 'Открыто' : `🔒 ${f.price} XP`)}
+                    </span>
+                </div>
+            `;
+        }).join('');
+
+        const items = grid.querySelectorAll('.holo-frame-item');
+        items.forEach(el => {
+            el.addEventListener('click', () => {
+                const fId = el.getAttribute('data-frame-choice');
+                if (fId) {
+                    selectedHoloFrameId = fId;
+                    renderHolocabinet();
+                }
+            });
+        });
+
+        const equipBtn = document.getElementById('btn-holo-equip-frame');
+        if (equipBtn) {
+            equipBtn.onclick = () => {
+                const chosen = HOLO_FRAMES.find(f => f.id === selectedHoloFrameId);
+                if (!chosen) return;
+                const currentStats = getLocalUnlockStats();
+                const isAlreadyUnlocked = chosen.checkUnlocked(currentStats);
+
+                if (!isAlreadyUnlocked) {
+                    // Try to unlock with XP
+                    if (currentStats.xp < chosen.price) {
+                        alert(`Рамка «${chosen.name}» заблокирована!\nТребование: ${chosen.reqLabel}.\nЛибо накопите ${chosen.price} XP (сейчас у вас ${currentStats.xp} XP).`);
+                        return;
+                    }
+                    if (confirm(`Разблокировать рамку «${chosen.name}» за ${chosen.price} XP?`)) {
+                        modifyUserXp(-chosen.price);
+                        localStorage.setItem(`study_unlocked_frame_${chosen.id}`, 'true');
+                        applyAvatarFrameEverywhere(chosen.id);
+                        showHubToast(`✨ Рамка «${chosen.name}» разблокирована и надета!`, 'success');
+                        renderHolocabinet();
+                    }
+                } else {
+                    applyAvatarFrameEverywhere(chosen.id);
+                    showHubToast(`🛰️ Орбита «${chosen.name}» активирована!`, 'success');
+                    renderHolocabinet();
+                }
+            };
+        }
+    }
+
+    function updateHolocabinetStage(frameId) {
+        const stageAvatar = document.getElementById('holo-preview-avatar');
+        const titleEl = document.getElementById('holo-selected-frame-title');
+        const descEl = document.getElementById('holo-selected-frame-desc');
+        const equipBtn = document.getElementById('btn-holo-equip-frame');
+        const config = HOLO_FRAMES.find(f => f.id === frameId) || HOLO_FRAMES[0];
+
+        if (stageAvatar) stageAvatar.setAttribute('data-frame', config.id);
+        if (titleEl) titleEl.textContent = config.name;
+        if (descEl) descEl.textContent = config.desc;
+
+        if (equipBtn) {
+            const currentActive = localStorage.getItem('profileAvatarFrame') || 'orbit';
+            const stats = getLocalUnlockStats();
+            const isUnlocked = config.checkUnlocked(stats);
+
+            if (config.id === currentActive) {
+                equipBtn.textContent = '✓ Уже надето';
+                equipBtn.disabled = true;
+                equipBtn.className = 'btn btn-secondary';
+            } else if (isUnlocked) {
+                equipBtn.textContent = '✓ Надеть на профиль';
+                equipBtn.disabled = false;
+                equipBtn.className = 'btn btn-emerald';
+            } else {
+                equipBtn.textContent = `⚡ Разблокировать за ${config.price} XP`;
+                equipBtn.disabled = false;
+                equipBtn.className = 'btn btn-emerald';
+            }
+        }
+    }
+
+    function applyAvatarFrameEverywhere(frameId) {
+        localStorage.setItem('profileAvatarFrame', frameId);
+        const heroWrap = document.getElementById('avatar-container');
+        if (heroWrap) heroWrap.setAttribute('data-frame', frameId);
+        const previewWrap = document.getElementById('custom-preview-avatar-wrap');
+        if (previewWrap) previewWrap.setAttribute('data-frame', frameId);
+        const badge = document.getElementById('frame-active-badge');
+        const config = HOLO_FRAMES.find(f => f.id === frameId);
+        if (badge && config) badge.textContent = config.name;
+    }
+
+    // ==========================================================================
+    // SECTION 4: INVENTORY & ACTIVE BUFFS
+    // ==========================================================================
+    function initInventory() {
         renderInventoryView();
         startBuffTimer();
     }
@@ -3049,7 +3373,7 @@ initLevelProgressModal();
                     <div style="flex:1;">
                         <div style="font-weight: 800; font-size: 0.9rem; display: flex; justify-content: space-between;">
                             <span>${b.title}</span>
-                            <span class="badge" style="background: rgba(255,119,40,0.2); color: var(--accent);">${qty} шт.</span>
+                            <span class="badge" style="background: rgba(44,230,214,0.15); color: var(--accent-cyan);">${qty} шт.</span>
                         </div>
                         <div style="font-size: 0.76rem; color: var(--muted-bright); margin-top: 2px;">${b.desc}</div>
                         ${actionHtml}
@@ -3071,7 +3395,7 @@ initLevelProgressModal();
                 const diffSec = Math.floor((until - Date.now()) / 1000);
                 const m = Math.floor(diffSec / 60);
                 const s = diffSec % 60;
-                if (indicator) indicator.style.display = 'block';
+                if (indicator) indicator.style.display = 'inline-flex';
                 if (timerText) timerText.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
             } else {
                 if (indicator) indicator.style.display = 'none';
@@ -3646,8 +3970,10 @@ initLevelProgressModal();
         if (recordEl) recordEl.textContent = `${state.bestFloor} этаж`;
 
         initSubnav();
-        initRoulette();
-        initStore();
+        initCollider();
+        initTechTree();
+        renderHolocabinet();
+        initInventory();
         initTowerUpgrades();
         renderTowerArena();
     }
