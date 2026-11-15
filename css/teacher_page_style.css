@@ -947,6 +947,15 @@ dialog.admin-modal::backdrop {
     gap: 8px;
     flex-shrink: 0;
 }
+.lesson-actions .btn-toggle-lesson-complete,
+.lesson-actions .btn-toggle-lesson-paid {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    min-width: 125px;
+    font-weight: 700;
+}
 
 /* --- CONSTRUCTOR STYLES --- */
 .constructor-grid {
@@ -1457,19 +1466,34 @@ sup sup {
         width: 100%;
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
         gap: 8px;
         margin-top: 0.25rem;
         padding-top: 0.75rem;
         border-top: 1px solid var(--line);
     }
-    .lesson-actions .btn-toggle-lesson-complete {
-        flex: 1;
-        min-width: 0;
-        justify-content: center;
+    .lesson-actions .btn-toggle-lesson-complete,
+    .lesson-actions .btn-toggle-lesson-paid {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 120px;
         min-height: 40px;
-        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
         font-weight: 700;
-        padding: 0 12px;
+        padding: 0 10px;
+        white-space: nowrap;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    @media (min-width: 520px) {
+        .lesson-actions .btn-toggle-lesson-complete,
+        .lesson-actions .btn-toggle-lesson-paid {
+            flex: 1 1 auto;
+            min-width: 125px;
+        }
     }
     .lesson-actions .btn-edit-lesson,
     .lesson-actions .btn-delete-lesson {
@@ -1488,15 +1512,6 @@ sup sup {
     }
     .class-actions {
         flex-wrap: wrap;
-    }
-    .lesson-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .lesson-actions {
-        width: 100%;
-        justify-content: flex-end;
     }
     .data-table th, .data-table td {
         padding: 10px 12px;
@@ -1528,5 +1543,11 @@ sup sup {
     }
     .search-box-wrap {
         width: 100%;
+    }
+    .lesson-actions .btn-toggle-lesson-complete,
+    .lesson-actions .btn-toggle-lesson-paid {
+        min-width: 120px;
+        font-size: 0.8rem;
+        padding: 0 8px;
     }
 }
