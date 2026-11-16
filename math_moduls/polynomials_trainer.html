@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр «Многочлены» · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --emerald: #10b981;
+      --emerald-light: #ecfdf5;
+      --emerald-border: rgba(16,185,129,.3);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.14) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.13) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .nav-btn.primary { background: var(--vermilion); color: #fff; border-color: var(--vermilion); }
+    .nav-btn.primary:hover { background: #9c363d; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px;
+    }
+
+    /* MAIN SHELL */
+    .trainer-shell {
+      max-width: 920px; margin: 0 auto; width: 100%; padding: 32px 5vw 64px;
+      display: flex; flex-direction: column; gap: 22px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 10px;
+    }
+    .trainer-title {
+      font: 700 clamp(28px, 4.5vw, 40px) 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 8px; line-height: 1.15;
+    }
+    .trainer-subtitle {
+      color: var(--muted); font-size: 15px; max-width: 680px; margin: 0 auto; line-height: 1.5;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .stat-box {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 12px 14px; text-align: center; box-shadow: var(--shadow-sm);
+    }
+    .stat-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 4px; display: block;
+    }
+    .stat-val {
+      font-size: 20px; font-weight: 800; color: var(--indigo); font-feature-settings: "tnum";
+    }
+    .stat-val.streak { color: var(--vermilion); }
+
+    /* CATEGORIES BAR */
+    .cat-bar {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .cat-pill {
+      white-space: nowrap; padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--paper-card);
+      font-size: 13px; font-weight: 600; color: var(--indigo); transition: all .2s;
+    }
+    .cat-pill:hover { border-color: var(--vermilion); color: var(--vermilion); }
+    .cat-pill.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 4px 12px rgba(38,63,97,.2);
+    }
+
+    /* CHEAT SHEET ACCORDION */
+    .cheat-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-md);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .cheat-header {
+      padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; background: var(--paper-light); user-select: none;
+      font-size: 14px; font-weight: 700; color: var(--indigo);
+    }
+    .cheat-header:hover { background: #fff; }
+    .cheat-title { display: flex; align-items: center; gap: 8px; }
+    .cheat-toggle { font-size: 13px; color: var(--muted); }
+    .cheat-body {
+      display: none; padding: 18px 20px; font-size: 13.5px; line-height: 1.6;
+      border-top: 1px solid var(--line); background: #fff;
+    }
+    .cheat-card.open .cheat-body { display: block; }
+    .cheat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;
+    }
+    .cheat-item {
+      background: var(--paper-light); border: 1px solid rgba(38,63,97,.08);
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .cheat-item strong {
+      display: block; font-size: 13px; font-weight: 700; color: var(--vermilion); margin-bottom: 4px;
+    }
+    .cheat-math {
+      font-family: inherit; font-weight: 700; color: var(--indigo); font-size: 14px;
+      margin-bottom: 4px; background: rgba(38,63,97,.06); padding: 4px 8px; border-radius: 4px;
+    }
+    .cheat-desc { color: var(--ink); font-size: 12.5px; }
+
+    /* PLAYGROUND CARD */
+    .playground-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px 36px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 24px;
+      position: relative;
+    }
+
+    .task-meta {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid var(--line); padding-bottom: 14px;
+    }
+    .task-topic-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+      color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px;
+    }
+    .task-mode-toggle {
+      font-size: 12px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 6px; border: 1px dashed var(--line); transition: all .2s;
+    }
+    .task-mode-toggle:hover { color: var(--indigo); border-color: var(--indigo); background: var(--paper-light); }
+
+    .task-prompt {
+      font-size: 15px; font-weight: 600; color: var(--muted); text-align: center;
+    }
+
+    .task-formula-box {
+      min-height: 90px; display: grid; place-items: center; background: var(--paper-light);
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 24px;
+    }
+    .formula-expression {
+      font: 700 clamp(24px, 4.5vw, 38px) 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); text-align: center; letter-spacing: .02em;
+    }
+    .formula-expression sup { font-size: 0.6em; vertical-align: super; line-height: 0; }
+
+    /* OPTIONS GRID (4 CHOICES) */
+    .options-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+    }
+    .option-btn {
+      min-height: 60px; padding: 12px 18px; border-radius: var(--r-md);
+      border: 2px solid var(--line); background: var(--paper-light);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; transition: all .2s ease; cursor: pointer; text-align: left;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--indigo); background: #fff; transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .option-text {
+      font: 700 18px 'Zen Old Mincho', serif; color: var(--indigo-dark); flex: 1;
+    }
+    .option-text sup { font-size: 0.65em; vertical-align: super; line-height: 0; }
+    .option-key {
+      width: 26px; height: 26px; border-radius: 6px; background: rgba(38,63,97,.08);
+      color: var(--muted); font: 700 12px 'DM Sans', sans-serif; display: grid;
+      place-items: center; flex-shrink: 0;
+    }
+    .option-btn:hover:not(:disabled) .option-key { background: var(--vermilion); color: #fff; }
+    .option-btn.correct {
+      background: var(--green-light) !important; border-color: var(--green) !important;
+      color: var(--green) !important; font-weight: 800;
+    }
+    .option-btn.wrong {
+      background: var(--vermilion-light) !important; border-color: var(--vermilion) !important;
+      color: var(--vermilion) !important;
+    }
+    .option-btn:disabled { cursor: default; }
+
+    /* TEXT INPUT MODE */
+    .input-mode-box {
+      display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%;
+    }
+    .answer-input-wrap {
+      display: flex; align-items: center; gap: 10px; width: 100%; max-width: 440px;
+    }
+    .answer-input {
+      width: 100%; height: 52px; padding: 0 18px; border-radius: var(--r-md);
+      border: 2px solid var(--line); background: #fff; font: 700 20px 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); text-align: center; transition: border-color .2s;
+    }
+    .answer-input:focus { outline: none; border-color: var(--vermilion); }
+    .submit-answer-btn {
+      height: 52px; padding: 0 24px; border-radius: var(--r-md); background: var(--vermilion);
+      color: #fff; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background .2s;
+    }
+    .submit-answer-btn:hover { background: #9c363d; }
+    .input-hint-text {
+      font-size: 12px; color: var(--muted); text-align: center;
+    }
+
+    /* FEEDBACK CARD */
+    .feedback-banner {
+      display: none; padding: 14px 18px; border-radius: var(--r-md);
+      font-size: 14px; font-weight: 600; line-height: 1.5; align-items: flex-start; gap: 12px;
+    }
+    .feedback-banner.show { display: flex; }
+    .feedback-banner.correct {
+      background: var(--green-light); border: 1px solid var(--green); color: var(--green);
+    }
+    .feedback-banner.wrong {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion); color: var(--vermilion);
+    }
+
+    /* STEP SOLUTION */
+    .solution-card {
+      display: none; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 16px 20px; font-size: 14px; line-height: 1.6;
+    }
+    .solution-card.show { display: block; animation: fadeIn .3s; }
+    .solution-title { font-weight: 800; color: var(--indigo); margin-bottom: 8px; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+    .solution-steps { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .solution-steps li { position: relative; padding-left: 20px; }
+    .solution-steps li::before {
+      content: '▸'; position: absolute; left: 4px; color: var(--vermilion); font-weight: 900;
+    }
+    .solution-steps li sup { font-size: 0.7em; vertical-align: super; line-height: 0; }
+
+    /* ACTION BAR */
+    .card-actions {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+      border-top: 1px solid var(--line); padding-top: 18px;
+    }
+    .boost-skip-btn {
+      min-height: 42px; padding: 0 16px; border-radius: var(--r-md);
+      border: 1px solid var(--line); background: var(--paper-light);
+      color: var(--indigo); font-size: 12px; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 6px; transition: all .2s;
+    }
+    .boost-skip-btn:hover:not(:disabled) {
+      border-color: var(--gold); color: #9c6c3e; background: var(--gold-light);
+    }
+    .boost-skip-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .next-wrap { display: flex; justify-content: flex-end; margin-left: auto; }
+    .next-btn {
+      min-height: 48px; padding: 0 28px; border-radius: var(--r-md); background: var(--indigo);
+      color: #fff; font-size: 13px; font-weight: 700; display: none; align-items: center;
+      gap: 8px; transition: all .2s; user-select: none;
+    }
+    .next-btn:hover { background: var(--vermilion); transform: translateY(-1px); }
+
+    /* TOAST */
+    .toast-popup {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--indigo-dark); color: #fff; padding: 12px 20px;
+      border-radius: var(--r-md); font-size: 13px; font-weight: 700;
+      box-shadow: var(--shadow-lg); border-left: 4px solid var(--emerald);
+      transform: translateY(100px); opacity: 0; transition: all .3s ease;
+      pointer-events: none;
+    }
+    .toast-popup.visible { transform: translateY(0); opacity: 1; }
+
+    /* FOOTER */
+    .page-footer {
+      margin-top: auto; border-top: 1px solid var(--line); padding: 22px 5vw;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--muted); background: var(--paper-light);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .options-grid { grid-template-columns: 1fr; }
+      .playground-card { padding: 20px 18px; }
+      .formula-expression { font-size: 22px; }
+      .card-actions { flex-direction: column-reverse; align-items: stretch; }
+      .next-btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SITE NAV -->
+  <nav class="site-nav" aria-label="Главная навигация">
+    <a class="brand" href="../pages/math_7.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">Математика</span>
+        <span class="brand-sub">7 класс · Алгебра</span>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <span class="xp-counter" id="nav-xp-counter">0 XP</span>
+      <a class="nav-btn" href="../profile.html">Мой профиль</a>
+      <a class="nav-btn primary" href="../pages/math_7.html">← В 7 класс</a>
+    </div>
+  </nav>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <header class="trainer-header">
+      <div class="trainer-kicker">Алгебра · 7 класс · Интерактивный тренажёр</div>
+      <h1 class="trainer-title">Многочлены и действия над ними</h1>
+      <p class="trainer-subtitle">
+        Отрабатывай приведение подобных членов, сложение, вычитание, умножение многочленов и вынесение общего множителя за скобки. Повышай своё звание!
+      </p>
+    </header>
+
+    <!-- STATS DASHBOARD -->
+    <section class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box">
+        <span class="stat-label">Серия (Streak)</span>
+        <span class="stat-val streak" id="stat-streak">0 <span aria-hidden="true">🔥</span></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Точность</span>
+        <span class="stat-val" id="stat-accuracy">100%</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Решено</span>
+        <span class="stat-val" id="stat-solved">0</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Текущее звание</span>
+        <span class="stat-val" id="stat-rank" style="font-size: 14px;">Начинающий 🥉</span>
+      </div>
+    </section>
+
+    <!-- CATEGORY PILLS -->
+    <nav class="cat-bar" role="tablist" aria-label="Выбор действия с многочленами">
+      <button class="cat-pill active" data-cat="all" role="tab" aria-selected="true">🎲 Все действия (Микс)</button>
+      <button class="cat-pill" data-cat="similar" role="tab" aria-selected="false">🧩 Приведение подобных</button>
+      <button class="cat-pill" data-cat="addition" role="tab" aria-selected="false">➕ Сложение</button>
+      <button class="cat-pill" data-cat="subtraction" role="tab" aria-selected="false">➖ Вычитание</button>
+      <button class="cat-pill" data-cat="mult_monomial" role="tab" aria-selected="false">✖️ Умножение на одночлен</button>
+      <button class="cat-pill" data-cat="mult_polynomial" role="tab" aria-selected="false">📦 Умножение многочленов</button>
+      <button class="cat-pill" data-cat="factoring" role="tab" aria-selected="false">🔑 Вынесение за скобки</button>
+    </nav>
+
+    <!-- THEORY ACCORDION -->
+    <section class="cheat-card" id="cheat-card">
+      <div class="cheat-header" id="cheat-header" role="button" aria-expanded="false" tabindex="0">
+        <div class="cheat-title">
+          <span>📖</span>
+          <span>Шпаргалка: Ключевые правила работы с многочленами</span>
+        </div>
+        <div class="cheat-toggle" id="cheat-toggle-text">Показать правила ▾</div>
+      </div>
+      <div class="cheat-body">
+        <div class="cheat-grid">
+          <div class="cheat-item">
+            <strong>1. Приведение подобных слагаемых</strong>
+            <div class="cheat-math">4x² − 3x + 2x² + 5x = 6x² + 2x</div>
+            <p class="cheat-desc">Подобные слагаемые имеют одинаковую буквенную часть. Складываем их коэффициенты, показатели степеней не меняются.</p>
+          </div>
+          <div class="cheat-item">
+            <strong>2. Сложение и вычитание</strong>
+            <div class="cheat-math">(5a − 2b) − (3a − 4b) = 2a + 2b</div>
+            <p class="cheat-desc">Знак «минус» перед скобкой меняет знаки всех слагаемых внутри на противоположные: −(x − y) = −x + y.</p>
+          </div>
+          <div class="cheat-item">
+            <strong>3. Умножение на одночлен</strong>
+            <div class="cheat-math">3x · (2x² − 5) = 6x³ − 15x</div>
+            <p class="cheat-desc">Умножаем одночлен на каждое слагаемое многочлена: a(b + c) = ab + ac. Степени складываются: x · x² = x³.</p>
+          </div>
+          <div class="cheat-item">
+            <strong>4. Умножение многочлена на многочлен</strong>
+            <div class="cheat-math">(x + 3)(x − 2) = x² + x − 6</div>
+            <p class="cheat-desc">Каждый член первой скобки умножаем на каждый член второй скобки, затем приводим подобные слагаемые.</p>
+          </div>
+          <div class="cheat-item">
+            <strong>5. Вынесение общего множителя</strong>
+            <div class="cheat-math">6x³ − 9x² = 3x²(2x − 3)</div>
+            <p class="cheat-desc">Находим наибольший общий делитель чисел и переменную в наименьшей степени, выносим за скобки.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYGROUND CARD -->
+    <section class="playground-card" aria-label="Карточка задания">
+      <div class="task-meta">
+        <span class="task-topic-badge" id="task-topic-badge">Приведение подобных</span>
+        <button class="task-mode-toggle" id="task-mode-toggle" title="Переключить вариант ввода ответа">
+          <span id="toggle-icon">⌨️</span>
+          <span id="toggle-label">Режим: Выбор из 4 вариантов</span>
+        </button>
+      </div>
+
+      <p class="task-prompt" id="task-prompt">Выполните действие и приведите результат к стандартному виду:</p>
+
+      <div class="task-formula-box">
+        <div class="formula-expression" id="formula-expression">...</div>
+      </div>
+
+      <!-- Multiple choice options grid -->
+      <div class="options-grid" id="options-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Manual Input Mode -->
+      <div class="input-mode-box" id="input-mode-box" style="display: none;">
+        <div class="answer-input-wrap">
+          <input type="text" class="answer-input" id="answer-input" placeholder="Например: 2x^2 + 3x - 4" autocomplete="off" autocapitalize="none" spellcheck="false" />
+          <button class="submit-answer-btn" id="submit-answer-btn">Проверить</button>
+        </div>
+        <p class="input-hint-text">Степень можно вводить знаком ^ (например, <code>2x^2 + 3x - 4</code>) или верхним индексом</p>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback-banner" id="feedback-banner">
+        <span id="feedback-icon" style="font-size: 20px;">✓</span>
+        <div id="feedback-text">Отлично! Многочлен приведён к верному виду.</div>
+      </div>
+
+      <!-- Step Solution -->
+      <div class="solution-card" id="solution-card">
+        <div class="solution-title">
+          <span>🔍</span>
+          <span>Пошаговое объяснение:</span>
+        </div>
+        <ul class="solution-steps" id="solution-steps">
+          <!-- Steps injected -->
+        </ul>
+      </div>
+
+      <!-- Actions (Skip Boost & Next Button) -->
+      <div class="card-actions">
+        <button class="boost-skip-btn" id="btn-use-skip" title="Пропустить задание без потери серии с помощью буста прокачки">
+          <span>🛡️</span>
+          <span>Использовать буст пропуска</span>
+        </button>
+        <div class="next-wrap">
+          <button class="next-btn" id="next-btn">
+            <span>Следующее задание</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-popup" id="toast-popup"></div>
+
+  <footer class="page-footer">
+    <span>НЕШкола · Математика 7 класс · Алгебра</span>
+    <a href="../pages/math_7.html">← Вернуться в 7 класс</a>
+  </footer>
+
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/polynomials_trainer.js"></script>
+  <script src="../js/auth_sync.js"></script>
+
+  <script>
+    (function () {
+      const TRAINER_ID = 'polynomials';
+      let currentCategory = 'all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+      let isManualMode = false;
+
+      // Stats
+      let streak = 0;
+      let totalSolved = 0;
+      let totalAttempts = 0;
+
+      // DOM Elements
+      const statStreak = document.getElementById('stat-streak');
+      const statAccuracy = document.getElementById('stat-accuracy');
+      const statSolved = document.getElementById('stat-solved');
+      const statRank = document.getElementById('stat-rank');
+      const navXpCounter = document.getElementById('nav-xp-counter');
+
+      const catPills = document.querySelectorAll('.cat-pill');
+      const cheatCard = document.getElementById('cheat-card');
+      const cheatHeader = document.getElementById('cheat-header');
+      const cheatToggleText = document.getElementById('cheat-toggle-text');
+
+      const taskTopicBadge = document.getElementById('task-topic-badge');
+      const taskPrompt = document.getElementById('task-prompt');
+      const formulaExpr = document.getElementById('formula-expression');
+      const optionsGrid = document.getElementById('options-grid');
+      const inputModeBox = document.getElementById('input-mode-box');
+      const answerInput = document.getElementById('answer-input');
+      const submitAnswerBtn = document.getElementById('submit-answer-btn');
+      const taskModeToggle = document.getElementById('task-mode-toggle');
+      const toggleLabel = document.getElementById('toggle-label');
+
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const feedbackText = document.getElementById('feedback-text');
+      const feedbackIcon = document.getElementById('feedback-icon');
+      const solutionCard = document.getElementById('solution-card');
+      const solutionSteps = document.getElementById('solution-steps');
+      const nextBtn = document.getElementById('next-btn');
+      const btnUseSkip = document.getElementById('btn-use-skip');
+      const toastPopup = document.getElementById('toast-popup');
+
+      // Web Audio sound synthesizer
+      let audioCtx = null;
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) audioCtx = new AudioContext();
+        }
+        return audioCtx;
+      }
+
+      function playSuccessSound() {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.18, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.32);
+        } catch (e) {}
+      }
+
+      function playErrorSound() {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(140, ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.27);
+        } catch (e) {}
+      }
+
+      function playRankUpSound() {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime + idx * 0.1);
+            gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.1);
+            osc.stop(ctx.currentTime + idx * 0.1 + 0.28);
+          });
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        if (!toastPopup) return;
+        toastPopup.textContent = msg;
+        toastPopup.classList.add('visible');
+        setTimeout(() => toastPopup.classList.remove('visible'), 3200);
+      }
+
+      // Sync stats with TrainerTracker
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const rec = TrainerTracker.getRecord(TRAINER_ID);
+          if (rec) {
+            streak = rec.currentStreak || 0;
+            totalSolved = rec.totalSolved || 0;
+            totalAttempts = rec.totalAttempts || 0;
+            statRank.textContent = rec.rankTitle || 'Начинающий 🥉';
+          }
+        }
+        statStreak.innerHTML = `${streak} <span aria-hidden="true">🔥</span>`;
+        statSolved.textContent = totalSolved;
+        const acc = totalAttempts > 0 ? Math.round((totalSolved / totalAttempts) * 100) : 100;
+        statAccuracy.textContent = `${acc}%`;
+
+        try {
+          const curXp = localStorage.getItem('user_xp') || '0';
+          if (navXpCounter) navXpCounter.textContent = `${curXp} XP`;
+        } catch (e) {}
+
+        updateSkipBoostButton();
+      }
+
+      function updateSkipBoostButton() {
+        try {
+          const rawInv = localStorage.getItem('study_boosts_inventory');
+          const inv = rawInv ? JSON.parse(rawInv) : {};
+          const count = (inv.streak_shield || 0) + (inv.spy_hint || 0);
+          if (count > 0) {
+            btnUseSkip.disabled = false;
+            btnUseSkip.style.display = 'inline-flex';
+            btnUseSkip.title = `У вас доступно бустов: ${count}`;
+          } else {
+            btnUseSkip.disabled = true;
+            btnUseSkip.title = 'В магазине прокачки нет бустов пропуска';
+          }
+        } catch (e) {
+          btnUseSkip.disabled = true;
+        }
+      }
+
+      // Accordion toggle
+      cheatHeader.addEventListener('click', () => {
+        const isOpen = cheatCard.classList.toggle('open');
+        cheatHeader.setAttribute('aria-expanded', String(isOpen));
+        cheatToggleText.textContent = isOpen ? 'Скрыть правила ▴' : 'Показать правила ▾';
+      });
+
+      // Category filter pills
+      catPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          catPills.forEach(p => {
+            p.classList.remove('active');
+            p.setAttribute('aria-selected', 'false');
+          });
+          pill.classList.add('active');
+          pill.setAttribute('aria-selected', 'true');
+          currentCategory = pill.getAttribute('data-cat') || 'all';
+          loadNewTask();
+        });
+      });
+
+      // Toggle Input Mode
+      taskModeToggle.addEventListener('click', () => {
+        isManualMode = !isManualMode;
+        if (isManualMode) {
+          optionsGrid.style.display = 'none';
+          inputModeBox.style.display = 'flex';
+          toggleLabel.textContent = 'Режим: Ввод с клавиатуры';
+          answerInput.focus();
+        } else {
+          optionsGrid.style.display = 'grid';
+          inputModeBox.style.display = 'none';
+          toggleLabel.textContent = 'Режим: Выбор из 4 вариантов';
+        }
+      });
+
+      function loadNewTask() {
+        if (!window.PolynomialsTrainer) return;
+
+        hasAnsweredCurrent = false;
+        feedbackBanner.style.display = 'none';
+        feedbackBanner.className = 'feedback-banner';
+        solutionCard.classList.remove('show');
+        solutionSteps.innerHTML = '';
+        nextBtn.style.display = 'none';
+
+        currentTask = PolynomialsTrainer.generateTask(currentCategory);
+
+        taskTopicBadge.textContent = currentTask.catName || 'Многочлены';
+        taskPrompt.textContent = currentTask.prompt || 'Выполните действие:';
+        formulaExpr.innerHTML = currentTask.questionHtml || '';
+
+        // Render options grid
+        optionsGrid.innerHTML = '';
+        if (currentTask.options) {
+          currentTask.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.setAttribute('data-idx', String(idx));
+            btn.innerHTML = `
+              <span class="option-text">${opt.html || opt.text}</span>
+              <span class="option-key">${idx + 1}</span>
+            `;
+            btn.addEventListener('click', () => handleOptionClick(idx, btn));
+            optionsGrid.appendChild(btn);
+          });
+        }
+
+        answerInput.value = '';
+        answerInput.disabled = false;
+        submitAnswerBtn.disabled = false;
+
+        if (isManualMode) {
+          answerInput.focus();
+        }
+      }
+
+      function handleOptionClick(optIdx, btnEl) {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const res = PolynomialsTrainer.checkAnswer(currentTask, optIdx);
+        finishAnswer(res.isCorrect, btnEl);
+      }
+
+      submitAnswerBtn.addEventListener('click', () => {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const val = answerInput.value.trim();
+        if (!val) {
+          answerInput.focus();
+          return;
+        }
+        const res = PolynomialsTrainer.checkAnswer(currentTask, val);
+        finishAnswer(res.isCorrect, null);
+      });
+
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitAnswerBtn.click();
+        }
+      });
+
+      function finishAnswer(isCorrect, clickedBtn) {
+        hasAnsweredCurrent = true;
+
+        const optionBtns = optionsGrid.querySelectorAll('.option-btn');
+        optionBtns.forEach((btn, idx) => {
+          btn.disabled = true;
+          if (idx === currentTask.correctOptionIndex) {
+            btn.classList.add('correct');
+          }
+        });
+
+        if (clickedBtn && !isCorrect) {
+          clickedBtn.classList.add('wrong');
+        }
+
+        answerInput.disabled = true;
+        submitAnswerBtn.disabled = true;
+
+        feedbackBanner.style.display = 'flex';
+        feedbackBanner.classList.add('show');
+
+        if (isCorrect) {
+          playSuccessSound();
+          feedbackBanner.classList.add('correct');
+          feedbackIcon.textContent = '✓';
+          feedbackText.innerHTML = `<strong>Верно!</strong> Ответ <code>${currentTask.displayAnswer}</code> правильный! (+15 XP)`;
+
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+            const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10);
+            localStorage.setItem('studyBonusXp', String(curBonus + 15));
+          } catch (e) {}
+
+          if (window.TrainerTracker) {
+            const res = TrainerTracker.recordAttempt(TRAINER_ID, true);
+            syncStats();
+            if (res && res.rankChanged) {
+              playRankUpSound();
+              showToast('🎖️ Поздравляем! Новое звание: ' + res.rankTitle);
+            } else if (res && res.currentStreak > 0 && res.currentStreak % 5 === 0) {
+              showToast(`🔥 Отличная серия: ${res.currentStreak} правильных ответов подряд!`);
+            }
+          }
+        } else {
+          playErrorSound();
+          feedbackBanner.classList.add('wrong');
+          feedbackIcon.textContent = '✕';
+          feedbackText.innerHTML = `<strong>Не совсем так.</strong> Правильный ответ: <code>${currentTask.displayAnswer}</code>. Посмотрите решение ниже.`;
+
+          if (window.TrainerTracker) {
+            TrainerTracker.recordAttempt(TRAINER_ID, false);
+            syncStats();
+          }
+
+          showSolution();
+        }
+
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.focus();
+      }
+
+      function showSolution() {
+        if (!currentTask || !currentTask.solutionSteps) return;
+        solutionSteps.innerHTML = '';
+        currentTask.solutionSteps.forEach(step => {
+          const li = document.createElement('li');
+          li.innerHTML = step;
+          solutionSteps.appendChild(li);
+        });
+        solutionCard.classList.add('show');
+      }
+
+      // Boost Skip button
+      btnUseSkip.addEventListener('click', () => {
+        if (hasAnsweredCurrent || !currentTask) return;
+        try {
+          const rawInv = localStorage.getItem('study_boosts_inventory');
+          const inv = rawInv ? JSON.parse(rawInv) : {};
+          if ((inv.streak_shield || 0) > 0) {
+            inv.streak_shield--;
+            localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+            hasAnsweredCurrent = true;
+            feedbackBanner.style.display = 'flex';
+            feedbackBanner.className = 'feedback-banner correct show';
+            feedbackIcon.textContent = '🛡️';
+            feedbackText.innerHTML = `<strong>Защита серии активирована!</strong> Задание пропущено без сброса серии. Правильный ответ: <code>${currentTask.displayAnswer}</code>.`;
+            showSolution();
+            nextBtn.style.display = 'inline-flex';
+            showToast('🛡️ Буст защиты серии использован!');
+            syncStats();
+            return;
+          }
+          if ((inv.spy_hint || 0) > 0) {
+            inv.spy_hint--;
+            localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+            showToast(`🕵️ Шпионская подсказка: правильный ответ — ${currentTask.displayAnswer}`);
+            answerInput.value = currentTask.displayAnswer;
+            syncStats();
+            return;
+          }
+          showToast('У вас нет активных бустов пропуска');
+        } catch (e) {}
+      });
+
+      nextBtn.addEventListener('click', loadNewTask);
+
+      // Keyboard navigation (1-4 and Enter)
+      window.addEventListener('keydown', (e) => {
+        if (e.target && e.target.tagName === 'INPUT') return;
+
+        if (!hasAnsweredCurrent && !isManualMode) {
+          if (['1', '2', '3', '4'].includes(e.key)) {
+            const idx = parseInt(e.key, 10) - 1;
+            const btn = optionsGrid.querySelector(`[data-idx="${idx}"]`);
+            if (btn) handleOptionClick(idx, btn);
+          }
+        } else if (hasAnsweredCurrent) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            loadNewTask();
+          }
+        }
+      });
+
+      // Init
+      syncStats();
+      loadNewTask();
+    })();
+  </script>
+</body>
+</html>

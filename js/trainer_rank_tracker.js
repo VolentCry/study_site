@@ -59,6 +59,26 @@
             ]
         },
         {
+            id: 'polynomials',
+            name: 'Многочлены (7 класс)',
+            shortName: 'Многочлены',
+            subject: 'Математика',
+            category: 'Алгебра',
+            classNum: '7 класс',
+            url: '../math_moduls/polynomials_trainer.html',
+            profileUrl: 'math_moduls/polynomials_trainer.html',
+            icon: '📜',
+            description: 'Приведение подобных, сложение, вычитание, умножение многочленов и вынесение общего множителя.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг многочленов 👑' },
+                { min: 20, title: 'Повелитель полиномов 🧙' },
+                { min: 14, title: 'Мастер тождеств 💎' },
+                { min: 8,  title: 'Знаток многочленов 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'linear_function',
             name: 'Линейная функция (7 класс)',
             shortName: 'Линейная функция',

@@ -1971,6 +1971,10 @@
                     if (window.MonomialsTrainer) {
                         t = window.MonomialsTrainer.generateTask(type);
                     }
+                } else if (type.startsWith('polynomials_')) {
+                    if (window.PolynomialsTrainer) {
+                        t = window.PolynomialsTrainer.generateTask(type);
+                    }
                 } else if (type.startsWith('linear_')) {
                     if (window.LinearFunctionTrainer) {
                         t = window.LinearFunctionTrainer.generateTask(type);
