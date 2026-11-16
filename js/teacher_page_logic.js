@@ -1971,6 +1971,10 @@
                     if (window.MonomialsTrainer) {
                         t = window.MonomialsTrainer.generateTask(type);
                     }
+                } else if (type.startsWith('linear_')) {
+                    if (window.LinearFunctionTrainer) {
+                        t = window.LinearFunctionTrainer.generateTask(type);
+                    }
                 }
 
                 if (!t) break;
@@ -2781,9 +2785,19 @@
                     const fs = parseFloat(s);
                     const fc = parseFloat(c);
                     if (!isNaN(fs) && !isNaN(fc)) return Math.abs(fs - fc) < 0.0001;
-                    return s.toLowerCase() === c.toLowerCase();
+                    if (s.toLowerCase() === c.toLowerCase()) return true;
+                    const getNums = (str) => (str.replace(/−/g, '-').replace(/;/g, ' ').replace(/,/g, ' ').match(/[-+]?\d+(?:\.\d+)?/g) || []);
+                    const ns = getNums(s);
+                    const nc = getNums(c);
+                    if (ns.length && ns.length === nc.length && (ns.length === 2 || ns.length === 4)) {
+                        return ns.every((val, i) => Math.abs(parseFloat(val) - parseFloat(nc[i])) < 0.0001);
+                    }
+                    return false;
                 };
                 isCorrect = checkEquiv(normStudent, normPrimary) || checkEquiv(normStudent, normDisplay);
+                if (!isCorrect && Array.isArray(t.acceptedAnswers)) {
+                    isCorrect = t.acceptedAnswers.some(acc => checkEquiv(normStudent, String(acc).replace(/\s+/g, '').replace(',', '.')));
+                }
             }
 
             if (isCorrect) autoCorrectCount++;

@@ -59,6 +59,26 @@
             ]
         },
         {
+            id: 'linear_function',
+            name: 'Линейная функция (7 класс)',
+            shortName: 'Линейная функция',
+            subject: 'Математика',
+            category: 'Алгебра',
+            classNum: '7 класс',
+            url: '../math_moduls/linear_function_trainer.html',
+            profileUrl: 'math_moduls/linear_function_trainer.html',
+            icon: '📈',
+            description: 'Значение функции и аргумента, область определения, точки пересечения графика с осями координат Ox и Oy, пересечение двух графиков.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг функций 👑' },
+                { min: 20, title: 'Мастер графиков 🧙' },
+                { min: 14, title: 'Эксперт координат 💎' },
+                { min: 8,  title: 'Знаток прямой 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'powers_compare',
             name: 'Сравнение степеней (<, >, =)',
             shortName: 'Сравнение степеней',

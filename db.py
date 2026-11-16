@@ -1965,6 +1965,8 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
             def _answers_match(u_val: str, c_val: str) -> bool:
                 if not u_val or not c_val:
                     return False
+                if u_val.strip().lower() == c_val.strip().lower():
+                    return True
                 nu = u_val.replace(' ', '').replace(',', '.')
                 nc = c_val.replace(' ', '').replace(',', '.')
                 try:
@@ -1972,7 +1974,25 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
                     fc = float(nc)
                     return abs(fu - fc) < 0.0001
                 except ValueError:
-                    return nu.lower() == nc.lower()
+                    pass
+                if nu.lower() == nc.lower():
+                    return True
+                # Coordinate tuple matching: e.g. (2; 3) vs (2, 3) vs 2; 3 vs x=2, y=3
+                import re
+                def extract_nums(s: str):
+                    s_clean = s.replace('−', '-').replace(';', ' ')
+                    s_clean = re.sub(r'[,]+', ' ', s_clean)
+                    return re.findall(r'[-+]?\d+(?:\.\d+)?', s_clean)
+
+                m_u = extract_nums(u_val)
+                m_c = extract_nums(c_val)
+                if m_u and m_c and len(m_u) == len(m_c) and len(m_u) in (2, 4):
+                    try:
+                        if all(abs(float(a) - float(b)) < 0.0001 for a, b in zip(m_u, m_c)):
+                            return True
+                    except ValueError:
+                        pass
+                return False
 
             is_correct = False
             if user_ans and (primary_ans or display_ans):

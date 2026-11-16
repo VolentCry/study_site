@@ -419,6 +419,8 @@
                     `;
                 }
             } else {
+                const isOnlyDigits = /^-?\d+([.,]\d+)?$/.test(String(task.answer || task.displayAnswer || '').trim());
+                const inputModeAttr = isOnlyDigits ? 'decimal' : 'text';
                 answerUiHtml = `
                     <div class="answer-box">
                         <div class="input-group">
@@ -428,7 +430,7 @@
                                 placeholder="Ваш ответ..."
                                 value="${escapeHtml(studentVal)}"
                                 autocomplete="off"
-                                inputmode="decimal">
+                                inputmode="${inputModeAttr}">
                         </div>
                     </div>
                 `;
