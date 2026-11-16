@@ -617,6 +617,28 @@
                     </button>
                 </div>
 
+                <!-- Grading Toolbar: Filter buttons & search -->
+                <div class="grading-toolbar">
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                        <button type="button" class="btn btn-secondary btn-sm grading-filter-btn active" data-filter="all">
+                            Все задания (<span id="count-grading-all">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm grading-filter-btn" data-filter="needs_review">
+                            🔔 Требуют проверки (<span id="count-grading-unreviewed">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm grading-filter-btn" data-filter="checked">
+                            ✓ Уже проверенные (<span id="count-grading-checked">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm grading-filter-btn" data-filter="pending">
+                            ⏳ Ожидают сдачи (<span id="count-grading-pending">0</span>)
+                        </button>
+                    </div>
+                    <div class="search-box-wrap" style="min-width: 220px; max-width: 320px;">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="grading-search-input" class="search-input" placeholder="Поиск по названию или классу...">
+                    </div>
+                </div>
+
                 <div class="hw-cards-grid" id="grading-hw-grid">
                     <!-- Загружается динамически -->
                 </div>
@@ -827,13 +849,29 @@
 
     <!-- MODAL: СПИСОК СДАННЫХ РАБОТ ПО ДОМАШКЕ -->
     <dialog id="modal-submissions-list" class="admin-modal">
-        <div class="modal-body" style="max-width: 680px;">
+        <div class="modal-body" style="max-width: 720px;">
             <div class="modal-header">
                 <div>
                     <h3 class="modal-title" id="submissions-modal-title">Сданные работы</h3>
                     <p style="font-size:0.85rem; color:var(--muted);" id="submissions-modal-subtitle"></p>
                 </div>
                 <button type="button" class="modal-close" data-close-modal="modal-submissions-list">✕</button>
+            </div>
+
+            <!-- Submissions Toolbar: Quick Filter Pills -->
+            <div id="submissions-filter-toolbar" style="display: flex; gap: 6px; margin: 0.5rem 0 1rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm sub-filter-btn active" data-filter="all">
+                    Все (<span id="sub-cnt-all">0</span>)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm sub-filter-btn" data-filter="submitted">
+                    🔔 Непроверенные (<span id="sub-cnt-submitted">0</span>)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm sub-filter-btn" data-filter="checked">
+                    ✓ Проверенные (<span id="sub-cnt-checked">0</span>)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm sub-filter-btn" data-filter="not_started">
+                    ⏳ Не сдано (<span id="sub-cnt-pending">0</span>)
+                </button>
             </div>
 
             <div class="table-responsive" style="max-height: 440px; overflow-y: auto;">

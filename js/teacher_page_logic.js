@@ -2488,6 +2488,15 @@
     let currentReviewHw = null;
     let currentReviewSubmission = null;
 
+    let gradingHomeworksCache = [];
+    let activeGradingFilter = 'all';
+    let gradingSearchQuery = '';
+
+    let currentHwSubmissions = [];
+    let currentSubmissionsFilter = 'all';
+    let gradingToolbarBound = false;
+    let submissionsToolbarBound = false;
+
     if (btnRefreshGrading) {
         btnRefreshGrading.addEventListener('click', loadGrading);
     }
@@ -2502,8 +2511,294 @@
         }
     });
 
+    function getHwGradingPriority(h) {
+        const subCount = h.submittedCount !== undefined ? h.submittedCount : (h.submissions_count || 0);
+        const chkCount = h.checkedCount !== undefined ? h.checkedCount : (h.checked_count || 0);
+        const unreviewed = Math.max(0, subCount - chkCount);
+
+        // 0: Непроверенные работы (есть сданные, требующие проверки) -> В САМОМ ВЕРХУ!
+        if (unreviewed > 0) return 0;
+        // 1: Ожидают сдачи (пока 0 сданных работ)
+        if (subCount === 0) return 1;
+        // 2: Уже проверенные работы (все сданные проверены) -> ВНИЗ СПИСКА!
+        return 2;
+    }
+
+    function initGradingToolbar() {
+        if (gradingToolbarBound) return;
+        gradingToolbarBound = true;
+
+        document.querySelectorAll('.grading-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.grading-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeGradingFilter = btn.getAttribute('data-filter') || 'all';
+                renderGradingGrid();
+            });
+        });
+
+        const searchInput = document.getElementById('grading-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                gradingSearchQuery = (e.target.value || '').trim().toLowerCase();
+                renderGradingGrid();
+            });
+        }
+    }
+
+    function updateGradingCounters() {
+        const total = gradingHomeworksCache.length;
+        let unreviewed = 0;
+        let checked = 0;
+        let pending = 0;
+
+        gradingHomeworksCache.forEach(h => {
+            const p = getHwGradingPriority(h);
+            if (p === 0) unreviewed++;
+            else if (p === 2) checked++;
+            else pending++;
+        });
+
+        const cntAll = document.getElementById('count-grading-all');
+        const cntUnrev = document.getElementById('count-grading-unreviewed');
+        const cntChk = document.getElementById('count-grading-checked');
+        const cntPend = document.getElementById('count-grading-pending');
+
+        if (cntAll) cntAll.textContent = total;
+        if (cntUnrev) cntUnrev.textContent = unreviewed;
+        if (cntChk) cntChk.textContent = checked;
+        if (cntPend) cntPend.textContent = pending;
+    }
+
+    function renderGradingGrid() {
+        if (!gradingHwGrid) return;
+
+        if (gradingHomeworksCache.length === 0) {
+            gradingHwGrid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
+                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">📝</div>
+                    <div style="font-weight:700; font-size:1.1rem; color:var(--ink); margin-bottom:0.4rem;">Вы пока не создали ни одного домашнего задания</div>
+                    <div style="font-size:0.9rem; margin-bottom:1.25rem;">Используйте конструктор, чтобы быстро собрать Д/З из тренажёров ОГЭ.</div>
+                    <button type="button" class="btn btn-emerald btn-sm" onclick="switchTab('constructor')">
+                        🛠️ Перейти в конструктор
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        // 1. Фильтрация по активной вкладке фильтра
+        let filtered = gradingHomeworksCache.filter(h => {
+            const p = getHwGradingPriority(h);
+            if (activeGradingFilter === 'needs_review') return p === 0;
+            if (activeGradingFilter === 'checked') return p === 2;
+            if (activeGradingFilter === 'pending') return p === 1;
+            return true;
+        });
+
+        // 2. Поиск по строке
+        if (gradingSearchQuery) {
+            filtered = filtered.filter(h => {
+                const title = (h.title || '').toLowerCase();
+                const cls = (h.className || h.class_name || '').toLowerCase();
+                const subj = (h.subject || '').toLowerCase();
+                const student = (h.studentName || '').toLowerCase();
+                return title.includes(gradingSearchQuery) ||
+                       cls.includes(gradingSearchQuery) ||
+                       subj.includes(gradingSearchQuery) ||
+                       student.includes(gradingSearchQuery);
+            });
+        }
+
+        if (filtered.length === 0) {
+            gradingHwGrid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:2.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
+                    <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
+                    <div style="font-weight:700; font-size:1rem; color:var(--ink); margin-bottom:0.3rem;">В этой категории задания не найдены</div>
+                    <div style="font-size:0.85rem;">Попробуйте переключить фильтр или изменить поисковый запрос</div>
+                </div>
+            `;
+            return;
+        }
+
+        // 3. СОРТИРОВКА:
+        // Priority 0 (Непроверенные работы) — вверху!
+        // Priority 1 (Ожидают сдачи) — в середине
+        // Priority 2 (Уже проверенные работы) — улетают вниз списка!
+        filtered.sort((a, b) => {
+            const pA = getHwGradingPriority(a);
+            const pB = getHwGradingPriority(b);
+            if (pA !== pB) return pA - pB;
+
+            // Внутри группы "требуют проверки" сначала те, где больше непроверенных работ
+            if (pA === 0) {
+                const unrevA = Math.max(0, (a.submittedCount ?? a.submissions_count ?? 0) - (a.checkedCount ?? a.checked_count ?? 0));
+                const unrevB = Math.max(0, (b.submittedCount ?? b.submissions_count ?? 0) - (b.checkedCount ?? b.checked_count ?? 0));
+                if (unrevB !== unrevA) return unrevB - unrevA;
+            }
+
+            // Иначе сортируем по дате создания (свежие выше)
+            const tA = new Date(a.created_at || a.createdAt || 0).getTime();
+            const tB = new Date(b.created_at || b.createdAt || 0).getTime();
+            return tB - tA;
+        });
+
+        // 4. Отрисовка карточек с визуальными разделителями групп при отображении всех
+        let html = '';
+        let lastPriority = null;
+        const showDividers = (activeGradingFilter === 'all' && !gradingSearchQuery);
+
+        filtered.forEach(h => {
+            const p = getHwGradingPriority(h);
+
+            if (showDividers && p !== lastPriority) {
+                if (p === 0) {
+                    const unrevTotal = filtered.filter(x => getHwGradingPriority(x) === 0).length;
+                    html += `
+                        <div class="grading-group-divider" style="color:var(--accent-gold);">
+                            <span>🔔 Непроверенные работы · Требуют проверки (${unrevTotal})</span>
+                            <div style="flex:1; height:1px; background:rgba(245, 158, 11, 0.3);"></div>
+                        </div>
+                    `;
+                } else if (p === 1) {
+                    const pendTotal = filtered.filter(x => getHwGradingPriority(x) === 1).length;
+                    html += `
+                        <div class="grading-group-divider" style="color:var(--muted);">
+                            <span>⏳ Ожидают сдачи учениками (${pendTotal})</span>
+                            <div style="flex:1; height:1px; background:var(--line);"></div>
+                        </div>
+                    `;
+                } else if (p === 2) {
+                    const chkTotal = filtered.filter(x => getHwGradingPriority(x) === 2).length;
+                    html += `
+                        <div class="grading-group-divider" style="color:var(--accent-emerald);">
+                            <span>✓ Уже проверенные работы (${chkTotal})</span>
+                            <div style="flex:1; height:1px; background:rgba(16, 185, 129, 0.3);"></div>
+                        </div>
+                    `;
+                }
+                lastPriority = p;
+            }
+
+            const taskCount = h.tasks ? h.tasks.length : (h.tasksCount || 0);
+            const subCount = h.submittedCount !== undefined ? h.submittedCount : (h.submissions_count || 0);
+            const chkCount = h.checkedCount !== undefined ? h.checkedCount : (h.checked_count || 0);
+            const unreviewedCount = Math.max(0, subCount - chkCount);
+            const createdStr = (h.created_at || h.createdAt) ? formatDateTime(h.created_at || h.createdAt) : '—';
+            const deadlineStr = (h.deadline || h.deadlineAt) ? formatDateTime(h.deadline || h.deadlineAt) : 'Бессрочно';
+
+            let cardExtraClass = '';
+            let statusBadge = '';
+            let submissionsBtnText = `👥 Сданные работы (${subCount})`;
+            let submissionsBtnClass = 'btn-secondary';
+
+            if (p === 0) {
+                cardExtraClass = 'hw-card-needs-review';
+                statusBadge = `<span class="badge" style="background:rgba(245,158,11,0.18); color:var(--accent-gold); font-weight:800; border:1px solid rgba(245,158,11,0.4);">🔔 Не проверено: ${unreviewedCount}</span>`;
+                submissionsBtnText = `👥 Сданные работы (${subCount}) · 🔔 Проверить (${unreviewedCount})`;
+                submissionsBtnClass = 'btn-emerald';
+            } else if (p === 2) {
+                cardExtraClass = 'hw-card-checked';
+                statusBadge = `<span class="badge" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald); font-weight:700; border:1px solid rgba(16,185,129,0.35);">✓ Все проверены</span>`;
+                submissionsBtnText = `👥 Сданные работы (${subCount}) · ✓`;
+                submissionsBtnClass = 'btn-secondary';
+            } else {
+                statusBadge = `<span class="badge" style="background:rgba(148,163,184,0.12); color:var(--muted); font-weight:600; border:1px solid var(--line);">⏳ Ожидает сдачи</span>`;
+                submissionsBtnText = `👥 Сданные работы (0)`;
+                submissionsBtnClass = 'btn-secondary';
+            }
+
+            html += `
+                <div class="hw-card ${cardExtraClass}" id="hw-card-${h.id}">
+                    <div class="hw-card-top">
+                        <div class="hw-card-meta">
+                            <span class="lesson-class-badge">🏫 ${escapeHtml(h.className || h.class_name)}</span>
+                            ${h.studentName ? `<span class="lesson-class-badge" style="background:rgba(255,119,40,0.15); border-color:rgba(255,119,40,0.3); color:var(--accent);">👤 ${escapeHtml(h.studentName)}</span>` : ''}
+                            ${statusBadge}
+                            <span style="color:var(--accent-cyan); font-weight:700;">${escapeHtml(h.subject)}</span>
+                            <span title="Дата создания задания" style="display:inline-flex; align-items:center; gap:3px;">📅 Выдано: <strong style="color:var(--ink);">${createdStr}</strong></span>
+                            <span title="Срок сдачи задания" style="display:inline-flex; align-items:center; gap:3px;">⏳ Срок: <strong style="color:var(--ink);">${deadlineStr}</strong></span>
+                        </div>
+                        <h3 class="hw-card-title">${escapeHtml(h.title)}</h3>
+                        ${h.description ? `<p style="font-size:0.85rem; color:var(--muted);">${escapeHtml(h.description)}</p>` : ''}
+                    </div>
+
+                    <div class="hw-card-stats">
+                        <div>
+                            <div class="hw-stat-val" style="color:var(--accent);">${taskCount}</div>
+                            <div class="hw-stat-lbl">Заданий</div>
+                        </div>
+                        <div>
+                            <div class="hw-stat-val" style="color:var(--accent-gold);">${subCount}</div>
+                            <div class="hw-stat-lbl">Сдано работ</div>
+                        </div>
+                        <div>
+                            <div class="hw-stat-val" style="color:var(--accent-emerald);">${chkCount}</div>
+                            <div class="hw-stat-lbl">Проверено</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                            <button type="button" class="btn ${submissionsBtnClass} btn-sm btn-view-submissions" data-hw-id="${h.id}">
+                                ${submissionsBtnText}
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm btn-edit-hw" data-hw-id="${h.id}" title="Редактировать условия, состав задач и параметры задания">
+                                ✏️ Редактировать
+                            </button>
+                            <a href="homework.html?id=${h.id}" target="_blank" class="btn btn-secondary btn-sm" title="Смотреть домашнее задание с ответами" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                👀 Смотреть
+                            </a>
+                        </div>
+                        <button type="button" class="btn btn-danger-outline btn-sm btn-delete-hw" data-hw-id="${h.id}" title="Удалить Д/З">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        gradingHwGrid.innerHTML = html;
+
+        // View submissions buttons
+        gradingHwGrid.querySelectorAll('.btn-view-submissions').forEach(b => {
+            b.addEventListener('click', () => {
+                const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
+                const foundHw = gradingHomeworksCache.find(h => h.id === hwId);
+                if (foundHw) openSubmissionsModal(foundHw);
+            });
+        });
+
+        // Edit HW buttons
+        gradingHwGrid.querySelectorAll('.btn-edit-hw').forEach(b => {
+            b.addEventListener('click', async () => {
+                const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
+                await startEditingHomework(hwId);
+            });
+        });
+
+        // Delete HW buttons
+        gradingHwGrid.querySelectorAll('.btn-delete-hw').forEach(b => {
+            b.addEventListener('click', async () => {
+                const hwId = b.getAttribute('data-hw-id');
+                if (!confirm('Вы действительно хотите удалить это домашнее задание? (История и прогресс сданных работ сохранятся в досье учеников)')) return;
+                try {
+                    const delRes = await fetch(`/api/teacher/homeworks/${hwId}`, { method: 'DELETE' });
+                    const delData = await delRes.json();
+                    if (delData.success) {
+                        showToast('Домашнее задание удалено');
+                        loadGrading();
+                    } else {
+                        alert(delData.error || 'Ошибка при удалении');
+                    }
+                } catch(e) { alert('Ошибка сети'); }
+            });
+        });
+    }
+
     async function loadGrading() {
         if (!gradingHwGrid) return;
+        initGradingToolbar();
         gradingHwGrid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--muted); grid-column:1/-1;">Загрузка домашних заданий...</div>';
 
         try {
@@ -2514,119 +2809,221 @@
                 return;
             }
 
-            const homeworks = data.homeworks || [];
-            if (homeworks.length === 0) {
-                gradingHwGrid.innerHTML = `
-                    <div style="grid-column:1/-1; text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
-                        <div style="font-size:2.5rem; margin-bottom:0.75rem;">📝</div>
-                        <div style="font-weight:700; font-size:1.1rem; color:var(--ink); margin-bottom:0.4rem;">Вы пока не создали ни одного домашнего задания</div>
-                        <div style="font-size:0.9rem; margin-bottom:1.25rem;">Используйте конструктор, чтобы быстро собрать Д/З из тренажёров ОГЭ.</div>
-                        <button type="button" class="btn btn-emerald btn-sm" onclick="switchTab('constructor')">
-                            🛠️ Перейти в конструктор
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            gradingHwGrid.innerHTML = homeworks.map(h => {
-                const taskCount = h.tasks ? h.tasks.length : (h.tasksCount || 0);
-                const subCount = h.submittedCount !== undefined ? h.submittedCount : (h.submissions_count || 0);
-                const chkCount = h.checkedCount !== undefined ? h.checkedCount : (h.checked_count || 0);
-                const createdStr = (h.created_at || h.createdAt) ? formatDateTime(h.created_at || h.createdAt) : '—';
-                const deadlineStr = (h.deadline || h.deadlineAt) ? formatDateTime(h.deadline || h.deadlineAt) : 'Бессрочно';
-
-                return `
-                    <div class="hw-card" id="hw-card-${h.id}">
-                        <div class="hw-card-top">
-                            <div class="hw-card-meta">
-                                <span class="lesson-class-badge">🏫 ${escapeHtml(h.className || h.class_name)}</span>
-                                ${h.studentName ? `<span class="lesson-class-badge" style="background:rgba(255,119,40,0.15); border-color:rgba(255,119,40,0.3); color:var(--accent);">👤 ${escapeHtml(h.studentName)}</span>` : ''}
-                                <span style="color:var(--accent-cyan); font-weight:700;">${escapeHtml(h.subject)}</span>
-                                <span title="Дата создания задания" style="display:inline-flex; align-items:center; gap:3px;">📅 Выдано: <strong style="color:var(--ink);">${createdStr}</strong></span>
-                                <span title="Срок сдачи задания" style="display:inline-flex; align-items:center; gap:3px;">⏳ Срок: <strong style="color:var(--ink);">${deadlineStr}</strong></span>
-                            </div>
-                            <h3 class="hw-card-title">${escapeHtml(h.title)}</h3>
-                            ${h.description ? `<p style="font-size:0.85rem; color:var(--muted);">${escapeHtml(h.description)}</p>` : ''}
-                        </div>
-
-                        <div class="hw-card-stats">
-                            <div>
-                                <div class="hw-stat-val" style="color:var(--accent);">${taskCount}</div>
-                                <div class="hw-stat-lbl">Заданий</div>
-                            </div>
-                            <div>
-                                <div class="hw-stat-val" style="color:var(--accent-gold);">${subCount}</div>
-                                <div class="hw-stat-lbl">Сдано работ</div>
-                            </div>
-                            <div>
-                                <div class="hw-stat-val" style="color:var(--accent-emerald);">${chkCount}</div>
-                                <div class="hw-stat-lbl">Проверено</div>
-                            </div>
-                        </div>
-
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-                            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-                                <button type="button" class="btn btn-emerald btn-sm btn-view-submissions" data-hw-id="${h.id}">
-                                    👥 Сданные работы (${subCount})
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-sm btn-edit-hw" data-hw-id="${h.id}" title="Редактировать условия, состав задач и параметры задания">
-                                    ✏️ Редактировать
-                                </button>
-                                <a href="homework.html?id=${h.id}" target="_blank" class="btn btn-secondary btn-sm" title="Смотреть домашнее задание с ответами" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                                    👀 Смотреть
-                                </a>
-                            </div>
-                            <button type="button" class="btn btn-danger-outline btn-sm btn-delete-hw" data-hw-id="${h.id}" title="Удалить Д/З">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // View submissions buttons
-            gradingHwGrid.querySelectorAll('.btn-view-submissions').forEach(b => {
-                b.addEventListener('click', () => {
-                    const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
-                    const foundHw = homeworks.find(h => h.id === hwId);
-                    if (foundHw) openSubmissionsModal(foundHw);
-                });
-            });
-
-            // Edit HW buttons
-            gradingHwGrid.querySelectorAll('.btn-edit-hw').forEach(b => {
-                b.addEventListener('click', async () => {
-                    const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
-                    await startEditingHomework(hwId);
-                });
-            });
-
-            // Delete HW buttons
-            gradingHwGrid.querySelectorAll('.btn-delete-hw').forEach(b => {
-                b.addEventListener('click', async () => {
-                    const hwId = b.getAttribute('data-hw-id');
-                    if (!confirm('Вы действительно хотите удалить это домашнее задание? (История и прогресс сданных работ сохранятся в досье учеников)')) return;
-                    try {
-                        const delRes = await fetch(`/api/teacher/homeworks/${hwId}`, { method: 'DELETE' });
-                        const delData = await delRes.json();
-                        if (delData.success) {
-                            showToast('Домашнее задание удалено');
-                            loadGrading();
-                        } else {
-                            alert(delData.error || 'Ошибка при удалении');
-                        }
-                    } catch(e) { alert('Ошибка сети'); }
-                });
-            });
-
+            gradingHomeworksCache = data.homeworks || [];
+            updateGradingCounters();
+            renderGradingGrid();
         } catch(err) {
             gradingHwGrid.innerHTML = '<div style="text-align:center; color:var(--danger); grid-column:1/-1;">Ошибка загрузки домашних заданий.</div>';
         }
     }
 
+    function initSubmissionsToolbar(hw) {
+        if (submissionsToolbarBound) return;
+        submissionsToolbarBound = true;
+
+        document.querySelectorAll('.sub-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sub-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSubmissionsFilter = btn.getAttribute('data-filter') || 'all';
+                renderSubmissionsTable(currentReviewHw || hw);
+            });
+        });
+    }
+
+    function updateSubmissionsCounters() {
+        const total = currentHwSubmissions.length;
+        const submitted = currentHwSubmissions.filter(s => s.status === 'submitted').length;
+        const checked = currentHwSubmissions.filter(s => s.status === 'checked').length;
+        const pending = currentHwSubmissions.filter(s => !s.status || s.status === 'not_started').length;
+
+        const cntAll = document.getElementById('sub-cnt-all');
+        const cntSub = document.getElementById('sub-cnt-submitted');
+        const cntChk = document.getElementById('sub-cnt-checked');
+        const cntPend = document.getElementById('sub-cnt-pending');
+
+        if (cntAll) cntAll.textContent = total;
+        if (cntSub) cntSub.textContent = submitted;
+        if (cntChk) cntChk.textContent = checked;
+        if (cntPend) cntPend.textContent = pending;
+    }
+
+    function getSubPriority(s) {
+        // 0: Непроверенные работы (сдано, ожидает проверки) -> В САМОМ ВЕРХУ!
+        if (s.status === 'submitted') return 0;
+        // 1: Уже проверенные работы -> ВНИЗ СПИСКА СДАННЫХ РАБОТ!
+        if (s.status === 'checked') return 1;
+        // 2: Не начато (ещё не сдали)
+        if (s.status === 'not_started' || !s.status) return 2;
+        // 3: Освобождён
+        return 3;
+    }
+
+    function renderSubmissionsTable(hw) {
+        if (!submissionsTableBody) return;
+
+        let filtered = currentHwSubmissions.filter(s => {
+            if (currentSubmissionsFilter === 'submitted') return s.status === 'submitted';
+            if (currentSubmissionsFilter === 'checked') return s.status === 'checked';
+            if (currentSubmissionsFilter === 'not_started') return (!s.status || s.status === 'not_started');
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            submissionsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--muted);">В этой категории нет работ.</td></tr>`;
+            return;
+        }
+
+        // СОРТИРОВКА:
+        // Непроверенные работы (status: submitted) -> ВСЕГДА ВВЕРХУ!
+        // Уже проверенные работы (status: checked) -> УЛЕТАЮТ ВНИЗ!
+        // Не начато -> в самом конце списка
+        filtered.sort((a, b) => {
+            const pA = getSubPriority(a);
+            const pB = getSubPriority(b);
+            if (pA !== pB) return pA - pB;
+
+            // Внутри непроверенных — сначала те, кто сдал раньше (FIFO)
+            if (pA === 0) {
+                const tA = new Date(a.submittedAt || a.submitted_at || 0).getTime();
+                const tB = new Date(b.submittedAt || b.submitted_at || 0).getTime();
+                if (tA && tB && tA !== tB) return tA - tB;
+            }
+
+            // Внутри проверенных — сначала недавно проверенные
+            if (pA === 1) {
+                const tA = new Date(a.checkedAt || a.checked_at || 0).getTime();
+                const tB = new Date(b.checkedAt || b.checked_at || 0).getTime();
+                if (tA && tB && tA !== tB) return tB - tA;
+            }
+
+            // По алфавиту
+            const nameA = (a.displayName || a.display_name || a.username || a.student_username || '').toLowerCase();
+            const nameB = (b.displayName || b.display_name || b.username || b.student_username || '').toLowerCase();
+            return nameA.localeCompare(nameB, 'ru');
+        });
+
+        let html = '';
+        let lastPriority = null;
+        const showSubDividers = (currentSubmissionsFilter === 'all');
+
+        filtered.forEach(s => {
+            const p = getSubPriority(s);
+
+            if (showSubDividers && p !== lastPriority) {
+                if (p === 0) {
+                    const subCount = filtered.filter(x => getSubPriority(x) === 0).length;
+                    html += `
+                        <tr style="background: rgba(245, 158, 11, 0.08);">
+                            <td colspan="5" style="padding: 6px 12px; font-weight: 800; font-size: 0.78rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 0.04em;">
+                                🔔 Непроверенные работы (${subCount})
+                            </td>
+                        </tr>
+                    `;
+                } else if (p === 1) {
+                    const chkCount = filtered.filter(x => getSubPriority(x) === 1).length;
+                    html += `
+                        <tr style="background: rgba(16, 185, 129, 0.08);">
+                            <td colspan="5" style="padding: 6px 12px; font-weight: 800; font-size: 0.78rem; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 0.04em;">
+                                ✓ Уже проверенные работы (${chkCount})
+                            </td>
+                        </tr>
+                    `;
+                } else if (p === 2) {
+                    const pendCount = filtered.filter(x => getSubPriority(x) === 2).length;
+                    html += `
+                        <tr style="background: rgba(148, 163, 184, 0.06);">
+                            <td colspan="5" style="padding: 6px 12px; font-weight: 700; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">
+                                ⏳ Не сдано (${pendCount})
+                            </td>
+                        </tr>
+                    `;
+                }
+                lastPriority = p;
+            }
+
+            let statusBadge = '';
+            let rowClass = '';
+            if (s.status === 'waived') {
+                statusBadge = `<span class="badge" style="background:rgba(255, 119, 40, 0.15); color:var(--accent); font-weight:700;">📜 Освобождён</span>`;
+            } else if (s.status === 'checked') {
+                statusBadge = `<span class="badge badge-status status-checked">✓ Проверено</span>`;
+                rowClass = 'sub-row-checked';
+            } else if (s.status === 'submitted') {
+                statusBadge = `<span class="badge badge-status status-submitted">🔔 Ждёт проверки</span>`;
+                rowClass = 'sub-row-needs-review';
+            } else {
+                statusBadge = `<span class="badge badge-status status-pending">Не начато</span>`;
+            }
+
+            const maxSc = s.maxScore || s.max_score || (hw.tasks ? hw.tasks.length : (hw.tasksCount || 0));
+            const scoreDisplay = (s.status === 'checked' || s.status === 'waived') 
+                ? `<strong style="color:var(--accent-emerald); font-size:1rem;">${s.score}</strong> / ${maxSc}` 
+                : (s.status === 'submitted' ? `<span style="color:var(--accent-gold); font-weight:700;">${s.score} / ${maxSc}</span> (авто)` : '—');
+            const submitTime = (s.submittedAt || s.submitted_at) ? formatDateTime(s.submittedAt || s.submitted_at) : '—';
+            const sName = s.displayName || s.display_name || s.username || s.student_username;
+            const sUname = s.username || s.student_username;
+            const sId = s.studentId || s.student_id;
+
+            let actionHtml = '';
+            if (s.status === 'submitted') {
+                actionHtml = `
+                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-emerald btn-sm" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; font-weight:600;" title="Проверить работу в отдельном окне на весь экран">
+                        🔍 Проверить в новом окне
+                    </a>
+                    <button type="button" class="btn btn-secondary btn-sm btn-review-work" data-student-id="${sId}" title="Быстрый просмотр в компактном окне" style="margin-left:4px; padding:0.25rem 0.55rem; font-size:0.8rem;">
+                        🗗 В окне
+                    </button>
+                `;
+            } else if (s.status === 'checked') {
+                actionHtml = `
+                    <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; font-weight:600;" title="Проверить работу в отдельном окне на весь экран">
+                        ✏️ Изменить в новом окне
+                    </a>
+                    <button type="button" class="btn btn-secondary btn-sm btn-review-work" data-student-id="${sId}" title="Быстрый просмотр в компактном окне" style="margin-left:4px; padding:0.25rem 0.55rem; font-size:0.8rem;">
+                        🗗 В окне
+                    </button>
+                `;
+            } else {
+                actionHtml = `
+                    <span style="color:var(--muted); font-size:0.82rem; font-style:italic;">Не сдано</span>
+                    <button type="button" class="btn btn-secondary btn-sm btn-review-work" data-student-id="${sId}" title="Ручная проверка / оценивание" style="margin-left:6px; opacity:0.8; font-size:0.75rem; padding:3px 8px;">
+                        🗗 Оценить
+                    </button>
+                `;
+            }
+
+            html += `
+                <tr class="${rowClass}">
+                    <td>
+                        <div style="font-weight:700;">${escapeHtml(sName)}</div>
+                        <div style="font-size:0.75rem; color:var(--muted);">@${escapeHtml(sUname)}</div>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td style="font-size:0.85rem;">${submitTime}</td>
+                    <td>${scoreDisplay}</td>
+                    <td style="text-align:right; white-space:nowrap;">
+                        ${actionHtml}
+                    </td>
+                </tr>
+            `;
+        });
+
+        submissionsTableBody.innerHTML = html;
+
+        // Attach review clicks
+        submissionsTableBody.querySelectorAll('.btn-review-work').forEach(b => {
+            b.addEventListener('click', () => {
+                const sId = parseInt(b.getAttribute('data-student-id'), 10);
+                const foundSub = currentHwSubmissions.find(s => (s.studentId || s.student_id) === sId);
+                if (foundSub) openReviewSubmissionModal(foundSub, currentReviewHw || hw);
+            });
+        });
+    }
+
     async function openSubmissionsModal(hw) {
         currentReviewHw = hw;
+        initSubmissionsToolbar(hw);
         document.getElementById('submissions-modal-title').textContent = hw.title;
         const initialTaskCount = (hw.tasks && hw.tasks.length) ? hw.tasks.length : (hw.tasksCount || 0);
         const sNameInit = hw.studentName || (hw.student_name ? hw.student_name : '');
@@ -2654,62 +3051,9 @@
                 document.getElementById('submissions-modal-subtitle').textContent = `Класс: ${hw.class_name || hw.className || ''}${studentSubUpd} · 📅 Выдано: ${crDateUpd} · Всего заданий: ${updatedTaskCount}`;
             }
 
-            const subs = data.submissions || [];
-            if (subs.length === 0) {
-                submissionsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--muted);">Ученики этого класса ещё не отправили работы на проверку.</td></tr>`;
-                return;
-            }
-
-            submissionsTableBody.innerHTML = subs.map((s, sIdx) => {
-                let statusBadge = '';
-                if (s.status === 'waived') {
-                    statusBadge = `<span class="badge" style="background:rgba(255, 119, 40, 0.15); color:var(--accent); font-weight:700;">📜 Освобождён</span>`;
-                } else if (s.status === 'checked') {
-                    statusBadge = `<span class="badge badge-status status-checked">Проверено</span>`;
-                } else if (s.status === 'submitted') {
-                    statusBadge = `<span class="badge badge-status status-submitted">Сдано</span>`;
-                } else {
-                    statusBadge = `<span class="badge badge-status status-pending">Не начато</span>`;
-                }
-
-                const maxSc = s.maxScore || s.max_score || (hw.tasks ? hw.tasks.length : (hw.tasksCount || 0));
-                const scoreDisplay = (s.status === 'checked' || s.status === 'waived') 
-                    ? `<strong>${s.score}</strong> / ${maxSc}` 
-                    : (s.status === 'submitted' ? `<span style="color:var(--accent-gold); font-weight:700;">${s.score} / ${maxSc}</span> (авто)` : '—');
-                const submitTime = (s.submittedAt || s.submitted_at) ? formatDateTime(s.submittedAt || s.submitted_at) : '—';
-                const sName = s.displayName || s.display_name || s.username || s.student_username;
-                const sUname = s.username || s.student_username;
-                const sId = s.studentId || s.student_id;
-
-                return `
-                    <tr>
-                        <td>
-                            <div style="font-weight:700;">${escapeHtml(sName)}</div>
-                            <div style="font-size:0.75rem; color:var(--muted);">@${escapeHtml(sUname)}</div>
-                        </td>
-                        <td>${statusBadge}</td>
-                        <td style="font-size:0.85rem;">${submitTime}</td>
-                        <td>${scoreDisplay}</td>
-                        <td style="text-align:right; white-space:nowrap;">
-                            <a href="homework.html?id=${hw.id}&student_id=${sId}" target="_blank" class="btn btn-emerald btn-sm" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; font-weight:600;" title="Проверить работу в отдельном окне на весь экран">
-                                ${s.status === 'checked' ? '✏️ Изменить в новом окне' : '🔍 Проверить в новом окне'}
-                            </a>
-                            <button type="button" class="btn btn-secondary btn-sm btn-review-work" data-sub-idx="${sIdx}" title="Быстрый просмотр в компактном окне" style="margin-left:4px; padding:0.25rem 0.55rem; font-size:0.8rem;">
-                                🗗 В окне
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Attach review clicks
-            submissionsTableBody.querySelectorAll('.btn-review-work').forEach(b => {
-                b.addEventListener('click', () => {
-                    const sIdx = parseInt(b.getAttribute('data-sub-idx'), 10);
-                    const foundSub = subs[sIdx];
-                    if (foundSub) openReviewSubmissionModal(foundSub, currentReviewHw || hw);
-                });
-            });
+            currentHwSubmissions = data.submissions || [];
+            updateSubmissionsCounters();
+            renderSubmissionsTable(hw);
 
         } catch(e) {
             submissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">Ошибка при запросе к серверу</td></tr>';

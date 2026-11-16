@@ -1166,6 +1166,81 @@ dialog.admin-modal::backdrop {
     text-transform: uppercase;
 }
 
+/* --- HW CARD GRADING STATUSES & DIVIDERS --- */
+.hw-card.hw-card-needs-review {
+    border-color: rgba(245, 158, 11, 0.45);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.08);
+}
+.hw-card.hw-card-checked {
+    opacity: 0.88;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+.hw-card.hw-card-checked:hover {
+    opacity: 1;
+    border-color: rgba(16, 185, 129, 0.5);
+}
+.grading-group-divider {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 1.25rem 0 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+.grading-toolbar {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.grading-filter-btn.active,
+.sub-filter-btn.active {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    border-color: var(--accent) !important;
+}
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    padding: 4px 8px;
+    border-radius: var(--r-sm);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.badge-status.status-submitted {
+    background: rgba(245, 158, 11, 0.18);
+    color: var(--accent-gold);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.badge-status.status-checked {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.badge-status.status-pending {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--muted);
+    border: 1px solid var(--line);
+}
+.sub-row-needs-review {
+    background: rgba(245, 158, 11, 0.05);
+}
+.sub-row-checked {
+    opacity: 0.9;
+}
+.sub-row-checked:hover {
+    opacity: 1;
+}
+
 /* --- MATH FORMULAS CSS & SUPERSCRIPTS --- */
 sup, sub {
     font-size: 0.7em;
