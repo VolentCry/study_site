@@ -975,8 +975,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusBadge = `<span class="badge badge-status status-checked">Оценка: ${sub.score}/${sub.maxScore || sub.max_score || h.tasksCount || 0}</span>`;
                 actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Результаты и разбор</a>`;
             } else if (status === 'submitted') {
-                statusBadge = `<span class="badge badge-status status-submitted">На проверке</span>`;
-                actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Смотреть ответы</a>`;
+                const curScore = (sub.score != null) ? sub.score : 0;
+                const maxScore = sub.maxScore || sub.max_score || h.tasksCount || 0;
+                statusBadge = `<span class="badge badge-status status-submitted" title="Ожидает проверки учителем">На проверке: ${curScore}/${maxScore} б.</span>`;
+                actionBtn = `<a href="homework.html?id=${h.id}" class="hw-action-btn hw-btn-secondary">Смотреть работу</a>`;
             } else {
                 const hasDraft = (sub.answers && Object.keys(sub.answers).length > 0);
                 statusBadge = hasDraft
@@ -1352,6 +1354,11 @@ async function initParentDashboard(user) {
                                         <div style="font-size:0.82rem; padding:8px 10px; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
                                             Балл: <strong class="parent-hw-score">${sub.score || 0} / ${sub.maxScore || 0}</strong>
                                             ${sub.teacherFeedback ? `<div style="margin-top:4px; color:var(--muted); font-size:0.78rem;">Отзыв: «${escapeHtml(sub.teacherFeedback)}»</div>` : ''}
+                                        </div>
+                                    ` : (st === 'submitted') ? `
+                                        <div style="font-size:0.82rem; padding:8px 10px; background:rgba(251,191,36,0.08); border-radius:8px; border:1px solid rgba(251,191,36,0.25);">
+                                            Первоначальный балл: <strong class="parent-hw-score" style="color:var(--accent-gold);">${sub.score || 0} / ${sub.maxScore || 0}</strong>
+                                            <div style="margin-top:4px; color:var(--muted); font-size:0.78rem;">⏳ Ожидает проверки учителем</div>
                                         </div>
                                     ` : ''}
                                 </div>

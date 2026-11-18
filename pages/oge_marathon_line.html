@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f2eb">
+  <title>Марафон «Линия» · Подготовка к ОГЭ по математике</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --green-border: rgba(46, 125, 50, 0.3);
+      --line: rgba(38, 63, 97, 0.18);
+      --shadow-sm: 0 2px 8px rgba(38, 63, 97, 0.06);
+      --shadow-md: 0 8px 24px rgba(38, 63, 97, 0.09);
+      --shadow-lg: 0 16px 40px rgba(38, 63, 97, 0.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 12% 18%, rgba(229, 181, 184, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 88% 82%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      border-radius: 6px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .nav-btn.audio-toggle { padding: 0 10px; }
+    .xp-counter {
+      font-size: 12px; font-weight: 800; background: rgba(183, 70, 78, 0.12); color: var(--vermilion);
+      padding: 4px 12px; border-radius: 999px;
+    }
+
+    /* SHELL */
+    .marathon-shell {
+      max-width: 1080px; margin: 0 auto; width: 100%; padding: 32px 5vw 64px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+
+    /* SECTIONS TOGGLING */
+    .screen-view { display: none; flex-direction: column; gap: 24px; animation: fadeIn .25s ease; }
+    .screen-view.active { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- HUB / CATALOG SCREEN --- */
+    .hub-hero {
+      text-align: center; max-width: 760px; margin: 0 auto;
+    }
+    .hub-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .hub-title {
+      font: 900 clamp(32px, 5vw, 46px)/1.15 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 12px;
+    }
+    .hub-subtitle {
+      color: var(--muted); font-size: 15px; line-height: 1.6;
+    }
+
+    /* RULES BANNER */
+    .rules-card {
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 22px 28px; box-shadow: var(--shadow-sm);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+    }
+    .rule-item {
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .rule-icon {
+      font-size: 24px; line-height: 1; flex-shrink: 0; padding-top: 2px;
+    }
+    .rule-item h4 {
+      font: 700 15px 'Zen Old Mincho', serif; color: var(--indigo-dark); margin-bottom: 3px;
+    }
+    .rule-item p {
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+    }
+
+    /* GRID OF TASKS */
+    .section-title-wrap {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .section-title {
+      font: 800 22px 'Zen Old Mincho', serif; color: var(--indigo);
+    }
+    .section-badge-info {
+      font-size: 12px; font-weight: 600; color: var(--muted);
+    }
+
+    .tasks-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;
+    }
+
+    .marathon-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 22px 20px; box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; justify-content: space-between; gap: 16px;
+      transition: all .22s ease; position: relative; overflow: hidden;
+    }
+    .marathon-card.active-marathon:hover {
+      border-color: var(--indigo); transform: translateY(-3px); box-shadow: var(--shadow-md);
+    }
+    .marathon-card.locked-marathon {
+      opacity: 0.65; background: rgba(245, 242, 235, 0.6); border-style: dashed;
+    }
+
+    .m-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    }
+    .m-card-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800;
+      color: var(--indigo); background: var(--indigo-soft); padding: 4px 10px; border-radius: 999px;
+    }
+    .m-card-badge.badge-locked {
+      background: rgba(105, 115, 131, 0.15); color: var(--muted);
+    }
+    .m-card-icon {
+      font-size: 26px; line-height: 1;
+    }
+    .m-card-title {
+      font: 700 18px/1.25 'Zen Old Mincho', serif; color: var(--indigo-dark); margin: 8px 0 6px;
+    }
+    .m-card-desc {
+      font-size: 12.5px; color: var(--muted); line-height: 1.5; flex-grow: 1;
+    }
+
+    .m-card-footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding-top: 14px; border-top: 1px solid var(--line);
+    }
+    .m-card-meta {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .m-distance-badge {
+      font-size: 11.5px; font-weight: 800; color: var(--vermilion); display: inline-flex; align-items: center; gap: 4px;
+    }
+    .m-record-text {
+      font-size: 11px; color: var(--muted);
+    }
+    .m-start-btn {
+      padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
+      background: var(--indigo); color: #fff; transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .m-start-btn:hover {
+      background: var(--vermilion); box-shadow: 0 4px 12px rgba(183, 70, 78, 0.3);
+    }
+    .m-locked-btn {
+      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      background: rgba(105, 115, 131, 0.12); color: var(--muted); cursor: not-allowed;
+    }
+
+    /* --- LIVE RUN SCREEN --- */
+    .run-top-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 12px 20px; box-shadow: var(--shadow-sm);
+    }
+    .run-task-info { display: flex; align-items: center; gap: 12px; }
+    .run-task-badge {
+      font: 700 14px 'Zen Old Mincho', serif; color: var(--indigo-dark);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .run-step-counter {
+      font-size: 12px; font-weight: 800; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 4px 10px; border-radius: 999px;
+    }
+    .run-timer {
+      font-size: 16px; font-weight: 800; font-family: monospace; color: var(--indigo);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .run-quit-btn {
+      font-size: 12px; font-weight: 700; color: var(--muted); border: 1px solid var(--line);
+      padding: 6px 14px; border-radius: 6px; background: #fff; transition: all .2s;
+    }
+    .run-quit-btn:hover { color: var(--vermilion); border-color: var(--vermilion); }
+
+    /* LINE TRACK VISUALIZER */
+    .line-track-wrapper {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 18px 20px; box-shadow: var(--shadow-sm); position: relative; overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .line-track-scroll {
+      display: flex; align-items: center; gap: 10px; min-width: max-content; padding: 6px 4px;
+    }
+    .line-node {
+      width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 11px; font-weight: 800; border: 2px solid var(--line);
+      background: var(--paper-light); color: var(--muted); position: relative;
+      transition: all .25s ease; flex-shrink: 0;
+    }
+    .line-node::after {
+      content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 2px; background: var(--line);
+    }
+    .line-node:last-child::after { display: none; }
+    .line-node.completed {
+      background: var(--green); border-color: var(--green); color: #fff;
+    }
+    .line-node.completed::after { background: var(--green); }
+    .line-node.current {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+      transform: scale(1.18); box-shadow: 0 0 14px rgba(183, 70, 78, 0.45); font-weight: 900;
+    }
+    .line-node.broken {
+      background: var(--vermilion); border-color: var(--vermilion); color: #fff;
+      animation: shatter .4s ease;
+    }
+    @keyframes shatter {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.3) rotate(8deg); }
+      60% { transform: scale(1.2) rotate(-6deg); }
+      100% { transform: scale(1.1); }
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+    }
+    .problem-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+    }
+    .problem-danger-pill {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 800; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 10px; border-radius: 999px;
+    }
+
+    .problem-body {
+      width: 100%; text-align: center; margin-top: 10px;
+    }
+    .problem-prompt {
+      font-size: 15px; color: var(--ink); margin-bottom: 16px; font-weight: 600; line-height: 1.6;
+    }
+    .math-expr {
+      display: inline-block;
+      font-size: clamp(22px, 3.8vw, 32px);
+      color: var(--indigo-dark);
+      padding: 16px 28px;
+      background: var(--paper-light);
+      border: 1px solid rgba(38, 63, 97, 0.14);
+      border-radius: 12px;
+      margin: 10px 0;
+    }
+    .math-cond {
+      font-size: 16px; color: var(--muted); font-style: italic; margin-left: 12px;
+    }
+
+    /* FRACTIONS & SQRT */
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 4px; font-size: 0.9em; line-height: 1.08;
+    }
+    .fraction .num {
+      border-bottom: 2px solid currentColor; padding-bottom: 2px;
+    }
+    .fraction .den {
+      padding-top: 2px;
+    }
+    .rad-wrap {
+      display: inline-block; vertical-align: middle; white-space: nowrap;
+    }
+    .rad-sym {
+      font-size: 1.15em; line-height: 1; vertical-align: -2px; margin-right: 1px;
+    }
+    .rad-body {
+      border-top: 2px solid currentColor; padding-top: 1px; display: inline-block; vertical-align: middle;
+    }
+
+    /* SVG CONTAINERS */
+    .task-svg-wrap {
+      display: flex; justify-content: center; width: 100%; margin: 12px 0; overflow-x: auto;
+    }
+    .task-svg-wrap svg {
+      max-width: 100%; height: auto; border-radius: 8px;
+    }
+
+    /* OPTIONS GRID (№7, №13) */
+    .options-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px; width: 100%; max-width: 680px; margin: 14px 0 6px;
+    }
+    .option-card {
+      padding: 12px 18px; border: 2px solid var(--line); border-radius: 12px;
+      background: #fff; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600;
+      color: var(--ink);
+    }
+    .option-card:hover {
+      border-color: var(--indigo); background: var(--paper-light);
+    }
+    .option-card.selected {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+      box-shadow: 0 4px 14px rgba(183, 70, 78, 0.18);
+    }
+    .opt-badge {
+      width: 28px; height: 28px; border-radius: 50%; background: rgba(38, 63, 97, 0.08);
+      color: var(--indigo); display: grid; place-items: center; font-size: 13px; font-weight: 800; flex-shrink: 0;
+    }
+    .option-card.selected .opt-badge {
+      background: var(--vermilion); color: #fff;
+    }
+
+    /* MATCHING TABLE (№11) */
+    .matching-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 12px 0;
+    }
+    .matching-slots {
+      display: flex; gap: 16px;
+    }
+    .matching-col {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .matching-label {
+      font: 800 15px 'Zen Old Mincho', serif; color: var(--indigo);
+    }
+    .matching-input-slot {
+      width: 48px; height: 48px; border: 2px solid var(--line); border-radius: 10px;
+      text-align: center; font-size: 20px; font-weight: 800; background: #fff;
+    }
+
+    /* ANSWER ROW & INPUT */
+    .answer-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 540px;
+    }
+    .answer-input-wrap {
+      flex: 1; min-width: 200px; position: relative;
+    }
+    .answer-input {
+      width: 100%; height: 54px; padding: 0 18px;
+      border: 2px solid var(--line); border-radius: 10px;
+      background: #fff; color: var(--ink); font-size: 20px; font-weight: 800;
+      font-family: 'DM Sans', monospace; text-align: center;
+      transition: all .2s ease;
+    }
+    .answer-input:focus {
+      outline: none; border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(38, 63, 97, 0.12);
+    }
+    .quick-chars {
+      display: flex; gap: 6px; justify-content: center; width: 100%; margin-top: -12px;
+    }
+    .q-btn {
+      padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); border: 1px solid var(--line); color: var(--muted);
+      transition: all .15s;
+    }
+    .q-btn:hover { background: #fff; color: var(--indigo); border-color: var(--indigo); }
+
+    .btn-submit {
+      height: 54px; padding: 0 28px; border-radius: 10px;
+      background: var(--vermilion); color: #fff; font-size: 15px; font-weight: 800;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 16px rgba(183, 70, 78, 0.35); transition: all .2s ease;
+    }
+    .btn-submit:hover {
+      background: #a33840; transform: translateY(-1px);
+    }
+
+    /* --- FAILURE SCREEN --- */
+    .failure-card {
+      background: var(--paper-card); border: 2px solid var(--vermilion); border-radius: var(--r-lg);
+      padding: 40px 32px; box-shadow: var(--shadow-lg); text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+    }
+    .failure-icon-wrap {
+      width: 72px; height: 72px; border-radius: 50%; background: var(--vermilion-light);
+      display: grid; place-items: center; font-size: 36px; color: var(--vermilion);
+      border: 2px solid var(--vermilion-border);
+    }
+    .failure-title {
+      font: 900 32px 'Zen Old Mincho', serif; color: var(--vermilion);
+    }
+    .failure-subtitle {
+      max-width: 600px; color: var(--muted); font-size: 15px; line-height: 1.5;
+    }
+    .failure-stats-row {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    }
+    .f-stat-box {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 18px; text-align: center;
+    }
+    .f-stat-val { font: 800 20px 'Zen Old Mincho', serif; color: var(--indigo); }
+    .f-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .breakdown-box {
+      width: 100%; max-width: 680px; text-align: left; background: var(--paper-light);
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px 24px;
+    }
+    .breakdown-header {
+      font: 700 15px 'Zen Old Mincho', serif; color: var(--indigo-dark); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .breakdown-answer-row {
+      display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; padding-bottom: 14px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .ans-tag { font-size: 13px; font-weight: 700; }
+    .ans-user { color: var(--vermilion); text-decoration: line-through; }
+    .ans-correct { color: var(--green); }
+    .solution-list {
+      font-size: 13.5px; line-height: 1.6; color: var(--ink);
+    }
+    .solution-step {
+      margin-bottom: 8px; padding-left: 12px; border-left: 3px solid var(--indigo);
+    }
+
+    .failure-actions {
+      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px;
+    }
+    .btn-retry {
+      height: 48px; padding: 0 24px; border-radius: 8px; background: var(--vermilion);
+      color: #fff; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(183, 70, 78, 0.35); transition: all .2s;
+    }
+    .btn-retry:hover { background: #a33840; }
+    .btn-back-hub {
+      height: 48px; padding: 0 20px; border-radius: 8px; background: var(--paper-light);
+      border: 1px solid var(--line); color: var(--indigo); font-size: 14px; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 8px; transition: all .2s;
+    }
+    .btn-back-hub:hover { border-color: var(--indigo); background: #fff; }
+
+    /* --- VICTORY SCREEN --- */
+    .victory-card {
+      background: var(--paper-card); border: 2px solid var(--green); border-radius: var(--r-lg);
+      padding: 44px 32px; box-shadow: var(--shadow-lg); text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 22px; position: relative;
+    }
+    .victory-trophy {
+      font-size: 64px; line-height: 1; animation: bounce 1s infinite alternate ease-in-out;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+    .victory-title {
+      font: 900 36px 'Zen Old Mincho', serif; color: var(--green);
+    }
+    .victory-subtitle {
+      max-width: 620px; color: var(--muted); font-size: 16px; line-height: 1.6;
+    }
+    .victory-stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px;
+      width: 100%; max-width: 620px;
+    }
+    .v-stat-card {
+      background: var(--green-light); border: 1px solid var(--green-border); border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .v-stat-val { font: 800 22px 'Zen Old Mincho', serif; color: var(--green); }
+    .v-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* CONFETTI CANVAS */
+    #confetti-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 999;
+    }
+
+    @media (max-width: 640px) {
+      .problem-card { padding: 28px 18px 22px; }
+      .problem-danger-pill { display: none; }
+      .answer-row { flex-direction: column; width: 100%; }
+      .btn-submit { width: 100%; justify-content: center; }
+      .answer-input-wrap { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CONFETTI CANVAS -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- NAV -->
+  <nav class="site-nav" aria-label="Главная навигация">
+    <a class="brand" href="math_9.html" aria-label="Вернуться к темам 9 класса">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">Марафон «Линия»</span>
+        <span class="brand-sub">9 класс · ОГЭ</span>
+      </div>
+    </a>
+
+    <div class="nav-actions">
+      <button type="button" class="nav-btn audio-toggle" id="btn-audio-toggle" title="Включить/выключить звук">
+        <span id="audio-icon">🔊</span>
+      </button>
+      <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      <a class="nav-btn" href="math_9.html">
+        <span>← 9 класс</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="marathon-shell">
+
+    <!-- ========================================== -->
+    <!-- SCREEN 1: HUB / CATALOG                   -->
+    <!-- ========================================== -->
+    <section class="screen-view active" id="screen-hub">
+      <div class="hub-hero">
+        <span class="hub-kicker">Экзаменационный хардкор-режим ОГЭ</span>
+        <h1 class="hub-title">Марафон «Линия»</h1>
+        <p class="hub-subtitle">
+          Пройди непрерывную цепочку прототипов конкретного задания ОГЭ без единой ошибки.
+          Любая неверная сдача немедленно обрывает Линию — текущий забег сгорает, и всё начинается с 0!
+        </p>
+      </div>
+
+      <!-- RULES BANNER -->
+      <div class="rules-card">
+        <div class="rule-item">
+          <div class="rule-icon">🎯</div>
+          <div>
+            <h4>Фиксированная дистанция</h4>
+            <p>25 или 30 задач в зависимости от номера задания ОГЭ. Пройди всю дистанцию до победного конца.</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon">⚡</div>
+          <div>
+            <h4>Генерация без повторов</h4>
+            <p>Каждая задача в забеге генерируется заново. Вы никогда не встретите дубликатов в одном забеге.</p>
+          </div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon">💥</div>
+          <div>
+            <h4>Sudden Death (0 ошибок)</h4>
+            <p>1 ошибка при сдаче — результат аннулируется, линия рвётся. Забег начинается заново с 1-й задачи.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID SECTION -->
+      <div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Выберите дистанцию задания ОГЭ</h2>
+          <span class="section-badge-info">8 активных марафонов · остальные в разработке</span>
+        </div>
+
+        <div class="tasks-grid" id="tasks-grid" style="margin-top: 16px;">
+          <!-- Карточки заданий динамически строятся через JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 2: LIVE MARATHON RUN               -->
+    <!-- ========================================== -->
+    <section class="screen-view" id="screen-run">
+      <!-- TOP STATUS BAR -->
+      <div class="run-top-bar">
+        <div class="run-task-info">
+          <span class="run-task-badge" id="run-task-badge">Задание №6</span>
+          <span class="run-step-counter" id="run-step-counter">1 / 30</span>
+        </div>
+        <div class="run-timer">
+          <span>⏱️</span>
+          <span id="run-timer-text">00:00</span>
+        </div>
+        <button type="button" class="run-quit-btn" id="btn-quit-run">Сдаться и выйти</button>
+      </div>
+
+      <!-- LINE TRACK VISUALIZER -->
+      <div class="line-track-wrapper">
+        <div class="line-track-scroll" id="line-track-nodes">
+          <!-- Ноды генерируются динамически -->
+        </div>
+      </div>
+
+      <!-- PROBLEM CARD -->
+      <div class="problem-card">
+        <span class="problem-tag" id="problem-tag">Вопрос 1 из 30</span>
+        <span class="problem-danger-pill">⚠️ 1 ошибка = конец забега</span>
+
+        <div class="problem-body">
+          <p class="problem-prompt" id="problem-prompt">Найдите значение выражения:</p>
+          <div id="problem-math-wrap">
+            <div class="math-expr" id="problem-math-expr">...</div>
+          </div>
+          <div class="task-svg-wrap" id="problem-svg-wrap" style="display: none;"></div>
+
+          <!-- Варианты ответов для заданий №7 и №13 -->
+          <div class="options-grid" id="problem-options-grid" style="display: none;"></div>
+
+          <!-- Сетка сопоставления для задания №11 -->
+          <div class="matching-wrap" id="problem-matching-wrap" style="display: none;">
+            <p style="font-size: 13px; color: var(--muted); font-weight: 600;">Введите 3 цифры соответствия (А, Б, В):</p>
+            <div class="matching-slots">
+              <div class="matching-col"><span class="matching-label">А</span><input type="text" maxlength="1" class="matching-input-slot" data-slot="0"></div>
+              <div class="matching-col"><span class="matching-label">Б</span><input type="text" maxlength="1" class="matching-input-slot" data-slot="1"></div>
+              <div class="matching-col"><span class="matching-label">В</span><input type="text" maxlength="1" class="matching-input-slot" data-slot="2"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK BUTTONS & INPUT ROW -->
+        <div class="answer-row">
+          <div class="answer-input-wrap">
+            <input type="text" class="answer-input" id="marathon-answer-input" placeholder="Введите ответ..." autocomplete="off">
+          </div>
+          <button type="button" class="btn-submit" id="btn-submit-answer">
+            <span>Сдать ответ</span>
+            <span>↵</span>
+          </button>
+        </div>
+
+        <div class="quick-chars" id="quick-chars-bar">
+          <button type="button" class="q-btn" data-char="-">−</button>
+          <button type="button" class="q-btn" data-char=",">,</button>
+          <button type="button" class="q-btn" data-char=".">.</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 3: FAILURE (LINE BROKEN)           -->
+    <!-- ========================================== -->
+    <section class="screen-view" id="screen-failure">
+      <div class="failure-card">
+        <div class="failure-icon-wrap">⚡</div>
+        <h2 class="failure-title">Линия оборвана!</h2>
+        <p class="failure-subtitle">
+          В марафоне действует правило абсолютной точности: 1 неверный ответ аннулирует весь забег.
+          Не расстраивайтесь — изучите пошаговый разбор ошибки ниже и начните заново!
+        </p>
+
+        <div class="failure-stats-row">
+          <div class="f-stat-box">
+            <div class="f-stat-val" id="f-stat-streak">0</div>
+            <div class="f-stat-lbl">Задач решено верно</div>
+          </div>
+          <div class="f-stat-box">
+            <div class="f-stat-val" id="f-stat-total">30</div>
+            <div class="f-stat-lbl">Всего в дистанции</div>
+          </div>
+          <div class="f-stat-box">
+            <div class="f-stat-val" id="f-stat-time">00:00</div>
+            <div class="f-stat-lbl">Время попытки</div>
+          </div>
+        </div>
+
+        <!-- DETAILED ERROR BREAKDOWN -->
+        <div class="breakdown-box">
+          <div class="breakdown-header">
+            <span>🔍</span>
+            <span>Разбор задачи, на которой произошёл обрыв Линии:</span>
+          </div>
+
+          <div id="f-problem-content" style="margin-bottom: 14px;"></div>
+
+          <div class="breakdown-answer-row">
+            <div>
+              <span class="ans-tag">Ваш ответ: </span>
+              <span class="ans-user" id="f-user-answer">—</span>
+            </div>
+            <div>
+              <span class="ans-tag">Правильный ответ: </span>
+              <span class="ans-correct" id="f-correct-answer">—</span>
+            </div>
+          </div>
+
+          <div class="solution-list" id="f-solution-steps"></div>
+        </div>
+
+        <div class="failure-actions">
+          <button type="button" class="btn-retry" id="btn-retry-marathon">
+            <span>🔄</span>
+            <span>Начать заново с 1-й задачи</span>
+          </button>
+          <button type="button" class="btn-back-hub" id="btn-failure-back-hub">
+            <span>📋</span>
+            <span>Выбрать другой номер</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 4: VICTORY (TRIUMPH)               -->
+    <!-- ========================================== -->
+    <section class="screen-view" id="screen-victory">
+      <div class="victory-card">
+        <div class="victory-trophy">🏆</div>
+        <h2 class="victory-title">Линия покорена!</h2>
+        <p class="victory-subtitle" id="v-subtitle">
+          Вы безупречно решили все 30 задач подряд без единой ошибки.
+          Вы доказали абсолютную уверенность в этом прототипе ОГЭ!
+        </p>
+
+        <div class="victory-stats-grid">
+          <div class="v-stat-card">
+            <div class="v-stat-val" id="v-stat-tasks">30 / 30</div>
+            <div class="v-stat-lbl">Решено задач подряд</div>
+          </div>
+          <div class="v-stat-card">
+            <div class="v-stat-val" id="v-stat-time">00:00</div>
+            <div class="v-stat-lbl">Общее время</div>
+          </div>
+          <div class="v-stat-card">
+            <div class="v-stat-val" id="v-stat-speed">0 сек</div>
+            <div class="v-stat-lbl">Ср. скорость на задачу</div>
+          </div>
+          <div class="v-stat-card">
+            <div class="v-stat-val" id="v-stat-xp">+200 XP</div>
+            <div class="v-stat-lbl">Опыт начислен в профиль</div>
+          </div>
+        </div>
+
+        <div class="failure-actions" style="margin-top: 10px;">
+          <button type="button" class="btn-retry" id="btn-victory-replay" style="background: var(--green);">
+            <span>🔄</span>
+            <span>Пройти ещё раз на скорость</span>
+          </button>
+          <button type="button" class="btn-back-hub" id="btn-victory-back-hub">
+            <span>📋</span>
+            <span>Вернуться в каталог заданий</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- СКРИПТЫ ГЕНЕРАТОРОВ ОГЭ -->
+  <script src="../js/oge_task_6_trainer.js"></script>
+  <script src="../js/oge_task_7_trainer.js"></script>
+  <script src="../js/oge_task_8_trainer.js"></script>
+  <script src="../js/oge_task_9_trainer.js"></script>
+  <script src="../js/oge_task_10_trainer.js"></script>
+  <script src="../js/oge_task_11_trainer.js"></script>
+  <script src="../js/oge_task_13_trainer.js"></script>
+  <script src="../js/oge_task_18_trainer.js"></script>
+  <!-- ДВИЖОК МАРАФОНА -->
+  <script src="../js/oge_marathon_engine.js"></script>
+  <script src="../js/auth_sync.js"></script>
+
+  <!-- ИНТЕЛЛЕКТУАЛЬНАЯ ЛОГИКА СТРАНИЦЫ -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Элементы навигации и экранов
+      const screenHub = document.getElementById('screen-hub');
+      const screenRun = document.getElementById('screen-run');
+      const screenFailure = document.getElementById('screen-failure');
+      const screenVictory = document.getElementById('screen-victory');
+
+      const tasksGrid = document.getElementById('tasks-grid');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+      const btnAudioToggle = document.getElementById('btn-audio-toggle');
+      const audioIcon = document.getElementById('audio-icon');
+
+      // Элементы экрана забега
+      const runTaskBadge = document.getElementById('run-task-badge');
+      const runStepCounter = document.getElementById('run-step-counter');
+      const runTimerText = document.getElementById('run-timer-text');
+      const btnQuitRun = document.getElementById('btn-quit-run');
+      const lineTrackNodes = document.getElementById('line-track-nodes');
+
+      const problemTag = document.getElementById('problem-tag');
+      const problemPrompt = document.getElementById('problem-prompt');
+      const problemMathWrap = document.getElementById('problem-math-wrap');
+      const problemMathExpr = document.getElementById('problem-math-expr');
+      const problemSvgWrap = document.getElementById('problem-svg-wrap');
+      const problemOptionsGrid = document.getElementById('problem-options-grid');
+      const problemMatchingWrap = document.getElementById('problem-matching-wrap');
+      const marathonAnswerInput = document.getElementById('marathon-answer-input');
+      const btnSubmitAnswer = document.getElementById('btn-submit-answer');
+      const quickCharsBar = document.getElementById('quick-chars-bar');
+
+      // Элементы экрана неудачи
+      const fStatStreak = document.getElementById('f-stat-streak');
+      const fStatTotal = document.getElementById('f-stat-total');
+      const fStatTime = document.getElementById('f-stat-time');
+      const fProblemContent = document.getElementById('f-problem-content');
+      const fUserAnswer = document.getElementById('f-user-answer');
+      const fCorrectAnswer = document.getElementById('f-correct-answer');
+      const fSolutionSteps = document.getElementById('f-solution-steps');
+      const btnRetryMarathon = document.getElementById('btn-retry-marathon');
+      const btnFailureBackHub = document.getElementById('btn-failure-back-hub');
+
+      // Элементы экрана победы
+      const vSubtitle = document.getElementById('v-subtitle');
+      const vStatTasks = document.getElementById('v-stat-tasks');
+      const vStatTime = document.getElementById('v-stat-time');
+      const vStatSpeed = document.getElementById('v-stat-speed');
+      const vStatXp = document.getElementById('v-stat-xp');
+      const btnVictoryReplay = document.getElementById('btn-victory-replay');
+      const btnVictoryBackHub = document.getElementById('btn-victory-back-hub');
+      const confettiCanvas = document.getElementById('confetti-canvas');
+
+      // Состояние игры
+      let currentTaskNum = null;
+      let currentQueue = [];
+      let currentIndex = 0;
+      let startTime = null;
+      let timerInterval = null;
+      let selectedOptionIndex = null;
+      let isAnswerSubmitted = false;
+
+      // Инициализация звука и XP
+      function updateXpBadge() {
+        try {
+          const xp = localStorage.getItem('user_xp') || '0';
+          navXpBadge.textContent = 'XP +' + xp;
+        } catch (e) {}
+      }
+
+      window.addEventListener('studySiteXpChanged', (e) => {
+        if (e.detail && e.detail.xp !== undefined) {
+          navXpBadge.textContent = 'XP +' + e.detail.xp;
+        }
+      });
+
+      btnAudioToggle.addEventListener('click', () => {
+        const enabled = OgeMarathonEngine.toggleAudio();
+        audioIcon.textContent = enabled ? '🔊' : '🔇';
+      });
+
+      // Переключение экранов
+      function showScreen(screenEl) {
+        [screenHub, screenRun, screenFailure, screenVictory].forEach(s => s.classList.remove('active'));
+        screenEl.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Отрисовка каталога заданий в Хабе
+      function renderHub() {
+        const tasks = OgeMarathonEngine.getTasksConfig();
+        tasksGrid.innerHTML = '';
+
+        tasks.forEach(task => {
+          const record = OgeMarathonEngine.getTaskRecord(task.id);
+          const card = document.createElement('div');
+
+          if (task.active) {
+            card.className = 'marathon-card active-marathon';
+            let recordText = 'Ещё не начат';
+            if (record.completed) {
+              const bestTime = OgeMarathonEngine.formatTime(record.bestTimeMs);
+              recordText = `👑 Линия пройдена! Рекорд: ${bestTime}`;
+            } else if (record.maxStreak > 0) {
+              recordText = `Лучшая серия: ${record.maxStreak} из ${task.count}`;
+            }
+
+            card.innerHTML = `
+              <div>
+                <div class="m-card-header">
+                  <span class="m-card-badge">Задание №${task.taskNum} · ОГЭ</span>
+                  <div class="m-card-icon">${task.icon}</div>
+                </div>
+                <h3 class="m-card-title">${task.title}</h3>
+                <p class="m-card-desc">${task.desc || ''}</p>
+              </div>
+              <div class="m-card-footer">
+                <div class="m-card-meta">
+                  <span class="m-distance-badge">🎯 Дистанция: ${task.count} задач</span>
+                  <span class="m-record-text">${recordText}</span>
+                </div>
+                <button type="button" class="m-start-btn" data-task="${task.id}">
+                  <span>Старт</span>
+                  <span>→</span>
+                </button>
+              </div>
+            `;
+
+            card.querySelector('.m-start-btn').addEventListener('click', () => {
+              startMarathon(task.id);
+            });
+          } else {
+            card.className = 'marathon-card locked-marathon';
+            card.innerHTML = `
+              <div>
+                <div class="m-card-header">
+                  <span class="m-card-badge badge-locked">🔒 Скоро · В разработке</span>
+                  <div class="m-card-icon">${task.icon}</div>
+                </div>
+                <h3 class="m-card-title">Задание №${task.taskNum} · ${task.title}</h3>
+                <p class="m-card-desc">${task.desc || 'Модуль в стадии подготовки и верификации прототипов ФИПИ.'}</p>
+              </div>
+              <div class="m-card-footer">
+                <div class="m-card-meta">
+                  <span class="m-distance-badge" style="color: var(--muted);">🎯 Дистанция: ${task.count} задач</span>
+                  <span class="m-record-text">Закрыто</span>
+                </div>
+                <button type="button" class="m-locked-btn" disabled>🔒 Закрыто</button>
+              </div>
+            `;
+          }
+
+          tasksGrid.appendChild(card);
+        });
+      }
+
+      // Старт марафона
+      function startMarathon(taskNum) {
+        currentTaskNum = taskNum;
+        try {
+          currentQueue = OgeMarathonEngine.generateMarathonQueue(taskNum);
+        } catch (e) {
+          alert('Ошибка запуска: ' + e.message);
+          return;
+        }
+
+        currentIndex = 0;
+        selectedOptionIndex = null;
+        isAnswerSubmitted = false;
+
+        const config = OgeMarathonEngine.getTaskConfig(taskNum);
+        runTaskBadge.textContent = `Задание №${config.taskNum} · ${config.title}`;
+
+        // Сборка узлов линии
+        renderLineTrack(config.count);
+
+        // Запуск секундомера
+        if (timerInterval) clearInterval(timerInterval);
+        startTime = Date.now();
+        runTimerText.textContent = '00:00';
+        timerInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          runTimerText.textContent = OgeMarathonEngine.formatTime(elapsed);
+        }, 1000);
+
+        showScreen(screenRun);
+        loadCurrentTask();
+      }
+
+      // Отрисовка ленты узлов Линии
+      function renderLineTrack(totalSteps) {
+        lineTrackNodes.innerHTML = '';
+        for (let i = 1; i <= totalSteps; i++) {
+          const node = document.createElement('div');
+          node.className = 'line-node';
+          node.id = `line-node-${i}`;
+          node.textContent = i;
+          lineTrackNodes.appendChild(node);
+        }
+      }
+
+      function updateLineTrackNodes(currentIdx, totalCount, isBroken = false) {
+        for (let i = 1; i <= totalCount; i++) {
+          const node = document.getElementById(`line-node-${i}`);
+          if (!node) continue;
+
+          node.className = 'line-node';
+          if (i < currentIdx + 1) {
+            node.classList.add('completed');
+            node.textContent = '✓';
+          } else if (i === currentIdx + 1) {
+            if (isBroken) {
+              node.classList.add('broken');
+              node.textContent = '✕';
+            } else {
+              node.classList.add('current');
+              node.textContent = i;
+              // Автоскролл ленты к текущей ноде
+              node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+          } else {
+            node.textContent = i;
+          }
+        }
+      }
+
+      // Загрузка текущей задачи
+      function loadCurrentTask() {
+        if (currentIndex >= currentQueue.length) {
+          handleVictory();
+          return;
+        }
+
+        const task = currentQueue[currentIndex];
+        const total = currentQueue.length;
+
+        isAnswerSubmitted = false;
+        selectedOptionIndex = null;
+
+        runStepCounter.textContent = `${currentIndex + 1} / ${total}`;
+        problemTag.textContent = `Вопрос ${currentIndex + 1} из ${total}`;
+        updateLineTrackNodes(currentIndex, total);
+
+        // Очистка старых данных
+        problemPrompt.innerHTML = task.text || task.promptText || 'Найдите значение выражения:';
+        problemSvgWrap.innerHTML = '';
+        problemSvgWrap.style.display = 'none';
+        problemOptionsGrid.innerHTML = '';
+        problemOptionsGrid.style.display = 'none';
+        problemMatchingWrap.style.display = 'none';
+        marathonAnswerInput.value = '';
+        marathonAnswerInput.disabled = false;
+
+        // Рендеринг условий задачи
+        if (task.svg) {
+          problemSvgWrap.innerHTML = task.svg;
+          problemSvgWrap.style.display = 'flex';
+        }
+
+        if (task.questionHtml) {
+          problemMathWrap.style.display = 'block';
+          problemMathExpr.innerHTML = task.questionHtml;
+        } else {
+          problemMathWrap.style.display = 'none';
+        }
+
+        // Если есть опции выбора (Задание №7 или №13)
+        if (task.options && Array.isArray(task.options) && task.options.length > 0) {
+          problemOptionsGrid.style.display = 'grid';
+          marathonAnswerInput.placeholder = 'Номер верного варианта (1–4)';
+
+          task.options.forEach((optText, idx) => {
+            const optCard = document.createElement('div');
+            optCard.className = 'option-card';
+            optCard.dataset.idx = idx + 1;
+            optCard.innerHTML = `
+              <span class="opt-badge">${idx + 1}</span>
+              <span>${optText}</span>
+            `;
+
+            optCard.addEventListener('click', () => {
+              document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+              optCard.classList.add('selected');
+              selectedOptionIndex = idx + 1;
+              marathonAnswerInput.value = String(idx + 1);
+              marathonAnswerInput.focus();
+            });
+
+            problemOptionsGrid.appendChild(optCard);
+          });
+        }
+        // Если это сопоставление (Задание №11)
+        else if (task.type === 'matching') {
+          problemMatchingWrap.style.display = 'flex';
+          marathonAnswerInput.placeholder = 'Ответ цифрами (например, 132)';
+
+          const slots = problemMatchingWrap.querySelectorAll('.matching-input-slot');
+          slots.forEach(slot => {
+            slot.value = '';
+            slot.addEventListener('input', (e) => {
+              let val = e.target.value.replace(/[^1-9]/g, '');
+              e.target.value = val;
+              const slotIdx = parseInt(e.target.dataset.slot, 10);
+              if (val && slotIdx < slots.length - 1) {
+                slots[slotIdx + 1].focus();
+              }
+              // Синхронизируем с marathonAnswerInput
+              marathonAnswerInput.value = Array.from(slots).map(s => s.value).join('');
+            });
+          });
+        } else {
+          marathonAnswerInput.placeholder = 'Введите числовой ответ...';
+        }
+
+        setTimeout(() => marathonAnswerInput.focus(), 60);
+      }
+
+      // Проверка ответа
+      function submitAnswer() {
+        if (isAnswerSubmitted) return;
+        const raw = marathonAnswerInput.value.trim();
+        if (!raw) {
+          marathonAnswerInput.focus();
+          return;
+        }
+
+        isAnswerSubmitted = true;
+        const task = currentQueue[currentIndex];
+        const isCorrect = OgeMarathonEngine.checkTaskAnswer(currentTaskNum, raw, task);
+
+        if (isCorrect) {
+          // Успех шага
+          OgeMarathonEngine.playSuccessSound();
+          currentIndex++;
+          if (currentIndex < currentQueue.length) {
+            loadCurrentTask();
+          } else {
+            handleVictory();
+          }
+        } else {
+          // ОБРЫВ ЛИНИИ (1 ошибка)
+          handleFailure(raw, task);
+        }
+      }
+
+      // Обработка краха (1 ошибка)
+      function handleFailure(userRaw, task) {
+        clearInterval(timerInterval);
+        const timeElapsed = Date.now() - startTime;
+        OgeMarathonEngine.playBreakSound();
+
+        // Обновляем визуализацию разрыва на текущей ноде
+        updateLineTrackNodes(currentIndex, currentQueue.length, true);
+
+        // Сохраняем стрик и попытку в рекордах
+        OgeMarathonEngine.recordRunResult(currentTaskNum, false, currentIndex, timeElapsed);
+
+        fStatStreak.textContent = currentIndex;
+        fStatTotal.textContent = currentQueue.length;
+        fStatTime.textContent = OgeMarathonEngine.formatTime(timeElapsed);
+
+        // Разбор задачи
+        fProblemContent.innerHTML = '';
+        if (task.text) {
+          fProblemContent.innerHTML += `<p style="margin-bottom: 8px; font-weight: 600;">${task.text}</p>`;
+        }
+        if (task.questionHtml) {
+          fProblemContent.innerHTML += `<div style="text-align: center; margin: 10px 0;">${task.questionHtml}</div>`;
+        }
+        if (task.svg) {
+          fProblemContent.innerHTML += `<div style="display:flex; justify-content:center; margin: 10px 0;">${task.svg}</div>`;
+        }
+
+        fUserAnswer.textContent = userRaw || 'Пусто';
+        fCorrectAnswer.textContent = task.displayAnswer || String(task.answer);
+
+        // Шаги решения
+        fSolutionSteps.innerHTML = '';
+        if (task.solutionSteps && Array.isArray(task.solutionSteps)) {
+          task.solutionSteps.forEach(step => {
+            const div = document.createElement('div');
+            div.className = 'solution-step';
+            div.innerHTML = step;
+            fSolutionSteps.appendChild(div);
+          });
+        } else if (task.explanation) {
+          fSolutionSteps.innerHTML = `<div class="solution-step">${task.explanation}</div>`;
+        } else {
+          fSolutionSteps.innerHTML = '<div class="solution-step">Внимательно повторите алгоритм вычисления данного прототипа.</div>';
+        }
+
+        setTimeout(() => {
+          showScreen(screenFailure);
+        }, 350);
+      }
+
+      // Обработка триумфа (Победа)
+      function handleVictory() {
+        clearInterval(timerInterval);
+        const timeElapsed = Date.now() - startTime;
+        OgeMarathonEngine.playVictoryFanfare();
+
+        // Запись рекорда и начисление XP
+        const updatedRecord = OgeMarathonEngine.recordRunResult(currentTaskNum, true, currentQueue.length, timeElapsed);
+        updateXpBadge();
+
+        const config = OgeMarathonEngine.getTaskConfig(currentTaskNum);
+        vSubtitle.innerHTML = `Вы решили все <strong>${currentQueue.length}</strong> задач Задания №${config.taskNum} («${config.title}») подряд без единой ошибки!`;
+
+        vStatTasks.textContent = `${currentQueue.length} / ${currentQueue.length}`;
+        vStatTime.textContent = OgeMarathonEngine.formatTime(timeElapsed);
+        const avgSec = Math.round(timeElapsed / 1000 / currentQueue.length);
+        vStatSpeed.textContent = `${avgSec} сек`;
+        vStatXp.textContent = (currentQueue.length >= 30 ? '+200 XP' : '+150 XP');
+
+        showScreen(screenVictory);
+        fireConfetti();
+      }
+
+      // Canvas Confetti
+      function fireConfetti() {
+        if (!confettiCanvas) return;
+        const ctx = confettiCanvas.getContext('2d');
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+
+        const particles = [];
+        const colors = ['#b7464e', '#263f61', '#c8956c', '#2e7d32', '#e5b5b8'];
+        for (let i = 0; i < 90; i++) {
+          particles.push({
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2,
+            vx: (Math.random() - 0.5) * 16,
+            vy: (Math.random() - 0.8) * 16,
+            size: Math.random() * 8 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 12
+          });
+        }
+
+        let frames = 0;
+        function render() {
+          ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.35; // гравитация
+            p.rotation += p.vRot;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+            ctx.restore();
+          });
+
+          frames++;
+          if (frames < 140) {
+            requestAnimationFrame(render);
+          } else {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+          }
+        }
+        render();
+      }
+
+      // Слушатели событий
+      btnSubmitAnswer.addEventListener('click', submitAnswer);
+
+      marathonAnswerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          submitAnswer();
+        }
+      });
+
+      // Быстрые кнопки символов
+      quickCharsBar.querySelectorAll('.q-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const char = btn.dataset.char;
+          marathonAnswerInput.value += char;
+          marathonAnswerInput.focus();
+        });
+      });
+
+      // Кнопка выхода из забега
+      btnQuitRun.addEventListener('click', () => {
+        if (confirm('Вы уверены, что хотите выйти? Текущий прогресс забега будет сброшен.')) {
+          clearInterval(timerInterval);
+          renderHub();
+          showScreen(screenHub);
+        }
+      });
+
+      // Кнопки после поражения
+      btnRetryMarathon.addEventListener('click', () => {
+        if (currentTaskNum) {
+          startMarathon(currentTaskNum);
+        } else {
+          showScreen(screenHub);
+        }
+      });
+
+      btnFailureBackHub.addEventListener('click', () => {
+        renderHub();
+        showScreen(screenHub);
+      });
+
+      // Кнопки после победы
+      btnVictoryReplay.addEventListener('click', () => {
+        if (currentTaskNum) {
+          startMarathon(currentTaskNum);
+        }
+      });
+
+      btnVictoryBackHub.addEventListener('click', () => {
+        renderHub();
+        showScreen(screenHub);
+      });
+
+      // Инициализация при загрузке страницы
+      updateXpBadge();
+      renderHub();
+
+      // Поддержка быстрого запуска через URL ?task=6
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskParam = urlParams.get('task');
+        if (taskParam) {
+          const num = parseInt(taskParam, 10);
+          const config = OgeMarathonEngine.getTaskConfig(num);
+          if (config && config.active) {
+            startMarathon(num);
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

@@ -3151,8 +3151,19 @@
             if (isCorrect) autoCorrectCount++;
 
             const item = document.createElement('div');
-            item.className = 'draft-task-item';
-            item.style.borderLeft = isCorrect ? '4px solid var(--accent-emerald)' : '4px solid var(--danger)';
+            item.className = 'draft-task-item ' + (isCorrect ? 'task-item-correct' : 'task-item-incorrect');
+            item.style.borderLeft = isCorrect ? '5px solid var(--accent-emerald)' : '5px solid var(--danger)';
+            if (!isCorrect) {
+                item.style.borderColor = 'rgba(239, 68, 68, 0.55)';
+                item.style.background = 'linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, var(--surface-card) 100%)';
+                item.style.boxShadow = '0 0 14px rgba(239, 68, 68, 0.08)';
+            } else {
+                item.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+                item.style.background = 'linear-gradient(180deg, rgba(16, 185, 129, 0.04) 0%, var(--surface-card) 100%)';
+            }
+
+            const ansBoxBorder = isCorrect ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.45)';
+            const ansBoxBg = isCorrect ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)';
 
             item.innerHTML = `
                 <div class="draft-task-header">
@@ -3164,7 +3175,7 @@
                 <div class="draft-task-body" style="font-size:0.95rem; line-height:1.5; margin:0.5rem 0;">
                     ${t.questionHtml ? formatMathHtml(t.questionHtml) : formatMathHtml(escapeHtml(t.text || t.condition || ''))}
                 </div>
-                <div style="background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r-sm); padding:0.6rem 0.85rem; display:flex; justify-content:space-between; font-size:0.88rem; flex-wrap:wrap; gap:0.5rem;">
+                <div style="background:${ansBoxBg}; border:1px solid ${ansBoxBorder}; border-radius:var(--r-sm); padding:0.6rem 0.85rem; display:flex; justify-content:space-between; font-size:0.88rem; flex-wrap:wrap; gap:0.5rem;">
                     <div>Ответ ученика: <strong style="color:${isCorrect ? 'var(--accent-emerald)' : (studentAns ? 'var(--danger)' : 'var(--muted)')}; font-family:var(--f-mono);">${escapeHtml(studentAns || '(пусто)')}</strong></div>
                     <div>Правильный ответ: <strong style="color:var(--accent-cyan); font-family:var(--f-mono);">${escapeHtml(correctAns || '—')}</strong></div>
                 </div>

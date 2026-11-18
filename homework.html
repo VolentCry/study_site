@@ -76,7 +76,7 @@
                     <div>Заданий: <strong id="hw-tasks-count">0</strong></div>
                     <div>Учитель: <strong id="hw-teacher-name">—</strong></div>
                     <div id="hw-created-wrap">Выдано: <strong id="hw-created-at" style="color: var(--ink);">—</strong></div>
-                    <div id="hw-score-wrap" style="display: none;">Оценка: <strong id="hw-score" style="color: var(--accent-emerald); font-size: 1.1rem;">0/0</strong></div>
+                    <div id="hw-score-wrap" style="display: none;"><span id="hw-score-label">Оценка:</span> <strong id="hw-score" style="color: var(--accent-emerald); font-size: 1.1rem;">0/0</strong></div>
                 </div>
             </div>
 
@@ -86,6 +86,18 @@
                 <div class="feedback-body">
                     <h4>Комментарий преподавателя</h4>
                     <p id="hw-feedback-text"></p>
+                </div>
+            </div>
+
+            <!-- Pending Review Notice Banner (when submitted, awaiting teacher check) -->
+            <div class="feedback-banner pending-banner" id="hw-pending-banner" style="display: none;">
+                <div class="feedback-icon">⏳</div>
+                <div class="feedback-body">
+                    <h4 id="hw-pending-title">Работа сдана и ожидает проверки учителем</h4>
+                    <p id="hw-pending-text">
+                        Первоначальная оценка: <strong id="hw-pending-score">0 / 0 баллов</strong> (по автоматической проверке ответов).<br>
+                        Правильные ответы и подробные решения не раскрываются, ведь работа требует проверки учителем. Преподаватель проверит ваши решения и выставит итоговый балл.
+                    </p>
                 </div>
             </div>
 
@@ -152,6 +164,33 @@
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" id="btn-cancel-modal">Отмена</button>
                 <button type="button" class="btn-cta" id="btn-confirm-submit">Да, сдать работу</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission Result Modal -->
+    <div class="modal-backdrop" id="submit-result-modal" style="display: none;">
+        <div class="modal-card" style="text-align: center; max-width: 480px;">
+            <div style="font-size: 2.75rem; margin-bottom: 0.75rem;">📋</div>
+            <h3 style="margin-bottom: 0.5rem; font-family: var(--f-display);">Работа успешно сдана!</h3>
+            <p style="color: var(--muted-bright); font-size: 0.95rem; margin-bottom: 1.25rem;">
+                Ваши ответы зафиксированы и отправлены на проверку учителю.
+            </p>
+            
+            <div style="display: inline-flex; flex-direction: column; align-items: center; padding: 0.85rem 1.5rem; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: var(--r); margin-bottom: 1.25rem;">
+                <span style="font-size: 0.82rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Первоначальная оценка</span>
+                <strong style="font-size: 1.75rem; color: var(--accent-gold); font-family: var(--f-display); margin-top: 0.25rem;" id="modal-result-score">0 / 0 баллов</strong>
+                <span style="font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem;">(автоматическая сверка ответов)</span>
+            </div>
+
+            <p style="color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                🔒 <strong>Правильные ответы не раскрываются</strong>, ведь работа требует проверки учителем. Преподаватель проверит ваши решения и выставит итоговый балл.
+            </p>
+
+            <div class="modal-actions" style="justify-content: center;">
+                <button type="button" class="btn-cta" id="btn-close-result-modal" style="min-width: 200px;">
+                    Посмотреть работу
+                </button>
             </div>
         </div>
     </div>

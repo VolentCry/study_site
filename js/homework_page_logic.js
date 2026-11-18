@@ -50,6 +50,13 @@
     const btnConfirmSubmit = document.getElementById('btn-confirm-submit');
     const toast = document.getElementById('toast');
 
+    const pendingBanner = document.getElementById('hw-pending-banner');
+    const pendingScoreEl = document.getElementById('hw-pending-score');
+    const scoreLabel = document.getElementById('hw-score-label');
+    const resultModal = document.getElementById('submit-result-modal');
+    const modalResultScore = document.getElementById('modal-result-score');
+    const btnCloseResultModal = document.getElementById('btn-close-result-modal');
+
     let hwData = null;
     let currentAnswers = {};
     let isSavingDraft = false;
@@ -214,29 +221,63 @@
         if (status === 'waived') {
             statusBadge.className = 'badge badge-status status-checked';
             statusBadge.textContent = 'Освобождён бустом прокачки 📜';
+            if (scoreLabel) scoreLabel.textContent = 'Оценка:';
             scoreWrap.style.display = 'block';
+            scoreEl.style.color = 'var(--accent-emerald)';
             const maxScore = (sub.max_score != null) ? sub.max_score : ((sub.maxScore != null) ? sub.maxScore : hwData.tasks.length);
             scoreEl.textContent = `${sub.score || maxScore} / ${maxScore} (100%)`;
             feedbackBanner.style.display = 'flex';
             feedbackText.textContent = sub.teacher_feedback || 'Официально освобождён от выполнения по игровому бусту «Отказ от Д/З» 📜';
+            if (pendingBanner) pendingBanner.style.display = 'none';
             bottomBar.style.display = 'none';
         } else if (status === 'checked') {
             statusBadge.className = 'badge badge-status status-checked';
             statusBadge.textContent = isTeacher ? `Проверено (ученик: ${escapeHtml(hwData.studentName || hwData.student_name || 'Ученик')})` : 'Проверено';
+            if (scoreLabel) scoreLabel.textContent = 'Итоговая оценка:';
             scoreWrap.style.display = 'block';
+            scoreEl.style.color = 'var(--accent-emerald)';
             const maxScore = (sub.max_score != null) ? sub.max_score : ((sub.maxScore != null) ? sub.maxScore : hwData.tasks.length);
-            scoreEl.textContent = `${sub.score || 0} / ${maxScore}`;
+            scoreEl.textContent = `${sub.score || 0} / ${maxScore} баллов`;
+
+            if (pendingBanner) pendingBanner.style.display = 'none';
 
             const teacherFb = sub.teacher_feedback || sub.teacherFeedback;
             if (teacherFb && teacherFb.trim()) {
                 feedbackBanner.style.display = 'flex';
                 feedbackText.textContent = teacherFb;
+            } else {
+                feedbackBanner.style.display = 'none';
             }
             bottomBar.style.display = 'none';
         } else if (status === 'submitted') {
             statusBadge.className = 'badge badge-status status-submitted';
             statusBadge.textContent = isTeacher ? `Сдано на проверку (ученик: ${escapeHtml(hwData.studentName || hwData.student_name || 'Ученик')})` : 'На проверке';
             bottomBar.style.display = 'none';
+
+            const maxScore = (sub.max_score != null) ? sub.max_score : ((sub.maxScore != null) ? sub.maxScore : (hwData.tasks ? hwData.tasks.length : 0));
+            const curScore = (sub.score != null) ? sub.score : 0;
+
+            if (scoreLabel) {
+                scoreLabel.textContent = isTeacher ? 'Авто-балл ученика:' : 'Первоначальная оценка:';
+            }
+            if (scoreEl) {
+                scoreEl.style.color = 'var(--accent-gold)';
+                scoreEl.textContent = `${curScore} / ${maxScore} баллов`;
+            }
+            scoreWrap.style.display = 'block';
+
+            if (feedbackBanner) feedbackBanner.style.display = 'none';
+
+            if (pendingBanner) {
+                if (!isTeacher) {
+                    pendingBanner.style.display = 'flex';
+                    if (pendingScoreEl) {
+                        pendingScoreEl.textContent = `${curScore} / ${maxScore} баллов`;
+                    }
+                } else {
+                    pendingBanner.style.display = 'none';
+                }
+            }
         } else if (isTeacher) {
             statusBadge.className = 'badge badge-status';
             statusBadge.style.background = 'rgba(16, 185, 129, 0.15)';
@@ -244,11 +285,14 @@
             statusBadge.style.border = '1px solid rgba(16, 185, 129, 0.35)';
             statusBadge.innerHTML = '👀 Режим просмотра учителя · Ответы открыты';
             if (scoreWrap) scoreWrap.style.display = 'none';
+            if (pendingBanner) pendingBanner.style.display = 'none';
             bottomBar.style.display = 'none';
         } else {
             statusBadge.className = 'badge badge-status status-pending';
             const hasAnyAns = Object.values(currentAnswers).some(v => v && String(v).trim().length > 0);
             statusBadge.textContent = hasAnyAns ? 'В процессе' : 'Не начато';
+            if (scoreWrap) scoreWrap.style.display = 'none';
+            if (pendingBanner) pendingBanner.style.display = 'none';
             if (!isTeacher) bottomBar.style.display = 'flex';
         }
 
@@ -388,24 +432,66 @@
                     `;
                 }
             } else if (status === 'submitted') {
-                answerUiHtml = `
-                    <div class="answer-box">
-                        <div class="submitted-pill">
-                            <span class="submitted-pill-label">${isTeacher ? 'Ответ ученика:' : 'Ваш отправленный ответ:'}</span>
-                            <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не заполнено)')}</strong>
-                        </div>
-                        ${isTeacher ? `
+                let isCorrect = (task.is_correct === true || task.isCorrect === true);
+                if (task.is_correct === null || task.is_correct === undefined) {
+                    const s = String(studentVal || '').trim();
+                    const a = String(task.answer || '').trim();
+                    const d = String(task.displayAnswer || '').trim();
+                    if (s && (a || d)) {
+                        const norm = str => str.replace(/\s+/g, '').replace(',', '.').toLowerCase();
+                        const ns = norm(s);
+                        const na = norm(a);
+                        const nd = norm(d);
+                        if (ns === na || ns === nd) {
+                            isCorrect = true;
+                        } else {
+                            const fs = parseFloat(ns);
+                            const fa = parseFloat(na);
+                            const fd = parseFloat(nd);
+                            if (!isNaN(fs) && ((!isNaN(fa) && Math.abs(fs - fa) < 0.0001) || (!isNaN(fd) && Math.abs(fs - fd) < 0.0001))) {
+                                isCorrect = true;
+                            }
+                        }
+                    }
+                }
+
+                if (isTeacher) {
+                    if (isCorrect) {
+                        card.classList.add('is-correct');
+                    } else {
+                        card.classList.add('is-incorrect');
+                    }
+
+                    answerUiHtml = `
+                        <div class="answer-box">
+                            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                                <div class="submitted-pill ${isCorrect ? 'pill-correct' : 'pill-incorrect'}">
+                                    <span class="submitted-pill-label">Ответ ученика:</span>
+                                    <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не заполнено)')}</strong>
+                                </div>
+                                <span class="task-result-status ${isCorrect ? 'res-correct' : 'res-incorrect'}" style="font-weight:700; font-size:0.85rem;">
+                                    ${isCorrect ? '✓ Ответ совпал (+1 балл)' : '✗ Ответ не совпал (0 баллов)'}
+                                </span>
+                            </div>
                             <div class="submitted-pill pill-correct" style="margin-top:8px; display:inline-flex;">
                                 <span class="submitted-pill-label">Правильный ответ:</span>
                                 <strong class="submitted-pill-val">${correctAnsDisplay || '—'}</strong>
                             </div>
-                        ` : `
-                            <span class="task-result-status" style="color:var(--muted); font-size:0.85rem; font-weight:500;">
-                                🔒 Ответ сохранён и зафиксирован
+                        </div>
+                    `;
+                } else {
+                    answerUiHtml = `
+                        <div class="answer-box">
+                            <div class="submitted-pill">
+                                <span class="submitted-pill-label">Ваш отправленный ответ:</span>
+                                <strong class="submitted-pill-val">${escapeHtml(studentVal || '— (не заполнено)')}</strong>
+                            </div>
+                            <span class="task-result-status" style="color:var(--accent-gold); font-size:0.85rem; font-weight:600;">
+                                ⏳ Ожидает проверки учителя · Правильный ответ скрыт
                             </span>
-                        `}
-                    </div>
-                `;
+                        </div>
+                    `;
+                }
 
                 if (isTeacher && task.solutionSteps && task.solutionSteps.length > 0) {
                     const stepsLi = task.solutionSteps.map(s => `<li>${formatSolutionStep(s)}</li>`).join('');
@@ -527,11 +613,19 @@
             const data = await res.json();
             if (data.success) {
                 submitModal.style.display = 'none';
-                showToast('Работа успешно сдана учителю!');
-                // Reload page to display submitted status
-                setTimeout(() => {
-                    window.location.reload();
-                }, 800);
+                
+                const scoreVal = (data.score != null) ? data.score : 0;
+                const maxVal = (data.maxScore != null) ? data.maxScore : (hwData && hwData.tasks ? hwData.tasks.length : 0);
+
+                if (resultModal && modalResultScore) {
+                    modalResultScore.textContent = `${scoreVal} / ${maxVal} баллов`;
+                    resultModal.style.display = 'flex';
+                } else {
+                    showToast(`Работа успешно сдана! Первоначальная оценка: ${scoreVal}/${maxVal} баллов`);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                }
             } else {
                 alert(data.error || 'Ошибка при отправке работы');
                 btnConfirmSubmit.disabled = false;
@@ -543,6 +637,22 @@
             btnConfirmSubmit.textContent = 'Да, сдать работу';
         }
     });
+
+    if (btnCloseResultModal) {
+        btnCloseResultModal.addEventListener('click', () => {
+            if (resultModal) resultModal.style.display = 'none';
+            window.location.reload();
+        });
+    }
+
+    if (resultModal) {
+        resultModal.addEventListener('click', (e) => {
+            if (e.target === resultModal) {
+                resultModal.style.display = 'none';
+                window.location.reload();
+            }
+        });
+    }
 
     // Teacher Grading form submission
     const teacherGradeForm = document.getElementById('teacher-grade-form');

@@ -1069,6 +1069,17 @@ dialog.admin-modal::backdrop {
     transition: border-color 0.2s;
     position: relative;
 }
+.draft-task-item.task-item-incorrect {
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    border-left: 5px solid var(--danger) !important;
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, var(--surface) 100%) !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.08) !important;
+}
+.draft-task-item.task-item-correct {
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    border-left: 5px solid var(--accent-emerald) !important;
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.04) 0%, var(--surface) 100%) !important;
+}
 .draft-task-item:hover {
     border-color: var(--line-active);
 }

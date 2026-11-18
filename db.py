@@ -1699,6 +1699,15 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
         is_teacher_or_admin = role in ('teacher', 'admin')
         is_checked = submission and submission.get('status') == 'checked'
 
+        if not is_teacher_or_admin and not is_checked and submission and submission.get('answers'):
+            clean_answers = {}
+            for k, v in submission['answers'].items():
+                if isinstance(v, dict):
+                    clean_answers[k] = {'answer': v.get('answer', '')}
+                else:
+                    clean_answers[k] = v
+            submission['answers'] = clean_answers
+
         sanitized_tasks = []
         for idx, t in enumerate(tasks):
             t_copy = dict(t)
@@ -1723,14 +1732,19 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
                         student_answer = str(raw_item).strip()
 
             t_copy['studentAnswer'] = student_answer
-            t_copy['is_correct'] = is_correct
-            t_copy['isCorrect'] = is_correct
 
             if not is_teacher_or_admin and not is_checked:
-                # Скрываем ответы и подсказки с решением
+                # Скрываем ответы, подсказки с решением и поштучную правильность до проверки учителем
+                t_copy['is_correct'] = None
+                t_copy['isCorrect'] = None
                 t_copy.pop('answer', None)
                 t_copy.pop('displayAnswer', None)
                 t_copy.pop('solutionSteps', None)
+                t_copy.pop('acceptedAnswers', None)
+                t_copy.pop('accepted_answers', None)
+            else:
+                t_copy['is_correct'] = is_correct
+                t_copy['isCorrect'] = is_correct
 
             sanitized_tasks.append(t_copy)
 
