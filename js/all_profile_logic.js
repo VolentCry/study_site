@@ -938,6 +938,69 @@ document.addEventListener('DOMContentLoaded', () => {
         dayDetailsContent.innerHTML = htmlItems;
     }
 
+    function getHwPassMonthlyUsageCount() {
+        let count = 0;
+        const now = new Date();
+        const curYear = now.getFullYear();
+        const curMonth = now.getMonth();
+        const checkedHwIds = new Set();
+
+        // 1. Считаем из актуальных данных сервера (studentHomeworksData)
+        if (Array.isArray(studentHomeworksData)) {
+            studentHomeworksData.forEach(h => {
+                const sub = h && h.submission;
+                if (sub && sub.status === 'waived') {
+                    const dateStr = sub.submittedAt || sub.submitted_at || h.created_at || h.createdAt;
+                    if (dateStr) {
+                        const d = new Date(dateStr);
+                        if (!isNaN(d.getTime()) && d.getFullYear() === curYear && d.getMonth() === curMonth) {
+                            count++;
+                            checkedHwIds.add(h.id);
+                        }
+                    } else {
+                        count++;
+                        checkedHwIds.add(h.id);
+                    }
+                }
+            });
+        }
+
+        // 2. Сверяем с локальной историей применений (на случай оффлайна или несохраненных данных)
+        try {
+            const raw = localStorage.getItem('study_hw_pass_usage_history');
+            const list = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(list)) {
+                list.forEach(item => {
+                    const ts = (typeof item === 'object' && item !== null) ? item.timestamp : item;
+                    const hwId = (typeof item === 'object' && item !== null) ? item.homeworkId : null;
+                    if (hwId && checkedHwIds.has(hwId)) return;
+                    const d = new Date(ts);
+                    if (!isNaN(d.getTime()) && d.getFullYear() === curYear && d.getMonth() === curMonth) {
+                        count++;
+                    }
+                });
+            }
+        } catch(e) {}
+
+        return count;
+    }
+
+    function recordHwPassUsage(hwId) {
+        try {
+            const raw = localStorage.getItem('study_hw_pass_usage_history');
+            const list = raw ? JSON.parse(raw) : [];
+            const validList = Array.isArray(list) ? list : [];
+            validList.push({
+                homeworkId: hwId || null,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('study_hw_pass_usage_history', JSON.stringify(validList));
+        } catch(e) {}
+    }
+
+    window.getHwPassMonthlyUsageCount = getHwPassMonthlyUsageCount;
+    window.recordHwPassUsage = recordHwPassUsage;
+
     function renderStudentHomeworks() {
         if (!studentHomeworksList) return;
         activeHwCount.textContent = studentHomeworksData.length;
@@ -951,6 +1014,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const monthlyUsed = getHwPassMonthlyUsageCount();
+
         studentHomeworksList.innerHTML = studentHomeworksData.map(h => {
             const sub = h.submission || {};
             const status = sub.status || 'not_started';
@@ -963,7 +1028,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const rawInv = localStorage.getItem('study_boosts_inventory');
                     const inv = rawInv ? JSON.parse(rawInv) : {};
                     if (inv && inv.hw_pass > 0) {
-                        passBtn = `<button type="button" class="btn btn-secondary btn-sm btn-use-hw-pass" data-hw-id="${h.id}" style="margin-right:8px; font-size:0.8rem; padding:0.4rem 0.8rem; background:rgba(255, 119, 40, 0.1); border-color:rgba(255,119,40,0.3); color:var(--accent); font-weight:700;">📜 Отказ от Д/З</button>`;
+                        if (monthlyUsed >= 2) {
+                            passBtn = `<button type="button" class="btn btn-secondary btn-sm" disabled style="margin-right:8px; font-size:0.8rem; padding:0.4rem 0.8rem; opacity:0.55; cursor:not-allowed;" title="Лимит списаний в текущем месяце исчерпан (максимум 2 раза в месяц)">📜 Отказ от Д/З (лимит 2/2)</button>`;
+                        } else {
+                            passBtn = `<button type="button" class="btn btn-secondary btn-sm btn-use-hw-pass" data-hw-id="${h.id}" style="margin-right:8px; font-size:0.8rem; padding:0.4rem 0.8rem; background:rgba(255, 119, 40, 0.1); border-color:rgba(255,119,40,0.3); color:var(--accent); font-weight:700;" title="Применено в этом месяце: ${monthlyUsed} из 2 (максимум 2 в месяц)">📜 Отказ от Д/З (${monthlyUsed}/2)</button>`;
+                        }
                     }
                 } catch(e) {}
             }
@@ -1019,7 +1088,13 @@ document.addEventListener('DOMContentLoaded', () => {
         studentHomeworksList.querySelectorAll('.btn-use-hw-pass').forEach(b => {
             b.addEventListener('click', async () => {
                 const hwId = parseInt(b.getAttribute('data-hw-id'), 10);
-                if (!confirm('Использовать 1 билет «Отказ от Д/З» для автоматического 100% зачёта этого домашнего задания?')) return;
+                const currentMonthUsage = getHwPassMonthlyUsageCount();
+                if (currentMonthUsage >= 2) {
+                    alert('Превышен лимит применения: «Академический зачёт» разрешено использовать не более 2 раз за один календарный месяц (использовано: 2 из 2).');
+                    return;
+                }
+
+                if (!confirm(`Использовать 1 билет «Отказ от Д/З» для автоматического 100% зачёта этого домашнего задания?\n\n(Применено в этом месяце: ${currentMonthUsage} из 2)`)) return;
                 try {
                     const res = await fetch(`/api/homework/${hwId}/waive`, { method: 'POST' });
                     const d = await res.json();
@@ -1029,7 +1104,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             const inv = rawInv ? JSON.parse(rawInv) : {};
                             inv.hw_pass = Math.max(0, (inv.hw_pass || 0) - 1);
                             localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
-                            window.dispatchEvent(new CustomEvent('study-boost-consumed', { detail: { boostId: 'hw_pass' } }));
+                            recordHwPassUsage(hwId);
+                            window.dispatchEvent(new CustomEvent('study-boost-consumed', { detail: { boostId: 'hw_pass', homeworkId: hwId } }));
                         } catch(e) {}
                         alert('📜 Домашнее задание успешно зачтено бустом «Отказ от Д/З»!');
                         await fetchStudentHomeworks();
@@ -2575,7 +2651,17 @@ initLevelProgressModal();
     function getBoostsInventory() {
         try {
             const raw = localStorage.getItem('study_boosts_inventory');
-            return raw ? JSON.parse(raw) : {};
+            const inv = raw ? JSON.parse(raw) : {};
+            let changed = false;
+            // Лимит на максимальное количество в наличии (не более 1 шт.)
+            if (inv && typeof inv === 'object' && typeof inv.hw_pass === 'number' && inv.hw_pass > 1) {
+                inv.hw_pass = 1;
+                changed = true;
+            }
+            if (changed) {
+                localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+            }
+            return inv || {};
         } catch (e) {
             return {};
         }
@@ -3031,7 +3117,15 @@ initLevelProgressModal();
     // ==========================================================================
     const BOOST_CATALOG = {
         streak_shield: { id: 'streak_shield', title: 'Квантовый щит', icon: '🛡️', price: 60, desc: 'Спасает комбо верных ответов в любом тренажёре.' },
-        hw_pass: { id: 'hw_pass', title: 'Академический зачёт', icon: '📜', price: 400, desc: '100% зачёт одного домашнего задания.' },
+        hw_pass: { 
+            id: 'hw_pass', 
+            title: 'Академический зачёт', 
+            icon: '📜', 
+            price: 400, 
+            desc: '100% зачёт одного домашнего задания.',
+            maxInventory: 1,
+            maxMonthlyUsage: 2
+        },
         double_xp: { id: 'double_xp', title: 'Катализатор Сверхновой', icon: '⚡', price: 100, desc: 'Удваивает XP в тренажёрах на 30 мин.' },
         hint: { id: 'hint', title: 'Нейро-сканер', icon: '🔍', price: 50, desc: 'Открывает разбор задачи без штрафа.' },
         time_freeze: { id: 'time_freeze', title: 'Хроно-стазис', icon: '⏱️', price: 50, desc: 'Останавливает таймер на 60 сек.' }
@@ -3102,6 +3196,41 @@ initLevelProgressModal();
     function updateTechTreeUI() {
         const xpEl = document.getElementById('techtree-user-xp');
         if (xpEl) xpEl.textContent = `${getUserTotalXp()} XP`;
+
+        const inv = getBoostsInventory();
+        const hwPassQty = Math.max(0, inv.hw_pass || 0);
+        const monthlyUsed = window.getHwPassMonthlyUsageCount ? window.getHwPassMonthlyUsageCount() : 0;
+
+        const stockEl = document.getElementById('hw-pass-current-stock');
+        if (stockEl) stockEl.textContent = `${hwPassQty}/1`;
+        const stockPill = document.getElementById('hw-pass-stock-limit');
+        if (stockPill) {
+            stockPill.classList.toggle('limit-reached', hwPassQty >= 1);
+        }
+
+        const monthEl = document.getElementById('hw-pass-month-usage');
+        if (monthEl) monthEl.textContent = `${monthlyUsed}/2`;
+        const monthPill = document.getElementById('hw-pass-monthly-limit');
+        if (monthPill) {
+            monthPill.classList.toggle('limit-reached', monthlyUsed >= 2);
+        }
+
+        const hwBuyBtn = document.querySelector('.btn-buy-boost[data-boost-id="hw_pass"]');
+        if (hwBuyBtn) {
+            if (hwPassQty >= 1) {
+                hwBuyBtn.disabled = true;
+                hwBuyBtn.style.opacity = '0.6';
+                hwBuyBtn.style.cursor = 'not-allowed';
+                hwBuyBtn.textContent = 'В наличии (макс. 1)';
+                hwBuyBtn.title = 'У вас уже есть 1 шт. в наличии (лимит: не более 1 шт.). Сначала используйте её для Д/З.';
+            } else {
+                hwBuyBtn.disabled = false;
+                hwBuyBtn.style.opacity = '';
+                hwBuyBtn.style.cursor = '';
+                hwBuyBtn.textContent = 'Синтезировать';
+                hwBuyBtn.title = 'Синтезировать модуль «Академический зачёт» (макс. 1 шт. в наличии)';
+            }
+        }
     }
 
     function initTechTree() {
@@ -3111,6 +3240,15 @@ initLevelProgressModal();
                 const boostId = btn.getAttribute('data-boost-id');
                 const price = parseInt(btn.getAttribute('data-boost-price'), 10);
                 const curXp = getUserTotalXp();
+
+                if (boostId === 'hw_pass') {
+                    const inv = getBoostsInventory();
+                    const currentQty = inv.hw_pass || 0;
+                    if (currentQty >= 1) {
+                        alert('Ограничение предмета «Академический зачёт»:\nВ наличии уже есть 1 шт. Нельзя иметь более 1 шт. одновременно.\nСначала используйте текущий свиток для списания домашнего задания.');
+                        return;
+                    }
+                }
 
                 if (curXp < price) {
                     alert(`Недостаточно энергии XP! Стоимость модуля: ${price} XP, у вас ${curXp} XP.`);
@@ -3125,7 +3263,11 @@ initLevelProgressModal();
                     showHubToast('⚡ Катализатор активирован! 30 минут 2x XP!', 'success');
                 } else {
                     const inv = getBoostsInventory();
-                    inv[boostId] = (inv[boostId] || 0) + 1;
+                    if (boostId === 'hw_pass') {
+                        inv.hw_pass = Math.min(1, (inv.hw_pass || 0) + 1);
+                    } else {
+                        inv[boostId] = (inv[boostId] || 0) + 1;
+                    }
                     saveBoostsInventory(inv);
                     const b = BOOST_CATALOG[boostId];
                     showHubToast(`🧬 Модуль интегрирован: ${b ? b.title : boostId}!`, 'success');
@@ -3363,6 +3505,7 @@ initLevelProgressModal();
 
         if (!wrap) return;
 
+        const monthlyUsed = window.getHwPassMonthlyUsageCount ? window.getHwPassMonthlyUsageCount() : 0;
         const boostKeys = Object.keys(BOOST_CATALOG);
         wrap.innerHTML = boostKeys.map(k => {
             const b = BOOST_CATALOG[k];
@@ -3370,19 +3513,46 @@ initLevelProgressModal();
             const isZero = (qty === 0);
 
             let actionHtml = '';
-            if (k === 'hw_pass' && qty > 0) {
-                actionHtml = `<button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px; font-size:0.75rem;" onclick="if(window.switchProfileTab){window.switchProfileTab('study');}">Использовать в Д/З</button>`;
+            let limitHtml = '';
+            if (k === 'hw_pass') {
+                const isMonthLimitReached = (monthlyUsed >= 2);
+                limitHtml = `
+                    <div class="techtree-limits-badge-wrap" style="margin-top:6px;">
+                        <span class="techtree-limit-pill stock-limit ${qty >= 1 ? 'limit-reached' : ''}" title="Ограничение склада: не более 1 шт. в наличии">
+                            📦 В наличии: <strong>${qty}/1</strong>
+                        </span>
+                        <span class="techtree-limit-pill month-limit ${isMonthLimitReached ? 'limit-reached' : ''}" title="Ограничение применения: не более 2 раз за месяц">
+                            📅 В этом месяце: <strong>${monthlyUsed}/2</strong>
+                        </span>
+                    </div>
+                `;
+
+                if (qty > 0) {
+                    if (isMonthLimitReached) {
+                        actionHtml = `
+                            <div style="margin-top:6px;">
+                                <span class="badge" style="background:rgba(239,68,68,0.14); color:#ef4444; font-size:0.74rem; border:1px solid rgba(239,68,68,0.3); padding:3px 8px; border-radius:6px; display:inline-block;">
+                                    ⚠️ Лимит на текущий месяц (2/2) исчерпан
+                                </span>
+                            </div>
+                        `;
+                    } else {
+                        const remaining = 2 - monthlyUsed;
+                        actionHtml = `<button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px; font-size:0.75rem;" onclick="if(window.switchProfileTab){window.switchProfileTab('study');}">Использовать в Д/З (осталось ${remaining})</button>`;
+                    }
+                }
             }
 
             return `
                 <div class="boost-inventory-item" style="opacity: ${isZero ? 0.45 : 1};">
                     <div class="boost-inv-icon">${b.icon}</div>
-                    <div style="flex:1;">
-                        <div style="font-weight: 800; font-size: 0.9rem; display: flex; justify-content: space-between;">
+                    <div style="flex:1; min-width: 0;">
+                        <div style="font-weight: 800; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                             <span>${b.title}</span>
-                            <span class="badge" style="background: rgba(44,230,214,0.15); color: var(--accent-cyan);">${qty} шт.</span>
+                            <span class="badge" style="background: rgba(44,230,214,0.15); color: var(--accent-cyan); flex-shrink: 0; white-space: nowrap;">${qty} шт.</span>
                         </div>
                         <div style="font-size: 0.76rem; color: var(--muted-bright); margin-top: 2px;">${b.desc}</div>
+                        ${limitHtml}
                         ${actionHtml}
                     </div>
                 </div>
@@ -3986,6 +4156,11 @@ initLevelProgressModal();
     }
 
     window.initUpgradeHub = initUpgradeHub;
+
+    window.addEventListener('study-boost-consumed', () => {
+        updateTechTreeUI();
+        renderInventoryView();
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
         const storedTab = sessionStorage.getItem('profileActiveTab');

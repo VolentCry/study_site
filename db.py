@@ -791,6 +791,12 @@ def save_user_data(user_id: int, payload: Dict[str, Any]) -> str:
     claimed_gifts_json = json.dumps(claimed_gifts if isinstance(claimed_gifts, dict) else {}, ensure_ascii=False)
 
     boosts_inventory = payload.get('boostsInventory') or payload.get('boosts_inventory') or {}
+    if isinstance(boosts_inventory, dict) and 'hw_pass' in boosts_inventory:
+        try:
+            if int(boosts_inventory.get('hw_pass', 0) or 0) > 1:
+                boosts_inventory['hw_pass'] = 1
+        except Exception:
+            pass
     boosts_inventory_json = json.dumps(boosts_inventory if isinstance(boosts_inventory, dict) else {}, ensure_ascii=False)
 
     tower_stats = payload.get('towerStats') or payload.get('tower_stats') or {}
@@ -1596,6 +1602,35 @@ def waive_homework_submission(homework_id: int, student_id: int) -> Dict[str, An
                 (homework_id, student_id)
             )
             sub = cursor.fetchone()
+
+            # Если задание уже освобождено по бусту, возвращаем его статус без списания лимита
+            if sub and sub['status'] == 'waived':
+                return {
+                    'id': sub['id'],
+                    'homeworkId': homework_id,
+                    'studentId': student_id,
+                    'status': 'waived',
+                    'score': max_score,
+                    'maxScore': max_score
+                }
+
+            # Проверка лимита: не более 2 раз в календарный месяц
+            month_prefix = datetime.now(timezone.utc).strftime('%Y-%m')
+            cursor.execute(
+                """
+                SELECT COUNT(*) as cnt FROM homework_submissions
+                WHERE student_id = ? AND status = 'waived' AND (
+                    (submitted_at IS NOT NULL AND submitted_at LIKE ?) OR
+                    (submitted_at IS NULL AND created_at LIKE ?)
+                ) AND homework_id != ?
+                """,
+                (student_id, f"{month_prefix}%", f"{month_prefix}%", homework_id)
+            )
+            cnt_row = cursor.fetchone()
+            waived_in_month = cnt_row['cnt'] if cnt_row else 0
+            if waived_in_month >= 2:
+                raise ValueError("Лимит применения «Академического зачёта» исчерпан (максимум 2 раза в месяц).")
+
             feedback_text = 'Официально освобождён от выполнения (буст «Отказ от Д/З» 📜)'
             if sub:
                 cursor.execute(

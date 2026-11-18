@@ -769,11 +769,19 @@
                                         <div class="techtree-card-details">
                                             <h5 class="techtree-module-title">Академический зачёт</h5>
                                             <p class="techtree-module-desc">Официальный 100% зачёт домашнего задания со статусом в журнале учителя «Освобождён за успехи в тренажерах».</p>
+                                            <div class="techtree-limits-badge-wrap">
+                                                <span class="techtree-limit-pill stock-limit" id="hw-pass-stock-limit" title="Ограничение склада: не более 1 шт. в наличии">
+                                                    📦 В наличии: <strong id="hw-pass-current-stock">0/1</strong>
+                                                </span>
+                                                <span class="techtree-limit-pill month-limit" id="hw-pass-monthly-limit" title="Ограничение: можно применить лишь 2 раза в месяц">
+                                                    📅 В этом месяце: <strong id="hw-pass-month-usage">0/2</strong>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="techtree-card-footer">
                                         <span class="techtree-price">⚡ 400 XP</span>
-                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hw_pass" data-boost-price="400">
+                                        <button type="button" class="btn btn-emerald btn-sm btn-buy-boost" data-boost-id="hw_pass" data-boost-price="400" id="btn-buy-hw-pass">
                                             Синтезировать
                                         </button>
                                     </div>

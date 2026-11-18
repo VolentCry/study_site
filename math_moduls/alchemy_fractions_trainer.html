@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4efe6" />
+  <title>Алхимическая лаборатория дробей · 5 класс · НЕШкола</title>
+  <meta name="description" content="Интерактивный тренажёр решения задач с обыкновенными дробями и смешанными числами в форме алхимического синтеза ресурсов.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../css/alchemy_fractions.css">
+  <style>
+    /* Navigation Bar Styling */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.95); border-bottom: 1px solid var(--lab-border); backdrop-filter: blur(12px);
+    }
+    [data-theme="dark"] .site-nav {
+      background: rgba(21, 27, 38, 0.92);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand-mark {
+      width: 36px; height: 36px; display: grid; place-items: center;
+      border: 1px solid var(--lab-accent); color: var(--lab-accent); font: 700 18px var(--f-serif);
+      background: var(--lab-card); border-radius: 8px;
+    }
+    .brand-name { font: 700 17px var(--f-serif); line-height: 1.1; color: var(--lab-ink); }
+    .brand-sub { color: var(--lab-muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--lab-border); color: var(--lab-ink); font-size: 13px; font-weight: 600;
+      text-decoration: none; border-radius: 8px; background: var(--lab-card);
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .nav-btn:hover { border-color: var(--lab-accent); color: var(--lab-accent); }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: rgba(217, 119, 6, 0.12); color: var(--lab-accent);
+      padding: 4px 10px; border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="alchemy-lab-body">
+
+  <!-- Header Nav -->
+  <header class="site-nav">
+    <a class="brand" href="../pages/math_5.html">
+      <span class="brand-mark">⚗️</span>
+      <div class="brand-text">
+        <span class="brand-name">Алхимия дробей</span>
+        <span class="brand-sub">Математика · 5 класс</span>
+      </div>
+    </a>
+
+    <div class="nav-actions">
+      <span class="xp-counter">+30 XP за эликсир</span>
+      <a href="../pages/math_5.html" class="nav-btn">← К темам 5 класса</a>
+      <a href="../profile.html" class="nav-btn">Профиль</a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="alchemy-container">
+    
+    <!-- Top Bar with Recipe Selectors -->
+    <div class="lab-header-bar">
+      <div class="lab-title-wrap">
+        <div class="lab-emblem">🧪</div>
+        <div class="lab-title-text">
+          <h1>Лаборатория Синтеза</h1>
+          <p>Соблюдай пропорции, следи за стабильностью и не допускай перегрева смеси!</p>
+        </div>
+      </div>
+
+      <div class="lab-modes-wrap">
+        <button type="button" class="lab-mode-btn active" data-recipe="speed_elixir">⚡ Эликсир Скорости</button>
+        <button type="button" class="lab-mode-btn" data-recipe="night_vision">🔮 Ночное Видение</button>
+        <button type="button" class="lab-mode-btn" data-recipe="frost_crystal">❄️ Раствор Мороза</button>
+        <button type="button" class="lab-mode-btn" data-recipe="fire_strength">🔥 Эликсир Силы</button>
+        <button type="button" class="lab-mode-btn" data-recipe="random">🎲 Случайный рецепт</button>
+      </div>
+    </div>
+
+    <!-- 3-Column Interactive Grid -->
+    <div class="alchemy-grid">
+      
+      <!-- 1. Recipe Scroll Column -->
+      <div class="col-recipe">
+        <div class="lab-card recipe-scroll">
+          <div class="recipe-badge">📜 Рецепт алхимика</div>
+          <h2 class="recipe-title" id="recipe-title">Синтез Эликсира Скорости</h2>
+          <p class="recipe-story" id="recipe-story">Загрузка рецепта...</p>
+
+          <div class="recipe-spec-box">
+            <div class="recipe-spec-row">
+              <span class="recipe-spec-label">Вместимость котла:</span>
+              <span class="recipe-spec-val" id="recipe-capacity">3.0 л</span>
+            </div>
+            <div class="recipe-spec-row">
+              <span class="recipe-spec-label">Количество порций:</span>
+              <span class="recipe-spec-val" id="recipe-portions">3 пробирки</span>
+            </div>
+            <div class="recipe-spec-row">
+              <span class="recipe-spec-label">Правило стабильности:</span>
+              <span class="recipe-spec-val" style="color:var(--lab-emerald);">Только несократимые дроби</span>
+            </div>
+          </div>
+
+          <div class="recipe-math-box">
+            <div class="recipe-math-label">Математическая модель</div>
+            <div class="recipe-math-expr" id="recipe-math-expr">(3/4 + 1 2/5 - 7/10) : 3</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Flask & Reactor Column -->
+      <div class="col-flask">
+        <div class="lab-card flask-stage">
+          <div class="flask-hud">
+            <div class="hud-chip chip-stability stable" id="chip-stability">
+              🟢 Смесь стабильна
+            </div>
+            <div class="hud-chip">
+              Объём: <strong id="readout-cur-volume" style="margin-left:4px; font-family:var(--f-serif); color:var(--lab-accent);">0 л</strong>
+            </div>
+          </div>
+
+          <!-- Animated Vessel -->
+          <div class="reactor-vessel-wrap">
+            <div class="alembic-neck"></div>
+            <div class="alembic-flask" id="alembic-flask">
+              <div class="flask-bubbles-container" id="flask-bubbles-container"></div>
+              <div class="flask-liquid-layer" id="flask-liquid-layer">
+                <div class="liquid-wave"></div>
+              </div>
+              <div class="flask-ruler" id="flask-ruler"></div>
+            </div>
+          </div>
+
+          <div class="reactor-stats-bar">
+            <div class="stat-pill">Лимит котла: <strong id="readout-max-volume">3.0 л</strong></div>
+            <div class="stat-pill">Статус: <strong style="color:var(--lab-emerald);">Реакция готова</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Laboratory Journal Column -->
+      <div class="col-journal">
+        <div class="lab-card">
+          <div class="journal-header">
+            <h3 class="journal-title">Лабораторный журнал</h3>
+            <span class="step-counter-badge" id="step-current-num">Шаг 1 из 3</span>
+          </div>
+
+          <div class="current-step-card is-active">
+            <div class="step-instruction" id="step-action-name">Смешивание базовых компонентов</div>
+            <p style="font-size:0.88rem; color:var(--lab-muted); margin:0 0 12px;" id="step-desc">
+              Введите промежуточный объём смеси:
+            </p>
+
+            <!-- Fraction Input Widget -->
+            <div class="fraction-input-row">
+              <div class="whole-input-wrap">
+                <input type="number" class="whole-input" id="input-whole" placeholder="Целая" min="0" title="Целая часть (если есть)">
+                <span style="font-size:0.68rem; color:var(--lab-muted); margin-top:2px;">целая</span>
+              </div>
+
+              <span style="font-size:1.5rem; font-weight:700; color:var(--lab-muted); margin: 0 4px;">+</span>
+
+              <div class="fraction-box-input">
+                <input type="number" class="frac-part-input" id="input-num" placeholder="Числитель" min="0" title="Числитель">
+                <div class="fraction-divider-line"></div>
+                <input type="number" class="frac-part-input" id="input-den" placeholder="Знаменатель" min="1" title="Знаменатель">
+              </div>
+            </div>
+
+            <!-- Dynamic Alert for Reducible fractions or Overflow -->
+            <div class="stability-alert-box" id="stability-alert"></div>
+
+            <button type="button" class="btn-synthesize" id="btn-synthesize">
+              🧪 Произвести реакцию (Enter)
+            </button>
+          </div>
+
+          <!-- History Steps Chain -->
+          <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; color:var(--lab-muted); margin-top:16px;">
+            Пройденные этапы синтеза:
+          </div>
+          <div class="steps-chain" id="steps-chain"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Victory Modal -->
+  <div class="modal-overlay" id="victory-modal" style="display: none;">
+    <div class="victory-card">
+      <div class="potion-bottle-art" id="victory-potion-icon">⚡</div>
+      <h2 class="victory-title" id="victory-title">Эликсир успешно синтезирован!</h2>
+      <p class="victory-text" id="victory-text">
+        Формула соблюдена с безупречной точностью. Все дроби приведены к стабильной несократимой форме!
+      </p>
+      <div class="xp-reward-box">
+        <span>🏆 Награда:</span>
+        <span>+30 XP</span>
+      </div>
+      <div class="victory-actions">
+        <button type="button" class="btn-next-recipe" id="btn-next-recipe">Следующий эликсир →</button>
+        <button type="button" class="nav-btn" id="btn-close-victory">Остаться в лаборатории</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/alchemy_fractions_trainer.js"></script>
+</body>
+</html>

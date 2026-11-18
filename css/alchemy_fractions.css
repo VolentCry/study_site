@@ -1,0 +1,750 @@
+/* ==========================================================================
+   ALCHEMY FRACTIONS TRAINER STYLES (5 КЛАСС)
+   Алхимическая лаборатория дробей · Синтез эликсиров
+   ========================================================================== */
+
+:root {
+  --lab-bg: #f4efe6;
+  --lab-card: #ffffff;
+  --lab-border: rgba(56, 42, 30, 0.14);
+  --lab-ink: #1e1915;
+  --lab-muted: #6e645a;
+  --lab-accent: #b45309;       /* Тёплая медь / янтарь */
+  --lab-accent-glow: rgba(180, 83, 9, 0.22);
+  --lab-gold: #d97706;
+  --lab-emerald: #059669;      /* Стабильность */
+  --lab-emerald-glow: rgba(5, 150, 105, 0.25);
+  --lab-danger: #dc2626;       /* Перегрев / Переполнение */
+  --lab-danger-glow: rgba(220, 38, 38, 0.3);
+  --lab-cyan: #0284c7;        /* Магическая жидкость */
+  --lab-parchment: #fdfbf7;
+  --lab-glass: rgba(255, 255, 255, 0.75);
+  --lab-shadow: 0 10px 30px rgba(56, 42, 30, 0.08);
+  --lab-shadow-lg: 0 20px 45px rgba(56, 42, 30, 0.14);
+  --r-card: 18px;
+  --r-pill: 9999px;
+  --f-serif: 'Zen Old Mincho', serif;
+  --f-sans: 'DM Sans', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme="dark"] {
+  --lab-bg: #0e1219;
+  --lab-card: #151b26;
+  --lab-border: rgba(255, 255, 255, 0.12);
+  --lab-ink: #f1f5f9;
+  --lab-muted: #94a3b8;
+  --lab-accent: #f59e0b;
+  --lab-accent-glow: rgba(245, 158, 11, 0.25);
+  --lab-gold: #fbbf24;
+  --lab-emerald: #10b981;
+  --lab-emerald-glow: rgba(16, 185, 129, 0.3);
+  --lab-danger: #ef4444;
+  --lab-danger-glow: rgba(239, 68, 68, 0.35);
+  --lab-cyan: #38bdf8;
+  --lab-parchment: #1a2232;
+  --lab-glass: rgba(21, 27, 38, 0.85);
+  --lab-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+  --lab-shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.6);
+}
+
+/* Base resets & typography */
+body.alchemy-lab-body {
+  background-color: var(--lab-bg);
+  color: var(--lab-ink);
+  font-family: var(--f-sans);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background-image: 
+    radial-gradient(circle at 12% 15%, rgba(217, 119, 6, 0.07) 0%, transparent 40%),
+    radial-gradient(circle at 88% 85%, rgba(2, 132, 199, 0.08) 0%, transparent 45%);
+}
+
+.alchemy-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 24px 20px 60px;
+  box-sizing: border-box;
+}
+
+/* Top toolbar & level switch */
+.lab-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.lab-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lab-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 14px var(--lab-accent-glow);
+}
+.lab-title-text h1 {
+  font-family: var(--f-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+.lab-title-text p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--lab-muted);
+}
+
+.lab-modes-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.lab-mode-btn {
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--lab-border);
+  background: var(--lab-card);
+  color: var(--lab-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.lab-mode-btn:hover {
+  border-color: var(--lab-accent);
+  color: var(--lab-accent);
+}
+.lab-mode-btn.active {
+  background: var(--lab-accent);
+  border-color: var(--lab-accent);
+  color: #ffffff;
+  box-shadow: 0 2px 10px var(--lab-accent-glow);
+}
+
+/* Main 3-column Grid */
+.alchemy-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .alchemy-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .alchemy-grid > .col-flask {
+    order: 1;
+    grid-column: span 2;
+  }
+  .alchemy-grid > .col-recipe {
+    order: 2;
+  }
+  .alchemy-grid > .col-journal {
+    order: 3;
+  }
+}
+
+@media (max-width: 760px) {
+  .alchemy-grid {
+    grid-template-columns: 1fr;
+  }
+  .alchemy-grid > .col-flask {
+    grid-column: span 1;
+  }
+}
+
+/* Card base */
+.lab-card {
+  background: var(--lab-card);
+  border: 1px solid var(--lab-border);
+  border-radius: var(--r-card);
+  padding: 22px;
+  box-shadow: var(--lab-shadow);
+  position: relative;
+}
+
+/* 1. RECIPE SCROLL COLUMN */
+.recipe-scroll {
+  background: var(--lab-parchment);
+  border: 2px dashed rgba(217, 119, 6, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.recipe-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--lab-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+.recipe-title {
+  font-family: var(--f-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: var(--lab-ink);
+}
+.recipe-story {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--lab-muted);
+  margin-bottom: 16px;
+}
+
+.recipe-spec-box {
+  background: var(--lab-card);
+  border: 1px solid var(--lab-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.recipe-spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+[data-theme="dark"] .recipe-spec-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.recipe-spec-row:last-child {
+  border-bottom: none;
+}
+.recipe-spec-label {
+  color: var(--lab-muted);
+}
+.recipe-spec-val {
+  font-weight: 700;
+  color: var(--lab-ink);
+}
+
+.recipe-math-box {
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.recipe-math-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--lab-cyan);
+  margin-bottom: 6px;
+}
+.recipe-math-expr {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--lab-ink);
+  font-family: var(--f-serif);
+}
+
+/* 2. REACTOR / FLASK COLUMN */
+.flask-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 520px;
+}
+
+.flask-hud {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--lab-border);
+  background: var(--lab-parchment);
+}
+.chip-stability.stable {
+  border-color: rgba(5, 150, 105, 0.35);
+  color: var(--lab-emerald);
+  background: rgba(5, 150, 105, 0.08);
+}
+.chip-stability.unstable {
+  border-color: rgba(217, 119, 6, 0.45);
+  color: var(--lab-gold);
+  background: rgba(217, 119, 6, 0.1);
+  animation: pulse-warn 1.5s infinite alternate ease-in-out;
+}
+.chip-stability.danger {
+  border-color: rgba(220, 38, 38, 0.5);
+  color: var(--lab-danger);
+  background: rgba(220, 38, 38, 0.12);
+  animation: pulse-danger 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-warn {
+  from { box-shadow: 0 0 0 rgba(217, 119, 6, 0); }
+  to { box-shadow: 0 0 14px var(--lab-accent-glow); }
+}
+@keyframes pulse-danger {
+  from { box-shadow: 0 0 0 rgba(220, 38, 38, 0); }
+  to { box-shadow: 0 0 20px var(--lab-danger-glow); }
+}
+
+/* Alembic Cauldron Graphic Container */
+.reactor-vessel-wrap {
+  position: relative;
+  width: 280px;
+  height: 380px;
+  margin: 10px auto 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* Glass Alembic Flask */
+.alembic-flask {
+  width: 240px;
+  height: 340px;
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+  border: 3px solid rgba(180, 83, 9, 0.4);
+  border-radius: 40px 40px 100px 100px;
+  box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.25), var(--lab-shadow);
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+.alembic-neck {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 76px;
+  height: 44px;
+  border: 3px solid rgba(180, 83, 9, 0.4);
+  border-bottom: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+  border-radius: 8px 8px 0 0;
+  z-index: 2;
+}
+
+/* Boiling Liquid Layer */
+.flask-liquid-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  transition: height 0.7s cubic-bezier(0.16, 1, 0.3, 1), background 0.7s ease;
+  z-index: 1;
+}
+
+/* Liquid Surface Wave Effect */
+.liquid-wave {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  opacity: 0.8;
+  animation: wave-motion 2.5s infinite ease-in-out;
+}
+@keyframes wave-motion {
+  0%, 100% { transform: scaleY(0.9) translateY(0); }
+  50% { transform: scaleY(1.4) translateY(-2px); }
+}
+
+/* Bubbles Inside Liquid */
+.flask-bubbles-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bubble {
+  position: absolute;
+  bottom: -10px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  animation: rise-bubble 3s infinite ease-in;
+}
+@keyframes rise-bubble {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-300px) scale(1.2); opacity: 0; }
+}
+
+/* Flask Measuring Ticks */
+.flask-ruler {
+  position: absolute;
+  right: 8px;
+  bottom: 15px;
+  top: 40px;
+  width: 45px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  z-index: 5;
+  pointer-events: none;
+}
+.ruler-tick {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--lab-muted);
+  opacity: 0.75;
+}
+.ruler-tick::after {
+  content: '';
+  width: 12px;
+  height: 1.5px;
+  background: var(--lab-ink);
+  opacity: 0.4;
+}
+.ruler-tick.limit {
+  color: var(--lab-danger);
+  font-weight: 800;
+}
+.ruler-tick.limit::after {
+  width: 18px;
+  background: var(--lab-danger);
+  height: 2px;
+}
+
+/* Overheat alert glow around flask */
+.alembic-flask.overheated {
+  box-shadow: 0 0 35px var(--lab-danger-glow), inset 0 0 25px rgba(239, 68, 68, 0.35);
+  border-color: var(--lab-danger);
+}
+.alembic-flask.overheated .flask-liquid-layer {
+  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%) !important;
+}
+
+/* Reactor Bottom Stats Readout */
+.reactor-stats-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--lab-parchment);
+  border: 1px solid var(--lab-border);
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+.stat-pill strong {
+  font-size: 1.05rem;
+  font-family: var(--f-serif);
+  color: var(--lab-accent);
+}
+
+/* 3. LABORATORY JOURNAL COLUMN */
+.journal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--lab-border);
+}
+.journal-title {
+  font-family: var(--f-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+.step-counter-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(180, 83, 9, 0.12);
+  color: var(--lab-accent);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+}
+
+/* Current Step Interactive Box */
+.current-step-card {
+  background: var(--lab-parchment);
+  border: 2px solid var(--lab-border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease;
+}
+.current-step-card.is-active {
+  border-color: var(--lab-accent);
+  box-shadow: 0 4px 16px var(--lab-accent-glow);
+}
+.step-instruction {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--lab-ink);
+  margin-bottom: 12px;
+}
+.step-expr-preview {
+  font-family: var(--f-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
+  background: var(--lab-card);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 1px solid var(--lab-border);
+}
+
+/* Fraction Input Component */
+.fraction-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.whole-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.whole-input {
+  width: 54px;
+  height: 48px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--f-serif);
+  border: 2px solid var(--lab-border);
+  border-radius: 8px;
+  background: var(--lab-card);
+  color: var(--lab-ink);
+}
+.whole-input:focus {
+  outline: none;
+  border-color: var(--lab-accent);
+}
+
+.fraction-box-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 58px;
+}
+.frac-part-input {
+  width: 54px;
+  height: 38px;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-family: var(--f-serif);
+  border: 2px solid var(--lab-border);
+  border-radius: 6px;
+  background: var(--lab-card);
+  color: var(--lab-ink);
+}
+.frac-part-input:focus {
+  outline: none;
+  border-color: var(--lab-accent);
+}
+.fraction-divider-line {
+  width: 100%;
+  height: 2px;
+  background: var(--lab-ink);
+  opacity: 0.6;
+}
+
+/* Warning & Feedback Notification */
+.stability-alert-box {
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin-bottom: 14px;
+  display: none;
+}
+.stability-alert-box.alert-unstable {
+  display: block;
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  color: var(--lab-gold);
+}
+.stability-alert-box.alert-overflow {
+  display: block;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: var(--lab-danger);
+}
+.stability-alert-box.alert-success {
+  display: block;
+  background: rgba(5, 150, 105, 0.12);
+  border: 1px solid rgba(5, 150, 105, 0.35);
+  color: var(--lab-emerald);
+}
+
+/* Action Buttons */
+.btn-synthesize {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px var(--lab-accent-glow);
+  transition: all 0.2s ease;
+}
+.btn-synthesize:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px var(--lab-accent-glow);
+}
+.btn-synthesize:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* History Steps Chain */
+.steps-chain {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chain-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  font-size: 0.82rem;
+  border-left: 3px solid var(--lab-border);
+}
+[data-theme="dark"] .chain-item {
+  background: rgba(255, 255, 255, 0.03);
+}
+.chain-item.completed {
+  border-left-color: var(--lab-emerald);
+}
+.chain-item.failed {
+  border-left-color: var(--lab-danger);
+}
+
+/* Victory Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 18, 25, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.victory-card {
+  background: var(--lab-card);
+  border: 2px solid var(--lab-accent);
+  border-radius: 24px;
+  max-width: 460px;
+  width: 100%;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: var(--lab-shadow-lg);
+  animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes pop-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.potion-bottle-art {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 20px var(--lab-accent-glow));
+}
+.victory-title {
+  font-family: var(--f-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.victory-text {
+  font-size: 0.95rem;
+  color: var(--lab-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.xp-reward-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  padding: 8px 18px;
+  border-radius: var(--r-pill);
+  font-weight: 800;
+  color: var(--lab-gold);
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+}
+.victory-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.btn-next-recipe {
+  padding: 12px 24px;
+  background: var(--lab-accent);
+  color: #ffffff;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 14px var(--lab-accent-glow);
+}

@@ -4517,6 +4517,7 @@ dialog::backdrop {
     display: flex;
     gap: 0.75rem;
     align-items: flex-start;
+    padding-top: 0.75rem;
 }
 
 .techtree-icon-box {
@@ -4536,6 +4537,7 @@ dialog::backdrop {
     font-weight: 800;
     color: var(--text);
     margin: 0 0 2px 0;
+    padding-right: 68px;
 }
 
 .techtree-module-desc {
@@ -4543,6 +4545,51 @@ dialog::backdrop {
     color: var(--muted-bright);
     line-height: 1.4;
     margin: 0;
+}
+
+.techtree-limits-badge-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.techtree-limit-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-family: var(--f-mono, monospace);
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    line-height: 1.25;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.techtree-limit-pill.stock-limit {
+    background: rgba(255, 184, 0, 0.12);
+    color: var(--accent-gold, #ffb800);
+    border: 1px solid rgba(255, 184, 0, 0.3);
+}
+
+.techtree-limit-pill.stock-limit.limit-reached {
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+.techtree-limit-pill.month-limit {
+    background: rgba(44, 230, 214, 0.12);
+    color: var(--accent-cyan, #2ce6d6);
+    border: 1px solid rgba(44, 230, 214, 0.3);
+}
+
+.techtree-limit-pill.month-limit.limit-reached {
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
 }
 
 .techtree-card-footer {
@@ -4829,6 +4876,24 @@ dialog::backdrop {
     border-color: rgba(2, 132, 199, 0.25);
     box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
 }
+
+[data-theme="light"] .techtree-limit-pill.stock-limit {
+    background: rgba(217, 119, 6, 0.1);
+    color: #b45309;
+    border-color: rgba(217, 119, 6, 0.28);
+}
+
+[data-theme="light"] .techtree-limit-pill.month-limit {
+    background: rgba(13, 148, 136, 0.1);
+    color: #0f766e;
+    border-color: rgba(13, 148, 136, 0.28);
+}
+
+[data-theme="light"] .techtree-limit-pill.limit-reached {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.28);
+}
     display: flex;
     align-items: flex-start;
     gap: 0.85rem;
@@ -4889,7 +4954,7 @@ dialog::backdrop {
 
 .boost-inventory-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
     margin-top: 1rem;
 }
@@ -4898,10 +4963,9 @@ dialog::backdrop {
     background: var(--surface-card);
     border: 1px solid var(--line);
     border-radius: var(--r);
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1rem;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
     gap: 0.75rem;
 }
 
