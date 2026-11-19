@@ -948,6 +948,220 @@
     const dossierModal = document.getElementById('student-dossier-modal');
     window.openStudentDossier = openStudentDossier;
 
+    let currentDossierStudentId = null;
+    let billingEventsInitialized = false;
+
+    function setupDossierBilling(studentId, billing) {
+        currentDossierStudentId = studentId;
+        const b = billing || {};
+
+        const priceInput = document.getElementById('dossier-billing-price-input');
+        const paidInput = document.getElementById('dossier-billing-paid-input');
+        const passedInput = document.getElementById('dossier-billing-passed-input');
+
+        if (priceInput) priceInput.value = b.lessonPrice != null ? b.lessonPrice : 700;
+        if (paidInput) paidInput.value = b.paidLessons != null ? b.paidLessons : 0;
+        if (passedInput) passedInput.value = b.passedLessons != null ? b.passedLessons : 0;
+
+        recalcDossierBillingUI();
+        initDossierBillingEvents();
+    }
+
+    function recalcDossierBillingUI() {
+        const priceInput = document.getElementById('dossier-billing-price-input');
+        const paidInput = document.getElementById('dossier-billing-paid-input');
+        const passedInput = document.getElementById('dossier-billing-passed-input');
+
+        const passed = Math.max(0, parseInt(passedInput ? passedInput.value : 0, 10) || 0);
+        const paid = Math.max(0, parseInt(paidInput ? paidInput.value : 0, 10) || 0);
+        const price = Math.max(0, parseInt(priceInput ? priceInput.value : 700, 10) || 0);
+
+        const unpaid = Math.max(0, passed - paid);
+        const debt = unpaid * price;
+        const prepaid = Math.max(0, paid - passed);
+        const prepaidSum = prepaid * price;
+        const paidSum = paid * price;
+
+        const passedVal = document.getElementById('dossier-billing-passed-val');
+        const paidVal = document.getElementById('dossier-billing-paid-val');
+        const paidSub = document.getElementById('dossier-billing-paid-sub');
+        const unpaidVal = document.getElementById('dossier-billing-unpaid-val');
+        const unpaidSub = document.getElementById('dossier-billing-unpaid-sub');
+        const badge = document.getElementById('dossier-billing-badge');
+        const unpaidBox = document.getElementById('dossier-billing-unpaid-box');
+
+        if (passedVal) passedVal.textContent = passed;
+        if (paidVal) paidVal.textContent = paid;
+        if (paidSub) paidSub.textContent = `${paidSum.toLocaleString('ru-RU')} ₽`;
+        if (unpaidVal) unpaidVal.textContent = unpaid;
+
+        if (badge && unpaidSub) {
+            if (unpaid > 0) {
+                unpaidSub.textContent = `Долг: ${debt.toLocaleString('ru-RU')} ₽`;
+                unpaidSub.style.color = 'var(--danger)';
+                badge.className = 'dossier-billing-badge status-debt';
+                badge.innerHTML = `⚠️ Не оплачено: <strong>${unpaid} ур. (${debt.toLocaleString('ru-RU')} ₽)</strong>`;
+                if (unpaidBox) unpaidBox.style.borderColor = 'rgba(239, 68, 68, 0.45)';
+            } else if (prepaid > 0) {
+                unpaidSub.textContent = 'Оплачено полностью';
+                unpaidSub.style.color = 'var(--accent-emerald)';
+                badge.className = 'dossier-billing-badge status-prepaid';
+                badge.innerHTML = `✨ Аванс: <strong>+${prepaid} ур. (+${prepaidSum.toLocaleString('ru-RU')} ₽)</strong>`;
+                if (unpaidBox) unpaidBox.style.borderColor = 'rgba(44, 230, 214, 0.35)';
+            } else {
+                unpaidSub.textContent = 'Все уроки оплачены';
+                unpaidSub.style.color = 'var(--accent-emerald)';
+                badge.className = 'dossier-billing-badge status-ok';
+                badge.innerHTML = '✅ Все уроки оплачены';
+                if (unpaidBox) unpaidBox.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+            }
+        }
+    }
+
+    async function saveDossierBilling(showToastMsg = true) {
+        if (!currentDossierStudentId) return;
+        const priceInput = document.getElementById('dossier-billing-price-input');
+        const paidInput = document.getElementById('dossier-billing-paid-input');
+        const passedInput = document.getElementById('dossier-billing-passed-input');
+        const saveBtn = document.getElementById('dossier-billing-btn-save');
+
+        const price = Math.max(0, parseInt(priceInput ? priceInput.value : 700, 10) || 700);
+        const paid = Math.max(0, parseInt(paidInput ? paidInput.value : 0, 10) || 0);
+        const passed = Math.max(0, parseInt(passedInput ? passedInput.value : 0, 10) || 0);
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Сохранение...';
+        }
+
+        try {
+            const res = await fetch(`/api/teacher/students/${currentDossierStudentId}/billing`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lessonPrice: price,
+                    paidLessons: paid,
+                    passedLessons: passed
+                })
+            });
+            const d = await res.json();
+            if (d.success) {
+                if (showToastMsg && typeof showToast === 'function') {
+                    showToast(`✓ Данные об оплате сохранены! (Оплачено: ${paid}, Цена: ${price} ₽)`);
+                }
+                if (saveBtn) {
+                    saveBtn.textContent = '✓ Сохранено';
+                    saveBtn.classList.remove('btn-emerald');
+                    saveBtn.classList.add('btn-secondary');
+                    setTimeout(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = '💾 Сохранить';
+                        saveBtn.classList.add('btn-emerald');
+                        saveBtn.classList.remove('btn-secondary');
+                    }, 1400);
+                }
+                // Refresh schedule timeline if visible to sync payment badges
+                if (typeof loadSchedule === 'function') {
+                    loadSchedule();
+                }
+            } else {
+                alert(d.error || 'Ошибка сохранения данных об оплате');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = '💾 Сохранить';
+                }
+            }
+        } catch(err) {
+            alert('Сетевая ошибка при сохранении: ' + err.message);
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Сохранить';
+            }
+        }
+    }
+
+    function initDossierBillingEvents() {
+        if (billingEventsInitialized) return;
+        billingEventsInitialized = true;
+
+        const priceInput = document.getElementById('dossier-billing-price-input');
+        const paidInput = document.getElementById('dossier-billing-paid-input');
+        const passedInput = document.getElementById('dossier-billing-passed-input');
+
+        const paidMinus = document.getElementById('dossier-billing-paid-minus');
+        const paidPlus = document.getElementById('dossier-billing-paid-plus');
+        const passedMinus = document.getElementById('dossier-billing-passed-minus');
+        const passedPlus = document.getElementById('dossier-billing-passed-plus');
+        const allPaidBtn = document.getElementById('dossier-billing-btn-all-paid');
+        const saveBtn = document.getElementById('dossier-billing-btn-save');
+
+        if (priceInput) {
+            priceInput.addEventListener('input', recalcDossierBillingUI);
+            priceInput.addEventListener('change', () => saveDossierBilling(false));
+        }
+        if (paidInput) {
+            paidInput.addEventListener('input', recalcDossierBillingUI);
+            paidInput.addEventListener('change', () => saveDossierBilling(false));
+        }
+        if (passedInput) {
+            passedInput.addEventListener('input', recalcDossierBillingUI);
+            passedInput.addEventListener('change', () => saveDossierBilling(false));
+        }
+
+        if (paidMinus) {
+            paidMinus.addEventListener('click', () => {
+                if (paidInput) {
+                    paidInput.value = Math.max(0, (parseInt(paidInput.value, 10) || 0) - 1);
+                    recalcDossierBillingUI();
+                    saveDossierBilling(false);
+                }
+            });
+        }
+        if (paidPlus) {
+            paidPlus.addEventListener('click', () => {
+                if (paidInput) {
+                    paidInput.value = (parseInt(paidInput.value, 10) || 0) + 1;
+                    recalcDossierBillingUI();
+                    saveDossierBilling(false);
+                }
+            });
+        }
+
+        if (passedMinus) {
+            passedMinus.addEventListener('click', () => {
+                if (passedInput) {
+                    passedInput.value = Math.max(0, (parseInt(passedInput.value, 10) || 0) - 1);
+                    recalcDossierBillingUI();
+                    saveDossierBilling(false);
+                }
+            });
+        }
+        if (passedPlus) {
+            passedPlus.addEventListener('click', () => {
+                if (passedInput) {
+                    passedInput.value = (parseInt(passedInput.value, 10) || 0) + 1;
+                    recalcDossierBillingUI();
+                    saveDossierBilling(false);
+                }
+            });
+        }
+
+        if (allPaidBtn) {
+            allPaidBtn.addEventListener('click', () => {
+                const passed = parseInt(passedInput ? passedInput.value : 0, 10) || 0;
+                if (paidInput) {
+                    paidInput.value = passed;
+                    recalcDossierBillingUI();
+                    saveDossierBilling(true);
+                }
+            });
+        }
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => saveDossierBilling(true));
+        }
+    }
+
     async function openStudentDossier(studentId) {
         try {
             const res = await fetch(`/api/teacher/students/${studentId}/dossier`, { cache: 'no-store' });
@@ -1036,6 +1250,9 @@
             }
 
 
+
+            // Подготовка и отображение блока учёта занятий и оплат
+            setupDossierBilling(studentId, dossier.billing);
 
             dossierModal.showModal();
         } catch(err) {

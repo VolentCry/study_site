@@ -711,6 +711,93 @@
                 </div>
             </div>
 
+            <!-- БЛОК ОПЛАТЫ И УЧЁТА ЗАНЯТИЙ -->
+            <div class="dossier-billing-card" id="dossier-billing-card">
+                <div class="dossier-billing-header">
+                    <div class="dossier-billing-title-box">
+                        <span class="dossier-billing-icon">💳</span>
+                        <div>
+                            <h4 class="dossier-billing-title">Учёт занятий и оплата</h4>
+                            <div class="dossier-billing-subtitle">Финансовый баланс, посещаемость и расчёт стоимости</div>
+                        </div>
+                    </div>
+                    <div id="dossier-billing-badge" class="dossier-billing-badge status-ok">
+                        ✅ Все уроки оплачены
+                    </div>
+                </div>
+
+                <!-- 3 Главных показателя: Прошло, Оплачено, Не оплачено -->
+                <div class="dossier-billing-grid">
+                    <div class="kpi-box dossier-billing-kpi">
+                        <div class="kpi-val" id="dossier-billing-passed-val" style="color:var(--accent-cyan);">0</div>
+                        <div class="kpi-lbl">Уроков прошло</div>
+                        <div class="dossier-billing-kpi-sub" id="dossier-billing-passed-sub">Проведено</div>
+                    </div>
+                    <div class="kpi-box dossier-billing-kpi">
+                        <div class="kpi-val" id="dossier-billing-paid-val" style="color:var(--accent-emerald);">0</div>
+                        <div class="kpi-lbl">Оплачено уроков</div>
+                        <div class="dossier-billing-kpi-sub" id="dossier-billing-paid-sub" style="color:var(--accent-emerald);">0 ₽</div>
+                    </div>
+                    <div class="kpi-box dossier-billing-kpi" id="dossier-billing-unpaid-box">
+                        <div class="kpi-val" id="dossier-billing-unpaid-val" style="color:var(--danger);">0</div>
+                        <div class="kpi-lbl">Не оплачено</div>
+                        <div class="dossier-billing-kpi-sub" id="dossier-billing-unpaid-sub" style="color:var(--danger); font-weight:700;">Долг: 0 ₽</div>
+                    </div>
+                </div>
+
+                <!-- Панель ручного ввода: Цена (по умолч. 700) и Кол-во оплаченных уроков -->
+                <div class="dossier-billing-controls-card">
+                    <div class="dossier-billing-inputs-row">
+                        <!-- Цена за урок -->
+                        <div class="dossier-billing-field">
+                            <label for="dossier-billing-price-input" class="dossier-billing-label">
+                                Цена за урок:
+                            </label>
+                            <div class="dossier-billing-input-group">
+                                <input type="number" id="dossier-billing-price-input" min="0" step="50" value="700"
+                                       class="dossier-billing-number-input" title="Цена одного урока для ученика">
+                                <span class="dossier-billing-currency">₽</span>
+                            </div>
+                        </div>
+
+                        <!-- Оплачено уроков (ручное изменение) -->
+                        <div class="dossier-billing-field">
+                            <label for="dossier-billing-paid-input" class="dossier-billing-label">
+                                Оплачено уроков:
+                            </label>
+                            <div class="dossier-billing-stepper">
+                                <button type="button" class="btn btn-secondary btn-sm dossier-stepper-btn" id="dossier-billing-paid-minus" title="Уменьшить на 1">−</button>
+                                <input type="number" id="dossier-billing-paid-input" min="0" value="0"
+                                       class="dossier-billing-number-input dossier-stepper-input" title="Количество оплаченных уроков">
+                                <button type="button" class="btn btn-secondary btn-sm dossier-stepper-btn" id="dossier-billing-paid-plus" title="Увеличить на 1">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Прошло уроков (с возможностью скорректировать) -->
+                        <div class="dossier-billing-field">
+                            <label for="dossier-billing-passed-input" class="dossier-billing-label">
+                                Прошло уроков:
+                            </label>
+                            <div class="dossier-billing-stepper">
+                                <button type="button" class="btn btn-secondary btn-sm dossier-stepper-btn" id="dossier-billing-passed-minus" title="Уменьшить на 1">−</button>
+                                <input type="number" id="dossier-billing-passed-input" min="0" value="0"
+                                       class="dossier-billing-number-input dossier-stepper-input" title="Количество проведённых уроков">
+                                <button type="button" class="btn btn-secondary btn-sm dossier-stepper-btn" id="dossier-billing-passed-plus" title="Увеличить на 1">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dossier-billing-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" id="dossier-billing-btn-all-paid" title="Отметить все проведённые уроки как оплаченные">
+                            ✓ Все оплачены
+                        </button>
+                        <button type="button" class="btn btn-emerald btn-sm" id="dossier-billing-btn-save">
+                            💾 Сохранить
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- KPI Summary Grid -->
             <div class="dossier-kpi-grid">
                 <div class="kpi-box">

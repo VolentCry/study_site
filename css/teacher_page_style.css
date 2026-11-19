@@ -711,6 +711,185 @@ dialog.admin-modal::backdrop {
     margin-top: 0.15rem;
 }
 
+/* --- DOSSIER LESSON BILLING STYLES --- */
+.dossier-billing-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 1.15rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+[data-theme="light"] .dossier-billing-card {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.12);
+}
+.dossier-billing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.dossier-billing-title-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.dossier-billing-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+.dossier-billing-title {
+    font-family: var(--f-display);
+    font-size: 0.98rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ink);
+}
+.dossier-billing-subtitle {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 2px;
+}
+.dossier-billing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--r-pill);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.dossier-billing-badge.status-ok {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.dossier-billing-badge.status-debt {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+.dossier-billing-badge.status-prepaid {
+    background: rgba(44, 230, 214, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(44, 230, 214, 0.35);
+}
+.dossier-billing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.dossier-billing-kpi {
+    padding: 0.85rem;
+    border-radius: var(--r-sm);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--line);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+[data-theme="light"] .dossier-billing-kpi {
+    background: #ffffff;
+}
+.dossier-billing-kpi-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+}
+.dossier-billing-controls-card {
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+[data-theme="light"] .dossier-billing-controls-card {
+    background: #ffffff;
+}
+.dossier-billing-inputs-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+}
+.dossier-billing-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.dossier-billing-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--muted-bright);
+}
+.dossier-billing-input-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.dossier-billing-number-input {
+    width: 100px;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--ink);
+    font-family: var(--f-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.dossier-billing-number-input:focus {
+    border-color: var(--accent);
+}
+[data-theme="light"] .dossier-billing-number-input {
+    background: #f1f5f9;
+}
+.dossier-billing-currency {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--muted-bright);
+}
+.dossier-billing-stepper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.dossier-stepper-btn {
+    width: 32px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    user-select: none;
+}
+.dossier-stepper-input {
+    width: 65px;
+    text-align: center;
+    padding: 6px 4px;
+}
+.dossier-billing-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .empty-state {
     text-align: center;
     padding: 3.5rem 1rem;

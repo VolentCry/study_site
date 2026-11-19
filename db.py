@@ -345,6 +345,32 @@ def init_db() -> None:
                 CREATE INDEX IF NOT EXISTS idx_parent_links_student ON parent_student_links(student_id);
             ''')
 
+            # 10. Таблица учёта оплат и стоимости занятий учеников
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS student_billing (
+                    student_id INTEGER PRIMARY KEY,
+                    teacher_id INTEGER,
+                    lesson_price INTEGER NOT NULL DEFAULT 700,
+                    paid_lessons INTEGER NOT NULL DEFAULT 0,
+                    manual_passed_lessons INTEGER DEFAULT NULL,
+                    is_manual_paid INTEGER DEFAULT 0,
+                    updated_at TEXT NOT NULL,
+                    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE SET NULL
+                );
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_student_billing_teacher ON student_billing(teacher_id);
+            ''')
+
+            # Миграции для student_billing
+            cursor.execute('PRAGMA table_info(student_billing);')
+            sb_cols = [row['name'] for row in cursor.fetchall()]
+            if sb_cols and 'is_manual_paid' not in sb_cols:
+                conn.execute("ALTER TABLE student_billing ADD COLUMN is_manual_paid INTEGER DEFAULT 0;")
+            if sb_cols and 'manual_passed_lessons' not in sb_cols:
+                conn.execute("ALTER TABLE student_billing ADD COLUMN manual_passed_lessons INTEGER DEFAULT NULL;")
+
             # Auto-heal: recalculate user_xp and total_solved for records with metrics
             try:
                 cur_heal = conn.cursor()
@@ -637,6 +663,7 @@ def delete_user(user_id: int) -> bool:
             cursor.execute("DELETE FROM methodical_plans WHERE teacher_id = ? OR student_id = ?", (user_id, user_id))
             cursor.execute("DELETE FROM homeworks WHERE teacher_id = ?", (user_id,))
             cursor.execute("DELETE FROM classes WHERE teacher_id = ?", (user_id,))
+            cursor.execute("DELETE FROM student_billing WHERE student_id = ? OR teacher_id = ?", (user_id, user_id))
             cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
             return cursor.rowcount > 0
     finally:
@@ -1118,6 +1145,168 @@ def get_all_users_for_teacher(
         conn.close()
 
 
+def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = None) -> Dict[str, Any]:
+    """
+    Получает информацию об оплате и занятиях ученика:
+    - количество прошедших занятий (по расписанию или вручную скорректированное)
+    - количество оплаченных занятий (ручное значение или количество уроков со статусом is_paid)
+    - количество неоплаченных занятий и сумма долга (или сумма переплаты / аванса)
+    - цена за занятие (по умолчанию 700 руб.)
+    """
+    should_close = False
+    if conn is None:
+        conn = get_db_connection()
+        should_close = True
+
+    try:
+        cursor = conn.cursor()
+
+        # 1. Загружаем все занятия, назначенные лично ученику или его классам
+        cursor.execute(
+            """
+            SELECT l.id, l.scheduled_at, l.is_completed, l.is_paid
+            FROM lessons l
+            WHERE l.student_id = ?
+               OR (l.student_id IS NULL AND l.class_id IN (
+                   SELECT class_id FROM class_members WHERE student_id = ?
+               ))
+            ORDER BY l.scheduled_at ASC
+            """,
+            (student_id, student_id)
+        )
+        lesson_rows = cursor.fetchall()
+
+        now_iso = datetime.now().isoformat()
+        # Прошедшим считается урок, если он отмечен как проведённый (is_completed)
+        # либо если дата/время урока уже наступили
+        schedule_passed_count = sum(
+            1 for r in lesson_rows
+            if bool(r['is_completed']) or (r['scheduled_at'] and str(r['scheduled_at']) <= now_iso)
+        )
+        schedule_paid_count = sum(
+            1 for r in lesson_rows
+            if bool(r['is_paid'])
+        )
+
+        # 2. Читаем персональные настройки биллинга ученика
+        cursor.execute(
+            """
+            SELECT lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, updated_at
+            FROM student_billing
+            WHERE student_id = ?
+            """,
+            (student_id,)
+        )
+        b_row = cursor.fetchone()
+
+        if b_row:
+            lesson_price = int(b_row['lesson_price']) if b_row['lesson_price'] is not None else 700
+            is_manual_paid = bool(b_row['is_manual_paid'])
+            if is_manual_paid:
+                paid_lessons = int(b_row['paid_lessons'] or 0)
+            else:
+                paid_lessons = schedule_paid_count
+
+            manual_passed = b_row['manual_passed_lessons']
+            if manual_passed is not None:
+                passed_lessons = int(manual_passed)
+                is_manual_passed = True
+            else:
+                passed_lessons = schedule_passed_count
+                is_manual_passed = False
+            updated_at = b_row['updated_at']
+        else:
+            lesson_price = 700
+            paid_lessons = schedule_paid_count
+            passed_lessons = schedule_passed_count
+            is_manual_paid = False
+            is_manual_passed = False
+            updated_at = None
+
+        unpaid_lessons = max(0, passed_lessons - paid_lessons)
+        prepaid_lessons = max(0, paid_lessons - passed_lessons)
+        debt_amount = unpaid_lessons * lesson_price
+        prepaid_amount = prepaid_lessons * lesson_price
+
+        return {
+            'studentId': student_id,
+            'lessonPrice': lesson_price,
+            'paidLessons': paid_lessons,
+            'passedLessons': passed_lessons,
+            'unpaidLessons': unpaid_lessons,
+            'debtAmount': debt_amount,
+            'prepaidLessons': prepaid_lessons,
+            'prepaidAmount': prepaid_amount,
+            'schedulePassedCount': schedule_passed_count,
+            'schedulePaidCount': schedule_paid_count,
+            'isManualPaid': is_manual_paid,
+            'isManualPassed': is_manual_passed,
+            'updatedAt': updated_at
+        }
+    finally:
+        if should_close:
+            conn.close()
+
+
+def update_student_billing(
+    student_id: int,
+    lesson_price: int = 700,
+    paid_lessons: int = 0,
+    manual_passed_lessons: Optional[int] = None,
+    teacher_id: Optional[int] = None
+) -> Dict[str, Any]:
+    """
+    Обновляет настройки биллинга ученика:
+    - стоимость занятия (по умолчанию 700)
+    - количество оплаченных уроков
+    - при необходимости ручное количество проведённых уроков
+    Синхронизирует флаг is_paid для индивидуальных уроков ученика в расписании.
+    """
+    price = max(0, int(lesson_price)) if lesson_price is not None else 700
+    paid = max(0, int(paid_lessons)) if paid_lessons is not None else 0
+    passed = max(0, int(manual_passed_lessons)) if manual_passed_lessons is not None else None
+    now_ts = datetime.now().isoformat()
+
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO student_billing (student_id, teacher_id, lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, updated_at)
+                VALUES (?, ?, ?, ?, ?, 1, ?)
+                ON CONFLICT(student_id) DO UPDATE SET
+                    teacher_id = COALESCE(excluded.teacher_id, student_billing.teacher_id),
+                    lesson_price = excluded.lesson_price,
+                    paid_lessons = excluded.paid_lessons,
+                    manual_passed_lessons = excluded.manual_passed_lessons,
+                    is_manual_paid = 1,
+                    updated_at = excluded.updated_at
+                """,
+                (student_id, teacher_id, price, paid, passed, now_ts)
+            )
+
+            # Синхронизация флага is_paid для индивидуальных уроков ученика
+            cursor.execute(
+                """
+                SELECT id FROM lessons
+                WHERE student_id = ?
+                ORDER BY scheduled_at ASC
+                """,
+                (student_id,)
+            )
+            ind_lessons = cursor.fetchall()
+            for idx, r in enumerate(ind_lessons):
+                should_be_paid = 1 if idx < paid else 0
+                cursor.execute(
+                    "UPDATE lessons SET is_paid = ? WHERE id = ?",
+                    (should_be_paid, r['id'])
+                )
+        return get_student_billing(student_id)
+    finally:
+        conn.close()
+
+
 def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
     """
     Получает подробнейшее досье ученика:
@@ -1307,7 +1496,8 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
             },
             'classes': enrolled_classes,
             'recentTasks': sorted_tasks[:60],  # последние 60 выполненных заданий (внеурочных и домашних)
-            'trainerRecords': trainer_records
+            'trainerRecords': trainer_records,
+            'billing': get_student_billing(student_id, conn=conn)
         }
     finally:
         conn.close()
@@ -3337,16 +3527,23 @@ def get_parent_dashboard_data(parent_id: int, student_id: Optional[int] = None) 
     # 3. Методические планы ученика (без возможности редактирования)
     plans_list = get_methodical_plans(student_id=sid)
 
+    # 4. Биллинг и финансовые расчёты
+    billing_data = get_student_billing(sid)
+
     return {
         'linked': True,
         'students': linked_students,
         'student': active_student,
         'kpi': {
             'totalLessons': len(lessons_list),
-            'completedLessons': completed_count,
-            'paidLessons': paid_count,
-            'unpaidLessons': unpaid_count
+            'completedLessons': billing_data['passedLessons'],
+            'paidLessons': billing_data['paidLessons'],
+            'unpaidLessons': billing_data['unpaidLessons'],
+            'lessonPrice': billing_data['lessonPrice'],
+            'debtAmount': billing_data['debtAmount'],
+            'prepaidLessons': billing_data['prepaidLessons']
         },
+        'billing': billing_data,
         'lessons': lessons_list,
         'homeworks': homeworks_list,
         'methodicalPlans': plans_list

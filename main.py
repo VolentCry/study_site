@@ -512,6 +512,51 @@ def api_teacher_student_dossier(student_id: int):
     return jsonify({'success': True, 'dossier': dossier})
 
 
+@app.route('/api/teacher/students/<int:student_id>/billing', methods=['POST', 'PUT'])
+def api_teacher_update_student_billing(student_id: int):
+    """Обновление стоимости урока и количества оплаченных/проведённых занятий."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    data = request.get_json(silent=True) or {}
+    price_raw = data.get('lessonPrice')
+    paid_raw = data.get('paidLessons')
+    passed_raw = data.get('passedLessons')
+
+    try:
+        price = int(price_raw) if price_raw is not None else 700
+        if price < 0:
+            price = 0
+    except (ValueError, TypeError):
+        price = 700
+
+    try:
+        paid = int(paid_raw) if paid_raw is not None else 0
+        if paid < 0:
+            paid = 0
+    except (ValueError, TypeError):
+        paid = 0
+
+    passed = None
+    if passed_raw is not None:
+        try:
+            passed = int(passed_raw)
+            if passed < 0:
+                passed = 0
+        except (ValueError, TypeError):
+            passed = None
+
+    billing = db.update_student_billing(
+        student_id=student_id,
+        lesson_price=price,
+        paid_lessons=paid,
+        manual_passed_lessons=passed,
+        teacher_id=teacher['id']
+    )
+    return jsonify({'success': True, 'billing': billing})
+
+
 @app.route('/api/teacher/feed', methods=['GET'])
 def api_teacher_activity_feed():
     """Хронологическая лента выполненных заданий учеников."""
