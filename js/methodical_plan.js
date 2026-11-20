@@ -388,6 +388,83 @@
                 border-color: #10b981;
                 color: #ffffff;
             }
+            /* Mobile Responsive Styles */
+            @media (max-width: 768px) {
+                .plan-dialog {
+                    width: 96vw !important;
+                    max-width: 96vw !important;
+                    max-height: 94vh !important;
+                }
+                .plan-modal-header {
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                    gap: 12px !important;
+                    padding: 12px 14px !important;
+                }
+                .plan-modal-header > div:first-child {
+                    justify-content: space-between !important;
+                }
+                .plan-modal-header .no-print {
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                }
+                .plan-modal-header .no-print select {
+                    flex: 1 1 100% !important;
+                    max-width: 100% !important;
+                }
+                .plan-modal-body {
+                    padding: 14px 10px !important;
+                }
+                .topic-item-row {
+                    flex-wrap: wrap !important;
+                    gap: 6px 8px !important;
+                    padding: 8px 10px !important;
+                }
+                .topic-title-input {
+                    flex: 1 1 calc(100% - 34px) !important;
+                    min-width: 0 !important;
+                }
+                .topic-hours-input {
+                    width: 85px !important;
+                    text-align: left !important;
+                    font-size: 0.8rem !important;
+                }
+                .topic-part-toggle {
+                    font-size: 0.72rem !important;
+                    padding: 3px 6px !important;
+                    white-space: nowrap !important;
+                }
+                .btn-delete-topic {
+                    margin-left: auto !important;
+                }
+                .conducted-tracking-table {
+                    min-width: 480px !important;
+                }
+                .month-block-title {
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                    gap: 4px !important;
+                }
+                .month-total-banner {
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                    gap: 8px !important;
+                }
+                .month-counts-grid {
+                    grid-template-columns: repeat(3, 1fr) !important;
+                    gap: 6px !important;
+                }
+                .plan-kpi-banner {
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 8px !important;
+                }
+                .plan-meta-grid {
+                    grid-template-columns: 1fr !important;
+                }
+            }
+
             /* Print View Styles */
             @media print {
                 body * {
