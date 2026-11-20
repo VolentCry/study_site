@@ -1267,6 +1267,17 @@ def admin_page():
     abort(404)
 
 
+@app.route('/tasks.html')
+@app.route('/tasks')
+@app.route('/tasks/')
+def tasks_page():
+    """Страница каталога задач Minecraft."""
+    tasks_file = BASE_DIR / 'tasks' / 'tasks.html'
+    if tasks_file.is_file():
+        return send_from_directory(BASE_DIR / 'tasks', 'tasks.html')
+    abort(404)
+
+
 @app.route('/<path:subpath>')
 def serve_file(subpath: str):
     """
