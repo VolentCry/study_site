@@ -547,13 +547,32 @@ def api_teacher_update_student_billing(student_id: int):
         except (ValueError, TypeError):
             passed = None
 
+    payer_raw = data.get('payer', 'student')
+    payer = 'parent' if str(payer_raw).strip().lower() == 'parent' else 'student'
+
     billing = db.update_student_billing(
         student_id=student_id,
         lesson_price=price,
         paid_lessons=paid,
         manual_passed_lessons=passed,
-        teacher_id=teacher['id']
+        teacher_id=teacher['id'],
+        payer=payer
     )
+    return jsonify({'success': True, 'billing': billing})
+
+
+@app.route('/api/student/billing', methods=['GET'])
+def api_student_billing():
+    """Получение финансового баланса и параметров оплаты для авторизованного ученика."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
+
+    user = db.get_user_by_id(user_id)
+    if not user:
+        return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 404
+
+    billing = db.get_student_billing(user_id)
     return jsonify({'success': True, 'billing': billing})
 
 

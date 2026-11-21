@@ -799,6 +799,29 @@
                     </div>
                 </div>
 
+                <!-- ПАРАМЕТР: КТО ПРОИЗВОДИТ ОПЛАТУ (ТУМБЛЕР) -->
+                <div class="dossier-payer-panel" id="dossier-payer-panel">
+                    <div class="dossier-payer-info">
+                        <div class="dossier-payer-title-row">
+                            <span class="dossier-payer-icon">👤</span>
+                            <span class="dossier-payer-title">Кто производит оплату:</span>
+                        </div>
+                        <div class="dossier-payer-hint" id="dossier-payer-hint">
+                            Проверка привязки родителя...
+                        </div>
+                    </div>
+                    <div class="dossier-payer-tumbler-box">
+                        <span class="dossier-payer-label opt-student" id="dossier-payer-label-student" title="Оплачивает ребёнок (информация о балансе отображается у него в профиле)">Ребёнок</span>
+                        <label class="dossier-tumbler" id="dossier-tumbler-label" title="Кто производит оплату: Ребёнок (слева) / Родитель (справа)">
+                            <input type="checkbox" id="dossier-payer-toggle" aria-label="Кто производит оплату: Ребёнок или Родитель">
+                            <span class="dossier-tumbler-track">
+                                <span class="dossier-tumbler-thumb"></span>
+                            </span>
+                        </label>
+                        <span class="dossier-payer-label opt-parent" id="dossier-payer-label-parent" title="Оплачивает родитель">Родитель</span>
+                    </div>
+                </div>
+
                 <!-- 3 Главных показателя: Прошло, Оплачено, Не оплачено -->
                 <div class="dossier-billing-grid">
                     <div class="kpi-box dossier-billing-kpi">

@@ -354,6 +354,7 @@ def init_db() -> None:
                     paid_lessons INTEGER NOT NULL DEFAULT 0,
                     manual_passed_lessons INTEGER DEFAULT NULL,
                     is_manual_paid INTEGER DEFAULT 0,
+                    payer TEXT NOT NULL DEFAULT 'student',
                     updated_at TEXT NOT NULL,
                     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
                     FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE SET NULL
@@ -370,6 +371,8 @@ def init_db() -> None:
                 conn.execute("ALTER TABLE student_billing ADD COLUMN is_manual_paid INTEGER DEFAULT 0;")
             if sb_cols and 'manual_passed_lessons' not in sb_cols:
                 conn.execute("ALTER TABLE student_billing ADD COLUMN manual_passed_lessons INTEGER DEFAULT NULL;")
+            if sb_cols and 'payer' not in sb_cols:
+                conn.execute("ALTER TABLE student_billing ADD COLUMN payer TEXT DEFAULT 'student';")
 
             # Auto-heal: recalculate user_xp and total_solved for records with metrics
             try:
@@ -1191,13 +1194,31 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
         # 2. Читаем персональные настройки биллинга ученика
         cursor.execute(
             """
-            SELECT lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, updated_at
+            SELECT lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, payer, updated_at
             FROM student_billing
             WHERE student_id = ?
             """,
             (student_id,)
         )
         b_row = cursor.fetchone()
+
+        # 3. Проверяем, зарегистрирован ли родитель и привязан ли к данному ученику
+        cursor.execute(
+            """
+            SELECT p.id, p.username, p.display_name
+            FROM parent_student_links l
+            JOIN users p ON l.parent_id = p.id
+            WHERE l.student_id = ?
+            ORDER BY l.id ASC
+            """,
+            (student_id,)
+        )
+        parent_rows = cursor.fetchall()
+        linked_parents = [
+            {'id': pr['id'], 'username': pr['username'], 'displayName': pr['display_name']}
+            for pr in parent_rows
+        ]
+        has_parent = len(linked_parents) > 0
 
         if b_row:
             lesson_price = int(b_row['lesson_price']) if b_row['lesson_price'] is not None else 700
@@ -1214,6 +1235,8 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
             else:
                 passed_lessons = schedule_passed_count
                 is_manual_passed = False
+            raw_payer = b_row['payer'] if ('payer' in b_row.keys() and b_row['payer']) else 'student'
+            payer = raw_payer if (has_parent and raw_payer in ('student', 'parent')) else 'student'
             updated_at = b_row['updated_at']
         else:
             lesson_price = 700
@@ -1221,6 +1244,7 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
             passed_lessons = schedule_passed_count
             is_manual_paid = False
             is_manual_passed = False
+            payer = 'student'
             updated_at = None
 
         unpaid_lessons = max(0, passed_lessons - paid_lessons)
@@ -1241,6 +1265,9 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
             'schedulePaidCount': schedule_paid_count,
             'isManualPaid': is_manual_paid,
             'isManualPassed': is_manual_passed,
+            'payer': payer,
+            'hasParent': has_parent,
+            'parents': linked_parents,
             'updatedAt': updated_at
         }
     finally:
@@ -1253,13 +1280,15 @@ def update_student_billing(
     lesson_price: int = 700,
     paid_lessons: int = 0,
     manual_passed_lessons: Optional[int] = None,
-    teacher_id: Optional[int] = None
+    teacher_id: Optional[int] = None,
+    payer: str = 'student'
 ) -> Dict[str, Any]:
     """
     Обновляет настройки биллинга ученика:
     - стоимость занятия (по умолчанию 700)
     - количество оплаченных уроков
     - при необходимости ручное количество проведённых уроков
+    - кто производит оплату ('student' или 'parent')
     Синхронизирует флаг is_paid для индивидуальных уроков ученика в расписании.
     """
     price = max(0, int(lesson_price)) if lesson_price is not None else 700
@@ -1271,19 +1300,27 @@ def update_student_billing(
     try:
         with conn:
             cursor = conn.cursor()
+
+            # Проверяем, привязан ли родитель к ученику. Если родитель не зарегистрирован/не привязан,
+            # переключение на родителя недопустимо — всегда ставим 'student'.
+            cursor.execute("SELECT 1 FROM parent_student_links WHERE student_id = ? LIMIT 1", (student_id,))
+            has_parent = bool(cursor.fetchone())
+            final_payer = 'parent' if (has_parent and str(payer).lower() == 'parent') else 'student'
+
             cursor.execute(
                 """
-                INSERT INTO student_billing (student_id, teacher_id, lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, updated_at)
-                VALUES (?, ?, ?, ?, ?, 1, ?)
+                INSERT INTO student_billing (student_id, teacher_id, lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, payer, updated_at)
+                VALUES (?, ?, ?, ?, ?, 1, ?, ?)
                 ON CONFLICT(student_id) DO UPDATE SET
                     teacher_id = COALESCE(excluded.teacher_id, student_billing.teacher_id),
                     lesson_price = excluded.lesson_price,
                     paid_lessons = excluded.paid_lessons,
                     manual_passed_lessons = excluded.manual_passed_lessons,
                     is_manual_paid = 1,
+                    payer = excluded.payer,
                     updated_at = excluded.updated_at
                 """,
-                (student_id, teacher_id, price, paid, passed, now_ts)
+                (student_id, teacher_id, price, paid, passed, final_payer, now_ts)
             )
 
             # Синхронизация флага is_paid для индивидуальных уроков ученика
@@ -2841,13 +2878,18 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 'student_name': row_up['student_name'] if ('student_name' in row_up.keys() and row_up['student_name']) else ''
             }
 
+        billing_data = None
+        if role not in ('teacher', 'admin'):
+            billing_data = get_student_billing(user_id, conn=conn)
+
         return {
             'year': year,
             'month': month,
             'lessons': lessons,
             'homeworks': hw_list,
             'upcomingLesson': upcoming_lesson,
-            'role': role
+            'role': role,
+            'billing': billing_data
         }
     finally:
         conn.close()

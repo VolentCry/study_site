@@ -5887,6 +5887,173 @@ dialog::backdrop {
     }
 }
 
+/* LATEST TEACHER FEEDBACK HERO CARD */
+.teacher-feedback-hero-card {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%), var(--surface-card);
+    border: 1px solid rgba(6, 182, 212, 0.28);
+    border-radius: var(--r-lg);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+[data-theme="light"] .teacher-feedback-hero-card {
+    background: #ffffff;
+    border-color: rgba(6, 182, 212, 0.35);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+}
+.feedback-hero-accent-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--accent-cyan, #06b6d4), #818cf8);
+}
+.feedback-hero-inner {
+    padding: 1.5rem 1.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.feedback-hero-inner.feedback-hero-empty {
+    padding: 1.25rem 1.85rem;
+    gap: 0.6rem;
+}
+.feedback-hero-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.feedback-hero-tag {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-cyan, #06b6d4);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+.feedback-hero-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+.feedback-hero-hw-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--line);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+[data-theme="light"] .feedback-hero-hw-badge {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+.feedback-hero-hw-badge:hover {
+    background: rgba(6, 182, 212, 0.15);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+}
+.feedback-hero-content-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+.feedback-hero-text-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+.feedback-quote-mark {
+    font-family: Georgia, serif;
+    font-size: 2.5rem;
+    line-height: 0.9;
+    color: var(--accent-cyan, #06b6d4);
+    opacity: 0.7;
+    user-select: none;
+    flex-shrink: 0;
+}
+.feedback-hero-quote {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 600;
+    margin: 0;
+    word-break: break-word;
+}
+.feedback-hero-quote.empty-quote {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--muted);
+}
+.feedback-hero-action-box {
+    flex-shrink: 0;
+}
+.feedback-open-btn {
+    white-space: nowrap;
+    text-decoration: none;
+    font-size: 0.86rem;
+    padding: 0.6rem 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--r-sm);
+}
+.feedback-hero-footer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: var(--muted-bright);
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+[data-theme="light"] .feedback-hero-footer-row {
+    border-top-color: #f1f5f9;
+}
+.feedback-hero-meta-item strong {
+    color: var(--ink);
+}
+.feedback-hero-score-badge {
+    color: var(--accent-emerald, #10b981);
+}
+.feedback-hero-sep {
+    opacity: 0.4;
+}
+
+@media (max-width: 768px) {
+    .feedback-hero-content-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .feedback-hero-action-box {
+        width: 100%;
+    }
+    .feedback-open-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* STUDY DASHBOARD GRID */
 .study-dashboard-grid {
     display: grid;
@@ -5900,6 +6067,13 @@ dialog::backdrop {
     }
 }
 
+.study-main-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
 .study-card {
     background: var(--surface-card);
     border: 1px solid var(--line);
@@ -5910,6 +6084,125 @@ dialog::backdrop {
 [data-theme="light"] .study-card {
     background: #ffffff;
     box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+/* STUDENT BILLING CARD */
+.student-billing-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 1.25rem 1.4rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+[data-theme="light"] .student-billing-card {
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+.student-billing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 1.15rem;
+    flex-wrap: wrap;
+}
+.student-billing-title-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.student-billing-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+.student-billing-title {
+    font-family: var(--f-display);
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ink);
+}
+.student-billing-subtitle {
+    font-size: 0.77rem;
+    color: var(--muted);
+    margin-top: 2px;
+}
+.student-billing-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+}
+.student-billing-badge.status-ok {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald, #10b981);
+    border-color: rgba(16, 185, 129, 0.35);
+}
+.student-billing-badge.status-debt {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger, #ef4444);
+    border-color: rgba(239, 68, 68, 0.35);
+}
+.student-billing-badge.status-prepaid {
+    background: rgba(44, 230, 214, 0.15);
+    color: var(--accent-cyan, #06b6d4);
+    border-color: rgba(44, 230, 214, 0.35);
+}
+
+.student-billing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+@media (max-width: 768px) {
+    .student-billing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 420px) {
+    .student-billing-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.student-billing-kpi {
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 10px 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+[data-theme="light"] .student-billing-kpi {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+.student-billing-kpi-val {
+    font-family: var(--f-mono);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 4px;
+}
+.student-billing-kpi-lbl {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--muted-bright, #94a3b8);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 2px;
+}
+.student-billing-kpi-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
 }
 
 /* CALENDAR STYLES */

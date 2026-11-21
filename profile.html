@@ -291,40 +291,88 @@
                 </div>
             </div>
 
+            <!-- ПОСЛЕДНИЙ КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ ИЗ Д/З -->
+            <div class="teacher-feedback-hero-card" id="latest-teacher-feedback-card" style="display: none;">
+                <!-- Контент динамически загружается в all_profile_logic.js -->
+            </div>
+
             <!-- СЕТКА: КАЛЕНДАРЬ МЕСЯЦА + СОБЫТИЯ И Д/З -->
             <div class="study-dashboard-grid">
-                <!-- КАЛЕНДАРЬ ТЕКУЩЕГО МЕСЯЦА -->
-                <div class="study-card calendar-card">
-                    <div class="calendar-header">
-                        <div class="cal-nav-group">
-                            <button type="button" class="cal-nav-btn" id="cal-prev-btn" aria-label="Предыдущий месяц">‹</button>
-                            <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
-                            <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
+                <!-- ЛЕВАЯ КОЛОНКА: КАЛЕНДАРЬ И БИЛЛИНГ УЧЕНИКА -->
+                <div class="study-main-col">
+                    <!-- КАЛЕНДАРЬ ТЕКУЩЕГО МЕСЯЦА -->
+                    <div class="study-card calendar-card">
+                        <div class="calendar-header">
+                            <div class="cal-nav-group">
+                                <button type="button" class="cal-nav-btn" id="cal-prev-btn" aria-label="Предыдущий месяц">‹</button>
+                                <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
+                                <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm cal-plan-btn" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
+                            <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
                         </div>
-                        <button type="button" class="btn btn-secondary btn-sm cal-plan-btn" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
-                        <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
+
+                        <div class="calendar-weekdays">
+                            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                        </div>
+
+                        <div class="calendar-grid" id="calendar-days-grid">
+                            <!-- Динамическая сетка дней -->
+                        </div>
+
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot dot-lesson"></span>
+                                <span>Урок</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot dot-hw"></span>
+                                <span>Дедлайн Д/З</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot dot-today"></span>
+                                <span>Сегодня</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="calendar-weekdays">
-                        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-                    </div>
-
-                    <div class="calendar-grid" id="calendar-days-grid">
-                        <!-- Динамическая сетка дней -->
-                    </div>
-
-                    <div class="calendar-legend">
-                        <div class="legend-item">
-                            <span class="legend-dot dot-lesson"></span>
-                            <span>Урок</span>
+                    <!-- КАРТОЧКА ОПЛАТЫ И ЗАНЯТИЙ (ОТОБРАЖАЕТСЯ, ЕСЛИ ПЛАТЕЛЬЩИК - РЕБЁНОК) -->
+                    <div class="study-card student-billing-card" id="student-billing-card" style="display:none;">
+                        <div class="student-billing-header">
+                            <div class="student-billing-title-box">
+                                <span class="student-billing-icon">💳</span>
+                                <div>
+                                    <h4 class="student-billing-title">Учёт занятий и оплата</h4>
+                                    <div class="student-billing-subtitle">Финансовый баланс и посещаемость</div>
+                                </div>
+                            </div>
+                            <div id="student-billing-status-badge" class="student-billing-badge status-ok">
+                                ✅ Все уроки оплачены
+                            </div>
                         </div>
-                        <div class="legend-item">
-                            <span class="legend-dot dot-hw"></span>
-                            <span>Дедлайн Д/З</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot dot-today"></span>
-                            <span>Сегодня</span>
+
+                        <!-- 4 Главных показателя: Прошло, Оплачено, Цена одного занятия, Общая задолженность -->
+                        <div class="student-billing-grid">
+                            <div class="student-billing-kpi">
+                                <div class="student-billing-kpi-val" id="student-billing-passed-val" style="color:var(--accent-cyan);">0</div>
+                                <div class="student-billing-kpi-lbl">Занятий прошло</div>
+                                <div class="student-billing-kpi-sub">Проведено</div>
+                            </div>
+                            <div class="student-billing-kpi">
+                                <div class="student-billing-kpi-val" id="student-billing-paid-val" style="color:var(--accent-emerald);">0</div>
+                                <div class="student-billing-kpi-lbl">Оплачено занятий</div>
+                                <div class="student-billing-kpi-sub" id="student-billing-paid-sub" style="color:var(--accent-emerald);">0 ₽</div>
+                            </div>
+                            <div class="student-billing-kpi">
+                                <div class="student-billing-kpi-val" id="student-billing-price-val" style="color:var(--accent-gold, #f59e0b);">700 ₽</div>
+                                <div class="student-billing-kpi-lbl">Цена занятия</div>
+                                <div class="student-billing-kpi-sub">Стоимость 1 урока</div>
+                            </div>
+                            <div class="student-billing-kpi" id="student-billing-debt-kpi">
+                                <div class="student-billing-kpi-val" id="student-billing-debt-val" style="color:var(--danger, #ef4444);">0 ₽</div>
+                                <div class="student-billing-kpi-lbl">Общая задолженность</div>
+                                <div class="student-billing-kpi-sub" id="student-billing-debt-sub" style="color:var(--danger, #ef4444); font-weight:700;">К оплате: 0 ₽</div>
+                            </div>
                         </div>
                     </div>
                 </div>

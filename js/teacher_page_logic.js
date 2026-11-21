@@ -949,22 +949,76 @@
     window.openStudentDossier = openStudentDossier;
 
     let currentDossierStudentId = null;
+    let currentDossierHasParent = false;
+    let currentDossierParents = [];
     let billingEventsInitialized = false;
 
     function setupDossierBilling(studentId, billing) {
         currentDossierStudentId = studentId;
         const b = billing || {};
+        currentDossierHasParent = Boolean(b.hasParent);
+        currentDossierParents = Array.isArray(b.parents) ? b.parents : [];
 
         const priceInput = document.getElementById('dossier-billing-price-input');
         const paidInput = document.getElementById('dossier-billing-paid-input');
         const passedInput = document.getElementById('dossier-billing-passed-input');
+        const payerToggle = document.getElementById('dossier-payer-toggle');
+        const tumblerLabel = document.getElementById('dossier-tumbler-label');
+        const optStudent = document.getElementById('dossier-payer-label-student');
+        const optParent = document.getElementById('dossier-payer-label-parent');
 
         if (priceInput) priceInput.value = b.lessonPrice != null ? b.lessonPrice : 700;
         if (paidInput) paidInput.value = b.paidLessons != null ? b.paidLessons : 0;
         if (passedInput) passedInput.value = b.passedLessons != null ? b.passedLessons : 0;
 
+        const currentPayer = (currentDossierHasParent && b.payer === 'parent') ? 'parent' : 'student';
+
+        if (payerToggle) {
+            payerToggle.disabled = !currentDossierHasParent;
+            payerToggle.checked = (currentPayer === 'parent');
+        }
+
+        if (tumblerLabel) {
+            if (currentDossierHasParent) {
+                tumblerLabel.classList.remove('disabled');
+                tumblerLabel.title = "Кто производит оплату: Ребёнок (слева) / Родитель (справа)";
+            } else {
+                tumblerLabel.classList.add('disabled');
+                tumblerLabel.title = "Родитель не зарегистрирован. Оплата закреплена за ребёнком.";
+            }
+        }
+
+        if (optParent) {
+            optParent.classList.toggle('disabled', !currentDossierHasParent);
+        }
+
+        updateDossierPayerUI(currentPayer, currentDossierHasParent, currentDossierParents);
         recalcDossierBillingUI();
         initDossierBillingEvents();
+    }
+
+    function updateDossierPayerUI(payer, hasParent, parents) {
+        const optStudent = document.getElementById('dossier-payer-label-student');
+        const optParent = document.getElementById('dossier-payer-label-parent');
+        const hint = document.getElementById('dossier-payer-hint');
+
+        if (optStudent) {
+            optStudent.classList.toggle('active', payer === 'student');
+        }
+        if (optParent) {
+            optParent.classList.toggle('active', payer === 'parent');
+        }
+
+        if (hint) {
+            if (!hasParent) {
+                hint.innerHTML = '<span class="payer-hint-warn">🔒 Родитель не зарегистрирован (прикрепление по коду отсутствует). Оплата закреплена за ребёнком.</span>';
+            } else {
+                const names = Array.isArray(parents) && parents.length > 0
+                    ? parents.map(p => p.displayName || p.username).join(', ')
+                    : 'Зарегистрирован';
+                hint.innerHTML = `<span class="payer-hint-success">✓ Прикреплён родитель: <strong>${escapeHtml(names)}</strong></span>`;
+            }
+        }
     }
 
     function recalcDossierBillingUI() {
@@ -1028,6 +1082,8 @@
         const price = Math.max(0, parseInt(priceInput ? priceInput.value : 700, 10) || 700);
         const paid = Math.max(0, parseInt(paidInput ? paidInput.value : 0, 10) || 0);
         const passed = Math.max(0, parseInt(passedInput ? passedInput.value : 0, 10) || 0);
+        const payerToggle = document.getElementById('dossier-payer-toggle');
+        const payer = (payerToggle && payerToggle.checked && !payerToggle.disabled) ? 'parent' : 'student';
 
         if (saveBtn) {
             saveBtn.disabled = true;
@@ -1041,13 +1097,15 @@
                 body: JSON.stringify({
                     lessonPrice: price,
                     paidLessons: paid,
-                    passedLessons: passed
+                    passedLessons: passed,
+                    payer: payer
                 })
             });
             const d = await res.json();
             if (d.success) {
                 if (showToastMsg && typeof showToast === 'function') {
-                    showToast(`✓ Данные об оплате сохранены! (Оплачено: ${paid}, Цена: ${price} ₽)`);
+                    const payerText = payer === 'parent' ? 'Родитель' : 'Ребёнок';
+                    showToast(`✓ Данные об оплате сохранены! (Плательщик: ${payerText}, Оплачено: ${paid}, Цена: ${price} ₽)`);
                 }
                 if (saveBtn) {
                     saveBtn.textContent = '✓ Сохранено';
@@ -1087,6 +1145,36 @@
         const priceInput = document.getElementById('dossier-billing-price-input');
         const paidInput = document.getElementById('dossier-billing-paid-input');
         const passedInput = document.getElementById('dossier-billing-passed-input');
+        const payerToggle = document.getElementById('dossier-payer-toggle');
+        const optStudent = document.getElementById('dossier-payer-label-student');
+        const optParent = document.getElementById('dossier-payer-label-parent');
+
+        if (payerToggle) {
+            payerToggle.addEventListener('change', () => {
+                if (payerToggle.disabled) return;
+                const payer = payerToggle.checked ? 'parent' : 'student';
+                updateDossierPayerUI(payer, currentDossierHasParent, currentDossierParents);
+                saveDossierBilling(false);
+            });
+        }
+
+        if (optStudent) {
+            optStudent.addEventListener('click', () => {
+                if (payerToggle && !payerToggle.disabled && payerToggle.checked) {
+                    payerToggle.checked = false;
+                    payerToggle.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        if (optParent) {
+            optParent.addEventListener('click', () => {
+                if (payerToggle && !payerToggle.disabled && !payerToggle.checked) {
+                    payerToggle.checked = true;
+                    payerToggle.dispatchEvent(new Event('change'));
+                }
+            });
+        }
 
         const paidMinus = document.getElementById('dossier-billing-paid-minus');
         const paidPlus = document.getElementById('dossier-billing-paid-plus');

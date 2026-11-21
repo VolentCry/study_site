@@ -615,7 +615,9 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedDateStr = toDateKey(new Date());
         }
         const isTeacher = isTeacherUser();
+        const fbCard = document.getElementById('latest-teacher-feedback-card');
         if (isTeacher) {
+            if (fbCard) fbCard.style.display = 'none';
             await fetchMonthSchedule();
             if (studentHomeworksList) {
                 const hwCard = studentHomeworksList.closest('.study-card');
@@ -637,7 +639,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } else {
-            await Promise.all([fetchMonthSchedule(), fetchStudentHomeworks()]);
+            if (studentHomeworksData) {
+                renderLatestTeacherFeedback(studentHomeworksData);
+            }
+            await Promise.all([fetchMonthSchedule(), fetchStudentHomeworks(), fetchStudentBilling()]);
         }
     }
 
@@ -658,9 +663,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCalendar();
                 renderUpcomingHero();
                 renderDayDetails(selectedDateStr || toDateKey(new Date()));
+                if (data.schedule.billing) {
+                    renderStudentBilling(data.schedule.billing);
+                }
             }
         } catch(e) {
             console.error('Error fetching month schedule', e);
+        }
+    }
+
+    async function fetchStudentBilling() {
+        try {
+            const res = await fetch('/api/student/billing', { cache: 'no-store' });
+            const data = await res.json();
+            if (data.success && data.billing) {
+                renderStudentBilling(data.billing);
+            }
+        } catch(e) {
+            console.error('Error fetching student billing', e);
+        }
+    }
+
+    function renderStudentBilling(billing) {
+        const card = document.getElementById('student-billing-card');
+        if (!card) return;
+
+        // Если в качестве оплаты выбран Ребёнок, то у него в профиле в разделе "Учёба и расписание"
+        // под карточкой с календарём будет отображено сколько занятий прошло, сколько оплачено,
+        // цена одного занятия и общая задолженность.
+        // Если выбран Родитель (или нет данных), карточка скрывается.
+        if (!billing || billing.payer !== 'student') {
+            card.style.display = 'none';
+            return;
+        }
+
+        card.style.display = 'block';
+
+        const passedVal = document.getElementById('student-billing-passed-val');
+        const paidVal = document.getElementById('student-billing-paid-val');
+        const paidSub = document.getElementById('student-billing-paid-sub');
+        const priceVal = document.getElementById('student-billing-price-val');
+        const debtVal = document.getElementById('student-billing-debt-val');
+        const debtSub = document.getElementById('student-billing-debt-sub');
+        const badge = document.getElementById('student-billing-status-badge');
+        const debtKpi = document.getElementById('student-billing-debt-kpi');
+
+        const passed = Math.max(0, parseInt(billing.passedLessons, 10) || 0);
+        const paid = Math.max(0, parseInt(billing.paidLessons, 10) || 0);
+        const price = Math.max(0, parseInt(billing.lessonPrice, 10) || 700);
+        const debt = Math.max(0, parseInt(billing.debtAmount, 10) || 0);
+        const unpaid = Math.max(0, parseInt(billing.unpaidLessons, 10) || 0);
+        const prepaid = Math.max(0, parseInt(billing.prepaidLessons, 10) || 0);
+        const prepaidSum = Math.max(0, parseInt(billing.prepaidAmount, 10) || 0);
+
+        if (passedVal) passedVal.textContent = passed;
+        if (paidVal) paidVal.textContent = paid;
+        if (paidSub) paidSub.textContent = `${(paid * price).toLocaleString('ru-RU')} ₽`;
+        if (priceVal) priceVal.textContent = `${price.toLocaleString('ru-RU')} ₽`;
+        if (debtVal) debtVal.textContent = `${debt.toLocaleString('ru-RU')} ₽`;
+
+        if (badge && debtSub) {
+            if (debt > 0) {
+                debtVal.style.color = 'var(--danger, #ef4444)';
+                debtSub.textContent = `Долг: ${debt.toLocaleString('ru-RU')} ₽ (${unpaid} ур.)`;
+                debtSub.style.color = 'var(--danger, #ef4444)';
+                badge.className = 'student-billing-badge status-debt';
+                badge.innerHTML = `⚠️ Задолженность: <strong>${debt.toLocaleString('ru-RU')} ₽</strong>`;
+                if (debtKpi) debtKpi.style.borderColor = 'rgba(239, 68, 68, 0.45)';
+            } else if (prepaid > 0) {
+                debtVal.style.color = 'var(--accent-emerald, #10b981)';
+                debtSub.textContent = `Аванс: +${prepaidSum.toLocaleString('ru-RU')} ₽ (+${prepaid} ур.)`;
+                debtSub.style.color = 'var(--accent-emerald, #10b981)';
+                badge.className = 'student-billing-badge status-prepaid';
+                badge.innerHTML = `✨ Оплачено наперёд (+${prepaid} ур.)`;
+                if (debtKpi) debtKpi.style.borderColor = 'rgba(6, 182, 212, 0.35)';
+            } else {
+                debtVal.style.color = 'var(--accent-emerald, #10b981)';
+                debtSub.textContent = 'Оплачено полностью';
+                debtSub.style.color = 'var(--accent-emerald, #10b981)';
+                badge.className = 'student-billing-badge status-ok';
+                badge.innerHTML = '✅ Все уроки оплачены';
+                if (debtKpi) debtKpi.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+            }
         }
     }
 
@@ -671,10 +755,114 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success && data.homeworks) {
                 studentHomeworksData = data.homeworks;
                 renderStudentHomeworks();
+                renderLatestTeacherFeedback(studentHomeworksData);
             }
         } catch(e) {
             console.error('Error fetching student homeworks', e);
         }
+    }
+
+    function renderLatestTeacherFeedback(homeworks) {
+        const card = document.getElementById('latest-teacher-feedback-card');
+        if (!card) return;
+
+        if (isTeacherUser() || isParentUser()) {
+            card.style.display = 'none';
+            return;
+        }
+
+        const hws = Array.isArray(homeworks) ? homeworks : [];
+        const commentedHws = hws.filter(h => {
+            const sub = h.submission || {};
+            const fb = (sub.teacherFeedback || sub.teacher_feedback || '').trim();
+            if (!fb) return false;
+            if (sub.status === 'waived' && fb.includes('Официально освобождён')) return false;
+            return true;
+        });
+
+        if (commentedHws.length === 0) {
+            card.style.display = 'block';
+            card.innerHTML = `
+                <div class="feedback-hero-accent-strip"></div>
+                <div class="feedback-hero-inner feedback-hero-empty">
+                    <div class="feedback-hero-top-row">
+                        <div class="feedback-hero-tag">
+                            <span class="feedback-hero-icon">💬</span>
+                            <span>Последний комментарий преподавателя</span>
+                        </div>
+                    </div>
+                    <div class="feedback-hero-content-row">
+                        <div class="feedback-hero-text-wrap">
+                            <p class="feedback-hero-quote empty-quote">
+                                Преподаватель ещё не оставил комментариев к проверенным домашним заданиям. Выполняйте задания, чтобы получать разборы и отзывы учителя!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Сортируем по дате проверки / отправки / создания в порядке убывания (самый свежий первый)
+        commentedHws.sort((a, b) => {
+            const timeA = new Date(a.submission?.checkedAt || a.submission?.submittedAt || a.createdAt || 0).getTime();
+            const timeB = new Date(b.submission?.checkedAt || b.submission?.submittedAt || b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
+
+        const latestHw = commentedHws[0];
+        const sub = latestHw.submission || {};
+        const feedback = (sub.teacherFeedback || sub.teacher_feedback || '').trim();
+        const dateStr = sub.checkedAt ? formatDateTimeStr(sub.checkedAt) : (sub.submittedAt ? formatDateTimeStr(sub.submittedAt) : '');
+        const scoreStr = (sub.maxScore > 0) ? `${sub.score} / ${sub.maxScore} баллов` : '';
+
+        card.style.display = 'block';
+        card.innerHTML = `
+            <div class="feedback-hero-accent-strip"></div>
+            <div class="feedback-hero-inner">
+                <div class="feedback-hero-top-row">
+                    <div class="feedback-hero-tag">
+                        <span class="feedback-hero-icon">💬</span>
+                        <span>Последний комментарий преподавателя</span>
+                    </div>
+                    <a href="homework.html?id=${latestHw.id}" class="feedback-hero-hw-badge" title="Перейти к домашнему заданию">
+                        📝 Д/З: ${escapeHtml(latestHw.title || 'Домашнее задание')} ↗
+                    </a>
+                </div>
+
+                <div class="feedback-hero-content-row">
+                    <div class="feedback-hero-text-wrap">
+                        <div class="feedback-quote-mark" aria-hidden="true">“</div>
+                        <p class="feedback-hero-quote">
+                            ${escapeHtml(feedback)}
+                        </p>
+                    </div>
+                    <div class="feedback-hero-action-box">
+                        <a href="homework.html?id=${latestHw.id}" class="hw-action-btn hw-btn-primary feedback-open-btn">
+                            Разбор и оценка ↗
+                        </a>
+                    </div>
+                </div>
+
+                <div class="feedback-hero-footer-row">
+                    <span class="feedback-hero-meta-item">
+                        <strong>Преподаватель:</strong> ${escapeHtml(latestHw.teacherName || 'Учитель')}
+                    </span>
+                    ${scoreStr ? `
+                        <span class="feedback-hero-sep">·</span>
+                        <span class="feedback-hero-meta-item feedback-hero-score-badge">
+                            ✓ Результат: <strong>${scoreStr}</strong>
+                        </span>
+                    ` : ''}
+                    ${dateStr ? `
+                        <span class="feedback-hero-sep">·</span>
+                        <span class="feedback-hero-meta-item feedback-hero-date">
+                            🕒 Проверено: ${dateStr}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+        `;
     }
 
     function renderCalendar() {
