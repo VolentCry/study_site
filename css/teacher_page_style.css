@@ -676,12 +676,129 @@ dialog.admin-modal::backdrop {
 .dossier-hud-card {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 1.25rem;
     padding: 1.25rem;
     border-radius: var(--r);
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--line);
     margin-bottom: 1.5rem;
+}
+[data-theme="light"] .dossier-hud-card {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.1);
+}
+.dossier-hud-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+#dossier-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+.dossier-hud-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.dossier-name {
+    font-family: var(--f-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    word-break: break-word;
+    color: var(--ink);
+}
+.dossier-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    word-break: break-word;
+}
+.dossier-hud-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.dossier-section-block {
+    margin-bottom: 1.5rem;
+}
+.dossier-section-heading {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-bright);
+}
+.dossier-subjects-bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.dossier-subject-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.dossier-subject-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+}
+.dossier-subject-pct {
+    color: var(--accent-emerald);
+}
+.dossier-subject-track {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+}
+[data-theme="light"] .dossier-subject-track {
+    background: rgba(15, 23, 42, 0.08);
+}
+.dossier-subject-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #2ce6d6);
+    border-radius: 3px;
+}
+.dossier-table-responsive {
+    max-height: 280px;
+    overflow-y: auto;
+}
+.dossier-task-time {
+    font-size: 0.8rem;
+    font-family: var(--f-mono);
+    color: var(--muted);
+    white-space: nowrap;
+}
+.dossier-task-badge-hw {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent, #6366f1);
+    margin-bottom: 2px;
+}
+.dossier-task-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+.dossier-task-link:hover {
+    text-decoration: underline;
+}
+.dossier-task-action {
+    text-align: right;
+    white-space: nowrap;
 }
 .dossier-kpi-grid {
     display: grid;
@@ -1782,11 +1899,19 @@ sup sup {
         padding: 10px 12px;
         font-size: 0.82rem;
     }
+    dialog.admin-modal {
+        width: calc(100% - 16px) !important;
+        max-width: calc(100% - 16px) !important;
+        margin: auto !important;
+        max-height: 94vh !important;
+        border-radius: var(--r-md) !important;
+    }
     .admin-modal .modal-body {
-        width: 95vw !important;
-        max-width: 95vw !important;
+        width: 100% !important;
+        max-width: 100% !important;
         padding: 16px 14px !important;
-        margin: 12px auto !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
     .generator-row {
         flex-direction: column;
@@ -1794,6 +1919,206 @@ sup sup {
     }
     .generator-row .btn {
         width: 100%;
+    }
+
+    /* --- MOBILE STYLES FOR STUDENT DOSSIER MODAL (<= 768px) --- */
+    #student-dossier-modal {
+        width: calc(100% - 16px) !important;
+        max-width: calc(100% - 16px) !important;
+    }
+    #student-dossier-modal .modal-body {
+        padding: 16px 12px !important;
+    }
+    #student-dossier-modal .modal-header {
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.85rem;
+    }
+    #student-dossier-modal .modal-title {
+        font-size: 1.15rem;
+    }
+    .dossier-hud-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+        margin-bottom: 1rem;
+    }
+    .dossier-hud-user {
+        gap: 12px;
+        width: 100%;
+    }
+    #dossier-avatar {
+        width: 46px;
+        height: 46px;
+        font-size: 1.25rem;
+    }
+    .dossier-name {
+        font-size: 1.15rem;
+    }
+    .dossier-sub {
+        font-size: 0.8rem;
+    }
+    .dossier-hud-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+        justify-content: stretch;
+        margin-left: 0;
+    }
+    .dossier-hud-actions .btn {
+        flex: 1 1 calc(50% - 4px);
+        justify-content: center;
+        text-align: center;
+        padding: 8px 6px;
+        font-size: 0.82rem;
+        min-height: 38px;
+    }
+    .dossier-billing-card {
+        padding: 12px;
+        margin-bottom: 1rem;
+    }
+    .dossier-billing-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 0.75rem;
+    }
+    .dossier-billing-title-box {
+        gap: 8px;
+    }
+    .dossier-billing-icon {
+        font-size: 1.25rem;
+    }
+    .dossier-billing-title {
+        font-size: 0.92rem;
+    }
+    .dossier-billing-subtitle {
+        font-size: 0.74rem;
+    }
+    .dossier-billing-badge {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    .dossier-billing-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 0.75rem;
+    }
+    .dossier-billing-kpi {
+        padding: 8px 4px;
+    }
+    .dossier-billing-kpi .kpi-val {
+        font-size: 1.15rem;
+    }
+    .dossier-billing-kpi .kpi-lbl {
+        font-size: 0.68rem;
+        margin-top: 2px;
+        line-height: 1.2;
+    }
+    .dossier-billing-kpi-sub {
+        font-size: 0.68rem;
+        margin-top: 2px;
+    }
+    .dossier-billing-controls-card {
+        padding: 10px 12px;
+        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .dossier-billing-inputs-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    .dossier-billing-field {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed var(--line);
+    }
+    .dossier-billing-field:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .dossier-billing-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .dossier-billing-number-input {
+        width: 80px;
+        height: 36px;
+        padding: 4px 8px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+    .dossier-stepper-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.15rem;
+    }
+    .dossier-stepper-input {
+        width: 52px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+    .dossier-billing-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+        margin-top: 2px;
+    }
+    .dossier-billing-actions .btn {
+        flex: 1 1 calc(50% - 4px);
+        justify-content: center;
+        text-align: center;
+        padding: 8px 10px;
+        min-height: 38px;
+        font-size: 0.82rem;
+    }
+    .dossier-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 1rem;
+    }
+    .dossier-kpi-grid .kpi-box {
+        padding: 8px;
+    }
+    .dossier-kpi-grid .kpi-val {
+        font-size: 1.15rem;
+    }
+    .dossier-kpi-grid .kpi-lbl {
+        font-size: 0.72rem;
+    }
+    .dossier-section-block {
+        margin-bottom: 1.15rem;
+    }
+    .dossier-section-heading {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+    }
+    .dossier-table-responsive {
+        max-height: 240px;
+        border-radius: var(--r-sm);
+        -webkit-overflow-scrolling: touch;
+    }
+    .dossier-table-responsive table.data-table th,
+    .dossier-table-responsive table.data-table td {
+        padding: 8px 6px;
+        font-size: 0.78rem;
+    }
+    .dossier-table-responsive table.data-table th {
+        font-size: 0.7rem;
+        padding: 8px 6px;
     }
 }
 
@@ -1814,5 +2139,55 @@ sup sup {
         min-width: 120px;
         font-size: 0.8rem;
         padding: 0 8px;
+    }
+    #student-dossier-modal .modal-body {
+        padding: 12px 10px !important;
+    }
+    #dossier-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    .dossier-name {
+        font-size: 1.05rem;
+    }
+    .dossier-sub {
+        font-size: 0.74rem;
+    }
+    .dossier-hud-actions .btn {
+        font-size: 0.76rem;
+        padding: 6px 4px;
+    }
+    .dossier-billing-kpi .kpi-val {
+        font-size: 1.05rem;
+    }
+    .dossier-billing-kpi .kpi-lbl {
+        font-size: 0.65rem;
+    }
+    .dossier-billing-kpi-sub {
+        font-size: 0.64rem;
+    }
+    .dossier-billing-actions .btn {
+        font-size: 0.78rem;
+        padding: 6px 8px;
+    }
+    .dossier-kpi-grid .kpi-val {
+        font-size: 1.05rem;
+    }
+    .dossier-kpi-grid .kpi-lbl {
+        font-size: 0.68rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .dossier-billing-field {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    .dossier-billing-input-group,
+    .dossier-billing-stepper {
+        width: 100%;
+        justify-content: flex-start;
     }
 }

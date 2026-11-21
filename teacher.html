@@ -696,12 +696,14 @@
 
             <!-- Identity HUD -->
             <div class="dossier-hud-card" id="dossier-hud">
-                <div class="avatar-circle" id="dossier-avatar" style="width:52px; height:52px; font-size:1.4rem; flex-shrink:0;">У</div>
-                <div style="display:flex; flex-direction:column; gap:4px; min-width:0;">
-                    <div style="font-family:var(--f-display); font-size:1.25rem; font-weight:800; word-break:break-word;" id="dossier-name">Имя Ученика</div>
-                    <div style="font-size:0.85rem; color:var(--muted); word-break:break-word;" id="dossier-sub">@username · ID: #0</div>
+                <div class="dossier-hud-user">
+                    <div class="avatar-circle" id="dossier-avatar">У</div>
+                    <div class="dossier-hud-info">
+                        <div class="dossier-name" id="dossier-name">Имя Ученика</div>
+                        <div class="dossier-sub" id="dossier-sub">@username · ID: #0</div>
+                    </div>
                 </div>
-                <div class="dossier-hud-actions" style="margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                <div class="dossier-hud-actions">
                     <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-plan" title="Открыть методический план этого ученика">
                         📋 Методический план
                     </button>
@@ -819,17 +821,17 @@
             </div>
 
             <!-- Subject Breakdown -->
-            <div style="margin-bottom:1.5rem;">
-                <h4 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; text-transform:uppercase;">Успеваемость по предметам</h4>
-                <div id="dossier-subjects-bars" style="display:flex; flex-direction:column; gap:8px;">
+            <div class="dossier-section-block">
+                <h4 class="dossier-section-heading">Успеваемость по предметам</h4>
+                <div id="dossier-subjects-bars" class="dossier-subjects-bars-container">
                     <!-- Полосы успеваемости по предметам -->
                 </div>
             </div>
 
             <!-- Task Log (Какие задания решает ученик) -->
-            <div>
-                <h4 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; text-transform:uppercase;">Журнал выполненных заданий</h4>
-                <div class="table-responsive" style="max-height:280px; overflow-y:auto;">
+            <div class="dossier-section-block">
+                <h4 class="dossier-section-heading">Журнал выполненных заданий</h4>
+                <div class="table-responsive dossier-table-responsive">
                     <table class="data-table">
                         <thead>
                             <tr>

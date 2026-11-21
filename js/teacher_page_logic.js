@@ -1207,13 +1207,13 @@
             const barsCont = document.getElementById('dossier-subjects-bars');
             if (stats.subjectBreakdown && stats.subjectBreakdown.length) {
                 barsCont.innerHTML = stats.subjectBreakdown.map(sb => `
-                    <div>
-                        <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:3px;">
-                            <span>${escapeHtml(sb.subject)}: <strong>${sb.correct}/${sb.total} верно</strong></span>
-                            <strong style="color:var(--accent-emerald);">${sb.percent}%</strong>
+                    <div class="dossier-subject-row">
+                        <div class="dossier-subject-meta">
+                            <span class="dossier-subject-name">${escapeHtml(sb.subject)}: <strong>${sb.correct}/${sb.total} верно</strong></span>
+                            <strong class="dossier-subject-pct">${sb.percent}%</strong>
                         </div>
-                        <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                            <div style="height:100%; width:${sb.percent}%; background:linear-gradient(90deg, #10b981, #2ce6d6);"></div>
+                        <div class="dossier-subject-track">
+                            <div class="dossier-subject-fill" style="width:${sb.percent}%;"></div>
                         </div>
                     </div>
                 `).join('');
@@ -1231,17 +1231,17 @@
                         : '<span class="badge badge-wrong">❌ Ошибка</span>';
                     const isHw = t.source === 'homework';
                     const typeBadge = isHw
-                        ? '<span style="display:inline-block; font-size:0.7rem; font-weight:700; padding:1px 6px; border-radius:4px; background:rgba(99,102,241,0.15); color:var(--accent, #6366f1); margin-bottom:2px;">📚 Домашняя работа</span><br>'
+                        ? '<span class="dossier-task-badge-hw">📚 Домашняя работа</span>'
                         : '';
                     const linkText = isHw ? 'К Д/З ↗' : 'Открыть ↗';
-                    const link = t.taskId ? `<a href="${escapeHtml(t.taskId)}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">${linkText}</a>` : '—';
+                    const link = t.taskId ? `<a href="${escapeHtml(t.taskId)}" target="_blank" class="dossier-task-link">${linkText}</a>` : '—';
                     return `
                         <tr>
-                            <td style="font-size:0.8rem; font-family:var(--f-mono); color:var(--muted);">${formatDateTime(t.timestamp)}</td>
-                            <td>${escapeHtml(t.subject || '—')}</td>
-                            <td>${typeBadge}<strong>${escapeHtml(t.skill || t.taskId || 'Задание')}</strong></td>
-                            <td>${badge}</td>
-                            <td style="text-align: right;">${link}</td>
+                            <td class="dossier-task-time">${formatDateTime(t.timestamp)}</td>
+                            <td class="dossier-task-subject">${escapeHtml(t.subject || '—')}</td>
+                            <td class="dossier-task-skill">${typeBadge}<strong>${escapeHtml(t.skill || t.taskId || 'Задание')}</strong></td>
+                            <td class="dossier-task-result">${badge}</td>
+                            <td class="dossier-task-action">${link}</td>
                         </tr>
                     `;
                 }).join('');
