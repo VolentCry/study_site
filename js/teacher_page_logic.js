@@ -2394,6 +2394,10 @@
                     if (window.PowersCompareTrainer) {
                         t = window.PowersCompareTrainer.generateTask('compare_all');
                     }
+                } else if (type.startsWith('fractions_compare')) {
+                    if (window.FractionCompareTrainer) {
+                        t = window.FractionCompareTrainer.generateTask(type);
+                    }
                 } else if (type.startsWith('powers_')) {
                     if (window.PowersTrainer) {
                         t = window.PowersTrainer.generateTask(type);
