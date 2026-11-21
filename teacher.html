@@ -294,6 +294,70 @@
                     </div>
                 </div>
 
+                <!-- БЛОК ФИЛЬТРОВ РАСПИСАНИЯ -->
+                <div class="schedule-filter-card" style="background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r-md); padding:1.1rem; margin-bottom:1.25rem; display:flex; flex-direction:column; gap:0.85rem;">
+                    <!-- Row 1: Поиск, быстрые фильтры, счётчик, кнопки обновления и сброса -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <div class="search-box-wrap" style="flex:1; min-width:240px; max-width:380px;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="schedule-search-input" class="search-input" placeholder="Поиск по теме, классу, ученику или заметкам...">
+                        </div>
+                        <div class="schedule-quick-pills" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <button type="button" class="btn btn-secondary btn-sm schedule-pill-btn active" data-pill-type="all" data-pill-value="">Все уроки</button>
+                            <button type="button" class="btn btn-secondary btn-sm schedule-pill-btn" data-pill-type="status" data-pill-value="not_completed">⏳ Предстоящие</button>
+                            <button type="button" class="btn btn-secondary btn-sm schedule-pill-btn" data-pill-type="status" data-pill-value="completed">✅ Проведённые</button>
+                            <button type="button" class="btn btn-secondary btn-sm schedule-pill-btn" data-pill-type="payment" data-pill-value="unpaid">⚠️ Не оплаченные</button>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+                            <span class="badge" id="schedule-counter-badge" style="background:var(--surface); border:1px solid var(--line); padding:6px 12px; font-size:0.82rem; color:var(--muted); font-weight:600; white-space:nowrap;">
+                                Найдено: <strong id="schedule-count-current" style="color:var(--ink);">0</strong> из <span id="schedule-count-total">0</span>
+                            </span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-schedule" title="Обновить расписание" style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px;">
+                                🔄 Обновить
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-schedule-filters" title="Сбросить все фильтры" style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px;">
+                                ✕ Сброс
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Селекты фильтрации по ученикам, проведению и оплате -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; align-items:center;">
+                        <!-- 1. Фильтр по ученикам / формату -->
+                        <div>
+                            <label for="schedule-filter-student" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Ученик / Формат</label>
+                            <select id="schedule-filter-student" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
+                                <option value="">Все ученики и форматы</option>
+                                <option value="group">👥 Только групповые (весь класс)</option>
+                                <option value="individual">👤 Все индивидуальные уроки</option>
+                                <optgroup id="schedule-filter-students-group" label="Конкретные ученики">
+                                    <!-- Динамический список учеников -->
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <!-- 2. Фильтр по проведению (проведённые / непроведённые) -->
+                        <div>
+                            <label for="schedule-filter-status" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Проведение урока</label>
+                            <select id="schedule-filter-status" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
+                                <option value="">Все статусы (проведённые и нет)</option>
+                                <option value="completed">✅ Проведённые уроки</option>
+                                <option value="not_completed">⏳ Не проведённые (предстоящие)</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Фильтр по оплате (оплаченные / неоплаченные) -->
+                        <div>
+                            <label for="schedule-filter-payment" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Оплата занятий</label>
+                            <select id="schedule-filter-payment" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
+                                <option value="">Любая оплата</option>
+                                <option value="paid">💳 Оплаченные занятия</option>
+                                <option value="unpaid">⚠️ Не оплаченные занятия</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="lessons-timeline-container" class="lessons-timeline">
                     <!-- Загружается динамически -->
                 </div>

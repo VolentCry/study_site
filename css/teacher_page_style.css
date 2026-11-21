@@ -1207,6 +1207,36 @@ dialog.admin-modal::backdrop {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
+.lesson-payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--r-pill);
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+.lesson-payment-badge.pay-paid {
+    background: rgba(16, 185, 129, 0.14);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.lesson-payment-badge.pay-unpaid {
+    background: rgba(239, 68, 68, 0.14);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+[data-theme="light"] .schedule-filter-card {
+    background: #ffffff !important;
+    border-color: rgba(15, 23, 42, 0.12) !important;
+}
+.schedule-pill-btn.active {
+    background: var(--accent) !important;
+    color: #fff !important;
+    border-color: var(--accent) !important;
+}
 .lesson-hw-badge {
     display: inline-flex;
     align-items: center;
@@ -1840,6 +1870,7 @@ sup sup {
     }
     .lesson-class-badge,
     .lesson-student-badge,
+    .lesson-payment-badge,
     .lesson-hw-badge {
         font-size: 0.72rem;
         padding: 3px 8px;

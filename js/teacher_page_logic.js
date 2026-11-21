@@ -1501,6 +1501,7 @@
     }
 
     let currentScheduleLessons = [];
+    let scheduleFilterEventsInitialized = false;
 
     async function loadSchedule() {
         if (!lessonsTimelineContainer) return;
@@ -1516,224 +1517,453 @@
 
             const lessons = Array.isArray(data.lessons) ? data.lessons : [];
             currentScheduleLessons = lessons;
-            if (lessons.length === 0) {
-                lessonsTimelineContainer.innerHTML = `
-                    <div style="text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
-                        <div style="font-size:2.5rem; margin-bottom:0.75rem;">📅</div>
-                        <div style="font-weight:700; font-size:1.1rem; color:var(--ink); margin-bottom:0.4rem;">У вас пока нет запланированных занятий</div>
-                        <div style="font-size:0.9rem; margin-bottom:1.25rem;">Нажмите кнопку выше, чтобы назначить урок классу и прикрепить домашку.</div>
-                        <button type="button" class="btn btn-emerald btn-sm" onclick="document.getElementById('btn-open-create-lesson').click()">
-                            ➕ Запланировать занятие
-                        </button>
-                    </div>
-                `;
-                return;
-            }
 
             // Sort lessons chronologically
-            lessons.sort((a, b) => {
+            currentScheduleLessons.sort((a, b) => {
                 const da = new Date(a.starts_at || a.scheduled_at || a.scheduledAt || 0);
                 const db = new Date(b.starts_at || b.scheduled_at || b.scheduledAt || 0);
                 return da - db;
             });
 
-            const now = new Date();
-            lessonsTimelineContainer.innerHTML = lessons.map(les => {
-                const rawDate = les.starts_at || les.scheduled_at || les.scheduledAt;
-                const d = rawDate ? new Date(rawDate) : null;
-                const isToday = !!(d && (
-                    d.getFullYear() === now.getFullYear() &&
-                    d.getMonth() === now.getMonth() &&
-                    d.getDate() === now.getDate()
-                ));
-                const dateStr = d ? d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'short' }) : '—';
-                const timeStr = d ? d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
-                const todayBadge = isToday ? '<span class="lesson-today-pill">Сегодня</span> ' : '';
-
-                const hwId = les.homework_id || les.homeworkId;
-                const hwTitle = les.homework_title || les.homeworkTitle;
-                const hwDeadline = les.homework_deadline || les.homeworkDeadline;
-                const cName = les.class_name || les.className || '';
-                const notes = les.notes || les.description || '';
-
-                let hwBadgeHtml = '';
-                if (hwId && hwTitle) {
-                    hwBadgeHtml = `<a href="homework.html?id=${hwId}" target="_blank" class="lesson-hw-badge" title="Смотреть домашнее задание с ответами">👀 Д/З: ${escapeHtml(hwTitle)} ↗</a>`;
-                }
-
-                let studentBadgeHtml = '';
-                if (les.student_id && (les.student_name || les.student_username)) {
-                    studentBadgeHtml = `<span class="lesson-student-badge student-individual">👤 Индивидуально: ${escapeHtml(les.student_name || les.student_username)}</span>`;
-                } else {
-                    studentBadgeHtml = `<span class="lesson-student-badge student-all">👥 Весь класс</span>`;
-                }
-
-                const isPast = d && (d.getTime() < Date.now() - 3600000);
-                const isCompleted = !!(les.isCompleted || les.is_completed);
-                const isPaid = !!(les.isPaid || les.is_paid);
-                const statusBadge = isCompleted
-                    ? '<span class="lesson-status-badge status-completed">✅ Проведено</span>'
-                    : (isPast ? '<span class="lesson-status-badge status-past">Прошедший</span>' : '<span class="lesson-status-badge status-planned">Запланирован</span>');
-
-                return `
-                    <div class="lesson-card ${isToday ? 'lesson-card-today' : ''} ${isCompleted ? 'lesson-card-completed' : ''}" id="lesson-card-${les.id}" style="${isPast && !isCompleted ? 'opacity:0.8;' : ''}">
-                        <div class="lesson-time-box">
-                            <div class="lesson-time-main">${timeStr}</div>
-                            <div class="lesson-time-sub">${todayBadge}${dateStr}</div>
-                        </div>
-                        <div class="lesson-info">
-                            <div class="lesson-title">
-                                <span class="lesson-title-text">${escapeHtml(les.title)}</span>
-                                ${statusBadge}
-                            </div>
-                            <div class="lesson-badges-row">
-                                <span class="lesson-class-badge">🏫 ${escapeHtml(cName)}</span>
-                                ${studentBadgeHtml}
-                                ${hwBadgeHtml}
-                                ${notes ? `<span class="lesson-notes">${escapeHtml(notes)}</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="lesson-actions">
-                            <button type="button" class="btn btn-sm ${isCompleted ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-complete" data-lesson-id="${les.id}" data-completed="${isCompleted ? '1' : '0'}" title="${isCompleted ? 'Снять отметку о проведении' : 'Отметить как проведённое занятие'}">
-                                ${isCompleted ? '✓ Проведено' : '⏳ Провести'}
-                            </button>
-                            <button type="button" class="btn btn-sm ${isPaid ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-paid" data-lesson-id="${les.id}" data-paid="${isPaid ? '1' : '0'}" title="${isPaid ? 'Снять отметку об оплате' : 'Отметить как оплаченное занятие'}">
-                                ${isPaid ? '💳 Оплачено' : '💳 Не оплачено'}
-                            </button>
-                            <button type="button" class="btn btn-secondary btn-sm btn-edit-lesson" data-lesson-id="${les.id}" title="Редактировать занятие">
-                                ✏️
-                            </button>
-                            <button type="button" class="btn btn-danger-outline btn-sm btn-delete-lesson" data-lesson-id="${les.id}" title="Отменить занятие">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Attach completion toggle listeners
-            lessonsTimelineContainer.querySelectorAll('.btn-toggle-lesson-complete').forEach(b => {
-                b.addEventListener('click', async () => {
-                    const lid = b.getAttribute('data-lesson-id');
-                    const wasCompleted = b.getAttribute('data-completed') === '1';
-                    try {
-                        const res = await fetch(`/api/teacher/lessons/${lid}/toggle-conducted`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isCompleted: !wasCompleted })
-                        });
-                        const d = await res.json();
-                        if (d.success) {
-                            showToast(!wasCompleted ? 'Занятие отмечено проведённым!' : 'Отметка о проведении снята');
-                            loadSchedule();
-                        } else {
-                            alert(d.error || 'Ошибка обновления статуса занятия');
-                        }
-                    } catch(e) {
-                        alert('Ошибка сети при обновлении статуса занятия');
-                    }
-                });
-            });
-
-            // Attach payment toggle listeners
-            lessonsTimelineContainer.querySelectorAll('.btn-toggle-lesson-paid').forEach(b => {
-                b.addEventListener('click', async () => {
-                    const lid = b.getAttribute('data-lesson-id');
-                    const wasPaid = b.getAttribute('data-paid') === '1';
-                    try {
-                        const res = await fetch(`/api/teacher/lessons/${lid}/toggle-payment`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isPaid: !wasPaid })
-                        });
-                        const d = await res.json();
-                        if (d.success) {
-                            showToast(!wasPaid ? 'Занятие отмечено как оплаченное!' : 'Отметка об оплате снята');
-                            loadSchedule();
-                        } else {
-                            alert(d.error || 'Ошибка обновления статуса оплаты');
-                        }
-                    } catch(e) {
-                        alert('Ошибка сети при обновлении статуса оплаты');
-                    }
-                });
-            });
-
-            // Attach edit listeners
-            lessonsTimelineContainer.querySelectorAll('.btn-edit-lesson').forEach(b => {
-                b.addEventListener('click', async () => {
-                    const lid = parseInt(b.getAttribute('data-lesson-id'), 10);
-                    const les = currentScheduleLessons.find(l => (l.id === lid));
-                    if (!les) return;
-
-                    document.getElementById('lesson-edit-id').value = String(les.id);
-                    document.getElementById('modal-lesson-title').textContent = 'Редактировать занятие';
-                    document.getElementById('btn-submit-lesson').textContent = 'Сохранить изменения';
-
-                    await populateLessonModalSelects();
-
-                    const cid = String(les.class_id || les.classId || '');
-                    lessonTargetClass.value = cid;
-
-                    // Populate students for selected class and select the lesson student
-                    const targetStudentId = les.student_id || les.studentId;
-                    if (cid) {
-                        try {
-                            const res = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
-                            const data = await res.json();
-                            if (data.success && data.class && Array.isArray(data.class.students)) {
-                                if (data.class.students.length > 0) {
-                                    lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>' +
-                                        data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
-                                } else {
-                                    lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
-                                }
-                            }
-                        } catch(e) {}
-                    }
-                    lessonTargetStudent.value = targetStudentId ? String(targetStudentId) : '';
-                    await updateLessonMethodicalPlanTopics();
-
-                    document.getElementById('lesson-input-title').value = les.title || '';
-
-                    // Format datetime to YYYY-MM-DDTHH:MM local
-                    const rawDt = les.starts_at || les.scheduled_at || les.scheduledAt;
-                    if (rawDt) {
-                        const dt = new Date(rawDt);
-                        const localIso = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                        document.getElementById('lesson-input-date').value = localIso;
-                    } else {
-                        document.getElementById('lesson-input-date').value = '';
-                    }
-
-                    lessonAttachHw.value = (les.homework_id || les.homeworkId) ? String(les.homework_id || les.homeworkId) : '';
-                    document.getElementById('lesson-input-notes').value = les.notes || les.description || '';
-
-                    modalCreateLesson.showModal();
-                });
-            });
-
-            // Attach delete listeners
-            lessonsTimelineContainer.querySelectorAll('.btn-delete-lesson').forEach(b => {
-                b.addEventListener('click', async () => {
-                    const lid = b.getAttribute('data-lesson-id');
-                    if (!confirm('Отменить и удалить это занятие из расписания?')) return;
-                    try {
-                        const delRes = await fetch(`/api/teacher/lessons/${lid}`, { method: 'DELETE' });
-                        const delData = await delRes.json();
-                        if (delData.success) {
-                            showToast('Занятие отменено');
-                            loadSchedule();
-                        } else {
-                            alert(delData.error || 'Ошибка при удалении урока');
-                        }
-                    } catch(e) { alert('Ошибка сети'); }
-                });
-            });
-
+            initScheduleFilterEvents();
+            updateScheduleStudentFilterOptions();
+            applyScheduleFiltersAndRender();
         } catch(err) {
             lessonsTimelineContainer.innerHTML = '<div style="text-align:center; color:var(--danger); padding:2rem;">Ошибка загрузки расписания.</div>';
         }
+    }
+
+    function initScheduleFilterEvents() {
+        if (scheduleFilterEventsInitialized) return;
+        scheduleFilterEventsInitialized = true;
+
+        const searchInput = document.getElementById('schedule-search-input');
+        const studentSelect = document.getElementById('schedule-filter-student');
+        const statusSelect = document.getElementById('schedule-filter-status');
+        const paymentSelect = document.getElementById('schedule-filter-payment');
+        const resetBtn = document.getElementById('btn-reset-schedule-filters');
+        const refreshBtn = document.getElementById('btn-refresh-schedule');
+
+        if (searchInput) searchInput.addEventListener('input', applyScheduleFiltersAndRender);
+        if (studentSelect) studentSelect.addEventListener('change', applyScheduleFiltersAndRender);
+
+        if (statusSelect) {
+            statusSelect.addEventListener('change', () => {
+                syncSchedulePills();
+                applyScheduleFiltersAndRender();
+            });
+        }
+
+        if (paymentSelect) {
+            paymentSelect.addEventListener('change', () => {
+                syncSchedulePills();
+                applyScheduleFiltersAndRender();
+            });
+        }
+
+        // Quick filter pill buttons
+        document.querySelectorAll('.schedule-pill-btn').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const type = pill.getAttribute('data-pill-type');
+                const val = pill.getAttribute('data-pill-value') || '';
+
+                if (type === 'all') {
+                    if (statusSelect) statusSelect.value = '';
+                    if (paymentSelect) paymentSelect.value = '';
+                } else if (type === 'status') {
+                    if (statusSelect) statusSelect.value = val;
+                    if (paymentSelect) paymentSelect.value = '';
+                } else if (type === 'payment') {
+                    if (paymentSelect) paymentSelect.value = val;
+                    if (statusSelect) statusSelect.value = '';
+                }
+
+                syncSchedulePills();
+                applyScheduleFiltersAndRender();
+            });
+        });
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                resetScheduleFilters();
+            });
+        }
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                loadSchedule();
+            });
+        }
+    }
+
+    function syncSchedulePills() {
+        const statusVal = document.getElementById('schedule-filter-status')?.value || '';
+        const paymentVal = document.getElementById('schedule-filter-payment')?.value || '';
+
+        document.querySelectorAll('.schedule-pill-btn').forEach(pill => {
+            const type = pill.getAttribute('data-pill-type');
+            const val = pill.getAttribute('data-pill-value') || '';
+
+            let isActive = false;
+            if (type === 'all' && !statusVal && !paymentVal) {
+                isActive = true;
+            } else if (type === 'status' && statusVal === val && !paymentVal) {
+                isActive = true;
+            } else if (type === 'payment' && paymentVal === val && !statusVal) {
+                isActive = true;
+            }
+            pill.classList.toggle('active', isActive);
+        });
+    }
+
+    function resetScheduleFilters() {
+        const searchInput = document.getElementById('schedule-search-input');
+        const studentSelect = document.getElementById('schedule-filter-student');
+        const statusSelect = document.getElementById('schedule-filter-status');
+        const paymentSelect = document.getElementById('schedule-filter-payment');
+
+        if (searchInput) searchInput.value = '';
+        if (studentSelect) studentSelect.value = '';
+        if (statusSelect) statusSelect.value = '';
+        if (paymentSelect) paymentSelect.value = '';
+
+        syncSchedulePills();
+        applyScheduleFiltersAndRender();
+    }
+
+    function updateScheduleStudentFilterOptions() {
+        const groupEl = document.getElementById('schedule-filter-students-group');
+        if (!groupEl) return;
+        const currentVal = document.getElementById('schedule-filter-student')?.value || '';
+
+        const studentsMap = new Map();
+        // 1. Collect from current loaded lessons
+        currentScheduleLessons.forEach(l => {
+            if (l.student_id) {
+                const name = l.student_name || l.student_username || `Ученик #${l.student_id}`;
+                const uname = l.student_username ? ` (@${l.student_username})` : '';
+                studentsMap.set(String(l.student_id), `${name}${uname}`);
+            }
+        });
+
+        // 2. Also collect from allUsersCache if available
+        if (Array.isArray(allUsersCache)) {
+            allUsersCache.forEach(u => {
+                if (u.role === 'student' || u.isInMyClass) {
+                    const name = u.displayName || u.username || `Ученик #${u.id}`;
+                    const uname = u.username ? ` (@${u.username})` : '';
+                    studentsMap.set(String(u.id), `${name}${uname}`);
+                }
+            });
+        }
+
+        if (studentsMap.size === 0) {
+            groupEl.innerHTML = '<option value="" disabled>(Индивидуальных учеников пока нет)</option>';
+        } else {
+            const sorted = Array.from(studentsMap.entries()).sort((a, b) => a[1].localeCompare(b[1], 'ru'));
+            groupEl.innerHTML = sorted.map(([id, name]) => `<option value="${id}">👤 ${escapeHtml(name)}</option>`).join('');
+        }
+
+        if (currentVal && document.getElementById('schedule-filter-student')) {
+            document.getElementById('schedule-filter-student').value = currentVal;
+        }
+    }
+
+    function applyScheduleFiltersAndRender() {
+        if (!lessonsTimelineContainer) return;
+
+        const studentFilter = document.getElementById('schedule-filter-student')?.value || '';
+        const statusFilter = document.getElementById('schedule-filter-status')?.value || '';
+        const paymentFilter = document.getElementById('schedule-filter-payment')?.value || '';
+        const searchQuery = (document.getElementById('schedule-search-input')?.value || '').trim().toLowerCase();
+
+        let filtered = [...currentScheduleLessons];
+
+        // 1. Фильтр по ученикам / формату
+        if (studentFilter === 'group') {
+            filtered = filtered.filter(l => !l.student_id);
+        } else if (studentFilter === 'individual') {
+            filtered = filtered.filter(l => Boolean(l.student_id));
+        } else if (studentFilter) {
+            filtered = filtered.filter(l => String(l.student_id) === String(studentFilter));
+        }
+
+        // 2. Фильтр по проведению (проведённые / непроведённые)
+        if (statusFilter === 'completed') {
+            filtered = filtered.filter(l => Boolean(l.isCompleted || l.is_completed));
+        } else if (statusFilter === 'not_completed') {
+            filtered = filtered.filter(l => !Boolean(l.isCompleted || l.is_completed));
+        }
+
+        // 3. Фильтр по оплате (оплаченные / неоплаченные)
+        if (paymentFilter === 'paid') {
+            filtered = filtered.filter(l => Boolean(l.isPaid || l.is_paid));
+        } else if (paymentFilter === 'unpaid') {
+            filtered = filtered.filter(l => !Boolean(l.isPaid || l.is_paid));
+        }
+
+        // 4. Текстовый поиск
+        if (searchQuery) {
+            filtered = filtered.filter(l => {
+                const title = (l.title || '').toLowerCase();
+                const cName = (l.class_name || l.className || '').toLowerCase();
+                const sName = (l.student_name || '').toLowerCase();
+                const sUname = (l.student_username || '').toLowerCase();
+                const notes = (l.notes || l.description || '').toLowerCase();
+                const hwTitle = (l.homework_title || l.homeworkTitle || '').toLowerCase();
+                return title.includes(searchQuery) ||
+                       cName.includes(searchQuery) ||
+                       sName.includes(searchQuery) ||
+                       sUname.includes(searchQuery) ||
+                       notes.includes(searchQuery) ||
+                       hwTitle.includes(searchQuery);
+            });
+        }
+
+        // Обновление счетчиков
+        const countCurrentEl = document.getElementById('schedule-count-current');
+        const countTotalEl = document.getElementById('schedule-count-total');
+        if (countCurrentEl) countCurrentEl.textContent = filtered.length;
+        if (countTotalEl) countTotalEl.textContent = currentScheduleLessons.length;
+
+        renderLessonsTimeline(filtered);
+    }
+
+    function renderLessonsTimeline(lessons) {
+        if (!lessonsTimelineContainer) return;
+
+        if (currentScheduleLessons.length === 0) {
+            lessonsTimelineContainer.innerHTML = `
+                <div style="text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
+                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">📅</div>
+                    <div style="font-weight:700; font-size:1.1rem; color:var(--ink); margin-bottom:0.4rem;">У вас пока нет запланированных занятий</div>
+                    <div style="font-size:0.9rem; margin-bottom:1.25rem;">Нажмите кнопку выше, чтобы назначить урок классу и прикрепить домашку.</div>
+                    <button type="button" class="btn btn-emerald btn-sm" onclick="document.getElementById('btn-open-create-lesson').click()">
+                        ➕ Запланировать занятие
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        if (lessons.length === 0) {
+            lessonsTimelineContainer.innerHTML = `
+                <div style="text-align:center; padding:3rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
+                    <div style="font-size:2.2rem; margin-bottom:0.5rem;">🔍</div>
+                    <div style="font-weight:700; color:var(--ink); font-size:1.05rem; margin-bottom:0.4rem;">По выбранным фильтрам уроки не найдены</div>
+                    <div style="font-size:0.85rem; margin-bottom:1.25rem;">Попробуйте изменить параметры фильтрации или сбросить фильтры</div>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-empty-reset-schedule">
+                        ✕ Сбросить фильтры
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-empty-reset-schedule')?.addEventListener('click', resetScheduleFilters);
+            return;
+        }
+
+        const now = new Date();
+        lessonsTimelineContainer.innerHTML = lessons.map(les => {
+            const rawDate = les.starts_at || les.scheduled_at || les.scheduledAt;
+            const d = rawDate ? new Date(rawDate) : null;
+            const isToday = !!(d && (
+                d.getFullYear() === now.getFullYear() &&
+                d.getMonth() === now.getMonth() &&
+                d.getDate() === now.getDate()
+            ));
+            const dateStr = d ? d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'short' }) : '—';
+            const timeStr = d ? d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '—';
+            const todayBadge = isToday ? '<span class="lesson-today-pill">Сегодня</span> ' : '';
+
+            const hwId = les.homework_id || les.homeworkId;
+            const hwTitle = les.homework_title || les.homeworkTitle;
+            const cName = les.class_name || les.className || '';
+            const notes = les.notes || les.description || '';
+
+            let hwBadgeHtml = '';
+            if (hwId && hwTitle) {
+                hwBadgeHtml = `<a href="homework.html?id=${hwId}" target="_blank" class="lesson-hw-badge" title="Смотреть домашнее задание с ответами">👀 Д/З: ${escapeHtml(hwTitle)} ↗</a>`;
+            }
+
+            let studentBadgeHtml = '';
+            if (les.student_id && (les.student_name || les.student_username)) {
+                studentBadgeHtml = `<span class="lesson-student-badge student-individual">👤 Индивидуально: ${escapeHtml(les.student_name || les.student_username)}</span>`;
+            } else {
+                studentBadgeHtml = `<span class="lesson-student-badge student-all">👥 Весь класс</span>`;
+            }
+
+            const isPast = d && (d.getTime() < Date.now() - 3600000);
+            const isCompleted = !!(les.isCompleted || les.is_completed);
+            const isPaid = !!(les.isPaid || les.is_paid);
+            const statusBadge = isCompleted
+                ? '<span class="lesson-status-badge status-completed">✅ Проведено</span>'
+                : (isPast ? '<span class="lesson-status-badge status-past">Прошедший</span>' : '<span class="lesson-status-badge status-planned">Запланирован</span>');
+
+            const paymentBadgeHtml = isPaid
+                ? '<span class="lesson-payment-badge pay-paid" title="Занятие оплачено">💳 Оплачено</span>'
+                : '<span class="lesson-payment-badge pay-unpaid" title="Занятие ещё не оплачено">⚠️ Не оплачено</span>';
+
+            return `
+                <div class="lesson-card ${isToday ? 'lesson-card-today' : ''} ${isCompleted ? 'lesson-card-completed' : ''}" id="lesson-card-${les.id}" style="${isPast && !isCompleted ? 'opacity:0.8;' : ''}">
+                    <div class="lesson-time-box">
+                        <div class="lesson-time-main">${timeStr}</div>
+                        <div class="lesson-time-sub">${todayBadge}${dateStr}</div>
+                    </div>
+                    <div class="lesson-info">
+                        <div class="lesson-title">
+                            <span class="lesson-title-text">${escapeHtml(les.title)}</span>
+                            ${statusBadge}
+                        </div>
+                        <div class="lesson-badges-row">
+                            <span class="lesson-class-badge">🏫 ${escapeHtml(cName)}</span>
+                            ${studentBadgeHtml}
+                            ${paymentBadgeHtml}
+                            ${hwBadgeHtml}
+                            ${notes ? `<span class="lesson-notes">${escapeHtml(notes)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="lesson-actions">
+                        <button type="button" class="btn btn-sm ${isCompleted ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-complete" data-lesson-id="${les.id}" data-completed="${isCompleted ? '1' : '0'}" title="${isCompleted ? 'Снять отметку о проведении' : 'Отметить как проведённое занятие'}">
+                            ${isCompleted ? '✓ Проведено' : '⏳ Провести'}
+                        </button>
+                        <button type="button" class="btn btn-sm ${isPaid ? 'btn-emerald' : 'btn-secondary'} btn-toggle-lesson-paid" data-lesson-id="${les.id}" data-paid="${isPaid ? '1' : '0'}" title="${isPaid ? 'Снять отметку об оплате' : 'Отметить как оплаченное занятие'}">
+                            ${isPaid ? '💳 Оплачено' : '💳 Не оплачено'}
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm btn-edit-lesson" data-lesson-id="${les.id}" title="Редактировать занятие">
+                            ✏️
+                        </button>
+                        <button type="button" class="btn btn-danger-outline btn-sm btn-delete-lesson" data-lesson-id="${les.id}" title="Отменить занятие">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        attachLessonActionListeners();
+    }
+
+    function attachLessonActionListeners() {
+        if (!lessonsTimelineContainer) return;
+
+        // Attach completion toggle listeners
+        lessonsTimelineContainer.querySelectorAll('.btn-toggle-lesson-complete').forEach(b => {
+            b.addEventListener('click', async () => {
+                const lid = b.getAttribute('data-lesson-id');
+                const wasCompleted = b.getAttribute('data-completed') === '1';
+                try {
+                    const res = await fetch(`/api/teacher/lessons/${lid}/toggle-conducted`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ isCompleted: !wasCompleted })
+                    });
+                    const d = await res.json();
+                    if (d.success) {
+                        showToast(!wasCompleted ? 'Занятие отмечено проведённым!' : 'Отметка о проведении снята');
+                        loadSchedule();
+                    } else {
+                        alert(d.error || 'Ошибка обновления статуса занятия');
+                    }
+                } catch(e) {
+                    alert('Ошибка сети при обновлении статуса занятия');
+                }
+            });
+        });
+
+        // Attach payment toggle listeners
+        lessonsTimelineContainer.querySelectorAll('.btn-toggle-lesson-paid').forEach(b => {
+            b.addEventListener('click', async () => {
+                const lid = b.getAttribute('data-lesson-id');
+                const wasPaid = b.getAttribute('data-paid') === '1';
+                try {
+                    const res = await fetch(`/api/teacher/lessons/${lid}/toggle-payment`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ isPaid: !wasPaid })
+                    });
+                    const d = await res.json();
+                    if (d.success) {
+                        showToast(!wasPaid ? 'Занятие отмечено как оплаченное!' : 'Отметка об оплате снята');
+                        loadSchedule();
+                    } else {
+                        alert(d.error || 'Ошибка обновления статуса оплаты');
+                    }
+                } catch(e) {
+                    alert('Ошибка сети при обновлении статуса оплаты');
+                }
+            });
+        });
+
+        // Attach edit listeners
+        lessonsTimelineContainer.querySelectorAll('.btn-edit-lesson').forEach(b => {
+            b.addEventListener('click', async () => {
+                const lid = parseInt(b.getAttribute('data-lesson-id'), 10);
+                const les = currentScheduleLessons.find(l => (l.id === lid));
+                if (!les) return;
+
+                document.getElementById('lesson-edit-id').value = String(les.id);
+                document.getElementById('modal-lesson-title').textContent = 'Редактировать занятие';
+                document.getElementById('btn-submit-lesson').textContent = 'Сохранить изменения';
+
+                await populateLessonModalSelects();
+
+                const cid = String(les.class_id || les.classId || '');
+                lessonTargetClass.value = cid;
+
+                // Populate students for selected class and select the lesson student
+                const targetStudentId = les.student_id || les.studentId;
+                if (cid) {
+                    try {
+                        const res = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
+                        const data = await res.json();
+                        if (data.success && data.class && Array.isArray(data.class.students)) {
+                            if (data.class.students.length > 0) {
+                                lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (групповой урок)</option>' +
+                                    data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                            } else {
+                                lessonTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
+                            }
+                        }
+                    } catch(e) {}
+                }
+                lessonTargetStudent.value = targetStudentId ? String(targetStudentId) : '';
+                await updateLessonMethodicalPlanTopics();
+
+                document.getElementById('lesson-input-title').value = les.title || '';
+
+                // Format datetime to YYYY-MM-DDTHH:MM local
+                const rawDt = les.starts_at || les.scheduled_at || les.scheduledAt;
+                if (rawDt) {
+                    const dt = new Date(rawDt);
+                    const localIso = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                    document.getElementById('lesson-input-date').value = localIso;
+                } else {
+                    document.getElementById('lesson-input-date').value = '';
+                }
+
+                lessonAttachHw.value = (les.homework_id || les.homeworkId) ? String(les.homework_id || les.homeworkId) : '';
+                document.getElementById('lesson-input-notes').value = les.notes || les.description || '';
+
+                modalCreateLesson.showModal();
+            });
+        });
+
+        // Attach delete listeners
+        lessonsTimelineContainer.querySelectorAll('.btn-delete-lesson').forEach(b => {
+            b.addEventListener('click', async () => {
+                const lid = b.getAttribute('data-lesson-id');
+                if (!confirm('Отменить и удалить это занятие из расписания?')) return;
+                try {
+                    const delRes = await fetch(`/api/teacher/lessons/${lid}`, { method: 'DELETE' });
+                    const delData = await delRes.json();
+                    if (delData.success) {
+                        showToast('Занятие отменено');
+                        loadSchedule();
+                    } else {
+                        alert(delData.error || 'Ошибка при удалении урока');
+                    }
+                } catch(e) { alert('Ошибка сети'); }
+            });
+        });
     }
 
 
