@@ -473,6 +473,182 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     color: #fff; margin-left: 2px;
 }
 
+/* --- NOTES SECTION (КОНСПЕКТЫ УРОКОВ) --- */
+.notes-section {
+    padding: 64px 24px 72px;
+    background: var(--paper-light);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 28px;
+}
+.note-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 26px 24px;
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 16px rgba(38, 63, 97, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    transition: all .25s ease;
+    position: relative;
+    box-sizing: border-box;
+}
+.note-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--vermilion);
+    box-shadow: 0 10px 28px rgba(183, 70, 78, 0.12);
+}
+.note-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+.note-badge {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--vermilion-light);
+    color: var(--vermilion);
+}
+.note-number {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(38, 63, 97, 0.08);
+    color: var(--indigo);
+    font-size: 12px;
+    font-weight: 800;
+    transition: all .2s ease;
+}
+.note-card:hover .note-number {
+    background: var(--vermilion);
+    color: #fff;
+}
+.note-title {
+    margin: 0;
+    color: var(--indigo-dark);
+    font: 700 21px/1.25 'Zen Old Mincho', serif;
+}
+.note-formula-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    background: rgba(38, 63, 97, 0.05);
+    border: 1px solid rgba(38, 63, 97, 0.12);
+}
+.note-formula-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--muted);
+}
+.note-formula-math {
+    font-family: 'DM Sans', monospace, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--indigo);
+}
+.note-summary {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+.note-summary p {
+    margin: 0;
+}
+.note-points-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.note-point-item {
+    position: relative;
+    padding-left: 18px;
+    line-height: 1.5;
+}
+.note-point-item::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    top: 0;
+    color: var(--vermilion);
+    font-size: 16px;
+    line-height: 1.2;
+}
+.note-point-item code {
+    font-family: inherit;
+    font-weight: 700;
+    background: rgba(38, 63, 97, 0.06);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--indigo);
+}
+.note-footer {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(38, 63, 97, 0.1);
+}
+.theory-notes-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    width: 100%;
+    padding: 0 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(183, 70, 78, 0.35);
+    background: linear-gradient(135deg, rgba(183, 70, 78, 0.08), rgba(38, 63, 97, 0.12));
+    color: var(--indigo-dark);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.theory-notes-btn:hover {
+    background: var(--vermilion);
+    color: #ffffff;
+    border-color: var(--vermilion);
+    box-shadow: 0 6px 20px rgba(183, 70, 78, 0.25);
+    transform: translateY(-1px);
+}
+.theory-notes-btn:active {
+    transform: translateY(0);
+}
+.theory-notes-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
 /* Part 2 Trainer Card Specific Styling */
 .trainer-card.trainer-card-part2 {
     border-color: rgba(183, 70, 78, 0.35);
@@ -689,6 +865,10 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     .trainers-section { padding: 36px 14px 44px; }
     .trainers-grid { grid-template-columns: 1fr; gap: 16px; }
     .trainer-card { padding: 22px 18px; }
+    .notes-section { padding: 36px 14px 44px; }
+    .notes-grid { grid-template-columns: 1fr; gap: 16px; }
+    .note-card { padding: 22px 18px; }
+    .note-title { font-size: 19px; }
     .section-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
     .section-heading h2 { font-size: 24px; }
     .exam-strategy { padding: 36px 14px 44px; }
