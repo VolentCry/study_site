@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Закон сохранения импульса и соударения — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #f472b6; --cyan: #38bdf8; --gold: #fbbf24; --green: #34d399; --indigo: #818cf8;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(244,114,182,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(244,114,182,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--indigo) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-pink   { background: rgba(244,114,182,.15); color: var(--accent); border: 1px solid rgba(244,114,182,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-gold   { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.collision-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.s-elastic { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+.s-inelastic { background: rgba(244,114,182,.15); color: var(--accent); border: 1px solid rgba(244,114,182,.3); }
+
+#momentumCanvas { display: block; width: 100%; height: 440px; background: #030810; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-p1 { color: var(--cyan); }
+.mv-p2 { color: var(--accent); }
+.mv-ptot { color: var(--gold); }
+.mv-ek { color: var(--green); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.type-toggle-group { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+.type-btn { flex: 1; padding: 10px 8px; background: rgba(255,255,255,.02); border: none; color: var(--text2); font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+.type-btn.active { background: rgba(244,114,182,.18); color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(244,114,182,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px rgba(244,114,182,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.btn-row { display: flex; gap: 8px; }
+.btn-sim { flex: 1; padding: 11px 10px; border-radius: 10px; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; cursor: pointer; transition: all .2s; border: none; }
+.btn-run { background: linear-gradient(135deg, var(--accent), var(--indigo)); color: #fff; box-shadow: 0 0 20px rgba(244,114,182,.3); }
+.btn-run:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(244,114,182,.5); }
+.btn-reset { background: transparent; color: var(--text2); border: 1px solid rgba(148,163,184,.25); }
+.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--accent); background: rgba(244,114,182,.08); }
+.preset-btn.active { border-color: var(--accent); background: rgba(244,114,182,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(244,114,182,.06); border: 1px solid rgba(244,114,182,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(244,114,182,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=9">К задачам 9 класса</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>9 класс</span> · Законы сохранения</p>
+  <h1 class="page-title">Закон сохранения импульса</h1>
+  <p class="page-sub">Исследуйте упругие и абсолютно неупругие столкновения тел на воздушной дорожке. Наблюдайте постоянство векторной суммы импульсов замкнутой системы.</p>
+  <div class="tags-row">
+    <span class="tag tag-pink">9 класс</span>
+    <span class="tag tag-cyan">p⃗₁ + p⃗₂ = const</span>
+    <span class="tag tag-gold">p = m · v</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Соударение двух тележек на треке</span>
+        <span class="collision-badge s-elastic" id="collisionBadge">Абсолютно упругий удар</span>
+      </div>
+      <canvas id="momentumCanvas" width="840" height="440"></canvas>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Импульс p₁</div>
+          <div class="meter-val mv-p1" id="meterP1">+3.00</div>
+          <div class="meter-unit">кг·м/с</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Импульс p₂</div>
+          <div class="meter-val mv-p2" id="meterP2">-1.50</div>
+          <div class="meter-unit">кг·м/с</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Суммарный P_полн</div>
+          <div class="meter-val mv-ptot" id="meterPtot">+1.50</div>
+          <div class="meter-unit">кг·м/с (const!)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Кинетическая Eк</div>
+          <div class="meter-val mv-ek" id="meterEk">4.50</div>
+          <div class="meter-unit">Джоуль (Дж)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Тип соударения</div>
+      <div style="padding:14px 18px 0;">
+        <div class="type-toggle-group">
+          <button class="type-btn active" id="btnElastic" type="button">Упругий удар</button>
+          <button class="type-btn" id="btnInelastic" type="button">Неупругий удар</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Масса тележки 1 (m₁)</span>
+            <span class="ctrl-val-box" style="color:var(--cyan);"><span id="m1Val">1.5</span> <small>кг</small></span>
+          </div>
+          <input type="range" id="m1Slider" min="0.5" max="4.0" step="0.5" value="1.5">
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Скорость тележки 1 (v₁)</span>
+            <span class="ctrl-val-box" style="color:var(--cyan);"><span id="v1Val">+2.0</span> <small>м/с</small></span>
+          </div>
+          <input type="range" id="v1Slider" min="0.0" max="4.0" step="0.5" value="2.0">
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Масса тележки 2 (m₂)</span>
+            <span class="ctrl-val-box" style="color:var(--accent);"><span id="m2Val">1.5</span> <small>кг</small></span>
+          </div>
+          <input type="range" id="m2Slider" min="0.5" max="4.0" step="0.5" value="1.5">
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Скорость тележки 2 (v₂)</span>
+            <span class="ctrl-val-box" style="color:var(--accent);"><span id="v2Val">-1.0</span> <small>м/с</small></span>
+          </div>
+          <input type="range" id="v2Slider" min="-3.0" max="2.0" step="0.5" value="-1.0">
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-run" id="btnPlayPause">Пауза</button>
+          <button class="btn-sim btn-reset" id="btnReset">Сброс позиции</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Классические соударения</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-type="elastic" data-m1="1.5" data-v1="2.0" data-m2="1.5" data-v2="-1.0">
+          <div class="preset-title">Лобовой удар</div>
+          <div class="preset-sub">m₁ = m₂, v₁ = 2, v₂ = -1</div>
+        </button>
+        <button class="preset-btn" data-type="elastic" data-m1="1.5" data-v1="2.5" data-m2="1.5" data-v2="0">
+          <div class="preset-title">Удар по мишени</div>
+          <div class="preset-sub">Обмен скоростями (v₂=0)</div>
+        </button>
+        <button class="preset-btn" data-type="inelastic" data-m1="2.0" data-v1="3.0" data-m2="1.0" data-v2="0">
+          <div class="preset-title">Слипание тележек</div>
+          <div class="preset-sub">Неупругий удар, v > 0</div>
+        </button>
+        <button class="preset-btn" data-type="elastic" data-m1="3.5" data-v1="2.0" data-m2="0.5" data-v2="0">
+          <div class="preset-title">Тяжёлый о лёгкий</div>
+          <div class="preset-sub">m₁ ≫ m₂, отскок вперёд</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Физика удара</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">m₁v₁ + m₂v₂ = m₁u₁ + m₂u₂</span>
+            <span class="formula-meaning">Закон сохр. импульса</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">u = (m₁v₁ + m₂v₂) / (m₁+m₂)</span>
+            <span class="formula-meaning">Неупругий удар</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">Q = E_до - E_после</span>
+            <span class="formula-meaning">Потеря энергии на тепло</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          В замкнутой системе тел суммарный векторный импульс остаётся неизменным при любых внутренних взаимодействиях. При абсолютно упругом ударе сохраняется и кинетическая энергия.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('momentumCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const btnElastic = document.getElementById('btnElastic');
+  const btnInelastic = document.getElementById('btnInelastic');
+  const collisionBadge = document.getElementById('collisionBadge');
+
+  const m1Slider = document.getElementById('m1Slider');
+  const v1Slider = document.getElementById('v1Slider');
+  const m2Slider = document.getElementById('m2Slider');
+  const v2Slider = document.getElementById('v2Slider');
+
+  const m1Val = document.getElementById('m1Val');
+  const v1Val = document.getElementById('v1Val');
+  const m2Val = document.getElementById('m2Val');
+  const v2Val = document.getElementById('v2Val');
+
+  const meterP1 = document.getElementById('meterP1');
+  const meterP2 = document.getElementById('meterP2');
+  const meterPtot = document.getElementById('meterPtot');
+  const meterEk = document.getElementById('meterEk');
+
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const btnReset = document.getElementById('btnReset');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  let isElastic = true;
+  let m1 = parseFloat(m1Slider.value);
+  let v1_init = parseFloat(v1Slider.value);
+  let m2 = parseFloat(m2Slider.value);
+  let v2_init = parseFloat(v2Slider.value);
+
+  // Dynamic cart states (in meters and m/s)
+  let x1 = 1.0;
+  let x2 = 4.0;
+  let v1 = v1_init;
+  let v2 = v2_init;
+  let isPlaying = true;
+  let stuckTogether = false;
+
+  function resetPositions() {
+    x1 = 1.0;
+    x2 = 4.0;
+    v1 = v1_init;
+    v2 = v2_init;
+    stuckTogether = false;
+  }
+
+  function updateMeters() {
+    m1Val.textContent = m1.toFixed(1);
+    v1Val.textContent = (v1_init >= 0 ? '+' : '') + v1_init.toFixed(1);
+    m2Val.textContent = m2.toFixed(1);
+    v2Val.textContent = (v2_init >= 0 ? '+' : '') + v2_init.toFixed(1);
+
+    const p1 = m1 * v1;
+    const p2 = m2 * v2;
+    const pTot = p1 + p2;
+    const ek = 0.5 * m1 * v1 * v1 + 0.5 * m2 * v2 * v2;
+
+    meterP1.textContent = (p1 >= 0 ? '+' : '') + p1.toFixed(2);
+    meterP2.textContent = (p2 >= 0 ? '+' : '') + p2.toFixed(2);
+    meterPtot.textContent = (pTot >= 0 ? '+' : '') + pTot.toFixed(2);
+    meterEk.textContent = ek.toFixed(2);
+  }
+
+  function updatePhysics(dt) {
+    if (!isPlaying) return;
+
+    x1 += v1 * dt;
+    x2 += v2 * dt;
+
+    // Track bounds (0 to 6 meters)
+    const trackLen = 6.0;
+    const cartW1 = 0.5 + m1 * 0.1;
+    const cartW2 = 0.5 + m2 * 0.1;
+
+    // Bounce from track left/right borders
+    if (x1 - cartW1 / 2 <= 0.1 && v1 < 0) {
+      v1 = -v1;
+    }
+    if (x2 + cartW2 / 2 >= trackLen - 0.1 && v2 > 0) {
+      v2 = -v2;
+    }
+
+    // Collision check between carts
+    const minDist = (cartW1 + cartW2) / 2;
+    if (x2 - x1 <= minDist && v1 > v2) {
+      if (isElastic) {
+        // Elastic collision formulas
+        const u1 = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+        const u2 = (2 * m1 * v1 + (m2 - m1) * v2) / (m1 + m2);
+        v1 = u1;
+        v2 = u2;
+      } else {
+        // Inelastic collision: stick together
+        const u = (m1 * v1 + m2 * v2) / (m1 + m2);
+        v1 = u;
+        v2 = u;
+        stuckTogether = true;
+      }
+    }
+
+    if (stuckTogether) {
+      x2 = x1 + minDist;
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(56,189,248,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    const trackY = H * 0.55;
+    const trackStartX = 60;
+    const trackEndX = W - 60;
+    const trackLenMeters = 6.0;
+    const pxPerMeter = (trackEndX - trackStartX) / trackLenMeters;
+
+    // Air Track Surface
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(trackStartX - 10, trackY, trackEndX - trackStartX + 20, 24);
+    ctx.strokeStyle = 'rgba(244,114,182,0.4)';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(trackStartX - 10, trackY, trackEndX - trackStartX + 20, 24);
+
+    // Track meter ticks
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1;
+    for (let m = 0; m <= trackLenMeters; m++) {
+      const tx = trackStartX + m * pxPerMeter;
+      ctx.beginPath(); ctx.moveTo(tx, trackY); ctx.lineTo(tx, trackY + 10); ctx.stroke();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px Raleway';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${m} м`, tx, trackY + 22);
+    }
+
+    // Cart 1 (Cyan)
+    const pxX1 = trackStartX + x1 * pxPerMeter;
+    const pxW1 = (0.5 + m1 * 0.1) * pxPerMeter;
+    const pxH1 = 44;
+    const py1 = trackY - pxH1;
+
+    ctx.fillStyle = '#0e2a47';
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(pxX1 - pxW1 / 2, py1, pxW1, pxH1, 6);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`m₁=${m1.toFixed(1)} кг`, pxX1, py1 + 24);
+
+    // Cart 2 (Pink)
+    const pxX2 = trackStartX + x2 * pxPerMeter;
+    const pxW2 = (0.5 + m2 * 0.1) * pxPerMeter;
+    const pxH2 = 44;
+    const py2 = trackY - pxH2;
+
+    ctx.fillStyle = '#38122c';
+    ctx.strokeStyle = '#f472b6';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(pxX2 - pxW2 / 2, py2, pxW2, pxH2, 6);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#f472b6';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`m₂=${m2.toFixed(1)} кг`, pxX2, py2 + 24);
+
+    // Buffer springs / latch between carts
+    if (isElastic) {
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(pxX1 + pxW1 / 2, py1 + pxH1 / 2, 7, -Math.PI / 2, Math.PI / 2);
+      ctx.arc(pxX2 - pxW2 / 2, py2 + pxH2 / 2, 7, Math.PI / 2, -Math.PI / 2);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = stuckTogether ? '#f87171' : '#64748b';
+      ctx.fillRect(pxX1 + pxW1 / 2 - 2, py1 + pxH1 / 2 - 5, 4, 10);
+      ctx.fillRect(pxX2 - pxW2 / 2 - 2, py2 + pxH2 / 2 - 5, 4, 10);
+    }
+
+    // Velocity / Momentum Vectors on Carts
+    if (Math.abs(v1) > 0.05) {
+      const vLen1 = v1 * 26;
+      drawArrow(pxX1, py1 - 18, pxX1 + vLen1, py1 - 18, '#38bdf8', `v₁ = ${v1.toFixed(2)} м/с`);
+    }
+    if (Math.abs(v2) > 0.05) {
+      const vLen2 = v2 * 26;
+      drawArrow(pxX2, py2 - 18, pxX2 + vLen2, py2 - 18, '#f472b6', `v₂ = ${v2.toFixed(2)} м/с`);
+    }
+
+    // Momentum Vector Diagram at bottom of canvas
+    const diagY = H - 65;
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'left';
+    ctx.fillText('Диаграмма импульсов системы:', trackStartX, diagY - 14);
+
+    const p1 = m1 * v1;
+    const p2 = m2 * v2;
+    const pTot = p1 + p2;
+    const pScale = 22;
+
+    const origX = W / 2;
+    ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(origX, diagY - 10); ctx.lineTo(origX, diagY + 30); ctx.stroke();
+
+    // Arrow p1
+    drawArrow(origX, diagY, origX + p1 * pScale, diagY, '#38bdf8', `p⃗₁ (${p1.toFixed(2)})`);
+    // Arrow p2
+    drawArrow(origX + p1 * pScale, diagY + 14, origX + (p1 + p2) * pScale, diagY + 14, '#f472b6', `p⃗₂ (${p2.toFixed(2)})`);
+    // Arrow Ptot
+    drawArrow(origX, diagY + 28, origX + pTot * pScale, diagY + 28, '#fbbf24', `P⃗_полн = ${pTot.toFixed(2)}`);
+
+    updateMeters();
+  }
+
+  function drawArrow(fromX, fromY, toX, toY, color, label) {
+    const headLen = 8;
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.5;
+
+    ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    if (label) {
+      ctx.font = 'bold 11px Raleway';
+      ctx.textAlign = (angle > -Math.PI / 2 && angle < Math.PI / 2) ? 'left' : 'right';
+      ctx.fillText(label, toX + Math.cos(angle) * 8, toY + Math.sin(angle) * 8 - 4);
+    }
+  }
+
+  let lastTime = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+
+    updatePhysics(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  btnElastic.addEventListener('click', () => {
+    isElastic = true;
+    btnElastic.classList.add('active');
+    btnInelastic.classList.remove('active');
+    collisionBadge.textContent = 'Абсолютно упругий удар';
+    collisionBadge.className = 'collision-badge s-elastic';
+    resetPositions();
+  });
+
+  btnInelastic.addEventListener('click', () => {
+    isElastic = false;
+    btnInelastic.classList.add('active');
+    btnElastic.classList.remove('active');
+    collisionBadge.textContent = 'Абсолютно неупругий удар';
+    collisionBadge.className = 'collision-badge s-inelastic';
+    resetPositions();
+  });
+
+  m1Slider.addEventListener('input', (e) => {
+    m1 = parseFloat(e.target.value);
+    resetPositions();
+  });
+  v1Slider.addEventListener('input', (e) => {
+    v1_init = parseFloat(e.target.value);
+    resetPositions();
+  });
+  m2Slider.addEventListener('input', (e) => {
+    m2 = parseFloat(e.target.value);
+    resetPositions();
+  });
+  v2Slider.addEventListener('input', (e) => {
+    v2_init = parseFloat(e.target.value);
+    resetPositions();
+  });
+
+  btnPlayPause.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    btnPlayPause.textContent = isPlaying ? 'Пауза' : 'Продолжить';
+  });
+
+  btnReset.addEventListener('click', () => {
+    resetPositions();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const type = btn.dataset.type;
+      if (type === 'elastic') btnElastic.click();
+      else btnInelastic.click();
+
+      m1 = parseFloat(btn.dataset.m1);
+      v1_init = parseFloat(btn.dataset.v1);
+      m2 = parseFloat(btn.dataset.m2);
+      v2_init = parseFloat(btn.dataset.v2);
+
+      m1Slider.value = m1;
+      v1Slider.value = v1_init;
+      m2Slider.value = m2;
+      v2Slider.value = v2_init;
+      resetPositions();
+    });
+  });
+
+  resetPositions();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

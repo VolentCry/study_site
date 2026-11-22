@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Закон Кулона — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #818cf8; --cyan: #38bdf8; --gold: #fbbf24; --green: #34d399; --pink: #f472b6; --red: #f87171;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(129,140,248,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--cyan), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(129,140,248,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-indigo { background: rgba(129,140,248,.15); color: var(--accent); border: 1px solid rgba(129,140,248,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-gold   { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.interaction-state { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.s-repel { background: rgba(244,114,182,.15); color: var(--pink); border: 1px solid rgba(244,114,182,.3); }
+.s-attract { background: rgba(56,189,248,.15); color: var(--cyan); border: 1px solid rgba(56,189,248,.3); }
+.s-zero { background: rgba(148,163,184,.15); color: var(--text2); border: 1px solid rgba(148,163,184,.3); }
+
+#coulombCanvas { display: block; width: 100%; height: 380px; background: #030810; }
+.graph-wrap { background: #030810; border-top: 1px solid var(--border); padding: 14px 20px 12px; }
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; display: flex; justify-content: space-between; }
+#graphCanvas { display: block; width: 100%; height: 160px; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-q1 { color: #f87171; }
+.mv-q2 { color: #38bdf8; }
+.mv-r  { color: #818cf8; }
+.mv-f  { color: #fbbf24; }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--cyan); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(129,140,248,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan); cursor: pointer; box-shadow: 0 0 10px rgba(56,189,248,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+select { width: 100%; padding: 8px 12px; background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: 'Raleway', sans-serif; font-size: 13px; outline: none; cursor: pointer; }
+select:focus { border-color: var(--cyan); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--cyan); background: rgba(56,189,248,.08); }
+.preset-btn.active { border-color: var(--cyan); background: rgba(56,189,248,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--cyan); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(129,140,248,.06); border: 1px solid rgba(129,140,248,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--cyan); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(129,140,248,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--cyan); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=8">К задачам 8 класса</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>8 класс</span> · Электростатика</p>
+  <h1 class="page-title">Закон Кулона</h1>
+  <p class="page-sub">Исследуйте взаимодействие неподвижных точечных зарядов. Изменяйте величины и знаки зарядов q₁, q₂, расстояние между ними и диэлектрическую проницаемость среды.</p>
+  <div class="tags-row">
+    <span class="tag tag-indigo">8 класс</span>
+    <span class="tag tag-cyan">F = k · |q₁q₂| / (εr²)</span>
+    <span class="tag tag-gold">k = 9·10⁹ Н·м²/Кл²</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Векторы электростатических сил и силовые линии</span>
+        <span class="interaction-state s-repel" id="stateBadge">Отталкивание</span>
+      </div>
+      <canvas id="coulombCanvas" width="840" height="380"></canvas>
+      
+      <div class="graph-wrap">
+        <div class="graph-title">
+          <span>График зависимости силы от расстояния: F(r)</span>
+          <span id="graphCoord" style="color:var(--gold);font-weight:600;"></span>
+        </div>
+        <canvas id="graphCanvas" width="840" height="160"></canvas>
+      </div>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Заряд q₁</div>
+          <div class="meter-val mv-q1" id="meterQ1">+4.0</div>
+          <div class="meter-unit">мкКл</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Заряд q₂</div>
+          <div class="meter-val mv-q2" id="meterQ2">+6.0</div>
+          <div class="meter-unit">мкКл</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Расстояние r</div>
+          <div class="meter-val mv-r" id="meterR">20.0</div>
+          <div class="meter-unit">см</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Сила Кулона F</div>
+          <div class="meter-val mv-f" id="meterF">5.40</div>
+          <div class="meter-unit">Ньютон (Н)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры зарядов</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Заряд первого тела (q₁)</span>
+            <span class="ctrl-val-box" style="color:var(--red);"><span id="q1Val">+4.0</span> <small>мкКл</small></span>
+          </div>
+          <input type="range" id="q1Slider" min="-10" max="10" step="0.5" value="4">
+          <span class="ctrl-desc">Знак определяет тип заряда (положительный или отрицательный).</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Заряд второго тела (q₂)</span>
+            <span class="ctrl-val-box" style="color:var(--cyan);"><span id="q2Val">+6.0</span> <small>мкКл</small></span>
+          </div>
+          <input type="range" id="q2Slider" min="-10" max="10" step="0.5" value="6">
+          <span class="ctrl-desc">Одноимённые заряды отталкиваются, разноимённые — притягиваются.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Расстояние между центрами (r)</span>
+            <span class="ctrl-val-box" style="color:var(--accent);"><span id="rVal">20.0</span> <small>см</small></span>
+          </div>
+          <input type="range" id="rSlider" min="5" max="50" step="1" value="20">
+          <span class="ctrl-desc">Сила обратно пропорциональна квадрату расстояния.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Окружающая среда (ε)</span>
+          </div>
+          <select id="mediumSelect">
+            <option value="1">Вакуум / Воздух (ε = 1.0)</option>
+            <option value="2.1">Керосин (ε = 2.1)</option>
+            <option value="6">Слюда (ε = 6.0)</option>
+            <option value="81">Дистиллированная вода (ε = 81.0)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Сценарии опытов</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-q1="4" data-q2="6" data-r="20" data-eps="1">
+          <div class="preset-title">Отталкивание</div>
+          <div class="preset-sub">+4 и +6 мкКл · 20 см</div>
+        </button>
+        <button class="preset-btn" data-q1="5" data-q2="-5" data-r="15" data-eps="1">
+          <div class="preset-title">Притяжение</div>
+          <div class="preset-sub">+5 и -5 мкКл · 15 см</div>
+        </button>
+        <button class="preset-btn" data-q1="8" data-q2="8" data-r="10" data-eps="1">
+          <div class="preset-title">Близкий контакт</div>
+          <div class="preset-sub">Большая сила отталкивания</div>
+        </button>
+        <button class="preset-btn" data-q1="10" data-q2="-10" data-r="20" data-eps="81">
+          <div class="preset-title">В воде (ε = 81)</div>
+          <div class="preset-sub">Ослабление силы в 81 раз</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Физический закон</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">F = k · |q₁q₂| / (εr²)</span>
+            <span class="formula-meaning">Закон Кулона</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">k = 1 / (4πε₀)</span>
+            <span class="formula-meaning">k ≈ 9·10⁹ Н·м²/Кл²</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">F⃗₁₂ = -F⃗₂₁</span>
+            <span class="formula-meaning">3-й закон Ньютона</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          Сила взаимодействия двух точечных неподвижных зарядов в вакууме прямо пропорциональна произведению модулей зарядов и обратно пропорциональна квадрату расстояния между ними.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('coulombCanvas');
+  const ctx = canvas.getContext('2d');
+  const gCanvas = document.getElementById('graphCanvas');
+  const gCtx = gCanvas.getContext('2d');
+
+  const q1Slider = document.getElementById('q1Slider');
+  const q2Slider = document.getElementById('q2Slider');
+  const rSlider = document.getElementById('rSlider');
+  const mediumSelect = document.getElementById('mediumSelect');
+
+  const q1Val = document.getElementById('q1Val');
+  const q2Val = document.getElementById('q2Val');
+  const rVal = document.getElementById('rVal');
+  const meterQ1 = document.getElementById('meterQ1');
+  const meterQ2 = document.getElementById('meterQ2');
+  const meterR = document.getElementById('meterR');
+  const meterF = document.getElementById('meterF');
+  const stateBadge = document.getElementById('stateBadge');
+  const graphCoord = document.getElementById('graphCoord');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  let q1 = parseFloat(q1Slider.value); // in microCoulombs
+  let q2 = parseFloat(q2Slider.value); // in microCoulombs
+  let r = parseFloat(rSlider.value);   // in cm
+  let eps = parseFloat(mediumSelect.value);
+
+  const kConst = 8.98755e9;
+
+  function calcForce(qA, qB, distCm, dielectric) {
+    if (distCm <= 0) return 0;
+    const rM = distCm * 0.01;
+    const q1C = qA * 1e-6;
+    const q2C = qB * 1e-6;
+    return (kConst * Math.abs(q1C * q2C)) / (dielectric * rM * rM);
+  }
+
+  function updateMeters() {
+    q1Val.textContent = (q1 > 0 ? '+' : '') + q1.toFixed(1);
+    q2Val.textContent = (q2 > 0 ? '+' : '') + q2.toFixed(1);
+    rVal.textContent = r.toFixed(1);
+
+    meterQ1.textContent = (q1 > 0 ? '+' : '') + q1.toFixed(1);
+    meterQ2.textContent = (q2 > 0 ? '+' : '') + q2.toFixed(1);
+    meterR.textContent = r.toFixed(1);
+
+    const F = calcForce(q1, q2, r, eps);
+    meterF.textContent = F < 1000 ? F.toFixed(2) : F.toExponential(2);
+    graphCoord.textContent = `r = ${r.toFixed(0)} см, F = ${F.toFixed(2)} Н`;
+
+    if (q1 === 0 || q2 === 0) {
+      stateBadge.textContent = 'Нет взаимодействия';
+      stateBadge.className = 'interaction-state s-zero';
+    } else if (q1 * q2 > 0) {
+      stateBadge.textContent = 'Отталкивание (F > 0)';
+      stateBadge.className = 'interaction-state s-repel';
+    } else {
+      stateBadge.textContent = 'Притяжение (F < 0)';
+      stateBadge.className = 'interaction-state s-attract';
+    }
+  }
+
+  function drawSimulation(time) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(56,189,248,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    const centerY = H / 2 - 20;
+    // Map r (5 to 50 cm) to pixel span (90 to 520 px)
+    const pxDist = 90 + ((r - 5) / (50 - 5)) * 430;
+    const x1 = W / 2 - pxDist / 2;
+    const x2 = W / 2 + pxDist / 2;
+
+    // 1. Draw Optical Bench / Slider Rail
+    const railY = centerY + 80;
+    ctx.fillStyle = '#0f172a';
+    ctx.strokeStyle = 'rgba(129,140,248,0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(W / 2 - 280, railY, 560, 24, 6);
+    ctx.fill(); ctx.stroke();
+
+    // Millimeter ticks on rail
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1;
+    for (let cm = 0; cm <= 50; cm += 2) {
+      const tx = (W / 2 - 240) + (cm / 50) * 480;
+      const tHeight = (cm % 10 === 0) ? 10 : 5;
+      ctx.beginPath();
+      ctx.moveTo(tx, railY + 2);
+      ctx.lineTo(tx, railY + 2 + tHeight);
+      ctx.stroke();
+      if (cm % 10 === 0) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '9px Raleway';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${cm}`, tx, railY + 20);
+      }
+    }
+
+    // Supports / stands holding charges to rail
+    ctx.strokeStyle = 'rgba(148,163,184,0.6)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x1, centerY + 28); ctx.lineTo(x1, railY);
+    ctx.moveTo(x2, centerY + 28); ctx.lineTo(x2, railY);
+    ctx.stroke();
+
+    // 2. Draw Distance Ruler indicator
+    ctx.strokeStyle = '#818cf8';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x1, centerY - 65);
+    ctx.lineTo(x2, centerY - 65);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Ruler arrows
+    ctx.fillStyle = '#818cf8';
+    ctx.beginPath();
+    ctx.moveTo(x1, centerY - 65); ctx.lineTo(x1 + 8, centerY - 70); ctx.lineTo(x1 + 8, centerY - 60); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x2, centerY - 65); ctx.lineTo(x2 - 8, centerY - 70); ctx.lineTo(x2 - 8, centerY - 60); ctx.fill();
+    ctx.font = 'bold 13px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`r = ${r.toFixed(1)} см`, (x1 + x2) / 2, centerY - 75);
+
+    // 3. Field lines between charges
+    if (q1 !== 0 && q2 !== 0) {
+      ctx.save();
+      const numLines = 7;
+      const isAttract = (q1 * q2 < 0);
+      for (let i = 0; i < numLines; i++) {
+        const offset = (i - (numLines - 1) / 2) * 22;
+        ctx.strokeStyle = isAttract ? 'rgba(56,189,248,0.2)' : 'rgba(244,114,182,0.18)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        if (isAttract) {
+          ctx.moveTo(x1, centerY);
+          ctx.bezierCurveTo(x1 + pxDist * 0.35, centerY + offset * 1.6, x2 - pxDist * 0.35, centerY + offset * 1.6, x2, centerY);
+        } else {
+          // Curved away
+          ctx.moveTo(x1, centerY);
+          ctx.quadraticCurveTo((x1 + x2) / 2, centerY + offset * 2.8, x2, centerY);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 4. Draw Charge 1
+    const r1 = 20 + Math.min(14, Math.abs(q1) * 1.4);
+    const color1 = q1 > 0 ? '#f87171' : (q1 < 0 ? '#38bdf8' : '#94a3b8');
+    ctx.save();
+    ctx.translate(x1, centerY);
+    // Glow
+    if (q1 !== 0) {
+      const grad1 = ctx.createRadialGradient(0, 0, 4, 0, 0, r1 * 2);
+      grad1.addColorStop(0, color1);
+      grad1.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad1;
+      ctx.beginPath(); ctx.arc(0, 0, r1 * 2, 0, Math.PI * 2); ctx.fill();
+    }
+    // Sphere
+    ctx.fillStyle = color1;
+    ctx.beginPath(); ctx.arc(0, 0, r1, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#050c1a';
+    ctx.font = 'bold 20px Raleway';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(q1 > 0 ? '+' : (q1 < 0 ? '−' : '0'), 0, 1);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '12px Raleway';
+    ctx.fillText(`q₁ = ${q1 > 0 ? '+' : ''}${q1.toFixed(1)} мкКл`, 0, r1 + 18);
+    ctx.restore();
+
+    // 5. Draw Charge 2
+    const r2 = 20 + Math.min(14, Math.abs(q2) * 1.4);
+    const color2 = q2 > 0 ? '#f87171' : (q2 < 0 ? '#38bdf8' : '#94a3b8');
+    ctx.save();
+    ctx.translate(x2, centerY);
+    // Glow
+    if (q2 !== 0) {
+      const grad2 = ctx.createRadialGradient(0, 0, 4, 0, 0, r2 * 2);
+      grad2.addColorStop(0, color2);
+      grad2.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad2;
+      ctx.beginPath(); ctx.arc(0, 0, r2 * 2, 0, Math.PI * 2); ctx.fill();
+    }
+    // Sphere
+    ctx.fillStyle = color2;
+    ctx.beginPath(); ctx.arc(0, 0, r2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#050c1a';
+    ctx.font = 'bold 20px Raleway';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(q2 > 0 ? '+' : (q2 < 0 ? '−' : '0'), 0, 1);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '12px Raleway';
+    ctx.fillText(`q₂ = ${q2 > 0 ? '+' : ''}${q2.toFixed(1)} мкКл`, 0, r2 + 18);
+    ctx.restore();
+
+    // 6. Draw Force Vectors
+    const F = calcForce(q1, q2, r, eps);
+    if (F > 0.01) {
+      // Vector length scaled logarithmic/clamped for visual aesthetics
+      const vecLen = Math.min(130, Math.max(25, 20 + Math.sqrt(F) * 16));
+      const isRepel = (q1 * q2 > 0);
+      const dir1 = isRepel ? -1 : 1;
+      const dir2 = isRepel ? 1 : -1;
+
+      // Force on q1: F12
+      ctx.strokeStyle = '#fbbf24';
+      ctx.fillStyle = '#fbbf24';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, centerY);
+      ctx.lineTo(x1 + dir1 * vecLen, centerY);
+      ctx.stroke();
+      // Arrowhead 1
+      ctx.beginPath();
+      ctx.moveTo(x1 + dir1 * vecLen, centerY);
+      ctx.lineTo(x1 + dir1 * (vecLen - 10), centerY - 6);
+      ctx.lineTo(x1 + dir1 * (vecLen - 10), centerY + 6);
+      ctx.closePath();
+      ctx.fill();
+
+      // Label F12
+      ctx.font = 'bold 12px "Playfair Display", serif';
+      ctx.textAlign = dir1 > 0 ? 'left' : 'right';
+      ctx.fillText(`F⃗₂₁ (${F.toFixed(2)} Н)`, x1 + dir1 * (vecLen + 10), centerY - 8);
+
+      // Force on q2: F21
+      ctx.beginPath();
+      ctx.moveTo(x2, centerY);
+      ctx.lineTo(x2 + dir2 * vecLen, centerY);
+      ctx.stroke();
+      // Arrowhead 2
+      ctx.beginPath();
+      ctx.moveTo(x2 + dir2 * vecLen, centerY);
+      ctx.lineTo(x2 + dir2 * (vecLen - 10), centerY - 6);
+      ctx.lineTo(x2 + dir2 * (vecLen - 10), centerY + 6);
+      ctx.closePath();
+      ctx.fill();
+
+      // Label F21
+      ctx.textAlign = dir2 > 0 ? 'left' : 'right';
+      ctx.fillText(`F⃗₁₂ (${F.toFixed(2)} Н)`, x2 + dir2 * (vecLen + 10), centerY - 8);
+    }
+  }
+
+  function drawGraph() {
+    gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+    const w = gCanvas.width;
+    const h = gCanvas.height;
+    const padL = 60, padR = 40, padT = 20, padB = 30;
+
+    // Grid
+    gCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+    gCtx.lineWidth = 1;
+    for (let dist = 10; dist <= 50; dist += 10) {
+      const x = padL + ((dist - 5) / (50 - 5)) * (w - padL - padR);
+      gCtx.beginPath(); gCtx.moveTo(x, padT); gCtx.lineTo(x, h - padB); gCtx.stroke();
+      gCtx.fillStyle = '#64748b';
+      gCtx.font = '10px Raleway';
+      gCtx.textAlign = 'center';
+      gCtx.fillText(`${dist} см`, x, h - padB + 14);
+    }
+
+    // Determine max force for scaling (force at min r=5cm)
+    const fAt5 = calcForce(q1, q2, 5, eps);
+    const maxF = Math.max(10, Math.min(100, fAt5 * 1.1));
+
+    for (let fVal = 0; fVal <= maxF; fVal += maxF / 4) {
+      const y = (h - padB) - (fVal / maxF) * (h - padT - padB);
+      gCtx.beginPath(); gCtx.moveTo(padL, y); gCtx.lineTo(w - padR, y); gCtx.stroke();
+      gCtx.fillStyle = '#64748b';
+      gCtx.font = '10px Raleway';
+      gCtx.textAlign = 'right';
+      gCtx.fillText(`${fVal.toFixed(1)}Н`, padL - 8, y + 3);
+    }
+
+    // Axes
+    gCtx.strokeStyle = '#94a3b8';
+    gCtx.lineWidth = 2;
+    gCtx.beginPath();
+    gCtx.moveTo(padL, padT);
+    gCtx.lineTo(padL, h - padB);
+    gCtx.lineTo(w - padR, h - padB);
+    gCtx.stroke();
+
+    // Plot F(r) curve
+    gCtx.strokeStyle = '#fbbf24';
+    gCtx.lineWidth = 3;
+    gCtx.shadowBlur = 8;
+    gCtx.shadowColor = '#fbbf24';
+    gCtx.beginPath();
+    let started = false;
+    for (let stepR = 5; stepR <= 50; stepR += 0.5) {
+      const f = calcForce(q1, q2, stepR, eps);
+      const x = padL + ((stepR - 5) / (50 - 5)) * (w - padL - padR);
+      const y = (h - padB) - (Math.min(f, maxF) / maxF) * (h - padT - padB);
+      if (!started) { gCtx.moveTo(x, y); started = true; }
+      else { gCtx.lineTo(x, y); }
+    }
+    gCtx.stroke();
+    gCtx.shadowBlur = 0;
+
+    // Mark current point
+    const currentF = calcForce(q1, q2, r, eps);
+    const curX = padL + ((r - 5) / (50 - 5)) * (w - padL - padR);
+    const curY = (h - padB) - (Math.min(currentF, maxF) / maxF) * (h - padT - padB);
+
+    gCtx.fillStyle = '#38bdf8';
+    gCtx.shadowBlur = 10;
+    gCtx.shadowColor = '#38bdf8';
+    gCtx.beginPath();
+    gCtx.arc(curX, curY, 6, 0, Math.PI * 2);
+    gCtx.fill();
+    gCtx.shadowBlur = 0;
+
+    // Dashed lines
+    gCtx.strokeStyle = 'rgba(56,189,248,0.5)';
+    gCtx.lineWidth = 1;
+    gCtx.setLineDash([3, 3]);
+    gCtx.beginPath();
+    gCtx.moveTo(curX, h - padB); gCtx.lineTo(curX, curY); gCtx.lineTo(padL, curY);
+    gCtx.stroke();
+    gCtx.setLineDash([]);
+  }
+
+  function loop(time) {
+    drawSimulation(time);
+    drawGraph();
+    requestAnimationFrame(loop);
+  }
+
+  q1Slider.addEventListener('input', (e) => {
+    q1 = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  q2Slider.addEventListener('input', (e) => {
+    q2 = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  rSlider.addEventListener('input', (e) => {
+    r = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  mediumSelect.addEventListener('change', (e) => {
+    eps = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      q1 = parseFloat(btn.dataset.q1);
+      q2 = parseFloat(btn.dataset.q2);
+      r = parseFloat(btn.dataset.r);
+      eps = parseFloat(btn.dataset.eps);
+      q1Slider.value = q1;
+      q2Slider.value = q2;
+      rSlider.value = r;
+      mediumSelect.value = eps;
+      updateMeters();
+    });
+  });
+
+  updateMeters();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

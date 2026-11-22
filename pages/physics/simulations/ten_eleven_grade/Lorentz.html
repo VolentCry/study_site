@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сила Лоренца в магнитном поле — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #fbbf24; --cyan: #38bdf8; --indigo: #818cf8; --green: #34d399; --pink: #f472b6;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(251,191,36,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(251,191,36,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-gold   { background: rgba(251,191,36,.15); color: var(--accent); border: 1px solid rgba(251,191,36,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-indigo { background: rgba(129,140,248,.12); color: var(--indigo); border: 1px solid rgba(129,140,248,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+
+#lorentzCanvas { display: block; width: 100%; height: 460px; background: #030810; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-f { color: var(--accent); }
+.mv-r { color: var(--cyan); }
+.mv-t { color: var(--indigo); }
+.mv-h { color: var(--green); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(251,191,36,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px rgba(251,191,36,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+select { width: 100%; padding: 8px 12px; background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: 'Raleway', sans-serif; font-size: 13px; outline: none; cursor: pointer; }
+select:focus { border-color: var(--accent); }
+
+.btn-row { display: flex; gap: 8px; }
+.btn-sim { flex: 1; padding: 11px 10px; border-radius: 10px; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; cursor: pointer; transition: all .2s; border: none; }
+.btn-run { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #050c1a; box-shadow: 0 0 20px rgba(251,191,36,.3); }
+.btn-run:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(251,191,36,.5); }
+.btn-reset { background: transparent; color: var(--text2); border: 1px solid rgba(148,163,184,.25); }
+.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--accent); background: rgba(251,191,36,.08); }
+.preset-btn.active { border-color: var(--accent); background: rgba(251,191,36,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(251,191,36,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=10-11">К задачам 10–11 классов</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>10–11 класс</span> · Магнитное поле</p>
+  <h1 class="page-title">Движение заряда в магнитном поле: сила Лоренца</h1>
+  <p class="page-sub">Исследуйте траекторию движения электронов, протонов и α-частиц в однородном магнитном поле. Наблюдайте круговую орбиту, винтовую спираль и правило левой руки.</p>
+  <div class="tags-row">
+    <span class="tag tag-gold">10–11 класс</span>
+    <span class="tag tag-cyan">F_л = |q| · v · B · sin α</span>
+    <span class="tag tag-indigo">R = m·v / (|q|·B)</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Траектория частицы в магнитном поле B (вектор направлен от нас ⊗)</span>
+        <span class="status-badge" id="statusBadge">Круговая траектория</span>
+      </div>
+      <canvas id="lorentzCanvas" width="840" height="460"></canvas>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Сила Лоренца Fл</div>
+          <div class="meter-val mv-f" id="meterF">3.20</div>
+          <div class="meter-unit">пН (10⁻¹² Н)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Радиус орбиты R</div>
+          <div class="meter-val mv-r" id="meterR">11.4</div>
+          <div class="meter-unit">см</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Период T</div>
+          <div class="meter-val mv-t" id="meterT">35.7</div>
+          <div class="meter-unit">нс (10⁻⁹ с)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Шаг винта h</div>
+          <div class="meter-val mv-h" id="meterH">0.0</div>
+          <div class="meter-unit">см (при α = 90°)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры эксперимента</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Заряженная частица</span>
+          </div>
+          <select id="particleSelect">
+            <option value="electron">Электрон e⁻ (q = -e, m = 9.1·10⁻³¹ кг)</option>
+            <option value="proton">Протон p⁺ (q = +e, m = 1.67·10⁻²⁷ кг)</option>
+            <option value="alpha">Альфа-частица α²⁺ (q = +2e, m = 6.64·10⁻²⁷ кг)</option>
+          </select>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Индукция поля (B)</span>
+            <span class="ctrl-val-box"><span id="bVal">1.00</span> <small>Тл</small></span>
+          </div>
+          <input type="range" id="bSlider" min="0.2" max="2.5" step="0.1" value="1.0">
+          <span class="ctrl-desc">Модуль вектора магнитной индукции (направлен ⊗).</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Скорость частицы (v)</span>
+            <span class="ctrl-val-box" style="color:var(--cyan);"><span id="vVal">2.0</span> <small>·10⁶ м/с</small></span>
+          </div>
+          <input type="range" id="vSlider" min="0.5" max="5.0" step="0.1" value="2.0">
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Угол влёта (α) к полю B</span>
+            <span class="ctrl-val-box" style="color:var(--green);"><span id="alphaVal">90</span> <small>°</small></span>
+          </div>
+          <input type="range" id="alphaSlider" min="15" max="90" step="5" value="90">
+          <span class="ctrl-desc">При α < 90° частица движется по спирали (винтовой линии).</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-run" id="btnPlayPause">Пауза</button>
+          <button class="btn-sim btn-reset" id="btnReset">Сброс следа</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Сценарии</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-part="electron" data-b="1.0" data-v="2.0" data-alpha="90">
+          <div class="preset-title">Электрон (окружность)</div>
+          <div class="preset-sub">α = 90°, R = 1.1 см</div>
+        </button>
+        <button class="preset-btn" data-part="electron" data-b="1.0" data-v="2.0" data-alpha="45">
+          <div class="preset-title">Спираль электрона</div>
+          <div class="preset-sub">α = 45°, шаг h > 0</div>
+        </button>
+        <button class="preset-btn" data-part="proton" data-b="0.5" data-v="1.0" data-alpha="90">
+          <div class="preset-title">Протон в поле</div>
+          <div class="preset-sub">m ≫ m_e, большой R</div>
+        </button>
+        <button class="preset-btn" data-part="alpha" data-b="1.2" data-v="2.5" data-alpha="60">
+          <div class="preset-title">Альфа-частица</div>
+          <div class="preset-sub">q = +2e, m = 4 а.е.м.</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Законы магнетизма</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">F_л = |q|vB · sin α</span>
+            <span class="formula-meaning">Сила Лоренца</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">R = mv / (|q|B)</span>
+            <span class="formula-meaning">Радиус кривизны</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">h = v_∥ · T</span>
+            <span class="formula-meaning">Шаг винтовой линии</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          Сила Лоренца всегда перпендикулярна скорости ($\vec{F}_{\text{л}} \perp \vec{v}$), поэтому она <strong>не совершает работы</strong> и не меняет кинетическую энергию частицы, изменяя только направление её движения.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('lorentzCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const particleSelect = document.getElementById('particleSelect');
+  const bSlider = document.getElementById('bSlider');
+  const vSlider = document.getElementById('vSlider');
+  const alphaSlider = document.getElementById('alphaSlider');
+
+  const bVal = document.getElementById('bVal');
+  const vVal = document.getElementById('vVal');
+  const alphaVal = document.getElementById('alphaVal');
+
+  const meterF = document.getElementById('meterF');
+  const meterR = document.getElementById('meterR');
+  const meterT = document.getElementById('meterT');
+  const meterH = document.getElementById('meterH');
+  const statusBadge = document.getElementById('statusBadge');
+
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const btnReset = document.getElementById('btnReset');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  const particles = {
+    electron: { q: -1.602e-19, m: 9.109e-31, color: '#38bdf8', label: 'e⁻' },
+    proton:   { q:  1.602e-19, m: 1.673e-27, color: '#f87171', label: 'p⁺' },
+    alpha:    { q:  3.204e-19, m: 6.644e-27, color: '#fbbf24', label: 'α²⁺' }
+  };
+
+  let partKey = 'electron';
+  let B = parseFloat(bSlider.value);
+  let v_scale = parseFloat(vSlider.value); // million m/s
+  let alphaDeg = parseFloat(alphaSlider.value);
+
+  let isPlaying = true;
+  let angle = 0;
+  let driftZ = 0;
+  let trail = [];
+
+  function updateMeters() {
+    const part = particles[partKey];
+    const vReal = v_scale * 1e6;
+    const alphaRad = (alphaDeg * Math.PI) / 180;
+    const vPerp = vReal * Math.sin(alphaRad);
+    const vPar = vReal * Math.cos(alphaRad);
+
+    const fL = Math.abs(part.q) * vReal * B * Math.sin(alphaRad);
+    const R_m = (part.m * vPerp) / (Math.abs(part.q) * B);
+    const T_s = (2 * Math.PI * part.m) / (Math.abs(part.q) * B);
+    const h_m = vPar * T_s;
+
+    bVal.textContent = B.toFixed(2);
+    vVal.textContent = v_scale.toFixed(1);
+    alphaVal.textContent = alphaDeg.toFixed(0);
+
+    meterF.textContent = (fL * 1e12).toFixed(2); // pN
+    meterR.textContent = (R_m * 100).toFixed(1); // cm
+    meterT.textContent = (T_s * 1e9).toFixed(1); // ns
+    meterH.textContent = (h_m * 100).toFixed(1); // cm
+
+    if (alphaDeg === 90) {
+      statusBadge.textContent = 'Круговая траектория (α = 90°)';
+    } else {
+      statusBadge.textContent = `Винтовая линия (шаг h = ${(h_m * 100).toFixed(1)} см)`;
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid with magnetic field symbols ⊗ (field pointing away into the page)
+    ctx.fillStyle = 'rgba(56,189,248,0.1)';
+    ctx.font = '14px monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let x = 40; x < W; x += 55) {
+      for (let y = 40; y < H; y += 55) {
+        ctx.fillText('⊗', x, y);
+      }
+    }
+
+    const midX = W / 2;
+    const midY = H / 2;
+    const part = particles[partKey];
+
+    // Visual radius scale
+    const alphaRad = (alphaDeg * Math.PI) / 180;
+    const rPx = 90 + (v_scale / 5.0) * 50 * (1 / B);
+    const driftSpeedPx = Math.cos(alphaRad) * 40;
+
+    // Position of particle on circle (with drift along horizontal axis if helical)
+    const sign = part.q > 0 ? 1 : -1;
+    const curX = midX + driftZ + Math.cos(angle * sign) * rPx;
+    const curY = midY + Math.sin(angle * sign) * rPx;
+
+    // Draw Trail
+    if (trail.length > 1) {
+      ctx.strokeStyle = part.color;
+      ctx.lineWidth = 2.5;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = part.color;
+      ctx.beginPath();
+      for (let i = 0; i < trail.length; i++) {
+        const pt = trail[i];
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    // Reference orbit circle
+    ctx.strokeStyle = 'rgba(251,191,36,0.2)';
+    ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.arc(midX + driftZ, midY, rPx, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Particle
+    ctx.fillStyle = part.color;
+    ctx.shadowBlur = 12; ctx.shadowColor = part.color;
+    ctx.beginPath(); ctx.arc(curX, curY, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'left';
+    ctx.fillText(part.label, curX + 12, curY + 4);
+
+    // Vector v (tangent)
+    const vAngle = (angle * sign) + (sign > 0 ? Math.PI / 2 : -Math.PI / 2);
+    const vLen = 45;
+    const vEndX = curX + Math.cos(vAngle) * vLen;
+    const vEndY = curY + Math.sin(vAngle) * vLen;
+    drawArrow(curX, curY, vEndX, vEndY, '#38bdf8', 'v⃗');
+
+    // Vector F_l (perpendicular to v, towards center)
+    const fAngle = Math.atan2(midY - curY, (midX + driftZ) - curX);
+    const fLen = 40;
+    const fEndX = curX + Math.cos(fAngle) * fLen;
+    const fEndY = curY + Math.sin(fAngle) * fLen;
+    drawArrow(curX, curY, fEndX, fEndY, '#fbbf24', 'F⃗_л');
+  }
+
+  function drawArrow(fromX, fromY, toX, toY, color, label) {
+    const headLen = 8;
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.5;
+
+    ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    if (label) {
+      ctx.font = 'bold 11px Raleway';
+      ctx.textAlign = (angle > -Math.PI / 2 && angle < Math.PI / 2) ? 'left' : 'right';
+      ctx.fillText(label, toX + Math.cos(angle) * 8, toY + Math.sin(angle) * 8 - 4);
+    }
+  }
+
+  let lastT = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+
+    if (isPlaying) {
+      const alphaRad = (alphaDeg * Math.PI) / 180;
+      const omega = B * 2.8;
+      angle += omega * dt;
+
+      if (alphaDeg < 89) {
+        driftZ += Math.cos(alphaRad) * 45 * dt;
+        if (driftZ > 220) {
+          driftZ = -220;
+          trail = [];
+        }
+      } else {
+        driftZ = 0;
+      }
+
+      const part = particles[partKey];
+      const sign = part.q > 0 ? 1 : -1;
+      const rPx = 90 + (v_scale / 5.0) * 50 * (1 / B);
+      const curX = canvas.width / 2 + driftZ + Math.cos(angle * sign) * rPx;
+      const curY = canvas.height / 2 + Math.sin(angle * sign) * rPx;
+
+      trail.push({ x: curX, y: curY });
+      if (trail.length > 250) trail.shift();
+    }
+
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  particleSelect.addEventListener('change', (e) => {
+    partKey = e.target.value;
+    trail = [];
+    updateMeters();
+  });
+
+  bSlider.addEventListener('input', (e) => {
+    B = parseFloat(e.target.value);
+    trail = [];
+    updateMeters();
+  });
+
+  vSlider.addEventListener('input', (e) => {
+    v_scale = parseFloat(e.target.value);
+    trail = [];
+    updateMeters();
+  });
+
+  alphaSlider.addEventListener('input', (e) => {
+    alphaDeg = parseFloat(e.target.value);
+    trail = [];
+    updateMeters();
+  });
+
+  btnPlayPause.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    btnPlayPause.textContent = isPlaying ? 'Пауза' : 'Продолжить';
+  });
+
+  btnReset.addEventListener('click', () => {
+    angle = 0; driftZ = 0; trail = [];
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      partKey = btn.dataset.part;
+      B = parseFloat(btn.dataset.b);
+      v_scale = parseFloat(btn.dataset.v);
+      alphaDeg = parseFloat(btn.dataset.alpha);
+
+      particleSelect.value = partKey;
+      bSlider.value = B;
+      vSlider.value = v_scale;
+      alphaSlider.value = alphaDeg;
+
+      trail = [];
+      updateMeters();
+    });
+  });
+
+  updateMeters();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

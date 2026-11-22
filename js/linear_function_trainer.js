@@ -402,7 +402,7 @@
         <div>Найдите координаты точки пересечения графика функции с осью абсцисс (Ox):</div>
         <div class="math-expr"><span class="expr-line">y = ${eqHtml}</span></div>
         <div style="font-size:0.85em; color:var(--muted); margin-top:0.4rem;">
-          (Ответ запишите в виде координат <strong>(x; y)</strong>, например: <code>(${x0}; 0)</code>)
+          (Ответ запишите в виде координат <strong>(x; y)</strong>, например: <code>(3; 0)</code>)
         </div>
       `;
       const prompt = 'Найдите координаты точки пересечения графика с осью Ox:';
@@ -458,7 +458,7 @@
         <div>Найдите координаты точки пересечения графика функции с осью ординат (Oy):</div>
         <div class="math-expr"><span class="expr-line">y = ${eqHtml}</span></div>
         <div style="font-size:0.85em; color:var(--muted); margin-top:0.4rem;">
-          (Ответ запишите в виде координат <strong>(x; y)</strong>, например: <code>(0; ${b})</code>)
+          (Ответ запишите в виде координат <strong>(x; y)</strong>, например: <code>(0; -4)</code>)
         </div>
       `;
       const prompt = 'Найдите координаты точки пересечения графика с осью Oy:';
@@ -513,7 +513,7 @@
         <div>Найдите координаты точек пересечения графика функции с осями Ox и Oy:</div>
         <div class="math-expr"><span class="expr-line">y = ${eqHtml}</span></div>
         <div style="font-size:0.85em; color:var(--muted); margin-top:0.4rem;">
-          (Запишите обе точки, например: <code>(${x0}; 0); (0; ${b})</code>)
+          (Запишите обе точки, например: <code>(3; 0); (0; -4)</code>)
         </div>
       `;
       const prompt = 'Найдите точки пересечения графика с осями координат:';
@@ -597,7 +597,7 @@
         </div>
       </div>
       <div style="font-size:0.85em; color:var(--muted); margin-top:0.4rem;">
-        (Ответ запишите в виде координат <strong>(x; y)</strong>, например: <code>(${x0}; ${y0})</code>)
+        (Ответ запишите в виде координат <strong>(x; y)</strong>, например: <code>(2; -3)</code>)
       </div>
     `;
     const prompt = 'Найдите координаты точки пересечения графиков:';

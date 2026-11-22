@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Закон Ома и электрическая цепь — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #818cf8; --cyan: #38bdf8; --gold: #fbbf24; --green: #34d399; --pink: #f472b6;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(129,140,248,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--cyan), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(129,140,248,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-indigo { background: rgba(129,140,248,.15); color: var(--accent); border: 1px solid rgba(129,140,248,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-gold   { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.s-on  { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+.s-off { background: rgba(244,114,182,.15); color: var(--pink); border: 1px solid rgba(244,114,182,.3); }
+
+#circuitCanvas { display: block; width: 100%; height: 380px; background: #030810; }
+.graph-wrap { background: #030810; border-top: 1px solid var(--border); padding: 14px 20px 12px; }
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; display: flex; justify-content: space-between; }
+#graphCanvas { display: block; width: 100%; height: 160px; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-u { color: var(--cyan); }
+.mv-r { color: var(--accent); }
+.mv-i { color: var(--gold); }
+.mv-p { color: var(--pink); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--cyan); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(129,140,248,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan); cursor: pointer; box-shadow: 0 0 10px rgba(56,189,248,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.btn-row { display: flex; gap: 8px; }
+.btn-sim { flex: 1; padding: 11px 10px; border-radius: 10px; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; cursor: pointer; transition: all .2s; border: none; }
+.btn-toggle { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #050c1a; box-shadow: 0 0 20px rgba(129,140,248,.3); }
+.btn-toggle:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(56,189,248,.5); }
+.btn-reset { background: transparent; color: var(--text2); border: 1px solid rgba(148,163,184,.25); }
+.btn-reset:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--cyan); background: rgba(56,189,248,.08); }
+.preset-btn.active { border-color: var(--cyan); background: rgba(56,189,248,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--cyan); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(129,140,248,.06); border: 1px solid rgba(129,140,248,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--cyan); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(129,140,248,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--cyan); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=8">К задачам 8 класса</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>8 класс</span> · Электрические явления</p>
+  <h1 class="page-title">Закон Ома для участка цепи</h1>
+  <p class="page-sub">Исследуйте зависимость силы тока от напряжения и сопротивления. Наблюдайте движение электронов по цепи, яркость накала лампы и показания измерительных приборов в реальном времени.</p>
+  <div class="tags-row">
+    <span class="tag tag-indigo">8 класс</span>
+    <span class="tag tag-cyan">I = U / R</span>
+    <span class="tag tag-gold">P = U · I</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Интерактивная электрическая цепь</span>
+        <span class="status-badge s-on" id="statusBadge">Цепь замкнута</span>
+      </div>
+      <canvas id="circuitCanvas" width="840" height="380"></canvas>
+      
+      <div class="graph-wrap">
+        <div class="graph-title">
+          <span>Вольт-амперная характеристика (ВАХ): I(U)</span>
+          <span id="graphCoord" style="color:var(--cyan);font-weight:600;"></span>
+        </div>
+        <canvas id="graphCanvas" width="840" height="160"></canvas>
+      </div>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Напряжение U</div>
+          <div class="meter-val mv-u" id="meterU">12.0</div>
+          <div class="meter-unit">Вольт (В)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Сопротивление R</div>
+          <div class="meter-val mv-r" id="meterR">10.0</div>
+          <div class="meter-unit">Ом (Ω)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Сила тока I</div>
+          <div class="meter-val mv-i" id="meterI">1.20</div>
+          <div class="meter-unit">Ампер (А)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Мощность P</div>
+          <div class="meter-val mv-p" id="meterP">14.4</div>
+          <div class="meter-unit">Ватт (Вт)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры цепи</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Напряжение источника (U)</span>
+            <span class="ctrl-val-box"><span id="uVal">12.0</span> <small>В</small></span>
+          </div>
+          <input type="range" id="uSlider" min="1" max="24" step="0.5" value="12">
+          <span class="ctrl-desc">Регулирует разность потенциалов на клеммах источника.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Сопротивление реостата (R)</span>
+            <span class="ctrl-val-box"><span id="rVal">10.0</span> <small>Ом</small></span>
+          </div>
+          <input type="range" id="rSlider" min="1" max="50" step="0.5" value="10">
+          <span class="ctrl-desc">Задаёт сопротивление протеканию электрического тока.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-toggle" id="toggleBtn">Размыкать цепь</button>
+          <button class="btn-sim btn-reset" id="resetBtn">Сброс</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Сценарии экспериментов</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-u="12" data-r="10">
+          <div class="preset-title">Номинал лампы</div>
+          <div class="preset-sub">12 В, 10 Ом · 1.2 А</div>
+        </button>
+        <button class="preset-btn" data-u="24" data-r="20">
+          <div class="preset-title">Высокое U</div>
+          <div class="preset-sub">24 В, 20 Ом · 1.2 А</div>
+        </button>
+        <button class="preset-btn" data-u="6" data-r="2">
+          <div class="preset-title">Яркий накал</div>
+          <div class="preset-sub">6 В, 2 Ом · 3.0 А</div>
+        </button>
+        <button class="preset-btn" data-u="3" data-r="30">
+          <div class="preset-title">Слабый ток</div>
+          <div class="preset-sub">3 В, 30 Ом · 0.1 А</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Теоретическая справка</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">I = U / R</span>
+            <span class="formula-meaning">Закон Ома</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">P = U · I = I²R</span>
+            <span class="formula-meaning">Мощность тока</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">Q = I² · R · t</span>
+            <span class="formula-meaning">Закон Джоуля-Ленца</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          <strong>Сила тока</strong> прямо пропорциональна напряжению и обратно пропорциональна сопротивлению проводника. При замкнутом ключе электроны направленно движутся против направления вектора напряжённости электрического поля.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('circuitCanvas');
+  const ctx = canvas.getContext('2d');
+  const gCanvas = document.getElementById('graphCanvas');
+  const gCtx = gCanvas.getContext('2d');
+
+  const uSlider = document.getElementById('uSlider');
+  const rSlider = document.getElementById('rSlider');
+  const uVal = document.getElementById('uVal');
+  const rVal = document.getElementById('rVal');
+  const meterU = document.getElementById('meterU');
+  const meterR = document.getElementById('meterR');
+  const meterI = document.getElementById('meterI');
+  const meterP = document.getElementById('meterP');
+  const statusBadge = document.getElementById('statusBadge');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+  const graphCoord = document.getElementById('graphCoord');
+
+  let U = parseFloat(uSlider.value);
+  let R = parseFloat(rSlider.value);
+  let isClosed = true;
+
+  // Electrons along rectangle circuit
+  // Circuit loop: x1,y1 to x2,y2
+  const W_BOX = 640;
+  const H_BOX = 240;
+  const OX = 100;
+  const OY = 60;
+  const perimeter = 2 * (W_BOX + H_BOX);
+
+  const numElectrons = 36;
+  const electrons = [];
+  for (let i = 0; i < numElectrons; i++) {
+    electrons.push((i / numElectrons) * perimeter);
+  }
+
+  function getCircuitPoint(dist) {
+    let d = ((dist % perimeter) + perimeter) % perimeter;
+    // Top wire: left to right (from OX,OY to OX+W_BOX, OY)
+    if (d < W_BOX) {
+      return { x: OX + d, y: OY };
+    }
+    d -= W_BOX;
+    // Right wire: top to bottom
+    if (d < H_BOX) {
+      return { x: OX + W_BOX, y: OY + d };
+    }
+    d -= H_BOX;
+    // Bottom wire: right to left
+    if (d < W_BOX) {
+      return { x: OX + W_BOX - d, y: OY + H_BOX };
+    }
+    d -= W_BOX;
+    // Left wire: bottom to top
+    return { x: OX, y: OY + H_BOX - d };
+  }
+
+  function updateMeters() {
+    uVal.textContent = U.toFixed(1);
+    rVal.textContent = R.toFixed(1);
+    const I = isClosed ? (U / R) : 0;
+    const P = isClosed ? (U * I) : 0;
+    meterU.textContent = isClosed ? U.toFixed(1) : '0.0';
+    meterR.textContent = R.toFixed(1);
+    meterI.textContent = I.toFixed(2);
+    meterP.textContent = P.toFixed(1);
+    graphCoord.textContent = `U = ${U.toFixed(1)} В, I = ${I.toFixed(2)} А`;
+  }
+
+  function drawCircuit(time) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const I = isClosed ? (U / R) : 0;
+    const P = isClosed ? (U * I) : 0;
+
+    // Draw grid background
+    ctx.strokeStyle = 'rgba(56,189,248,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    // 1. Draw Wires (Rectangle with gaps for components)
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = isClosed ? 8 : 0;
+    ctx.shadowColor = '#38bdf8';
+
+    // Top wire: OX to OX+W_BOX with gap for Battery at center
+    const midTop = OX + W_BOX / 2;
+    ctx.beginPath();
+    ctx.moveTo(OX, OY);
+    ctx.lineTo(midTop - 35, OY);
+    ctx.moveTo(midTop + 35, OY);
+    ctx.lineTo(OX + W_BOX, OY);
+
+    // Right wire with gap for Ammeter
+    const midRight = OY + H_BOX / 2;
+    ctx.moveTo(OX + W_BOX, OY);
+    ctx.lineTo(OX + W_BOX, midRight - 35);
+    ctx.moveTo(OX + W_BOX, midRight + 35);
+    ctx.lineTo(OX + W_BOX, OY + H_BOX);
+
+    // Bottom wire with gap for Rheostat and Bulb
+    const bulbX = OX + W_BOX * 0.3;
+    const rheoX = OX + W_BOX * 0.72;
+    ctx.moveTo(OX + W_BOX, OY + H_BOX);
+    ctx.lineTo(rheoX + 50, OY + H_BOX);
+    ctx.moveTo(rheoX - 50, OY + H_BOX);
+    ctx.lineTo(bulbX + 35, OY + H_BOX);
+    ctx.moveTo(bulbX - 35, OY + H_BOX);
+    ctx.lineTo(OX, OY + H_BOX);
+
+    // Left wire with gap for Key Switch
+    const midLeft = OY + H_BOX / 2;
+    ctx.moveTo(OX, OY + H_BOX);
+    ctx.lineTo(OX, midLeft + 30);
+    ctx.moveTo(OX, midLeft - 30);
+    ctx.lineTo(OX, OY);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // 2. Battery (Top center)
+    ctx.save();
+    ctx.translate(midTop, OY);
+    // Long plate (+)
+    ctx.strokeStyle = '#34d399';
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(-12, -22); ctx.lineTo(-12, 22); ctx.stroke();
+    ctx.fillStyle = '#34d399';
+    ctx.font = 'bold 12px Raleway';
+    ctx.fillText('+', -26, -10);
+
+    // Short plate (-)
+    ctx.strokeStyle = '#f472b6';
+    ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(12, -14); ctx.lineTo(12, 14); ctx.stroke();
+    ctx.fillStyle = '#f472b6';
+    ctx.fillText('−', 22, -10);
+
+    // Battery label
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '12px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Источник: ${U.toFixed(1)} В`, 0, -32);
+    ctx.restore();
+
+    // 3. Switch (Left)
+    ctx.save();
+    ctx.translate(OX, midLeft);
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath(); ctx.arc(0, -25, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 25, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, 25);
+    if (isClosed) {
+      ctx.lineTo(0, -25);
+    } else {
+      ctx.lineTo(26, -15);
+    }
+    ctx.stroke();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '11px Raleway';
+    ctx.textAlign = 'right';
+    ctx.fillText(isClosed ? 'Ключ замкнут' : 'Ключ разомкнут', -12, 4);
+    ctx.restore();
+
+    // 4. Ammeter (Right)
+    ctx.save();
+    ctx.translate(OX + W_BOX, midRight);
+    ctx.fillStyle = '#0a1830';
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 20px "Playfair Display", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('A', 0, -2);
+    // Needle deflection
+    const maxI = 5;
+    const angle = (Math.min(I, maxI) / maxI) * 0.8 - 0.4;
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 16);
+    ctx.lineTo(Math.sin(angle) * 22, -Math.cos(angle) * 22 + 16);
+    ctx.stroke();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '11px Raleway';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`${I.toFixed(2)} А`, 0, 36);
+    ctx.restore();
+
+    // 5. Lamp / Bulb (Bottom Left-center)
+    ctx.save();
+    ctx.translate(bulbX, OY + H_BOX);
+    // Glow circle
+    if (isClosed && P > 0.05) {
+      const glowR = Math.min(80, 20 + Math.sqrt(P) * 14);
+      const radGlow = ctx.createRadialGradient(0, 0, 8, 0, 0, glowR);
+      radGlow.addColorStop(0, 'rgba(251,191,36,0.85)');
+      radGlow.addColorStop(0.4, 'rgba(251,191,36,0.3)');
+      radGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = radGlow;
+      ctx.beginPath(); ctx.arc(0, 0, glowR, 0, Math.PI * 2); ctx.fill();
+    }
+    // Bulb Glass
+    ctx.fillStyle = 'rgba(15,23,42,0.8)';
+    ctx.strokeStyle = isClosed && P > 0.5 ? '#fde047' : '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Filament cross
+    ctx.strokeStyle = isClosed && P > 0.5 ? '#ffffff' : '#64748b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-10, -10); ctx.lineTo(10, 10);
+    ctx.moveTo(10, -10); ctx.lineTo(-10, 10);
+    ctx.stroke();
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '11px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Лампа (${P.toFixed(1)} Вт)`, 0, 34);
+    ctx.restore();
+
+    // 6. Rheostat / Resistor (Bottom Right-center)
+    ctx.save();
+    ctx.translate(rheoX, OY + H_BOX);
+    ctx.fillStyle = '#0f172a';
+    ctx.strokeStyle = '#818cf8';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(-42, -16, 84, 32, 6);
+    ctx.fill(); ctx.stroke();
+    // Rheostat zigzag / coil lines
+    ctx.strokeStyle = 'rgba(129,140,248,0.6)';
+    ctx.lineWidth = 1.5;
+    for (let lx = -32; lx <= 32; lx += 8) {
+      ctx.beginPath(); ctx.moveTo(lx, -12); ctx.lineTo(lx, 12); ctx.stroke();
+    }
+    // Slider arrow on top
+    const sliderPos = ((R - 1) / (50 - 1)) * 60 - 30;
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.moveTo(sliderPos, -26);
+    ctx.lineTo(sliderPos - 6, -34);
+    ctx.lineTo(sliderPos + 6, -34);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath(); ctx.moveTo(sliderPos, -26); ctx.lineTo(sliderPos, -16); ctx.stroke();
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '11px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Реостат: ${R.toFixed(1)} Ω`, 0, 34);
+    ctx.restore();
+
+    // 7. Voltmeter in parallel across bottom components
+    const vY = OY + H_BOX + 60;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(56,189,248,0.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(bulbX - 45, OY + H_BOX);
+    ctx.lineTo(bulbX - 45, vY);
+    ctx.lineTo((bulbX + rheoX) / 2 - 25, vY);
+    ctx.moveTo((bulbX + rheoX) / 2 + 25, vY);
+    ctx.lineTo(rheoX + 55, vY);
+    ctx.lineTo(rheoX + 55, OY + H_BOX);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const vCenterX = (bulbX + rheoX) / 2;
+    ctx.fillStyle = '#0a1830';
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(vCenterX, vY, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 15px "Playfair Display", serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('V', vCenterX, vY);
+    ctx.restore();
+
+    // 8. Animate electron flow
+    if (isClosed && I > 0) {
+      const speed = I * 1.5;
+      for (let i = 0; i < electrons.length; i++) {
+        electrons[i] = (electrons[i] + speed) % perimeter;
+        const pt = getCircuitPoint(electrons[i]);
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function drawGraph() {
+    gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+    const w = gCanvas.width;
+    const h = gCanvas.height;
+    const padL = 60, padR = 40, padT = 20, padB = 30;
+
+    // Background grid
+    gCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+    gCtx.lineWidth = 1;
+    for (let u = 0; u <= 24; u += 4) {
+      const x = padL + (u / 24) * (w - padL - padR);
+      gCtx.beginPath(); gCtx.moveTo(x, padT); gCtx.lineTo(x, h - padB); gCtx.stroke();
+      gCtx.fillStyle = '#64748b';
+      gCtx.font = '10px Raleway';
+      gCtx.textAlign = 'center';
+      gCtx.fillText(`${u}В`, x, h - padB + 14);
+    }
+    for (let iVal = 0; iVal <= 3; iVal += 0.5) {
+      const y = (h - padB) - (iVal / 3) * (h - padT - padB);
+      gCtx.beginPath(); gCtx.moveTo(padL, y); gCtx.lineTo(w - padR, y); gCtx.stroke();
+      gCtx.fillStyle = '#64748b';
+      gCtx.font = '10px Raleway';
+      gCtx.textAlign = 'right';
+      gCtx.fillText(`${iVal.toFixed(1)}А`, padL - 8, y + 3);
+    }
+
+    // Axes
+    gCtx.strokeStyle = '#94a3b8';
+    gCtx.lineWidth = 2;
+    gCtx.beginPath();
+    gCtx.moveTo(padL, padT);
+    gCtx.lineTo(padL, h - padB);
+    gCtx.lineTo(w - padR, h - padB);
+    gCtx.stroke();
+
+    // Plot I(u) line for current R
+    gCtx.strokeStyle = '#818cf8';
+    gCtx.lineWidth = 3;
+    gCtx.shadowBlur = 8;
+    gCtx.shadowColor = '#818cf8';
+    gCtx.beginPath();
+    const x0 = padL;
+    const y0 = h - padB;
+    const uMax = 24;
+    const iMax = uMax / R;
+    const xMax = padL + (uMax / 24) * (w - padL - padR);
+    const yMax = (h - padB) - (Math.min(iMax, 3) / 3) * (h - padT - padB);
+    gCtx.moveTo(x0, y0);
+    gCtx.lineTo(xMax, yMax);
+    gCtx.stroke();
+    gCtx.shadowBlur = 0;
+
+    // Current working point marker
+    if (isClosed) {
+      const curI = U / R;
+      const ptX = padL + (U / 24) * (w - padL - padR);
+      const ptY = (h - padB) - (Math.min(curI, 3) / 3) * (h - padT - padB);
+
+      gCtx.fillStyle = '#38bdf8';
+      gCtx.shadowBlur = 12;
+      gCtx.shadowColor = '#38bdf8';
+      gCtx.beginPath();
+      gCtx.arc(ptX, ptY, 6, 0, Math.PI * 2);
+      gCtx.fill();
+      gCtx.shadowBlur = 0;
+
+      // Coordinate dashed lines
+      gCtx.strokeStyle = 'rgba(56,189,248,0.5)';
+      gCtx.lineWidth = 1;
+      gCtx.setLineDash([3, 3]);
+      gCtx.beginPath();
+      gCtx.moveTo(ptX, h - padB); gCtx.lineTo(ptX, ptY); gCtx.lineTo(padL, ptY);
+      gCtx.stroke();
+      gCtx.setLineDash([]);
+    }
+  }
+
+  function loop(time) {
+    drawCircuit(time);
+    drawGraph();
+    requestAnimationFrame(loop);
+  }
+
+  // Event Listeners
+  uSlider.addEventListener('input', (e) => {
+    U = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  rSlider.addEventListener('input', (e) => {
+    R = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  toggleBtn.addEventListener('click', () => {
+    isClosed = !isClosed;
+    if (isClosed) {
+      statusBadge.textContent = 'Цепь замкнута';
+      statusBadge.className = 'status-badge s-on';
+      toggleBtn.textContent = 'Размыкать цепь';
+    } else {
+      statusBadge.textContent = 'Цепь разомкнута';
+      statusBadge.className = 'status-badge s-off';
+      toggleBtn.textContent = 'Замкнуть цепь';
+    }
+    updateMeters();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    U = 12; R = 10; isClosed = true;
+    uSlider.value = 12; rSlider.value = 10;
+    statusBadge.textContent = 'Цепь замкнута';
+    statusBadge.className = 'status-badge s-on';
+    toggleBtn.textContent = 'Размыкать цепь';
+    presetBtns.forEach((b, i) => b.classList.toggle('active', i === 0));
+    updateMeters();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      U = parseFloat(btn.dataset.u);
+      R = parseFloat(btn.dataset.r);
+      isClosed = true;
+      uSlider.value = U;
+      rSlider.value = R;
+      statusBadge.textContent = 'Цепь замкнута';
+      statusBadge.className = 'status-badge s-on';
+      toggleBtn.textContent = 'Размыкать цепь';
+      updateMeters();
+    });
+  });
+
+  updateMeters();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

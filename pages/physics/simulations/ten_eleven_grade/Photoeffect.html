@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фотоэффект и уравнение Эйнштейна — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #fbbf24; --cyan: #38bdf8; --indigo: #818cf8; --green: #34d399; --pink: #f472b6; --red: #f87171;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(251,191,36,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(251,191,36,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-gold   { background: rgba(251,191,36,.15); color: var(--accent); border: 1px solid rgba(251,191,36,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-indigo { background: rgba(129,140,248,.12); color: var(--indigo); border: 1px solid rgba(129,140,248,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.s-on { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+.s-off { background: rgba(244,114,182,.15); color: var(--pink); border: 1px solid rgba(244,114,182,.3); }
+
+#photoCanvas { display: block; width: 100%; height: 360px; background: #030810; }
+.graph-wrap { background: #030810; border-top: 1px solid var(--border); padding: 14px 20px 12px; }
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; display: flex; justify-content: space-between; }
+#ivCanvas { display: block; width: 100%; height: 160px; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-hf   { color: var(--cyan); }
+.mv-a    { color: var(--accent); }
+.mv-uz   { color: var(--red); }
+.mv-i    { color: var(--green); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(251,191,36,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px rgba(251,191,36,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+select { width: 100%; padding: 8px 12px; background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: 'Raleway', sans-serif; font-size: 13px; outline: none; cursor: pointer; }
+select:focus { border-color: var(--accent); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--accent); background: rgba(251,191,36,.08); }
+.preset-btn.active { border-color: var(--accent); background: rgba(251,191,36,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(251,191,36,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=10-11">К задачам 10–11 классов</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>10–11 класс</span> · Квантовая физика</p>
+  <h1 class="page-title">Внешний фотоэффект</h1>
+  <p class="page-sub">Исследуйте выбивание электронов светом из металлического катода. Изучайте уравнение Эйнштейна, красную границу фотоэффекта и вольт-амперную характеристику.</p>
+  <div class="tags-row">
+    <span class="tag tag-gold">10–11 класс</span>
+    <span class="tag tag-cyan">hν = A_вых + E_к.max</span>
+    <span class="tag tag-indigo">e·U_з = hν - A_вых</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Вакуумный фотоэлемент и цепь задерживающего потенциала</span>
+        <span class="status-badge s-on" id="statusBadge">Фототок идёт</span>
+      </div>
+      <canvas id="photoCanvas" width="840" height="360"></canvas>
+
+      <div class="graph-wrap">
+        <div class="graph-title">
+          <span>Вольт-амперная характеристика: I(U)</span>
+          <span id="graphCoord" style="color:var(--accent);font-weight:600;"></span>
+        </div>
+        <canvas id="ivCanvas" width="840" height="160"></canvas>
+      </div>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Энергия кванта hν</div>
+          <div class="meter-val mv-hf" id="meterHf">2.75</div>
+          <div class="meter-unit">эВ (электрон-вольт)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Работа выхода Aвых</div>
+          <div class="meter-val mv-a" id="meterA">1.89</div>
+          <div class="meter-unit">эВ (Цезий Cs)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Задерживающее Uз</div>
+          <div class="meter-val mv-uz" id="meterUz">0.86</div>
+          <div class="meter-unit">Вольт (В)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Фототок I</div>
+          <div class="meter-val mv-i" id="meterI">24.5</div>
+          <div class="meter-unit">мкА (микроАмпер)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры фотоэлемента</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Материал фотокатода</span>
+          </div>
+          <select id="metalSelect">
+            <option value="Cs">Цезий Cs (A = 1.89 эВ, λ₀ = 656 нм)</option>
+            <option value="K">Калий K (A = 2.29 эВ, λ₀ = 542 нм)</option>
+            <option value="Na">Натрий Na (A = 2.36 эВ, λ₀ = 525 нм)</option>
+            <option value="Zn">Цинк Zn (A = 4.24 эВ, λ₀ = 292 нм, УФ)</option>
+          </select>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Длина волны излучения (λ)</span>
+            <span class="ctrl-val-box" id="lambdaBox"><span id="lambdaVal">450</span> <small>нм</small></span>
+          </div>
+          <input type="range" id="lambdaSlider" min="200" max="750" step="5" value="450">
+          <span class="ctrl-desc">Определяет энергию падающих фотонов: E = hc / λ.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Напряжение анод-катод (U)</span>
+            <span class="ctrl-val-box" style="color:var(--green);"><span id="uVal">+1.50</span> <small>В</small></span>
+          </div>
+          <input type="range" id="uSlider" min="-3.0" max="3.0" step="0.1" value="1.5">
+          <span class="ctrl-desc">Отрицательное U тормозит фотоэлектроны.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Интенсивность света (Ф)</span>
+            <span class="ctrl-val-box" style="color:var(--accent);"><span id="intVal">70</span> <small>%</small></span>
+          </div>
+          <input type="range" id="intSlider" min="20" max="100" step="5" value="70">
+          <span class="ctrl-desc">Определяет число фотонов в секунду и ток насыщения.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Сценарии опытов</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-metal="Cs" data-lam="450" data-u="1.5">
+          <div class="preset-title">Фототок в цезии</div>
+          <div class="preset-sub">hν > A, U > 0 (ускорение)</div>
+        </button>
+        <button class="preset-btn" data-metal="Cs" data-lam="450" data-u="-0.86">
+          <div class="preset-title">Запирание тока (Uз)</div>
+          <div class="preset-sub">U = -U_з, фототок I = 0</div>
+        </button>
+        <button class="preset-btn" data-metal="Zn" data-lam="250" data-u="1.0">
+          <div class="preset-title">УФ на цинке</div>
+          <div class="preset-sub">Ультрафиолет (250 нм)</div>
+        </button>
+        <button class="preset-btn" data-metal="K" data-lam="650" data-u="2.0">
+          <div class="preset-title">Красный свет (нет тока)</div>
+          <div class="preset-sub">hν < A (ниже красной границы)</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Законы Столетова и Эйнштейна</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">hν = A_вых + E_к.max</span>
+            <span class="formula-meaning">Уравнение Эйнштейна</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">e · U_з = E_к.max</span>
+            <span class="formula-meaning">Задерживающий потенциал</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">λ_0 = hc / A_вых</span>
+            <span class="formula-meaning">Красная граница</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          1) Сила тока насыщения прямо пропорциональна световому потоку.<br>
+          2) Максимальная начальная скорость фотоэлектронов зависит только от частоты света и не зависит от интенсивности.<br>
+          3) Для каждого вещества существует красная граница фотоэффекта.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('photoCanvas');
+  const ctx = canvas.getContext('2d');
+  const ivCanvas = document.getElementById('ivCanvas');
+  const ivCtx = ivCanvas.getContext('2d');
+
+  const metalSelect = document.getElementById('metalSelect');
+  const lambdaSlider = document.getElementById('lambdaSlider');
+  const uSlider = document.getElementById('uSlider');
+  const intSlider = document.getElementById('intSlider');
+
+  const lambdaVal = document.getElementById('lambdaVal');
+  const uVal = document.getElementById('uVal');
+  const intVal = document.getElementById('intVal');
+
+  const meterHf = document.getElementById('meterHf');
+  const meterA = document.getElementById('meterA');
+  const meterUz = document.getElementById('meterUz');
+  const meterI = document.getElementById('meterI');
+  const statusBadge = document.getElementById('statusBadge');
+  const graphCoord = document.getElementById('graphCoord');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  const metals = {
+    Cs: { name: 'Цезий Cs', A: 1.89, lambda0: 656 },
+    K:  { name: 'Калий K',  A: 2.29, lambda0: 542 },
+    Na: { name: 'Натрий Na', A: 2.36, lambda0: 525 },
+    Zn: { name: 'Цинк Zn',  A: 4.24, lambda0: 292 }
+  };
+
+  const hc_eV_nm = 1240.0; // hc in eV*nm
+
+  let currentMetal = 'Cs';
+  let lambda = parseFloat(lambdaSlider.value);
+  let U = parseFloat(uSlider.value);
+  let intensity = parseFloat(intSlider.value);
+
+  // Flying particles: photons and electrons
+  const electrons = [];
+
+  function getPhysics() {
+    const metal = metals[currentMetal];
+    const hf = hc_eV_nm / lambda; // eV
+    const A = metal.A; // eV
+    const ekMax = Math.max(0, hf - A);
+    const hasPhotoeffect = hf > A;
+    const Uz = hasPhotoeffect ? ekMax : 0; // V
+
+    // Current calculation
+    let current_uA = 0;
+    if (hasPhotoeffect) {
+      if (U < -Uz) {
+        current_uA = 0;
+      } else {
+        const satCurrent = (intensity / 100) * 35; // uA
+        // Smooth saturation curve
+        const vRatio = (U + Uz) / 1.5;
+        current_uA = satCurrent * Math.min(1.0, Math.sqrt(Math.max(0, vRatio)));
+      }
+    }
+    return { hf, A, ekMax, hasPhotoeffect, Uz, current_uA };
+  }
+
+  function wavelengthToRGB(nm) {
+    if (nm < 380) return 'rgb(180, 100, 255)'; // UV tint
+    let r, g, b;
+    if (nm >= 380 && nm < 440) {
+      r = -(nm - 440) / (440 - 380); g = 0; b = 1;
+    } else if (nm >= 440 && nm < 490) {
+      r = 0; g = (nm - 440) / (490 - 440); b = 1;
+    } else if (nm >= 490 && nm < 510) {
+      r = 0; g = 1; b = -(nm - 510) / (510 - 490);
+    } else if (nm >= 510 && nm < 580) {
+      r = (nm - 510) / (580 - 510); g = 1; b = 0;
+    } else if (nm >= 580 && nm < 645) {
+      r = 1; g = -(nm - 645) / (645 - 580); b = 0;
+    } else {
+      r = 1; g = 0; b = 0;
+    }
+    return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+  }
+
+  function updateMeters() {
+    const p = getPhysics();
+    lambdaVal.textContent = lambda.toFixed(0);
+    uVal.textContent = (U >= 0 ? '+' : '') + U.toFixed(2);
+    intVal.textContent = intensity.toFixed(0);
+
+    meterHf.textContent = p.hf.toFixed(2);
+    meterA.textContent = p.A.toFixed(2);
+    meterUz.textContent = p.Uz.toFixed(2);
+    meterI.textContent = p.current_uA.toFixed(1);
+
+    if (!p.hasPhotoeffect) {
+      statusBadge.textContent = 'Нет фотоэффекта (hν < Aвых)';
+      statusBadge.className = 'status-badge s-off';
+    } else if (p.current_uA <= 0.01) {
+      statusBadge.textContent = 'Ток задержан (U ≤ -Uз)';
+      statusBadge.className = 'status-badge s-off';
+    } else {
+      statusBadge.textContent = `Фототок идёт (I = ${p.current_uA.toFixed(1)} мкА)`;
+      statusBadge.className = 'status-badge s-on';
+    }
+    graphCoord.textContent = `U = ${(U >= 0 ? '+' : '')}${U.toFixed(2)} В, I = ${p.current_uA.toFixed(1)} мкА`;
+  }
+
+  function drawSimulation(dt) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(56,189,248,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    const tubeCenterX = W * 0.44;
+    const tubeCenterY = H * 0.48;
+    const tubeR = 120;
+
+    // 1. Vacuum Phototube Bulb
+    ctx.fillStyle = 'rgba(15,23,42,0.6)';
+    ctx.strokeStyle = 'rgba(56,189,248,0.3)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(tubeCenterX, tubeCenterY, tubeR, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // 2. Cathode Plate (Left)
+    const cathX = tubeCenterX - 75;
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(cathX - 8, tubeCenterY - 60, 16, 120);
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cathX - 8, tubeCenterY - 60, 16, 120);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'right';
+    ctx.fillText('Катод (К)', cathX - 16, tubeCenterY);
+
+    // 3. Anode Ring / Plate (Right)
+    const anodeX = tubeCenterX + 75;
+    ctx.fillStyle = '#475569';
+    ctx.fillRect(anodeX - 4, tubeCenterY - 45, 8, 90);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(anodeX - 4, tubeCenterY - 45, 8, 90);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'left';
+    ctx.fillText('Анод (А)', anodeX + 16, tubeCenterY);
+
+    // 4. Incident Light Beam (Photons)
+    const lightRgb = wavelengthToRGB(lambda);
+    ctx.save();
+    ctx.strokeStyle = lightRgb;
+    ctx.lineWidth = 2.5;
+    for (let i = -40; i <= 40; i += 20) {
+      const startX = tubeCenterX - 180;
+      const startY = tubeCenterY - 100 + i;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(cathX, tubeCenterY + i);
+      ctx.stroke();
+
+      // Arrowhead on beam
+      ctx.fillStyle = lightRgb;
+      ctx.beginPath();
+      ctx.arc(cathX - 6, tubeCenterY + i - 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // 5. Spawn & Move Photoelectrons
+    const p = getPhysics();
+    if (p.hasPhotoeffect) {
+      // Spawn rate depends on intensity
+      if (Math.random() < (intensity / 100) * 0.6) {
+        electrons.push({
+          x: cathX + 8,
+          y: tubeCenterY + (Math.random() * 80 - 40),
+          vx: Math.sqrt(p.ekMax) * 45 + 15,
+          vy: (Math.random() - 0.5) * 15
+        });
+      }
+    }
+
+    // Update and draw electrons
+    ctx.fillStyle = '#38bdf8';
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#38bdf8';
+
+    for (let i = electrons.length - 1; i >= 0; i--) {
+      const e = electrons[i];
+      // Acceleration due to electric field: a = (e * U / d)
+      const ax = U * 35;
+      e.vx += ax * dt;
+      e.x += e.vx * dt;
+      e.y += e.vy * dt;
+
+      // Draw electron
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Remove if reaches anode or bounced back behind cathode or outside tube
+      if (e.x >= anodeX || e.x <= cathX - 5 || Math.abs(e.y - tubeCenterY) > tubeR) {
+        electrons.splice(i, 1);
+      }
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  function drawIVCurve() {
+    ivCtx.clearRect(0, 0, ivCanvas.width, ivCanvas.height);
+    const W = ivCanvas.width;
+    const H = ivCanvas.height;
+    const padL = 60, padR = 40, padT = 20, padB = 30;
+
+    const p = getPhysics();
+
+    // U axis from -3V to +3V
+    const midX = padL + (3 / 6) * (W - padL - padR);
+    const baseY = H - padB;
+
+    // Grid
+    ivCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ivCtx.lineWidth = 1;
+    for (let u = -3; u <= 3; u += 1) {
+      const x = padL + ((u + 3) / 6) * (W - padL - padR);
+      ivCtx.beginPath(); ivCtx.moveTo(x, padT); ivCtx.lineTo(x, baseY); ivCtx.stroke();
+      ivCtx.fillStyle = '#64748b';
+      ivCtx.font = '10px Raleway';
+      ivCtx.textAlign = 'center';
+      ivCtx.fillText(`${u > 0 ? '+' : ''}${u}В`, x, baseY + 14);
+    }
+
+    // Axes
+    ivCtx.strokeStyle = '#94a3b8';
+    ivCtx.lineWidth = 1.5;
+    ivCtx.beginPath();
+    ivCtx.moveTo(padL, baseY); ivCtx.lineTo(W - padR, baseY); // U axis
+    ivCtx.moveTo(midX, padT); ivCtx.lineTo(midX, baseY);     // I axis (U=0)
+    ivCtx.stroke();
+
+    // Plot I-V curve
+    ivCtx.strokeStyle = '#34d399';
+    ivCtx.lineWidth = 2.5;
+    ivCtx.beginPath();
+
+    const satCurrent = (intensity / 100) * 35;
+    const maxI = 40; // uA scale
+
+    for (let uVal = -3; uVal <= 3; uVal += 0.05) {
+      let cur = 0;
+      if (p.hasPhotoeffect) {
+        if (uVal >= -p.Uz) {
+          const vRatio = (uVal + p.Uz) / 1.5;
+          cur = satCurrent * Math.min(1.0, Math.sqrt(Math.max(0, vRatio)));
+        }
+      }
+      const x = padL + ((uVal + 3) / 6) * (W - padL - padR);
+      const y = baseY - (cur / maxI) * (baseY - padT);
+      if (uVal === -3) ivCtx.moveTo(x, y);
+      else ivCtx.lineTo(x, y);
+    }
+    ivCtx.stroke();
+
+    // Current working point marker
+    const curX = padL + ((U + 3) / 6) * (W - padL - padR);
+    const curY = baseY - (p.current_uA / maxI) * (baseY - padT);
+
+    ivCtx.fillStyle = '#fbbf24';
+    ivCtx.shadowBlur = 8; ivCtx.shadowColor = '#fbbf24';
+    ivCtx.beginPath(); ivCtx.arc(curX, curY, 6, 0, Math.PI * 2); ivCtx.fill();
+    ivCtx.shadowBlur = 0;
+
+    // Uz threshold label
+    if (p.hasPhotoeffect && p.Uz > 0) {
+      const uzX = padL + ((-p.Uz + 3) / 6) * (W - padL - padR);
+      ivCtx.fillStyle = '#f87171';
+      ivCtx.font = 'bold 11px Raleway';
+      ivCtx.textAlign = 'center';
+      ivCtx.fillText(`-U_з (-${p.Uz.toFixed(2)}В)`, uzX, baseY - 8);
+    }
+  }
+
+  let lastTime = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+
+    drawSimulation(dt);
+    drawIVCurve();
+    requestAnimationFrame(loop);
+  }
+
+  metalSelect.addEventListener('change', (e) => {
+    currentMetal = e.target.value;
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  lambdaSlider.addEventListener('input', (e) => {
+    lambda = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  uSlider.addEventListener('input', (e) => {
+    U = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  intSlider.addEventListener('input', (e) => {
+    intensity = parseFloat(e.target.value);
+    updateMeters();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMetal = btn.dataset.metal;
+      lambda = parseFloat(btn.dataset.lam);
+      U = parseFloat(btn.dataset.u);
+
+      metalSelect.value = currentMetal;
+      lambdaSlider.value = lambda;
+      uSlider.value = U;
+      updateMeters();
+    });
+  });
+
+  updateMeters();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

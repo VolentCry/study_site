@@ -1148,6 +1148,29 @@ def get_all_users_for_teacher(
         conn.close()
 
 
+def is_lesson_passed(scheduled_at: Any, is_completed: Any) -> bool:
+    """
+    Урок считается прошедшим, если:
+    1) он отмечен как проведённый (is_completed = 1), ЛИБО
+    2) его запланированные дата и время уже наступили (не в будущем!).
+    Уроки в будущем ни при каких условиях не считаются прошедшими.
+    """
+    if bool(is_completed):
+        return True
+    if not scheduled_at:
+        return False
+    try:
+        raw_str = str(scheduled_at).strip().replace(' ', 'T')
+        if raw_str.endswith('Z'):
+            raw_str = raw_str[:-1]
+        dt = datetime.fromisoformat(raw_str)
+        now = datetime.now(dt.tzinfo) if dt.tzinfo else datetime.now()
+        return dt <= now
+    except Exception:
+        now_str = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        return str(scheduled_at).strip().replace(' ', 'T') <= now_str
+
+
 def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = None) -> Dict[str, Any]:
     """
     Получает информацию об оплате и занятиях ученика:
@@ -1179,12 +1202,11 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
         )
         lesson_rows = cursor.fetchall()
 
-        now_iso = datetime.now().isoformat()
-        # Прошедшим считается урок, если он отмечен как проведённый (is_completed)
-        # либо если дата/время урока уже наступили
+        # Прошедшими считаются только уроки, которые уже состоялись или отмечены как проведённые.
+        # Будущие (ещё не прошедшие) уроки сюда не попадают и не формируют долг.
         schedule_passed_count = sum(
             1 for r in lesson_rows
-            if bool(r['is_completed']) or (r['scheduled_at'] and str(r['scheduled_at']) <= now_iso)
+            if is_lesson_passed(r['scheduled_at'], r['is_completed'])
         )
         schedule_paid_count = sum(
             1 for r in lesson_rows
@@ -2757,7 +2779,9 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 'homeworkDeadline': r['homework_deadline'],
                 'homework_deadline': r['homework_deadline'],
                 'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
-                'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False
+                'is_completed': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
+                'isPaid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False,
+                'is_paid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False
             }
             if 'teacher_name' in r.keys():
                 item['teacherName'] = r['teacher_name']
@@ -2875,7 +2899,9 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
                 'studentId': row_up['student_id'] if 'student_id' in row_up.keys() else None,
                 'student_id': row_up['student_id'] if 'student_id' in row_up.keys() else None,
                 'studentName': row_up['student_name'] if ('student_name' in row_up.keys() and row_up['student_name']) else '',
-                'student_name': row_up['student_name'] if ('student_name' in row_up.keys() and row_up['student_name']) else ''
+                'student_name': row_up['student_name'] if ('student_name' in row_up.keys() and row_up['student_name']) else '',
+                'isPaid': bool(row_up['is_paid']) if ('is_paid' in row_up.keys() and row_up['is_paid']) else False,
+                'is_paid': bool(row_up['is_paid']) if ('is_paid' in row_up.keys() and row_up['is_paid']) else False
             }
 
         billing_data = None

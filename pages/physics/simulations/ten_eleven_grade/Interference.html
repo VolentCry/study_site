@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Интерференция света: опыт Юнга — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #fbbf24; --cyan: #38bdf8; --indigo: #818cf8; --green: #34d399; --pink: #f472b6;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(251,191,36,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(251,191,36,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-gold   { background: rgba(251,191,36,.15); color: var(--accent); border: 1px solid rgba(251,191,36,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-indigo { background: rgba(129,140,248,.12); color: var(--indigo); border: 1px solid rgba(129,140,248,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+
+#interfCanvas { display: block; width: 100%; height: 360px; background: #030810; }
+.graph-wrap { background: #030810; border-top: 1px solid var(--border); padding: 14px 20px 12px; }
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; display: flex; justify-content: space-between; }
+#screenCanvas { display: block; width: 100%; height: 160px; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-lambda { color: var(--cyan); }
+.mv-d      { color: var(--accent); }
+.mv-l      { color: var(--indigo); }
+.mv-dx     { color: var(--green); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(251,191,36,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px rgba(251,191,36,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--accent); background: rgba(251,191,36,.08); }
+.preset-btn.active { border-color: var(--accent); background: rgba(251,191,36,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(251,191,36,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=10-11">К задачам 10–11 классов</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>10–11 класс</span> · Волновая оптика</p>
+  <h1 class="page-title">Интерференция света: опыт Юнга</h1>
+  <p class="page-sub">Исследуйте наложение двух когерентных световых волн. Изменяйте длину волны спектра, расстояние между щелями и наблюдайте чередование светлых и тёмных интерференционных полос.</p>
+  <div class="tags-row">
+    <span class="tag tag-gold">10–11 класс</span>
+    <span class="tag tag-cyan">Δx = λ · L / d</span>
+    <span class="tag tag-indigo">Δ = d · sin θ = mλ</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Волновой фронт и дифракция на двух щелях</span>
+        <span class="status-badge" id="statusBadge">Интерференционная картина</span>
+      </div>
+      <canvas id="interfCanvas" width="840" height="360"></canvas>
+
+      <div class="graph-wrap">
+        <div class="graph-title">
+          <span>Вид полос на экране и профиль интенсивности I(x)</span>
+          <span id="graphCoord" style="color:var(--accent);font-weight:600;"></span>
+        </div>
+        <canvas id="screenCanvas" width="840" height="160"></canvas>
+      </div>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Длина волны λ</div>
+          <div class="meter-val mv-lambda" id="meterLambda">532</div>
+          <div class="meter-unit">нм (зелёный свет)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Расстояние щелей d</div>
+          <div class="meter-val mv-d" id="meterD">0.30</div>
+          <div class="meter-unit">мм</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">До экрана L</div>
+          <div class="meter-val mv-l" id="meterL">1.50</div>
+          <div class="meter-unit">метра (м)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Ширина полосы Δx</div>
+          <div class="meter-val mv-dx" id="meterDx">2.66</div>
+          <div class="meter-unit">мм</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры волны</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Длина волны (λ)</span>
+            <span class="ctrl-val-box" id="lambdaValBox"><span id="lambdaVal">532</span> <small>нм</small></span>
+          </div>
+          <input type="range" id="lambdaSlider" min="380" max="750" step="5" value="532">
+          <span class="ctrl-desc">Спектральный диапазон от фиолетового до красного.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Расстояние между щелями (d)</span>
+            <span class="ctrl-val-box"><span id="dVal">0.30</span> <small>мм</small></span>
+          </div>
+          <input type="range" id="dSlider" min="0.10" max="0.80" step="0.02" value="0.30">
+          <span class="ctrl-desc">Чем ближе щели, тем шире интерференционные полосы!</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Расстояние до экрана (L)</span>
+            <span class="ctrl-val-box" style="color:var(--indigo);"><span id="lVal">1.50</span> <small>м</small></span>
+          </div>
+          <input type="range" id="lSlider" min="0.8" max="3.0" step="0.1" value="1.50">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Сценарии опытов</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-lam="532" data-d="0.30" data-l="1.5">
+          <div class="preset-title">Зелёный лазер</div>
+          <div class="preset-sub">λ = 532 нм, Δx = 2.66 мм</div>
+        </button>
+        <button class="preset-btn" data-lam="650" data-d="0.30" data-l="1.5">
+          <div class="preset-title">Красный лазер</div>
+          <div class="preset-sub">λ = 650 нм, широкие полосы</div>
+        </button>
+        <button class="preset-btn" data-lam="405" data-d="0.30" data-l="1.5">
+          <div class="preset-title">Фиолетовый свет</div>
+          <div class="preset-sub">λ = 405 нм, частые полосы</div>
+        </button>
+        <button class="preset-btn" data-lam="589" data-d="0.15" data-l="2.0">
+          <div class="preset-title">Натриевая лампа</div>
+          <div class="preset-sub">Жёлтый дуплет, узкие щели</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Условия максимумов</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">Δx = λ · L / d</span>
+            <span class="formula-meaning">Ширина полосы</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">Δ = d·sin θ = mλ</span>
+            <span class="formula-meaning">Максимум (светлая полоса)</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">Δ = (2m+1) λ / 2</span>
+            <span class="formula-meaning">Минимум (тёмная полоса)</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          Свет от двух когерентных щелей интерферирует в пространстве. В точках, где разность хода кратна целому числу длин волн, волны усиливают друг друга; где разность хода равна нечётному числу полуволн — гасят.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('interfCanvas');
+  const ctx = canvas.getContext('2d');
+  const sCanvas = document.getElementById('screenCanvas');
+  const sCtx = sCanvas.getContext('2d');
+
+  const lambdaSlider = document.getElementById('lambdaSlider');
+  const dSlider = document.getElementById('dSlider');
+  const lSlider = document.getElementById('lSlider');
+
+  const lambdaVal = document.getElementById('lambdaVal');
+  const dVal = document.getElementById('dVal');
+  const lVal = document.getElementById('lVal');
+
+  const meterLambda = document.getElementById('meterLambda');
+  const meterD = document.getElementById('meterD');
+  const meterL = document.getElementById('meterL');
+  const meterDx = document.getElementById('meterDx');
+  const graphCoord = document.getElementById('graphCoord');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  let lambdaNm = parseFloat(lambdaSlider.value);
+  let dMm = parseFloat(dSlider.value);
+  let lM = parseFloat(lSlider.value);
+  let wavePhase = 0;
+
+  function wavelengthToRGB(nm) {
+    let r, g, b;
+    if (nm >= 380 && nm < 440) {
+      r = -(nm - 440) / (440 - 380); g = 0; b = 1;
+    } else if (nm >= 440 && nm < 490) {
+      r = 0; g = (nm - 440) / (490 - 440); b = 1;
+    } else if (nm >= 490 && nm < 510) {
+      r = 0; g = 1; b = -(nm - 510) / (510 - 490);
+    } else if (nm >= 510 && nm < 580) {
+      r = (nm - 510) / (580 - 510); g = 1; b = 0;
+    } else if (nm >= 580 && nm < 645) {
+      r = 1; g = -(nm - 645) / (645 - 580); b = 0;
+    } else if (nm >= 645 && nm <= 750) {
+      r = 1; g = 0; b = 0;
+    } else {
+      r = 1; g = 1; b = 1;
+    }
+    return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+  }
+
+  function updateMeters() {
+    const lamM = lambdaNm * 1e-9;
+    const dM = dMm * 1e-3;
+    const deltaX_mm = (lamM * lM / dM) * 1e3;
+
+    lambdaVal.textContent = lambdaNm.toFixed(0);
+    dVal.textContent = dMm.toFixed(2);
+    lVal.textContent = lM.toFixed(2);
+
+    meterLambda.textContent = lambdaNm.toFixed(0);
+    meterD.textContent = dMm.toFixed(2);
+    meterL.textContent = lM.toFixed(2);
+    meterDx.textContent = deltaX_mm.toFixed(2);
+
+    const rgb = wavelengthToRGB(lambdaNm);
+    meterLambda.style.color = rgb;
+    graphCoord.textContent = `Δx = ${deltaX_mm.toFixed(2)} мм, цвет: ${rgb}`;
+  }
+
+  function drawWaveField() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const barrierX = W * 0.35;
+    const midY = H / 2;
+    const slitSpanPx = 25 + (dMm / 0.8) * 60; // visual slit spacing
+    const s1Y = midY - slitSpanPx / 2;
+    const s2Y = midY + slitSpanPx / 2;
+
+    const rgb = wavelengthToRGB(lambdaNm);
+
+    // 1. Incident plane waves from left
+    const waveLambdaPx = 16 + (lambdaNm - 380) / (750 - 380) * 16;
+    ctx.strokeStyle = rgb;
+    ctx.lineWidth = 2;
+    for (let x = (wavePhase % waveLambdaPx); x < barrierX - 6; x += waveLambdaPx) {
+      ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, H - 20); ctx.stroke();
+    }
+
+    // 2. Barrier with two slits
+    ctx.fillStyle = '#1e293b';
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 3;
+
+    // Top block
+    ctx.fillRect(barrierX - 6, 0, 12, s1Y - 6);
+    ctx.strokeRect(barrierX - 6, 0, 12, s1Y - 6);
+    // Middle block
+    ctx.fillRect(barrierX - 6, s1Y + 6, 12, (s2Y - 6) - (s1Y + 6));
+    ctx.strokeRect(barrierX - 6, s1Y + 6, 12, (s2Y - 6) - (s1Y + 6));
+    // Bottom block
+    ctx.fillRect(barrierX - 6, s2Y + 6, 12, H - (s2Y + 6));
+    ctx.strokeRect(barrierX - 6, s2Y + 6, 12, H - (s2Y + 6));
+
+    // Slit labels S1, S2
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 11px Raleway';
+    ctx.textAlign = 'right';
+    ctx.fillText('S₁', barrierX - 12, s1Y + 4);
+    ctx.fillText('S₂', barrierX - 12, s2Y + 4);
+
+    // 3. Circular Wavefronts from each slit
+    const maxR = W - barrierX;
+    ctx.lineWidth = 1.5;
+    for (let r = (wavePhase % waveLambdaPx); r < maxR; r += waveLambdaPx) {
+      ctx.strokeStyle = rgb;
+      ctx.beginPath();
+      ctx.arc(barrierX, s1Y, r, -Math.PI / 2, Math.PI / 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(barrierX, s2Y, r, -Math.PI / 2, Math.PI / 2);
+      ctx.stroke();
+    }
+
+    // 4. Screen on the right edge
+    const screenX = W - 25;
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(screenX, 20, 10, H - 40);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(screenX, 20, 10, H - 40);
+  }
+
+  function drawScreenAndIntensity() {
+    sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
+    const W = sCanvas.width;
+    const H = sCanvas.height;
+
+    const rgb = wavelengthToRGB(lambdaNm);
+    const lamM = lambdaNm * 1e-9;
+    const dM = dMm * 1e-3;
+    const deltaX_mm = (lamM * lM / dM) * 1e3;
+
+    // Visual scale factor for fringes
+    const fringeScale = 22 / deltaX_mm;
+
+    // 1. Draw Simulated Optical Screen Band (Top half)
+    const bandY = 15;
+    const bandH = 45;
+    for (let x = 0; x < W; x += 2) {
+      const relMm = (x - W / 2) * fringeScale;
+      // Intensity: I = cos^2(pi * x / deltaX)
+      const phase = (Math.PI * relMm) / deltaX_mm;
+      const intensity = Math.pow(Math.cos(phase), 2);
+
+      sCtx.fillStyle = rgb;
+      sCtx.globalAlpha = intensity;
+      sCtx.fillRect(x, bandY, 2, bandH);
+    }
+    sCtx.globalAlpha = 1.0;
+    sCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+    sCtx.lineWidth = 1.5;
+    sCtx.strokeRect(0, bandY, W, bandH);
+
+    // 2. Draw Intensity Curve I(x) (Bottom half)
+    const curveTopY = bandY + bandH + 18;
+    const curveH = H - curveTopY - 20;
+    const baseY = curveTopY + curveH;
+
+    // Base axis
+    sCtx.strokeStyle = '#64748b';
+    sCtx.lineWidth = 1.5;
+    sCtx.beginPath();
+    sCtx.moveTo(40, baseY);
+    sCtx.lineTo(W - 40, baseY);
+    sCtx.stroke();
+
+    // Plot Intensity curve
+    sCtx.strokeStyle = rgb;
+    sCtx.lineWidth = 2.5;
+    sCtx.beginPath();
+    for (let x = 40; x <= W - 40; x += 2) {
+      const relMm = (x - W / 2) * fringeScale;
+      const phase = (Math.PI * relMm) / deltaX_mm;
+      const intensity = Math.pow(Math.cos(phase), 2);
+      const y = baseY - intensity * curveH;
+      if (x === 40) sCtx.moveTo(x, y);
+      else sCtx.lineTo(x, y);
+    }
+    sCtx.stroke();
+
+    // Central maximum label
+    sCtx.fillStyle = '#fbbf24';
+    sCtx.font = 'bold 11px Raleway';
+    sCtx.textAlign = 'center';
+    sCtx.fillText('m = 0 (главный максимум)', W / 2, baseY + 14);
+  }
+
+  let lastT = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+
+    wavePhase += dt * 30;
+
+    drawWaveField();
+    drawScreenAndIntensity();
+    requestAnimationFrame(loop);
+  }
+
+  lambdaSlider.addEventListener('input', (e) => {
+    lambdaNm = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  dSlider.addEventListener('input', (e) => {
+    dMm = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  lSlider.addEventListener('input', (e) => {
+    lM = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateMeters();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      lambdaNm = parseFloat(btn.dataset.lam);
+      dMm = parseFloat(btn.dataset.d);
+      lM = parseFloat(btn.dataset.l);
+
+      lambdaSlider.value = lambdaNm;
+      dSlider.value = dMm;
+      lSlider.value = lM;
+      updateMeters();
+    });
+  });
+
+  updateMeters();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

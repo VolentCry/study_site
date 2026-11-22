@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тонкая линза и построение изображений — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #818cf8; --cyan: #38bdf8; --gold: #fbbf24; --green: #34d399; --pink: #f472b6; --red: #f87171;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(129,140,248,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--cyan), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(129,140,248,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-indigo { background: rgba(129,140,248,.15); color: var(--accent); border: 1px solid rgba(129,140,248,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-gold   { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.image-type-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.s-real { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+.s-virtual { background: rgba(244,114,182,.15); color: var(--pink); border: 1px solid rgba(244,114,182,.3); }
+.s-infinity { background: rgba(251,191,36,.15); color: var(--gold); border: 1px solid rgba(251,191,36,.3); }
+
+#lensCanvas { display: block; width: 100%; height: 460px; background: #030810; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-d { color: var(--cyan); }
+.mv-foc { color: var(--accent); }
+.mv-f { color: var(--gold); }
+.mv-gamma { color: var(--pink); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--cyan); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(129,140,248,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan); cursor: pointer; box-shadow: 0 0 10px rgba(56,189,248,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.type-toggle-group { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+.type-btn { flex: 1; padding: 10px 8px; background: rgba(255,255,255,.02); border: none; color: var(--text2); font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+.type-btn.active { background: rgba(56,189,248,.18); color: var(--cyan); border-bottom: 2px solid var(--cyan); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--cyan); background: rgba(56,189,248,.08); }
+.preset-btn.active { border-color: var(--cyan); background: rgba(56,189,248,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--cyan); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(129,140,248,.06); border: 1px solid rgba(129,140,248,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--cyan); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(129,140,248,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--cyan); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=8">К задачам 8 класса</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>8 класс</span> · Геометрическая оптика</p>
+  <h1 class="page-title">Тонкая линза: ход лучей и изображение</h1>
+  <p class="page-sub">Наблюдайте преломление световых лучей в собирающей и рассеивающей линзах. Перемещайте предмет, изменяйте фокусное расстояние и исследуйте формирование действительных и мнимых изображений.</p>
+  <div class="tags-row">
+    <span class="tag tag-indigo">8 класс</span>
+    <span class="tag tag-cyan">1/F = 1/d + 1/f</span>
+    <span class="tag tag-gold">Г = f / d = H / h</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Оптическая скамья и главные лучи</span>
+        <span class="image-type-badge s-real" id="imageBadge">Действительное, перевёрнутое</span>
+      </div>
+      <canvas id="lensCanvas" width="840" height="460"></canvas>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Расстояние d</div>
+          <div class="meter-val mv-d" id="meterD">30.0</div>
+          <div class="meter-unit">см (до предмета)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Фокус F</div>
+          <div class="meter-val mv-foc" id="meterFoc">+15.0</div>
+          <div class="meter-unit">см (D = +6.7 дптр)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Изображение f</div>
+          <div class="meter-val mv-f" id="meterF">30.0</div>
+          <div class="meter-unit">см (до экрана)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Увеличение Г</div>
+          <div class="meter-val mv-gamma" id="meterGamma">1.00×</div>
+          <div class="meter-unit">кратность</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Тип линзы</div>
+      <div style="padding:14px 18px 0;">
+        <div class="type-toggle-group">
+          <button class="type-btn active" id="btnConverging" type="button">Собирающая (F > 0)</button>
+          <button class="type-btn" id="btnDiverging" type="button">Рассеивающая (F < 0)</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Положение предмета (d)</span>
+            <span class="ctrl-val-box"><span id="dVal">30.0</span> <small>см</small></span>
+          </div>
+          <input type="range" id="dSlider" min="5" max="60" step="0.5" value="30">
+          <span class="ctrl-desc">Расстояние от стрелки-предмета до плоскости линзы.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Фокусное расстояние (|F|)</span>
+            <span class="ctrl-val-box" style="color:var(--accent);"><span id="focVal">15.0</span> <small>см</small></span>
+          </div>
+          <input type="range" id="focSlider" min="10" max="30" step="0.5" value="15">
+          <span class="ctrl-desc">Определяет оптическую силу линзы: D = 1 / F.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Высота предмета (h)</span>
+            <span class="ctrl-val-box" style="color:var(--gold);"><span id="hVal">50</span> <small>мм</small></span>
+          </div>
+          <input type="range" id="hSlider" min="20" max="80" step="5" value="50">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Классические случаи</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-type="conv" data-d="30" data-f="15">
+          <div class="preset-title">d = 2F (в фокусе 2F)</div>
+          <div class="preset-sub">Равное по высоте, f = 2F</div>
+        </button>
+        <button class="preset-btn" data-type="conv" data-d="45" data-f="15">
+          <div class="preset-title">d > 2F (фотоаппарат)</div>
+          <div class="preset-sub">Уменьшенное, F < f < 2F</div>
+        </button>
+        <button class="preset-btn" data-type="conv" data-d="22" data-f="15">
+          <div class="preset-title">F < d < 2F (проектор)</div>
+          <div class="preset-sub">Увеличенное, f > 2F</div>
+        </button>
+        <button class="preset-btn" data-type="conv" data-d="9" data-f="15">
+          <div class="preset-title">d < F (лупа)</div>
+          <div class="preset-sub">Мнимое, прямое, увеличенное</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Формулы и правила лучей</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">1/F = 1/d + 1/f</span>
+            <span class="formula-meaning">Формула тонкой линзы</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">Г = |f / d| = H / h</span>
+            <span class="formula-meaning">Линейное увеличение</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">D = 1 / F [м]</span>
+            <span class="formula-meaning">Оптическая сила (дптр)</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          <strong>Луч 1:</strong> идёт параллельно главной оси, после линзы — через задний фокус.<br>
+          <strong>Луч 2:</strong> проходит через оптический центр O без преломления.<br>
+          <strong>Мнимое изображение:</strong> получается на продолжении расходящихся лучей.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('lensCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const btnConverging = document.getElementById('btnConverging');
+  const btnDiverging = document.getElementById('btnDiverging');
+  const dSlider = document.getElementById('dSlider');
+  const focSlider = document.getElementById('focSlider');
+  const hSlider = document.getElementById('hSlider');
+
+  const dVal = document.getElementById('dVal');
+  const focVal = document.getElementById('focVal');
+  const hVal = document.getElementById('hVal');
+
+  const meterD = document.getElementById('meterD');
+  const meterFoc = document.getElementById('meterFoc');
+  const meterF = document.getElementById('meterF');
+  const meterGamma = document.getElementById('meterGamma');
+  const imageBadge = document.getElementById('imageBadge');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  let isConverging = true;
+  let d = parseFloat(dSlider.value);
+  let F_abs = parseFloat(focSlider.value);
+  let h_obj = parseFloat(hSlider.value);
+
+  function updateCalculations() {
+    dVal.textContent = d.toFixed(1);
+    focVal.textContent = F_abs.toFixed(1);
+    hVal.textContent = h_obj.toFixed(0);
+
+    const F = isConverging ? F_abs : -F_abs;
+    const D = 100 / F; // diopters
+
+    meterD.textContent = d.toFixed(1);
+    meterFoc.textContent = (F > 0 ? '+' : '') + F.toFixed(1);
+
+    // 1/F = 1/d + 1/f => 1/f = 1/F - 1/d = (d - F) / (d*F) => f = (d*F) / (d - F)
+    const denom = d - F;
+    if (Math.abs(denom) < 0.05) {
+      // In focus
+      meterF.textContent = '∞';
+      meterGamma.textContent = '—';
+      imageBadge.textContent = 'Лучи параллельны (изображение в бесконечности)';
+      imageBadge.className = 'image-type-badge s-infinity';
+    } else {
+      const f = (d * F) / denom;
+      const gamma = Math.abs(f / d);
+      meterF.textContent = (f > 0 ? '+' : '') + f.toFixed(1);
+      meterGamma.textContent = gamma.toFixed(2) + '×';
+
+      if (f > 0) {
+        let desc = gamma > 1.05 ? 'Увеличенное' : (gamma < 0.95 ? 'Уменьшенное' : 'Равное');
+        imageBadge.textContent = `Действительное, перевёрнутое, ${desc.toLowerCase()}`;
+        imageBadge.className = 'image-type-badge s-real';
+      } else {
+        let desc = gamma > 1.05 ? 'Увеличенное' : (gamma < 0.95 ? 'Уменьшенное' : 'Равное');
+        imageBadge.textContent = `Мнимое, прямое, ${desc.toLowerCase()}`;
+        imageBadge.className = 'image-type-badge s-virtual';
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+    const midX = W / 2;
+    const midY = H / 2;
+
+    // Scale: pixels per cm
+    const scale = 7.5;
+
+    // 1. Grid
+    ctx.strokeStyle = 'rgba(56,189,248,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // 2. Principal Optical Axis
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(20, midY);
+    ctx.lineTo(W - 20, midY);
+    ctx.stroke();
+
+    // 3. Focal points markers on axis
+    const F_px = F_abs * scale;
+    const points = [
+      { x: midX - 2 * F_px, label: '-2F' },
+      { x: midX - F_px,     label: '-F' },
+      { x: midX,            label: 'O' },
+      { x: midX + F_px,     label: 'F' },
+      { x: midX + 2 * F_px, label: '2F' }
+    ];
+
+    points.forEach(pt => {
+      ctx.fillStyle = '#818cf8';
+      ctx.beginPath(); ctx.arc(pt.x, midY, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 11px Raleway';
+      ctx.textAlign = 'center';
+      ctx.fillText(pt.label, pt.x, midY + 18);
+    });
+
+    // 4. Lens Plane Line & Arrows
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#38bdf8';
+    ctx.beginPath();
+    ctx.moveTo(midX, 40);
+    ctx.lineTo(midX, H - 40);
+    ctx.stroke();
+
+    // Arrows at ends of lens
+    ctx.fillStyle = '#38bdf8';
+    if (isConverging) {
+      // Outward arrows (converging)
+      ctx.beginPath();
+      ctx.moveTo(midX, 36); ctx.lineTo(midX - 10, 52); ctx.lineTo(midX + 10, 52); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(midX, H - 36); ctx.lineTo(midX - 10, H - 52); ctx.lineTo(midX + 10, H - 52); ctx.closePath(); ctx.fill();
+    } else {
+      // Inward arrows (diverging)
+      ctx.beginPath();
+      ctx.moveTo(midX - 10, 36); ctx.lineTo(midX + 10, 36); ctx.lineTo(midX, 52); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(midX - 10, H - 36); ctx.lineTo(midX + 10, H - 36); ctx.lineTo(midX, H - 52); ctx.closePath(); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    // 5. Draw Object (Arrow pointing up)
+    const objX = midX - d * scale;
+    // Scale h (mm) to px: 50mm -> 65px
+    const objHeightPx = h_obj * 1.3;
+    const objY = midY - objHeightPx;
+
+    ctx.strokeStyle = '#34d399';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(objX, midY);
+    ctx.lineTo(objX, objY);
+    ctx.stroke();
+    // Arrowhead
+    ctx.fillStyle = '#34d399';
+    ctx.beginPath();
+    ctx.moveTo(objX, objY - 2);
+    ctx.lineTo(objX - 7, objY + 12);
+    ctx.lineTo(objX + 7, objY + 12);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText('Предмет', objX, objY - 10);
+
+    // 6. Draw Image
+    const F = isConverging ? F_abs : -F_abs;
+    const denom = d - F;
+    if (Math.abs(denom) >= 0.05) {
+      const f = (d * F) / denom;
+      const imgX = midX + f * scale;
+      const imgHeightPx = -(f / d) * objHeightPx;
+      const imgY = midY - imgHeightPx;
+
+      const isReal = (f > 0);
+      ctx.strokeStyle = isReal ? '#fbbf24' : '#f472b6';
+      ctx.lineWidth = 4;
+      if (!isReal) ctx.setLineDash([5, 4]);
+
+      ctx.beginPath();
+      ctx.moveTo(imgX, midY);
+      ctx.lineTo(imgX, imgY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Arrowhead
+      ctx.fillStyle = isReal ? '#fbbf24' : '#f472b6';
+      const arrowDir = imgHeightPx > 0 ? -1 : 1;
+      ctx.beginPath();
+      ctx.moveTo(imgX, imgY);
+      ctx.lineTo(imgX - 7, imgY + arrowDir * 12);
+      ctx.lineTo(imgX + 7, imgY + arrowDir * 12);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.font = 'bold 12px Raleway';
+      ctx.textAlign = 'center';
+      ctx.fillText(isReal ? 'Изображение' : 'Мнимое изобр.', imgX, imgY + (imgHeightPx > 0 ? -12 : 22));
+
+      // 7. Ray Tracing
+      // Ray 1: Parallel to axis from object tip to lens, then through focus
+      ctx.strokeStyle = 'rgba(56,189,248,0.7)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(objX, objY);
+      ctx.lineTo(midX, objY);
+      ctx.stroke();
+
+      if (isConverging) {
+        // Refracts through right focus (midX + F_px, midY)
+        const slope1 = (midY - objY) / F_px;
+        const targetX = W - 20;
+        const targetY = objY + slope1 * (targetX - midX);
+        ctx.beginPath();
+        ctx.moveTo(midX, objY);
+        ctx.lineTo(targetX, targetY);
+        ctx.stroke();
+
+        // If virtual, dashed ray back to image
+        if (!isReal) {
+          ctx.strokeStyle = 'rgba(244,114,182,0.5)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(midX, objY);
+          ctx.lineTo(imgX, imgY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      } else {
+        // Diverging: refracts along line from left focus (midX - F_px, midY)
+        const slope1 = (objY - midY) / F_px;
+        const targetX = W - 20;
+        const targetY = objY + slope1 * (targetX - midX);
+        ctx.beginPath();
+        ctx.moveTo(midX, objY);
+        ctx.lineTo(targetX, targetY);
+        ctx.stroke();
+
+        // Virtual back-trace through left focus
+        ctx.strokeStyle = 'rgba(244,114,182,0.5)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(midX, objY);
+        ctx.lineTo(midX - F_px, midY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Ray 2: Through optical center (straight line)
+      ctx.strokeStyle = 'rgba(251,191,36,0.7)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      const slope2 = (midY - objY) / (midX - objX);
+      const r2StartX = objX;
+      const r2EndX = W - 20;
+      ctx.moveTo(r2StartX, objY);
+      ctx.lineTo(r2EndX, midY + slope2 * (r2EndX - midX));
+      ctx.stroke();
+
+      if (!isReal) {
+        ctx.strokeStyle = 'rgba(244,114,182,0.5)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(midX, midY);
+        ctx.lineTo(imgX, imgY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
+
+  function loop() {
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  btnConverging.addEventListener('click', () => {
+    isConverging = true;
+    btnConverging.classList.add('active');
+    btnDiverging.classList.remove('active');
+    updateCalculations();
+  });
+
+  btnDiverging.addEventListener('click', () => {
+    isConverging = false;
+    btnDiverging.classList.add('active');
+    btnConverging.classList.remove('active');
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateCalculations();
+  });
+
+  dSlider.addEventListener('input', (e) => {
+    d = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateCalculations();
+  });
+
+  focSlider.addEventListener('input', (e) => {
+    F_abs = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    updateCalculations();
+  });
+
+  hSlider.addEventListener('input', (e) => {
+    h_obj = parseFloat(e.target.value);
+    updateCalculations();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      isConverging = (btn.dataset.type === 'conv');
+      d = parseFloat(btn.dataset.d);
+      F_abs = parseFloat(btn.dataset.f);
+      dSlider.value = d;
+      focSlider.value = F_abs;
+      btnConverging.classList.toggle('active', isConverging);
+      btnDiverging.classList.toggle('active', !isConverging);
+      updateCalculations();
+    });
+  });
+
+  updateCalculations();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

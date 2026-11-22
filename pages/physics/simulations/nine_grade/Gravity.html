@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Закон тяготения и орбитальное движение — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #f472b6; --cyan: #38bdf8; --gold: #fbbf24; --green: #34d399; --indigo: #818cf8;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(244,114,182,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(244,114,182,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--indigo) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-pink   { background: rgba(244,114,182,.15); color: var(--accent); border: 1px solid rgba(244,114,182,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-gold   { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.s-circ   { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+.s-ellip  { background: rgba(56,189,248,.15); color: var(--cyan); border: 1px solid rgba(56,189,248,.3); }
+.s-escape { background: rgba(251,191,36,.15); color: var(--gold); border: 1px solid rgba(251,191,36,.3); }
+.s-crash  { background: rgba(244,114,182,.15); color: var(--accent); border: 1px solid rgba(244,114,182,.3); }
+
+#gravityCanvas { display: block; width: 100%; height: 500px; background: #030810; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-v { color: var(--cyan); }
+.mv-v1 { color: var(--green); }
+.mv-r { color: var(--accent); }
+.mv-f { color: var(--gold); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(244,114,182,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px rgba(244,114,182,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+select { width: 100%; padding: 8px 12px; background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: 'Raleway', sans-serif; font-size: 13px; outline: none; cursor: pointer; }
+select:focus { border-color: var(--accent); }
+
+.btn-row { display: flex; gap: 8px; }
+.btn-sim { flex: 1; padding: 11px 10px; border-radius: 10px; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; cursor: pointer; transition: all .2s; border: none; }
+.btn-run { background: linear-gradient(135deg, var(--accent), var(--indigo)); color: #fff; box-shadow: 0 0 20px rgba(244,114,182,.3); }
+.btn-run:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(244,114,182,.5); }
+.btn-reset { background: transparent; color: var(--text2); border: 1px solid rgba(148,163,184,.25); }
+.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--accent); background: rgba(244,114,182,.08); }
+.preset-btn.active { border-color: var(--accent); background: rgba(244,114,182,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(244,114,182,.06); border: 1px solid rgba(244,114,182,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(244,114,182,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=9">К задачам 9 класса</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>9 класс</span> · Гравитация</p>
+  <h1 class="page-title">Закон тяготения и орбиты</h1>
+  <p class="page-sub">Запускайте искусственный спутник на орбиту вокруг планеты. Изучайте первую и вторую космические скорости, форму орбиты и действие силы притяжения.</p>
+  <div class="tags-row">
+    <span class="tag tag-pink">9 класс</span>
+    <span class="tag tag-cyan">F = G · M·m / r²</span>
+    <span class="tag tag-gold">v₁ = √(G·M/r)</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Модель движения спутника в гравитационном поле</span>
+        <span class="status-badge s-circ" id="statusBadge">Круговая орбита</span>
+      </div>
+      <canvas id="gravityCanvas" width="840" height="500"></canvas>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Скорость v</div>
+          <div class="meter-val mv-v" id="meterV">7.90</div>
+          <div class="meter-unit">км/с</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">1-я космическая v₁</div>
+          <div class="meter-val mv-v1" id="meterV1">7.90</div>
+          <div class="meter-unit">км/с</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Высота над планетой h</div>
+          <div class="meter-val mv-r" id="meterH">400</div>
+          <div class="meter-unit">км (r = 6771 км)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Сила тяготения F</div>
+          <div class="meter-val mv-f" id="meterF">8.70</div>
+          <div class="meter-unit">кН (при m = 1000 кг)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры запуска</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Центральное тело</span>
+          </div>
+          <select id="planetSelect">
+            <option value="earth">Земля (M = 5.97·10²⁴ кг, R = 6371 км)</option>
+            <option value="mars">Марс (M = 0.64·10²⁴ кг, R = 3389 км)</option>
+            <option value="moon">Луна (M = 0.073·10²⁴ кг, R = 1737 км)</option>
+          </select>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Начальная скорость (v₀)</span>
+            <span class="ctrl-val-box"><span id="vVal">7.90</span> <small>км/с</small></span>
+          </div>
+          <input type="range" id="vSlider" min="2.0" max="13.0" step="0.05" value="7.90">
+          <span class="ctrl-desc">Горизонтальная скорость отделения от ракеты-носителя.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Высота над планетой (h)</span>
+            <span class="ctrl-val-box" style="color:var(--cyan);"><span id="hVal">400</span> <small>км</small></span>
+          </div>
+          <input type="range" id="hSlider" min="100" max="3000" step="50" value="400">
+          <span class="ctrl-desc">Высота апогея/перигея над поверхностью.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-run" id="btnPlayPause">Пауза</button>
+          <button class="btn-sim btn-reset" id="btnRestart">Перезапуск</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Классические орбиты</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-v="7.67" data-h="400">
+          <div class="preset-title">МКС (v = v₁)</div>
+          <div class="preset-sub">Круговая орбита, h = 400 км</div>
+        </button>
+        <button class="preset-btn" data-v="9.20" data-h="400">
+          <div class="preset-title">Высокий эллипс</div>
+          <div class="preset-sub">v₁ < v < v₂</div>
+        </button>
+        <button class="preset-btn" data-v="11.2" data-h="400">
+          <div class="preset-title">2-я космическая</div>
+          <div class="preset-sub">v = v₂, уход в космос</div>
+        </button>
+        <button class="preset-btn" data-v="5.50" data-h="400">
+          <div class="preset-title">Суборбитальный</div>
+          <div class="preset-sub">v < v₁, падение на Землю</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Гравитационная теория</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">F = G · M·m / r²</span>
+            <span class="formula-meaning">Закон Ньютона</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">v₁ = √(G·M / r)</span>
+            <span class="formula-meaning">1-я космическая</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">v₂ = √2 · v₁</span>
+            <span class="formula-meaning">2-я космическая</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          Для движения по круговой орбите центростремительное ускорение создаётся исключительно силой всемирного тяготения: $m v^2 / r = G M m / r^2$.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('gravityCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const planetSelect = document.getElementById('planetSelect');
+  const vSlider = document.getElementById('vSlider');
+  const hSlider = document.getElementById('hSlider');
+  const vVal = document.getElementById('vVal');
+  const hVal = document.getElementById('hVal');
+
+  const meterV = document.getElementById('meterV');
+  const meterV1 = document.getElementById('meterV1');
+  const meterH = document.getElementById('meterH');
+  const meterF = document.getElementById('meterF');
+  const statusBadge = document.getElementById('statusBadge');
+
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const btnRestart = document.getElementById('btnRestart');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  const planets = {
+    earth: { name: 'Земля', M: 5.972e24, R: 6371000, color: '#38bdf8', glow: 'rgba(56,189,248,0.3)' },
+    mars:  { name: 'Марс',  M: 0.642e24, R: 3389500, color: '#f87171', glow: 'rgba(248,113,113,0.3)' },
+    moon:  { name: 'Луна',  M: 0.073e24, R: 1737400, color: '#cbd5e1', glow: 'rgba(203,213,225,0.3)' }
+  };
+
+  const G = 6.67430e-11;
+  const satMass = 1000; // kg
+
+  let planetKey = 'earth';
+  let initV_km_s = parseFloat(vSlider.value);
+  let initH_km = parseFloat(hSlider.value);
+
+  // Simulation state in meters and m/s
+  let posX = 0;
+  let posY = 0;
+  let velX = 0;
+  let velY = 0;
+  let trail = [];
+  let isPlaying = true;
+  let hasCrashed = false;
+  let isEscaped = false;
+
+  function resetSim() {
+    const pl = planets[planetKey];
+    const r0 = pl.R + initH_km * 1000;
+    posX = 0;
+    posY = -r0;
+    velX = initV_km_s * 1000;
+    velY = 0;
+    trail = [];
+    hasCrashed = false;
+    isEscaped = false;
+
+    // Recalculate 1st cosmic speed at this altitude
+    const v1_ms = Math.sqrt((G * pl.M) / r0);
+    const v1_km_s = v1_ms / 1000;
+    meterV1.textContent = v1_km_s.toFixed(2);
+
+    updateBadge(initV_km_s, v1_km_s);
+  }
+
+  function updateBadge(v, v1) {
+    if (hasCrashed) {
+      statusBadge.textContent = 'Столкновение с поверхностью!';
+      statusBadge.className = 'status-badge s-crash';
+    } else if (isEscaped) {
+      statusBadge.textContent = 'Уход из сферы притяжения (гипербола)';
+      statusBadge.className = 'status-badge s-escape';
+    } else if (Math.abs(v - v1) < 0.15) {
+      statusBadge.textContent = 'Круговая орбита';
+      statusBadge.className = 'status-badge s-circ';
+    } else if (v < v1) {
+      statusBadge.textContent = 'Суборбитальная траектория';
+      statusBadge.className = 'status-badge s-crash';
+    } else {
+      statusBadge.textContent = 'Эллиптическая орбита';
+      statusBadge.className = 'status-badge s-ellip';
+    }
+  }
+
+  function updatePhysics(dt) {
+    if (!isPlaying || hasCrashed || isEscaped) return;
+
+    const pl = planets[planetKey];
+    // Sub-stepping for orbital accuracy
+    const steps = 15;
+    const subDt = dt / steps;
+
+    for (let s = 0; s < steps; s++) {
+      const dist = Math.sqrt(posX * posX + posY * posY);
+      if (dist <= pl.R) {
+        hasCrashed = true;
+        break;
+      }
+      if (dist > pl.R * 6) {
+        isEscaped = true;
+        break;
+      }
+
+      // Gravitational acceleration: a = G * M / r^2 directed to (0,0)
+      const accel = (G * pl.M) / (dist * dist);
+      const ax = -accel * (posX / dist);
+      const ay = -accel * (posY / dist);
+
+      velX += ax * subDt;
+      velY += ay * subDt;
+      posX += velX * subDt;
+      posY += velY * subDt;
+    }
+
+    trail.push({ x: posX, y: posY });
+    if (trail.length > 500) trail.shift();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+    const midX = W / 2;
+    const midY = H / 2;
+
+    const pl = planets[planetKey];
+    // Pixel scale: planet radius drawn as 85px
+    const pxPerMeter = 85 / pl.R;
+
+    // Stars background
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 35; i++) {
+      const sx = (i * 97) % W;
+      const sy = (i * 143) % H;
+      ctx.fillRect(sx, sy, 1.5, 1.5);
+    }
+
+    // Draw Orbit Trail
+    if (trail.length > 1) {
+      ctx.strokeStyle = 'rgba(244,114,182,0.45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < trail.length; i++) {
+        const tx = midX + trail[i].x * pxPerMeter;
+        const ty = midY + trail[i].y * pxPerMeter;
+        if (i === 0) ctx.moveTo(tx, ty);
+        else ctx.lineTo(tx, ty);
+      }
+      ctx.stroke();
+    }
+
+    // Draw Planet
+    const plPxR = pl.R * pxPerMeter;
+    // Atmosphere glow
+    const grad = ctx.createRadialGradient(midX, midY, plPxR * 0.8, midX, midY, plPxR * 1.35);
+    grad.addColorStop(0, pl.glow);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(midX, midY, plPxR * 1.35, 0, Math.PI * 2); ctx.fill();
+
+    // Planet body
+    ctx.fillStyle = pl.color;
+    ctx.beginPath(); ctx.arc(midX, midY, plPxR, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2; ctx.stroke();
+
+    ctx.fillStyle = '#050c1a';
+    ctx.font = 'bold 13px Raleway';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(pl.name, midX, midY);
+
+    // Draw Satellite
+    const satPxX = midX + posX * pxPerMeter;
+    const satPxY = midY + posY * pxPerMeter;
+
+    if (!hasCrashed) {
+      // Satellite body
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath(); ctx.arc(satPxX, satPxY, 5, 0, Math.PI * 2); ctx.fill();
+      // Solar wings
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(satPxX - 14, satPxY); ctx.lineTo(satPxX + 14, satPxY);
+      ctx.stroke();
+
+      // Velocity Vector (tangent, cyan)
+      const currentV_km_s = Math.sqrt(velX * velX + velY * velY) / 1000;
+      const vScale = 3.5;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.fillStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(satPxX, satPxY);
+      ctx.lineTo(satPxX + (velX / 1000) * vScale, satPxY + (velY / 1000) * vScale);
+      ctx.stroke();
+
+      // Gravitational Force Vector (towards planet, gold)
+      const curDist = Math.sqrt(posX * posX + posY * posY);
+      const fDirX = -(posX / curDist);
+      const fDirY = -(posY / curDist);
+      const curF_N = (G * pl.M * satMass) / (curDist * curDist);
+      const fLen = 30;
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(satPxX, satPxY);
+      ctx.lineTo(satPxX + fDirX * fLen, satPxY + fDirY * fLen);
+      ctx.stroke();
+
+      // Live meters update
+      const curH_km = (curDist - pl.R) / 1000;
+      meterV.textContent = currentV_km_s.toFixed(2);
+      meterH.textContent = Math.max(0, curH_km).toFixed(0);
+      meterF.textContent = (curF_N / 1000).toFixed(2);
+    } else {
+      // Crash blast animation
+      ctx.fillStyle = '#f87171';
+      ctx.beginPath(); ctx.arc(satPxX, satPxY, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 12px Raleway';
+      ctx.textAlign = 'center';
+      ctx.fillText('Взрыв при падении', satPxX, satPxY - 16);
+    }
+
+    const currentV_km_s = Math.sqrt(velX * velX + velY * velY) / 1000;
+    const v1_km_s = (Math.sqrt((G * pl.M) / (pl.R + initH_km * 1000))) / 1000;
+    updateBadge(currentV_km_s, v1_km_s);
+  }
+
+  let lastT = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+
+    // Simulation time warp (speed up realistic orbital motion)
+    const timeScale = 120; // 120 simulated seconds per real second
+    updatePhysics(dt * timeScale);
+    draw();
+
+    requestAnimationFrame(loop);
+  }
+
+  planetSelect.addEventListener('change', (e) => {
+    planetKey = e.target.value;
+    const pl = planets[planetKey];
+    const r0 = pl.R + initH_km * 1000;
+    const v1_ms = Math.sqrt((G * pl.M) / r0);
+    initV_km_s = v1_ms / 1000;
+    vSlider.value = initV_km_s.toFixed(2);
+    vVal.textContent = initV_km_s.toFixed(2);
+    resetSim();
+  });
+
+  vSlider.addEventListener('input', (e) => {
+    initV_km_s = parseFloat(e.target.value);
+    vVal.textContent = initV_km_s.toFixed(2);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    resetSim();
+  });
+
+  hSlider.addEventListener('input', (e) => {
+    initH_km = parseFloat(e.target.value);
+    hVal.textContent = initH_km.toFixed(0);
+    presetBtns.forEach(b => b.classList.remove('active'));
+    resetSim();
+  });
+
+  btnPlayPause.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    btnPlayPause.textContent = isPlaying ? 'Пауза' : 'Продолжить';
+  });
+
+  btnRestart.addEventListener('click', () => {
+    resetSim();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      initV_km_s = parseFloat(btn.dataset.v);
+      initH_km = parseFloat(btn.dataset.h);
+      vSlider.value = initV_km_s;
+      hSlider.value = initH_km;
+      vVal.textContent = initV_km_s.toFixed(2);
+      hVal.textContent = initH_km.toFixed(0);
+      planetSelect.value = 'earth';
+      planetKey = 'earth';
+      resetSim();
+    });
+  });
+
+  resetSim();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Колебательный контур (LC-контур) — ФизикаПро</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #050c1a; --bg2: #071222; --bg3: #0a1830;
+  --accent: #fbbf24; --cyan: #38bdf8; --indigo: #818cf8; --green: #34d399; --pink: #f472b6;
+  --text: #e2e8f0; --text2: #94a3b8;
+  --card-bg: rgba(14,28,54,0.85); --border: rgba(251,191,36,0.25);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Raleway', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(5,12,26,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-back { border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px; }
+.nav-back:hover { border-color: var(--accent); color: var(--accent); }
+
+#page-top { padding: 96px 24px 0; text-align: center; position: relative; overflow: hidden; }
+#page-top::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(251,191,36,.12) 0%, transparent 70%); pointer-events: none; }
+.breadcrumb { font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+.breadcrumb span { color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 15px; font-weight: 300; color: var(--text2); line-height: 1.7; max-width: 640px; margin: 12px auto 0; }
+.tags-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; }
+.tag-gold   { background: rgba(251,191,36,.15); color: var(--accent); border: 1px solid rgba(251,191,36,.3); }
+.tag-cyan   { background: rgba(56,189,248,.12); color: var(--cyan); border: 1px solid rgba(56,189,248,.25); }
+.tag-indigo { background: rgba(129,140,248,.12); color: var(--indigo); border: 1px solid rgba(129,140,248,.25); }
+
+#main { max-width: 1280px; margin: 40px auto 0; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 370px; gap: 24px; align-items: start; }
+@media (max-width: 1024px) { #main { grid-template-columns: 1fr; } }
+
+.canvas-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.canvas-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.canvas-title { font-size: 14px; font-weight: 700; letter-spacing: .04em; }
+.status-badge { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
+
+#lcCanvas { display: block; width: 100%; height: 360px; background: #030810; }
+.graph-wrap { background: #030810; border-top: 1px solid var(--border); padding: 14px 20px 12px; }
+.graph-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; display: flex; justify-content: space-between; }
+#graphCanvas { display: block; width: 100%; height: 160px; }
+
+.meters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border-top: 1px solid var(--border); background: var(--border); }
+@media (max-width: 640px) { .meters-row { grid-template-columns: repeat(2, 1fr); } }
+.meter { background: var(--bg2); padding: 12px 14px; text-align: center; }
+.meter-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); }
+.meter-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.meter-unit { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.mv-t { color: var(--accent); }
+.mv-nu { color: var(--cyan); }
+.mv-we { color: var(--green); }
+.mv-wm { color: var(--indigo); }
+
+.side-panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+.card-head-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctrl-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ctrl-val-box { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+.ctrl-val-box small { font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--text2); font-weight: 400; }
+.ctrl-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(251,191,36,.2); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px rgba(251,191,36,.5); transition: transform .15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+.btn-row { display: flex; gap: 8px; }
+.btn-sim { flex: 1; padding: 11px 10px; border-radius: 10px; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; cursor: pointer; transition: all .2s; border: none; }
+.btn-run { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #050c1a; box-shadow: 0 0 20px rgba(251,191,36,.3); }
+.btn-run:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(251,191,36,.5); }
+.btn-reset { background: transparent; color: var(--text2); border: 1px solid rgba(148,163,184,.25); }
+.btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+.presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px; }
+.preset-btn { padding: 9px 10px; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,.03); border: 1px solid var(--border); transition: all .2s; text-align: left; }
+.preset-btn:hover { border-color: var(--accent); background: rgba(251,191,36,.08); }
+.preset-btn.active { border-color: var(--accent); background: rgba(251,191,36,.12); }
+.preset-title { font-size: 11px; font-weight: 700; color: var(--text); }
+.preset-sub { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+.formula-block { background: rgba(251,191,36,.06); border: 1px solid rgba(251,191,36,.2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.formula-row { display: flex; justify-content: space-between; align-items: center; }
+.formula-expr { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+.formula-meaning { font-size: 11px; color: var(--text2); text-align: right; }
+.formula-divider { height: 1px; background: rgba(251,191,36,.15); }
+
+footer { padding: 32px 24px; border-top: 1px solid var(--border); text-align: center; color: var(--text2); font-size: 13px; }
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../physics.html" class="nav-logo">⚛ ФизикаПро</a>
+  <div class="nav-links">
+    <a href="../all_simulations.html" class="nav-back">← Все симуляции</a>
+    <a href="../tasks/index.html?grade=10-11">К задачам 10–11 классов</a>
+  </div>
+</nav>
+
+<div id="page-top">
+  <p class="breadcrumb">Симуляции · <span>10–11 класс</span> · Электромагнитные колебания</p>
+  <h1 class="page-title">Колебательный контур (LC-контур)</h1>
+  <p class="page-sub">Наблюдайте превращение энергии электрического поля конденсатора в энергию магнитного поля катушки индуктивности. Изучайте формулу Томсона и фазовый сдвиг π/2.</p>
+  <div class="tags-row">
+    <span class="tag tag-gold">10–11 класс</span>
+    <span class="tag tag-cyan">T = 2π√(L · C)</span>
+    <span class="tag tag-indigo">W = q²/(2C) + Li²/2</span>
+  </div>
+</div>
+
+<div id="main">
+  <!-- LEFT: CANVAS & METERS -->
+  <div>
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <span class="canvas-title">Контур: Конденсатор C ⇄ Катушка L</span>
+        <span class="status-badge" id="statusBadge">Колебания активны</span>
+      </div>
+      <canvas id="lcCanvas" width="840" height="360"></canvas>
+
+      <div class="graph-wrap">
+        <div class="graph-title">
+          <span>Двухканальный осциллограф: q(t) [голубой] и i(t) [золотой]</span>
+          <span id="graphCoord" style="color:var(--accent);font-weight:600;"></span>
+        </div>
+        <canvas id="graphCanvas" width="840" height="160"></canvas>
+      </div>
+
+      <div class="meters-row">
+        <div class="meter">
+          <div class="meter-label">Период T</div>
+          <div class="meter-val mv-t" id="meterT">628</div>
+          <div class="meter-unit">мкс (10⁻⁶ с)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Частота ν</div>
+          <div class="meter-val mv-nu" id="meterNu">1.59</div>
+          <div class="meter-unit">кГц (килогерц)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Энергия Wэл</div>
+          <div class="meter-val mv-we" id="meterWe">2.50</div>
+          <div class="meter-unit">мДж (поле конденсатора)</div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">Энергия Wмаг</div>
+          <div class="meter-val mv-wm" id="meterWm">0.00</div>
+          <div class="meter-unit">мДж (поле катушки)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS & THEORY -->
+  <div class="side-panel">
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Параметры контура</div>
+      <div class="card-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Индуктивность (L)</span>
+            <span class="ctrl-val-box" style="color:var(--indigo);"><span id="lVal">10.0</span> <small>мГн</small></span>
+          </div>
+          <input type="range" id="lSlider" min="1.0" max="30.0" step="0.5" value="10.0">
+          <span class="ctrl-desc">Индуктивность катушки с сердечником.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Ёмкость конденсатора (C)</span>
+            <span class="ctrl-val-box" style="color:var(--cyan);"><span id="cVal">10.0</span> <small>мкФ</small></span>
+          </div>
+          <input type="range" id="cSlider" min="1.0" max="30.0" step="0.5" value="10.0">
+          <span class="ctrl-desc">Электроёмкость накопителя заряда.</span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-label-row">
+            <span class="ctrl-name">Сопротивление потерь (R)</span>
+            <span class="ctrl-val-box" style="color:var(--pink);"><span id="rVal">0.0</span> <small>Ом</small></span>
+          </div>
+          <input type="range" id="rSlider" min="0.0" max="8.0" step="0.2" value="0.0">
+          <span class="ctrl-desc">При R > 0 колебания затухают со временем.</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-sim btn-run" id="btnPlayPause">Пауза</button>
+          <button class="btn-sim btn-reset" id="btnCharge">Зарядить C</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Сценарии контура</div>
+      <div class="presets-grid">
+        <button class="preset-btn active" data-l="10.0" data-c="10.0" data-r="0.0">
+          <div class="preset-title">Идеальный LC</div>
+          <div class="preset-sub">R = 0 (незатухающий)</div>
+        </button>
+        <button class="preset-btn" data-l="10.0" data-c="10.0" data-r="2.5">
+          <div class="preset-title">Затухание (R > 0)</div>
+          <div class="preset-sub">Потеря энергии на тепло</div>
+        </button>
+        <button class="preset-btn" data-l="2.0" data-c="2.0" data-r="0.0">
+          <div class="preset-title">Высокая частота</div>
+          <div class="preset-sub">T = 126 мкс, ν = 7.9 кГц</div>
+        </button>
+        <button class="preset-btn" data-l="25.0" data-c="25.0" data-r="0.0">
+          <div class="preset-title">Низкая частота</div>
+          <div class="preset-sub">T = 1.57 мс, ν = 636 Гц</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-head-dot"></div>Теория колебаний</div>
+      <div class="card-body">
+        <div class="formula-block">
+          <div class="formula-row">
+            <span class="formula-expr">T = 2π√(L · C)</span>
+            <span class="formula-meaning">Формула Томсона</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">W_эл = q² / (2C)</span>
+            <span class="formula-meaning">Энергия в конденсаторе</span>
+          </div>
+          <div class="formula-divider"></div>
+          <div class="formula-row">
+            <span class="formula-expr">W_маг = L·i² / 2</span>
+            <span class="formula-meaning">Энергия в катушке</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5;">
+          Сила тока опережает заряд по фазе на угол $\pi/2$. Когда заряд на обкладках максимален, ток равен нулю. Когда конденсатор полностью разряжен, ток и энергия магнитного поля достигают пика.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>ФизикаПро · Интерактивные физические симуляции для школы</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('lcCanvas');
+  const ctx = canvas.getContext('2d');
+  const gCanvas = document.getElementById('graphCanvas');
+  const gCtx = gCanvas.getContext('2d');
+
+  const lSlider = document.getElementById('lSlider');
+  const cSlider = document.getElementById('cSlider');
+  const rSlider = document.getElementById('rSlider');
+
+  const lVal = document.getElementById('lVal');
+  const cVal = document.getElementById('cVal');
+  const rVal = document.getElementById('rVal');
+
+  const meterT = document.getElementById('meterT');
+  const meterNu = document.getElementById('meterNu');
+  const meterWe = document.getElementById('meterWe');
+  const meterWm = document.getElementById('meterWm');
+  const statusBadge = document.getElementById('statusBadge');
+  const graphCoord = document.getElementById('graphCoord');
+
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const btnCharge = document.getElementById('btnCharge');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  let L_mH = parseFloat(lSlider.value);
+  let C_uF = parseFloat(cSlider.value);
+  let R_ohm = parseFloat(rSlider.value);
+
+  let isPlaying = true;
+  let simTime = 0;
+  let history = []; // { t, q, i }
+
+  function getCircuitParams() {
+    const L = L_mH * 1e-3;
+    const C = C_uF * 1e-6;
+    const omega0 = 1 / Math.sqrt(L * C);
+    const T = 2 * Math.PI / omega0;
+    const gamma = R_ohm / (2 * L); // damping factor
+    return { L, C, omega0, T, gamma };
+  }
+
+  function updateMeters(q, iCurrent, We, Wm) {
+    const { T, omega0 } = getCircuitParams();
+    lVal.textContent = L_mH.toFixed(1);
+    cVal.textContent = C_uF.toFixed(1);
+    rVal.textContent = R_ohm.toFixed(1);
+
+    meterT.textContent = (T * 1e6).toFixed(0); // microseconds
+    meterNu.textContent = (1 / T / 1000).toFixed(2); // kHz
+    meterWe.textContent = (We * 1000).toFixed(2); // mJ
+    meterWm.textContent = (Wm * 1000).toFixed(2); // mJ
+
+    graphCoord.textContent = `q = ${(q * 1e6).toFixed(1)} мкКл, i = ${(iCurrent * 1000).toFixed(1)} мА`;
+  }
+
+  function drawCircuit(q, iCurrent, We, Wm) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(56,189,248,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    const midY = H * 0.46;
+    const capX = W * 0.26;
+    const coilX = W * 0.62;
+    const loopH = 140;
+
+    // 1. Connecting Wires (Top and Bottom branches)
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 3.5;
+    ctx.shadowBlur = Math.abs(iCurrent) > 0.005 ? 6 : 0;
+    ctx.shadowColor = '#38bdf8';
+
+    // Top wire
+    ctx.beginPath();
+    ctx.moveTo(capX, midY - loopH / 2);
+    ctx.lineTo(coilX, midY - loopH / 2);
+    // Bottom wire
+    ctx.moveTo(capX, midY + loopH / 2);
+    ctx.lineTo(coilX, midY + loopH / 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Vertical leads to components
+    ctx.beginPath();
+    // Cap leads
+    ctx.moveTo(capX, midY - loopH / 2); ctx.lineTo(capX, midY - 26);
+    ctx.moveTo(capX, midY + loopH / 2); ctx.lineTo(capX, midY + 26);
+    // Coil leads
+    ctx.moveTo(coilX, midY - loopH / 2); ctx.lineTo(coilX, midY - 45);
+    ctx.moveTo(coilX, midY + loopH / 2); ctx.lineTo(coilX, midY + 45);
+    ctx.stroke();
+
+    // 2. Capacitor Plates
+    const plateW = 70;
+    const plateH = 8;
+    // Top plate
+    ctx.fillStyle = q > 0 ? '#f87171' : '#38bdf8';
+    ctx.fillRect(capX - plateW / 2, midY - 26, plateW, plateH);
+    // Bottom plate
+    ctx.fillStyle = q > 0 ? '#38bdf8' : '#f87171';
+    ctx.fillRect(capX - plateW / 2, midY + 18, plateW, plateH);
+
+    // Charge signs (+ / -)
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const topSign = q > 0 ? '+' : (q < 0 ? '−' : '0');
+    const botSign = q > 0 ? '−' : (q < 0 ? '+' : '0');
+    for (let lx = -22; lx <= 22; lx += 14) {
+      ctx.fillText(topSign, capX + lx, midY - 22);
+      ctx.fillText(botSign, capX + lx, midY + 22);
+    }
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 12px Raleway';
+    ctx.fillText(`C = ${C_uF.toFixed(1)} мкФ`, capX, midY + loopH / 2 + 25);
+
+    // 3. Inductor Coil
+    const numTurns = 5;
+    const turnH = 16;
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 4;
+    for (let i = 0; i < numTurns; i++) {
+      const cy = (midY - 32) + i * turnH;
+      ctx.beginPath();
+      ctx.arc(coilX, cy, 18, -Math.PI / 2, Math.PI / 2);
+      ctx.stroke();
+    }
+
+    // Magnetic field inside coil
+    if (Wm > 0.0001) {
+      ctx.strokeStyle = 'rgba(251,191,36,0.35)';
+      ctx.lineWidth = 1.5;
+      for (let offset = -8; offset <= 8; offset += 8) {
+        ctx.beginPath();
+        ctx.moveTo(coilX + offset, midY - 50);
+        ctx.lineTo(coilX + offset, midY + 50);
+        ctx.stroke();
+      }
+    }
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 12px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText(`L = ${L_mH.toFixed(1)} мГн`, coilX, midY + loopH / 2 + 25);
+
+    // 4. Energy Bar Gauges on right
+    const gaugeX = W - 110;
+    const gaugeY = 60;
+    const gH = 180;
+    const gW = 28;
+    const eTot = Math.max(0.0001, We + Wm);
+
+    ctx.fillStyle = 'rgba(15,23,42,0.6)';
+    ctx.strokeStyle = 'rgba(251,191,36,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(gaugeX, gaugeY, gW, gH);
+    ctx.strokeRect(gaugeX + 42, gaugeY, gW, gH);
+
+    // Fill We (electric)
+    const weH = (We / eTot) * gH;
+    ctx.fillStyle = '#34d399';
+    ctx.fillRect(gaugeX, gaugeY + gH - weH, gW, weH);
+
+    // Fill Wm (magnetic)
+    const wmH = (Wm / eTot) * gH;
+    ctx.fillStyle = '#818cf8';
+    ctx.fillRect(gaugeX + 42, gaugeY + gH - wmH, gW, wmH);
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '11px Raleway';
+    ctx.textAlign = 'center';
+    ctx.fillText('W_эл', gaugeX + gW / 2, gaugeY + gH + 16);
+    ctx.fillText('W_маг', gaugeX + 42 + gW / 2, gaugeY + gH + 16);
+    ctx.font = 'bold 12px Raleway';
+    ctx.fillText('Энергия', gaugeX + 34, gaugeY - 14);
+  }
+
+  function drawOscilloscope() {
+    gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+    const w = gCanvas.width;
+    const h = gCanvas.height;
+    const padL = 60, padR = 40, padT = 20, padB = 30;
+
+    // Grid
+    gCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+    gCtx.lineWidth = 1;
+    for (let x = padL; x <= w - padR; x += 70) {
+      gCtx.beginPath(); gCtx.moveTo(x, padT); gCtx.lineTo(x, h - padB); gCtx.stroke();
+    }
+    const midY = (padT + (h - padB)) / 2;
+    gCtx.strokeStyle = 'rgba(148,163,184,0.3)';
+    gCtx.beginPath(); gCtx.moveTo(padL, midY); gCtx.lineTo(w - padR, midY); gCtx.stroke();
+
+    // Axes
+    gCtx.strokeStyle = '#94a3b8';
+    gCtx.lineWidth = 2;
+    gCtx.beginPath();
+    gCtx.moveTo(padL, padT);
+    gCtx.lineTo(padL, h - padB);
+    gCtx.lineTo(w - padR, h - padB);
+    gCtx.stroke();
+
+    // Plot q(t) [cyan]
+    if (history.length > 1) {
+      gCtx.strokeStyle = '#38bdf8';
+      gCtx.lineWidth = 2.5;
+      gCtx.beginPath();
+      for (let i = 0; i < history.length; i++) {
+        const x = padL + (i / 200) * (w - padL - padR);
+        const y = midY - history[i].qNorm * (h - padB - padT) * 0.42;
+        if (i === 0) gCtx.moveTo(x, y);
+        else gCtx.lineTo(x, y);
+      }
+      gCtx.stroke();
+
+      // Plot i(t) [gold]
+      gCtx.strokeStyle = '#fbbf24';
+      gCtx.lineWidth = 2.5;
+      gCtx.beginPath();
+      for (let i = 0; i < history.length; i++) {
+        const x = padL + (i / 200) * (w - padL - padR);
+        const y = midY - history[i].iNorm * (h - padB - padT) * 0.42;
+        if (i === 0) gCtx.moveTo(x, y);
+        else gCtx.lineTo(x, y);
+      }
+      gCtx.stroke();
+    }
+  }
+
+  let lastT = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+
+    const { L, C, omega0, gamma } = getCircuitParams();
+
+    if (isPlaying) {
+      // Visual simulation speed factor
+      simTime += dt * 3.5;
+
+      const q0 = 50e-6; // 50 uC
+      const decay = Math.exp(-gamma * simTime * 0.2);
+      const q = q0 * decay * Math.cos(omega0 * simTime);
+      const iCurrent = -q0 * omega0 * decay * Math.sin(omega0 * simTime) * 0.001; // scaled A
+
+      const We = (q * q) / (2 * C);
+      const Wm = (L * iCurrent * iCurrent) / 2;
+
+      history.push({
+        qNorm: Math.cos(omega0 * simTime) * decay,
+        iNorm: Math.sin(omega0 * simTime) * decay
+      });
+      if (history.length > 200) history.shift();
+
+      updateMeters(q, iCurrent, We, Wm);
+      drawCircuit(q, iCurrent, We, Wm);
+    } else {
+      const q0 = 50e-6;
+      const decay = Math.exp(-gamma * simTime * 0.2);
+      const q = q0 * decay * Math.cos(omega0 * simTime);
+      const iCurrent = -q0 * omega0 * decay * Math.sin(omega0 * simTime) * 0.001;
+      const We = (q * q) / (2 * C);
+      const Wm = (L * iCurrent * iCurrent) / 2;
+      drawCircuit(q, iCurrent, We, Wm);
+    }
+
+    drawOscilloscope();
+    requestAnimationFrame(loop);
+  }
+
+  lSlider.addEventListener('input', (e) => {
+    L_mH = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  cSlider.addEventListener('input', (e) => {
+    C_uF = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  rSlider.addEventListener('input', (e) => {
+    R_ohm = parseFloat(e.target.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  btnPlayPause.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    btnPlayPause.textContent = isPlaying ? 'Пауза' : 'Продолжить';
+    statusBadge.textContent = isPlaying ? 'Колебания активны' : 'Пауза';
+  });
+
+  btnCharge.addEventListener('click', () => {
+    simTime = 0; history = [];
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      L_mH = parseFloat(btn.dataset.l);
+      C_uF = parseFloat(btn.dataset.c);
+      R_ohm = parseFloat(btn.dataset.r);
+      lSlider.value = L_mH;
+      cSlider.value = C_uF;
+      rSlider.value = R_ohm;
+      simTime = 0; history = [];
+    });
+  });
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

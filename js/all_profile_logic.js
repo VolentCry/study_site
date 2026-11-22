@@ -705,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const priceVal = document.getElementById('student-billing-price-val');
         const debtVal = document.getElementById('student-billing-debt-val');
         const debtSub = document.getElementById('student-billing-debt-sub');
+        const debtLbl = document.getElementById('student-billing-debt-lbl');
         const badge = document.getElementById('student-billing-status-badge');
         const debtKpi = document.getElementById('student-billing-debt-kpi');
 
@@ -727,6 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 debtVal.style.color = 'var(--danger, #ef4444)';
                 debtSub.textContent = `Долг: ${debt.toLocaleString('ru-RU')} ₽ (${unpaid} ур.)`;
                 debtSub.style.color = 'var(--danger, #ef4444)';
+                if (debtLbl) debtLbl.textContent = 'Общая задолженность';
                 badge.className = 'student-billing-badge status-debt';
                 badge.innerHTML = `⚠️ Задолженность: <strong>${debt.toLocaleString('ru-RU')} ₽</strong>`;
                 if (debtKpi) debtKpi.style.borderColor = 'rgba(239, 68, 68, 0.45)';
@@ -734,6 +736,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 debtVal.style.color = 'var(--accent-emerald, #10b981)';
                 debtSub.textContent = `Аванс: +${prepaidSum.toLocaleString('ru-RU')} ₽ (+${prepaid} ур.)`;
                 debtSub.style.color = 'var(--accent-emerald, #10b981)';
+                if (debtLbl) debtLbl.textContent = 'Оплачено наперёд';
                 badge.className = 'student-billing-badge status-prepaid';
                 badge.innerHTML = `✨ Оплачено наперёд (+${prepaid} ур.)`;
                 if (debtKpi) debtKpi.style.borderColor = 'rgba(6, 182, 212, 0.35)';
@@ -741,6 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 debtVal.style.color = 'var(--accent-emerald, #10b981)';
                 debtSub.textContent = 'Оплачено полностью';
                 debtSub.style.color = 'var(--accent-emerald, #10b981)';
+                if (debtLbl) debtLbl.textContent = 'Задолженность отсутствует';
                 badge.className = 'student-billing-badge status-ok';
                 badge.innerHTML = '✅ Все уроки оплачены';
                 if (debtKpi) debtKpi.style.borderColor = 'rgba(16, 185, 129, 0.35)';
@@ -1087,6 +1091,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const indBadge = isInd ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(251, 191, 36, 0.15); color:var(--accent-gold); font-weight:700; margin-left:6px; border:1px solid rgba(251, 191, 36, 0.35);">👤 1-на-1</span>' : '';
             const isCompleted = Boolean(les.isCompleted || les.is_completed);
             const completedBadge = isCompleted ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(16, 185, 129, 0.15); color:var(--accent-emerald); font-weight:700; margin-left:6px; border:1px solid rgba(16, 185, 129, 0.35);">✅ Проведено</span>' : '';
+            const isPaid = Boolean(les.isPaid || les.is_paid);
+            const paidBadge = isPaid
+                ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(16, 185, 129, 0.15); color:var(--accent-emerald); font-weight:700; margin-left:6px; border:1px solid rgba(16, 185, 129, 0.35);">💳 Оплачен</span>'
+                : '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(239, 68, 68, 0.12); color:var(--danger, #ef4444); font-weight:700; margin-left:6px; border:1px solid rgba(239, 68, 68, 0.3);">⏳ Не оплачен</span>';
 
             htmlItems += `
                 <div class="day-event-card">
@@ -1095,6 +1103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div>
                             <span class="lesson-class-badge" style="font-size:0.75rem;">${escapeHtml(cName)}${indBadge}</span>
                             ${completedBadge}
+                            ${paidBadge}
                         </div>
                     </div>
                     <div class="day-event-title">${escapeHtml(les.title)}</div>
@@ -1485,6 +1494,10 @@ async function initParentDashboard(user) {
                 kpiUnpaid.textContent = unpaid;
                 if (kpiUnpaidCard) {
                     kpiUnpaidCard.classList.toggle('has-unpaid', unpaid > 0);
+                }
+                const kpiHint = document.getElementById('kpi-unpaid-hint');
+                if (kpiHint) {
+                    kpiHint.textContent = unpaid > 0 ? 'К оплате' : 'Задолженность отсутствует';
                 }
             }
         }
