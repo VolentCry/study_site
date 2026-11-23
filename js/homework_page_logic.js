@@ -505,21 +505,36 @@
                     `;
                 }
             } else {
-                const isOnlyDigits = /^-?\d+([.,]\d+)?$/.test(String(task.answer || task.displayAnswer || '').trim());
-                const inputModeAttr = isOnlyDigits ? 'decimal' : 'text';
-                answerUiHtml = `
-                    <div class="answer-box">
-                        <div class="input-group">
-                            <input type="text"
-                                class="answer-input"
-                                id="input-task-${index}"
-                                placeholder="Ваш ответ..."
-                                value="${escapeHtml(studentVal)}"
-                                autocomplete="off"
-                                inputmode="${inputModeAttr}">
+                const isTask20 = Boolean(
+                    (task.type === 'equation' || task.type === 'inequality' || task.type === 'system') ||
+                    (task.answerData && (task.answerData.type === 'equation' || task.answerData.type === 'inequality' || task.answerData.type === 'system')) ||
+                    (task.id && (String(task.id).startsWith('eq_') || String(task.id).startsWith('ineq_') || String(task.id).startsWith('sys_') || String(task.id).startsWith('oge20_'))) ||
+                    (task.catName && (task.catName.includes('№20') || task.catName.includes('Биквадратное') || task.catName.includes('Неравенство') || task.catName.includes('Система уравнений')))
+                );
+
+                if (isTask20 && window.OgeTask20Trainer) {
+                    answerUiHtml = `
+                        <div class="answer-box task20-hw-answer-box" style="padding:14px; background:rgba(38,63,97,0.03); border:1px solid rgba(38,63,97,0.12); border-radius:14px; width:100%;">
+                            <div id="task20-widget-container-${index}" style="width:100%;"></div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    const isOnlyDigits = /^-?\d+([.,]\d+)?$/.test(String(task.answer || task.displayAnswer || '').trim());
+                    const inputModeAttr = isOnlyDigits ? 'decimal' : 'text';
+                    answerUiHtml = `
+                        <div class="answer-box">
+                            <div class="input-group">
+                                <input type="text"
+                                    class="answer-input"
+                                    id="input-task-${index}"
+                                    placeholder="Ваш ответ..."
+                                    value="${escapeHtml(studentVal)}"
+                                    autocomplete="off"
+                                    inputmode="${inputModeAttr}">
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
             const categoryName = task.catName || task.category || 'Задание';
@@ -540,12 +555,25 @@
 
             // Input change event (only for students solving)
             if (!isFinal && !isTeacher) {
-                const input = card.querySelector(`#input-task-${index}`);
-                if (input) {
-                    input.addEventListener('input', (e) => {
-                        currentAnswers[index] = e.target.value.trim();
-                        triggerAutoSaveDraft();
+                const widgetContainer = card.querySelector(`#task20-widget-container-${index}`);
+                if (widgetContainer && window.OgeTask20Trainer) {
+                    window.OgeTask20Trainer.createInputWidget({
+                        container: widgetContainer,
+                        task: task,
+                        initialValue: studentVal,
+                        onChange: (canonicalVal) => {
+                            currentAnswers[index] = canonicalVal.trim();
+                            triggerAutoSaveDraft();
+                        }
                     });
+                } else {
+                    const input = card.querySelector(`#input-task-${index}`);
+                    if (input) {
+                        input.addEventListener('input', (e) => {
+                            currentAnswers[index] = e.target.value.trim();
+                            triggerAutoSaveDraft();
+                        });
+                    }
                 }
             }
         });

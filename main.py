@@ -1105,6 +1105,15 @@ def api_teacher_homework_detail(homework_id: int):
         else:
             student_id = None
 
+        class_id = payload.get('classId') or payload.get('class_id')
+        if class_id:
+            try:
+                class_id = int(class_id)
+            except (ValueError, TypeError):
+                class_id = None
+        else:
+            class_id = None
+
         if not title:
             return jsonify({'success': False, 'error': 'Название домашней работы не может быть пустым.'}), 400
         if not isinstance(tasks, list) or len(tasks) == 0:
@@ -1119,7 +1128,8 @@ def api_teacher_homework_detail(homework_id: int):
                 tasks=tasks,
                 description=str(description or ''),
                 deadline_at=str(deadline_at) if deadline_at else None,
-                student_id=student_id
+                student_id=student_id,
+                class_id=class_id
             )
             return jsonify({'success': True, 'homework': hw})
         except ValueError as e:

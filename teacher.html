@@ -221,7 +221,7 @@
                     </div>
 
                     <!-- Row 2: Class filter, Activity filter, Sort select -->
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; align-items:center;">
+                    <div class="filter-grid-3col">
                         <div>
                             <label for="users-filter-class" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Класс</label>
                             <select id="users-filter-class" class="form-select" style="padding:7px 12px; font-size:0.85rem; height:38px; border-radius:var(--r-sm);">
@@ -322,7 +322,7 @@
                     </div>
 
                     <!-- Row 2: Селекты фильтрации по ученикам, проведению и оплате -->
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; align-items:center;">
+                    <div class="filter-grid-3col">
                         <!-- 1. Фильтр по ученикам / формату -->
                         <div>
                             <label for="schedule-filter-student" style="display:block; font-size:0.75rem; color:var(--muted); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Ученик / Формат</label>
@@ -416,7 +416,7 @@
                                 <label class="form-label">Название домашнего задания *</label>
                                 <input type="text" id="hw-input-title" class="form-input" placeholder="Например: Д/З №5: Дроби и уравнения">
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-row-2col">
                                 <div class="form-group">
                                     <label class="form-label">Предмет</label>
                                     <input type="text" id="hw-input-subject" class="form-input" value="Математика">
@@ -632,7 +632,7 @@
                                         <label class="form-label">Условие задачи (текст или HTML)</label>
                                         <textarea id="manual-task-condition" class="form-textarea" rows="3" placeholder="Найдите значение выражения..."></textarea>
                                     </div>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-row-2col">
                                         <div class="form-group">
                                             <label class="form-label">Категория / Тема</label>
                                             <input type="text" id="manual-task-cat" class="form-input" placeholder="Например: Текстовая задача">
@@ -733,7 +733,7 @@
                     <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:6px; text-transform:uppercase;">Краткое описание (необязательно)</label>
                     <textarea id="input-class-desc" class="gate-input" style="text-align:left; resize:vertical;" rows="3" placeholder="Например: Подготовка к ОГЭ по понедельникам и средам" maxlength="200"></textarea>
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <div class="admin-modal-actions">
                     <button type="button" class="btn btn-secondary" data-close-modal="modal-create-class">Отмена</button>
                     <button type="submit" class="btn btn-emerald">Создать класс</button>
                 </div>
@@ -884,6 +884,9 @@
                     </div>
 
                     <div class="dossier-billing-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" id="dossier-billing-btn-sync" title="Подтянуть количество проведённых и оплаченных уроков из расписания">
+                            🔄 Синхронизировать с расписанием
+                        </button>
                         <button type="button" class="btn btn-secondary btn-sm" id="dossier-billing-btn-all-paid" title="Отметить все проведённые уроки как оплаченные">
                             ✓ Все оплачены
                         </button>
@@ -1022,7 +1025,7 @@
                     <label class="form-label">Заметки / Ссылка на созвон (необязательно)</label>
                     <textarea id="lesson-input-notes" class="form-textarea" rows="2" placeholder="Ссылка на Zoom, материалы к уроку..."></textarea>
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <div class="admin-modal-actions">
                     <button type="button" class="btn btn-secondary" data-close-modal="modal-create-lesson">Отмена</button>
                     <button type="submit" class="btn btn-emerald" id="btn-submit-lesson">Сохранить занятие</button>
                 </div>
@@ -1099,7 +1102,7 @@
 
             <!-- Оценка и комментарий -->
             <form id="form-grade-submission" style="border-top: 1px solid var(--line); padding-top: 1.25rem;">
-                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div class="review-grade-grid">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label class="form-label">Балл / Оценка</label>
                         <input type="number" id="grade-input-score" class="form-input" min="0" required style="font-size: 1.1rem; font-weight: 700; text-align: center;">
@@ -1109,7 +1112,7 @@
                         <input type="text" id="grade-input-feedback" class="form-input" placeholder="Молодец! Отличное решение, обрати внимание на знак в №2...">
                     </div>
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <div class="admin-modal-actions">
                     <button type="button" class="btn btn-secondary" data-close-modal="modal-review-submission">Закрыть</button>
                     <button type="submit" class="btn btn-emerald">Сохранить оценку и отзыв</button>
                 </div>
@@ -1154,7 +1157,7 @@
                 <div style="font-size: 0.88rem; color: var(--ink);">
                     Выбрано для добавления: <strong id="modal-bank-selected-count" style="color: var(--accent-cyan); font-size: 1.05rem;">0</strong>
                 </div>
-                <div style="display:flex; gap:10px;">
+                <div class="bank-picker-actions">
                     <button type="button" class="btn btn-secondary" data-close-modal="modal-bank-tasks-picker">Отмена</button>
                     <button type="button" class="btn btn-emerald" id="btn-confirm-add-bank-tasks">➕ Добавить выбранные в Д/З</button>
                 </div>

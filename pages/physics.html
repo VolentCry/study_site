@@ -45,6 +45,10 @@
     font-size: 20px; font-weight: 700;
     background: linear-gradient(90deg, var(--accent), var(--accent2));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
   .nav-brand { display: flex; align-items: center; gap: 20px; }
   .nav-lobby {
@@ -449,14 +453,14 @@
 <!-- NAV -->
 <nav>
   <div class="nav-brand">
-    <a class="nav-lobby" href="../index.html">← Вернуться в лобби</a>
-    <div class="nav-logo">⚛ ФизикаПро</div>
+    <a class="nav-lobby" href="../index.html">← В лобби</a>
+    <a class="nav-logo" href="physics.html">⚛ НЕШкола · Физика</a>
   </div>
   <div class="nav-links">
     <a href="#classes">Классы</a>
-    <a href="#sim-grid">Симуляции</a>
-    <a href="physics/tasks/index.html">К задачам</a>
-    <a href="#games">Игры</a>
+    <a href="physics/all_simulations.html">Симуляции</a>
+    <a href="physics/tasks/index.html">Задачи</a>
+    <a href="physics/games/memo.html">Мемо 🎮</a>
   </div>
   <a class="nav-profile-btn" href="../profile.html">Мой профиль</a>
 </nav>

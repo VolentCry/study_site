@@ -1752,7 +1752,8 @@ def update_homework(
     tasks: List[Dict[str, Any]],
     description: str = '',
     deadline_at: Optional[str] = None,
-    student_id: Optional[int] = None
+    student_id: Optional[int] = None,
+    class_id: Optional[int] = None
 ) -> Dict[str, Any]:
     """Обновляет существующее домашнее задание учителя."""
     title_clean = str(title).strip()
@@ -1806,10 +1807,10 @@ def update_homework(
             cursor.execute(
                 """
                 UPDATE homeworks
-                SET title = ?, description = ?, subject = ?, tasks_json = ?, deadline_at = ?, student_id = ?, updated_at = ?
+                SET class_id = COALESCE(?, class_id), title = ?, description = ?, subject = ?, tasks_json = ?, deadline_at = ?, student_id = ?, updated_at = ?
                 WHERE id = ?
                 """,
-                (title_clean, description.strip(), subject.strip(), tasks_json, deadline_at, student_id, now_iso, homework_id)
+                (class_id, title_clean, description.strip(), subject.strip(), tasks_json, deadline_at, student_id, now_iso, homework_id)
             )
 
             return {
@@ -2056,8 +2057,8 @@ def get_homework_by_id(homework_id: int, user_id: Optional[int] = None, role: st
             'student_name': actual_student_name,
             'studentUsername': actual_student_username,
             'student_username': actual_student_username,
-            'studentId': user_id,
-            'student_id': user_id,
+            'studentId': row['student_id'],
+            'student_id': row['student_id'],
             'isTeacherView': is_teacher_or_admin,
             'viewerRole': role
         }
@@ -2263,33 +2264,124 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
             def _answers_match(u_val: str, c_val: str) -> bool:
                 if not u_val or not c_val:
                     return False
-                if u_val.strip().lower() == c_val.strip().lower():
+                u_str = str(u_val).strip()
+                c_str = str(c_val).strip()
+                if u_str.lower() == c_str.lower():
                     return True
-                nu = u_val.replace(' ', '').replace(',', '.')
-                nc = c_val.replace(' ', '').replace(',', '.')
+
+                import re
+
+                def normalize_str(s: str) -> str:
+                    return s.replace('−', '-').replace('—', '-').replace('∪', 'U').replace(',', '.')
+
+                nu = normalize_str(u_str)
+                nc = normalize_str(c_str)
+
+                # 1. Single float compare
                 try:
-                    fu = float(nu)
-                    fc = float(nc)
+                    fu = float(nu.replace(' ', ''))
+                    fc = float(nc.replace(' ', ''))
                     return abs(fu - fc) < 0.0001
                 except ValueError:
                     pass
-                if nu.lower() == nc.lower():
+
+                if nu.replace(' ', '').lower() == nc.replace(' ', '').lower():
                     return True
-                # Coordinate tuple matching: e.g. (2; 3) vs (2, 3) vs 2; 3 vs x=2, y=3
-                import re
+
+                # 2. System of equations (pairs of coordinates in parentheses)
+                pair_regex = re.compile(r'\(\s*([-+]?\d+(?:\.\d+)?)\s*[;,]\s*([-+]?\d+(?:\.\d+)?)\s*\)')
+                is_c_system = bool(pair_regex.search(nc))
+                if is_c_system:
+                    u_pairs = pair_regex.findall(nu)
+                    c_pairs = pair_regex.findall(nc)
+                    if u_pairs and c_pairs and len(u_pairs) == len(c_pairs):
+                        try:
+                            u_pts = [(float(x), float(y)) for x, y in u_pairs]
+                            c_pts = [(float(x), float(y)) for x, y in c_pairs]
+                            matched_pts = set()
+                            for ux, uy in u_pts:
+                                found = False
+                                for idx, (cx, cy) in enumerate(c_pts):
+                                    if idx not in matched_pts and abs(ux - cx) < 0.0001 and abs(uy - cy) < 0.0001:
+                                        matched_pts.add(idx)
+                                        found = True
+                                        break
+                                if not found:
+                                    break
+                            if len(matched_pts) == len(c_pts):
+                                return True
+                        except ValueError:
+                            pass
+                    return False
+
+                # 3. Inequalities with intervals and isolated points
+                int_regex = re.compile(r'([(\[])\s*([^;,]+)\s*[;,]\s*([^;,]+)\s*([)\]])')
+                pt_regex = re.compile(r'\{\s*([-+]?\d+(?:\.\d+)?)\s*\}')
+                is_c_ineq = bool(int_regex.search(nc) or pt_regex.search(nc) or 'u' in nc.lower() or '∪' in c_str)
+                if is_c_ineq:
+                    u_ints = int_regex.findall(nu)
+                    c_ints = int_regex.findall(nc)
+                    u_pts_ineq = pt_regex.findall(nu)
+                    c_pts_ineq = pt_regex.findall(nc)
+
+                    if (c_ints or c_pts_ineq) and (len(u_ints) + len(u_pts_ineq) == len(c_ints) + len(c_pts_ineq)):
+                        def parse_bound(b_str: str) -> float:
+                            b = b_str.strip().lower()
+                            if 'inf' in b or 'беск' in b or '∞' in b:
+                                return -float('inf') if '-' in b else float('inf')
+                            return float(b)
+
+                        try:
+                            u_parts = [('int', l, parse_bound(lv), parse_bound(rv), r) for l, lv, rv, r in u_ints] + \
+                                      [('pt', float(pv)) for pv in u_pts_ineq]
+                            c_parts = [('int', l, parse_bound(lv), parse_bound(rv), r) for l, lv, rv, r in c_ints] + \
+                                      [('pt', float(pv)) for pv in c_pts_ineq]
+
+                            matched_parts = set()
+                            for up in u_parts:
+                                found = False
+                                for idx, cp in enumerate(c_parts):
+                                    if idx in matched_parts:
+                                        continue
+                                    if up[0] == cp[0]:
+                                        if up[0] == 'pt':
+                                            if abs(up[1] - cp[1]) < 0.0001:
+                                                matched_parts.add(idx)
+                                                found = True
+                                                break
+                                        else:
+                                            if up[1] == cp[1] and up[4] == cp[4]:
+                                                lok = (up[2] == -float('inf') and cp[2] == -float('inf')) or abs(up[2] - cp[2]) < 0.0001
+                                                rok = (up[3] == float('inf') and cp[3] == float('inf')) or abs(up[3] - cp[3]) < 0.0001
+                                                if lok and rok:
+                                                    matched_parts.add(idx)
+                                                    found = True
+                                                    break
+                                if not found:
+                                    break
+                            if len(matched_parts) == len(c_parts) and len(c_parts) > 0:
+                                return True
+                        except ValueError:
+                            pass
+                    return False
+
+                # 4. Multi-root equations (set of numbers in any order)
                 def extract_nums(s: str):
                     s_clean = s.replace('−', '-').replace(';', ' ')
                     s_clean = re.sub(r'[,]+', ' ', s_clean)
                     return re.findall(r'[-+]?\d+(?:\.\d+)?', s_clean)
 
-                m_u = extract_nums(u_val)
-                m_c = extract_nums(c_val)
-                if m_u and m_c and len(m_u) == len(m_c) and len(m_u) in (2, 4):
+                m_u = extract_nums(nu)
+                m_c = extract_nums(nc)
+                if m_u and m_c and len(m_u) == len(m_c) and len(m_u) >= 2:
                     try:
-                        if all(abs(float(a) - float(b)) < 0.0001 for a, b in zip(m_u, m_c)):
+                        u_sorted = sorted([float(x) for x in m_u])
+                        c_sorted = sorted([float(x) for x in m_c])
+                        if all(abs(a - b) < 0.0001 for a, b in zip(u_sorted, c_sorted)):
                             return True
                     except ValueError:
                         pass
+
                 return False
 
             is_correct = False

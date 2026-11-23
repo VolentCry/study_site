@@ -476,6 +476,7 @@
         <span class="xp-counter" id="nav-xp-badge">XP +0</span>
       </a>
       <a href="../pages/oge_roadmap.html" class="nav-btn">🗺️ Роадмап</a>
+      <a href="../index.html" class="nav-btn">В лобби</a>
     </div>
   </header>
 
@@ -541,19 +542,12 @@
         </div>
       </div>
 
-      <!-- Quick Symbol Helper Buttons -->
-      <div class="quick-symbols-bar" id="quick-symbols-bar" aria-label="Быстрый ввод математических символов">
-        <!-- Injected dynamically based on task type -->
+      <!-- Interactive Answer Widget Area (adapted per task type: Equations / Inequalities / Systems) -->
+      <div id="answer-widget-area" style="width: 100%;">
+        <!-- Rendered dynamically by OgeTask20Trainer.createInputWidget -->
       </div>
 
-      <div class="format-hint" id="format-hint">
-        <!-- Format hint -->
-      </div>
-
-      <div class="answer-row">
-        <div class="answer-input-wrap">
-          <input type="text" id="answer-input" class="answer-input" placeholder="Введите ваш ответ" autocomplete="off" autocapitalize="off" spellcheck="false" />
-        </div>
+      <div class="answer-action-row" style="display: flex; justify-content: center; gap: 12px; width: 100%; margin-top: 6px;">
         <button type="button" id="btn-check" class="btn-check">
           <span>Проверить ответ</span>
           <span>✓</span>
@@ -654,12 +648,15 @@
       let currentTask = null;
       let hasAnsweredCurrent = false;
 
+      // Active widget state
+      let activeWidgetController = null;
+      let currentWidgetValue = '';
+      let currentWidgetData = null;
+
       // DOM Elements
       const mathContainer = document.getElementById('math-container');
       const taskPrompt = document.getElementById('task-prompt');
-      const formatHint = document.getElementById('format-hint');
-      const quickSymbolsBar = document.getElementById('quick-symbols-bar');
-      const answerInput = document.getElementById('answer-input');
+      const answerWidgetArea = document.getElementById('answer-widget-area');
       const btnCheck = document.getElementById('btn-check');
       const btnNext = document.getElementById('btn-next');
       const feedbackBanner = document.getElementById('feedback-banner');
@@ -712,33 +709,6 @@
         }
       }
 
-      function renderQuickSymbols(symbols) {
-        quickSymbolsBar.innerHTML = '';
-        if (!symbols || !symbols.length) return;
-
-        symbols.forEach(sym => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'quick-symbol-btn';
-          btn.textContent = sym;
-          btn.addEventListener('click', () => {
-            insertSymbol(sym);
-          });
-          quickSymbolsBar.appendChild(btn);
-        });
-      }
-
-      function insertSymbol(sym) {
-        const start = answerInput.selectionStart || answerInput.value.length;
-        const end = answerInput.selectionEnd || answerInput.value.length;
-        const val = answerInput.value;
-        const textToInsert = sym === 'нет корней' ? 'нет корней' : sym;
-        answerInput.value = val.substring(0, start) + textToInsert + val.substring(end);
-        answerInput.focus();
-        const newPos = start + textToInsert.length;
-        answerInput.setSelectionRange(newPos, newPos);
-      }
-
       // Task Generation
       function nextTask() {
         if (!window.OgeTask20Trainer) return;
@@ -751,14 +721,30 @@
         taskCatBadge.textContent = currentTask.catName || 'Задание №20';
         taskBadge.textContent = 'Задание №20 · Часть 2 (2 балла)';
 
-        formatHint.textContent = currentTask.inputPlaceholder || '';
-        renderQuickSymbols(currentTask.quickSymbols);
-
-        answerInput.value = '';
-        answerInput.className = 'answer-input';
-        answerInput.disabled = false;
-        answerInput.placeholder = currentTask.inputPlaceholder || 'Введите ответ';
-        answerInput.focus();
+        // Mount interactive input widget
+        currentWidgetValue = '';
+        currentWidgetData = null;
+        if (answerWidgetArea) {
+          activeWidgetController = window.OgeTask20Trainer.createInputWidget({
+            container: answerWidgetArea,
+            task: currentTask,
+            initialValue: '',
+            onChange: (valStr, dataObj) => {
+              currentWidgetValue = valStr;
+              currentWidgetData = dataObj;
+            },
+            onEnter: () => {
+              if (!hasAnsweredCurrent) {
+                handleCheck();
+              } else {
+                nextTask();
+              }
+            }
+          });
+          if (activeWidgetController) {
+            activeWidgetController.focus();
+          }
+        }
 
         feedbackBanner.className = 'feedback-banner';
         feedbackBanner.textContent = '';
@@ -781,19 +767,16 @@
 
       function handleCheck() {
         if (hasAnsweredCurrent || !currentTask) return;
-        const val = answerInput.value.trim();
-        if (!val) {
-          answerInput.focus();
+        const valToTest = currentWidgetData || currentWidgetValue;
+        if (!currentWidgetValue && !currentWidgetData) {
+          if (activeWidgetController) activeWidgetController.focus();
           return;
         }
 
-        const isCorrect = window.OgeTask20Trainer.checkAnswer(val, currentTask);
+        const isCorrect = window.OgeTask20Trainer.checkAnswer(valToTest, currentTask);
 
         if (isCorrect) {
           hasAnsweredCurrent = true;
-          answerInput.className = 'answer-input correct';
-          answerInput.disabled = true;
-
           playTone(587, 'sine', 0.15);
           setTimeout(() => playTone(880, 'sine', 0.25), 120);
 
@@ -813,7 +796,6 @@
             updateStatsDisplay();
           }
         } else {
-          answerInput.className = 'answer-input wrong';
           playTone(220, 'sawtooth', 0.25);
 
           feedbackBanner.className = 'feedback-banner show error';
@@ -833,16 +815,6 @@
       // Event Listeners
       btnCheck.addEventListener('click', handleCheck);
       btnNext.addEventListener('click', nextTask);
-
-      answerInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          if (!hasAnsweredCurrent) {
-            handleCheck();
-          } else {
-            nextTask();
-          }
-        }
-      });
 
       // Categories switching
       const catButtons = document.querySelectorAll('.cat-btn');

@@ -1080,3 +1080,78 @@ sup sup {
     font-weight: 800;
     color: var(--accent);
 }
+
+/* --- TASK 20 HW WIDGET INTEGRATION --- */
+.task20-hw-answer-box {
+    margin-top: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 16px;
+    width: 100%;
+}
+[data-theme="light"] .task20-hw-answer-box {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.12);
+}
+.task20-hw-answer-box .task20-widget-root {
+    color: var(--ink);
+}
+.task20-hw-answer-box .task20-root-item,
+.task20-hw-answer-box .task20-interval-card,
+.task20-hw-answer-box .task20-point-card,
+.task20-hw-answer-box .task20-pair-card {
+    background: var(--surface-card);
+    border-color: var(--line);
+    color: var(--ink);
+}
+.task20-hw-answer-box .task20-bound-input,
+.task20-hw-answer-box .task20-point-input,
+.task20-hw-answer-box .task20-coord-input {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: var(--line);
+    color: var(--ink);
+}
+[data-theme="light"] .task20-hw-answer-box .task20-bound-input,
+[data-theme="light"] .task20-hw-answer-box .task20-point-input,
+[data-theme="light"] .task20-hw-answer-box .task20-coord-input {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+}
+.task20-hw-answer-box .task20-tpl-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--line);
+    color: var(--ink);
+}
+[data-theme="light"] .task20-hw-answer-box .task20-tpl-btn {
+    background: #f1f5f9;
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #0f172a;
+}
+.task20-hw-answer-box .task20-tpl-btn.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+}
+.task20-hw-answer-box .task20-bracket-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--line);
+    color: var(--ink);
+}
+[data-theme="light"] .task20-hw-answer-box .task20-bracket-btn {
+    background: #f1f5f9;
+    border-color: rgba(15, 23, 42, 0.15);
+    color: #0f172a;
+}
+.task20-hw-answer-box .task20-preview-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--line);
+    color: var(--muted);
+}
+.task20-hw-answer-box .task20-preview-val {
+    color: var(--accent-cyan);
+}
+[data-theme="light"] .task20-hw-answer-box .task20-preview-val {
+    color: var(--accent);
+}

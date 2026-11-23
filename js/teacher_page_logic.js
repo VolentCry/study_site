@@ -951,11 +951,13 @@
     let currentDossierStudentId = null;
     let currentDossierHasParent = false;
     let currentDossierParents = [];
+    let currentDossierBilling = null;
     let billingEventsInitialized = false;
 
     function setupDossierBilling(studentId, billing) {
         currentDossierStudentId = studentId;
         const b = billing || {};
+        currentDossierBilling = b;
         currentDossierHasParent = Boolean(b.hasParent);
         currentDossierParents = Array.isArray(b.parents) ? b.parents : [];
 
@@ -1180,8 +1182,46 @@
         const paidPlus = document.getElementById('dossier-billing-paid-plus');
         const passedMinus = document.getElementById('dossier-billing-passed-minus');
         const passedPlus = document.getElementById('dossier-billing-passed-plus');
+        const syncBtn = document.getElementById('dossier-billing-btn-sync');
         const allPaidBtn = document.getElementById('dossier-billing-btn-all-paid');
         const saveBtn = document.getElementById('dossier-billing-btn-save');
+
+        if (syncBtn) {
+            syncBtn.addEventListener('click', async () => {
+                if (!currentDossierStudentId) return;
+                try {
+                    syncBtn.disabled = true;
+                    syncBtn.textContent = '⏳ Синхронизация...';
+
+                    // Запрашиваем актуальные данные досье/биллинга с сервера
+                    const res = await fetch(`/api/teacher/students/${currentDossierStudentId}/dossier`, { cache: 'no-store' });
+                    const d = await res.json();
+                    if (!res.ok || !d.success) throw new Error(d.error || 'Ошибка загрузки данных');
+
+                    const billing = (d.dossier && d.dossier.billing) ? d.dossier.billing : {};
+                    currentDossierBilling = billing;
+
+                    // Берём данные именно из расписания (schedulePassedCount и schedulePaidCount)
+                    const schedPassed = billing.schedulePassedCount != null ? billing.schedulePassedCount : (billing.passedLessons || 0);
+                    const schedPaid = billing.schedulePaidCount != null ? billing.schedulePaidCount : (billing.paidLessons || 0);
+
+                    if (passedInput) passedInput.value = schedPassed;
+                    if (paidInput) paidInput.value = schedPaid;
+
+                    recalcDossierBillingUI();
+                    await saveDossierBilling(false);
+
+                    if (typeof showToast === 'function') {
+                        showToast(`✓ Синхронизировано с расписанием: проведено ${schedPassed}, оплачено ${schedPaid}`);
+                    }
+                } catch(err) {
+                    alert('Не удалось синхронизировать с расписанием: ' + err.message);
+                } finally {
+                    syncBtn.disabled = false;
+                    syncBtn.textContent = '🔄 Синхронизировать с расписанием';
+                }
+            });
+        }
 
         if (priceInput) {
             priceInput.addEventListener('input', recalcDossierBillingUI);
@@ -2079,6 +2119,48 @@
     const hwEditModeSubtitle = document.getElementById('hw-edit-mode-subtitle');
     const btnCancelEditHw = document.getElementById('btn-cancel-edit-hw');
 
+    async function populateClassesSelect(targetClassId = null) {
+        if (!hwTargetClass) return;
+        try {
+            const res = await fetch('/api/teacher/classes', { cache: 'no-store' });
+            const data = await res.json();
+            if (data.success && Array.isArray(data.classes)) {
+                const currentVal = (targetClassId != null && targetClassId !== '') ? String(targetClassId) : hwTargetClass.value;
+                hwTargetClass.innerHTML = '<option value="">Выберите класс...</option>' +
+                    data.classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                if (currentVal) {
+                    hwTargetClass.value = currentVal;
+                }
+            }
+        } catch(e) {
+            console.error('Error populating classes select', e);
+        }
+    }
+
+    async function loadStudentsForHwClass(classId, selectedStudentId = null) {
+        if (!hwTargetStudent) return;
+        hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
+        if (!classId) return;
+
+        try {
+            const res = await fetch(`/api/teacher/classes/${classId}`, { cache: 'no-store' });
+            const data = await res.json();
+            if (data.success && data.class && Array.isArray(data.class.students)) {
+                if (data.class.students.length > 0) {
+                    hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>' +
+                        data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                } else {
+                    hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
+                }
+                if (selectedStudentId != null && selectedStudentId !== '') {
+                    hwTargetStudent.value = String(selectedStudentId);
+                }
+            }
+        } catch(e) {
+            console.error('Error fetching students for homework target class', e);
+        }
+    }
+
     async function startEditingHomework(hwId) {
         try {
             showToast('Загрузка задания для редактирования...');
@@ -2093,22 +2175,18 @@
 
             switchTab('constructor');
 
-            if (hwTargetClass) {
-                hwTargetClass.value = String(hw.class_id || hw.classId || '');
-                const cid = hwTargetClass.value;
-                if (cid && hwTargetStudent) {
-                    try {
-                        const sRes = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
-                        const sData = await sRes.json();
-                        if (sData.success && sData.class && Array.isArray(sData.class.students)) {
-                            hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>' +
-                                sData.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
-                        }
-                    } catch(e) {}
-                }
-                if (hwTargetStudent) {
-                    hwTargetStudent.value = (hw.student_id || hw.studentId) ? String(hw.student_id || hw.studentId) : '';
-                }
+            const targetClassId = (hw.class_id || hw.classId) ? String(hw.class_id || hw.classId) : '';
+            const targetStudentId = (hw.student_id || hw.studentId) ? String(hw.student_id || hw.studentId) : null;
+
+            await populateClassesSelect(targetClassId);
+            if (hwTargetClass && targetClassId) {
+                hwTargetClass.value = targetClassId;
+            }
+
+            if (targetClassId) {
+                await loadStudentsForHwClass(targetClassId, targetStudentId);
+            } else if (hwTargetStudent) {
+                hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
             }
 
             if (hwInputTitle) hwInputTitle.value = hw.title || '';
@@ -2145,6 +2223,8 @@
         }
         if (hwInputTitle) hwInputTitle.value = '';
         if (hwInputDesc) hwInputDesc.value = '';
+        if (hwTargetClass) hwTargetClass.value = '';
+        if (hwTargetStudent) hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
         loadDraftFromStorage();
         renderConstructorDraft();
         showToast('Режим редактирования отменён');
@@ -2200,44 +2280,22 @@
     }
 
     async function loadConstructor() {
-        loadDraftFromStorage();
-        initBankTopics();
-        try {
-            const res = await fetch('/api/teacher/classes', { cache: 'no-store' });
-            const data = await res.json();
-            if (data.success && data.classes && hwTargetClass) {
-                hwTargetClass.innerHTML = '<option value="">Выберите класс...</option>' +
-                    data.classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
-            }
-
-            if (hwTargetClass && !hwTargetClass.__hasStudentListener) {
-                hwTargetClass.__hasStudentListener = true;
-                hwTargetClass.addEventListener('change', async () => {
-                    const cid = hwTargetClass.value;
-                    if (!hwTargetStudent) return;
-                    hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
-                    if (!cid) return;
-
-                    try {
-                        const res = await fetch(`/api/teacher/classes/${cid}`, { cache: 'no-store' });
-                        const data = await res.json();
-                        if (data.success && data.class && Array.isArray(data.class.students)) {
-                            if (data.class.students.length > 0) {
-                                hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>' +
-                                    data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
-                            } else {
-                                hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
-                            }
-                        }
-                    } catch(e) {
-                        console.error('Error fetching students for homework target class', e);
-                    }
-                });
-            }
-        } catch(e) {
-            console.error('Error loading constructor classes', e);
+        if (!editingHomeworkId) {
+            loadDraftFromStorage();
         }
-        renderConstructorDraft();
+        initBankTopics();
+        const preserveClassId = editingHomeworkId && hwTargetClass ? hwTargetClass.value : null;
+        await populateClassesSelect(preserveClassId);
+
+        if (hwTargetClass && !hwTargetClass.__hasStudentListener) {
+            hwTargetClass.__hasStudentListener = true;
+            hwTargetClass.addEventListener('change', () => {
+                loadStudentsForHwClass(hwTargetClass.value);
+            });
+        }
+        if (!editingHomeworkId) {
+            renderConstructorDraft();
+        }
     }
 
     function renderConstructorDraft() {
@@ -2618,6 +2676,7 @@
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
+                            class_id: parseInt(classId, 10),
                             title,
                             subject,
                             description: desc,
