@@ -1304,6 +1304,39 @@
             document.getElementById('dossier-sub').textContent = `@${u.username} · ID: #${u.id} · Рамка: ${u.avatarFrame || 'Орбита'}`;
             document.getElementById('dossier-avatar').textContent = (u.displayName || u.username || 'У')[0].toUpperCase();
 
+            // Отображение индивидуального кода ученика
+            const studentCode = u.parentCode || u.parent_code || '';
+            const codeEl = document.getElementById('dossier-student-code');
+            const codeRow = document.getElementById('dossier-code-row');
+            const copyCodeBtn = document.getElementById('btn-copy-dossier-code');
+
+            if (codeEl) {
+                codeEl.textContent = studentCode || '—';
+            }
+            if (codeRow) {
+                codeRow.style.display = studentCode ? 'flex' : 'none';
+            }
+            if (copyCodeBtn && studentCode) {
+                copyCodeBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(studentCode);
+                        copyCodeBtn.textContent = '✓ Скопировано';
+                        copyCodeBtn.classList.remove('btn-secondary');
+                        copyCodeBtn.classList.add('btn-emerald');
+                        setTimeout(() => {
+                            copyCodeBtn.textContent = '📋 Копировать';
+                            copyCodeBtn.classList.remove('btn-emerald');
+                            copyCodeBtn.classList.add('btn-secondary');
+                        }, 2000);
+                        if (typeof showToast === 'function') {
+                            showToast(`Код ученика ${studentCode} скопирован в буфер`);
+                        }
+                    } catch (e) {
+                        prompt('Скопируйте код ученика:', studentCode);
+                    }
+                };
+            }
+
             const dossierPlanBtn = document.getElementById('btn-dossier-methodical-plan') || document.getElementById('dossier-btn-plan');
             if (dossierPlanBtn) {
                 dossierPlanBtn.onclick = () => {

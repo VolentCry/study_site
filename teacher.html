@@ -772,6 +772,13 @@
                     <div class="dossier-hud-info">
                         <div class="dossier-name" id="dossier-name">Имя Ученика</div>
                         <div class="dossier-sub" id="dossier-sub">@username · ID: #0</div>
+                        <div class="dossier-code-row" id="dossier-code-row" style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                            <span class="dossier-code-label" style="font-size: 0.78rem; color: var(--muted); font-weight: 600;">Код ученика:</span>
+                            <span class="dossier-code-value" id="dossier-student-code" style="font-family: var(--f-mono, monospace); font-weight: 800; font-size: 0.88rem; color: var(--accent); background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); padding: 2px 8px; border-radius: var(--r-sm); user-select: all; letter-spacing: 0.04em;">STU-—————</span>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-dossier-code" style="padding: 2px 8px; font-size: 0.75rem; min-height: 26px; height: 26px;" title="Скопировать код ученика">
+                                📋 Копировать
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="dossier-hud-actions">

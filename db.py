@@ -1379,7 +1379,7 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
         cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT u.id, u.username, u.display_name, u.role, u.created_at, u.last_login,
+            SELECT u.id, u.username, u.display_name, u.role, u.parent_code, u.created_at, u.last_login,
                    d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved,
                    d.metrics_json, d.trainer_records_json, d.updated_at
             FROM users u
@@ -1391,6 +1391,13 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
         row = cursor.fetchone()
         if not row:
             return None
+
+        # Убеждаемся, что у ученика есть parent_code (если отсутствует, генерируем)
+        student_parent_code = row['parent_code']
+        if (row['role'] == 'student' or not row['role']) and not student_parent_code:
+            student_parent_code = generate_unique_parent_code(cursor)
+            cursor.execute("UPDATE users SET parent_code = ? WHERE id = ?", (student_parent_code, student_id))
+            conn.commit()
 
         # Разбор истории решений вне уроков (тренажёры, тесты)
         try:
@@ -1539,6 +1546,8 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
                 'username': row['username'],
                 'displayName': row['display_name'],
                 'role': row['role'] or 'student',
+                'parentCode': student_parent_code,
+                'parent_code': student_parent_code,
                 'createdAt': row['created_at'],
                 'lastLogin': row['last_login'],
                 'avatarFrame': row['avatar_frame'] or 'orbit',
