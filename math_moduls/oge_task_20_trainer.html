@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
+    :root, html[data-theme="dark"], html[data-theme="light"], body {
       --paper: #f5f2eb;
       --paper-light: #fbf9f4;
       --paper-card: #ffffff;
@@ -35,14 +35,29 @@
     }
 
     body {
-      background-color: var(--paper);
-      color: var(--ink);
+      background-color: var(--paper) !important;
+      color: var(--ink) !important;
       font-family: 'DM Sans', -apple-system, sans-serif;
       min-height: 100vh;
       display: flex; flex-direction: column;
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(38,63,97,.03) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(183,70,78,.03) 0%, transparent 40%);
+    }
+
+    /* Гарантированное сохранение теплой японской палитры в области интерактивного виджета */
+    #answer-widget-area {
+      --task20-card-bg: #ffffff;
+      --task20-btn-bg: #fbf9f4;
+      --task20-input-bg: #ffffff;
+      --task20-border: rgba(38,63,97,.18);
+      --task20-ink: #202a3a;
+      --task20-muted: #697383;
+      --task20-indigo: #263f61;
+      --task20-vermilion: #b7464e;
+      --task20-preview-bg: #fbf9f4;
+      color: #202a3a;
+      width: 100%;
     }
 
     /* SITE NAV */

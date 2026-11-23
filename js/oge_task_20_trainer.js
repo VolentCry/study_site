@@ -1183,6 +1183,12 @@
   /* --------------------------------------------------------------------------
      ВСТРАИВАЕМЫЕ CSS-СТИЛИ ДЛЯ ВИДЖЕТОВ ВВОДА ЗАДАНИЯ №20
      -------------------------------------------------------------------------- */
+  /* --------------------------------------------------------------------------
+     ВСТРАИВАЕМЫЕ CSS-СТИЛИ ДЛЯ ВИДЖЕТОВ ВВОДА ЗАДАНИЯ №20
+     Дизайн строго следует эстетике японской бумаги (Japanese Paper / Wabi-Sabi):
+     --paper: #f5f2eb, --ink: #202a3a, --indigo: #263f61, --vermilion: #b7464e.
+     Для тёмной темы в домашних заданиях стили изолированы под .task20-hw-answer-box.
+     -------------------------------------------------------------------------- */
   function ensureWidgetStyles() {
     if (typeof document === 'undefined') return;
     if (document.getElementById('task20-widget-styles')) return;
@@ -1193,29 +1199,25 @@
       .task20-widget-root {
         display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 680px; margin: 0 auto;
         font-family: 'DM Sans', -apple-system, sans-serif;
+        color: var(--task20-ink, #202a3a);
       }
       .task20-template-pills {
-        display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 2px;
+        display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 2px;
       }
       .task20-tpl-btn {
-        background: rgba(38,63,97,.06); border: 1px solid rgba(38,63,97,.18);
+        background: var(--task20-btn-bg, #fbf9f4);
+        border: 1px solid var(--task20-border, rgba(38,63,97,.18));
         border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 700;
-        color: #202a3a; cursor: pointer; transition: all .15s ease;
-      }
-      [data-theme="dark"] .task20-tpl-btn {
-        background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); color: #f4f6fa;
+        color: var(--task20-ink, #202a3a); cursor: pointer; transition: all .15s ease;
+        user-select: none;
       }
       .task20-tpl-btn:hover {
-        background: rgba(38,63,97,.12); transform: translateY(-1px);
-      }
-      [data-theme="dark"] .task20-tpl-btn:hover {
-        background: rgba(255,255,255,.12);
+        background: rgba(38,63,97,.1); color: var(--task20-indigo, #263f61);
+        border-color: var(--task20-indigo, #263f61); transform: translateY(-1px);
       }
       .task20-tpl-btn.active {
-        background: #263f61; color: #fff; border-color: #263f61; box-shadow: 0 2px 8px rgba(38,63,97,.25);
-      }
-      [data-theme="dark"] .task20-tpl-btn.active {
-        background: #ff7728; border-color: #ff7728; color: #fff; box-shadow: 0 2px 8px rgba(255,119,40,.3);
+        background: var(--task20-indigo, #263f61); color: #ffffff !important;
+        border-color: var(--task20-indigo, #263f61); box-shadow: 0 2px 8px rgba(38,63,97,.25);
       }
 
       /* Сетка корней уравнений */
@@ -1224,26 +1226,25 @@
       }
       .task20-root-item {
         display: inline-flex; align-items: center; gap: 8px;
-        background: #fff; border: 2px solid rgba(38,63,97,.18); border-radius: 12px;
-        padding: 6px 14px; box-shadow: 0 2px 6px rgba(0,0,0,.03); transition: border-color .2s;
-      }
-      [data-theme="dark"] .task20-root-item {
-        background: #141822; border-color: rgba(255,255,255,.14);
+        background: var(--task20-card-bg, #ffffff);
+        border: 1.5px solid var(--task20-border, rgba(38,63,97,.18)); border-radius: 12px;
+        padding: 6px 14px; box-shadow: 0 2px 6px rgba(38,63,97,.04); transition: border-color .2s;
       }
       .task20-root-item:focus-within {
-        border-color: #263f61; box-shadow: 0 0 0 3px rgba(38,63,97,.12);
-      }
-      [data-theme="dark"] .task20-root-item:focus-within {
-        border-color: #ff7728; box-shadow: 0 0 0 3px rgba(255,119,40,.2);
+        border-color: var(--task20-indigo, #263f61); box-shadow: 0 0 0 3px rgba(38,63,97,.12);
       }
       .task20-root-label {
-        font-weight: 700; font-size: 15px; color: #263f61; user-select: none;
+        font-weight: 700; font-size: 15px; color: var(--task20-indigo, #263f61); user-select: none;
       }
-      [data-theme="dark"] .task20-root-label { color: #2ce6d6; }
       .task20-root-input {
-        width: 100px; height: 38px; border: none; background: transparent;
+        width: 100px; height: 38px; border: 1px solid var(--task20-border, rgba(38,63,97,.18));
+        border-radius: 8px; background: var(--task20-input-bg, #ffffff);
         font-family: 'DM Sans', monospace; font-size: 18px; font-weight: 700;
-        text-align: center; color: inherit; outline: none;
+        text-align: center; color: var(--task20-ink, #202a3a); outline: none;
+        transition: border-color .15s ease;
+      }
+      .task20-root-input:focus {
+        border-color: var(--task20-indigo, #263f61);
       }
 
       /* Конструктор неравенств */
@@ -1254,97 +1255,78 @@
         display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; width: 100%;
       }
       .task20-union-sign {
-        font-size: 22px; font-weight: 900; color: #b7464e; user-select: none; line-height: 1; padding: 0 4px;
+        font-size: 22px; font-weight: 900; color: var(--task20-vermilion, #b7464e);
+        user-select: none; line-height: 1; padding: 0 4px;
       }
-      [data-theme="dark"] .task20-union-sign { color: #ff7728; }
       .task20-interval-card {
         display: inline-flex; align-items: center; gap: 6px;
-        background: #fff; border: 2px solid rgba(38,63,97,.18); border-radius: 14px;
-        padding: 6px 10px; box-shadow: 0 2px 6px rgba(0,0,0,.04);
-      }
-      [data-theme="dark"] .task20-interval-card {
-        background: #141822; border-color: rgba(255,255,255,.14);
+        background: var(--task20-card-bg, #ffffff);
+        border: 1.5px solid var(--task20-border, rgba(38,63,97,.18)); border-radius: 12px;
+        padding: 6px 10px; box-shadow: 0 2px 8px rgba(38,63,97,.04); transition: border-color .2s;
       }
       .task20-interval-card:focus-within {
-        border-color: #263f61;
-      }
-      [data-theme="dark"] .task20-interval-card:focus-within {
-        border-color: #ff7728;
+        border-color: var(--task20-indigo, #263f61); box-shadow: 0 0 0 3px rgba(38,63,97,.1);
       }
       .task20-bracket-btn {
-        background: rgba(38,63,97,.08); border: 1px solid rgba(38,63,97,.2);
-        color: #263f61; font-weight: 800; font-size: 17px; width: 34px; height: 38px;
+        background: var(--task20-btn-bg, #fbf9f4);
+        border: 1px solid var(--task20-border, rgba(38,63,97,.2));
+        color: var(--task20-indigo, #263f61); font-weight: 800; font-size: 17px; width: 34px; height: 38px;
         border-radius: 8px; cursor: pointer; transition: all .15s ease; display: grid; place-items: center;
-      }
-      [data-theme="dark"] .task20-bracket-btn {
-        background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #fff;
+        user-select: none;
       }
       .task20-bracket-btn:hover {
-        background: #263f61; color: #fff;
-      }
-      [data-theme="dark"] .task20-bracket-btn:hover {
-        background: #ff7728; color: #fff;
+        background: var(--task20-indigo, #263f61); color: #ffffff;
+        border-color: var(--task20-indigo, #263f61);
       }
       .task20-bound-box {
         display: inline-flex; align-items: center; position: relative;
       }
       .task20-bound-input {
-        width: 82px; height: 38px; border: 1px solid rgba(38,63,97,.18);
-        border-radius: 8px; background: rgba(38,63,97,.03); text-align: center;
-        font-family: 'DM Sans', monospace; font-size: 16px; font-weight: 700; color: inherit; outline: none;
-      }
-      [data-theme="dark"] .task20-bound-input {
-        background: rgba(0,0,0,.2); border-color: rgba(255,255,255,.14);
+        width: 82px; height: 38px; border: 1px solid var(--task20-border, rgba(38,63,97,.18));
+        border-radius: 8px; background: var(--task20-input-bg, #ffffff); text-align: center;
+        font-family: 'DM Sans', monospace; font-size: 16px; font-weight: 700;
+        color: var(--task20-ink, #202a3a); outline: none; transition: border-color .15s ease;
       }
       .task20-bound-input:focus {
-        border-color: #263f61; background: #fff;
-      }
-      [data-theme="dark"] .task20-bound-input:focus {
-        border-color: #ff7728; background: #1c2230;
+        border-color: var(--task20-indigo, #263f61);
       }
       .task20-inf-quick-btn {
-        position: absolute; right: 2px; top: 2px; bottom: 2px;
-        background: rgba(38,63,97,.1); border: none; border-radius: 6px;
-        font-size: 11px; font-weight: 800; padding: 0 5px; color: #263f61;
-        cursor: pointer; opacity: 0.85; transition: opacity .15s;
+        position: absolute; right: 3px; top: 3px; bottom: 3px;
+        background: rgba(38,63,97,.08); border: none; border-radius: 6px;
+        font-size: 11px; font-weight: 800; padding: 0 5px; color: var(--task20-indigo, #263f61);
+        cursor: pointer; opacity: 0.88; transition: all .15s; user-select: none;
       }
-      [data-theme="dark"] .task20-inf-quick-btn {
-        background: rgba(255,255,255,.1); color: #2ce6d6;
+      .task20-inf-quick-btn:hover {
+        opacity: 1; background: var(--task20-indigo, #263f61); color: #ffffff;
       }
-      .task20-inf-quick-btn:hover { opacity: 1; background: #263f61; color: #fff; }
 
-      .task20-sep { font-weight: 800; font-size: 16px; color: #697383; padding: 0 2px; }
+      .task20-sep { font-weight: 800; font-size: 16px; color: var(--task20-muted, #697383); padding: 0 2px; }
 
       /* Точка в фигурных скобках {c} */
       .task20-point-card {
         display: inline-flex; align-items: center; gap: 4px;
-        background: #fff; border: 2px solid rgba(38,63,97,.18); border-radius: 14px;
-        padding: 6px 12px; box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        background: var(--task20-card-bg, #ffffff);
+        border: 1.5px solid var(--task20-border, rgba(38,63,97,.18)); border-radius: 12px;
+        padding: 6px 12px; box-shadow: 0 2px 8px rgba(38,63,97,.04); transition: border-color .2s;
       }
-      [data-theme="dark"] .task20-point-card {
-        background: #141822; border-color: rgba(255,255,255,.14);
+      .task20-point-card:focus-within {
+        border-color: var(--task20-indigo, #263f61); box-shadow: 0 0 0 3px rgba(38,63,97,.1);
       }
-      .task20-point-card:focus-within { border-color: #263f61; }
-      [data-theme="dark"] .task20-point-card:focus-within { border-color: #ff7728; }
-      .task20-brace-sign { font-size: 20px; font-weight: 700; color: #263f61; }
-      [data-theme="dark"] .task20-brace-sign { color: #2ce6d6; }
+      .task20-brace-sign { font-size: 20px; font-weight: 700; color: var(--task20-indigo, #263f61); user-select: none; }
       .task20-point-input {
-        width: 75px; height: 38px; border: 1px solid rgba(38,63,97,.18);
-        border-radius: 8px; background: rgba(38,63,97,.03); text-align: center;
-        font-family: 'DM Sans', monospace; font-size: 16px; font-weight: 700; color: inherit; outline: none;
+        width: 75px; height: 38px; border: 1px solid var(--task20-border, rgba(38,63,97,.18));
+        border-radius: 8px; background: var(--task20-input-bg, #ffffff); text-align: center;
+        font-family: 'DM Sans', monospace; font-size: 16px; font-weight: 700;
+        color: var(--task20-ink, #202a3a); outline: none; transition: border-color .15s ease;
       }
-      [data-theme="dark"] .task20-point-input {
-        background: rgba(0,0,0,.2); border-color: rgba(255,255,255,.14);
-      }
-      .task20-point-input:focus { border-color: #263f61; background: #fff; }
-      [data-theme="dark"] .task20-point-input:focus { border-color: #ff7728; background: #1c2230; }
+      .task20-point-input:focus { border-color: var(--task20-indigo, #263f61); }
 
       .task20-del-btn {
         width: 26px; height: 26px; border-radius: 999px; border: 1px solid rgba(183,70,78,.3);
-        background: rgba(183,70,78,.08); color: #b7464e; font-size: 12px; font-weight: 800;
+        background: rgba(183,70,78,.08); color: var(--task20-vermilion, #b7464e); font-size: 12px; font-weight: 800;
         cursor: pointer; display: grid; place-items: center; margin-left: 4px; transition: all .15s;
       }
-      .task20-del-btn:hover { background: #b7464e; color: #fff; }
+      .task20-del-btn:hover { background: var(--task20-vermilion, #b7464e); color: #ffffff; }
 
       /* Системы уравнений: пары решений */
       .task20-system-grid {
@@ -1352,60 +1334,97 @@
       }
       .task20-pair-card {
         display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
-        background: #fff; border: 2px solid rgba(38,63,97,.18); border-radius: 14px;
-        padding: 8px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        background: var(--task20-card-bg, #ffffff);
+        border: 1.5px solid var(--task20-border, rgba(38,63,97,.18)); border-radius: 12px;
+        padding: 8px 16px; box-shadow: 0 2px 8px rgba(38,63,97,.04); transition: border-color .2s;
       }
-      [data-theme="dark"] .task20-pair-card {
-        background: #141822; border-color: rgba(255,255,255,.14);
+      .task20-pair-card:focus-within {
+        border-color: var(--task20-indigo, #263f61); box-shadow: 0 0 0 3px rgba(38,63,97,.1);
       }
-      .task20-pair-card:focus-within { border-color: #263f61; }
-      [data-theme="dark"] .task20-pair-card:focus-within { border-color: #ff7728; }
-      .task20-pair-num { font-size: 13px; font-weight: 700; color: #697383; }
+      .task20-pair-num { font-size: 13px; font-weight: 700; color: var(--task20-muted, #697383); user-select: none; }
       .task20-pair-field { display: inline-flex; align-items: center; gap: 4px; }
-      .task20-pair-coord-lbl { font-weight: 700; color: #263f61; font-size: 15px; }
-      [data-theme="dark"] .task20-pair-coord-lbl { color: #2ce6d6; }
+      .task20-pair-coord-lbl { font-weight: 700; color: var(--task20-indigo, #263f61); font-size: 15px; user-select: none; }
       .task20-coord-input {
-        width: 80px; height: 38px; border: 1px solid rgba(38,63,97,.18);
+        width: 80px; height: 38px; border: 1px solid var(--task20-border, rgba(38,63,97,.18));
         border-radius: 8px; text-align: center; font-family: 'DM Sans', monospace;
-        font-size: 17px; font-weight: 700; color: inherit; background: rgba(38,63,97,.03); outline: none;
+        font-size: 17px; font-weight: 700; color: var(--task20-ink, #202a3a);
+        background: var(--task20-input-bg, #ffffff); outline: none; transition: border-color .15s ease;
       }
-      [data-theme="dark"] .task20-coord-input {
-        background: rgba(0,0,0,.2); border-color: rgba(255,255,255,.14);
-      }
-      .task20-coord-input:focus { border-color: #263f61; background: #fff; }
-      [data-theme="dark"] .task20-coord-input:focus { border-color: #ff7728; background: #1c2230; }
+      .task20-coord-input:focus { border-color: var(--task20-indigo, #263f61); }
 
       /* Панель кнопок быстрых действий */
       .task20-actions-bar {
         display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 2px;
       }
       .task20-act-btn {
-        background: rgba(38,63,97,.06); border: 1px solid rgba(38,63,97,.16);
-        border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700;
-        color: #263f61; cursor: pointer; transition: all .15s ease;
+        background: var(--task20-btn-bg, #fbf9f4);
+        border: 1px solid var(--task20-border, rgba(38,63,97,.2));
+        border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 700;
+        color: var(--task20-indigo, #263f61); cursor: pointer; transition: all .15s ease;
+        display: inline-flex; align-items: center; gap: 6px; user-select: none;
       }
-      [data-theme="dark"] .task20-act-btn {
-        background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); color: #f4f6fa;
+      .task20-act-btn:hover {
+        background: #ffffff; border-color: var(--task20-indigo, #263f61);
+        color: #19273c; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(38,63,97,.1);
       }
-      .task20-act-btn:hover { background: #fff; border-color: #263f61; transform: translateY(-1px); }
-      [data-theme="dark"] .task20-act-btn:hover { background: #1c2230; border-color: #ff7728; }
       .task20-act-btn.active {
-        background: #b7464e; color: #fff; border-color: #b7464e;
+        background: var(--task20-vermilion, #b7464e); color: #ffffff !important;
+        border-color: var(--task20-vermilion, #b7464e); box-shadow: 0 2px 6px rgba(183,70,78,.3);
       }
 
       /* Живой предпросмотр ответа */
       .task20-preview-box {
         display: flex; align-items: center; justify-content: center; gap: 8px;
-        background: rgba(38,63,97,.04); border: 1px dashed rgba(38,63,97,.2);
-        border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #697383;
-      }
-      [data-theme="dark"] .task20-preview-box {
-        background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.12); color: #8e98a8;
+        background: var(--task20-preview-bg, #fbf9f4);
+        border: 1px dashed var(--task20-border, rgba(38,63,97,.25));
+        border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+        color: var(--task20-muted, #697383);
       }
       .task20-preview-val {
-        font-family: 'DM Sans', monospace; font-size: 15px; font-weight: 700; color: #202a3a;
+        font-family: 'DM Sans', monospace; font-size: 15px; font-weight: 700;
+        color: var(--task20-ink, #202a3a);
       }
-      [data-theme="dark"] .task20-preview-val { color: #f4f6fa; }
+
+      /* =========================================================================
+         СПЕЦИФИЧЕСКИЕ ПЕРЕОПРЕДЕЛЕНИЯ ДЛЯ ТЁМНОЙ ТЕМЫ В ДОМАШНИХ РАБОТАХ
+         Изолированы под .task20-hw-answer-box, чтобы не затрагивать тренажёр
+         ========================================================================= */
+      [data-theme="dark"] .task20-hw-answer-box {
+        --task20-card-bg: #151b2b;
+        --task20-btn-bg: rgba(255, 255, 255, 0.06);
+        --task20-input-bg: #101522;
+        --task20-border: rgba(255, 255, 255, 0.14);
+        --task20-ink: #f8fafc;
+        --task20-muted: #b0bfd4;
+        --task20-indigo: #2ce6d6;
+        --task20-vermilion: #ff7728;
+        --task20-preview-bg: rgba(255, 255, 255, 0.03);
+      }
+      [data-theme="dark"] .task20-hw-answer-box .task20-tpl-btn:hover {
+        background: rgba(255, 255, 255, 0.12); color: #fff;
+      }
+      [data-theme="dark"] .task20-hw-answer-box .task20-tpl-btn.active {
+        background: #ff7728; border-color: #ff7728; color: #fff !important;
+        box-shadow: 0 2px 8px rgba(255, 119, 40, 0.3);
+      }
+      [data-theme="dark"] .task20-hw-answer-box .task20-bracket-btn:hover {
+        background: #ff7728; color: #fff; border-color: #ff7728;
+      }
+      [data-theme="dark"] .task20-hw-answer-box .task20-bound-input:focus,
+      [data-theme="dark"] .task20-hw-answer-box .task20-point-input:focus,
+      [data-theme="dark"] .task20-hw-answer-box .task20-coord-input:focus,
+      [data-theme="dark"] .task20-hw-answer-box .task20-root-input:focus {
+        border-color: #ff7728;
+      }
+      [data-theme="dark"] .task20-hw-answer-box .task20-interval-card:focus-within,
+      [data-theme="dark"] .task20-hw-answer-box .task20-point-card:focus-within,
+      [data-theme="dark"] .task20-hw-answer-box .task20-pair-card:focus-within,
+      [data-theme="dark"] .task20-hw-answer-box .task20-root-item:focus-within {
+        border-color: #ff7728; box-shadow: 0 0 0 3px rgba(255, 119, 40, 0.2);
+      }
+      [data-theme="dark"] .task20-hw-answer-box .task20-act-btn:hover {
+        background: #1c2230; border-color: #ff7728; color: #fff;
+      }
     `;
     document.head.appendChild(style);
   }
