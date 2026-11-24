@@ -131,11 +131,88 @@
     }
 
     /**
+     * Проверяет, является ли строка смешанным текстом (проза, <br>, <code> и т.п.),
+     * который нельзя передавать в KaTeX целиком.
+     */
+    function isMixedProseHtml(str) {
+        if (!str) return false;
+        // 1. Структурные или текстовые HTML-теги (вне математических обёрток)
+        if (/<(?:br|code|pre|ul|ol|li|table|tr|td|th|h[1-6]|p|blockquote|strong)\b/i.test(str)) {
+            return true;
+        }
+        // 2. Длинный русский текст (2 и более русских слова рядом, исключая слово "при")
+        const withoutTags = str.replace(/<[^>]+>/g, ' ').replace(/\bпри\b/gi, ' ');
+        if (/[а-яё]{2,}\s+[а-яё]{2,}/i.test(withoutTags)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Точечно рендерит только математические фрагменты внутри смешанного HTML-текста,
+     * не ломая пробелы, русский текст, <br>, <code> и <strong>.
+     */
+    function formatMixedHtml(html) {
+        if (!html) return '';
+        let result = String(html);
+
+        if (typeof document !== 'undefined' && document.createElement) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = result;
+
+            // Рендерим явные блоки .math-expr / .math-tex
+            tmp.querySelectorAll('.math-expr, .math-tex').forEach(el => {
+                if (el.closest('.katex')) return;
+                el.outerHTML = formatMath(el.outerHTML, el.tagName.toLowerCase() === 'div');
+            });
+
+            // Рендерим системы уравнений, если они вне .math-expr
+            tmp.querySelectorAll('.system-bracket').forEach(el => {
+                if (el.closest('.katex')) return;
+                el.outerHTML = formatMath(el.outerHTML, true);
+            });
+
+            // Рендерим встроенные корни и дроби верхнего уровня
+            tmp.querySelectorAll('.rad-wrap').forEach(el => {
+                if (el.closest('.katex') || el.closest('.fraction')) return;
+                const tex = htmlToTeX(el.outerHTML).trim();
+                if (tex) el.outerHTML = renderTeX(tex, false);
+            });
+
+            tmp.querySelectorAll('.fraction').forEach(el => {
+                if (el.closest('.katex') || el.parentElement.closest('.fraction')) return;
+                const tex = htmlToTeX(el.outerHTML).trim();
+                if (tex) el.outerHTML = renderTeX(tex, false);
+            });
+
+            result = tmp.innerHTML;
+        } else {
+            // Фолбэк для окружений без DOM (Node.js)
+            result = result.replace(/<div\s+class=["']math-expr["'][^>]*>[\s\S]*?<\/div>/gi, m => formatMath(m, true));
+            result = result.replace(/<span\s+class=["']fraction["'][^>]*>\s*<span\s+class=["']num["'][^>]*>(?:(?!<span\s+class=["']fraction).)*?<\/span>\s*<span\s+class=["']den["'][^>]*>(?:(?!<span\s+class=["']fraction).)*?<\/span>\s*<\/span>/gi, m => {
+                const tex = htmlToTeX(m).trim();
+                return tex ? renderTeX(tex, false) : m;
+            });
+        }
+
+        // Поддержка $...$ и $$...$$ внутри смешанного текста (вне <code> и уже готового .katex)
+        result = result.replace(/\$\$([\s\S]+?)\$\$/g, (m, tex) => renderTeX(tex.trim(), true));
+        result = result.replace(/(^|[^\\])\$([^$\n<]+?)\$/g, (m, prefix, tex) => prefix + renderTeX(tex.trim(), false));
+
+        return result;
+    }
+
+    /**
      * Преобразует и рендерит фрагмент формулы
      */
     function formatMath(raw, displayMode = false) {
         if (!raw) return '';
         let rawStr = String(raw).trim();
+
+        // 0. Never re-render already rendered KaTeX markup
+        if (rawStr.includes('class="katex') || rawStr.includes("class='katex") || rawStr.includes('data-katex-rendered')) {
+            return rawStr;
+        }
 
         // 1. Separate non-math instruction/condition blocks outside the math expression
         // e.g. <div class="task-instruction">...</div>, <span class="math-cond">...</span>, <div class="task-prompt">...</div>
@@ -153,7 +230,7 @@
         const exprWrapMatch = rawStr.match(/^<(div|span)\s+class=["'](?:math-expr|math-tex)["'][^>]*>([\s\S]*?)<\/\1>$/i);
         if (exprWrapMatch) {
             const inner = formatMath(exprWrapMatch[2].trim(), displayMode);
-            return `<div class="math-expr">${inner}</div>`;
+            return `<div class="math-expr katex-ready" data-katex-rendered="true">${inner}</div>`;
         }
 
         // 3. If it's a systems of equations HTML structure (<div class="system-bracket">...)
@@ -190,7 +267,12 @@
             }
         }
 
-        // 4. Remove non-semantic helper spans like <span class="expr-line">...</span>
+        // 4. Protect mixed prose / HTML (Russian text, <br>, <code>, <strong>) from being fed as raw TeX
+        if (isMixedProseHtml(rawStr)) {
+            return formatMixedHtml(rawStr);
+        }
+
+        // 5. Remove non-semantic helper spans like <span class="expr-line">...</span>
         rawStr = rawStr.replace(/<\/?span\s+class=["']expr-line["'][^>]*>/gi, '');
 
         // 5. If it's already LaTeX ($...$ or $$...$$)
@@ -231,7 +313,7 @@
         // 1. Process explicit .math-expr elements
         const exprs = container.querySelectorAll('.math-expr, .math-tex, [data-katex]');
         exprs.forEach(el => {
-            if (el.dataset.katexRendered === 'true') return;
+            if (el.dataset.katexRendered === 'true' || el.classList.contains('katex-ready') || el.querySelector('.katex') || el.closest('.katex')) return;
             // If element contains math-cond, extract it or render math parts inside
             const condEl = el.querySelector('.math-cond');
             let condSaved = null;
