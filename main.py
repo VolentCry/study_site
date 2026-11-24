@@ -368,7 +368,7 @@ def api_teacher_get_class(class_id: int):
         return err
 
     tid = None if teacher.get('role') == 'admin' else teacher['id']
-    data = db.get_class_details(class_id, tid)
+    data = db.get_class_details(class_id, tid, viewer_teacher_id=teacher['id'])
     if not data:
         return jsonify({'success': False, 'error': 'Класс не найден.'}), 404
     return jsonify({'success': True, 'class': data})
@@ -506,10 +506,123 @@ def api_teacher_student_dossier(student_id: int):
     if err:
         return err
 
-    dossier = db.get_student_dossier(student_id)
+    dossier = db.get_student_dossier(student_id, teacher_id=teacher['id'])
     if not dossier:
         return jsonify({'success': False, 'error': 'Ученик не найден.'}), 404
     return jsonify({'success': True, 'dossier': dossier})
+
+
+@app.route('/api/teacher/students/<int:student_id>/display-name', methods=['POST', 'PUT'])
+def api_teacher_update_student_display_name(student_id: int):
+    """Сохраняет или сбрасывает отображаемое имя ученика локально для текущего учителя."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    data = request.get_json(silent=True) or {}
+    raw_name = data.get('displayName')
+    if raw_name is None:
+        raw_name = data.get('customName')
+
+    if raw_name is not None and not isinstance(raw_name, str):
+        return jsonify({'success': False, 'error': 'Некорректное имя.'}), 400
+
+    try:
+        custom_name = db.set_teacher_student_alias(teacher['id'], student_id, raw_name or '')
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 404
+
+    student = db.get_user_by_id(student_id)
+    original_name = (student['display_name'] if student else '') or ''
+    effective_name = custom_name or original_name or (student['username'] if student else '')
+
+    return jsonify({
+        'success': True,
+        'studentId': student_id,
+        'displayName': effective_name,
+        'originalDisplayName': original_name,
+        'teacherCustomName': custom_name or ''
+    })
+
+
+@app.route('/api/teacher/students/<int:student_id>/recurring-schedule', methods=['GET'])
+def api_teacher_get_student_recurring_schedule(student_id: int):
+    """Возвращает сохранённый шаблон постоянного расписания ученика."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    schedule = db.get_student_recurring_schedule(teacher['id'], student_id)
+    return jsonify({'success': True, 'schedule': schedule})
+
+
+@app.route('/api/teacher/students/<int:student_id>/recurring-schedule', methods=['POST', 'PUT'])
+def api_teacher_save_student_recurring_schedule(student_id: int):
+    """Сохраняет или очищает постоянное расписание ученика для текущего учителя."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    data = request.get_json(silent=True) or {}
+    slots = data.get('slots', [])
+    class_id = data.get('classId') or data.get('class_id')
+    duration_min = data.get('durationMin', data.get('duration_min', 60))
+
+    try:
+        schedule = db.save_student_recurring_schedule(
+            teacher_id=teacher['id'],
+            student_id=student_id,
+            slots_raw=slots,
+            class_id=class_id,
+            duration_min=duration_min
+        )
+        return jsonify({'success': True, 'schedule': schedule})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 404
+
+
+@app.route('/api/teacher/recurring-schedules', methods=['GET'])
+def api_teacher_list_recurring_schedules():
+    """Список всех учеников, для которых у учителя задано постоянное расписание."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    schedules = db.get_teacher_recurring_schedules(teacher['id'])
+    return jsonify({'success': True, 'schedules': schedules})
+
+
+@app.route('/api/teacher/recurring-schedules/apply', methods=['POST'])
+def api_teacher_apply_recurring_schedule():
+    """Вставляет занятия по постоянному шаблону ученика на неделю или на месяц."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    data = request.get_json(silent=True) or {}
+    student_id_raw = data.get('studentId') or data.get('student_id')
+    period = data.get('period')
+    start_date = data.get('startDate') or data.get('start_date')
+    class_id = data.get('classId') or data.get('class_id')
+
+    try:
+        student_id = int(student_id_raw)
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'error': 'Выберите ученика.'}), 400
+
+    try:
+        result = db.apply_student_recurring_schedule(
+            teacher_id=teacher['id'],
+            student_id=student_id,
+            period=str(period or ''),
+            start_date_str=str(start_date or ''),
+            class_id=int(class_id) if (class_id and str(class_id).isdigit()) else None
+        )
+        return jsonify({'success': True, **result})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Ошибка сервера при вставке шаблона.'}), 500
 
 
 @app.route('/api/teacher/students/<int:student_id>/billing', methods=['POST', 'PUT'])
@@ -589,7 +702,12 @@ def api_teacher_activity_feed():
     scope = request.args.get('scope', 'all')
 
     tid = teacher['id'] if (scope == 'my' and class_id is None) else None
-    feed = db.get_recent_activity_feed(teacher_id=tid, class_id=class_id, limit=limit)
+    feed = db.get_recent_activity_feed(
+        teacher_id=tid,
+        class_id=class_id,
+        limit=limit,
+        viewer_teacher_id=teacher['id']
+    )
     return jsonify({'success': True, 'feed': feed})
 
 

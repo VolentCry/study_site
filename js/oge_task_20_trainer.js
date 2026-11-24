@@ -7,14 +7,20 @@
  */
 
 (function (root, factory) {
+  const exported = factory();
   if (typeof define === 'function' && define.amd) {
-    define([], factory);
-  } else if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
-  } else {
-    root.OgeTask20Trainer = factory();
+    define([], function () { return exported; });
   }
-}(typeof self !== 'undefined' ? self : this, function () {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = exported;
+  }
+  if (typeof window !== 'undefined') {
+    window.OgeTask20Trainer = exported;
+  }
+  if (root) {
+    root.OgeTask20Trainer = exported;
+  }
+}(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this), function () {
   'use strict';
 
   /* --------------------------------------------------------------------------
@@ -86,7 +92,7 @@
     const p = -(t1 + t2);
     const q = t1 * t2;
 
-    const pStr = p === 0 ? '' : (p > 0 ? `+ ${p}x<sup>2</sup>` : `− ${Math.abs(p)}x<sup>2</sup>`);
+    const pStr = p === 0 ? '' : (p > 0 ? `+ ${p === 1 ? '' : p}x<sup>2</sup>` : `− ${Math.abs(p) === 1 ? '' : Math.abs(p)}x<sup>2</sup>`);
     const qStr = q > 0 ? `+ ${q}` : `− ${Math.abs(q)}`;
     const expr = `x<sup>4</sup> ${pStr} ${qStr} = 0`;
 
@@ -196,15 +202,17 @@
     const bSq = b * b;
     const c = a * bSq;
 
-    const expr = `x<sup>3</sup> + ${a}x<sup>2</sup> − ${bSq}x − ${c} = 0`;
+    const bSqX = bSq === 1 ? 'x' : `${bSq}x`;
+    const bSqParen = bSq === 1 ? '' : `${bSq}`;
+    const expr = `x<sup>3</sup> + ${a}x<sup>2</sup> − ${bSqX} − ${c} = 0`;
     const questionHtml = `<div class="math-expr"><span class="expr-line">${expr}</span></div>`;
 
     const roots = [-a, -b, b].sort((x, y) => x - y);
     const uniqueRoots = [...new Set(roots)];
 
     const solutionSteps = [
-      `Сгруппируем слагаемые попарно:<br><strong>(x<sup>3</sup> + ${a}x<sup>2</sup>) − (${bSq}x + ${c}) = 0</strong>.`,
-      `Вынесем общие множители из каждой группы:<br><strong>x<sup>2</sup>(x + ${a}) − ${bSq}(x + ${a}) = 0</strong>.`,
+      `Сгруппируем слагаемые попарно:<br><strong>(x<sup>3</sup> + ${a}x<sup>2</sup>) − (${bSqX} + ${c}) = 0</strong>.`,
+      `Вынесем общие множители из каждой группы:<br><strong>x<sup>2</sup>(x + ${a}) − ${bSqParen}(x + ${a}) = 0</strong>.`,
       `Вынесем общий двучлен <strong>(x + ${a})</strong> за скобки:<br><strong>(x + ${a})(x<sup>2</sup> − ${bSq}) = 0</strong>.`,
       `Разложим разность квадратов:<br><strong>(x + ${a})(x − ${b})(x + ${b}) = 0</strong>.`,
       `Приравниваем каждый множитель к нулю:<br>` +
@@ -249,7 +257,7 @@
       roots = [x2, x1].sort((a, b) => a - b);
     }
 
-    const pTerm = p === 0 ? '' : (p > 0 ? `− ${p}x` : `+ ${Math.abs(p)}x`);
+    const pTerm = p === 0 ? '' : (p > 0 ? `− ${p === 1 ? '' : p}x` : `+ ${Math.abs(p) === 1 ? '' : Math.abs(p)}x`);
     const expr = `x<sup>2</sup> ${pTerm} + &radic;<span style="border-top:1px solid currentColor;">${k} − x</span> = &radic;<span style="border-top:1px solid currentColor;">${k} − x</span> + ${prod}`;
     const questionHtml = `<div class="math-expr"><span class="expr-line">${expr}</span></div>`;
 
@@ -297,7 +305,7 @@
     const p = -(sharedRoot + otherRoot);
     const q = sharedRoot * otherRoot;
 
-    const pStr = p === 0 ? '' : (p > 0 ? `+ ${p}x` : `− ${Math.abs(p)}x`);
+    const pStr = p === 0 ? '' : (p > 0 ? `+ ${p === 1 ? '' : p}x` : `− ${Math.abs(p) === 1 ? '' : Math.abs(p)}x`);
     const qStr = q > 0 ? `+ ${q}` : `− ${Math.abs(q)}`;
 
     const expr = `(x<sup>2</sup> − ${aSq})<sup>2</sup> + (x<sup>2</sup> ${pStr} ${qStr})<sup>2</sup> = 0`;

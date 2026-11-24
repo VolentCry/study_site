@@ -167,18 +167,42 @@
       taskNum: 19,
       title: 'Анализ геометрических высказываний',
       count: 25,
-      active: false,
-      icon: '🔍',
-      desc: 'Определение верных и неверных утверждений по курсу планиметрии 7–9 классов.'
+      active: true,
+      icon: '📐',
+      trainer: 'OgeTask19Trainer',
+      category: 'all',
+      desc: 'Определение верных и неверных утверждений по планиметрии (треугольники, четырёхугольники, окружности, площади).'
     },
     {
       id: 20,
-      taskNum: '20–25',
-      title: 'Часть 2 повышенной сложности',
-      count: 20,
+      taskNum: 20,
+      title: 'Уравнения, неравенства и системы (Часть 2)',
+      count: 15,
+      active: true,
+      icon: '🧮',
+      trainer: 'OgeTask20Trainer',
+      category: 'mixed_all',
+      desc: 'Задания повышенного уровня сложности на 2 балла: биквадратные уравнения, системы, метод интервалов.'
+    },
+    {
+      id: 22,
+      taskNum: 22,
+      title: 'Графики функций с параметром (Часть 2)',
+      count: 10,
+      active: true,
+      icon: '📉',
+      trainer: 'OgeTask22Trainer',
+      category: 'all',
+      desc: 'Задания повышенного уровня на 2 балла: кусочные функции, гиперболы, выколотые точки, исследование параметров.'
+    },
+    {
+      id: 'part2_other',
+      taskNum: '21, 23–25',
+      title: 'Остальные задания Части 2',
+      count: 15,
       active: false,
       icon: '🔥',
-      desc: 'Задания с развёрнутым ответом (2 балла): уравнения, текстовые задачи, функции, геометрия.'
+      desc: 'Текстовые задачи на движение/работу и геометрические задачи на вычисление и доказательство.'
     }
   ];
 
@@ -274,6 +298,14 @@
       trainer = self[config.trainer];
     } else if (typeof root !== 'undefined' && root[config.trainer]) {
       trainer = root[config.trainer];
+    } else {
+      try {
+        trainer = require('./' + config.trainer.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '') + '.js');
+      } catch (e) {
+        try {
+          trainer = require('./oge_task_' + config.id + '_trainer.js');
+        } catch (e2) {}
+      }
     }
 
     if (!trainer || typeof trainer.checkAnswer !== 'function') {
@@ -282,6 +314,14 @@
     }
 
     const strUser = String(userRaw !== undefined && userRaw !== null ? userRaw : '').trim();
+
+    // Задания с объектом задачи в checkAnswer
+    if (config.id === 19 || config.id === 20 || config.id === 22) {
+      const res = trainer.checkAnswer(strUser, taskObj);
+      if (typeof res === 'boolean') return res;
+      if (res && typeof res === 'object') return !!res.isCorrect;
+      return false;
+    }
 
     // Особые параметры для задания №11 (передаём taskType)
     if (config.id === 11) {

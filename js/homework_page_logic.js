@@ -76,7 +76,15 @@
         if (!raw) return '';
         let str = String(raw);
 
-        // Convert caret power notation:
+        // If KaTeX module is loaded, try KaTeX formatting
+        if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+            const mathRendered = window.StudyMath.formatMath(str);
+            if (mathRendered && mathRendered !== str) {
+                return mathRendered;
+            }
+        }
+
+        // Fallback: Convert caret power notation:
         // 1) Enclosed exponent in parentheses: 2^(3+2), x^(-2), (a+b)^(n+1)
         str = str.replace(/([a-zA-Z0-9_\)\]\}]+)\^\(([^)]+)\)/g, '$1<sup>$2</sup>');
         // 2) Simple exponent: 2^3, x^2, 10^-5, a^n
@@ -552,6 +560,11 @@
             `;
 
             tasksContainer.appendChild(card);
+
+            // Render KaTeX within card if available
+            if (window.StudyMath && typeof window.StudyMath.renderMathInElement === 'function') {
+                window.StudyMath.renderMathInElement(card);
+            }
 
             // Input change event (only for students solving)
             if (!isFinal && !isTeacher) {

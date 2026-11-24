@@ -10,6 +10,7 @@
     <link rel="canonical" href="http://127.0.0.1:5000/teacher.html">
 
     <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <link rel="stylesheet" href="assets/katex/katex.min.css">
     <link rel="stylesheet" href="css/methodical_plan.css">
     <link rel="stylesheet" href="css/teacher_page_style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22 fill=%22none%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%2310b981%22/><path d=%22M16 6L4 12l12 6 12-6-12-6zM4 18l12 6 1２-6%２２ stroke=%２２%２3ffffff%２２ stroke-width=%２２２%２２ stroke-linecap=%２２round%２２ stroke-linejoin=%２２round%２２/></svg>" />
@@ -287,6 +288,9 @@
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <button type="button" class="btn btn-secondary" id="btn-open-teacher-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700;">
                             📋 Методический план
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btn-open-apply-template">
+                            📅 Вставить шаблон
                         </button>
                         <button type="button" class="btn btn-emerald" id="btn-open-create-lesson">
                             ➕ Запланировать занятие
@@ -770,7 +774,21 @@
                 <div class="dossier-hud-user">
                     <div class="avatar-circle" id="dossier-avatar">У</div>
                     <div class="dossier-hud-info">
-                        <div class="dossier-name" id="dossier-name">Имя Ученика</div>
+                        <div class="dossier-name-row" id="dossier-name-display-row">
+                            <div class="dossier-name" id="dossier-name">Имя Ученика</div>
+                            <button type="button" class="btn btn-secondary btn-sm dossier-edit-name-btn" id="btn-dossier-edit-name" title="Изменить отображаемое имя ученика (только для вас)">
+                                ✏️ Изменить имя
+                            </button>
+                        </div>
+                        <div class="dossier-name-edit-row hidden" id="dossier-name-edit-row">
+                            <input type="text" id="dossier-name-input" class="dossier-name-input" maxlength="60" placeholder="Имя и фамилия ученика" autocomplete="off">
+                            <div class="dossier-name-edit-actions">
+                                <button type="button" class="btn btn-emerald btn-sm" id="btn-dossier-save-name">Сохранить</button>
+                                <button type="button" class="btn btn-secondary btn-sm hidden" id="btn-dossier-reset-name" title="Вернуть имя из профиля ученика">Сбросить</button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-dossier-cancel-name" title="Отмена">✕</button>
+                            </div>
+                        </div>
+                        <div class="dossier-original-name-hint hidden" id="dossier-original-name-hint"></div>
                         <div class="dossier-sub" id="dossier-sub">@username · ID: #0</div>
                         <div class="dossier-code-row" id="dossier-code-row" style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                             <span class="dossier-code-label" style="font-size: 0.78rem; color: var(--muted); font-weight: 600;">Код ученика:</span>
@@ -787,6 +805,9 @@
                     </button>
                     <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-link-plan" title="Привязать уже созданный методический план к этому ученику">
                         🔗 Привязать план
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="dossier-btn-recurring-schedule" title="Задать постоянные дни и время занятий на неделю">
+                        🗓️ Задать постоянное расписание...
                     </button>
                 </div>
             </div>
@@ -1040,6 +1061,160 @@
         </div>
     </dialog>
 
+    <!-- MODAL: ЗАДАТЬ ПОСТОЯННОЕ РАСПИСАНИЕ УЧЕНИКА -->
+    <dialog id="modal-recurring-schedule" class="admin-modal">
+        <div class="modal-body" style="max-width: 560px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title">Постоянное расписание</h3>
+                    <div id="recurring-schedule-student-subtitle" style="font-size:0.84rem; color:var(--muted); margin-top:2px;">Ученик</div>
+                </div>
+                <button type="button" class="modal-close" data-close-modal="modal-recurring-schedule">✕</button>
+            </div>
+            <form id="form-recurring-schedule" style="display:flex; flex-direction:column; gap:14px;">
+                <p style="font-size:0.85rem; color:var(--muted); margin:0;">
+                    Выберите дни недели и время начала занятий для этого ученика. По этому шаблону можно будет быстро заполнять расписание на неделю или месяц.
+                </p>
+
+                <div class="recurring-week-list" id="recurring-week-list">
+                    <label class="recurring-day-row" data-weekday="0">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="0">
+                            <span class="recurring-day-name">Понедельник</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="0" value="16:00" disabled>
+                    </label>
+                    <label class="recurring-day-row" data-weekday="1">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="1">
+                            <span class="recurring-day-name">Вторник</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="1" value="16:00" disabled>
+                    </label>
+                    <label class="recurring-day-row" data-weekday="2">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="2">
+                            <span class="recurring-day-name">Среда</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="2" value="16:00" disabled>
+                    </label>
+                    <label class="recurring-day-row" data-weekday="3">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="3">
+                            <span class="recurring-day-name">Четверг</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="3" value="16:00" disabled>
+                    </label>
+                    <label class="recurring-day-row" data-weekday="4">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="4">
+                            <span class="recurring-day-name">Пятница</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="4" value="16:00" disabled>
+                    </label>
+                    <label class="recurring-day-row" data-weekday="5">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="5">
+                            <span class="recurring-day-name">Суббота</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="5" value="12:00" disabled>
+                    </label>
+                    <label class="recurring-day-row" data-weekday="6">
+                        <span class="recurring-day-check-wrap">
+                            <input type="checkbox" class="recurring-day-checkbox" data-weekday="6">
+                            <span class="recurring-day-name">Воскресенье</span>
+                        </span>
+                        <input type="time" class="form-input recurring-day-time" data-weekday="6" value="12:00" disabled>
+                    </label>
+                </div>
+
+                <div class="recurring-meta-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="recurring-schedule-class">Класс (для вставки уроков)</label>
+                        <select id="recurring-schedule-class" class="form-select">
+                            <option value="">Автоматически (класс ученика)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="recurring-schedule-duration">Длительность (мин)</label>
+                        <input type="number" id="recurring-schedule-duration" class="form-input" min="15" max="240" step="15" value="60">
+                    </div>
+                </div>
+
+                <div class="admin-modal-actions" style="justify-content: space-between; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-danger-outline btn-sm hidden" id="btn-clear-recurring-schedule">Очистить шаблон</button>
+                    <div style="display:flex; gap:8px; margin-left:auto;">
+                        <button type="button" class="btn btn-secondary" data-close-modal="modal-recurring-schedule">Отмена</button>
+                        <button type="submit" class="btn btn-emerald" id="btn-save-recurring-schedule">Сохранить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- MODAL: ВСТАВИТЬ ШАБЛОН РАСПИСАНИЯ -->
+    <dialog id="modal-apply-schedule-template" class="admin-modal">
+        <div class="modal-body" style="max-width: 540px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Вставить шаблон расписания</h3>
+                <button type="button" class="modal-close" data-close-modal="modal-apply-schedule-template">✕</button>
+            </div>
+            <form id="form-apply-schedule-template" style="display:flex; flex-direction:column; gap:14px;">
+                <div id="apply-template-empty-hint" class="hidden" style="padding:14px; border-radius:var(--r-sm); background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.25); font-size:0.86rem; color:var(--ink);">
+                    Ни у одного ученика пока не задано постоянное расписание. Откройте досье нужного ученика и нажмите «Задать постоянное расписание...».
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="apply-template-student">Ученик *</label>
+                    <select id="apply-template-student" class="form-select" required>
+                        <option value="">Выберите ученика...</option>
+                    </select>
+                </div>
+
+                <div id="apply-template-preview" class="apply-template-preview hidden"></div>
+
+                <div class="form-group">
+                    <label class="form-label">Период вставки *</label>
+                    <div class="apply-template-period-group">
+                        <label class="apply-period-option">
+                            <input type="radio" name="apply-template-period" value="week" checked>
+                            <span>📅 На одну неделю</span>
+                        </label>
+                        <label class="apply-period-option">
+                            <input type="radio" name="apply-template-period" value="month">
+                            <span>🗓️ На месяц</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="recurring-meta-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="apply-template-start-date">Дата начала *</label>
+                        <input type="date" id="apply-template-start-date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="apply-template-class">Класс *</label>
+                        <select id="apply-template-class" class="form-select" required>
+                            <option value="">Выберите класс...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="apply-template-warning" class="apply-template-warning hidden" role="alert">
+                    <div id="apply-template-warning-text" style="font-weight:700;"></div>
+                    <button type="button" class="btn btn-secondary btn-sm hidden" id="btn-apply-template-open-plan" style="margin-top:8px;">
+                        📋 Заполнить методический план ученика
+                    </button>
+                </div>
+
+                <div class="admin-modal-actions">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-apply-schedule-template">Отмена</button>
+                    <button type="submit" class="btn btn-emerald" id="btn-submit-apply-template">Вставить в расписание</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
     <!-- MODAL: СПИСОК СДАННЫХ РАБОТ ПО ДОМАШКЕ -->
     <dialog id="modal-submissions-list" class="admin-modal">
         <div class="modal-body" style="max-width: 720px;">
@@ -1200,6 +1375,10 @@
     <script src="js/bank_tasks_data.js"></script>
     <script src="js/bank_tasks_runner.js"></script>
 
+
+    <!-- KaTeX & Math Render Engine -->
+    <script src="assets/katex/katex.min.js"></script>
+    <script src="js/math_render.js"></script>
 
     <script src="js/teacher_page_logic.js"></script>
 </body>

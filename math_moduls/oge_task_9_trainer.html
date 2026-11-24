@@ -184,6 +184,14 @@
     .task-display {
       width: 100%; text-align: center; margin-top: 10px;
     }
+    #math-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .math-expr .katex-display {
+      margin: 0;
+    }
     .task-prompt {
       font-size: 14px; color: var(--muted); margin-bottom: 16px; font-weight: 600;
     }
@@ -460,6 +468,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
 </head>
 <body>
 
@@ -484,9 +493,11 @@
       <a href="oge_task_11_trainer.html" class="task-pill">№11</a>
       <a href="oge_task_13_trainer.html" class="task-pill">№13</a>
       <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <a href="oge_task_19_trainer.html" class="task-pill">№19</a>
       <span class="nav-task-divider" aria-hidden="true"></span>
       <span class="nav-task-part-badge">Ч. 2:</span>
-      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20 (2 б.)</a>
+      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20</a>
+      <a href="oge_task_22_trainer.html" class="task-pill task-pill-part2">№22 (2 б.)</a>
     </div>
 
     <div class="nav-actions">
@@ -638,6 +649,8 @@
   <!-- SCRIPTS -->
   <script src="../js/trainer_rank_tracker.js"></script>
   <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
   <script src="../js/oge_task_9_trainer.js"></script>
   <script>
     (function () {
@@ -713,7 +726,11 @@
         hasAnsweredCurrent = false;
         currentTask = OgeTask9Trainer.generateTask(currentCategory);
         window._currentTask = currentTask;
-        mathContainer.innerHTML = currentTask.questionHtml;
+        if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+          mathContainer.innerHTML = window.StudyMath.formatMath(currentTask.questionHtml, true);
+        } else {
+          mathContainer.innerHTML = currentTask.questionHtml;
+        }
         taskCatBadge.textContent = currentTask.catName;
         taskBadge.textContent = 'Задание №9 · ' + (currentTask.catName || 'ОГЭ');
 
@@ -733,6 +750,9 @@
             <strong>Шаг ${idx + 1}:</strong> ${step}
           </div>
         `).join('');
+        if (window.StudyMath && typeof window.StudyMath.renderMathInElement === 'function') {
+          window.StudyMath.renderMathInElement(solutionContent);
+        }
         solutionPanel.classList.remove('active');
       }
 

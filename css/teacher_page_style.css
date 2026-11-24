@@ -706,12 +706,71 @@ dialog.admin-modal::backdrop {
     gap: 4px;
     min-width: 0;
 }
+.dossier-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 .dossier-name {
     font-family: var(--f-display);
     font-size: 1.25rem;
     font-weight: 800;
     word-break: break-word;
     color: var(--ink);
+}
+.dossier-edit-name-btn {
+    padding: 3px 10px;
+    font-size: 0.76rem;
+    min-height: 26px;
+    height: auto;
+    line-height: 1.2;
+}
+.dossier-name-edit-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.dossier-name-edit-row.hidden {
+    display: none;
+}
+.dossier-name-input {
+    min-width: 200px;
+    max-width: 300px;
+    flex: 1 1 200px;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 0.92rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.dossier-name-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.22);
+}
+[data-theme="light"] .dossier-name-input {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.18);
+    color: #0f172a;
+}
+.dossier-name-edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.dossier-original-name-hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+.dossier-original-name-hint.hidden {
+    display: none;
 }
 .dossier-sub {
     font-size: 0.85rem;
@@ -2648,4 +2707,135 @@ sup sup {
     .dossier-billing-kpi .kpi-lbl {
         font-size: 0.62rem;
     }
+}
+
+/* =========================================================================
+   RECURRING SCHEDULE & APPLY TEMPLATE MODALS
+   ========================================================================= */
+.recurring-week-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.recurring-day-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.recurring-day-row.active {
+    border-color: rgba(16, 185, 129, 0.55);
+    background: rgba(16, 185, 129, 0.08);
+}
+[data-theme="light"] .recurring-day-row {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.12);
+}
+[data-theme="light"] .recurring-day-row.active {
+    background: #ecfdf5;
+    border-color: rgba(16, 185, 129, 0.6);
+}
+.recurring-day-check-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--ink);
+}
+.recurring-day-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #10b981;
+    cursor: pointer;
+}
+.recurring-day-time {
+    width: 124px;
+    max-width: 130px;
+    padding: 6px 10px !important;
+    font-weight: 700;
+    text-align: center;
+}
+.recurring-day-time:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.recurring-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+@media (max-width: 520px) {
+    .recurring-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.apply-template-period-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.apply-period-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.apply-period-option:has(input:checked) {
+    border-color: rgba(16, 185, 129, 0.65);
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--ink);
+}
+.apply-period-option input {
+    accent-color: #10b981;
+}
+[data-theme="light"] .apply-period-option {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.14);
+}
+[data-theme="light"] .apply-period-option:has(input:checked) {
+    background: #ecfdf5;
+    border-color: rgba(16, 185, 129, 0.65);
+}
+.apply-template-preview {
+    padding: 12px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    background: rgba(99, 102, 241, 0.07);
+    font-size: 0.84rem;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+[data-theme="light"] .apply-template-preview {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+.apply-template-warning {
+    padding: 12px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    font-size: 0.88rem;
+}
+[data-theme="light"] .apply-template-warning {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
 }

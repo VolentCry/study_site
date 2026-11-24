@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/katex/katex.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -821,6 +822,10 @@
         </div>
     </footer>
 
+    <!-- KA TEX & MATH RENDER SCRIPT -->
+    <script src="../assets/katex/katex.min.js"></script>
+    <script src="../js/math_render.js"></script>
+
     <!-- THEORY DATA SCRIPT -->
     <script src="../js/oge_theory_data.js"></script>
 
@@ -957,6 +962,10 @@
                 trainerWrap.style.display = 'block';
                 trainerLink.href = '../math_moduls/oge_task_9_trainer.html';
                 trainerLabel.innerHTML = '⚖️ Открыть интерактивный тренажёр Задания №9 (Уравнения и системы)';
+            } else if (taskId === 10) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_10_trainer.html';
+                trainerLabel.innerHTML = '🎲 Открыть интерактивный тренажёр Задания №10 (Теория вероятностей)';
             } else if (taskId === 11) {
                 trainerWrap.style.display = 'block';
                 trainerLink.href = '../math_moduls/oge_task_11_trainer.html';
@@ -965,6 +974,22 @@
                 trainerWrap.style.display = 'block';
                 trainerLink.href = '../math_moduls/oge_task_13_trainer.html';
                 trainerLabel.innerHTML = '⚡ Открыть интерактивный тренажёр Задания №13 (Неравенства и системы)';
+            } else if (taskId === 18) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_18_trainer.html';
+                trainerLabel.innerHTML = '📐 Открыть интерактивный тренажёр Задания №18 (Геометрия на клетках)';
+            } else if (taskId === 19) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_19_trainer.html';
+                trainerLabel.innerHTML = '📐 Открыть интерактивный тренажёр Задания №19 (Геометрические высказывания)';
+            } else if (taskId === 20) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_20_trainer.html';
+                trainerLabel.innerHTML = '🧮 Открыть интерактивный тренажёр Задания №20 (Уравнения и системы, Часть 2)';
+            } else if (taskId === 22) {
+                trainerWrap.style.display = 'block';
+                trainerLink.href = '../math_moduls/oge_task_22_trainer.html';
+                trainerLabel.innerHTML = '📐 Открыть интерактивный тренажёр Задания №22 (Графики функций и параметры, Часть 2)';
             } else {
                 trainerWrap.style.display = 'none';
             }
@@ -1012,6 +1037,11 @@
             modal.classList.add('active');
             modal.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
+
+            // KaTeX render in modal
+            if (window.StudyMath && typeof window.StudyMath.renderMathInElement === 'function') {
+                window.StudyMath.renderMathInElement(container);
+            }
         }
 
         // Toggle individual spoiler independently

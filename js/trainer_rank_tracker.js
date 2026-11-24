@@ -520,6 +520,26 @@
             ]
         },
         {
+            id: 'oge_task_19',
+            name: 'ОГЭ №19 · Анализ геометрических высказываний',
+            shortName: 'ОГЭ Задание 19',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс (Часть 1)',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_19_trainer.html',
+            profileUrl: 'math_moduls/oge_task_19_trainer.html',
+            icon: '📐',
+            description: 'Истинные и ложные высказывания по планиметрии (треугольники, четырёхугольники, окружности, площади, аксиомы и теоремы).',
+            rankTiers: [
+                { min: 30, title: 'Архимаг аксиом 👑' },
+                { min: 20, title: 'Сенсей планиметрии 🧙' },
+                { min: 14, title: 'Знаток теорем 💎' },
+                { min: 8,  title: 'Геометр ОГЭ 🥇' },
+                { min: 4,  title: 'Практик определений 🥈' },
+                { min: 1,  title: 'Начинающий геометр 🥉' }
+            ]
+        },
+        {
             id: 'oge_task_20',
             name: 'ОГЭ №20 · Уравнения, неравенства, системы',
             shortName: 'ОГЭ Задание 20',
@@ -537,6 +557,26 @@
                 { min: 5,  title: 'Покоритель уравнений 🥇' },
                 { min: 3,  title: 'Аналитик неравенств 🥈' },
                 { min: 1,  title: 'Претендент на 2 балла 🥉' }
+            ]
+        },
+        {
+            id: 'oge_task_22',
+            name: 'ОГЭ №22 · Графики функций и параметры',
+            shortName: 'ОГЭ Задание 22',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс (Часть 2)',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_22_trainer.html',
+            profileUrl: 'math_moduls/oge_task_22_trainer.html',
+            icon: '📐',
+            description: 'Задание повышенного уровня (Часть 2, 2 балла): построение кусочных и дробно-рациональных функций, выколотые точки, исследование параметров.',
+            rankTiers: [
+                { min: 20, title: 'Архитектор графиков 👑' },
+                { min: 14, title: 'Магистр функций 🧙' },
+                { min: 9,  title: 'Эксперт параметров 💎' },
+                { min: 5,  title: 'Покоритель парабол 🥇' },
+                { min: 3,  title: 'Исследователь стыков 🥈' },
+                { min: 1,  title: 'Юный чертёжник 🥉' }
             ]
         }
     ];
@@ -1060,6 +1100,31 @@
         });
     }
 
+    function getStats(trainerId) {
+        const records = getTrainerRecords();
+        const cur = records[trainerId] || { maxStreak: 0, totalSolved: 0, maxRank: 'Не начат' };
+        const streak = sessionStreaks[trainerId] || 0;
+        return {
+            streak,
+            maxStreak: cur.maxStreak || 0,
+            totalSolved: cur.totalSolved || 0,
+            currentRank: { title: (cur.maxRank && cur.maxRank !== 'Не начат') ? cur.maxRank.replace(/[👑🧙💎🥇🥈🥉]/g, '').trim() : 'Новичок' }
+        };
+    }
+
+    function getSessionStreak(trainerId) {
+        return sessionStreaks[trainerId] || 0;
+    }
+
+    function getRecord(trainerId) {
+        const records = getTrainerRecords();
+        return records[trainerId] || { maxStreak: 0, totalSolved: 0, maxRank: 'Не начат' };
+    }
+
+    function getRank(trainerId, streak) {
+        return getRankForStreak(trainerId, streak);
+    }
+
     return {
         TRAINERS,
         getTrainerConfig,
@@ -1067,8 +1132,13 @@
         getRankForStreak,
         getNextTier,
         getTrainerRecords,
+        getRecord,
+        getRank,
         saveTrainerRecord,
         recordAttempt,
+        recordAnswer: recordAttempt,
+        getStats,
+        getSessionStreak,
         skipWithShield,
         setSessionStreak,
         renderRanksSection

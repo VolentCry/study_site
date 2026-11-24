@@ -949,9 +949,148 @@
     window.openStudentDossier = openStudentDossier;
 
     let currentDossierStudentId = null;
+    let currentDossierUser = null;
     let currentDossierHasParent = false;
     let currentDossierParents = [];
     let currentDossierBilling = null;
+    let currentDossierRecurringSchedule = null;
+
+    function renderDossierIdentity(u) {
+        if (!u) return;
+        const effectiveName = u.displayName || u.username;
+        const origName = u.originalDisplayName || u.username;
+        const customName = u.teacherCustomName || '';
+
+        const nameEl = document.getElementById('dossier-name');
+        const subEl = document.getElementById('dossier-sub');
+        const avatarEl = document.getElementById('dossier-avatar');
+        const hintEl = document.getElementById('dossier-original-name-hint');
+        const displayRow = document.getElementById('dossier-name-display-row');
+        const editRow = document.getElementById('dossier-name-edit-row');
+        const resetBtn = document.getElementById('btn-dossier-reset-name');
+
+        if (nameEl) nameEl.textContent = effectiveName;
+        if (subEl) subEl.textContent = `@${u.username} · ID: #${u.id} · Рамка: ${u.avatarFrame || 'Орбита'}`;
+        if (avatarEl) avatarEl.textContent = (effectiveName || 'У')[0].toUpperCase();
+
+        if (hintEl) {
+            if (customName && customName !== origName) {
+                hintEl.textContent = `В профиле ученика: ${origName} (видно только вам)`;
+                hintEl.classList.remove('hidden');
+            } else {
+                hintEl.textContent = '';
+                hintEl.classList.add('hidden');
+            }
+        }
+        if (resetBtn) {
+            resetBtn.classList.toggle('hidden', !customName);
+        }
+        if (editRow) editRow.classList.add('hidden');
+        if (displayRow) displayRow.classList.remove('hidden');
+    }
+
+    async function saveDossierStudentName(rawName) {
+        if (!currentDossierStudentId || !currentDossierUser) return;
+        const saveBtn = document.getElementById('btn-dossier-save-name');
+        const resetBtn = document.getElementById('btn-dossier-reset-name');
+        const inputEl = document.getElementById('dossier-name-input');
+        if (saveBtn) saveBtn.disabled = true;
+        if (resetBtn) resetBtn.disabled = true;
+
+        try {
+            const res = await fetch(`/api/teacher/students/${currentDossierStudentId}/display-name`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ displayName: rawName })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Не удалось сохранить имя');
+            }
+
+            currentDossierUser.displayName = data.displayName;
+            currentDossierUser.originalDisplayName = data.originalDisplayName;
+            currentDossierUser.teacherCustomName = data.teacherCustomName || '';
+            renderDossierIdentity(currentDossierUser);
+
+            // Обновляем кеш пользователей и открытый класс, если нужно
+            if (Array.isArray(allUsersCache) && allUsersCache.length) {
+                const cached = allUsersCache.find(item => item.id === currentDossierStudentId);
+                if (cached) {
+                    cached.displayName = data.displayName;
+                    cached.originalDisplayName = data.originalDisplayName;
+                    cached.teacherCustomName = data.teacherCustomName || '';
+                    applyUsersFiltersAndRender();
+                }
+            }
+            const singleClassView = document.getElementById('single-class-view');
+            if (activeClassId && singleClassView && !singleClassView.classList.contains('hidden')) {
+                openClassDetail(activeClassId);
+            }
+
+            if (typeof showToast === 'function') {
+                showToast(data.teacherCustomName
+                    ? '✓ Отображаемое имя обновлено (только для вас)'
+                    : '✓ Возвращено имя из профиля ученика');
+            }
+        } catch (err) {
+            alert('Ошибка при сохранении имени: ' + err.message);
+        } finally {
+            if (saveBtn) saveBtn.disabled = false;
+            if (resetBtn) resetBtn.disabled = false;
+            if (inputEl) inputEl.disabled = false;
+        }
+    }
+
+    function initDossierNameEditEvents() {
+        const editBtn = document.getElementById('btn-dossier-edit-name');
+        const saveBtn = document.getElementById('btn-dossier-save-name');
+        const resetBtn = document.getElementById('btn-dossier-reset-name');
+        const cancelBtn = document.getElementById('btn-dossier-cancel-name');
+        const displayRow = document.getElementById('dossier-name-display-row');
+        const editRow = document.getElementById('dossier-name-edit-row');
+        const inputEl = document.getElementById('dossier-name-input');
+
+        if (!editBtn || editBtn.dataset.bound === '1') return;
+        editBtn.dataset.bound = '1';
+
+        editBtn.addEventListener('click', () => {
+            if (!currentDossierUser || !editRow || !displayRow || !inputEl) return;
+            displayRow.classList.add('hidden');
+            editRow.classList.remove('hidden');
+            inputEl.value = currentDossierUser.teacherCustomName || currentDossierUser.displayName || '';
+            inputEl.focus();
+            inputEl.select();
+        });
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                if (editRow) editRow.classList.add('hidden');
+                if (displayRow) displayRow.classList.remove('hidden');
+            });
+        }
+
+        if (saveBtn && inputEl) {
+            saveBtn.addEventListener('click', () => saveDossierStudentName(inputEl.value));
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => saveDossierStudentName(''));
+        }
+
+        if (inputEl) {
+            inputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveDossierStudentName(inputEl.value);
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    if (editRow) editRow.classList.add('hidden');
+                    if (displayRow) displayRow.classList.remove('hidden');
+                }
+            });
+        }
+    }
     let billingEventsInitialized = false;
 
     function setupDossierBilling(studentId, billing) {
@@ -1300,9 +1439,11 @@
             const u = dossier.user;
             const stats = dossier.stats;
 
-            document.getElementById('dossier-name').textContent = u.displayName || u.username;
-            document.getElementById('dossier-sub').textContent = `@${u.username} · ID: #${u.id} · Рамка: ${u.avatarFrame || 'Орбита'}`;
-            document.getElementById('dossier-avatar').textContent = (u.displayName || u.username || 'У')[0].toUpperCase();
+            currentDossierStudentId = u.id;
+            currentDossierUser = u;
+            currentDossierRecurringSchedule = dossier.recurringSchedule || null;
+            renderDossierIdentity(u);
+            initDossierNameEditEvents();
 
             // Отображение индивидуального кода ученика
             const studentCode = u.parentCode || u.parent_code || '';
@@ -1356,6 +1497,13 @@
                     } else if (window.MethodicalPlan && window.MethodicalPlan.openAttachModal) {
                         window.MethodicalPlan.openAttachModal(u.id, u.displayName || u.username);
                     }
+                };
+            }
+
+            const dossierRecurringBtn = document.getElementById('dossier-btn-recurring-schedule');
+            if (dossierRecurringBtn) {
+                dossierRecurringBtn.onclick = () => {
+                    openRecurringScheduleModal(u, dossier.classes || [], currentDossierRecurringSchedule);
                 };
             }
 
@@ -1431,13 +1579,426 @@
     });
 
     // Close modals when clicking backdrop
-    [modalCreateClass, modalAddStudent, dossierModal, modalQuickEnroll, document.getElementById('modal-create-lesson'), document.getElementById('modal-submissions-list'), document.getElementById('modal-review-submission')].forEach(m => {
+    [modalCreateClass, modalAddStudent, dossierModal, modalQuickEnroll, document.getElementById('modal-create-lesson'), document.getElementById('modal-recurring-schedule'), document.getElementById('modal-apply-schedule-template'), document.getElementById('modal-submissions-list'), document.getElementById('modal-review-submission')].forEach(m => {
         if (m) {
             m.addEventListener('click', (e) => {
                 if (e.target === m) m.close();
             });
         }
     });
+
+
+    // =========================================================================
+    // RECURRING SCHEDULE (DOSSIER) & APPLY TEMPLATE (SCHEDULE)
+    // =========================================================================
+    const WEEKDAY_SHORT_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    const modalRecurringSchedule = document.getElementById('modal-recurring-schedule');
+    const formRecurringSchedule = document.getElementById('form-recurring-schedule');
+    let recurringModalEventsBound = false;
+    let recurringTargetStudentId = null;
+
+    function initRecurringScheduleModalEvents() {
+        if (recurringModalEventsBound) return;
+        recurringModalEventsBound = true;
+
+        const weekList = document.getElementById('recurring-week-list');
+        if (weekList) {
+            weekList.querySelectorAll('.recurring-day-row').forEach(row => {
+                const cb = row.querySelector('.recurring-day-checkbox');
+                const timeInp = row.querySelector('.recurring-day-time');
+                if (!cb || !timeInp) return;
+
+                cb.addEventListener('change', () => {
+                    timeInp.disabled = !cb.checked;
+                    row.classList.toggle('active', cb.checked);
+                    if (cb.checked) {
+                        timeInp.focus();
+                    }
+                });
+            });
+        }
+
+        const clearBtn = document.getElementById('btn-clear-recurring-schedule');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', async () => {
+                if (!recurringTargetStudentId) return;
+                clearBtn.disabled = true;
+                try {
+                    const res = await fetch(`/api/teacher/students/${recurringTargetStudentId}/recurring-schedule`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ slots: [] })
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) throw new Error(data.error || 'Не удалось очистить шаблон');
+                    if (currentDossierStudentId === recurringTargetStudentId) {
+                        currentDossierRecurringSchedule = null;
+                    }
+                    if (modalRecurringSchedule && modalRecurringSchedule.open) modalRecurringSchedule.close();
+                    if (typeof showToast === 'function') showToast('Постоянное расписание очищено');
+                } catch (err) {
+                    alert('Ошибка: ' + err.message);
+                } finally {
+                    clearBtn.disabled = false;
+                }
+            });
+        }
+
+        if (formRecurringSchedule) {
+            formRecurringSchedule.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!recurringTargetStudentId) return;
+
+                const slots = [];
+                document.querySelectorAll('#recurring-week-list .recurring-day-row').forEach(row => {
+                    const cb = row.querySelector('.recurring-day-checkbox');
+                    const timeInp = row.querySelector('.recurring-day-time');
+                    if (cb && cb.checked && timeInp && timeInp.value) {
+                        slots.push({
+                            weekday: parseInt(cb.getAttribute('data-weekday'), 10),
+                            time: timeInp.value
+                        });
+                    }
+                });
+
+                if (!slots.length) {
+                    alert('Выберите хотя бы один день недели и укажите время занятия.');
+                    return;
+                }
+
+                const classSel = document.getElementById('recurring-schedule-class');
+                const durInp = document.getElementById('recurring-schedule-duration');
+                const saveBtn = document.getElementById('btn-save-recurring-schedule');
+                if (saveBtn) saveBtn.disabled = true;
+
+                try {
+                    const res = await fetch(`/api/teacher/students/${recurringTargetStudentId}/recurring-schedule`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            slots,
+                            classId: classSel && classSel.value ? parseInt(classSel.value, 10) : null,
+                            durationMin: durInp ? parseInt(durInp.value || '60', 10) : 60
+                        })
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) throw new Error(data.error || 'Ошибка сохранения расписания');
+
+                    if (currentDossierStudentId === recurringTargetStudentId) {
+                        currentDossierRecurringSchedule = data.schedule;
+                    }
+                    if (modalRecurringSchedule && modalRecurringSchedule.open) modalRecurringSchedule.close();
+                    if (typeof showToast === 'function') showToast('✓ Постоянное расписание сохранено');
+                } catch (err) {
+                    alert('Ошибка при сохранении: ' + err.message);
+                } finally {
+                    if (saveBtn) saveBtn.disabled = false;
+                }
+            });
+        }
+    }
+
+    async function openRecurringScheduleModal(userObj, studentClasses, existingSchedule) {
+        if (!modalRecurringSchedule || !userObj) return;
+        initRecurringScheduleModalEvents();
+        recurringTargetStudentId = userObj.id;
+
+        const subtitle = document.getElementById('recurring-schedule-student-subtitle');
+        if (subtitle) {
+            subtitle.textContent = `${userObj.displayName || userObj.username} (@${userObj.username})`;
+        }
+
+        // Load latest schedule from backend in case it changed
+        let sched = existingSchedule;
+        try {
+            const res = await fetch(`/api/teacher/students/${userObj.id}/recurring-schedule`, { cache: 'no-store' });
+            const d = await res.json();
+            if (d.success) sched = d.schedule;
+        } catch (e) { /* fallback to passed */ }
+
+        const classSel = document.getElementById('recurring-schedule-class');
+        if (classSel) {
+            classSel.innerHTML = '<option value="">Автоматически (класс ученика)</option>';
+            try {
+                const resCl = await fetch('/api/teacher/classes', { cache: 'no-store' });
+                const dataCl = await resCl.json();
+                if (dataCl.success && Array.isArray(dataCl.classes)) {
+                    classSel.innerHTML += dataCl.classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                }
+            } catch (e) { /* ignore */ }
+
+            if (sched && sched.classId) {
+                classSel.value = String(sched.classId);
+            } else if (Array.isArray(studentClasses)) {
+                const ownCls = studentClasses.find(c => !currentTeacher || c.teacherId === currentTeacher.id);
+                if (ownCls) classSel.value = String(ownCls.id);
+            }
+        }
+
+        const durInp = document.getElementById('recurring-schedule-duration');
+        if (durInp) durInp.value = (sched && sched.durationMin) ? sched.durationMin : 60;
+
+        // Reset week rows
+        const slotsMap = {};
+        if (sched && Array.isArray(sched.slots)) {
+            sched.slots.forEach(s => {
+                slotsMap[s.weekday] = s.time;
+            });
+        }
+
+        document.querySelectorAll('#recurring-week-list .recurring-day-row').forEach(row => {
+            const wd = parseInt(row.getAttribute('data-weekday'), 10);
+            const cb = row.querySelector('.recurring-day-checkbox');
+            const timeInp = row.querySelector('.recurring-day-time');
+            const hasSlot = Object.prototype.hasOwnProperty.call(slotsMap, wd);
+            if (cb) cb.checked = hasSlot;
+            if (timeInp) {
+                timeInp.disabled = !hasSlot;
+                timeInp.value = hasSlot ? slotsMap[wd] : (wd >= 5 ? '12:00' : '16:00');
+            }
+            row.classList.toggle('active', hasSlot);
+        });
+
+        const clearBtn = document.getElementById('btn-clear-recurring-schedule');
+        if (clearBtn) {
+            clearBtn.classList.toggle('hidden', !(sched && Array.isArray(sched.slots) && sched.slots.length > 0));
+        }
+
+        modalRecurringSchedule.showModal();
+    }
+
+    // Apply Template Modal (Schedule tab)
+    const modalApplyTemplate = document.getElementById('modal-apply-schedule-template');
+    const formApplyTemplate = document.getElementById('form-apply-schedule-template');
+    const btnOpenApplyTemplate = document.getElementById('btn-open-apply-template');
+    let applyTemplateSchedulesCache = [];
+    let applyTemplateEventsBound = false;
+
+    function getLocalDateIso(dt = new Date()) {
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        const d = String(dt.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function countTemplateOccurrencesInRange(slots, startDateStr, period) {
+        if (!Array.isArray(slots) || !slots.length || !startDateStr) return { count: 0, endStr: '' };
+        const parts = startDateStr.split('-').map(Number);
+        if (parts.length !== 3 || parts.some(isNaN)) return { count: 0, endStr: '' };
+        const startD = new Date(parts[0], parts[1] - 1, parts[2]);
+        let endD;
+        if (period === 'week') {
+            endD = new Date(startD.getFullYear(), startD.getMonth(), startD.getDate() + 6);
+        } else {
+            const nextM = new Date(startD.getFullYear(), startD.getMonth() + 1, 1);
+            const maxDay = new Date(nextM.getFullYear(), nextM.getMonth() + 1, 0).getDate();
+            const target = new Date(nextM.getFullYear(), nextM.getMonth(), Math.min(startD.getDate(), maxDay));
+            endD = new Date(target.getFullYear(), target.getMonth(), target.getDate() - 1);
+        }
+        const weekdayCounts = {};
+        slots.forEach(s => {
+            weekdayCounts[s.weekday] = (weekdayCounts[s.weekday] || 0) + 1;
+        });
+        let total = 0;
+        const cur = new Date(startD.getTime());
+        while (cur <= endD) {
+            const pyWd = (cur.getDay() + 6) % 7; // JS 0=Sun -> Python 0=Mon..6=Sun
+            total += weekdayCounts[pyWd] || 0;
+            cur.setDate(cur.getDate() + 1);
+        }
+        return { count: total, endStr: getLocalDateIso(endD) };
+    }
+
+    function updateApplyTemplatePreview() {
+        const stuSel = document.getElementById('apply-template-student');
+        const previewEl = document.getElementById('apply-template-preview');
+        const classSel = document.getElementById('apply-template-class');
+        const startInp = document.getElementById('apply-template-start-date');
+        const warningBox = document.getElementById('apply-template-warning');
+        if (warningBox) warningBox.classList.add('hidden');
+        if (!stuSel || !previewEl) return;
+
+        const sid = parseInt(stuSel.value, 10);
+        const sched = applyTemplateSchedulesCache.find(s => s.studentId === sid);
+        if (!sched) {
+            previewEl.classList.add('hidden');
+            previewEl.innerHTML = '';
+            return;
+        }
+
+        if (classSel && sched.classId) {
+            classSel.value = String(sched.classId);
+        }
+
+        const periodRadio = document.querySelector('input[name="apply-template-period"]:checked');
+        const period = periodRadio ? periodRadio.value : 'week';
+        const startStr = startInp ? startInp.value : getLocalDateIso();
+        const calc = countTemplateOccurrencesInRange(sched.slots, startStr, period);
+
+        const slotLabels = sched.slots.map(s => `${WEEKDAY_SHORT_LABELS[s.weekday] || '?'} ${s.time}`).join(' · ');
+        const availCount = typeof sched.availableTopicsCount === 'number' ? sched.availableTopicsCount : null;
+        const topicsBadge = availCount !== null
+            ? `<div style="color:${availCount < calc.count ? 'var(--danger, #ef4444)' : 'var(--accent-emerald, #10b981)'}; font-weight:600;">Свободных тем в метод. плане: ${availCount} (нужно: ${calc.count})</div>`
+            : '';
+
+        previewEl.innerHTML = `
+            <div><strong>Шаблон:</strong> ${escapeHtml(slotLabels)} (${sched.durationMin || 60} мин)</div>
+            <div><strong>Период:</strong> ${escapeHtml(startStr)} — ${escapeHtml(calc.endStr)} · Занятий: <strong>${calc.count}</strong></div>
+            ${topicsBadge}
+        `;
+        previewEl.classList.remove('hidden');
+    }
+
+    function initApplyTemplateEvents() {
+        if (applyTemplateEventsBound) return;
+        applyTemplateEventsBound = true;
+
+        const stuSel = document.getElementById('apply-template-student');
+        const startInp = document.getElementById('apply-template-start-date');
+        const openPlanBtn = document.getElementById('btn-apply-template-open-plan');
+
+        if (stuSel) stuSel.addEventListener('change', updateApplyTemplatePreview);
+        if (startInp) startInp.addEventListener('change', updateApplyTemplatePreview);
+        document.querySelectorAll('input[name="apply-template-period"]').forEach(r => {
+            r.addEventListener('change', updateApplyTemplatePreview);
+        });
+
+        if (openPlanBtn) {
+            openPlanBtn.addEventListener('click', () => {
+                const sid = parseInt(stuSel ? stuSel.value : '', 10);
+                const sched = applyTemplateSchedulesCache.find(s => s.studentId === sid);
+                if (!sid) return;
+                if (modalApplyTemplate && modalApplyTemplate.open) modalApplyTemplate.close();
+                if (window.MethodicalPlanManager) {
+                    window.MethodicalPlanManager.openForStudent(sid, sched ? sched.studentName : '');
+                } else if (window.MethodicalPlan) {
+                    window.MethodicalPlan.open(sid, sched ? sched.studentName : '');
+                }
+            });
+        }
+
+        if (formApplyTemplate) {
+            formApplyTemplate.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const sid = parseInt(stuSel ? stuSel.value : '', 10);
+                const periodRadio = document.querySelector('input[name="apply-template-period"]:checked');
+                const period = periodRadio ? periodRadio.value : 'week';
+                const startDate = startInp ? startInp.value : '';
+                const classSel = document.getElementById('apply-template-class');
+                const classId = classSel && classSel.value ? parseInt(classSel.value, 10) : null;
+                const submitBtn = document.getElementById('btn-submit-apply-template');
+                const warningBox = document.getElementById('apply-template-warning');
+                const warningText = document.getElementById('apply-template-warning-text');
+
+                if (!sid || !startDate || !classId) {
+                    alert('Выберите ученика, дату начала и учебный класс.');
+                    return;
+                }
+
+                if (warningBox) warningBox.classList.add('hidden');
+                if (submitBtn) submitBtn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/teacher/recurring-schedules/apply', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ studentId: sid, period, startDate, classId })
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) {
+                        const msg = data.error || 'Не удалось вставить шаблон.';
+                        if (warningBox && warningText) {
+                            warningText.textContent = msg;
+                            warningBox.classList.remove('hidden');
+                            if (openPlanBtn) {
+                                openPlanBtn.classList.toggle('hidden', !msg.toLowerCase().includes('методический план'));
+                            }
+                        } else {
+                            alert(msg);
+                        }
+                        return;
+                    }
+
+                    if (modalApplyTemplate && modalApplyTemplate.open) modalApplyTemplate.close();
+                    if (typeof loadSchedule === 'function') loadSchedule();
+                    if (typeof showToast === 'function') {
+                        showToast(`✓ Добавлено занятий по шаблону: ${data.createdCount}`);
+                    }
+                } catch (err) {
+                    alert('Ошибка при вставке шаблона: ' + err.message);
+                } finally {
+                    if (submitBtn) submitBtn.disabled = false;
+                }
+            });
+        }
+    }
+
+    async function openApplyTemplateModal() {
+        if (!modalApplyTemplate) return;
+        initApplyTemplateEvents();
+
+        const stuSel = document.getElementById('apply-template-student');
+        const classSel = document.getElementById('apply-template-class');
+        const startInp = document.getElementById('apply-template-start-date');
+        const emptyHint = document.getElementById('apply-template-empty-hint');
+        const submitBtn = document.getElementById('btn-submit-apply-template');
+        const warningBox = document.getElementById('apply-template-warning');
+
+        if (warningBox) warningBox.classList.add('hidden');
+        if (startInp) startInp.value = getLocalDateIso();
+        const weekRadio = document.querySelector('input[name="apply-template-period"][value="week"]');
+        if (weekRadio) weekRadio.checked = true;
+
+        try {
+            const [resSched, resCls] = await Promise.all([
+                fetch('/api/teacher/recurring-schedules', { cache: 'no-store' }),
+                fetch('/api/teacher/classes', { cache: 'no-store' })
+            ]);
+            const dataSched = await resSched.json();
+            const dataCls = await resCls.json();
+
+            applyTemplateSchedulesCache = (dataSched.success && Array.isArray(dataSched.schedules)) ? dataSched.schedules : [];
+            const classesList = (dataCls.success && Array.isArray(dataCls.classes)) ? dataCls.classes : [];
+
+            if (classSel) {
+                classSel.innerHTML = '<option value="">Выберите класс...</option>' +
+                    classesList.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                if (classesList.length === 1) classSel.value = String(classesList[0].id);
+            }
+
+            if (stuSel) {
+                if (applyTemplateSchedulesCache.length === 0) {
+                    stuSel.innerHTML = '<option value="">Нет учеников с постоянным расписанием</option>';
+                    if (emptyHint) emptyHint.classList.remove('hidden');
+                    if (submitBtn) submitBtn.disabled = true;
+                } else {
+                    if (emptyHint) emptyHint.classList.add('hidden');
+                    if (submitBtn) submitBtn.disabled = false;
+                    stuSel.innerHTML = applyTemplateSchedulesCache.map(s => {
+                        const slotSummary = s.slots.map(sl => `${WEEKDAY_SHORT_LABELS[sl.weekday]} ${sl.time}`).join(', ');
+                        return `<option value="${s.studentId}">${escapeHtml(s.studentName)} (${escapeHtml(slotSummary)})</option>`;
+                    }).join('');
+
+                    const filteredStudentVal = document.getElementById('schedule-filter-student')?.value || '';
+                    if (filteredStudentVal && filteredStudentVal.startsWith('student:')) {
+                        const preSid = filteredStudentVal.replace('student:', '');
+                        if (applyTemplateSchedulesCache.some(s => String(s.studentId) === preSid)) {
+                            stuSel.value = preSid;
+                        }
+                    }
+                }
+            }
+
+            updateApplyTemplatePreview();
+            modalApplyTemplate.showModal();
+        } catch (err) {
+            alert('Не удалось загрузить шаблоны расписания: ' + err.message);
+        }
+    }
+
+    if (btnOpenApplyTemplate) {
+        btnOpenApplyTemplate.addEventListener('click', openApplyTemplateModal);
+    }
 
 
     // =========================================================================
@@ -3898,6 +4459,14 @@
     function formatMathHtml(raw) {
         if (!raw) return '';
         let str = String(raw);
+
+        // If KaTeX module is loaded, try KaTeX formatting
+        if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+            const mathRendered = window.StudyMath.formatMath(str);
+            if (mathRendered && mathRendered !== str) {
+                return mathRendered;
+            }
+        }
 
         // Convert caret power notation:
         // 1) Enclosed exponent in parentheses: 2^(3+2), x^(-2), (a+b)^(n+1)

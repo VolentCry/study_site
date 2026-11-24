@@ -7,11 +7,13 @@
 import os
 import re
 import json
+import calendar
 import sqlite3
 import hmac
 import random
 import string
-from datetime import datetime, timezone
+from collections import Counter
+from datetime import datetime, timezone, date, timedelta
 from pathlib import Path
 from typing import Optional, Dict, Any, Tuple, List, Set
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -373,6 +375,42 @@ def init_db() -> None:
                 conn.execute("ALTER TABLE student_billing ADD COLUMN manual_passed_lessons INTEGER DEFAULT NULL;")
             if sb_cols and 'payer' not in sb_cols:
                 conn.execute("ALTER TABLE student_billing ADD COLUMN payer TEXT DEFAULT 'student';")
+
+            # 11. Таблица локальных отображаемых имён учеников для конкретного учителя
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS teacher_student_aliases (
+                    teacher_id INTEGER NOT NULL,
+                    student_id INTEGER NOT NULL,
+                    custom_name TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY (teacher_id, student_id),
+                    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+                );
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_teacher_student_aliases_teacher ON teacher_student_aliases(teacher_id);
+            ''')
+
+            # 12. Таблица постоянного (недельного) расписания учеников для учителя
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS student_recurring_schedules (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    teacher_id INTEGER NOT NULL,
+                    student_id INTEGER NOT NULL,
+                    class_id INTEGER,
+                    slots_json TEXT NOT NULL DEFAULT '[]',
+                    duration_min INTEGER NOT NULL DEFAULT 60,
+                    updated_at TEXT NOT NULL,
+                    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL,
+                    UNIQUE(teacher_id, student_id)
+                );
+            ''')
+            conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_recurring_schedules_teacher ON student_recurring_schedules(teacher_id);
+            ''')
 
             # Auto-heal: recalculate user_xp and total_solved for records with metrics
             try:
@@ -969,7 +1007,11 @@ def delete_class(class_id: int, teacher_id: Optional[int] = None) -> bool:
         conn.close()
 
 
-def get_class_details(class_id: int, teacher_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+def get_class_details(
+    class_id: int,
+    teacher_id: Optional[int] = None,
+    viewer_teacher_id: Optional[int] = None
+) -> Optional[Dict[str, Any]]:
     """Получает детальную информацию о классе и список его учеников."""
     conn = get_db_connection()
     try:
@@ -982,6 +1024,9 @@ def get_class_details(class_id: int, teacher_id: Optional[int] = None) -> Option
         class_row = cursor.fetchone()
         if not class_row:
             return None
+
+        alias_tid = viewer_teacher_id if viewer_teacher_id is not None else teacher_id
+        aliases = get_teacher_student_aliases(alias_tid, conn=conn) if alias_tid is not None else {}
 
         # Выбираем учеников класса
         cursor.execute(
@@ -1001,10 +1046,13 @@ def get_class_details(class_id: int, teacher_id: Optional[int] = None) -> Option
             calc_xp, calc_solved = compute_user_metrics_xp(s['metrics_json'], s['bonus_xp'])
             final_xp = max(int(s['user_xp'] or 0), calc_xp)
             final_solved = max(int(s['total_solved'] or 0), calc_solved)
+            custom_name = aliases.get(s['id'])
             students.append({
                 'id': s['id'],
                 'username': s['username'],
-                'displayName': s['display_name'],
+                'displayName': custom_name or s['display_name'],
+                'originalDisplayName': s['display_name'],
+                'teacherCustomName': custom_name or '',
                 'role': s['role'] or 'student',
                 'avatarFrame': s['avatar_frame'] or 'orbit',
                 'userXP': final_xp,
@@ -1074,19 +1122,21 @@ def get_all_users_for_teacher(
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
+        aliases = get_teacher_student_aliases(teacher_id, conn=conn) if teacher_id is not None else {}
         query = '''
             SELECT u.id, u.username, u.display_name, u.role, u.created_at, u.last_login,
                    d.avatar_frame, d.user_xp, d.bonus_xp, d.total_solved, d.metrics_json, d.updated_at
             FROM users u
             LEFT JOIN user_data d ON u.id = d.user_id
+            LEFT JOIN teacher_student_aliases tsa ON tsa.student_id = u.id AND tsa.teacher_id = ?
             WHERE 1=1
         '''
-        params: List[Any] = []
+        params: List[Any] = [teacher_id if teacher_id is not None else -1]
 
         if search:
-            query += ' AND (u.username LIKE ? OR u.display_name LIKE ?)'
+            query += ' AND (u.username LIKE ? OR u.display_name LIKE ? OR tsa.custom_name LIKE ?)'
             term = f"%{search.strip()}%"
-            params.extend([term, term])
+            params.extend([term, term, term])
 
         if role_filter:
             query += ' AND u.role = ?'
@@ -1127,10 +1177,13 @@ def get_all_users_for_teacher(
             final_xp = max(int(r['user_xp'] or 0), calc_xp)
             final_solved = max(int(r['total_solved'] or 0), calc_solved)
 
+            custom_name = aliases.get(uid)
             users.append({
                 'id': uid,
                 'username': r['username'],
-                'displayName': r['display_name'],
+                'displayName': custom_name or r['display_name'],
+                'originalDisplayName': r['display_name'],
+                'teacherCustomName': custom_name or '',
                 'role': r['role'] or 'student',
                 'createdAt': r['created_at'],
                 'lastLogin': r['last_login'],
@@ -1366,7 +1419,99 @@ def update_student_billing(
         conn.close()
 
 
-def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
+def get_teacher_student_aliases(
+    teacher_id: Optional[int],
+    conn: Optional[sqlite3.Connection] = None
+) -> Dict[int, str]:
+    """Возвращает словарь {student_id: custom_name} для указанного учителя."""
+    if teacher_id is None:
+        return {}
+    own_conn = conn is None
+    if own_conn:
+        conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT student_id, custom_name FROM teacher_student_aliases WHERE teacher_id = ?",
+            (teacher_id,)
+        )
+        return {
+            row['student_id']: row['custom_name']
+            for row in cursor.fetchall()
+            if row['custom_name']
+        }
+    finally:
+        if own_conn:
+            conn.close()
+
+
+def get_teacher_student_alias(
+    teacher_id: Optional[int],
+    student_id: int,
+    conn: Optional[sqlite3.Connection] = None
+) -> Optional[str]:
+    """Возвращает локальное отображаемое имя ученика для указанного учителя или None."""
+    if teacher_id is None:
+        return None
+    own_conn = conn is None
+    if own_conn:
+        conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT custom_name FROM teacher_student_aliases WHERE teacher_id = ? AND student_id = ?",
+            (teacher_id, student_id)
+        )
+        row = cursor.fetchone()
+        return row['custom_name'] if (row and row['custom_name']) else None
+    finally:
+        if own_conn:
+            conn.close()
+
+
+def set_teacher_student_alias(
+    teacher_id: int,
+    student_id: int,
+    custom_name: Optional[str]
+) -> Optional[str]:
+    """
+    Сохраняет или удаляет локальное отображаемое имя ученика для конкретного учителя.
+    Если custom_name пустое, запись удаляется (возвращается имя по умолчанию).
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE id = ?", (student_id,))
+        if not cursor.fetchone():
+            raise ValueError("Ученик не найден.")
+
+        clean = (custom_name or '').strip()[:60]
+        if not clean:
+            cursor.execute(
+                "DELETE FROM teacher_student_aliases WHERE teacher_id = ? AND student_id = ?",
+                (teacher_id, student_id)
+            )
+            conn.commit()
+            return None
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+        cursor.execute(
+            """
+            INSERT INTO teacher_student_aliases (teacher_id, student_id, custom_name, updated_at)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(teacher_id, student_id) DO UPDATE SET
+                custom_name = excluded.custom_name,
+                updated_at = excluded.updated_at
+            """,
+            (teacher_id, student_id, clean, now_iso)
+        )
+        conn.commit()
+        return clean
+    finally:
+        conn.close()
+
+
+def get_student_dossier(student_id: int, teacher_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
     """
     Получает подробнейшее досье ученика:
     - Персональная информация и уровень
@@ -1540,11 +1685,17 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
         final_xp = max(int(row['user_xp'] or 0), calc_xp)
         final_solved = max(int(row['total_solved'] or 0), calc_solved + hw_correct_count, correct_attempts)
 
+        teacher_custom_name = get_teacher_student_alias(teacher_id, student_id, conn=conn) if teacher_id is not None else None
+        original_display_name = row['display_name']
+        effective_display_name = teacher_custom_name or original_display_name
+
         return {
             'user': {
                 'id': row['id'],
                 'username': row['username'],
-                'displayName': row['display_name'],
+                'displayName': effective_display_name,
+                'originalDisplayName': original_display_name,
+                'teacherCustomName': teacher_custom_name or '',
                 'role': row['role'] or 'student',
                 'parentCode': student_parent_code,
                 'parent_code': student_parent_code,
@@ -1565,7 +1716,8 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
             'classes': enrolled_classes,
             'recentTasks': sorted_tasks[:60],  # последние 60 выполненных заданий (внеурочных и домашних)
             'trainerRecords': trainer_records,
-            'billing': get_student_billing(student_id, conn=conn)
+            'billing': get_student_billing(student_id, conn=conn),
+            'recurringSchedule': get_student_recurring_schedule(teacher_id, student_id, conn=conn) if teacher_id is not None else None
         }
     finally:
         conn.close()
@@ -1573,7 +1725,8 @@ def get_student_dossier(student_id: int) -> Optional[Dict[str, Any]]:
 def get_recent_activity_feed(
     teacher_id: Optional[int] = None,
     class_id: Optional[int] = None,
-    limit: int = 50
+    limit: int = 50,
+    viewer_teacher_id: Optional[int] = None
 ) -> List[Dict[str, Any]]:
     """
     Получает общую хронологическую ленту активности (какие задания решают ученики).
@@ -1582,6 +1735,8 @@ def get_recent_activity_feed(
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
+        alias_tid = viewer_teacher_id if viewer_teacher_id is not None else teacher_id
+        aliases = get_teacher_student_aliases(alias_tid, conn=conn) if alias_tid is not None else {}
         query = '''
             SELECT u.id, u.username, u.display_name, d.avatar_frame, d.metrics_json
             FROM users u
@@ -1622,7 +1777,7 @@ def get_recent_activity_feed(
                     continue
                 all_events.append({
                     'studentId': r['id'],
-                    'studentName': r['display_name'] or r['username'],
+                    'studentName': aliases.get(r['id']) or r['display_name'] or r['username'],
                     'username': r['username'],
                     'avatarFrame': r['avatar_frame'] or 'orbit',
                     'timestamp': m.get('timestamp') or '',
@@ -2499,17 +2654,19 @@ def get_homework_submissions_for_teacher(homework_id: int, teacher_id: Optional[
                 (homework_id, hw['class_id'])
             )
 
+        aliases = get_teacher_student_aliases(teacher_id, conn=conn) if teacher_id is not None else {}
         submissions = []
         for r in cursor.fetchall():
             status = r['status'] or 'not_started'
             raw_answers = json.loads(r['answers_json']) if r['answers_json'] else {}
+            eff_name = aliases.get(r['student_id']) or r['display_name']
             submissions.append({
                 'studentId': r['student_id'],
                 'student_id': r['student_id'],
                 'username': r['username'],
                 'student_username': r['username'],
-                'displayName': r['display_name'],
-                'student_display_name': r['display_name'],
+                'displayName': eff_name,
+                'student_display_name': eff_name,
                 'submissionId': r['submission_id'],
                 'submission_id': r['submission_id'],
                 'status': status,
@@ -2752,6 +2909,7 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
+        aliases = get_teacher_student_aliases(teacher_id, conn=conn)
         cursor.execute(
             """
             SELECT l.*, c.name as class_name, h.title as homework_title, h.deadline_at as homework_deadline,
@@ -2767,6 +2925,7 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
         )
         lessons = []
         for r in cursor.fetchall():
+            eff_student_name = (aliases.get(r['student_id']) if r['student_id'] else None) or r['student_name'] or ''
             lessons.append({
                 'id': r['id'],
                 'classId': r['class_id'],
@@ -2793,8 +2952,8 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
                 'is_paid': bool(r['is_paid']) if ('is_paid' in r.keys() and r['is_paid']) else False,
                 'studentId': r['student_id'],
                 'student_id': r['student_id'],
-                'studentName': r['student_name'] or '',
-                'student_name': r['student_name'] or '',
+                'studentName': eff_student_name,
+                'student_name': eff_student_name,
                 'studentUsername': r['student_username'] or '',
                 'student_username': r['student_username'] or '',
                 'isCompleted': bool(r['is_completed']) if ('is_completed' in r.keys() and r['is_completed']) else False,
@@ -3072,6 +3231,475 @@ def toggle_lesson_paid(lesson_id: int, teacher_id: Optional[int] = None, is_paid
         conn.close()
 
 
+# ============================================================================
+# ФУНКЦИИ: ПОСТОЯННОЕ (ШАБЛОННОЕ) РАСПИСАНИЕ УЧЕНИКА И АВТОВСТАВКА
+# ============================================================================
+
+ACADEMIC_MONTHS_ORDER = [
+    'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май',
+    'Июнь', 'Июль', 'Август'
+]
+
+
+def _normalize_recurring_slots(slots_raw: Any) -> List[Dict[str, Any]]:
+    """Валидирует и сортирует слоты постоянного расписания [{'weekday': 0..6, 'time': 'HH:MM'}]."""
+    if not isinstance(slots_raw, list):
+        return []
+    seen = set()
+    normalized = []
+    for item in slots_raw:
+        if not isinstance(item, dict):
+            continue
+        try:
+            wd = int(item.get('weekday'))
+        except (ValueError, TypeError):
+            continue
+        if wd < 0 or wd > 6:
+            continue
+        t_str = str(item.get('time') or '').strip()
+        m = re.match(r'^(\d{1,2}):(\d{2})$', t_str)
+        if not m:
+            continue
+        hh, mm = int(m.group(1)), int(m.group(2))
+        if hh < 0 or hh > 23 or mm < 0 or mm > 59:
+            continue
+        clean_time = f"{hh:02d}:{mm:02d}"
+        key = (wd, clean_time)
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized.append({'weekday': wd, 'time': clean_time})
+    normalized.sort(key=lambda s: (s['weekday'], s['time']))
+    return normalized
+
+
+def get_student_recurring_schedule(
+    teacher_id: Optional[int],
+    student_id: int,
+    conn: Optional[sqlite3.Connection] = None
+) -> Optional[Dict[str, Any]]:
+    """Возвращает сохранённое постоянное расписание ученика для указанного учителя."""
+    if teacher_id is None:
+        return None
+    own_conn = conn is None
+    if own_conn:
+        conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT teacher_id, student_id, class_id, slots_json, duration_min, updated_at
+            FROM student_recurring_schedules
+            WHERE teacher_id = ? AND student_id = ?
+            """,
+            (teacher_id, student_id)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        try:
+            slots = _normalize_recurring_slots(json.loads(row['slots_json'] or '[]'))
+        except Exception:
+            slots = []
+        return {
+            'teacherId': row['teacher_id'],
+            'studentId': row['student_id'],
+            'classId': row['class_id'],
+            'slots': slots,
+            'durationMin': int(row['duration_min'] or 60),
+            'updatedAt': row['updated_at']
+        }
+    finally:
+        if own_conn:
+            conn.close()
+
+
+def save_student_recurring_schedule(
+    teacher_id: int,
+    student_id: int,
+    slots_raw: Any,
+    class_id: Optional[int] = None,
+    duration_min: int = 60
+) -> Dict[str, Any]:
+    """Сохраняет или очищает постоянное расписание ученика для конкретного учителя."""
+    slots = _normalize_recurring_slots(slots_raw)
+    try:
+        clean_duration = max(15, min(240, int(duration_min or 60)))
+    except (ValueError, TypeError):
+        clean_duration = 60
+
+    clean_class_id: Optional[int] = None
+    if class_id is not None and str(class_id).strip() != '':
+        try:
+            clean_class_id = int(class_id)
+        except (ValueError, TypeError):
+            clean_class_id = None
+
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE id = ?", (student_id,))
+        if not cursor.fetchone():
+            raise ValueError("Ученик не найден.")
+
+        if clean_class_id is not None:
+            cursor.execute("SELECT id FROM classes WHERE id = ? AND teacher_id = ?", (clean_class_id, teacher_id))
+            if not cursor.fetchone():
+                clean_class_id = None
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+        with conn:
+            if not slots:
+                conn.execute(
+                    "DELETE FROM student_recurring_schedules WHERE teacher_id = ? AND student_id = ?",
+                    (teacher_id, student_id)
+                )
+            else:
+                conn.execute(
+                    """
+                    INSERT INTO student_recurring_schedules (teacher_id, student_id, class_id, slots_json, duration_min, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(teacher_id, student_id) DO UPDATE SET
+                        class_id = excluded.class_id,
+                        slots_json = excluded.slots_json,
+                        duration_min = excluded.duration_min,
+                        updated_at = excluded.updated_at
+                    """,
+                    (teacher_id, student_id, clean_class_id, json.dumps(slots, ensure_ascii=False), clean_duration, now_iso)
+                )
+        return {
+            'teacherId': teacher_id,
+            'studentId': student_id,
+            'classId': clean_class_id,
+            'slots': slots,
+            'durationMin': clean_duration,
+            'updatedAt': now_iso
+        }
+    finally:
+        conn.close()
+
+
+def get_teacher_recurring_schedules(teacher_id: int) -> List[Dict[str, Any]]:
+    """Возвращает список всех учеников учителя, у которых задано постоянное расписание."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        aliases = get_teacher_student_aliases(teacher_id, conn=conn)
+        cursor.execute(
+            """
+            SELECT srs.teacher_id, srs.student_id, srs.class_id, srs.slots_json, srs.duration_min, srs.updated_at,
+                   u.username, u.display_name,
+                   (
+                       SELECT cm.class_id
+                       FROM class_members cm
+                       JOIN classes c ON cm.class_id = c.id
+                       WHERE cm.student_id = srs.student_id AND c.teacher_id = srs.teacher_id
+                       ORDER BY cm.joined_at ASC
+                       LIMIT 1
+                   ) AS enrolled_class_id
+            FROM student_recurring_schedules srs
+            JOIN users u ON srs.student_id = u.id
+            WHERE srs.teacher_id = ?
+            ORDER BY u.display_name ASC
+            """,
+            (teacher_id,)
+        )
+        result = []
+        for row in cursor.fetchall():
+            try:
+                slots = _normalize_recurring_slots(json.loads(row['slots_json'] or '[]'))
+            except Exception:
+                slots = []
+            if not slots:
+                continue
+            sid = row['student_id']
+            eff_name = aliases.get(sid) or row['display_name'] or row['username']
+            avail_topics = get_available_topics_from_methodical_plan(teacher_id, sid, conn=conn)
+            result.append({
+                'teacherId': row['teacher_id'],
+                'studentId': sid,
+                'studentName': eff_name,
+                'username': row['username'],
+                'classId': row['class_id'] or row['enrolled_class_id'],
+                'slots': slots,
+                'durationMin': int(row['duration_min'] or 60),
+                'availableTopicsCount': len(avail_topics),
+                'updatedAt': row['updated_at']
+            })
+        result.sort(key=lambda item: (item['studentName'] or '').lower())
+        return result
+    finally:
+        conn.close()
+
+
+def get_available_topics_from_methodical_plan(
+    teacher_id: int,
+    student_id: int,
+    conn: Optional[sqlite3.Connection] = None
+) -> List[str]:
+    """
+    Собирает список неиспользованных тем уроков из методического плана ученика.
+    В первую очередь берутся непроведённые уроки из поурочного плана по месяцам (monthlyLessons),
+    если в плане нет ни одного заполненного урока по месяцам — используются темы разделов (topics).
+    Учитываются уже запланированные в расписании уроки для этого ученика, чтобы темы не дублировались.
+    """
+    own_conn = conn is None
+    if own_conn:
+        conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        # Сначала ищем план с явной привязкой к student_id, затем по имени
+        cursor.execute(
+            """
+            SELECT * FROM methodical_plans
+            WHERE teacher_id = ? AND student_id = ?
+            ORDER BY updated_at DESC, id DESC
+            LIMIT 1
+            """,
+            (teacher_id, student_id)
+        )
+        plan_row = cursor.fetchone()
+        if not plan_row:
+            cur_user = cursor.execute("SELECT display_name, username FROM users WHERE id = ?", (student_id,)).fetchone()
+            alias_name = get_teacher_student_alias(teacher_id, student_id, conn=conn)
+            candidate_names = []
+            for n in [alias_name, cur_user['display_name'] if cur_user else None, cur_user['username'] if cur_user else None]:
+                if n and n.strip():
+                    candidate_names.append(n.strip().lower())
+            if candidate_names:
+                cursor.execute(
+                    """
+                    SELECT * FROM methodical_plans
+                    WHERE teacher_id = ? AND student_id IS NULL
+                    ORDER BY updated_at DESC, id DESC
+                    """,
+                    (teacher_id,)
+                )
+                for r in cursor.fetchall():
+                    pname = (r['student_name'] or '').strip().lower()
+                    if pname and any(cn == pname or cn in pname or pname in cn for cn in candidate_names):
+                        plan_row = r
+                        break
+
+        if not plan_row:
+            return []
+
+        plan = format_methodical_plan_row(plan_row)
+        monthly_lessons = plan.get('monthlyLessons') or {}
+        monthly_counts = plan.get('monthlyCounts') or {}
+
+        conducted_titles: List[str] = []
+        unconducted_titles: List[str] = []
+
+        # Проходим по месяцам учебного года в хронологическом порядке
+        ordered_months = list(ACADEMIC_MONTHS_ORDER) + [m for m in monthly_lessons.keys() if m not in ACADEMIC_MONTHS_ORDER]
+        for month in ordered_months:
+            lessons_list = monthly_lessons.get(month)
+            if not isinstance(lessons_list, list):
+                continue
+            month_limit = None
+            if month in monthly_counts:
+                try:
+                    month_limit = int(monthly_counts[month] or 0)
+                except (ValueError, TypeError):
+                    month_limit = None
+            for idx, item in enumerate(lessons_list):
+                if month_limit is not None and idx >= month_limit:
+                    break
+                if not isinstance(item, dict):
+                    continue
+                title = str(item.get('title') or '').strip()
+                if not title:
+                    continue
+                if item.get('isConducted'):
+                    conducted_titles.append(title)
+                else:
+                    unconducted_titles.append(title)
+
+        # Если поурочный список по месяцам совсем не заполнен (нет ни проведённых, ни непроведённых тем),
+        # используем список тем/разделов курса
+        if not conducted_titles and not unconducted_titles:
+            for top in (plan.get('topics') or []):
+                if isinstance(top, dict):
+                    t_title = str(top.get('title') or '').strip()
+                    if t_title:
+                        unconducted_titles.append(t_title)
+
+        if not unconducted_titles:
+            return []
+
+        # Вычитаем уже запланированные уроки (не учтённые как проведённые в метод. плане)
+        cursor.execute(
+            """
+            SELECT title FROM lessons
+            WHERE teacher_id = ? AND student_id = ?
+            ORDER BY scheduled_at ASC, id ASC
+            """,
+            (teacher_id, student_id)
+        )
+        existing_titles = [str(r['title'] or '').strip() for r in cursor.fetchall() if str(r['title'] or '').strip()]
+        unaccounted_existing = Counter(existing_titles) - Counter(conducted_titles)
+
+        available: List[str] = []
+        for title in unconducted_titles:
+            if unaccounted_existing.get(title, 0) > 0:
+                unaccounted_existing[title] -= 1
+                continue
+            available.append(title)
+        return available
+    finally:
+        if own_conn:
+            conn.close()
+
+
+def _compute_template_dates(start_date: date, period: str) -> Tuple[date, date]:
+    """Вычисляет диапазон дат [start_date, end_date] для периода 'week' или 'month'."""
+    if period == 'week':
+        return start_date, start_date + timedelta(days=6)
+    if period == 'month':
+        next_month = start_date.month + 1
+        next_year = start_date.year
+        if next_month > 12:
+            next_month = 1
+            next_year += 1
+        max_day = calendar.monthrange(next_year, next_month)[1]
+        next_month_date = date(next_year, next_month, min(start_date.day, max_day))
+        return start_date, next_month_date - timedelta(days=1)
+    raise ValueError("Укажите период: неделя или месяц.")
+
+
+def apply_student_recurring_schedule(
+    teacher_id: int,
+    student_id: int,
+    period: str,
+    start_date_str: str,
+    class_id: Optional[int] = None
+) -> Dict[str, Any]:
+    """
+    Вставляет занятия по постоянному шаблону ученика на неделю или на месяц,
+    подтягивая названия тем из методического плана ученика.
+    """
+    period_clean = (period or '').strip().lower()
+    if period_clean not in ('week', 'month'):
+        raise ValueError("Выберите период вставки: на неделю или на месяц.")
+
+    try:
+        start_d = datetime.strptime((start_date_str or '').strip()[:10], '%Y-%m-%d').date()
+    except ValueError:
+        raise ValueError("Некорректная дата начала периода.")
+
+    start_d, end_d = _compute_template_dates(start_d, period_clean)
+
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        schedule = get_student_recurring_schedule(teacher_id, student_id, conn=conn)
+        if not schedule or not schedule.get('slots'):
+            raise ValueError("Для этого ученика не задано постоянное расписание.")
+
+        # Определяем класс для уроков
+        resolved_class_id: Optional[int] = None
+        for cand_cid in [class_id, schedule.get('classId')]:
+            if cand_cid is not None:
+                try:
+                    cid_int = int(cand_cid)
+                    cursor.execute("SELECT id FROM classes WHERE id = ? AND teacher_id = ?", (cid_int, teacher_id))
+                    if cursor.fetchone():
+                        resolved_class_id = cid_int
+                        break
+                except (ValueError, TypeError):
+                    pass
+
+        if resolved_class_id is None:
+            cursor.execute(
+                """
+                SELECT cm.class_id
+                FROM class_members cm
+                JOIN classes c ON cm.class_id = c.id
+                WHERE cm.student_id = ? AND c.teacher_id = ?
+                ORDER BY cm.joined_at ASC
+                LIMIT 1
+                """,
+                (student_id, teacher_id)
+            )
+            cm_row = cursor.fetchone()
+            if cm_row:
+                resolved_class_id = cm_row['class_id']
+
+        if resolved_class_id is None:
+            cursor.execute("SELECT id FROM classes WHERE teacher_id = ? ORDER BY id ASC LIMIT 1", (teacher_id,))
+            any_cls = cursor.fetchone()
+            if any_cls:
+                resolved_class_id = any_cls['id']
+
+        if resolved_class_id is None:
+            raise ValueError("Сначала создайте учебный класс во вкладке «Мои классы».")
+
+        # Собираем слоты по дням в выбранном диапазоне
+        slots_by_weekday: Dict[int, List[str]] = {}
+        for slot in schedule['slots']:
+            slots_by_weekday.setdefault(slot['weekday'], []).append(slot['time'])
+
+        candidate_datetimes: List[str] = []
+        cur_d = start_d
+        while cur_d <= end_d:
+            times = slots_by_weekday.get(cur_d.weekday(), [])
+            for t_str in sorted(times):
+                candidate_datetimes.append(f"{cur_d.isoformat()}T{t_str}")
+            cur_d += timedelta(days=1)
+
+        if not candidate_datetimes:
+            raise ValueError("В выбранном периоде нет дней по шаблону ученика.")
+
+        # Исключаем уже существующие занятия в те же даты и время
+        cursor.execute(
+            "SELECT scheduled_at FROM lessons WHERE teacher_id = ? AND student_id = ?",
+            (teacher_id, student_id)
+        )
+        existing_dt_prefixes = {str(r['scheduled_at'] or '').strip()[:16] for r in cursor.fetchall()}
+        slots_to_create = [dt for dt in candidate_datetimes if dt[:16] not in existing_dt_prefixes]
+
+        if not slots_to_create:
+            raise ValueError("Все занятия на выбранный период уже есть в расписании.")
+
+        available_topics = get_available_topics_from_methodical_plan(teacher_id, student_id, conn=conn)
+        if len(available_topics) < len(slots_to_create):
+            raise ValueError("Сначала заполните методический план!")
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+        duration_min = int(schedule.get('durationMin') or 60)
+        created_lessons = []
+        with conn:
+            for idx, dt_str in enumerate(slots_to_create):
+                topic_title = available_topics[idx]
+                cursor.execute(
+                    """
+                    INSERT INTO lessons (teacher_id, class_id, title, description, scheduled_at, duration_min, homework_id, student_id, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?)
+                    """,
+                    (teacher_id, resolved_class_id, topic_title, '', dt_str, duration_min, student_id, now_iso)
+                )
+                created_lessons.append({
+                    'id': cursor.lastrowid,
+                    'classId': resolved_class_id,
+                    'studentId': student_id,
+                    'title': topic_title,
+                    'scheduledAt': dt_str,
+                    'durationMin': duration_min
+                })
+
+        return {
+            'createdCount': len(created_lessons),
+            'lessons': created_lessons,
+            'startDate': start_d.isoformat(),
+            'endDate': end_d.isoformat(),
+            'remainingTopics': len(available_topics) - len(created_lessons)
+        }
+    finally:
+        conn.close()
+
+
 def format_methodical_plan_row(r: Any) -> Dict[str, Any]:
     """Вспомогательная функция парсинга строки методического плана."""
     def parse_json(val, default):
@@ -3087,17 +3715,40 @@ def format_methodical_plan_row(r: Any) -> Dict[str, Any]:
     monthly_counts = parse_json(r['monthly_counts_json'], {})
     monthly_lessons = parse_json(r['monthly_lessons_json'], {})
 
+    ACADEMIC_MONTHS_ORDER = [
+        'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+        'Январь', 'Февраль', 'Март', 'Апрель', 'Май',
+        'Июнь', 'Июль', 'Август'
+    ]
+
+    def month_sort_key(m: str) -> int:
+        try:
+            return ACADEMIC_MONTHS_ORDER.index(m)
+        except ValueError:
+            return 999
+
+    sorted_counts = {m: monthly_counts[m] for m in sorted(monthly_counts.keys(), key=month_sort_key)}
+    sorted_lessons = {m: monthly_lessons[m] for m in sorted(monthly_lessons.keys(), key=month_sort_key)}
+
     total_conducted = 0
     total_planned = 0
-    for month, count in monthly_counts.items():
+    for month, count in sorted_counts.items():
         try:
             total_planned += int(count or 0)
         except (ValueError, TypeError):
             pass
 
-    for month, lessons in monthly_lessons.items():
+    for month, lessons in sorted_lessons.items():
         if isinstance(lessons, list):
-            for l in lessons:
+            month_limit = None
+            if month in sorted_counts:
+                try:
+                    month_limit = int(sorted_counts[month] or 0)
+                except (ValueError, TypeError):
+                    month_limit = None
+            for idx, l in enumerate(lessons):
+                if month_limit is not None and idx >= month_limit:
+                    break
                 if isinstance(l, dict) and l.get('isConducted'):
                     total_conducted += 1
 
@@ -3115,8 +3766,8 @@ def format_methodical_plan_row(r: Any) -> Dict[str, Any]:
         'tags': tags,
         'goals': r['goals'] or '',
         'topics': topics,
-        'monthlyCounts': monthly_counts,
-        'monthlyLessons': monthly_lessons,
+        'monthlyCounts': sorted_counts,
+        'monthlyLessons': sorted_lessons,
         'totalPlanned': total_planned,
         'totalConducted': total_conducted,
         'conductedPercent': round((total_conducted / total_planned * 100), 1) if total_planned > 0 else 0.0,
@@ -3460,6 +4111,7 @@ def get_oge_math_template() -> Dict[str, Any]:
         ],
         'topicsSummary': 'Итого занятий: 38 занятий 1 часть ОГЭ + 21 занятие 2 часть ОГЭ',
         'monthlyCounts': {
+            'Сентябрь': 0,
             'Октябрь': 2,
             'Ноябрь': 8,
             'Декабрь': 8,
@@ -3470,6 +4122,7 @@ def get_oge_math_template() -> Dict[str, Any]:
             'Май': 8
         },
         'monthlyLessons': {
+            'Сентябрь': [],
             'Октябрь': [
                 {'num': 1, 'title': 'Вводный урок. Разбор алгебры 1 части. Числа, вычисления, алгебраические выражения (Задание 8 ОГЭ)', 'isConducted': True},
                 {'num': 2, 'title': 'Числа, вычисления, алгебраические выражения (Задание 6 ОГЭ). Числовые неравенства и неравенства на координатной прямой (Задание 7 ОГЭ)', 'isConducted': True}

@@ -210,6 +210,7 @@
     .task-prompt {
       font-size: 14px; color: var(--muted); margin-bottom: 16px; font-weight: 600;
     }
+    .math-expr .katex-display { margin: 0; }
     .math-expr {
       display: inline-block;
       font-size: clamp(20px, 3.5vw, 30px);
@@ -456,6 +457,7 @@
       .nav-task-switcher { order: 3; width: 100%; justify-content: flex-start; }
     }
   </style>
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
 </head>
 <body>
 
@@ -480,9 +482,11 @@
       <a href="oge_task_11_trainer.html" class="task-pill">№11</a>
       <a href="oge_task_13_trainer.html" class="task-pill">№13</a>
       <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <a href="oge_task_19_trainer.html" class="task-pill">№19</a>
       <span class="nav-task-divider" aria-hidden="true"></span>
       <span class="nav-task-part-badge">Ч. 2:</span>
-      <span class="task-pill task-pill-part2 active" aria-current="page">№20 (2 б.)</span>
+      <span class="task-pill task-pill-part2 active" aria-current="page">№20</span>
+      <a href="oge_task_22_trainer.html" class="task-pill task-pill-part2">№22 (2 б.)</a>
     </div>
 
     <div class="nav-actions">
@@ -653,6 +657,8 @@
   <!-- SCRIPTS -->
   <script src="../js/trainer_rank_tracker.js"></script>
   <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
   <script src="../js/oge_task_20_trainer.js"></script>
   <script src="../js/oge_theory_data.js"></script>
 
@@ -714,24 +720,39 @@
       // Rank Tracker & Stats
       function updateStatsDisplay() {
         if (!window.TrainerTracker) return;
-        const stats = window.TrainerTracker.getStats(TRAINER_ID);
-        statStreak.textContent = stats.streak;
-        statMaxStreak.textContent = stats.maxStreak;
-        statTotal.textContent = stats.totalSolved;
-        statRank.textContent = stats.currentRank.title;
-        if (navXpBadge) {
-          navXpBadge.textContent = 'XP +' + (stats.totalSolved * 25);
+        try {
+          const records = window.TrainerTracker.getTrainerRecords ? window.TrainerTracker.getTrainerRecords() : {};
+          const cur = records[TRAINER_ID] || { maxStreak: 0, totalSolved: 0, maxRank: 'Новичок' };
+          const sessionStreaks = window.TrainerTracker.getSessionStreak ? window.TrainerTracker.getSessionStreak(TRAINER_ID) : 0;
+
+          if (statStreak) statStreak.textContent = sessionStreaks || 0;
+          if (statMaxStreak) statMaxStreak.textContent = cur.maxStreak || 0;
+          if (statTotal) statTotal.textContent = cur.totalSolved || 0;
+          if (statRank) statRank.textContent = (cur.maxRank && cur.maxRank !== 'Не начат') ? cur.maxRank.replace(/[👑🧙💎🥇🥈🥉]/g, '').trim() : 'Новичок';
+          if (navXpBadge) {
+            navXpBadge.textContent = 'XP +' + ((cur.totalSolved || 0) * 25);
+          }
+        } catch (e) {
+          console.warn('Stats display update error:', e);
         }
       }
 
       // Task Generation
       function nextTask() {
-        if (!window.OgeTask20Trainer) return;
+        if (!window.OgeTask20Trainer) {
+          console.warn('OgeTask20Trainer not loaded yet, retrying...');
+          setTimeout(nextTask, 100);
+          return;
+        }
         hasAnsweredCurrent = false;
         currentTask = window.OgeTask20Trainer.generateTask(currentCategory);
         window._currentTask = currentTask;
 
-        mathContainer.innerHTML = currentTask.questionHtml;
+        if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+          mathContainer.innerHTML = window.StudyMath.formatMath(currentTask.questionHtml, true);
+        } else {
+          mathContainer.innerHTML = currentTask.questionHtml;
+        }
         taskPrompt.textContent = currentTask.promptText || 'Решите задание:';
         taskCatBadge.textContent = currentTask.catName || 'Задание №20';
         taskBadge.textContent = 'Задание №20 · Часть 2 (2 балла)';
@@ -777,6 +798,9 @@
             Ответ: ${currentTask.displayAnswer}
           </div>
         `;
+        if (window.StudyMath && typeof window.StudyMath.renderMathInElement === 'function') {
+          window.StudyMath.renderMathInElement(solutionContent);
+        }
         solutionPanel.classList.remove('active');
       }
 
@@ -807,7 +831,11 @@
           }
 
           if (window.TrainerTracker) {
-            window.TrainerTracker.recordAnswer(TRAINER_ID, true);
+            if (typeof window.TrainerTracker.recordAttempt === 'function') {
+              window.TrainerTracker.recordAttempt(TRAINER_ID, true);
+            } else if (typeof window.TrainerTracker.recordAnswer === 'function') {
+              window.TrainerTracker.recordAnswer(TRAINER_ID, true);
+            }
             updateStatsDisplay();
           }
         } else {
@@ -821,7 +849,11 @@
           }
 
           if (window.TrainerTracker) {
-            window.TrainerTracker.recordAnswer(TRAINER_ID, false);
+            if (typeof window.TrainerTracker.recordAttempt === 'function') {
+              window.TrainerTracker.recordAttempt(TRAINER_ID, false);
+            } else if (typeof window.TrainerTracker.recordAnswer === 'function') {
+              window.TrainerTracker.recordAnswer(TRAINER_ID, false);
+            }
             updateStatsDisplay();
           }
         }
@@ -871,10 +903,18 @@
       }
 
       // Initial startup
-      if (window.TrainerTracker) {
-        updateStatsDisplay();
+      function initApp() {
+        if (window.TrainerTracker) {
+          updateStatsDisplay();
+        }
+        nextTask();
       }
-      nextTask();
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
     })();
   </script>
   <script src="../js/auth_sync.js"></script>

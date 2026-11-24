@@ -1656,7 +1656,35 @@ async function initParentDashboard(user) {
                 const pct = plan.conductedPercent || 0;
                 const monthlyLessons = plan.monthlyLessons || {};
                 const monthlyCounts = plan.monthlyCounts || {};
-                const months = Object.keys(monthlyLessons);
+
+                // Канонический академический порядок месяцев (начиная со сентября)
+                const ACADEMIC_MONTH_ORDER = [
+                    'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+                    'Январь', 'Февраль', 'Март', 'Апрель', 'Май',
+                    'Июнь', 'Июль', 'Август'
+                ];
+
+                // Базовые месяцы учебного года
+                const standardMonths = [
+                    'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+                    'Январь', 'Февраль', 'Март', 'Апрель', 'Май'
+                ];
+
+                const allMonths = new Set([
+                    ...standardMonths,
+                    ...Object.keys(monthlyLessons),
+                    ...Object.keys(monthlyCounts)
+                ]);
+
+                // Месяцы всегда идут по порядку с сентября: Сентябрь, Октябрь, Ноябрь, Декабрь, Январь и т.д.
+                const months = Array.from(allMonths).sort((a, b) => {
+                    const idxA = ACADEMIC_MONTH_ORDER.indexOf(a);
+                    const idxB = ACADEMIC_MONTH_ORDER.indexOf(b);
+                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                    if (idxA !== -1) return -1;
+                    if (idxB !== -1) return 1;
+                    return a.localeCompare(b, 'ru');
+                });
 
                 planContent.innerHTML = `
                     <div class="parent-plan-container">
@@ -1680,9 +1708,26 @@ async function initParentDashboard(user) {
 
                         <div class="parent-months-accordion">
                             ${months.map(m => {
-                                const list = monthlyLessons[m] || [];
-                                const plannedCount = monthlyCounts[m] || list.length || 0;
-                                const condCount = list.filter(l => l.isConducted).length;
+                                const rawList = Array.isArray(monthlyLessons[m]) ? monthlyLessons[m] : [];
+                                let plannedCount;
+                                if (monthlyCounts && monthlyCounts[m] !== undefined && monthlyCounts[m] !== null) {
+                                    const parsed = parseInt(monthlyCounts[m], 10);
+                                    plannedCount = (!isNaN(parsed) && parsed >= 0) ? parsed : rawList.length;
+                                } else {
+                                    plannedCount = rawList.length;
+                                }
+
+                                // Количество строк строго соответствует числу запланированных уроков в этом месяце
+                                const displayLessons = [];
+                                let condCount = 0;
+                                for (let i = 0; i < plannedCount; i++) {
+                                    const item = rawList[i] || { num: i + 1, title: '', isConducted: false };
+                                    if (item.isConducted) {
+                                        condCount++;
+                                    }
+                                    displayLessons.push(item);
+                                }
+
                                 return `
                                     <div class="parent-month-card">
                                         <div class="parent-month-head">
@@ -1690,8 +1735,8 @@ async function initParentDashboard(user) {
                                             <span class="parent-month-badge">Пройдено: ${condCount} / ${plannedCount}</span>
                                         </div>
                                         <div class="parent-month-lessons">
-                                            ${list.length === 0 ? `<div style="font-size:0.8rem; color:var(--muted); padding:4px 0;">Уроки не запланированы</div>` : ''}
-                                            ${list.map((item, idx) => `
+                                            ${displayLessons.length === 0 ? `<div style="font-size:0.8rem; color:var(--muted); padding:4px 0;">Уроки не запланированы</div>` : ''}
+                                            ${displayLessons.map((item, idx) => `
                                                 <div class="parent-plan-lesson-row">
                                                     <span class="parent-plan-lesson-name">
                                                         <strong style="color:var(--muted); margin-right:6px;">${idx + 1}.</strong>

@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -675,6 +676,7 @@
 
         <div class="quick-chars" id="quick-chars-bar">
           <button type="button" class="q-btn" data-char="-">−</button>
+          <button type="button" class="q-btn" data-char=";">;</button>
           <button type="button" class="q-btn" data-char=",">,</button>
           <button type="button" class="q-btn" data-char=".">.</button>
         </div>
@@ -791,6 +793,9 @@
   </main>
 
   <!-- СКРИПТЫ ГЕНЕРАТОРОВ ОГЭ -->
+  <!-- KaTeX + Math Engine -->
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
   <script src="../js/oge_task_6_trainer.js"></script>
   <script src="../js/oge_task_7_trainer.js"></script>
   <script src="../js/oge_task_8_trainer.js"></script>
@@ -799,6 +804,9 @@
   <script src="../js/oge_task_11_trainer.js"></script>
   <script src="../js/oge_task_13_trainer.js"></script>
   <script src="../js/oge_task_18_trainer.js"></script>
+  <script src="../js/oge_task_19_trainer.js"></script>
+  <script src="../js/oge_task_20_trainer.js"></script>
+  <script src="../js/oge_task_22_trainer.js"></script>
   <!-- ДВИЖОК МАРАФОНА -->
   <script src="../js/oge_marathon_engine.js"></script>
   <script src="../js/auth_sync.js"></script>
@@ -1066,7 +1074,11 @@
 
         if (task.questionHtml) {
           problemMathWrap.style.display = 'block';
-          problemMathExpr.innerHTML = task.questionHtml;
+          if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+            problemMathExpr.innerHTML = window.StudyMath.formatMath(task.questionHtml, true);
+          } else {
+            problemMathExpr.innerHTML = task.questionHtml;
+          }
         } else {
           problemMathWrap.style.display = 'none';
         }
@@ -1115,6 +1127,12 @@
               marathonAnswerInput.value = Array.from(slots).map(s => s.value).join('');
             });
           });
+        } else if (currentTaskNum === 19) {
+          marathonAnswerInput.placeholder = 'Номера верных утверждений (например: 13 или 2)';
+        } else if (currentTaskNum === 20) {
+          marathonAnswerInput.placeholder = 'Ответ к №20 (например: −2; 3 или (−∞; 1))';
+        } else if (currentTaskNum === 22) {
+          marathonAnswerInput.placeholder = 'Значения параметра (например: −1; 2)';
         } else {
           marathonAnswerInput.placeholder = 'Введите числовой ответ...';
         }
@@ -1194,6 +1212,9 @@
           fSolutionSteps.innerHTML = `<div class="solution-step">${task.explanation}</div>`;
         } else {
           fSolutionSteps.innerHTML = '<div class="solution-step">Внимательно повторите алгоритм вычисления данного прототипа.</div>';
+        }
+        if (window.StudyMath && typeof window.StudyMath.renderMathInElement === 'function') {
+          window.StudyMath.renderMathInElement(fSolutionSteps);
         }
 
         setTimeout(() => {

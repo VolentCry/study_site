@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр ОГЭ №22 · Графики функций и параметры (Часть 2) · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root, html[data-theme="dark"], html[data-theme="light"], body {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper) !important;
+      color: var(--ink) !important;
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(38,63,97,.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(183,70,78,.03) 0%, transparent 40%);
+    }
+
+    /* SITE NAV */
+    .site-nav {
+      background: rgba(245,242,235,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px; gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--indigo-dark);
+    }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--indigo); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'Zen Old Mincho', serif; font-size: 20px; font-weight: 700;
+      box-shadow: 0 4px 10px rgba(38,63,97,.2);
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+    .brand-sub { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+    .nav-task-switcher {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      padding: 4px; border-radius: 999px; overflow-x: auto; max-width: 100%;
+    }
+    .task-pill {
+      font-size: 12px; font-weight: 600; text-decoration: none;
+      padding: 5px 12px; border-radius: 999px; color: var(--muted);
+      transition: all .2s ease; white-space: nowrap;
+    }
+    .task-pill:hover { color: var(--indigo); background: rgba(38,63,97,.06); }
+    .task-pill.active {
+      background: var(--indigo); color: #fff;
+      box-shadow: 0 2px 6px rgba(38,63,97,.25);
+    }
+    .nav-task-divider {
+      width: 1px; height: 16px; background: var(--line); margin: 0 4px; display: inline-block;
+    }
+    .nav-task-part-badge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--vermilion); letter-spacing: .08em; padding: 0 2px;
+    }
+    .task-pill.task-pill-part2 {
+      border: 1px dashed rgba(183,70,78,.4); color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .task-pill.task-pill-part2:hover {
+      background: var(--vermilion); color: #fff;
+    }
+    .task-pill.task-pill-part2.active {
+      background: var(--vermilion); color: #fff; border-style: solid; box-shadow: 0 2px 6px rgba(183,70,78,.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--paper-card);
+      font-size: 12px; font-weight: 600; color: var(--indigo-dark);
+      text-decoration: none; transition: all .2s ease;
+    }
+    .nav-btn:hover { border-color: var(--indigo); background: #fff; transform: translateY(-1px); }
+    .xp-counter {
+      background: var(--gold-light); color: #9c6734; border: 1px solid rgba(200,149,108,.3);
+      padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    }
+
+    /* MAIN WRAPPER */
+    .trainer-shell {
+      flex: 1; max-width: 960px; width: 100%; margin: 0 auto;
+      padding: 28px 20px 48px; display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; max-width: 760px; margin: 0 auto; }
+    .trainer-kicker {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--vermilion); margin-bottom: 6px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .trainer-title {
+      font-family: 'Zen Old Mincho', serif;
+      font-size: clamp(26px, 4.2vw, 36px);
+      font-weight: 700; color: var(--indigo-dark);
+      line-height: 1.2; margin-bottom: 10px;
+    }
+    .trainer-subtitle {
+      font-size: 14px; color: var(--muted); line-height: 1.6;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .stat-box {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-icon { font-size: 20px; }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font-size: 16px; font-weight: 700; color: var(--indigo-dark); line-height: 1.1; }
+    .stat-label { font-size: 11px; color: var(--muted); }
+
+    /* CATEGORY TABS */
+    .category-filter {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-btn {
+      padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line);
+      cursor: pointer; font-family: inherit; transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 2px 8px rgba(38,63,97,.2);
+    }
+
+    /* PROBLEM CARD */
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 36px 32px 32px;
+      box-shadow: var(--shadow-md); position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 22px;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 24px;
+      font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 24px;
+      font-size: 11px; font-weight: 700; color: var(--vermilion);
+      background: var(--vermilion-light); padding: 3px 12px; border-radius: 999px;
+      border: 1px solid var(--vermilion-border);
+    }
+
+    /* MATH EXPRESSION DISPLAY */
+    .task-display {
+      width: 100%; text-align: center; margin-top: 10px;
+    }
+    .task-prompt {
+      font-size: 15px; color: var(--ink); margin-bottom: 16px; font-weight: 600; line-height: 1.5;
+    }
+    .math-expr .katex-display { margin: 0; }
+    .math-expr {
+      display: inline-block;
+      font-size: clamp(19px, 3.2vw, 26px);
+      color: var(--indigo-dark);
+      padding: 20px 28px;
+      background: var(--paper-light);
+      border: 1px solid rgba(38,63,97,.14);
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,.02);
+    }
+    .system-bracket {
+      display: inline-flex; align-items: center; gap: 10px; font-size: 0.9em;
+    }
+    .system-brace {
+      font-size: 2.4em; font-weight: 300; color: var(--indigo); line-height: 1; transform: scaleY(1.3);
+      user-select: none;
+    }
+    .system-equations {
+      display: flex; flex-direction: column; gap: 8px; text-align: left;
+    }
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 4px; font-size: 0.9em; line-height: 1.08;
+    }
+    .fraction .num { border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+    .fraction .den { padding-top: 2px; }
+    sup { font-size: 0.65em; vertical-align: super; line-height: 0; }
+
+    /* ANSWER ROW & INPUT */
+    .answer-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 560px;
+    }
+    .answer-input-wrap {
+      flex: 1; min-width: 220px; position: relative;
+    }
+    .answer-input {
+      width: 100%; height: 52px; padding: 0 18px;
+      border: 2px solid var(--line); border-radius: 12px;
+      background: #fff; color: var(--ink); font-size: 18px; font-weight: 700;
+      font-family: 'DM Sans', monospace; text-align: center;
+      transition: all .2s ease;
+    }
+    .answer-input:focus,
+    .answer-input:focus-visible {
+      outline: 2px solid var(--indigo);
+      outline-offset: 1px;
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 4px rgba(38,63,97,.12);
+    }
+    .answer-input.correct {
+      border-color: var(--green); background: var(--green-light); color: var(--green);
+    }
+    .answer-input.wrong {
+      border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion);
+    }
+
+    .btn-check,
+    .btn-next {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      height: 52px; padding: 0 28px; border-radius: 12px; border: none;
+      font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; line-height: 1; white-space: nowrap; transition: all .2s ease;
+    }
+    .btn-check {
+      background: var(--vermilion); color: #fff;
+      box-shadow: 0 4px 14px rgba(183,70,78,.35);
+    }
+    .btn-check:hover {
+      background: #d3525b; transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(183,70,78,.45);
+    }
+    .btn-next {
+      background: var(--indigo); color: #fff;
+      box-shadow: 0 4px 14px rgba(38,63,97,.25);
+    }
+    .btn-next:hover {
+      background: #19273c; transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(38,63,97,.35);
+    }
+
+    .quick-symbols-bar {
+      display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+      margin-top: -6px; margin-bottom: 2px;
+    }
+    .quick-symbol-btn {
+      background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo);
+      padding: 5px 12px; border-radius: 8px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: 'DM Sans', monospace; transition: all .15s ease;
+    }
+    .quick-symbol-btn:hover { background: #fff; border-color: var(--indigo); transform: translateY(-1px); }
+
+    /* FEEDBACK MESSAGE */
+    .feedback-banner {
+      width: 100%; max-width: 620px; border-radius: 12px; padding: 14px 18px;
+      font-size: 14px; font-weight: 600; display: none; line-height: 1.5;
+      animation: fadeIn .25s ease; text-align: center;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success {
+      background: var(--green-light); color: var(--green); border: 1px solid rgba(46,125,50,.25);
+    }
+    .feedback-banner.error {
+      background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* GRAPH DEMO BOX */
+    .graph-demo-container {
+      width: 100%; max-width: 640px; display: none; flex-direction: column; align-items: center;
+      gap: 14px; animation: fadeIn .3s ease; margin-top: 10px;
+    }
+    .graph-demo-container.active { display: flex; }
+    .graph-compare-card {
+      background: #fff; border: 2px solid var(--gold); border-radius: 16px;
+      padding: 20px 24px; box-shadow: var(--shadow-md); width: 100%;
+    }
+    .graph-compare-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .graph-compare-icon {
+      font-size: 24px;
+    }
+    .graph-compare-title {
+      font-family: 'Zen Old Mincho', serif; font-size: 17px; font-weight: 700; color: var(--indigo-dark);
+    }
+    .graph-compare-badge {
+      margin-left: auto; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 999px; background: var(--gold-light); color: #8e5828;
+      border: 1px solid rgba(200,149,108,.3);
+    }
+    .task22-svg-wrap {
+      width: 100%; max-width: 520px; margin: 0 auto;
+    }
+    .task22-graph-svg {
+      width: 100%; height: auto; display: block; border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+    .graph-compare-note {
+      margin-top: 14px; background: var(--paper-light); border-left: 3px solid var(--gold);
+      padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13px; color: var(--ink); line-height: 1.5;
+    }
+    .graph-compare-note strong { color: var(--indigo-dark); }
+
+    /* CARD ACTION TOOLS */
+    .card-tools {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
+      border-top: 1px solid var(--line); width: 100%; padding-top: 20px; margin-top: 6px;
+    }
+    .tool-btn {
+      background: none; border: 1px solid var(--line); border-radius: 999px;
+      padding: 7px 16px; font-size: 12px; font-weight: 600; color: var(--muted);
+      cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+      transition: all .2s ease;
+    }
+    .tool-btn:hover { color: var(--indigo); border-color: var(--indigo); background: #fff; }
+
+    /* COLLAPSIBLE PANELS (SOLUTION & THEORY) */
+    .accordion-panel {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 24px 28px; box-shadow: var(--shadow-sm);
+      display: none; flex-direction: column; gap: 16px;
+      animation: fadeIn .3s ease;
+    }
+    .accordion-panel.active { display: flex; }
+    .accordion-panel h3 {
+      font-family: 'Zen Old Mincho', serif; font-size: 18px; color: var(--indigo-dark);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .solution-step {
+      background: var(--paper-light); border-left: 3px solid var(--indigo);
+      padding: 12px 16px; border-radius: 0 10px 10px 0;
+      font-size: 14px; line-height: 1.6; color: var(--ink);
+    }
+    .criteria-box {
+      background: var(--gold-light); border: 1px solid rgba(200,149,108,.3);
+      border-radius: 12px; padding: 14px 18px; font-size: 13px; line-height: 1.5;
+      color: #7a4f23;
+    }
+    .criteria-box strong { color: #5a3614; }
+
+    .theory-content { display: flex; flex-direction: column; gap: 16px; font-size: 14px; line-height: 1.6; }
+    .theory-rule-box {
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px 18px;
+    }
+    .theory-rule-title { font-weight: 700; color: var(--indigo-dark); margin-bottom: 6px; }
+
+    @media (max-width: 640px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .problem-card { padding: 32px 18px 24px; }
+      .card-top-tag { font-size: 10px; left: 16px; }
+      .card-help-badge { font-size: 10px; right: 16px; }
+      .answer-row { flex-direction: column; }
+      .answer-input-wrap, .btn-check, .btn-next { width: 100%; }
+      .site-nav { flex-wrap: wrap; }
+      .nav-task-switcher { order: 3; width: 100%; justify-content: flex-start; }
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+</head>
+<body>
+
+  <!-- SITE NAV -->
+  <header class="site-nav" role="banner">
+    <a class="brand" href="../pages/math_9.html" aria-label="Вернуться в Математика 9 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика</span>
+      </div>
+    </a>
+
+    <!-- TASK SWITCHER -->
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <span class="nav-task-part-badge" style="color:var(--muted);">Ч. 1:</span>
+      <a href="oge_task_6_trainer.html" class="task-pill">№6</a>
+      <a href="oge_task_7_trainer.html" class="task-pill">№7</a>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10</a>
+      <a href="oge_task_11_trainer.html" class="task-pill">№11</a>
+      <a href="oge_task_13_trainer.html" class="task-pill">№13</a>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <a href="oge_task_19_trainer.html" class="task-pill">№19</a>
+      <span class="nav-task-divider" aria-hidden="true"></span>
+      <span class="nav-task-part-badge">Ч. 2:</span>
+      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20</a>
+      <span class="task-pill task-pill-part2 active" aria-current="page">№22 (2 б.)</span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/oge_roadmap.html" class="nav-btn">🗺️ Роадмап</a>
+      <a href="../index.html" class="nav-btn">В лобби</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <div class="trainer-header">
+      <div class="trainer-kicker">ОГЭ 2026 · Часть 2 · Графики и параметры (2 балла)</div>
+      <h1 class="trainer-title">Задание №22: Построение графиков и исследование параметров</h1>
+      <p class="trainer-subtitle">
+        Кусочно-заданные функции, выколотые точки при сокращении дробей, параболы с модулем и семейство прямых <em>y = m</em> и <em>y = kx</em>. После каждого решения сверяйте рисунок в тетради с эталонным чертежом на экране!
+      </p>
+    </div>
+
+    <!-- STATS DASHBOARD -->
+    <div class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Лучший рекорд</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Всего решено</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank" style="font-size: 13px;">Новичок</span>
+          <span class="stat-label">Текущее звание</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY FILTER / MODES -->
+    <div class="category-filter" role="tablist" aria-label="Режимы задания 22">
+      <button type="button" class="cat-btn active" data-cat="all">🎲 Все типы графиков №22</button>
+      <button type="button" class="cat-btn" data-cat="piecewise">🧩 Кусочные функции</button>
+      <button type="button" class="cat-btn" data-cat="rational">📉 Дробно-рациональные</button>
+      <button type="button" class="cat-btn" data-cat="parabola">🎯 Параболы с выколотыми точками</button>
+      <button type="button" class="cat-btn" data-cat="module">📐 Графики с модулем</button>
+    </div>
+
+    <!-- MAIN PROBLEM CARD -->
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Задание №22 · Часть 2 (2 балла)</span>
+      <span class="card-help-badge" id="task-cat-badge">Графики функций</span>
+
+      <div class="task-display">
+        <p class="task-prompt" id="task-prompt">Постройте график функции в тетради и определите значения параметра:</p>
+        <div id="math-container">
+          <!-- Dynamic Math Expression -->
+        </div>
+      </div>
+
+      <!-- Quick symbols helper -->
+      <div class="quick-symbols-bar" aria-label="Быстрый ввод символов">
+        <button type="button" class="quick-symbol-btn" data-sym="−">− (минус)</button>
+        <button type="button" class="quick-symbol-btn" data-sym=";">; (разделитель)</button>
+        <button type="button" class="quick-symbol-btn" data-sym=",">, (запятая)</button>
+      </div>
+
+      <!-- Single/Multiple answers row -->
+      <div class="answer-row">
+        <div class="answer-input-wrap">
+          <input type="text" id="answer-input" class="answer-input" placeholder="Например: -2; 1 или 4" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        </div>
+        <button type="button" id="btn-check" class="btn-check">
+          <span>Проверить ответ</span>
+          <span>✓</span>
+        </button>
+        <button type="button" id="btn-next" class="btn-next" style="display: none;">
+          <span>Следующее задание</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <div id="feedback-banner" class="feedback-banner" role="alert"></div>
+
+      <!-- DEMO GRAPH CONTAINER (Appears after check / solution toggle) -->
+      <div id="graph-demo-container" class="graph-demo-container">
+        <div class="graph-compare-card">
+          <div class="graph-compare-header">
+            <span class="graph-compare-icon">📐</span>
+            <div>
+              <div class="graph-compare-title">Эталонный чертёж графика функции</div>
+              <div style="font-size: 12px; color: var(--muted);">Демонстрация верного построения и прямых параметра</div>
+            </div>
+            <span class="graph-compare-badge">Сверьте с тетрадью</span>
+          </div>
+
+          <div id="graph-svg-holder">
+            <!-- Rendered SVG Graph -->
+          </div>
+
+          <div class="graph-compare-note" id="graph-compare-note">
+            <strong>⚠️ Пожалуйста, внимательно сравните построенный в тетради график с эталоном на экране!</strong>
+            Обратите особое внимание на выколотые точки, координаты вершины и граничные стыки звеньев.
+          </div>
+        </div>
+      </div>
+
+      <div class="card-tools">
+        <button type="button" class="tool-btn" id="btn-toggle-solution">
+          <span>💡 Показать решение и критерии ФИПИ</span>
+        </button>
+        <button type="button" class="tool-btn" id="btn-toggle-theory">
+          <span>📖 Справочник теории к №22</span>
+        </button>
+      </div>
+    </article>
+
+    <!-- SOLUTION ACCORDION -->
+    <div class="accordion-panel" id="solution-panel">
+      <h3>
+        <span>💡 Пошаговое оформление решения по критериям ФИПИ</span>
+      </h3>
+      <div class="criteria-box">
+        <strong>⚖️ Критерии оценивания задания №22 (2 балла):</strong><br>
+        • <strong>2 балла:</strong> График построен абсолютно верно (указаны масштаб, оси, выколотые точки или разрывы, вершины параболы), верно найдены и обоснованы все значения параметра.<br>
+        • <strong>1 балл:</strong> График построен верно, но значение параметра найдено неверно или не до конца исследовано; либо при верном исследовании в графике допущена небольшая неточность (например, точка выколота на чертеже, но не подписана её координата).<br>
+        • <strong>0 баллов:</strong> График построен неверно (пропущены выколотые точки, неверно определено направление ветвей), либо решение не соответствует критериям на 1–2 балла.
+      </div>
+      <div id="solution-content" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    <!-- THEORY ACCORDION -->
+    <div class="accordion-panel" id="theory-panel">
+      <h3>
+        <span>📖 Справочник по заданию №22 ОГЭ (Часть 2)</span>
+      </h3>
+      <div class="theory-content">
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">1. Алгоритм построения кусочной функции</div>
+          <p>
+            1. В тетради нарисуйте декартову систему координат, подписав оси <em>x</em>, <em>y</em>, начало координат <em>O</em> и единичные отрезки (обычно 1 или 2 клетки).<br>
+            2. Разбейте числовую прямую вертикальными пунктирными линиями на промежутки задания функции.<br>
+            3. Для каждого промежутка составьте небольшую таблицу значений (минимум 2 точки для прямой, 3–5 точек для параболы с обязательной вершиной <em>x<sub>в</sub> = −b / (2a)</em>).<br>
+            4. Особое внимание уделите граничным точкам: закрашенная точка при знаках ≤, ≥ и выколотая при строгих &lt;, &gt; (если соседняя ветвь не заполняет этот стык).
+          </p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">2. Дробно-рациональные функции и выколотые точки</div>
+          <p>
+            Если функция задана дробью, например <em>y = (x² + 5x + 6) / (x + 2)</em>:<br>
+            • Сначала <strong>обязательно выписываем ОДЗ</strong>: знаменатель не равен нулю (<em>x + 2 ≠ 0 ⟹ x ≠ −2</em>).<br>
+            • Раскладываем числитель на множители: <em>(x + 2)(x + 3) / (x + 2) = x + 3</em>.<br>
+            • Строим график итоговой простой функции (прямая <em>y = x + 3</em>).<br>
+            • <strong>Обязательно выкалываем на графике точку с абсциссой x = −2</strong> (ордината <em>y = −2 + 3 = 1</em>, точка (−2; 1) рисуется пустой внутри!).
+          </p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">3. Исследование прямых y = m (горизонтальные прямые)</div>
+          <p>
+            Прямая <em>y = m</em> параллельна оси абсцисс <em>Ox</em>.<br>
+            Представьте, что горизонтальная прямая плавно поднимается снизу вверх от <em>m = −∞</em> до <em>m = +∞</em>.<br>
+            Критическими уровнями, где меняется число пересечений, всегда являются:<br>
+            • Вершины парабол (касание);<br>
+            • Горизонтальные асимптоты гипербол (<em>y = 0</em> или <em>y = c</em>);<br>
+            • Выколотые точки графика (пересечение пропадает!);<br>
+            • Стыки и точки изломов кусочной функции.
+          </p>
+        </div>
+
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">4. Исследование прямых y = kx (пучок прямых из начала координат)</div>
+          <p>
+            Прямая <em>y = kx</em> проходит через начало координат <em>(0; 0)</em>.<br>
+            При изменении углового коэффициента <em>k</em> прямая вращается вокруг точки <em>(0; 0)</em>.<br>
+            Ровно одну общую точку с гиперболой прямая <em>y = kx</em> имеет тогда, когда она проходит через <strong>выколотую точку</strong> (подставляем координаты выколотой точки в <em>y = kx</em> и находим <em>k</em>).
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/oge_task_22_trainer.js"></script>
+
+  <script>
+    (function () {
+      const TRAINER_ID = 'oge_task_22';
+      let currentCategory = 'all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+
+      // DOM Elements
+      const mathContainer = document.getElementById('math-container');
+      const taskPrompt = document.getElementById('task-prompt');
+      const taskBadge = document.getElementById('task-badge');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+      const answerInput = document.getElementById('answer-input');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+
+      const graphDemoContainer = document.getElementById('graph-demo-container');
+      const graphSvgHolder = document.getElementById('graph-svg-holder');
+      const graphCompareNote = document.getElementById('graph-compare-note');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const theoryPanel = document.getElementById('theory-panel');
+      const btnToggleSolution = document.getElementById('btn-toggle-solution');
+      const btnToggleTheory = document.getElementById('btn-toggle-theory');
+
+      // Audio effects
+      let audioCtx = null;
+      function playTone(freq, type, duration) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      function updateStatsUI() {
+        if (!window.TrainerTracker) return;
+        try {
+          const streak = TrainerTracker.getSessionStreak(TRAINER_ID) || 0;
+          const record = TrainerTracker.getRecord(TRAINER_ID) || { maxStreak: 0, totalSolved: 0 };
+          const maxStreak = record.maxStreak || 0;
+          const total = record.totalSolved || 0;
+          const rankObj = TrainerTracker.getRank(TRAINER_ID, maxStreak);
+          const rankTitle = (rankObj && typeof rankObj === 'object') ? rankObj.title : (typeof rankObj === 'string' ? rankObj : 'Новичок');
+
+          if (statStreak) statStreak.textContent = streak;
+          if (statMaxStreak) statMaxStreak.textContent = maxStreak;
+          if (statTotal) statTotal.textContent = total;
+          if (statRank) statRank.textContent = (rankTitle && rankTitle !== 'Не начат') ? rankTitle.replace(/[👑🧙💎🥇🥈🥉]/g, '').trim() : 'Новичок';
+          if (navXpBadge) navXpBadge.textContent = 'XP +' + (total * 25);
+        } catch (e) {
+          console.warn('updateStatsUI error:', e);
+        }
+      }
+
+      function loadNewTask() {
+        if (!window.OgeTask22Trainer) {
+          console.warn('OgeTask22Trainer not loaded yet, retrying...');
+          setTimeout(loadNewTask, 100);
+          return;
+        }
+        hasAnsweredCurrent = false;
+        currentTask = window.OgeTask22Trainer.generateTask(currentCategory);
+
+        if (taskCatBadge) taskCatBadge.textContent = currentTask.catName;
+        if (taskPrompt) taskPrompt.innerHTML = currentTask.promptText;
+        if (mathContainer) if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+          mathContainer.innerHTML = window.StudyMath.formatMath(currentTask.questionHtml, true);
+        } else {
+          mathContainer.innerHTML = currentTask.questionHtml;
+        }
+
+        // Reset input & buttons
+        if (answerInput) {
+          answerInput.value = '';
+          answerInput.className = 'answer-input';
+          answerInput.disabled = false;
+          answerInput.focus();
+        }
+        if (btnCheck) {
+          btnCheck.style.display = 'inline-flex';
+          btnCheck.disabled = false;
+        }
+        if (btnNext) {
+          btnNext.style.display = 'none';
+        }
+        if (feedbackBanner) {
+          feedbackBanner.className = 'feedback-banner';
+          feedbackBanner.style.display = 'none';
+          feedbackBanner.textContent = '';
+        }
+
+        // Hide Demo Graph until user checks answer or requests solution
+        if (graphDemoContainer) {
+          graphDemoContainer.classList.remove('active');
+        }
+        if (graphSvgHolder) {
+          graphSvgHolder.innerHTML = '';
+        }
+
+        // Reset solutions
+        if (solutionPanel) if (window.StudyMath && typeof window.StudyMath.renderMathInElement === 'function') {
+          window.StudyMath.renderMathInElement(solutionContent);
+        }
+        solutionPanel.classList.remove('active');
+        if (solutionContent) solutionContent.innerHTML = '';
+      }
+
+      function showDemoGraph() {
+        if (!currentTask || !graphDemoContainer || !graphSvgHolder) return;
+        graphSvgHolder.innerHTML = currentTask.svgGraph;
+        if (currentTask.compareHint && graphCompareNote) {
+          graphCompareNote.innerHTML = `
+            <strong>⚠️ Пожалуйста, внимательно сравните построенный в тетради график с эталоном на экране!</strong><br>
+            ${currentTask.compareHint}
+          `;
+        }
+        graphDemoContainer.classList.add('active');
+      }
+
+      function renderSolution() {
+        if (!currentTask || !solutionContent) return;
+        let html = '';
+        currentTask.solutionSteps.forEach((step, idx) => {
+          html += `<div class="solution-step">${step}</div>`;
+        });
+        html += `
+          <div class="solution-step" style="border-left-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 700;">
+            Итоговый ответ: ${currentTask.displayAnswer}
+          </div>
+        `;
+        solutionContent.innerHTML = html;
+      }
+
+      function handleCheck() {
+        if (hasAnsweredCurrent || !currentTask) return;
+
+        const val = answerInput.value.trim();
+        if (!val) {
+          if (feedbackBanner) {
+            feedbackBanner.textContent = 'Пожалуйста, введите найденное значение параметра (например: -2; 1 или 4).';
+            feedbackBanner.className = 'feedback-banner show error';
+          }
+          if (answerInput) answerInput.focus();
+          return;
+        }
+
+        const res = window.OgeTask22Trainer.checkAnswer(val, currentTask);
+
+        if (res.isCorrect) {
+          hasAnsweredCurrent = true;
+          if (answerInput) {
+            answerInput.classList.remove('wrong');
+            answerInput.classList.add('correct');
+            answerInput.disabled = true;
+          }
+          if (feedbackBanner) {
+            feedbackBanner.textContent = res.message;
+            feedbackBanner.className = 'feedback-banner show success';
+          }
+          if (btnCheck) btnCheck.style.display = 'none';
+          if (btnNext) {
+            btnNext.style.display = 'inline-flex';
+            btnNext.focus();
+          }
+
+          // Показываем демонстрационный график и просим сравнить с тетрадью!
+          showDemoGraph();
+
+          playTone(523.25, 'triangle', 0.12);
+          setTimeout(() => playTone(659.25, 'triangle', 0.2), 100);
+
+          if (window.TrainerTracker) {
+            TrainerTracker.recordAnswer(TRAINER_ID, true);
+            updateStatsUI();
+          }
+        } else {
+          if (answerInput) {
+            answerInput.classList.remove('correct');
+            answerInput.classList.add('wrong');
+          }
+          if (feedbackBanner) {
+            feedbackBanner.textContent = res.message;
+            feedbackBanner.className = 'feedback-banner show error';
+          }
+          playTone(220, 'sawtooth', 0.25);
+
+          if (window.TrainerTracker) {
+            TrainerTracker.recordAnswer(TRAINER_ID, false);
+            updateStatsUI();
+          }
+        }
+      }
+
+      // Quick symbols buttons
+      document.querySelectorAll('.quick-symbol-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!answerInput || answerInput.disabled) return;
+          const sym = btn.getAttribute('data-sym');
+          const start = answerInput.selectionStart || answerInput.value.length;
+          const end = answerInput.selectionEnd || answerInput.value.length;
+          const val = answerInput.value;
+          answerInput.value = val.substring(0, start) + sym + val.substring(end);
+          answerInput.focus();
+          answerInput.selectionStart = answerInput.selectionEnd = start + sym.length;
+        });
+      });
+
+      // Category tab switcher
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat') || 'all';
+          loadNewTask();
+        });
+      });
+
+      if (btnCheck) btnCheck.addEventListener('click', handleCheck);
+      if (btnNext) btnNext.addEventListener('click', loadNewTask);
+
+      if (answerInput) {
+        answerInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (!hasAnsweredCurrent) handleCheck();
+            else loadNewTask();
+          }
+        });
+      }
+
+      if (btnToggleSolution) {
+        btnToggleSolution.addEventListener('click', () => {
+          if (!solutionPanel) return;
+          const willShow = !solutionPanel.classList.contains('active');
+          if (willShow) {
+            renderSolution();
+            showDemoGraph();
+            solutionPanel.classList.add('active');
+            btnToggleSolution.querySelector('span').textContent = '✕ Скрыть пошаговое решение';
+          } else {
+            solutionPanel.classList.remove('active');
+            btnToggleSolution.querySelector('span').textContent = '💡 Показать решение и критерии ФИПИ';
+          }
+        });
+      }
+
+      if (btnToggleTheory) {
+        btnToggleTheory.addEventListener('click', () => {
+          if (!theoryPanel) return;
+          theoryPanel.classList.toggle('active');
+          btnToggleTheory.querySelector('span').textContent = theoryPanel.classList.contains('active')
+            ? '✕ Скрыть справочник'
+            : '📖 Справочник теории к №22';
+        });
+      }
+
+      // Initial boot
+      function initApp() {
+        try {
+          updateStatsUI();
+        } catch (e) {
+          console.warn('Stats error:', e);
+        }
+        try {
+          loadNewTask();
+        } catch (e) {
+          console.error('Error in loadNewTask:', e);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -298,44 +298,8 @@
 
             <!-- СЕТКА: КАЛЕНДАРЬ МЕСЯЦА + СОБЫТИЯ И Д/З -->
             <div class="study-dashboard-grid">
-                <!-- ЛЕВАЯ КОЛОНКА: КАЛЕНДАРЬ И БИЛЛИНГ УЧЕНИКА -->
+                <!-- ЛЕВАЯ КОЛОНКА: БИЛЛИНГ УЧЕНИКА И КАЛЕНДАРЬ -->
                 <div class="study-main-col">
-                    <!-- КАЛЕНДАРЬ ТЕКУЩЕГО МЕСЯЦА -->
-                    <div class="study-card calendar-card">
-                        <div class="calendar-header">
-                            <div class="cal-nav-group">
-                                <button type="button" class="cal-nav-btn" id="cal-prev-btn" aria-label="Предыдущий месяц">‹</button>
-                                <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
-                                <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
-                            </div>
-                            <button type="button" class="btn btn-secondary btn-sm cal-plan-btn" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
-                            <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
-                        </div>
-
-                        <div class="calendar-weekdays">
-                            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-                        </div>
-
-                        <div class="calendar-grid" id="calendar-days-grid">
-                            <!-- Динамическая сетка дней -->
-                        </div>
-
-                        <div class="calendar-legend">
-                            <div class="legend-item">
-                                <span class="legend-dot dot-lesson"></span>
-                                <span>Урок</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot dot-hw"></span>
-                                <span>Дедлайн Д/З</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-dot dot-today"></span>
-                                <span>Сегодня</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- КАРТОЧКА ОПЛАТЫ И ЗАНЯТИЙ (ОТОБРАЖАЕТСЯ, ЕСЛИ ПЛАТЕЛЬЩИК - РЕБЁНОК) -->
                     <div class="study-card student-billing-card" id="student-billing-card" style="display:none;">
                         <div class="student-billing-header">
@@ -372,6 +336,42 @@
                                 <div class="student-billing-kpi-val" id="student-billing-debt-val" style="color:var(--accent-emerald, #10b981);">0 ₽</div>
                                 <div class="student-billing-kpi-lbl" id="student-billing-debt-lbl">Задолженность отсутствует</div>
                                 <div class="student-billing-kpi-sub" id="student-billing-debt-sub" style="color:var(--accent-emerald, #10b981); font-weight:700;">Оплачено полностью</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- КАЛЕНДАРЬ ТЕКУЩЕГО МЕСЯЦА -->
+                    <div class="study-card calendar-card">
+                        <div class="calendar-header">
+                            <div class="cal-nav-group">
+                                <button type="button" class="cal-nav-btn" id="cal-prev-btn" aria-label="Предыдущий месяц">‹</button>
+                                <h3 class="cal-title" id="cal-month-title">Месяц Год</h3>
+                                <button type="button" class="cal-nav-btn" id="cal-next-btn" aria-label="Следующий месяц">›</button>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm cal-plan-btn" id="btn-open-methodical-plan" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; border-radius:8px; padding:6px 12px;" title="Методический план и учёт проведённых занятий">📋 Методический план</button>
+                            <button type="button" class="cal-today-btn" id="cal-today-btn">Сегодня</button>
+                        </div>
+
+                        <div class="calendar-weekdays">
+                            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                        </div>
+
+                        <div class="calendar-grid" id="calendar-days-grid">
+                            <!-- Динамическая сетка дней -->
+                        </div>
+
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot dot-lesson"></span>
+                                <span>Урок</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot dot-hw"></span>
+                                <span>Дедлайн Д/З</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot dot-today"></span>
+                                <span>Сегодня</span>
                             </div>
                         </div>
                     </div>
