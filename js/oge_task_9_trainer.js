@@ -256,7 +256,7 @@
     const solutionSteps = [
       `Переносим свободный член в правую часть уравнения:<br>${a === 1 ? 'x<sup>2</sup>' : `${a}x<sup>2</sup>`} = ${c}`,
       a !== 1 ? `Делим обе части уравнения на ${a}:<br>x<sup>2</sup> = ${k * k}` : '',
-      `Извлекаем квадратный корень:<br>x = ±√${k * k} $\→$ <strong>x<sub>1</sub> = −${k}</strong>, <strong>x<sub>2</sub> = ${k}</strong>`,
+      `Извлекаем квадратный корень:<br>x = ±√${k * k} → <strong>x<sub>1</sub> = −${k}</strong>, <strong>x<sub>2</sub> = ${k}</strong>`,
       askSmaller
         ? `По условию требуется записать <em>меньший</em> из корней: <strong>${formatNum(answer)}</strong>.`
         : `По условию требуется записать <em>больший</em> из корней: <strong>${formatNum(answer)}</strong>.`
@@ -301,7 +301,7 @@
       `Выносим общий множитель <em>x</em> за скобки:<br>x · (${aStr}x ${bStr}) = 0`,
       `Произведение равно нулю, когда хотя бы один из множителей равен нулю:<br>` +
       `<strong>x<sub>1</sub> = 0</strong> или ${aStr}x ${bStr} = 0`,
-      `${aStr}x = ${-b} $\→$ <strong>x<sub>2</sub> = ${formatNum(root2)}</strong>`,
+      `${aStr}x = ${-b} → <strong>x<sub>2</sub> = ${formatNum(root2)}</strong>`,
       askSmaller
         ? `Корни уравнения: 0 и ${formatNum(root2)}. Меньший из корней равен <strong>${formatNum(answer)}</strong>.`
         : `Корни уравнения: 0 и ${formatNum(root2)}. Больший из корней равен <strong>${formatNum(answer)}</strong>.`
@@ -348,7 +348,7 @@
     const solutionSteps = [
       `Вычисляем дискриминант уравнения $D = b^2 − 4ac$:<br>` +
       `$D = (${p})^2 − 4 · 1 · (${q}) = ${p * p} − (${4 * q}) = ${D}$ (√D = ${sqrtD})`,
-      `Находим корни по формуле $x = \(-b \± \√D)/(2a)$:<br>` +
+      `Находим корни по формуле $x = \\frac{-b \\pm \\sqrt{D}}{2a}$:<br>` +
       `$x_1 = \\frac{${-p} − ${sqrtD}}{2} = $ <strong>${Math.min(x1, x2)}</strong><br>` +
       `$x_2 = \\frac{${-p} + ${sqrtD}}{2} = $ <strong>${Math.max(x1, x2)}</strong>`,
       askSmaller
@@ -464,12 +464,12 @@
 
     const solutionSteps = [
       `ОДЗ (область допустимых значений): знаменатель не равен нулю:<br>` +
-      `x ${formatSigned(b)} ≠ 0 $\→$ x ≠ ${-b}`,
+      `x ${formatSigned(b)} ≠ 0 → x ≠ ${-b}`,
       `Используем основное свойство пропорции (произведение крайних членов равно произведению средних):<br>` +
       `${rightVal} · (x ${formatSigned(b)}) = ${a}`,
       `x ${formatSigned(b)} = ${a} / ${rightVal} = ${targetDenom}`,
       `x = ${targetDenom} − (${b}) = <strong>${formatNum(x)}</strong>`,
-      `Проверяем ОДЗ: значение ${formatNum(x)} удовлетворяет условию $x \≠ ${-b}$.`
+      `Проверяем ОДЗ: значение ${formatNum(x)} удовлетворяет условию $x ≠ ${-b}$.`
     ];
 
     return {
@@ -479,7 +479,7 @@
       answer: x,
       displayAnswer: formatNum(x),
       solutionSteps,
-      hint: 'Вспомни основное свойство пропорции: a/b = c $\→$ b = a/c (при условии b ≠ 0).'
+      hint: 'Вспомни основное свойство пропорции: a/b = c → b = a/c (при условии b ≠ 0).'
     };
   }
 
@@ -500,7 +500,7 @@
     const questionHtml = `<div class="math-expr"><span class="expr-line">${fracHtml(`x ${formatSigned(-a)}`, `x ${formatSigned(b)}`)} = ${fracHtml(c, d)}</span></div>`;
 
     const solutionSteps = [
-      `ОДЗ: <em>x </em>{formatSigned(b)} \≠ 0 \→ x \≠ ${-b}$.`,
+      `ОДЗ: <em>x</em> ${formatSigned(b)} ≠ 0 → <em>x</em> ≠ ${-b}.`,
       `Применяем правило пропорции «крест-накрест»:<br>` +
       `${d} · (x ${formatSigned(-a)}) = ${c} · (x ${formatSigned(b)})`,
       `Раскрываем скобки:<br>` +
@@ -509,7 +509,7 @@
       `${d}x − ${c}x = ${c * b} + ${d * a}<br>` +
       `${d - c}x = ${c * b + d * a}`,
       `$x = ${c * b + d * a} / ${d - c} = $ <strong>${formatNum(x)}</strong>`,
-      `Корень удовлетворяет ОДЗ ($x \≠ ${-b}$).`
+      `Корень удовлетворяет ОДЗ ($x ≠ ${-b}$).`
     ];
 
     return {
@@ -644,7 +644,7 @@
       `${diff} · (x + y) = ${productDiff}`,
       `Отсюда находим сумму корней:<br>` +
       `x + y = ${productDiff} / ${diff} = <strong>${sum}</strong>`,
-      !askSum ? `Складывая уравнения (x − y = ${diff}) и (x + y = ${sum}), получаем 2x = ${diff + sum} $\→$ x = ${x}, y = ${y}.<br>` +
+      !askSum ? `Складывая уравнения (x − y = ${diff}) и (x + y = ${sum}), получаем 2x = ${diff + sum} → x = ${x}, y = ${y}.<br>` +
       `Произведение: xy = ${x} · ${y} = <strong>${answer}</strong>.` : ''
     ].filter(Boolean);
 
@@ -670,8 +670,8 @@
       solutionSteps: [
         'Раскрываем скобки: x − 3 + 21x = 2.',
         'Приводим подобные: 22x − 3 = 2.',
-        '22x = 5 $\→$ x = 5 / 22 ? Нет: 1x + 21x = 22x; 2 + 3 = 5... В прототипе Решу ОГЭ 4(x - 8) = -5 или x - 2(3 - x) = 4.',
-        'В данном уравнении: x = 5/22... Чтобы ответ был конечной десятичной дробью, приведем к каноническому виду ОГЭ: 4(x − 8) = −5 $\→$ x = 6,75.'
+        '22x = 5 → x = 5 / 22 ? Нет: 1x + 21x = 22x; 2 + 3 = 5... В прототипе Решу ОГЭ 4(x - 8) = -5 или x - 2(3 - x) = 4.',
+        'В данном уравнении: x = 5/22... Чтобы ответ был конечной десятичной дробью, приведем к каноническому виду ОГЭ: 4(x − 8) = −5 → x = 6,75.'
       ]
     },
     {
@@ -697,7 +697,7 @@
       displayAnswer: '-8',
       solutionSteps: [
         'x² = 64.',
-        'x = ±√64 $\→$ x₁ = −8, x₂ = 8.',
+        'x = ±√64 → x₁ = −8, x₂ = 8.',
         'Меньший из корней равен <strong>−8</strong>.'
       ]
     },
@@ -724,9 +724,9 @@
       answer: -10,
       displayAnswer: '-10',
       solutionSteps: [
-        'ОДЗ: x + 5 ≠ 0 $\→$ x ≠ −5.',
+        'ОДЗ: x + 5 ≠ 0 → x ≠ −5.',
         'Делим обе части уравнения на 12:<br>1 / (x + 5) = −1 / 5.',
-        'x + 5 = −5 $\→$ x = −5 − 5 = <strong>−10</strong>.',
+        'x + 5 = −5 → x = −5 − 5 = <strong>−10</strong>.',
         'Проверка ОДЗ: −10 ≠ −5.'
       ]
     },
@@ -748,8 +748,8 @@
       answer: 4,
       displayAnswer: '4',
       solutionSteps: [
-        'Складываем два уравнения системы почленно:<br>(2x + y) + (x − y) = 7 + 2 $\→$ 3x = 9 $\→$ x = 3.',
-        'Подставляем x = 3 во второе уравнение: 3 − y = 2 $\→$ y = 1.',
+        'Складываем два уравнения системы почленно:<br>(2x + y) + (x − y) = 7 + 2 → 3x = 9 → x = 3.',
+        'Подставляем x = 3 во второе уравнение: 3 − y = 2 → y = 1.',
         'Находим сумму: x + y = 3 + 1 = <strong>4</strong>.'
       ]
     }

@@ -114,9 +114,15 @@
      */
     function renderTeX(tex, displayMode = false) {
         if (!tex) return '';
+        let cleanTex = String(tex)
+            .replace(/−/g, '-')
+            .replace(/\\?≠/g, '\\ne ')
+            .replace(/\\?≤/g, '\\le ')
+            .replace(/\\?≥/g, '\\ge ')
+            .replace(/\\?→/g, '\\to ');
         if (typeof window.katex !== 'undefined') {
             try {
-                return window.katex.renderToString(tex, {
+                return window.katex.renderToString(cleanTex, {
                     displayMode: displayMode,
                     output: 'html', // Отключает дублирующий слой MathML, предотвращая сдвоенный текст
                     throwOnError: false,
@@ -124,10 +130,10 @@
                 });
             } catch (e) {
                 console.warn('KaTeX render warning:', e);
-                return tex;
+                return cleanTex;
             }
         }
-        return tex;
+        return cleanTex;
     }
 
     /**
@@ -194,6 +200,9 @@
                 return tex ? renderTeX(tex, false) : m;
             });
         }
+
+        // Очистка устаревших битых TeX-последовательностей из старых сохранений
+        result = result.replace(/\$\\→\$/g, '→').replace(/\\→/g, '→').replace(/\\≠/g, '≠');
 
         // Поддержка $...$ и $$...$$ внутри смешанного текста (вне <code> и уже готового .katex)
         result = result.replace(/\$\$([\s\S]+?)\$\$/g, (m, tex) => renderTeX(tex.trim(), true));

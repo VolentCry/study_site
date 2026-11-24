@@ -1493,7 +1493,14 @@ async function initParentDashboard(user) {
                 const unpaid = dash.kpi.unpaidLessons || 0;
                 kpiUnpaid.textContent = unpaid;
                 if (kpiUnpaidCard) {
-                    kpiUnpaidCard.classList.toggle('has-unpaid', unpaid > 0);
+                    kpiUnpaidCard.classList.remove('has-unpaid', 'unpaid-yellow', 'unpaid-orange', 'unpaid-red');
+                    if (unpaid >= 5) {
+                        kpiUnpaidCard.classList.add('unpaid-red');
+                    } else if (unpaid >= 2) {
+                        kpiUnpaidCard.classList.add('unpaid-orange');
+                    } else {
+                        kpiUnpaidCard.classList.add('unpaid-yellow');
+                    }
                 }
                 const kpiHint = document.getElementById('kpi-unpaid-hint');
                 if (kpiHint) {

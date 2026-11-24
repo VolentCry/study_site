@@ -6890,9 +6890,18 @@ dialog::backdrop {
     color: #f59e0b;
     border: 1px solid rgba(245, 158, 11, 0.25);
 }
-.kpi-unpaid.has-unpaid {
-    border-color: rgba(245, 158, 11, 0.4);
-    background: linear-gradient(145deg, var(--surface-card, #151b2b) 0%, rgba(245, 158, 11, 0.06) 100%);
+.kpi-unpaid.has-unpaid,
+.kpi-unpaid.unpaid-yellow {
+    border-color: rgba(234, 179, 8, 0.5);
+    background: linear-gradient(145deg, var(--surface-card, #151b2b) 0%, rgba(234, 179, 8, 0.06) 100%);
+}
+.kpi-unpaid.unpaid-orange {
+    border-color: rgba(249, 115, 22, 0.55);
+    background: linear-gradient(145deg, var(--surface-card, #151b2b) 0%, rgba(249, 115, 22, 0.08) 100%);
+}
+.kpi-unpaid.unpaid-red {
+    border-color: rgba(239, 68, 68, 0.6);
+    background: linear-gradient(145deg, var(--surface-card, #151b2b) 0%, rgba(239, 68, 68, 0.09) 100%);
 }
 .parent-kpi-content {
     display: flex;
@@ -7300,9 +7309,18 @@ dialog::backdrop {
     border-color: #e2e8f0;
     color: #0f172a;
 }
-[data-theme="light"] .kpi-unpaid.has-unpaid {
-    background: linear-gradient(145deg, #ffffff 0%, rgba(245, 158, 11, 0.08) 100%);
-    border-color: rgba(245, 158, 11, 0.35);
+[data-theme="light"] .kpi-unpaid.has-unpaid,
+[data-theme="light"] .kpi-unpaid.unpaid-yellow {
+    background: linear-gradient(145deg, #ffffff 0%, rgba(234, 179, 8, 0.09) 100%);
+    border-color: rgba(234, 179, 8, 0.55);
+}
+[data-theme="light"] .kpi-unpaid.unpaid-orange {
+    background: linear-gradient(145deg, #ffffff 0%, rgba(249, 115, 22, 0.1) 100%);
+    border-color: rgba(249, 115, 22, 0.55);
+}
+[data-theme="light"] .kpi-unpaid.unpaid-red {
+    background: linear-gradient(145deg, #ffffff 0%, rgba(239, 68, 68, 0.09) 100%);
+    border-color: rgba(239, 68, 68, 0.55);
 }
 
 /* Responsive Breakpoints */
