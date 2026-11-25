@@ -623,8 +623,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const isTeacher = isTeacherUser();
         const fbCard = document.getElementById('latest-teacher-feedback-card');
+        const billingCard = document.getElementById('student-billing-card');
         if (isTeacher) {
             if (fbCard) fbCard.style.display = 'none';
+            if (billingCard) billingCard.style.display = 'none';
             await fetchMonthSchedule();
             if (studentHomeworksList) {
                 const hwCard = studentHomeworksList.closest('.study-card');
@@ -680,6 +682,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchStudentBilling() {
+        if (isTeacherUser()) {
+            const card = document.getElementById('student-billing-card');
+            if (card) card.style.display = 'none';
+            return;
+        }
         try {
             const res = await fetch('/api/student/billing', { cache: 'no-store' });
             const data = await res.json();
@@ -695,11 +702,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.getElementById('student-billing-card');
         if (!card) return;
 
-        // Если в качестве оплаты выбран Ребёнок, то у него в профиле в разделе "Учёба и расписание"
-        // под карточкой с календарём будет отображено сколько занятий прошло, сколько оплачено,
-        // цена одного занятия и общая задолженность.
-        // Если выбран Родитель (или нет данных), карточка скрывается.
-        if (!billing || billing.payer !== 'student') {
+        // Карточка учёта занятий и оплаты предназначена только для учеников (если плательщик — сам ученик).
+        // Для учителей и администраторов, а также при оплате родителем или отсутствии данных карточка скрывается.
+        if (isTeacherUser() || !billing || billing.payer !== 'student') {
             card.style.display = 'none';
             return;
         }
