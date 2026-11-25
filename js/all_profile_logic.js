@@ -1476,6 +1476,7 @@ async function initParentDashboard(user) {
     const kpiPaid = document.getElementById('kpi-paid-count');
     const kpiUnpaid = document.getElementById('kpi-unpaid-count');
     const kpiUnpaidCard = document.getElementById('kpi-unpaid-card');
+    const kpiLessonPrice = document.getElementById('kpi-lesson-price');
     const lessonsCounter = document.getElementById('parent-lessons-counter');
     const scheduleContent = document.getElementById('parent-schedule-content');
     const hwCounter = document.getElementById('parent-hw-counter');
@@ -1517,6 +1518,14 @@ async function initParentDashboard(user) {
                 const kpiHint = document.getElementById('kpi-unpaid-hint');
                 if (kpiHint) {
                     kpiHint.textContent = unpaid > 0 ? 'К оплате' : 'Задолженность отсутствует';
+                }
+            }
+            if (kpiLessonPrice) {
+                if (dash.linked && dash.kpi.lessonPrice != null) {
+                    const price = Math.max(0, parseInt(dash.kpi.lessonPrice, 10) || 0);
+                    kpiLessonPrice.textContent = `${price.toLocaleString('ru-RU')} ₽`;
+                } else {
+                    kpiLessonPrice.textContent = '—';
                 }
             }
         }
