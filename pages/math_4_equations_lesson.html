@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Уравнения через «весы» · 4 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body {
+      background-color: var(--paper); color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6;
+      background-image: radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%), radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn { min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700; border-radius: 8px; background: var(--paper-light); }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .lesson-shell { max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px; display: flex; flex-direction: column; gap: 28px; }
+    .lesson-hero { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+    .lesson-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold)); }
+    .eyebrow { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .toc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .toc-pill { font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo); }
+    .concept-card { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px; }
+    .concept-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px; }
+
+    /* SCALES LAB */
+    .scales-lab { background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+    .scales-beam { display: flex; align-items: flex-end; justify-content: center; gap: 16px; width: 100%; max-width: 520px; flex-wrap: wrap; }
+    .scale-pan { flex: 1; min-width: 190px; background: #fff; border: 2px solid var(--indigo); border-radius: 12px; padding: 14px; text-align: center; display: flex; flex-direction: column; gap: 8px; min-height: 92px; justify-content: center; }
+    .scale-eq { font-size: 26px; font-weight: 800; color: var(--vermilion); padding-bottom: 24px; }
+    .pan-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+    .pan-box { padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 16px; }
+    .pan-x { background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion); }
+    .pan-num { background: var(--indigo-soft); border: 1px solid var(--line); color: var(--indigo-dark); }
+    .scale-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .btn-primary-sm { padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; background: var(--indigo); color: #fff; }
+    .btn-outline-sm { padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700; border: 1px solid var(--line); color: var(--indigo); background: #fff; }
+
+    .trap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .trap-box { border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px; background: var(--paper-light); display: flex; flex-direction: column; gap: 8px; }
+    .trap-box.warn { background: var(--vermilion-light); border-color: var(--vermilion-border); }
+    .trap-box.good { background: var(--green-light); border-color: var(--green-border); }
+
+    .quiz-item { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light); display: flex; flex-direction: column; gap: 12px; }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 700; color: var(--indigo); }
+    .quiz-opt:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta { background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff; border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">4 класс · Конспект урока</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_4.html">← Назад к 4 классу</a>
+      <a class="nav-btn" href="../math_moduls/equations_trainer_easy.html">Тренажёр уравнений →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Алгебра · 4 класс · Интерактивный разбор</span>
+      <h1>Уравнения через «весы»: почему при переносе меняется знак</h1>
+      <p>Уравнение — это не магия с «переносом чисел», а обычные равновесные весы. Чтобы весы не перекосились, с обеими чашами нужно делать абсолютно одно и то же действие.</p>
+      <div class="toc-pills">
+        <a class="toc-pill" href="#sec-scales">1. Живые весы равновесия</a>
+        <a class="toc-pill" href="#sec-traps">2. Ловушки с вычитанием и делением</a>
+        <a class="toc-pill" href="#sec-quiz">3. Проверь понимание</a>
+      </div>
+    </header>
+
+    <section class="concept-card" id="sec-scales">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Снимите гирю с обеих чаш — и $x$ останется один!</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Главный секрет:</strong> у нас на левой чаше лежит неизвестный мешок $x$ и гиря $+5\text{ кг}$, а на правой — $12\text{ кг}$. Чтобы узнать вес $x$, уберите по $5\text{ кг}$ с каждой стороны (вычтите $5$ слева и справа). Вот откуда берётся правило «перенесли $+5$ через равно и получили $-5$»!
+      </div>
+
+      <div class="scales-lab">
+        <div id="scale-equation" style="font-size: 20px; font-weight: 800; color: var(--indigo-dark);"></div>
+        <div class="scales-beam" id="scales-beam"></div>
+        <div class="scale-btns">
+          <button type="button" class="btn-primary-sm" id="scale-step-btn">Убрать 5 с обеих чаш (−5)</button>
+          <button type="button" class="btn-outline-sm" id="scale-reset-btn">↺ Вернуть обратно</button>
+        </div>
+        <p id="scale-note" style="font-size: 14px; color: var(--muted); text-align: center;"></p>
+      </div>
+    </section>
+
+    <section class="concept-card" id="sec-traps">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Где чаще всего путаются: $20 - x = 8$ и $24 : x = 6$</h2>
+        </div>
+      </div>
+      <div class="trap-grid">
+        <div class="trap-box warn">
+          <strong style="color:var(--vermilion);">Неизвестное вычитаемое: $20 - x = 8$</strong>
+          <p style="font-size: 14px;">Было $20$, забрали $x$, осталось $8$. Сколько забрали? Не $20 + 8 = 28$ (тогда получится $20 - 28$!), а <strong>$20 - 8 = 12$</strong>.</p>
+          <p style="font-size: 13.5px; color: var(--muted);">Проверьте простым примером: $5 - x = 2 \implies x = 3$.</p>
+        </div>
+        <div class="trap-box good">
+          <strong style="color:var(--green);">Неизвестный делитель: $24 : x = 6$</strong>
+          <p style="font-size: 14px;">$24$ яблока раздали $x$ детям по $6$ штук каждому. Сколько детей? Делим: <strong>$x = 24 : 6 = 4$</strong>.</p>
+          <p style="font-size: 13.5px; color: var(--muted);">Не перепутайте с $x : 4 = 6$, где ищем целое ($x = 6 \cdot 4 = 24$).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card" id="sec-quiz">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Проверьте понимание в 3 вопросах</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. На весах лежит $x + 9 = 17$. Что нужно сделать с обеими чашами, чтобы найти $x$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">Вычесть $9$ из обеих сторон ($x = 8$)</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">Прибавить $9$ к обеим сторонам ($x = 26$)</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Найдите корень уравнения $35 - x = 14$:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$x = 49$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$x = 21$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$x = 14$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="3">
+        <div class="quiz-q">3. Решите уравнение $42 : x = 7$:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$x = 6$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$x = 294$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-3"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Попробуйте решить на тренажёре уравнений</h3>
+        <p>Закрепите навык на простых и составных уравнениях с проверкой.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/equations_trainer_easy.html">Лёгкий уровень →</a>
+        <a class="cta-btn secondary" href="../math_moduls/equations_trainer_medium.html">Средний уровень</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) { return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s; }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = []; let n;
+        while ((n = walker.nextNode())) {
+          if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) nodes.push(n);
+        }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      let solved = false;
+      const eqEl = document.getElementById('scale-equation');
+      const beamEl = document.getElementById('scales-beam');
+      const noteEl = document.getElementById('scale-note');
+      const stepBtn = document.getElementById('scale-step-btn');
+
+      function renderScales() {
+        if (!solved) {
+          eqEl.innerHTML = tex('x + 5 = 12');
+          beamEl.innerHTML = `
+            <div class="scale-pan">
+              <div class="pan-items"><span class="pan-box pan-x">x</span><span style="font-weight:800;">+</span><span class="pan-box pan-num">5</span></div>
+              <small style="color:var(--muted);">Левая чаша</small>
+            </div>
+            <div class="scale-eq">=</div>
+            <div class="scale-pan">
+              <div class="pan-items"><span class="pan-box pan-num">7</span><span style="font-weight:800;">+</span><span class="pan-box pan-num">5</span></div>
+              <small style="color:var(--muted);">Правая чаша (12)</small>
+            </div>
+          `;
+          noteEl.textContent = 'Сейчас чаши в равновесии. Уберём гирю «5» с каждой стороны.';
+          stepBtn.disabled = false;
+          stepBtn.style.opacity = '1';
+        } else {
+          eqEl.innerHTML = tex('x = 12 - 5 = 7');
+          beamEl.innerHTML = `
+            <div class="scale-pan" style="border-color: var(--green);">
+              <div class="pan-items"><span class="pan-box pan-x">x</span></div>
+              <small style="color:var(--green); font-weight:700;">Остался один мешок x!</small>
+            </div>
+            <div class="scale-eq">=</div>
+            <div class="scale-pan" style="border-color: var(--green);">
+              <div class="pan-items"><span class="pan-box pan-num">7</span></div>
+              <small style="color:var(--green); font-weight:700;">И осталось ровно 7</small>
+            </div>
+          `;
+          noteEl.textContent = 'Мы убрали по 5 кг с обеих чаш — равновесие сохранилось, и x сразу стал равен 7!';
+          stepBtn.disabled = true;
+          stepBtn.style.opacity = '0.5';
+        }
+      }
+
+      stepBtn.onclick = () => { solved = true; renderScales(); };
+      document.getElementById('scale-reset-btn').onclick = () => { solved = false; renderScales(); };
+
+      const quizExplanations = {
+        1: { ok: 'Верно! Вычитаем 9 с обеих сторон: x = 17 − 9 = 8.', wrong1: 'Если прибавить 9, то слева станет x + 18, и мешок x не освободится.' },
+        2: { ok: 'Точно! Чтобы найти вычитаемое, вычитаем остаток из 35: x = 35 − 14 = 21.', wrong1: 'Проверь подстановкой: 35 − 49 не равно 14!', wrong2: 'Если x = 14, то 35 − 14 = 21 ≠ 14.' },
+        3: { ok: 'Правильно! Делитель равен делимому, делённому на частное: 42 : 7 = 6.', wrong1: 'Умножать нужно, когда x стоит на месте делимого (x : 42 = 7), а здесь ищем делитель.' }
+      };
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      renderScales();
+    })();
+  </script>
+</body>
+</html>

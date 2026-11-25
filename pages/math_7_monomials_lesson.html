@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Одночлены · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16);
+      --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06);
+      --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion);
+      font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700;
+      border-radius: 8px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+    .lesson-shell {
+      max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+
+    .lesson-hero {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .lesson-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold));
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light);
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .lesson-hero h1 {
+      font: 900 clamp(26px, 4vw, 36px)/1.2 'Lora', serif;
+      color: var(--indigo-dark); margin-bottom: 10px;
+    }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .toc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .toc-pill {
+      font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+      background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo); transition: all .2s;
+    }
+    .toc-pill:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+
+    .concept-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px;
+    }
+    .concept-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .concept-num {
+      font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .concept-head h2 {
+      font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark);
+    }
+
+    .intuition-box {
+      background: var(--gold-light); border-left: 4px solid var(--gold);
+      padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px;
+    }
+    .intuition-box strong { color: var(--indigo-dark); }
+
+    /* DETECTOR GRID */
+    .detector-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+    }
+    .expr-chip {
+      padding: 14px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper-light);
+      font-size: 17px; font-weight: 700; color: var(--indigo-dark); text-align: center;
+      transition: all .2s; display: flex; flex-direction: column; gap: 6px; align-items: center;
+    }
+    .expr-chip:hover { border-color: var(--indigo); transform: translateY(-2px); background: #fff; }
+    .expr-chip.is-yes { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .expr-chip.is-no { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .detector-note {
+      padding: 12px 16px; border-radius: 10px; background: var(--paper-light); border: 1px solid var(--line);
+      font-size: 14px; min-height: 46px; display: flex; align-items: center;
+    }
+
+    /* STANDARD FORM BUILDER */
+    .example-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ex-btn {
+      padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff;
+      font-size: 13px; font-weight: 700; color: var(--indigo); transition: all .15s;
+    }
+    .ex-btn.active { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+
+    .builder-stage {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .step-row {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .step-label { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .step-math { font-size: 17px; font-weight: 700; color: var(--indigo-dark); }
+    .kpi-pair { display: flex; flex-wrap: wrap; gap: 12px; }
+    .kpi-tag {
+      padding: 8px 14px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      background: #fff; border: 1px solid var(--line);
+    }
+
+    .trap-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+    }
+    .trap-box {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px; background: var(--paper-light);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .trap-box.good { border-color: var(--green-border); background: var(--green-light); }
+    .trap-box.warn { border-color: var(--vermilion-border); background: var(--vermilion-light); }
+    .trap-title { font-weight: 800; font-size: 14px; }
+
+    /* QUIZ */
+    .quiz-item {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff;
+      font-size: 14px; font-weight: 700; color: var(--indigo); transition: all .15s;
+    }
+    .quiz-opt:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; line-height: 1.5; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff;
+      border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: var(--shadow-md);
+    }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn {
+      padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      background: #fff; color: var(--indigo-dark); transition: transform .15s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">7 класс · Конспект урока</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_7.html">← Назад к 7 классу</a>
+      <a class="nav-btn" href="../math_moduls/monomials_trainer.html">Тренажёр одночленов →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Алгебра · 7 класс · Интерактивный разбор</span>
+      <h1>Одночлены: конструктор стандартного вида</h1>
+      <p>Учимся безошибочно отличать одночлены от других выражений, приводить «разбросанные» множители к стандартному виду, находить коэффициент и степень, а также не ошибаться при возведении в степень.</p>
+      <div class="toc-pills">
+        <a class="toc-pill" href="#sec-detect">1. Детектор: одночлен или нет?</a>
+        <a class="toc-pill" href="#sec-builder">2. Сборка стандартного вида</a>
+        <a class="toc-pill" href="#sec-traps">3. Ловушки степени и скобок</a>
+        <a class="toc-pill" href="#sec-quiz">4. Проверь понимание</a>
+      </div>
+    </header>
+
+    <!-- SECTION 1: DETECTOR -->
+    <section class="concept-card" id="sec-detect">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Главный признак одночлена: только умножение!</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Идея простыми словами:</strong> одночлен — это «монолитный кирпичик», внутри которого числа и буквы в натуральных степенях только <strong>перемножаются</strong>. Как только появляется знак `+`, `−` между частями или деление на переменную в знаменателе — это уже НЕ одночлен. Нажмите на любую карточку, чтобы проверить!
+      </div>
+
+      <div class="detector-grid" id="detector-grid"></div>
+      <div class="detector-note" id="detector-note">Нажмите на любую карточку выше — покажем разбор, является ли выражение одночленом и почему.</div>
+    </section>
+
+    <!-- SECTION 2: STANDARD FORM BUILDER -->
+    <section class="concept-card" id="sec-builder">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Как привести выражение к стандартному виду (сортировка «по полкам»)</h2>
+        </div>
+      </div>
+
+      <p>В стандартном виде одночлена на первом месте стоит ровно <strong>одно число</strong> (коэффициент), а каждая буква встречается <strong>ровно один раз</strong> (в нужной степени). Выберите пример, чтобы увидеть пошаговую сборку:</p>
+
+      <div class="example-tabs">
+        <button type="button" class="ex-btn active" data-ex="0">$3x^2y \cdot (-2xy^3)$</button>
+        <button type="button" class="ex-btn" data-ex="1">$0,5a^3b \cdot 4ab^2$</button>
+        <button type="button" class="ex-btn" data-ex="2">$(-2m^2n)^3$</button>
+      </div>
+
+      <div class="builder-stage" id="builder-stage"></div>
+    </section>
+
+    <!-- SECTION 3: TRAPS -->
+    <section class="concept-card" id="sec-traps">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 03</span>
+          <h2>Три главные ловушки темы</h2>
+        </div>
+      </div>
+
+      <div class="trap-grid">
+        <div class="trap-box warn">
+          <div class="trap-title" style="color: var(--vermilion);">Ловушка 1. Степень буквы без числа сверху</div>
+          <p style="font-size: 14px;">У выражения $5x^3y$ степень равна не $3$, а <strong>$3 + 1 = 4$</strong>! Буква $y$ без показателя — это на самом деле $y^1$.</p>
+          <p style="font-size: 13.5px; color: var(--muted);">А у обычного числа (например, $-12$) степень равна $0$.</p>
+        </div>
+
+        <div class="trap-box warn">
+          <div class="trap-title" style="color: var(--vermilion);">Ловушка 2. Забыли возвести число в степень</div>
+          <p style="font-size: 14px;">При возведении $(-2x^3)^2$ в квадрат возводится <strong>каждый</strong> множитель: и $-2$, и $x^3$.</p>
+          <p style="font-size: 13.5px; color: var(--muted);">Верно: $(-2)^2 \cdot (x^3)^2 = 4x^6$ (не $2x^6$ и не $-4x^6$!).</p>
+        </div>
+
+        <div class="trap-box good">
+          <div class="trap-title" style="color: var(--green);">Правило 3. Подобные одночлены</div>
+          <p style="font-size: 14px;">Складывать можно только одночлены с <strong>абсолютно одинаковой</strong> буквенной частью: $7a^2b - 3a^2b = 4a^2b$.</p>
+          <p style="font-size: 13.5px; color: var(--muted);">$a^2b$ и $ab^2$ складывать нельзя — у них разные степени при буквах!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: QUIZ -->
+    <section class="concept-card" id="sec-quiz">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Проверьте понимание в 3 вопросах</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Какова степень одночлена $-7x^4yz^2$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$6$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$7$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$-7$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Возведите одночлен в степень: $(-3a^2b)^3$</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$-9a^6b^3$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$-27a^6b^3$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$27a^5b^3$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="3">
+        <div class="quiz-q">3. Какое из выражений НЕ является одночленом?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$\frac{2}{5}x^3y$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$\frac{2}{x} + 1$ и $\frac{5a}{b}$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$-0{,}4$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-3"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Закрепите навык на тренажёрах</h3>
+        <p>Приводите одночлены к стандартному виду, считайте степени и переходите к многочленам.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/monomials_trainer.html">Тренажёр одночленов →</a>
+        <a class="cta-btn secondary" href="../math_moduls/polynomials_trainer.html">Тренажёр многочленов</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s, displayMode) {
+        if (window.StudyMath && window.StudyMath.renderTeX) {
+          return window.StudyMath.renderTeX(s, !!displayMode);
+        }
+        return s;
+      }
+
+      function renderAllInlineTex(root) {
+        const el = root || document.body;
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.parentElement && !node.parentElement.closest('.katex, script, style, code')) {
+            if (node.nodeValue.includes('$')) textNodes.push(node);
+          }
+        }
+        textNodes.forEach(tn => {
+          const val = tn.nodeValue;
+          if (!/\$[^$\n]+\$/.test(val)) return;
+          const span = document.createElement('span');
+          span.innerHTML = val.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m, false));
+          tn.parentNode.replaceChild(span, tn);
+        });
+      }
+
+      // 1. Detector items
+      const detectorItems = [
+        { expr: '5x^2y', ok: true, reason: '✅ Да, это одночлен: число 5, x² и y только перемножаются.' },
+        { expr: 'a + b', ok: false, reason: '❌ Нет: здесь есть сложение, это уже двучлен (многочлен).' },
+        { expr: '\\frac{7}{x}', ok: false, reason: '❌ Нет: есть деление на переменную x в знаменателе.' },
+        { expr: '-0{,}5', ok: true, reason: '✅ Да, любое отдельное число тоже считается одночленом (степени 0).' },
+        { expr: '\\frac{x^2y}{3}', ok: true, reason: '✅ Да! Деление на число 3 — это то же самое, что умножение на дробь 1/3.' },
+        { expr: '(2x)^3', ok: true, reason: '✅ Да, при раскрытии скобок получится одночлен 8x³.' }
+      ];
+
+      const detectorGrid = document.getElementById('detector-grid');
+      const detectorNote = document.getElementById('detector-note');
+
+      detectorItems.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'expr-chip';
+        btn.innerHTML = tex(item.expr, false);
+        btn.addEventListener('click', () => {
+          btn.classList.remove('is-yes', 'is-no');
+          btn.classList.add(item.ok ? 'is-yes' : 'is-no');
+          detectorNote.textContent = item.reason;
+        });
+        detectorGrid.appendChild(btn);
+      });
+
+      // 2. Standard form builder
+      const examples = [
+        {
+          step1: '3 \\cdot (-2) \\cdot (x^2 \\cdot x^1) \\cdot (y^1 \\cdot y^3)',
+          step2: '-6 \\cdot x^{2+1} \\cdot y^{1+3}',
+          result: '-6x^3y^4',
+          coeff: '-6',
+          degree: '3 + 4 = 7'
+        },
+        {
+          step1: '(0{,}5 \\cdot 4) \\cdot (a^3 \\cdot a^1) \\cdot (b^1 \\cdot b^2)',
+          step2: '2 \\cdot a^{3+1} \\cdot b^{1+2}',
+          result: '2a^4b^3',
+          coeff: '2',
+          degree: '4 + 3 = 7'
+        },
+        {
+          step1: '(-2)^3 \\cdot (m^2)^3 \\cdot (n^1)^3',
+          step2: '-8 \\cdot m^{2 \\cdot 3} \\cdot n^{1 \\cdot 3}',
+          result: '-8m^6n^3',
+          coeff: '-8',
+          degree: '6 + 3 = 9'
+        }
+      ];
+
+      const builderStage = document.getElementById('builder-stage');
+      function renderBuilder(idx) {
+        const ex = examples[idx];
+        builderStage.innerHTML = `
+          <div class="step-row">
+            <span class="step-label">Шаг 1. Группируем числа к числам, одинаковые буквы к одинаковым буквам</span>
+            <div class="step-math">${tex(ex.step1, false)}</div>
+          </div>
+          <div class="step-row">
+            <span class="step-label">Шаг 2. Применяем свойства степеней</span>
+            <div class="step-math">${tex(ex.step2, false)}</div>
+          </div>
+          <div class="step-row" style="border-color: var(--indigo);">
+            <span class="step-label" style="color: var(--vermilion);">Итог: Стандартный вид</span>
+            <div class="step-math" style="font-size: 20px;">${tex(ex.result, false)}</div>
+          </div>
+          <div class="kpi-pair">
+            <span class="kpi-tag">Коэффициент: <strong style="color:var(--vermilion);">${ex.coeff}</strong></span>
+            <span class="kpi-tag">Степень одночлена: <strong style="color:var(--indigo);">${ex.degree}</strong></span>
+          </div>
+        `;
+      }
+
+      document.querySelectorAll('.ex-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.ex-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderBuilder(parseInt(btn.dataset.ex, 10));
+        });
+      });
+      renderBuilder(0);
+
+      // 3. Quiz
+      const quizExplanations = {
+        1: {
+          ok: 'Верно! Складываем показатели всех переменных: 4 (у x) + 1 (у y) + 2 (у z) = 7.',
+          wrong1: 'Почти! Вы забыли степень 1 у буквы y (y = y¹). Правильно: 4 + 1 + 2 = 7.',
+          wrong2: '−7 — это числовой коэффициент перед буквами, он в степень одночлена не входит.'
+        },
+        2: {
+          ok: 'Точно! (−3)³ = −27, (a²)³ = a⁶, b³ — получаем −27a⁶b³.',
+          wrong1: 'Осторожно: (−3)³ = (−3)·(−3)·(−3) = −27, а не −9!',
+          wrong2: 'Отрицательное число в нечётной степени сохраняет минус, а при возведении (a²)³ показатели перемножаются (2·3 = 6).'
+        },
+        3: {
+          ok: 'Правильно! В обоих случаях есть деление на переменную в знаменателе (и сложение), поэтому это не одночлены.',
+          wrong1: 'Это обычный одночлен с дробным числовым коэффициентом 2/5.',
+          wrong2: 'Любое отдельное число считается одночленом нулевой степени.'
+        }
+      };
+
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            const isOk = ans === 'ok';
+            btn.classList.add(isOk ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${isOk ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Свойства степеней · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16);
+      --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06);
+      --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion);
+      font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700;
+      border-radius: 8px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+    /* SHELL */
+    .lesson-shell {
+      max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+
+    /* HERO */
+    .lesson-hero {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .lesson-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold));
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light);
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .lesson-hero h1 {
+      font: 900 clamp(26px, 4vw, 36px)/1.2 'Lora', serif;
+      color: var(--indigo-dark); margin-bottom: 10px;
+    }
+    .lesson-hero p {
+      color: var(--muted); font-size: 15.5px; max-width: 72ch;
+    }
+    .toc-pills {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+    }
+    .toc-pill {
+      font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+      background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo);
+      transition: all .2s;
+    }
+    .toc-pill:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+
+    /* SECTION CARDS */
+    .concept-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px;
+    }
+    .concept-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .concept-num {
+      font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .concept-head h2 {
+      font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark);
+    }
+
+    .intuition-box {
+      background: var(--gold-light); border-left: 4px solid var(--gold);
+      padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px;
+    }
+    .intuition-box strong { color: var(--indigo-dark); }
+
+    /* INTERACTIVE PLAYGROUND 1: MULTIPLY & POWER OF POWER */
+    .lab-box {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 20px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .lab-controls {
+      display: flex; flex-wrap: wrap; gap: 18px; align-items: center;
+    }
+    .control-group {
+      display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 700; color: var(--indigo);
+    }
+    .stepper {
+      display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px;
+      background: #fff; overflow: hidden;
+    }
+    .stepper button {
+      width: 30px; height: 30px; font-size: 16px; font-weight: 700; color: var(--indigo);
+      display: grid; place-items: center; transition: background .15s;
+    }
+    .stepper button:hover { background: var(--indigo-soft); }
+    .stepper span {
+      min-width: 28px; text-align: center; font-size: 14px; font-weight: 800; color: var(--vermilion);
+    }
+
+    .visual-stage {
+      background: #fff; border: 1px dashed rgba(38, 63, 97, 0.25); border-radius: 12px;
+      padding: 18px; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center;
+    }
+    .factors-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;
+    }
+    .factor-group {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 10px;
+      font-weight: 700; font-size: 15px;
+    }
+    .factor-group.grp-a { background: rgba(38, 63, 97, 0.08); border: 1px solid rgba(38, 63, 97, 0.22); color: var(--indigo-dark); }
+    .factor-group.grp-b { background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion); }
+    .factor-chip {
+      display: inline-block; padding: 2px 8px; border-radius: 6px; background: #fff;
+      border: 1px solid rgba(0,0,0,0.08); font-size: 14px;
+    }
+    .formula-result {
+      font-size: 19px; font-weight: 700; color: var(--indigo-dark); margin-top: 4px;
+    }
+
+    /* LADDER: WHY a^0 = 1 */
+    .ladder-wrap {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .ladder-actions {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .btn-primary-sm {
+      padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700;
+      background: var(--indigo); color: #fff; transition: transform .15s, background .2s;
+    }
+    .btn-primary-sm:hover { background: var(--indigo-dark); transform: translateY(-1px); }
+    .btn-outline-sm {
+      padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700;
+      border: 1px solid var(--line); color: var(--indigo); background: #fff;
+    }
+    .btn-outline-sm:hover { border-color: var(--vermilion); color: var(--vermilion); }
+
+    .ladder-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 10px;
+    }
+    .ladder-step {
+      padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #fff;
+      text-align: center; transition: all .25s; opacity: 0.45;
+    }
+    .ladder-step.active {
+      opacity: 1; border-color: var(--indigo); box-shadow: var(--shadow-sm); transform: translateY(-2px);
+    }
+    .ladder-step.highlight-zero {
+      border-color: var(--vermilion); background: var(--vermilion-light);
+    }
+    .ladder-step .step-exp { font-size: 16px; font-weight: 700; color: var(--indigo-dark); }
+    .ladder-step .step-val { font-size: 15px; font-weight: 800; color: var(--vermilion); margin-top: 4px; }
+    .ladder-step .step-op { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+    /* TRAP COMPARISON */
+    .trap-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+    }
+    .trap-box {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px; background: var(--paper-light);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .trap-box.good { border-color: var(--green-border); background: var(--green-light); }
+    .trap-box.warn { border-color: var(--vermilion-border); background: var(--vermilion-light); }
+    .trap-title { font-weight: 800; font-size: 14px; }
+
+    /* CHECK YOURSELF QUIZ */
+    .quiz-item {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff;
+      font-size: 14px; font-weight: 700; color: var(--indigo); transition: all .15s;
+    }
+    .quiz-opt:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback {
+      display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; line-height: 1.5;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    /* PRACTICE CTA */
+    .practice-cta {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff;
+      border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: var(--shadow-md);
+    }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn {
+      padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      background: #fff; color: var(--indigo-dark); transition: transform .15s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">7 класс · Конспект урока</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_7.html">← Назад к 7 классу</a>
+      <a class="nav-btn" href="../math_moduls/powers_trainer.html">Тренажёр степеней →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <!-- HERO -->
+    <header class="lesson-hero">
+      <span class="eyebrow">Алгебра · 7 класс · Интерактивный разбор</span>
+      <h1>Свойства степеней: не зубрёжка, а смысл</h1>
+      <p>Вместо того чтобы заучивать шесть правил «на веру», посмотрите, как каждое свойство выводится за 5 секунд из самого определения степени, почему $a^0 = 1$ и где ученики чаще всего ошибаются со знаком минус.</p>
+      <div class="toc-pills">
+        <a class="toc-pill" href="#sec-mult">1. Умножение и сложение показателей</a>
+        <a class="toc-pill" href="#sec-powpow">2. Степень в степени</a>
+        <a class="toc-pill" href="#sec-zero">3. Почему $a^0 = 1$ и откуда минус</a>
+        <a class="toc-pill" href="#sec-traps">4. Ловушка скобок: $(-3)^2$ vs $-3^2$</a>
+        <a class="toc-pill" href="#sec-quiz">5. Проверь понимание</a>
+      </div>
+    </header>
+
+    <!-- SECTION 1: MULTIPLICATION -->
+    <section class="concept-card" id="sec-mult">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Почему при умножении показатели складываются, а не перемножаются?</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Идея на пальцах:</strong> запись $2^3$ — это просто короткая команда «возьми число $2$ множителем $3$ раза». Когда мы умножаем $2^3 \cdot 2^2$, мы просто ставим две цепочки одинаковых множителей подряд. Сколько всего двоек оказалось в произведении? Сумма их количеств!
+      </div>
+
+      <div class="lab-box">
+        <div class="lab-controls">
+          <div class="control-group">
+            Основание $a$:
+            <div class="stepper">
+              <button type="button" id="mult-a-dec">−</button>
+              <span id="mult-a-val">2</span>
+              <button type="button" id="mult-a-inc">+</button>
+            </div>
+          </div>
+          <div class="control-group">
+            Первая степень $m$:
+            <div class="stepper">
+              <button type="button" id="mult-m-dec">−</button>
+              <span id="mult-m-val">3</span>
+              <button type="button" id="mult-m-inc">+</button>
+            </div>
+          </div>
+          <div class="control-group">
+            Вторая степень $n$:
+            <div class="stepper">
+              <button type="button" id="mult-n-dec">−</button>
+              <span id="mult-n-val">2</span>
+              <button type="button" id="mult-n-inc">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-stage">
+          <div class="factors-row" id="mult-factors-visual"></div>
+          <div class="formula-result" id="mult-formula-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: POWER OF A POWER -->
+    <section class="concept-card" id="sec-powpow">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Когда показатели действительно перемножаются: $(a^m)^n$</h2>
+        </div>
+      </div>
+
+      <p>Внешняя степень $n$ говорит: «повтори всю скобку множителем $n$ раз». Если внутри скобки уже сидит $m$ штук числа $a$, то у нас получается $n$ одинаковых «коробок», в каждой по $m$ множителей — всего $m \cdot n$ штук.</p>
+
+      <div class="lab-box">
+        <div class="lab-controls">
+          <div class="control-group">
+            Внутри скобки $m$:
+            <div class="stepper">
+              <button type="button" id="pp-m-dec">−</button>
+              <span id="pp-m-val">3</span>
+              <button type="button" id="pp-m-inc">+</button>
+            </div>
+          </div>
+          <div class="control-group">
+            Количество скобок $n$:
+            <div class="stepper">
+              <button type="button" id="pp-n-dec">−</button>
+              <span id="pp-n-val">2</span>
+              <button type="button" id="pp-n-inc">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-stage">
+          <div class="factors-row" id="pp-visual"></div>
+          <div class="formula-result" id="pp-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: WHY a^0 = 1 -->
+    <section class="concept-card" id="sec-zero">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 03</span>
+          <h2>Почему $a^0 = 1$, а не $0$? Лестница деления</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Логика закономерности:</strong> каждый раз, когда показатель степени уменьшается на $1$, само число делится на основание $a$. Прошагайте по лестнице вниз на 1 шаг за клик и посмотрите, что окажется на ступеньке $2^0$ и ниже.
+      </div>
+
+      <div class="ladder-wrap">
+        <div class="ladder-actions">
+          <button type="button" class="btn-primary-sm" id="ladder-next-btn">↓ Уменьшить степень (разделить на 2)</button>
+          <button type="button" class="btn-outline-sm" id="ladder-reset-btn">↺ Начать с $2^3$</button>
+        </div>
+        <div class="ladder-list" id="ladder-list"></div>
+        <p id="ladder-caption" style="font-size: 14px; color: var(--muted);"></p>
+      </div>
+    </section>
+
+    <!-- SECTION 4: SIGN TRAP -->
+    <section class="concept-card" id="sec-traps">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 04</span>
+          <h2>Главная ловушка в задачах: скобки решают всё</h2>
+        </div>
+      </div>
+
+      <p>Минус перед числом без скобок <strong>не относится к основанию степени</strong> — сначала выполняется возведение в степень, и только потом ставится знак минус.</p>
+
+      <div class="trap-grid">
+        <div class="trap-box good">
+          <div class="trap-title" style="color: var(--green);">✅ Есть скобки: $(-3)^2$ и $(-3)^4$</div>
+          <div>В степень возводится всё содержимое скобок вместе с минусом:</div>
+          <div class="math-expr">$(-3)^2 = (-3) \cdot (-3) = +9$</div>
+          <div style="font-size: 13.5px; color: var(--muted);">Чётная степень «съедает» минус, нечётная — оставляет: $(-2)^3 = -8$.</div>
+        </div>
+
+        <div class="trap-box warn">
+          <div class="trap-title" style="color: var(--vermilion);">⚠️ Нет скобок: $-3^2$ и $-2^4$</div>
+          <div>Степень действует <strong>только на число $3$</strong>, минус ждёт снаружи:</div>
+          <div class="math-expr">$-3^2 = -(3 \cdot 3) = -9$</div>
+          <div style="font-size: 13.5px; color: var(--muted);">Даже при чётной степени $2$ или $4$ результат остаётся отрицательным!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: MINI CHECK -->
+    <section class="concept-card" id="sec-quiz">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Проверьте понимание в 3 вопросах</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Ученик написал: $2^3 \cdot 2^4 = 4^7$. В чём его ошибка?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">Нужно было сложить не только степени, но и перемножить двойки</button>
+          <button type="button" class="quiz-opt" data-ans="ok">Основание $2$ не меняется, ответ должен быть $2^7$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">Правильный ответ $2^{12}$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Выберите верное значение выражения $-5^2 + (-5)^2$:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$50$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$0$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$-50$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="3">
+        <div class="quiz-q">3. Какое правило объясняет, почему $a^5 : a^5 = a^0 = 1$ (при $a \ne 0$)?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">Любое ненулевое число, разделённое само на себя, равно $1$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">Ноль в показателе просто отбрасывает букву</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$a^0$ равно $1$ только для положительных чисел</button>
+        </div>
+        <div class="quiz-feedback" id="qf-3"></div>
+      </div>
+    </section>
+
+    <!-- PRACTICE CTA -->
+    <section class="practice-cta">
+      <div>
+        <h3>Понятно на практике? Закрепите на тренажёре</h3>
+        <p>Интерактивная проверка шагов, сравнение степеней и таймер скорости помогут довести навык до автоматизма.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/powers_trainer.html">Тренажёр степеней →</a>
+        <a class="cta-btn secondary" href="../math_moduls/powers_compare_trainer.html">Сравнение степеней</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s, displayMode) {
+        if (window.StudyMath && window.StudyMath.renderTeX) {
+          return window.StudyMath.renderTeX(s, !!displayMode);
+        }
+        return s;
+      }
+
+      // Render all $...$ inline math on the page initially
+      function renderAllInlineTex(root) {
+        const el = root || document.body;
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.parentElement && !node.parentElement.closest('.katex, script, style, code')) {
+            if (node.nodeValue.includes('$')) textNodes.push(node);
+          }
+        }
+        textNodes.forEach(tn => {
+          const val = tn.nodeValue;
+          if (!/\$[^$\n]+\$/.test(val)) return;
+          const span = document.createElement('span');
+          span.innerHTML = val.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m, false));
+          tn.parentNode.replaceChild(span, tn);
+        });
+      }
+
+      // 1. Multiplication interactive lab
+      let multA = 2, multM = 3, multN = 2;
+      const multFactorsEl = document.getElementById('mult-factors-visual');
+      const multResultEl = document.getElementById('mult-formula-result');
+
+      function renderMultLab() {
+        document.getElementById('mult-a-val').textContent = multA;
+        document.getElementById('mult-m-val').textContent = multM;
+        document.getElementById('mult-n-val').textContent = multN;
+
+        const grp1 = Array.from({ length: multM }, () => `<span class="factor-chip">${multA}</span>`).join(' · ');
+        const grp2 = Array.from({ length: multN }, () => `<span class="factor-chip">${multA}</span>`).join(' · ');
+        multFactorsEl.innerHTML = `
+          <div class="factor-group grp-a">${grp1}</div>
+          <span style="font-weight:800; font-size:18px;">·</span>
+          <div class="factor-group grp-b">${grp2}</div>
+        `;
+
+        const total = multM + multN;
+        const val = Math.pow(multA, total);
+        multResultEl.innerHTML = tex(`${multA}^{${multM}} \\cdot ${multA}^{${multN}} = ${multA}^{${multM} + ${multN}} = ${multA}^{${total}} = ${val}`, false);
+      }
+
+      document.getElementById('mult-a-dec').onclick = () => { if (multA > 2) { multA--; renderMultLab(); } };
+      document.getElementById('mult-a-inc').onclick = () => { if (multA < 5) { multA++; renderMultLab(); } };
+      document.getElementById('mult-m-dec').onclick = () => { if (multM > 1) { multM--; renderMultLab(); } };
+      document.getElementById('mult-m-inc').onclick = () => { if (multM < 5) { multM++; renderMultLab(); } };
+      document.getElementById('mult-n-dec').onclick = () => { if (multN > 1) { multN--; renderMultLab(); } };
+      document.getElementById('mult-n-inc').onclick = () => { if (multN < 5) { multN++; renderMultLab(); } };
+
+      // 2. Power of a power interactive lab
+      let ppM = 3, ppN = 2;
+      const ppVisualEl = document.getElementById('pp-visual');
+      const ppResultEl = document.getElementById('pp-result');
+
+      function renderPowerOfPower() {
+        document.getElementById('pp-m-val').textContent = ppM;
+        document.getElementById('pp-n-val').textContent = ppN;
+
+        const groups = Array.from({ length: ppN }, () => {
+          const inner = Array.from({ length: ppM }, () => `<span class="factor-chip">a</span>`).join(' · ');
+          return `<div class="factor-group grp-a">(${inner})</div>`;
+        }).join('<span style="font-weight:800;">·</span>');
+
+        ppVisualEl.innerHTML = groups;
+        ppResultEl.innerHTML = tex(`(a^{${ppM}})^{${ppN}} = a^{${ppM} \\cdot ${ppN}} = a^{${ppM * ppN}}`, false);
+      }
+
+      document.getElementById('pp-m-dec').onclick = () => { if (ppM > 1) { ppM--; renderPowerOfPower(); } };
+      document.getElementById('pp-m-inc').onclick = () => { if (ppM < 4) { ppM++; renderPowerOfPower(); } };
+      document.getElementById('pp-n-dec').onclick = () => { if (ppN > 1) { ppN--; renderPowerOfPower(); } };
+      document.getElementById('pp-n-inc').onclick = () => { if (ppN < 4) { ppN++; renderPowerOfPower(); } };
+
+      // 3. Ladder of division (why 2^0 = 1)
+      const ladderSteps = [
+        { exp: '2^{3}', val: '8', op: 'исходное', note: 'Начинаем с 2³ = 2 · 2 · 2 = 8.' },
+        { exp: '2^{2}', val: '4', op: '8 : 2 = 4', note: 'Поделили на 2: осталось 2 множителя.' },
+        { exp: '2^{1}', val: '2', op: '4 : 2 = 2', note: 'Ещё раз поделили на 2: остался 1 множитель.' },
+        { exp: '2^{0}', val: '1', op: '2 : 2 = 1', note: 'Делим 2 на 2 — получаем ровно 1! Вот почему любое ненулевое число в нулевой степени равно 1.', zero: true },
+        { exp: '2^{-1}', val: '\\frac{1}{2}', op: '1 : 2 = 1/2', note: 'Делим 1 на 2 — так появляются отрицательные степени: они означают деление, а не минус перед числом!' },
+        { exp: '2^{-2}', val: '\\frac{1}{4}', op: '1/2 : 2 = 1/4', note: 'Отрицательная степень отправляет число в знаменатель: 2⁻² = 1 / 2² = 1/4.' }
+      ];
+      let unlockedCount = 1;
+      const ladderListEl = document.getElementById('ladder-list');
+      const ladderCaptionEl = document.getElementById('ladder-caption');
+
+      function renderLadder() {
+        ladderListEl.innerHTML = ladderSteps.map((st, idx) => {
+          const isUnlocked = idx < unlockedCount;
+          const classes = ['ladder-step', isUnlocked ? 'active' : '', (isUnlocked && st.zero) ? 'highlight-zero' : ''].join(' ');
+          return `
+            <div class="${classes}">
+              <div class="step-exp">${tex(st.exp, false)}</div>
+              <div class="step-val">${isUnlocked ? tex('= ' + st.val, false) : '?'}</div>
+              <div class="step-op">${isUnlocked ? st.op : 'следующий шаг'}</div>
+            </div>
+          `;
+        }).join('');
+        ladderCaptionEl.textContent = ladderSteps[unlockedCount - 1].note;
+      }
+
+      document.getElementById('ladder-next-btn').onclick = () => {
+        if (unlockedCount < ladderSteps.length) {
+          unlockedCount++;
+          renderLadder();
+        }
+      };
+      document.getElementById('ladder-reset-btn').onclick = () => {
+        unlockedCount = 1;
+        renderLadder();
+      };
+
+      // 4. Quiz handlers
+      const quizExplanations = {
+        1: {
+          ok: 'Верно! Число 2 просто повторяется множителем 3 + 4 = 7 раз, основание не перемножается: 2³ · 2⁴ = 2⁷.',
+          wrong1: 'Нет: двойки из первой и второй степени не складываются в четвёрки, они стоят в одном общем произведении 2·2·2 · 2·2·2·2.',
+          wrong2: 'Осторожно: показатели перемножаются только при возведении степени в степень (2³)⁴, а здесь 3 + 4 = 7.'
+        },
+        2: {
+          ok: 'Точно! −5² = −25 (минус снаружи), а (−5)² = +25 (минус внутри скобок). В сумме −25 + 25 = 0.',
+          wrong1: 'Внимательнее к первому слагаемому: там нет скобок, поэтому −5² = −25, а не +25.',
+          wrong2: 'Внимательнее ко второму слагаемому: там есть скобки, поэтому (−5)² = (−5)·(−5) = +25.'
+        },
+        3: {
+          ok: 'Именно так! С одной стороны a⁵ : a⁵ = a⁵⁻⁵ = a⁰, а с другой — число, делённое само на себя, всегда равно 1.',
+          wrong1: 'Нет: если бы оно давало 0 или просто a, то ломалось бы правило деления степеней.',
+          wrong2: 'Для отрицательных оснований правило работает точно так же: (−5)³ : (−5)³ = (−5)⁰ = 1.'
+        }
+      };
+
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            const isOk = ans === 'ok';
+            btn.classList.add(isOk ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${isOk ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      renderMultLab();
+      renderPowerOfPower();
+      renderLadder();
+    })();
+  </script>
+</body>
+</html>

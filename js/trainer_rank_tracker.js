@@ -578,6 +578,206 @@
                 { min: 3,  title: 'Исследователь стыков 🥈' },
                 { min: 1,  title: 'Юный чертёжник 🥉' }
             ]
+        },
+        {
+            id: 'inf_oge_task_1',
+            name: 'Информатика ОГЭ №1 · Объём информации',
+            shortName: 'Информатика ОГЭ №1',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_1_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_1_trainer.html',
+            icon: '💾',
+            description: 'Количественные параметры информационных объектов, кодировки КОИ-8, Windows-1251, UTF-16, расчёт объёма текста.',
+            rankTiers: [
+                { min: 25, title: 'Архитектор байтов 👑' },
+                { min: 18, title: 'Магистр кодировок 🧙' },
+                { min: 12, title: 'Мастер информации 💎' },
+                { min: 7,  title: 'Знаток битов 🥇' },
+                { min: 4,  title: 'Аналитик текста 🥈' },
+                { min: 1,  title: 'Новичок бита 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_2',
+            name: 'Информатика ОГЭ №2 · Кодирование',
+            shortName: 'Информатика ОГЭ №2',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_2_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_2_trainer.html',
+            icon: '🔐',
+            description: 'Декодирование двоичных и символьных сообщений, условие Фано, выбор цепочки с единственной расшифровкой.',
+            rankTiers: [
+                { min: 25, title: 'Мастер криптографии 👑' },
+                { min: 18, title: 'Дешифровщик Фано 🧙' },
+                { min: 12, title: 'Эксперт кодов 💎' },
+                { min: 7,  title: 'Знаток шифров 🥇' },
+                { min: 4,  title: 'Разведчик 🥈' },
+                { min: 1,  title: 'Стажёр-кодер 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_3',
+            name: 'Информатика ОГЭ №3 · Логические выражения',
+            shortName: 'Информатика ОГЭ №3',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_3_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_3_trainer.html',
+            icon: '🧠',
+            description: 'Анализ высказываний с НЕ, И, ИЛИ: поиск наименьшего, наибольшего или количества целых чисел x.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель логики 👑' },
+                { min: 18, title: 'Магистр Буля 🧙' },
+                { min: 12, title: 'Мастер предикатов 💎' },
+                { min: 7,  title: 'Знаток И/ИЛИ/НЕ 🥇' },
+                { min: 4,  title: 'Логик 🥈' },
+                { min: 1,  title: 'Ученик логики 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_4',
+            name: 'Информатика ОГЭ №4 · Таблица дорог',
+            shortName: 'Информатика ОГЭ №4',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_4_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_4_trainer.html',
+            icon: '🗺️',
+            description: 'Поиск кратчайшего пути во взвешенном графе по матрице смежности и через обязательный пункт.',
+            rankTiers: [
+                { min: 25, title: 'Гроссмейстер графов 👑' },
+                { min: 18, title: 'Штурман Дейкстры 🧙' },
+                { min: 12, title: 'Мастер маршрутов 💎' },
+                { min: 7,  title: 'Знаток матриц 🥇' },
+                { min: 4,  title: 'Навигатор 🥈' },
+                { min: 1,  title: 'Следопыт 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_5',
+            name: 'Информатика ОГЭ №5 · Исполнители',
+            shortName: 'Информатика ОГЭ №5',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_5_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_5_trainer.html',
+            icon: '🤖',
+            description: 'Линейный алгоритм формального исполнителя: поиск параметра b и составление кратчайшей программы.',
+            rankTiers: [
+                { min: 25, title: 'Создатель алгоритмов 👑' },
+                { min: 18, title: 'Архитектор машин 🧙' },
+                { min: 12, title: 'Мастер исполнителей 💎' },
+                { min: 7,  title: 'Знаток команд 🥇' },
+                { min: 4,  title: 'Оператор 🥈' },
+                { min: 1,  title: 'Стажёр-программист 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_6',
+            name: 'Информатика ОГЭ №6 · Программа с условием',
+            shortName: 'Информатика ОГЭ №6',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_6_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_6_trainer.html',
+            icon: '💻',
+            description: 'Трассировка условных операторов (Python, АлгЯз, Pascal) для 9 запусков и поиск параметра A.',
+            rankTiers: [
+                { min: 25, title: 'Сеньор ветвлений 👑' },
+                { min: 18, title: 'Мастер трассировки 🧙' },
+                { min: 12, title: 'Эксперт условий 💎' },
+                { min: 7,  title: 'Знаток Python/Pascal 🥇' },
+                { min: 4,  title: 'Кодер 🥈' },
+                { min: 1,  title: 'Джуниор 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_7',
+            name: 'Информатика ОГЭ №7 · URL и IPv4-адреса',
+            shortName: 'Информатика ОГЭ №7',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_7_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_7_trainer.html',
+            icon: '🌐',
+            description: 'Сборка адреса файла в сети Интернет по фрагментам и восстановление IP-адреса.',
+            rankTiers: [
+                { min: 25, title: 'Архитектор сетей 👑' },
+                { min: 18, title: 'Мастер протоколов 🧙' },
+                { min: 12, title: 'Эксперт IPv4/URL 💎' },
+                { min: 7,  title: 'Знаток Интернета 🥇' },
+                { min: 4,  title: 'Сетевой практик 🥈' },
+                { min: 1,  title: 'Пользователь сети 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_8',
+            name: 'Информатика ОГЭ №8 · Поисковые запросы',
+            shortName: 'Информатика ОГЭ №8',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_8_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_8_trainer.html',
+            icon: '🔎',
+            description: 'Круги Эйлера и формула включений-исключений для двух и трёх множеств со связками & и |.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель множеств 👑' },
+                { min: 18, title: 'Магистр Эйлера 🧙' },
+                { min: 12, title: 'Мастер запросов 💎' },
+                { min: 7,  title: 'Знаток диаграмм 🥇' },
+                { min: 4,  title: 'Искатель данных 🥈' },
+                { min: 1,  title: 'Начинающий аналитик 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_9',
+            name: 'Информатика ОГЭ №9 · Подсчёт путей в графе',
+            shortName: 'Информатика ОГЭ №9',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_9_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_9_trainer.html',
+            icon: '🕸️',
+            description: 'Подсчёт маршрутов в ориентированном графе (все пути, через город и в обход города).',
+            rankTiers: [
+                { min: 25, title: 'Властелин графов 👑' },
+                { min: 18, title: 'Магистр динамики 🧙' },
+                { min: 12, title: 'Мастер схем 💎' },
+                { min: 7,  title: 'Знаток маршрутов 🥇' },
+                { min: 4,  title: 'Картограф 🥈' },
+                { min: 1,  title: 'Путешественник 🥉' }
+            ]
+        },
+        {
+            id: 'inf_oge_task_10',
+            name: 'Информатика ОГЭ №10 · Системы счисления',
+            shortName: 'Информатика ОГЭ №10',
+            subject: 'Информатика',
+            category: 'ОГЭ Информатика (Часть 1)',
+            classNum: '9 класс',
+            url: '../inf_moduls/inf_oge_task_10_trainer.html',
+            profileUrl: 'inf_moduls/inf_oge_task_10_trainer.html',
+            icon: '🔟',
+            description: 'Сравнение чисел в 2, 8, 10 и 16-ричной системах счисления, подсчёт битов и чисел на интервале.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель счислений 👑' },
+                { min: 18, title: 'Магистр двоичности 🧙' },
+                { min: 12, title: 'Мастер Hex/Oct 💎' },
+                { min: 7,  title: 'Знаток разрядов 🥇' },
+                { min: 4,  title: 'Вычислитель 🥈' },
+                { min: 1,  title: 'Ученик СС 🥉' }
+            ]
         }
     ];
 

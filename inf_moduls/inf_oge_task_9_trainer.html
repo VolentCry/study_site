@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тренажёр ОГЭ Информатика №9 · Подсчёт путей в графе · НЕШкола</title>
+  <link rel="stylesheet" href="../assets/fonts/fonts.css" />
+  <script>
+    (function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="../css/inf_oge_style.css" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Навигация тренажёра">
+    <a class="brand" href="../pages/informatics.html">
+      <span class="brand-mark" aria-hidden="true">09</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Информатика · №9</span>
+      </span>
+    </a>
+
+    <div class="nav-task-switcher" aria-label="Переключатель заданий ОГЭ">
+      <a href="inf_oge_task_1_trainer.html" class="task-pill">1</a>
+      <a href="inf_oge_task_2_trainer.html" class="task-pill">2</a>
+      <a href="inf_oge_task_3_trainer.html" class="task-pill">3</a>
+      <a href="inf_oge_task_4_trainer.html" class="task-pill">4</a>
+      <a href="inf_oge_task_5_trainer.html" class="task-pill">5</a>
+      <a href="inf_oge_task_6_trainer.html" class="task-pill">6</a>
+      <a href="inf_oge_task_7_trainer.html" class="task-pill">7</a>
+      <a href="inf_oge_task_8_trainer.html" class="task-pill">8</a>
+      <a href="inf_oge_task_9_trainer.html" class="task-pill active">9</a>
+      <a href="inf_oge_task_10_trainer.html" class="task-pill">10</a>
+    </div>
+
+    <div class="nav-actions">
+      <a class="nav-btn" href="../pages/informatics.html">← Раздел ОГЭ</a>
+      <a class="nav-btn" href="../profile.html">Профиль</a>
+      <button type="button" class="nav-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Переключить тему">☀️</button>
+      <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+    </div>
+  </nav>
+
+  <main class="trainer-shell">
+    <header class="trainer-header">
+      <div class="trainer-kicker">Часть 1 · 1 балл · ФИПИ / Решу ОГЭ</div>
+      <h1 class="trainer-title">Задание №9 · Схемы дорог (Графы)</h1>
+      <p class="trainer-subtitle">Подсчёт количества путей в ориентированном графе: все маршруты, через заданный город и в обход города.</p>
+    </header>
+
+    <section class="stats-dashboard" aria-label="Статистика тренажёра">
+      <div class="stat-box streak-box"><div class="stat-icon">🔥</div><div class="stat-info"><span class="stat-num" id="stat-streak">0</span><span class="stat-label">Текущая серия</span></div></div>
+      <div class="stat-box"><div class="stat-icon">🏆</div><div class="stat-info"><span class="stat-num" id="stat-max-streak">0</span><span class="stat-label">Лучшая серия</span></div></div>
+      <div class="stat-box"><div class="stat-icon">✅</div><div class="stat-info"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Всего решено</span></div></div>
+      <div class="stat-box"><div class="stat-icon">🎖️</div><div class="stat-info"><span class="stat-num" id="stat-rank">Не начат</span><span class="stat-label">Ваше звание</span></div></div>
+    </section>
+
+    <div class="category-filter" role="tablist" aria-label="Прототипы задания 9">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">Все прототипы</button>
+      <button type="button" class="cat-btn" data-cat="all_paths">Все пути А → К</button>
+      <button type="button" class="cat-btn" data-cat="pass_through">Через заданный город</button>
+      <button type="button" class="cat-btn" data-cat="avoid_city">В обход города</button>
+    </div>
+
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Задание №9</span>
+      <span class="card-help-badge" id="task-cat-badge">Прототип ОГЭ</span>
+
+      <div class="task-body" id="task-container"></div>
+
+      <div class="answer-row">
+        <input type="text" inputmode="numeric" class="answer-input" id="answer-input" placeholder="Введите количество путей..." autocomplete="off" />
+        <button type="button" class="btn-action btn-check" id="btn-check">Проверить</button>
+        <button type="button" class="btn-action btn-next" id="btn-next" style="display:none;">Следующая задача →</button>
+      </div>
+
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <div class="card-tools">
+        <div class="card-tools-left">
+          <button type="button" class="tool-btn" id="btn-toggle-solution">💡 Разметка графа и разбор</button>
+          <button type="button" class="tool-btn" id="btn-toggle-theory">📘 Памятка по №9</button>
+        </div>
+        <button type="button" class="tool-btn" id="btn-new-task">↻ Новое условие</button>
+      </div>
+
+      <div class="spoiler-panel" id="solution-panel">
+        <div id="solution-content"></div>
+      </div>
+
+      <div class="spoiler-panel" id="theory-panel">
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">Метод суммирования весов</div>
+          <p>Поставьте <strong>1</strong> у стартовой вершины А. Для каждой следующей вершины сложите числа всех вершин, из которых в неё входят стрелки. Если город запрещён — зачеркните все его стрелки; если обязателен — зачеркните все пути, идущие мимо него.</p>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script src="../js/inf_oge_task_9_trainer.js"></script>
+  <script src="../js/inf_oge_trainer_shell.js"></script>
+  <script>
+    window.InfOgeShell.initTrainer({
+      trainerId: 'inf_oge_task_9',
+      taskNum: 9,
+      title: 'Задание №9 · Графы и пути',
+      engine: window.InfOgeTask9Trainer,
+      skillId: 'inf_graphs'
+    });
+  </script>
+</body>
+</html>

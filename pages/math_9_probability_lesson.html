@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Вероятность (ОГЭ №10) · 9 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body { background-color: var(--paper); color: var(--ink); font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .site-nav { position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn { min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700; border-radius: 8px; background: var(--paper-light); }
+    .lesson-shell { max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px; display: flex; flex-direction: column; gap: 28px; }
+    .lesson-hero { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+    .lesson-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold)); }
+    .eyebrow { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .concept-card { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px; }
+    .concept-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px; }
+
+    .lab-box { background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .btn-primary-sm { padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; background: var(--indigo); color: #fff; }
+    .btn-outline-sm { padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700; border: 1px solid var(--line); color: var(--indigo); background: #fff; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .stat-box { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
+
+    .quiz-item { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light); display: flex; flex-direction: column; gap: 12px; }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 700; color: var(--indigo); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta { background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff; border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text"><span class="brand-name">НЕШкола</span><span class="brand-sub">9 класс · ОГЭ · Конспект</span></span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_9.html">← Назад к 9 классу</a>
+      <a class="nav-btn" href="../math_moduls/oge_task_10_trainer.html">Тренажёр №10 ОГЭ →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">ОГЭ №10 · 9 класс · Интерактивный разбор</span>
+      <h1>Теория вероятностей на пальцах</h1>
+      <p>Как работает классическая формула $P = \frac{m}{n}$, почему при 1000 бросках доля орлов стремится к $0{,}5$ и как решать сложные задачи в 1 действие через противоположное событие.</p>
+    </header>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Симулятор бросков кубика (закон больших чисел)</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        На 6-гранном кубике ровно $2$ грани больше $4$ (это $5$ и $6$). Поэтому теоретическая вероятность равна $\frac{2}{6} = \frac{1}{3} \approx 0{,}333$. Проверьте, как часто выпадает «5 или 6» при серии бросков:
+      </div>
+      <div class="lab-box">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn-primary-sm" id="roll-10">🎲 Бросить 10 раз</button>
+          <button type="button" class="btn-primary-sm" id="roll-200">🎲 Бросить 200 раз</button>
+          <button type="button" class="btn-outline-sm" id="roll-reset">↺ Сбросить</button>
+        </div>
+        <div class="stats-row" id="roll-stats"></div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head"><div><span class="concept-num">Концепция 02</span><h2>Лайфхак: противоположное событие $P(\text{не } A) = 1 - P(A)$</h2></div></div>
+      <div class="intuition-box">
+        Если вероятность того, что батарейка окажется бракованной, равна $0{,}04$, то вероятность купить исправную: $1 - 0{,}04 = 0{,}96$. То же самое с «хотя бы один раз выпадет орёл» из $2$ бросков: проще посчитать, когда орёл НЕ выпадет ни разу (решка + решка = $\frac{1}{4} = 0{,}25$), и вычесть из единицы: $1 - 0{,}25 = 0{,}75$!
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head"><div><span class="concept-num">Самопроверка</span><h2>Проверьте понимание в 2 вопросах</h2></div></div>
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. В сборнике $25$ билетов, в $5$ из них есть вопрос про производную. Какова вероятность, что ученику НЕ достанется такой вопрос?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$0{,}2$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$0{,}8$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Монету бросают дважды. Какова вероятность, что оба раза выпадет орёл?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$0{,}25$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$0{,}5$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div><h3>Закрепите тему на тренажёре вероятности №10</h3><p>Пирожки, билеты, жеребьёвка спортсменов, кубики и монеты из банка ФИПИ.</p></div>
+      <a class="cta-btn" href="../math_moduls/oge_task_10_trainer.html">Открыть тренажёр №10 →</a>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) { return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s; }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = []; let n;
+        while ((n = walker.nextNode())) { if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) nodes.push(n); }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      let totalRolls = 0, successRolls = 0;
+      const statsEl = document.getElementById('roll-stats');
+
+      function updateRolls() {
+        const freq = totalRolls ? (successRolls / totalRolls).toFixed(3).replace('.', ',') : '—';
+        statsEl.innerHTML = `
+          <div class="stat-box"><div style="font-size:22px;font-weight:800;color:var(--indigo-dark);">${totalRolls}</div><small style="color:var(--muted);">Всего бросков (n)</small></div>
+          <div class="stat-box"><div style="font-size:22px;font-weight:800;color:var(--green);">${successRolls}</div><small style="color:var(--muted);">Выпало 5 или 6 (m)</small></div>
+          <div class="stat-box"><div style="font-size:22px;font-weight:800;color:var(--vermilion);">${freq}</div><small style="color:var(--muted);">Доля m / n (теория ≈ 0,333)</small></div>
+        `;
+      }
+      function doRolls(count) {
+        for (let i = 0; i < count; i++) {
+          totalRolls++;
+          const d = Math.floor(Math.random() * 6) + 1;
+          if (d >= 5) successRolls++;
+        }
+        updateRolls();
+      }
+      document.getElementById('roll-10').onclick = () => doRolls(10);
+      document.getElementById('roll-200').onclick = () => doRolls(200);
+      document.getElementById('roll-reset').onclick = () => { totalRolls = 0; successRolls = 0; updateRolls(); };
+
+      const quizExplanations = {
+        1: { ok: 'Верно! Без вопроса 25 − 5 = 20 билетов: 20 / 25 = 0,80.', wrong1: '0,2 — это вероятность того, что вопрос ЕСТЬ (5/25). А нас спрашивают «НЕ достанется»!' },
+        2: { ok: 'Точно! Всего 4 равновозможных исхода: ОО, ОР, РО, РР. Подходит 1 из 4 → 0,25.', wrong1: 'При двух бросках вероятности независимых событий перемножаются: 0,5 · 0,5 = 0,25.' }
+      };
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz; const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans; btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      updateRolls();
+    })();
+  </script>
+</body>
+</html>

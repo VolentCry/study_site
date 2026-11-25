@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Формулы сокращённого умножения · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body { background-color: var(--paper); color: var(--ink); font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .site-nav { position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn { min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700; border-radius: 8px; background: var(--paper-light); }
+    .lesson-shell { max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px; display: flex; flex-direction: column; gap: 28px; }
+    .lesson-hero { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+    .lesson-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold)); }
+    .eyebrow { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .concept-card { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px; }
+    .concept-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px; }
+
+    .lab-box { background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+    .lab-controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+    .control-group { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 700; color: var(--indigo); }
+    .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; }
+    .stepper button { width: 30px; height: 30px; font-size: 16px; font-weight: 700; color: var(--indigo); display: grid; place-items: center; }
+    .stepper span { min-width: 30px; text-align: center; font-size: 14px; font-weight: 800; color: var(--vermilion); }
+
+    .square-model { display: grid; border: 2px solid var(--indigo-dark); border-radius: 8px; overflow: hidden; width: 260px; height: 260px; background: #fff; }
+    .sq-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 13.5px; border: 1px dashed rgba(38,63,97,0.28); text-align: center; padding: 4px; }
+    .sq-a2 { background: rgba(38,63,97,0.14); color: var(--indigo-dark); }
+    .sq-ab { background: var(--gold-light); color: #8b5a2b; }
+    .sq-b2 { background: var(--vermilion-light); color: var(--vermilion); }
+
+    .trap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .trap-box { border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px; background: var(--paper-light); display: flex; flex-direction: column; gap: 8px; }
+    .trap-box.warn { background: var(--vermilion-light); border-color: var(--vermilion-border); }
+    .trap-box.good { background: var(--green-light); border-color: var(--green-border); }
+
+    .quiz-item { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light); display: flex; flex-direction: column; gap: 12px; }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 700; color: var(--indigo); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta { background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff; border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text"><span class="brand-name">НЕШкола</span><span class="brand-sub">7 класс · Конспект урока</span></span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_7.html">← Назад к 7 классу</a>
+      <a class="nav-btn" href="../math_moduls/fsu_trainer.html">Тренажёр ФСУ →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Алгебра · 7 класс · Интерактивный разбор</span>
+      <h1>Формулы сокращённого умножения (ФСУ): откуда берётся $2ab$</h1>
+      <p>Геометрический смысл квадрата суммы $(a+b)^2$, разность квадратов и защита от самой частой ошибки в алгебре.</p>
+    </header>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Разрезаем квадрат со стороной $(a + b)$ на 4 части</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        <strong>Почему $(a + b)^2 \ne a^2 + b^2$?</strong> Посмотрите на квадрат со стороной $a + b$: если взять только углы $a^2$ и $b^2$, в центре останутся два незакрашенных прямоугольника площадью $a \cdot b$ каждый! Именно они дают $+2ab$.
+      </div>
+      <div class="lab-box">
+        <div class="lab-controls">
+          <div class="control-group">Сторона $a$: <div class="stepper"><button type="button" id="fsu-a-dec">−</button><span id="fsu-a-val">5</span><button type="button" id="fsu-a-inc">+</button></div></div>
+          <div class="control-group">Сторона $b$: <div class="stepper"><button type="button" id="fsu-b-dec">−</button><span id="fsu-b-val">2</span><button type="button" id="fsu-b-inc">+</button></div></div>
+        </div>
+        <div class="square-model" id="square-model"></div>
+        <div id="fsu-res" style="font-size:18px; font-weight:800; color:var(--indigo-dark); text-align:center;"></div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Три главные формулы и ловушки</h2>
+        </div>
+      </div>
+      <div class="trap-grid">
+        <div class="trap-box good">
+          <strong style="color:var(--green);">Разность квадратов: $a^2 - b^2 = (a - b)(a + b)$</strong>
+          <p style="font-size:14px;">Помогает мгновенно считать в уме: $53^2 - 47^2 = (53 - 47)(53 + 47) = 6 \cdot 100 = 600$!</p>
+        </div>
+        <div class="trap-box warn">
+          <strong style="color:var(--vermilion);">Ловушка: $(a - b)^2 = a^2 - 2ab + b^2$</strong>
+          <p style="font-size:14px;">Перед $b^2$ <strong>всегда стоит плюс</strong>, потому что $(-b) \cdot (-b) = +b^2$. Минус стоит только перед $2ab$!</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head"><div><span class="concept-num">Самопроверка</span><h2>Проверьте понимание в 2 вопросах</h2></div></div>
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Раскройте скобки в выражении $(x + 4)^2$:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$x^2 + 16$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$x^2 + 8x + 16$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$x^2 + 4x + 16$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Раскройте выражение $9y^2 - 25$ по формуле разности квадратов:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$(3y - 5)(3y + 5)$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$(9y - 5)(9y + 5)$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div><h3>Закрепите формулы на тренажёре ФСУ</h3><p>Быстрое раскрытие скобок и разложение на множители.</p></div>
+      <a class="cta-btn" href="../math_moduls/fsu_trainer.html">Открыть тренажёр ФСУ →</a>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) { return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s; }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = []; let n;
+        while ((n = walker.nextNode())) { if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) nodes.push(n); }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      let a = 5, b = 2;
+      const model = document.getElementById('square-model');
+      const resEl = document.getElementById('fsu-res');
+
+      function updateSquare() {
+        document.getElementById('fsu-a-val').textContent = a;
+        document.getElementById('fsu-b-val').textContent = b;
+        const pA = Math.round((a / (a + b)) * 100);
+        const pB = 100 - pA;
+        model.style.gridTemplateColumns = `${pA}% ${pB}%`;
+        model.style.gridTemplateRows = `${pA}% ${pB}%`;
+        model.innerHTML = `
+          <div class="sq-cell sq-a2">${a}² = ${a * a}</div>
+          <div class="sq-cell sq-ab">${a}·${b} = ${a * b}</div>
+          <div class="sq-cell sq-ab">${a}·${b} = ${a * b}</div>
+          <div class="sq-cell sq-b2">${b}² = ${b * b}</div>
+        `;
+        resEl.innerHTML = tex(`(${a} + ${b})^2 = ${a * a} + 2 \\cdot ${a * b} + ${b * b} = ${(a + b) * (a + b)}`);
+      }
+      document.getElementById('fsu-a-dec').onclick = () => { if (a > 2) { a--; updateSquare(); } };
+      document.getElementById('fsu-a-inc').onclick = () => { if (a < 8) { a++; updateSquare(); } };
+      document.getElementById('fsu-b-dec').onclick = () => { if (b > 1) { b--; updateSquare(); } };
+      document.getElementById('fsu-b-inc').onclick = () => { if (b < 5) { b++; updateSquare(); } };
+
+      const quizExplanations = {
+        1: { ok: 'Верно! Квадрат первого (x²), плюс удвоенное произведение (2·x·4 = 8x), плюс квадрат второго (16).', wrong1: 'Нельзя забывать удвоенное произведение 2ab = 8x!', wrong2: 'Произведение x·4 нужно обязательно удвоить: 2 · 4x = 8x.' },
+        2: { ok: 'Точно! 9y² = (3y)², а 25 = 5², значит (3y − 5)(3y + 5).', wrong1: 'Девятку тоже нужно извлечь в 3, ведь (9y)² = 81y², а у нас 9y².' }
+      };
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz; const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans; btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      updateSquare();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Информатика · Подготовка к ОГЭ (Часть 1: №1–10) — НЕШкола</title>
+  <meta name="description" content="Интерактивный хаб подготовки к ОГЭ по информатике: 10 автогенерируемых тренажёров Части 1 по спецификации ФИПИ и каталогу Решу ОГЭ, шпаргалки и спринт на время." />
+  <link rel="stylesheet" href="../assets/fonts/fonts.css" />
+  <script>
+    (function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="../css/inf_oge_style.css" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Навигация раздела Информатика">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">Информатика · ОГЭ 9 кл</span>
+      </span>
+    </a>
+
+    <div class="nav-actions">
+      <a class="nav-btn" href="../index.html">← В лобби</a>
+      <a class="nav-btn" href="../profile.html">Мой профиль</a>
+      <button type="button" class="nav-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Переключить тему" title="Переключить тему">☀️</button>
+      <span class="xp-counter" id="hub-xp-badge">XP +0</span>
+    </div>
+  </nav>
+
+  <main class="hub-shell">
+    <!-- HERO -->
+    <section class="hub-hero" aria-labelledby="hub-title">
+      <div class="hub-hero-copy">
+        <div class="hub-kicker">9 класс</div>
+        <h1 class="hub-title" id="hub-title">Информатика: Подготовка к ОГЭ (Часть 1 · №1–10)</h1>
+        <p class="hub-lead">
+          Десять интерактивных тренажёров с бесконечной генерацией прототипов Части 1: от двоичного кодирования и кругов Эйлера до алгоритмов, графов и систем счисления. Наглядные SVG-схемы, пошаговые разборы и проверка в формате бланка.
+        </p>
+        <div class="hub-hero-actions">
+          <a class="btn-primary-inf" href="#oge-trainers">Перейти к тренажёрам (№1–10) ↓</a>
+          <a class="btn-secondary-inf" href="#cheatsheets">Шпаргалки и формулы</a>
+        </div>
+      </div>
+
+      <aside class="hub-stats-panel" aria-label="Твой прогресс по ОГЭ Информатика">
+        <div class="hub-stat-cell">
+          <div class="hub-stat-val" id="hub-stat-active">0 / 10</div>
+          <div class="hub-stat-lbl">Освоено заданий ОГЭ</div>
+        </div>
+        <div class="hub-stat-cell">
+          <div class="hub-stat-val" id="hub-stat-solved">0</div>
+          <div class="hub-stat-lbl">Решено задач</div>
+        </div>
+        <div class="hub-stat-cell">
+          <div class="hub-stat-val" id="hub-stat-streak">0 🔥</div>
+          <div class="hub-stat-lbl">Лучшая серия</div>
+        </div>
+        <div class="hub-stat-cell">
+          <div class="hub-stat-val">10 баллов</div>
+          <div class="hub-stat-lbl">Вес Части 1 (№1–10)</div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- 10 TRAINERS GRID -->
+    <section id="oge-trainers" aria-labelledby="trainers-heading">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">01 // Тренажёры по кодификатору</div>
+          <h2 class="section-title" id="trainers-heading">Задания ОГЭ №1–10 (Краткий ответ · по 1 баллу)</h2>
+        </div>
+        <span class="section-note">Кнопка «⚡ 10 мин» запускает режим спринта на время с личным рекордом</span>
+      </div>
+
+      <div class="oge-tasks-grid" id="oge-cards-grid"></div>
+    </section>
+
+    <!-- CHEAT SHEETS -->
+    <section id="cheatsheets" aria-labelledby="cheats-heading">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">02 // База теории</div>
+          <h2 class="section-title" id="cheats-heading">Шпаргалки и ключевые формулы к Части 1</h2>
+        </div>
+        <span class="section-note">Кликните по блоку, чтобы открыть памятку</span>
+      </div>
+
+      <div class="cheatsheet-grid">
+        <details class="cheat-details">
+          <summary>№1 · Единицы измерения и кодировки</summary>
+          <div class="cheat-body">
+            <p>1 байт = 8 бит; 1 Кбайт = 1024 байт; 1 Мбайт = 1024 Кбайт.</p>
+            <code class="cheat-code">КОИ-8 / Windows-1251 = 8 бит (1 байт)
+Unicode UTF-16 = 16 бит (2 байта)
+UTF-32 = 32 бита (4 байта)
+I = K · i</code>
+            <p>При удалении слова из списка через запятую дополнительно исчезают <strong>2 символа</strong>: запятая и пробел.</p>
+          </div>
+        </details>
+
+        <details class="cheat-details">
+          <summary>№2 · Условие Фано и декодирование</summary>
+          <div class="cheat-body">
+            <p>Прямое условие Фано: никакое кодовое слово не является <strong>началом</strong> другого кодового слова.</p>
+            <p>Если таблица не удовлетворяет условию Фано, пробуйте декодировать цепочку <strong>справа налево</strong> или перебирайте ветви, отбрасывая тупики.</p>
+          </div>
+        </details>
+
+        <details class="cheat-details">
+          <summary>№3 · Алгебра логики (НЕ, И, ИЛИ)</summary>
+          <div class="cheat-body">
+            <p>Приоритет операций: <strong>1) НЕ</strong> → <strong>2) И</strong> → <strong>3) ИЛИ</strong>.</p>
+            <code class="cheat-code">НЕ (x &lt; A)  ⇔  x ≥ A
+НЕ (x ≤ A)  ⇔  x &gt; A
+НЕ (A И B)  ⇔  (НЕ A) ИЛИ (НЕ B)
+НЕ (A ИЛИ B) ⇔ (НЕ A) И (НЕ B)</code>
+          </div>
+        </details>
+
+        <details class="cheat-details">
+          <summary>№4 и №9 · Графы и подсчёт путей</summary>
+          <div class="cheat-body">
+            <p><strong>В №4</strong> (таблица смежности): ищите кратчайший путь не напрямую, а через промежуточные пункты; если есть обязательный пункт C, сложите min(A→C) + min(C→F).</p>
+            <p><strong>В №9</strong> (ориентированный граф): N(A) = 1; далее для каждой вершины суммируйте значения всех входящих стрелок.</p>
+          </div>
+        </details>
+
+        <details class="cheat-details">
+          <summary>№7 · Структура URL и IPv4</summary>
+          <div class="cheat-body">
+            <code class="cheat-code">протокол://сервер/каталог/файл.расширение
+Пример: https://school.ru/info/oge.pdf</code>
+            <p>IPv4-адрес состоит из <strong>4 чисел от 0 до 255</strong>, разделённых точками (без ведущих нулей вроде 05).</p>
+          </div>
+        </details>
+
+        <details class="cheat-details">
+          <summary>№8 и №10 · Круги Эйлера и системы счисления</summary>
+          <div class="cheat-body">
+            <code class="cheat-code">N(A | B) = N(A) + N(B) − N(A &amp; B)
+2⁰=1, 2¹=2, 2²=4, 2³=8, 2⁴=16,
+2⁵=32, 2⁶=64, 2⁷=128, 2⁸=256</code>
+            <p>В 16-ричной системе: A=10, B=11, C=12, D=13, E=14, F=15.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- EXTRAS: PART 2 & LLM ANATOMY -->
+    <section aria-labelledby="extras-heading">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">03 // Дополнительно</div>
+          <h2 class="section-title" id="extras-heading">Практическая часть и спецкурсы</h2>
+        </div>
+      </div>
+
+      <div class="extras-grid">
+        <article class="extra-card dashed">
+          <div>
+            <div class="oge-card-top">
+              <span class="oge-num-badge">Часть 2 · №11–16</span>
+              <span class="oge-score-badge">В планах</span>
+            </div>
+            <h3 class="oge-card-title">Практические задания на компьютере</h3>
+            <p class="oge-card-desc">
+              Поиск в файлах (№11–12), презентация/документ (№13), электронные таблицы (№14), исполнитель Робот (№15) и программирование на Python (№16) — появятся на следующем этапе развития раздела.
+            </p>
+          </div>
+          <div>
+            <span class="section-note">Сейчас основной фокус — отработка 100% Части 1 на максимум (10/10 баллов).</span>
+          </div>
+        </article>
+
+        <article class="extra-card">
+          <div>
+            <div class="oge-card-top">
+              <span class="oge-num-badge">Спецкурс · ИИ</span>
+              <span class="oge-score-badge">Интерактив</span>
+            </div>
+            <h3 class="oge-card-title">Анатомия LLM: Нейроны, Модели, Токены</h3>
+            <p class="oge-card-desc">
+              Популярное интерактивное исследование о том, как устроены современные большие языковые модели, механизмы внимания и токенизация текста.
+            </p>
+          </div>
+          <div>
+            <a class="btn-secondary-inf" href="informatics/llm_anatomy.html">Открыть спецкурс →</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script src="../js/inf_oge_trainer_shell.js"></script>
+  <script>
+    (function () {
+      if (window.InfOgeShell) {
+        window.InfOgeShell.initThemeToggleOnly();
+      }
+
+      const TASKS = [
+        { num: 1, id: 'inf_oge_task_1', title: 'Количественные параметры объектов', desc: 'Удаление/добавление слов в кодировках КОИ-8, Windows-1251, UTF-16, UTF-32; расчёт объёма текста.', url: '../inf_moduls/inf_oge_task_1_trainer.html' },
+        { num: 2, id: 'inf_oge_task_2', title: 'Кодирование и декодирование', desc: 'Расшифровка двоичных и символьных сообщений, условие Фано, поиск единственной расшифровки.', url: '../inf_moduls/inf_oge_task_2_trainer.html' },
+        { num: 3, id: 'inf_oge_task_3', title: 'Значение логического выражения', desc: 'Высказывания с НЕ, И, ИЛИ: поиск наименьшего, наибольшего или количества целых чисел.', url: '../inf_moduls/inf_oge_task_3_trainer.html' },
+        { num: 4, id: 'inf_oge_task_4', title: 'Формальные описания и таблицы дорог', desc: 'Анализ весовой матрицы смежности графа и поиск длины кратчайшего пути между пунктами.', url: '../inf_moduls/inf_oge_task_4_trainer.html' },
+        { num: 5, id: 'inf_oge_task_5', title: 'Простой линейный алгоритм исполнителя', desc: 'Поиск неизвестного параметра b по программе и составление кратчайшего алгоритма.', url: '../inf_moduls/inf_oge_task_5_trainer.html' },
+        { num: 6, id: 'inf_oge_task_6', title: 'Программа с условным оператором', desc: 'Трассировка циклов запусков YES/NO и подбор параметра A (Python, АлгЯз, Pascal).', url: '../inf_moduls/inf_oge_task_6_trainer.html' },
+        { num: 7, id: 'inf_oge_task_7', title: 'Информационно-коммуникационные технологии', desc: 'Сборка URL-адресов по протоколу/серверу/файлу и восстановление IPv4-адреса из фрагментов.', url: '../inf_moduls/inf_oge_task_7_trainer.html' },
+        { num: 8, id: 'inf_oge_task_8', title: 'Поисковые запросы и круги Эйлера', desc: 'Задачи на пересечение (&) и объединение (|) для двух и трёх множеств с диаграммами.', url: '../inf_moduls/inf_oge_task_8_trainer.html' },
+        { num: 9, id: 'inf_oge_task_9', title: 'Подсчёт путей в схеме (графе)', desc: 'Ориентированные ациклические графы: все пути, проходящие через город или в обход города.', url: '../inf_moduls/inf_oge_task_9_trainer.html' },
+        { num: 10, id: 'inf_oge_task_10', title: 'Системы счисления', desc: 'Перевод и сравнение чисел в 2, 8, 10 и 16-ричной системах, подсчёт битов и интервалов.', url: '../inf_moduls/inf_oge_task_10_trainer.html' }
+      ];
+
+      const records = window.TrainerTracker ? window.TrainerTracker.getTrainerRecords() : {};
+      let activeCount = 0;
+      let totalSolved = 0;
+      let bestStreak = 0;
+
+      const grid = document.getElementById('oge-cards-grid');
+      if (grid) {
+        grid.innerHTML = TASKS.map((t) => {
+          const rec = records[t.id] || { maxStreak: 0, totalSolved: 0, maxRank: 'Не начат' };
+          if ((rec.totalSolved || 0) > 0) activeCount++;
+          totalSolved += (rec.totalSolved || 0);
+          if ((rec.maxStreak || 0) > bestStreak) bestStreak = rec.maxStreak || 0;
+
+          return `
+            <article class="oge-task-card">
+              <div>
+                <div class="oge-card-top">
+                  <span class="oge-num-badge">ОГЭ №${t.num}</span>
+                  <span class="oge-score-badge">1 балл · Часть 1</span>
+                </div>
+                <h3 class="oge-card-title">${t.title}</h3>
+                <p class="oge-card-desc">${t.desc}</p>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div class="oge-card-progress">
+                  <span class="oge-card-rank">${rec.maxRank && rec.maxRank !== 'Не начат' ? rec.maxRank : 'Ещё не начат'}</span>
+                  <span class="oge-card-streak">🔥 ${rec.maxStreak || 0} · ✅ ${rec.totalSolved || 0}</span>
+                </div>
+                <div class="oge-card-actions">
+                  <a class="btn-train" href="${t.url}">Тренировать →</a>
+                  <a class="btn-timed" href="${t.url}?mode=timed" title="Сыграть 10 минут на рекорд">⚡ 10 мин</a>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      const activeEl = document.getElementById('hub-stat-active');
+      const solvedEl = document.getElementById('hub-stat-solved');
+      const streakEl = document.getElementById('hub-stat-streak');
+      const xpEl = document.getElementById('hub-xp-badge');
+
+      if (activeEl) activeEl.textContent = `${activeCount} / 10`;
+      if (solvedEl) solvedEl.textContent = String(totalSolved);
+      if (streakEl) streakEl.textContent = `${bestStreak} 🔥`;
+      try {
+        if (xpEl) xpEl.textContent = 'XP +' + (localStorage.getItem('user_xp') || '0');
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

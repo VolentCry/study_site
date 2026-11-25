@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тренажёр ОГЭ Информатика №2 · Кодирование · НЕШкола</title>
+  <link rel="stylesheet" href="../assets/fonts/fonts.css" />
+  <script>
+    (function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();
+  </script>
+  <link rel="stylesheet" href="../css/inf_oge_style.css" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Навигация тренажёра">
+    <a class="brand" href="../pages/informatics.html">
+      <span class="brand-mark" aria-hidden="true">02</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Информатика · №2</span>
+      </span>
+    </a>
+
+    <div class="nav-task-switcher" aria-label="Переключатель заданий ОГЭ">
+      <a href="inf_oge_task_1_trainer.html" class="task-pill">1</a>
+      <a href="inf_oge_task_2_trainer.html" class="task-pill active">2</a>
+      <a href="inf_oge_task_3_trainer.html" class="task-pill">3</a>
+      <a href="inf_oge_task_4_trainer.html" class="task-pill">4</a>
+      <a href="inf_oge_task_5_trainer.html" class="task-pill">5</a>
+      <a href="inf_oge_task_6_trainer.html" class="task-pill">6</a>
+      <a href="inf_oge_task_7_trainer.html" class="task-pill">7</a>
+      <a href="inf_oge_task_8_trainer.html" class="task-pill">8</a>
+      <a href="inf_oge_task_9_trainer.html" class="task-pill">9</a>
+      <a href="inf_oge_task_10_trainer.html" class="task-pill">10</a>
+    </div>
+
+    <div class="nav-actions">
+      <a class="nav-btn" href="../pages/informatics.html">← Раздел ОГЭ</a>
+      <a class="nav-btn" href="../profile.html">Профиль</a>
+      <button type="button" class="nav-btn theme-toggle-btn" id="theme-toggle-btn" aria-label="Переключить тему">☀️</button>
+      <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+    </div>
+  </nav>
+
+  <main class="trainer-shell">
+    <header class="trainer-header">
+      <div class="trainer-kicker">Часть 1 · 1 балл · ФИПИ / Решу ОГЭ</div>
+      <h1 class="trainer-title">Задание №2 · Кодирование и декодирование</h1>
+      <p class="trainer-subtitle">Однозначное декодирование двоичных и символьных сообщений по таблице, условие Фано.</p>
+    </header>
+
+    <section class="stats-dashboard" aria-label="Статистика тренажёра">
+      <div class="stat-box streak-box"><div class="stat-icon">🔥</div><div class="stat-info"><span class="stat-num" id="stat-streak">0</span><span class="stat-label">Текущая серия</span></div></div>
+      <div class="stat-box"><div class="stat-icon">🏆</div><div class="stat-info"><span class="stat-num" id="stat-max-streak">0</span><span class="stat-label">Лучшая серия</span></div></div>
+      <div class="stat-box"><div class="stat-icon">✅</div><div class="stat-info"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Всего решено</span></div></div>
+      <div class="stat-box"><div class="stat-icon">🎖️</div><div class="stat-info"><span class="stat-num" id="stat-rank">Не начат</span><span class="stat-label">Ваше звание</span></div></div>
+    </section>
+
+    <div class="category-filter" role="tablist" aria-label="Прототипы задания 2">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">Все прототипы</button>
+      <button type="button" class="cat-btn" data-cat="digits_decode">Двоичный код (0 и 1)</button>
+      <button type="button" class="cat-btn" data-cat="symbols_decode">Символьные шифры</button>
+      <button type="button" class="cat-btn" data-cat="unique_decode">Единственная расшифровка</button>
+    </div>
+
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Задание №2</span>
+      <span class="card-help-badge" id="task-cat-badge">Прототип ОГЭ</span>
+
+      <div class="task-body" id="task-container"></div>
+
+      <div class="answer-row">
+        <input type="text" class="answer-input" id="answer-input" placeholder="Введите расшифрованное слово (например: КОРА)..." autocomplete="off" />
+        <button type="button" class="btn-action btn-check" id="btn-check">Проверить</button>
+        <button type="button" class="btn-action btn-next" id="btn-next" style="display:none;">Следующая задача →</button>
+      </div>
+
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <div class="card-tools">
+        <div class="card-tools-left">
+          <button type="button" class="tool-btn" id="btn-toggle-solution">💡 Пошаговый разбор</button>
+          <button type="button" class="tool-btn" id="btn-toggle-theory">📘 Памятка по №2</button>
+        </div>
+        <button type="button" class="tool-btn" id="btn-new-task">↻ Новое условие</button>
+      </div>
+
+      <div class="spoiler-panel" id="solution-panel">
+        <div id="solution-content"></div>
+      </div>
+
+      <div class="spoiler-panel" id="theory-panel">
+        <div class="theory-rule-box">
+          <div class="theory-rule-title">Стратегия расшифровки</div>
+          <p>Если в начале строки подходят сразу два кода, попробуйте оба варианта и проверьте, не упрётся ли один из них в тупик (остаток, которого нет в таблице). Иногда проще двигаться справа налево!</p>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/trainer_timed_mode.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script src="../js/inf_oge_task_2_trainer.js"></script>
+  <script src="../js/inf_oge_trainer_shell.js"></script>
+  <script>
+    window.InfOgeShell.initTrainer({
+      trainerId: 'inf_oge_task_2',
+      taskNum: 2,
+      title: 'Задание №2 · Кодирование',
+      engine: window.InfOgeTask2Trainer,
+      skillId: 'inf_encoding'
+    });
+  </script>
+</body>
+</html>

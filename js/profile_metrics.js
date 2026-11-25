@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const metricsStorageKey = 'studyMetrics';
     const chartColors = {
         'Математика': '#b7464e',
+        'Информатика': '#0ea5e9',
         'Английский': '#456f9f',
         'Физика': '#168c82'
     };
@@ -42,6 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'modernPhysics', label: 'Атомная и квантовая физика' },
             { id: 'measurement', label: 'Измерения' },
             { id: 'generalPhysics', label: 'Другие темы физики' }
+        ],
+        'Информатика': [
+            { id: 'inf_encoding', label: 'Объём и кодирование (№1–2)' },
+            { id: 'inf_logic', label: 'Алгебра логики (№3)' },
+            { id: 'inf_graphs', label: 'Графы и пути (№4, №9)' },
+            { id: 'inf_algorithms', label: 'Алгоритмы исполнителя (№5)' },
+            { id: 'inf_programming', label: 'Программирование (№6)' },
+            { id: 'inf_ict', label: 'ИКТ и поиск (№7–8)' },
+            { id: 'inf_numsys', label: 'Системы счисления (№10)' }
         ]
     };
     const svgNamespace = 'http://www.w3.org/2000/svg';

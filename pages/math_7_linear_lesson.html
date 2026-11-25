@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Линейная функция · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16);
+      --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06);
+      --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion);
+      font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700;
+      border-radius: 8px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+    .lesson-shell {
+      max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+
+    .lesson-hero {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .lesson-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold));
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light);
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .lesson-hero h1 {
+      font: 900 clamp(26px, 4vw, 36px)/1.2 'Lora', serif;
+      color: var(--indigo-dark); margin-bottom: 10px;
+    }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .toc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .toc-pill {
+      font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+      background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo); transition: all .2s;
+    }
+    .toc-pill:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+
+    .concept-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px;
+    }
+    .concept-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .concept-num {
+      font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .concept-head h2 {
+      font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark);
+    }
+
+    .intuition-box {
+      background: var(--gold-light); border-left: 4px solid var(--gold);
+      padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px;
+    }
+    .intuition-box strong { color: var(--indigo-dark); }
+
+    /* GRAPH LAB */
+    .graph-lab {
+      display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 22px; align-items: start;
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px;
+    }
+    @media (max-width: 720px) {
+      .graph-lab { grid-template-columns: 1fr; }
+    }
+    .svg-graph-box {
+      background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px;
+      display: flex; justify-content: center;
+    }
+    .graph-controls {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .formula-banner {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px;
+      text-align: center; font-size: 20px; font-weight: 700; color: var(--indigo-dark);
+    }
+    .slider-row {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .slider-head {
+      display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; font-weight: 700;
+    }
+    .slider-val {
+      padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 800;
+    }
+    .slider-val.k-badge { background: rgba(38, 63, 97, 0.1); color: var(--indigo); }
+    .slider-val.b-badge { background: var(--vermilion-light); color: var(--vermilion); }
+    input[type="range"] {
+      width: 100%; accent-color: var(--indigo); cursor: pointer;
+    }
+    .status-pill {
+      padding: 10px 14px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      border: 1px solid var(--line); background: #fff;
+    }
+    .mini-table {
+      width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--line); font-size: 13.5px; text-align: center;
+    }
+    .mini-table th, .mini-table td { padding: 6px 10px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
+    .mini-table th { background: rgba(38, 63, 97, 0.06); color: var(--indigo); font-weight: 800; }
+
+    /* PARALLEL / INTERSECT DEMO */
+    .mode-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+    .mode-btn {
+      padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff;
+      font-size: 13.5px; font-weight: 700; color: var(--indigo); transition: all .2s;
+    }
+    .mode-btn.active { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+    .compare-box {
+      display: grid; grid-template-columns: 240px 1fr; gap: 18px; align-items: center;
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px;
+    }
+    @media (max-width: 680px) { .compare-box { grid-template-columns: 1fr; } }
+
+    .trap-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;
+    }
+    .trap-box {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px; background: var(--paper-light);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .trap-box.good { border-color: var(--green-border); background: var(--green-light); }
+    .trap-box.warn { border-color: var(--vermilion-border); background: var(--vermilion-light); }
+    .trap-title { font-weight: 800; font-size: 14px; }
+
+    /* QUIZ */
+    .quiz-item {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff;
+      font-size: 14px; font-weight: 700; color: var(--indigo); transition: all .15s;
+    }
+    .quiz-opt:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; line-height: 1.5; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff;
+      border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: var(--shadow-md);
+    }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn {
+      padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      background: #fff; color: var(--indigo-dark); transition: transform .15s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">7 класс · Конспект урока</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_7.html">← Назад к 7 классу</a>
+      <a class="nav-btn" href="../math_moduls/linear_function_trainer.html">Тренажёр линейной функции →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Алгебра · 7 класс · Интерактивный разбор</span>
+      <h1>Линейная функция $y = kx + b$: как числа управляют прямой</h1>
+      <p>Разбираемся, за что отвечает каждый коэффициент в формуле прямой, как мгновенно читать график глазами без таблицы значений и почему при $k_1 = k_2$ прямые никогда не пересекутся.</p>
+      <div class="toc-pills">
+        <a class="toc-pill" href="#sec-lab">1. Живой график $y = kx + b$</a>
+        <a class="toc-pill" href="#sec-meaning">2. Геометрический смысл $k$ и $b$</a>
+        <a class="toc-pill" href="#sec-parallel">3. Когда прямые параллельны</a>
+        <a class="toc-pill" href="#sec-point">4. Проверка точки $(x_0; y_0)$</a>
+        <a class="toc-pill" href="#sec-quiz">5. Проверь понимание</a>
+      </div>
+    </header>
+
+    <!-- SECTION 1: INTERACTIVE GRAPH -->
+    <section class="concept-card" id="sec-lab">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Покрутите коэффициенты $k$ и $b$ и посмотрите на прямую</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Главный секрет:</strong> вам больше не нужно запоминать «если $k > 0$, то слева направо вверх». Подвигайте ползунки и проследите: $b$ — это просто **высота старта** на оси $Oy$, а $k$ — **шаг вверх или вниз** на каждую единицу вправо.
+      </div>
+
+      <div class="graph-lab">
+        <div class="svg-graph-box">
+          <svg id="linear-svg" width="300" height="300" viewBox="-150 -150 300 300" aria-label="Интерактивный график линейной функции"></svg>
+        </div>
+
+        <div class="graph-controls">
+          <div class="formula-banner" id="live-formula"></div>
+
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>Угловой коэффициент $k$ (наклон):</span>
+              <span class="slider-val k-badge" id="k-val-label">1</span>
+            </div>
+            <input type="range" id="slider-k" min="-3" max="3" step="0.5" value="1">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>Свободный член $b$ (сдвиг по оси $Oy$):</span>
+              <span class="slider-val b-badge" id="b-val-label">1</span>
+            </div>
+            <input type="range" id="slider-b" min="-4" max="4" step="1" value="1">
+          </div>
+
+          <div class="status-pill" id="graph-status"></div>
+
+          <table class="mini-table">
+            <thead>
+              <tr><th>$x$</th><th>$0$ (старт на $Oy$)</th><th>$1$</th><th>$2$</th></tr>
+            </thead>
+            <tbody>
+              <tr id="table-y-row"></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: GEOMETRIC MEANING -->
+    <section class="concept-card" id="sec-meaning">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Шпаргалка глазами: как по чертежу сразу определить знаки $k$ и $b$</h2>
+        </div>
+      </div>
+
+      <div class="trap-grid">
+        <div class="trap-box good">
+          <div class="trap-title" style="color: var(--indigo);">1. Смотрим на точку на оси $Oy$ → это $b$</div>
+          <p style="font-size: 14px;">При $x = 0$ формула превращается в $y = k \cdot 0 + b = b$. Поэтому прямая пересекает вертикальную ось $Oy$ ровно в точке <strong>$(0; b)$</strong>.</p>
+          <p style="font-size: 13.5px; color: var(--muted);">• Выше нуля → $b > 0$<br>• Через начало координат $(0; 0)$ → $b = 0$ (прямая пропорциональность $y = kx$)<br>• Ниже нуля → $b < 0$</p>
+        </div>
+
+        <div class="trap-box warn">
+          <div class="trap-title" style="color: var(--vermilion);">2. Смотрим на горку слева направо → это $k$</div>
+          <p style="font-size: 14px;">Идём по графику слева направо, как читаем книгу:</p>
+          <p style="font-size: 13.5px; color: var(--muted);">• Поднимаемся в горку → <strong>$k > 0$</strong> (функция возрастает)<br>• Скатываемся вниз → <strong>$k < 0$</strong> (функция убывает)<br>• Идём ровно по горизонту → <strong>$k = 0$</strong> ($y = b$)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: PARALLEL VS INTERSECT -->
+    <section class="concept-card" id="sec-parallel">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 03</span>
+          <h2>Когда две прямые параллельны, а когда пересекаются?</h2>
+        </div>
+      </div>
+
+      <div class="mode-tabs">
+        <button type="button" class="mode-btn active" data-rel="parallel">Параллельны ($k_1 = k_2, \; b_1 \ne b_2$)</button>
+        <button type="button" class="mode-btn" data-rel="intersect">Пересекаются ($k_1 \ne k_2$)</button>
+        <button type="button" class="mode-btn" data-rel="same">Совпадают ($k_1 = k_2, \; b_1 = b_2$)</button>
+      </div>
+
+      <div class="compare-box">
+        <div class="svg-graph-box" style="padding: 8px;">
+          <svg id="rel-svg" width="220" height="220" viewBox="-110 -110 220 220"></svg>
+        </div>
+        <div id="rel-desc" style="font-size: 14.5px;"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: POINT CHECK -->
+    <section class="concept-card" id="sec-point">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 04</span>
+          <h2>Как проверить, принадлежит ли точка $A(x_0; y_0)$ графику?</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Не нужно чертить график!</strong> График — это все точки, координаты которых превращают формулу в верное равенство. Просто подставьте первое число вместо $x$, а второе вместо $y$.
+      </div>
+
+      <div class="trap-grid">
+        <div class="trap-box good">
+          <div class="trap-title" style="color: var(--green);">Пример: $y = 3x - 2$ и точка $A(2; 4)$</div>
+          <div>Подставляем $x = 2$: $y = 3 \cdot 2 - 2 = 4$.</div>
+          <div>Получили $4 = 4$ (верно) → точка <strong>лежит на прямой</strong>.</div>
+        </div>
+        <div class="trap-box warn">
+          <div class="trap-title" style="color: var(--vermilion);">Пример: $y = 3x - 2$ и точка $B(1; 5)$</div>
+          <div>Подставляем $x = 1$: $y = 3 \cdot 1 - 2 = 1$.</div>
+          <div>Получили $1 \ne 5$ (не сошлось) → точка <strong>не лежит на прямой</strong>.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: QUIZ -->
+    <section class="concept-card" id="sec-quiz">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Проверьте понимание в 3 вопросах</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Прямая идёт слева направо вниз и пересекает ось $Oy$ выше нуля. Какие знаки у $k$ и $b$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$k > 0, \; b > 0$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$k < 0, \; b > 0$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$k < 0, \; b < 0$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. При каком значении $k$ прямая $y = kx + 7$ параллельна прямой $y = -4x - 2$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$k = -2$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$k = -4$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$k = 7$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="3">
+        <div class="quiz-q">3. Какая точка точно принадлежит графику функции $y = -2x + 5$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$A(2; 1)$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$B(1; 2)$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$C(0; -2)$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-3"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Закрепите навык на тренажёре линейной функции</h3>
+        <p>Определяйте $k$ и $b$ по графику, стройте прямые по двум точкам и находите пересечения.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/linear_function_trainer.html">Открыть тренажёр →</a>
+        <a class="cta-btn secondary" href="math_7.html">← Все темы 7 класса</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s, displayMode) {
+        if (window.StudyMath && window.StudyMath.renderTeX) {
+          return window.StudyMath.renderTeX(s, !!displayMode);
+        }
+        return s;
+      }
+
+      function renderAllInlineTex(root) {
+        const el = root || document.body;
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.parentElement && !node.parentElement.closest('.katex, script, style, code')) {
+            if (node.nodeValue.includes('$')) textNodes.push(node);
+          }
+        }
+        textNodes.forEach(tn => {
+          const val = tn.nodeValue;
+          if (!/\$[^$\n]+\$/.test(val)) return;
+          const span = document.createElement('span');
+          span.innerHTML = val.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m, false));
+          tn.parentNode.replaceChild(span, tn);
+        });
+      }
+
+      // 1. Live Interactive Graph
+      const svg = document.getElementById('linear-svg');
+      const sliderK = document.getElementById('slider-k');
+      const sliderB = document.getElementById('slider-b');
+      const kLabel = document.getElementById('k-val-label');
+      const bLabel = document.getElementById('b-val-label');
+      const formulaEl = document.getElementById('live-formula');
+      const statusEl = document.getElementById('graph-status');
+      const tableRow = document.getElementById('table-y-row');
+
+      const SCALE = 25; // 1 unit = 25px, range -6..6
+
+      function drawGrid(svgEl, halfSize, step) {
+        let html = '';
+        for (let i = -5; i <= 5; i++) {
+          const pos = i * step;
+          html += `<line x1="${pos}" y1="${-halfSize}" x2="${pos}" y2="${halfSize}" stroke="#e5e9ee" stroke-width="1"/>`;
+          html += `<line x1="${-halfSize}" y1="${pos}" x2="${halfSize}" y2="${pos}" stroke="#e5e9ee" stroke-width="1"/>`;
+        }
+        html += `<line x1="${-halfSize}" y1="0" x2="${halfSize}" y2="0" stroke="#697383" stroke-width="1.6"/>`;
+        html += `<line x1="0" y1="${-halfSize}" x2="0" y2="${halfSize}" stroke="#697383" stroke-width="1.6"/>`;
+        html += `<text x="${halfSize - 12}" y="-6" font-size="11" font-weight="700" fill="#697383">x</text>`;
+        html += `<text x="7" y="${-halfSize + 14}" font-size="11" font-weight="700" fill="#697383">y</text>`;
+        html += `<text x="5" y="13" font-size="10" fill="#697383">0</text>`;
+        html += `<text x="${step - 3}" y="13" font-size="10" fill="#697383">1</text>`;
+        html += `<text x="5" y="${-step + 4}" font-size="10" fill="#697383">1</text>`;
+        return html;
+      }
+
+      function formatLinearFormula(k, b) {
+        let kPart = '';
+        if (k === 1) kPart = 'x';
+        else if (k === -1) kPart = '-x';
+        else if (k !== 0) kPart = `${String(k).replace('.', ',')}x`;
+
+        let bPart = '';
+        if (k === 0) bPart = String(b);
+        else if (b > 0) bPart = ` + ${b}`;
+        else if (b < 0) bPart = ` - ${Math.abs(b)}`;
+
+        return `y = ${kPart}${bPart}`;
+      }
+
+      function updateGraph() {
+        const k = parseFloat(sliderK.value);
+        const b = parseFloat(sliderB.value);
+        kLabel.textContent = String(k).replace('.', ',');
+        bLabel.textContent = String(b);
+
+        formulaEl.innerHTML = tex(formatLinearFormula(k, b), false);
+
+        if (k > 0) {
+          statusEl.style.color = '#2e7d32';
+          statusEl.innerHTML = `📈 <strong>k > 0:</strong> прямая поднимается вверх. Точка на оси Oy: <strong>(0; ${b})</strong>.`;
+        } else if (k < 0) {
+          statusEl.style.color = '#b7464e';
+          statusEl.innerHTML = `📉 <strong>k < 0:</strong> прямая опускается вниз. Точка на оси Oy: <strong>(0; ${b})</strong>.`;
+        } else {
+          statusEl.style.color = '#263f61';
+          statusEl.innerHTML = `➖ <strong>k = 0:</strong> горизонтальная прямая, параллельная оси Ox, на высоте <strong>y = ${b}</strong>.`;
+        }
+
+        const y0 = b;
+        const y1 = k + b;
+        const y2 = 2 * k + b;
+        tableRow.innerHTML = `<th>$y$</th><td>${String(y0).replace('.', ',')}</td><td>${String(y1).replace('.', ',')}</td><td>${String(y2).replace('.', ',')}</td>`;
+        renderAllInlineTex(tableRow);
+
+        let content = drawGrid(svg, 150, SCALE);
+        const xMin = -6, xMax = 6;
+        const py1 = -(k * xMin + b) * SCALE;
+        const py2 = -(k * xMax + b) * SCALE;
+        content += `<line x1="${xMin * SCALE}" y1="${py1}" x2="${xMax * SCALE}" y2="${py2}" stroke="#263f61" stroke-width="2.8" stroke-linecap="round"/>`;
+
+        // Slope triangle from (0, b) -> (1, b) -> (1, k + b)
+        if (k !== 0) {
+          const by = -b * SCALE;
+          const x1px = 1 * SCALE;
+          const y1px = -(k + b) * SCALE;
+          content += `<line x1="0" y1="${by}" x2="${x1px}" y2="${by}" stroke="#c8956c" stroke-width="2" stroke-dasharray="4 3"/>`;
+          content += `<line x1="${x1px}" y1="${by}" x2="${x1px}" y2="${y1px}" stroke="#c8956c" stroke-width="2" stroke-dasharray="4 3"/>`;
+          content += `<text x="${x1px + 5}" y="${(by + y1px) / 2 + 4}" font-size="11" font-weight="800" fill="#c8956c">${k > 0 ? '+' : ''}${String(k).replace('.', ',')}</text>`;
+        }
+
+        // Point (0; b)
+        content += `<circle cx="0" cy="${-b * SCALE}" r="5" fill="#b7464e" stroke="#fff" stroke-width="1.5"/>`;
+        content += `<text x="8" y="${-b * SCALE - 6}" font-size="11" font-weight="800" fill="#b7464e">(0; ${b})</text>`;
+
+        svg.innerHTML = content;
+      }
+
+      sliderK.addEventListener('input', updateGraph);
+      sliderB.addEventListener('input', updateGraph);
+      updateGraph();
+
+      // 2. Relative position demo
+      const relSvg = document.getElementById('rel-svg');
+      const relDesc = document.getElementById('rel-desc');
+
+      function renderRel(mode) {
+        let html = drawGrid(relSvg, 110, 20);
+        const drawLine = (k, b, color, dash) => {
+          const y1 = -(k * (-6) + b) * 20;
+          const y2 = -(k * 6 + b) * 20;
+          return `<line x1="-120" y1="${y1}" x2="120" y2="${y2}" stroke="${color}" stroke-width="2.5" ${dash ? 'stroke-dasharray="6 4"' : ''}/>`;
+        };
+
+        if (mode === 'parallel') {
+          html += drawLine(1, 2, '#263f61', false);
+          html += drawLine(1, -1.5, '#b7464e', false);
+          relDesc.innerHTML = `<strong>Прямые идут под одним и тем же углом</strong> (${tex('y = x + 2')} и ${tex('y = x - 1,5')}). Поскольку у них одинаковый угловой коэффициент ${tex('k_1 = k_2 = 1')}, они никогда не пересекутся.`;
+        } else if (mode === 'intersect') {
+          html += drawLine(1, 1, '#263f61', false);
+          html += drawLine(-1, 1, '#b7464e', false);
+          html += `<circle cx="0" cy="-20" r="4.5" fill="#2e7d32" stroke="#fff" stroke-width="1.5"/>`;
+          relDesc.innerHTML = `<strong>Угловые коэффициенты разные</strong> (${tex('y = x + 1')} и ${tex('y = -x + 1')}). Поскольку ${tex('k_1 = 1 \\ne k_2 = -1')}, прямые обязательно пересекаются в одной точке — здесь это ${tex('(0; 1)')}.`;
+        } else {
+          html += drawLine(0.8, 1, '#263f61', false);
+          html += drawLine(0.8, 1, '#b7464e', true);
+          relDesc.innerHTML = `<strong>И коэффициенты ${tex('k')}, и сдвиги ${tex('b')} совпали</strong>: например, ${tex('y = 0,8x + 1')} и ${tex('y = \\frac{4}{5}x + 1')}. Одна прямая ложится точно поверх другой — общих точек бесконечно много.`;
+        }
+        relSvg.innerHTML = html;
+      }
+
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderRel(btn.dataset.rel);
+        });
+      });
+      renderRel('parallel');
+
+      // 3. Quiz
+      const quizExplanations = {
+        1: {
+          ok: 'Верно! Спуск слева направо означает k < 0, а пересечение оси Oy выше нуля означает b > 0.',
+          wrong1: 'При k > 0 прямая поднималась бы в горку слева направо, а здесь она спускается.',
+          wrong2: 'Ось Oy пересечена выше нуля, поэтому b > 0, а не меньше нуля.'
+        },
+        2: {
+          ok: 'Точно! Параллельные прямые имеют одинаковый наклон, значит k = −4.',
+          wrong1: 'Нет: −2 здесь свободный член b второй прямой, он отвечает за высоту, а не за наклон.',
+          wrong2: '7 — это свободный член b первой прямой. За параллельность отвечает коэффициент перед x.'
+        },
+        3: {
+          ok: 'Правильно! При x = 2 получаем y = −2 · 2 + 5 = −4 + 5 = 1 — координаты точки A(2; 1) подходят!',
+          wrong1: 'Проверим B(1; 2): −2 · 1 + 5 = 3 ≠ 2 — не подходит.',
+          wrong2: 'Проверим C(0; −2): −2 · 0 + 5 = 5 ≠ −2 — не подходит.'
+        }
+      };
+
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            const isOk = ans === 'ok';
+            btn.classList.add(isOk ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${isOk ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+    })();
+  </script>
+</body>
+</html>

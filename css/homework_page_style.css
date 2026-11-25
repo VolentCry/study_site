@@ -1165,3 +1165,59 @@ sup sup {
 .task20-hw-answer-box .task20-preview-val {
     color: var(--task20-vermilion);
 }
+
+/* --- Informatics OGE task widgets inside homework cards --- */
+.inf-code-tabs {
+    margin: 12px 0;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.45);
+    overflow: hidden;
+}
+[data-theme="light"] .inf-code-tabs {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.15);
+}
+.inf-code-tab-bar {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(148, 163, 184, 0.1);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+.inf-lang-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.inf-lang-btn.active {
+    background: rgba(44, 230, 214, 0.16);
+    border-color: rgba(44, 230, 214, 0.45);
+}
+.inf-code-pre {
+    margin: 0;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-x: auto;
+}
+.inf-table-wrap { margin: 12px 0; overflow-x: auto; }
+.inf-table { border-collapse: collapse; margin: 0 auto; font-size: 14px; }
+.inf-table th, .inf-table td { border: 1px solid rgba(148, 163, 184, 0.35); padding: 7px 11px; text-align: center; }
+.inf-table th { background: rgba(148, 163, 184, 0.14); font-weight: 700; }
+.inf-svg-wrap { margin: 12px auto; display: flex; justify-content: center; }
+.inf-svg-graph { width: 100%; max-width: 520px; height: auto; border-radius: 10px; background: rgba(15, 23, 42, 0.35); padding: 6px; }
+[data-theme="light"] .inf-svg-graph { background: #f8fafc; border: 1px solid rgba(15, 23, 42, 0.12); }
+.inf-svg-graph { --svg-node-fill: #1b2232; --svg-node-stroke: #2ce6d6; --svg-node-text: #f4f6fa; --svg-edge: #94a3b8; --svg-edge-hi: #ff7728; --accent: #2ce6d6; --warm: #ff7728; --success: #2ed573; --error: #ff5c72; }
+[data-theme="light"] .inf-svg-graph { --svg-node-fill: #ffffff; --svg-node-stroke: #0d9488; --svg-node-text: #162235; --svg-edge: #64748b; --svg-edge-hi: #d95b16; --accent: #0d9488; --warm: #d95b16; --success: #15803d; --error: #c81e3a; }
+.inf-fragment-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 10px 0; }
+.inf-fragment-chip { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.inf-fragment-key { font-weight: 800; padding: 2px 7px; border-radius: 5px; background: rgba(44, 230, 214, 0.16); }
+.inf-quote-box { margin: 10px 0; padding: 12px 14px; border-left: 3px solid #2ce6d6; background: rgba(148, 163, 184, 0.1); border-radius: 0 8px 8px 0; }
+.inf-program-seq { display: inline-block; padding: 2px 8px; border-radius: 6px; background: rgba(255, 119, 40, 0.16); font-family: 'JetBrains Mono', monospace; font-weight: 700; }

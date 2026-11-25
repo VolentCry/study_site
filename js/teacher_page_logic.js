@@ -3128,6 +3128,26 @@
                         };
                         t = window.OgeTask20Trainer.generateTask(catMap[type] || 'mixed_all');
                     }
+                } else if (type.startsWith('inf_oge')) {
+                    const infMap = {
+                        'inf_oge1_all': window.InfOgeTask1Trainer,
+                        'inf_oge2_all': window.InfOgeTask2Trainer,
+                        'inf_oge3_all': window.InfOgeTask3Trainer,
+                        'inf_oge4_all': window.InfOgeTask4Trainer,
+                        'inf_oge5_all': window.InfOgeTask5Trainer,
+                        'inf_oge6_all': window.InfOgeTask6Trainer,
+                        'inf_oge7_all': window.InfOgeTask7Trainer,
+                        'inf_oge8_all': window.InfOgeTask8Trainer,
+                        'inf_oge9_all': window.InfOgeTask9Trainer,
+                        'inf_oge10_all': window.InfOgeTask10Trainer
+                    };
+                    const engine = infMap[type];
+                    if (engine) {
+                        t = engine.generateTask('mixed_all');
+                        if (hwInputSubject && (!hwInputSubject.value || hwInputSubject.value.trim() === 'Математика')) {
+                            hwInputSubject.value = 'Информатика';
+                        }
+                    }
                 } else if (type.startsWith('mult_')) {
                     t = generateMultiplicationTask(type);
                 } else if (type.startsWith('powers_compare')) {
@@ -3338,8 +3358,9 @@
         const physicsTests = topics.filter(t => t.subject === 'physics' && t.isTest);
         const physicsProblems = topics.filter(t => t.subject === 'physics' && !t.isTest);
         const mathTopics = topics.filter(t => t.subject === 'math');
+        const informaticsTopics = topics.filter(t => t.subject === 'informatics');
         const englishTopics = topics.filter(t => t.subject === 'english');
-        const otherTopics = topics.filter(t => t.subject !== 'physics' && t.subject !== 'math' && t.subject !== 'english');
+        const otherTopics = topics.filter(t => t.subject !== 'physics' && t.subject !== 'math' && t.subject !== 'english' && t.subject !== 'informatics');
 
         let html = '<option value="">-- Выберите тему из Банка задач --</option>';
 
@@ -3364,6 +3385,15 @@
         if (mathTopics.length > 0) {
             html += '<optgroup label="📐 Математика · Задачи и вычисления">';
             mathTopics.forEach(t => {
+                const sel = t.id === selectedId ? 'selected' : '';
+                html += `<option value="${t.id}" ${sel}>${escapeHtml(t.title)} (${t.tasks.length} зад.)</option>`;
+            });
+            html += '</optgroup>';
+        }
+
+        if (informaticsTopics.length > 0) {
+            html += '<optgroup label="💻 Информатика · ОГЭ (задания 1–10)">';
+            informaticsTopics.forEach(t => {
                 const sel = t.id === selectedId ? 'selected' : '';
                 html += `<option value="${t.id}" ${sel}>${escapeHtml(t.title)} (${t.tasks.length} зад.)</option>`;
             });
@@ -3429,6 +3459,8 @@
                         hwInputSubject.value = 'Английский язык';
                     } else if (topic.subject === 'math') {
                         hwInputSubject.value = 'Математика';
+                    } else if (topic.subject === 'informatics') {
+                        hwInputSubject.value = 'Информатика';
                     }
                 }
             }
@@ -4526,6 +4558,19 @@
             return d.toLocaleDateString('ru-RU');
         } catch(e) { return isoStr; }
     }
+
+    // Delegated handler for Informatics OGE code language tabs in teacher previews
+    document.addEventListener('click', (e) => {
+        const langBtn = e.target.closest('.inf-lang-btn');
+        if (!langBtn) return;
+        const group = langBtn.closest('.inf-code-tabs');
+        if (!group) return;
+        const lang = langBtn.dataset.lang;
+        group.querySelectorAll('.inf-lang-btn').forEach(b => b.classList.toggle('active', b === langBtn));
+        group.querySelectorAll('.inf-code-pre').forEach(p => {
+            p.style.display = p.dataset.lang === lang ? 'block' : 'none';
+        });
+    });
 
     window.addEventListener('study-auth-changed', () => init());
     window.addEventListener('study-cloud-synced', () => init());

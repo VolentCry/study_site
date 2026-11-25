@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Быстрое умножение и деление · 4 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body {
+      background-color: var(--paper); color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6;
+      background-image: radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%), radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion);
+      color: var(--vermilion); font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700;
+      border-radius: 8px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .lesson-shell { max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px; display: flex; flex-direction: column; gap: 28px; }
+    .lesson-hero {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .lesson-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold));
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .toc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .toc-pill { font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--paper-light); border: 1px solid var(--line); color: var(--indigo); }
+    .toc-pill:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+    .concept-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px;
+    }
+    .concept-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px; }
+    .lab-box { background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .lab-controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+    .control-group { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 700; color: var(--indigo); }
+    .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; }
+    .stepper button { width: 30px; height: 30px; font-size: 16px; font-weight: 700; color: var(--indigo); display: grid; place-items: center; }
+    .stepper button:hover { background: var(--indigo-soft); }
+    .stepper span { min-width: 34px; text-align: center; font-size: 14px; font-weight: 800; color: var(--vermilion); }
+
+    .area-grid { display: flex; flex-direction: column; align-items: center; gap: 14px; background: #fff; border: 1px dashed rgba(38,63,97,0.25); border-radius: 12px; padding: 18px; }
+    .area-rect { display: flex; width: 100%; max-width: 440px; height: 90px; border-radius: 10px; overflow: hidden; border: 2px solid var(--indigo); }
+    .area-tens { background: rgba(38, 63, 97, 0.12); display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 800; color: var(--indigo-dark); border-right: 2px dashed var(--indigo); padding: 6px; }
+    .area-ones { background: var(--vermilion-light); display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 800; color: var(--vermilion); padding: 6px; }
+
+    .tricks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .trick-card { background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .trick-title { font-weight: 800; color: var(--indigo-dark); font-size: 15px; }
+
+    .quiz-item { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light); display: flex; flex-direction: column; gap: 12px; }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 700; color: var(--indigo); }
+    .quiz-opt:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff; border-radius: var(--r-lg);
+      padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: var(--shadow-md);
+    }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">4 класс · Конспект урока</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_4.html">← Назад к 4 классу</a>
+      <a class="nav-btn" href="../math_moduls/multiplication_trainer.html">Тренажёр умножения →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Арифметика · 4 класс · Интерактивный разбор</span>
+      <h1>Секреты быстрого умножения и деления в уме</h1>
+      <p>Учимся не считать двузначные числа столбиком каждый раз, а разбивать прямоугольник площади на удобные десятки и единицы, пользоваться умножением на 5 и 25, а также проверять ответ прикидкой.</p>
+      <div class="toc-pills">
+        <a class="toc-pill" href="#sec-rect">1. Прямоугольник умножения</a>
+        <a class="toc-pill" href="#sec-tricks">2. Приёмы для 5, 11 и 25</a>
+        <a class="toc-pill" href="#sec-check">3. Проверка прикидкой</a>
+        <a class="toc-pill" href="#sec-quiz">4. Проверь понимание</a>
+      </div>
+    </header>
+
+    <section class="concept-card" id="sec-rect">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Как умножать в уме через «разрезание» прямоугольника</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Главный приём:</strong> чтобы умножить $14 \cdot 6$, представьте прямоугольник шириной $14$ и высотой $6$. Разрежьте ширину на круглый десяток $10$ и хвост $4$. Посчитайте две лёгкие площади и сложите!
+      </div>
+
+      <div class="lab-box">
+        <div class="lab-controls">
+          <div class="control-group">
+            Двузначное число:
+            <div class="stepper">
+              <button type="button" id="rect-a-dec">−</button>
+              <span id="rect-a-val">14</span>
+              <button type="button" id="rect-a-inc">+</button>
+            </div>
+          </div>
+          <div class="control-group">
+            Множитель:
+            <div class="stepper">
+              <button type="button" id="rect-b-dec">−</button>
+              <span id="rect-b-val">6</span>
+              <button type="button" id="rect-b-inc">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="area-grid">
+          <div class="area-rect" id="area-rect"></div>
+          <div id="area-formula" style="font-size: 18px; font-weight: 700; color: var(--indigo-dark);"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card" id="sec-tricks">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Три «читерских» правила устного счёта</h2>
+        </div>
+      </div>
+
+      <div class="tricks-grid">
+        <div class="trick-card">
+          <div class="trick-title">1. Умножение на $5$</div>
+          <p style="font-size: 14px;">$5$ — это половина от $10$. Сначала припишите ноль (умножьте на $10$), а затем разделите пополам!</p>
+          <p style="font-size: 14px; font-weight: 700; color: var(--vermilion);">$36 \cdot 5 = 360 : 2 = 180$</p>
+        </div>
+
+        <div class="trick-card">
+          <div class="trick-title">2. Умножение на $25$</div>
+          <p style="font-size: 14px;">$25 \cdot 4 = 100$. Разделите число на $4$ и припишите два нуля!</p>
+          <p style="font-size: 14px; font-weight: 700; color: var(--vermilion);">$24 \cdot 25 = (24 : 4) \cdot 100 = 600$</p>
+        </div>
+
+        <div class="trick-card">
+          <div class="trick-title">3. Деление на части</div>
+          <p style="font-size: 14px;">Разбейте делимое на два удобных слагаемых, которые делятся нацело:</p>
+          <p style="font-size: 14px; font-weight: 700; color: var(--vermilion);">$84 : 6 = (60 + 24) : 6 = 10 + 4 = 14$</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card" id="sec-check">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 03</span>
+          <h2>Как за 2 секунды поймать грубую ошибку («прикидка»)</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        <strong>Две быстрые проверки:</strong>
+        <br>1) <strong>Последняя цифра:</strong> в $27 \cdot 4$ результат обязан заканчиваться на ту же цифру, что и $7 \cdot 4 = 28$ (то есть на $8$).
+        <br>2) <strong>Порядок величины:</strong> в $31 \cdot 49$ округляем до $30 \cdot 50 = 1500$. Если у вас вышло $159$ или $15000$ — где-то потерян разряд!
+      </div>
+    </section>
+
+    <section class="concept-card" id="sec-quiz">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Проверьте понимание в 3 вопросах</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Как быстрее всего посчитать в уме $28 \cdot 5$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$280 : 2 = 140$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$28 \cdot 10 = 280$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$20 \cdot 5 + 8 = 108$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. На какую цифру точно должно оканчиваться произведение $47 \cdot 6$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">На $6$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">На $2$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">На $4$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="3">
+        <div class="quiz-q">3. Чему равно $18 \cdot 7$ через разбиение на десятки и единицы?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$10 \cdot 7 + 8 = 78$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$10 \cdot 7 + 8 \cdot 7 = 70 + 56 = 126$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$10 \cdot 8 + 7 = 87$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-3"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Закрепите приёмы на тренажёре умножения</h3>
+        <p>Потренируйте устный счёт на лёгком, среднем и сложном уровнях.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/multiplication_trainer.html">Лёгкий тренажёр →</a>
+        <a class="cta-btn secondary" href="../math_moduls/multiplication_trainer_medium_level.html">Средний уровень</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) { return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s; }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = [];
+        let n;
+        while ((n = walker.nextNode())) {
+          if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) nodes.push(n);
+        }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      let numA = 14, numB = 6;
+      const rectEl = document.getElementById('area-rect');
+      const formulaEl = document.getElementById('area-formula');
+
+      function updateRect() {
+        document.getElementById('rect-a-val').textContent = numA;
+        document.getElementById('rect-b-val').textContent = numB;
+        const tens = Math.floor(numA / 10) * 10;
+        const ones = numA % 10;
+        const tensPct = Math.round((tens / numA) * 100);
+        const onesPct = 100 - tensPct;
+        rectEl.innerHTML = `
+          <div class="area-tens" style="width:${tensPct}%;">
+            <span>${tens} · ${numB}</span>
+            <span style="font-size:18px;">= ${tens * numB}</span>
+          </div>
+          ${ones > 0 ? `<div class="area-ones" style="width:${onesPct}%;"><span>${ones} · ${numB}</span><span style="font-size:18px;">= ${ones * numB}</span></div>` : ''}
+        `;
+        formulaEl.innerHTML = tex(`${numA} \\cdot ${numB} = ${tens * numB} + ${ones * numB} = ${numA * numB}`);
+      }
+
+      document.getElementById('rect-a-dec').onclick = () => { if (numA > 11) { numA--; updateRect(); } };
+      document.getElementById('rect-a-inc').onclick = () => { if (numA < 39) { numA++; updateRect(); } };
+      document.getElementById('rect-b-dec').onclick = () => { if (numB > 2) { numB--; updateRect(); } };
+      document.getElementById('rect-b-inc').onclick = () => { if (numB < 9) { numB++; updateRect(); } };
+
+      const quizExplanations = {
+        1: { ok: 'Точно! Умножаем на 10 (280) и делим пополам: 140.', wrong1: 'Вы умножили на 10, забыли разделить результат пополам.', wrong2: 'Восьмёрку тоже нужно умножать на 5: 20·5 + 8·5 = 100 + 40 = 140.' },
+        2: { ok: 'Верно! 7 · 6 = 42, значит ответ заканчивается на 2 (47 · 6 = 282).', wrong1: 'Смотрим на последние цифры множителей: 7 · 6 = 42, последняя цифра 2.', wrong2: 'Последняя цифра зависит только от 7 · 6 = 42 — это цифра 2.' },
+        3: { ok: 'Именно так! Каждую часть числа умножаем на 7, затем складываем.', wrong1: 'Забыли умножить на 7 единицы (8 · 7 = 56). Правильно: 70 + 56 = 126.', wrong2: 'Нужно раскладывать 18 на 10 + 8 и умножать обе части на 7.' }
+      };
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      updateRect();
+    })();
+  </script>
+</body>
+</html>

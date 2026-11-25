@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Неправильные дроби и смешанные числа · 5 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body {
+      background-color: var(--paper); color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6;
+      background-image: radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%), radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .site-nav { position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn { min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700; border-radius: 8px; background: var(--paper-light); }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .lesson-shell { max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px; display: flex; flex-direction: column; gap: 28px; }
+    .lesson-hero { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+    .lesson-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold)); }
+    .eyebrow { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .concept-card { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px; }
+    .concept-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px; }
+
+    .lab-box { background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .lab-controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+    .control-group { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 700; color: var(--indigo); }
+    .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; }
+    .stepper button { width: 30px; height: 30px; font-size: 16px; font-weight: 700; color: var(--indigo); display: grid; place-items: center; }
+    .stepper span { min-width: 30px; text-align: center; font-size: 14px; font-weight: 800; color: var(--vermilion); }
+
+    .tiles-row { display: flex; flex-wrap: wrap; gap: 12px; }
+    .whole-tile { display: flex; border: 2px solid var(--indigo); border-radius: 8px; overflow: hidden; height: 38px; min-width: 110px; background: #fff; }
+    .whole-tile.partial { border-color: var(--vermilion); }
+    .tile-cell { flex: 1; border-right: 1px solid rgba(38,63,97,0.25); }
+    .tile-cell:last-child { border-right: none; }
+    .tile-cell.on { background: rgba(38,63,97,0.16); }
+    .tile-cell.on-rem { background: var(--vermilion-light); }
+
+    .quiz-item { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light); display: flex; flex-direction: column; gap: 12px; }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 700; color: var(--indigo); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta { background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff; border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">5 класс · Конспект урока</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_5.html">← Назад к 5 классу</a>
+      <a class="nav-btn" href="../math_moduls/extract_whole_advanced_trainer.html">Тренажёр выделения целой части →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Дроби · 5 класс · Интерактивный разбор</span>
+      <h1>Неправильные дроби и смешанные числа</h1>
+      <p>Учимся видеть, сколько целых плиток прячется внутри неправильной дроби $\frac{17}{5}$, и без ошибок переводить числа туда и обратно.</p>
+    </header>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Живые плитки: выделяем целую часть из неправильной дроби</h2>
+        </div>
+      </div>
+
+      <div class="intuition-box">
+        <strong>Смысл:</strong> дробная черта — это знак деления! Разделите числитель на знаменатель с остатком: сколько раз знаменатель поместился целиком — это <strong>целая часть</strong>, а остаток идёт в числитель новой дроби.
+      </div>
+
+      <div class="lab-box">
+        <div class="lab-controls">
+          <div class="control-group">
+            Числитель (кусочков всего):
+            <div class="stepper">
+              <button type="button" id="m-num-dec">−</button>
+              <span id="m-num-val">13</span>
+              <button type="button" id="m-num-inc">+</button>
+            </div>
+          </div>
+          <div class="control-group">
+            Знаменатель (кусочков в 1 плитке):
+            <div class="stepper">
+              <button type="button" id="m-den-dec">−</button>
+              <span id="m-den-val">4</span>
+              <button type="button" id="m-den-inc">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="tiles-row" id="tiles-row"></div>
+        <div id="mixed-formula" style="font-size:19px; font-weight:800; color:var(--indigo-dark);"></div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Обратный путь: из смешанного числа в неправильную дробь</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        Чтобы превратить $3\frac{2}{5}$ обратно в неправильную дробь, «разрежьте» каждую из $3$ целых плиток на $5$ кусочков ($3 \cdot 5 = 15$) и добавьте $2$ оставшихся кусочка: $15 + 2 = 17$, то есть $\frac{17}{5}$.
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Проверьте понимание в 2 вопросах</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Выделите целую часть из дроби $\frac{23}{4}$:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$5\frac{3}{4}$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$4\frac{7}{4}$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$5\frac{2}{4}$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Переведите смешанное число $4\frac{3}{7}$ в неправильную дробь:</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$\frac{19}{7}$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$\frac{31}{7}$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Закрепите тему на тренажёрах 5 класса</h3>
+        <p>Выделение целой части и синтез дробей в «Алхимической лаборатории».</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/extract_whole_advanced_trainer.html">Выделение целой части →</a>
+        <a class="cta-btn secondary" href="../math_moduls/alchemy_fractions_trainer.html">Алхимия дробей ⚗️</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) { return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s; }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = []; let n;
+        while ((n = walker.nextNode())) {
+          if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) nodes.push(n);
+        }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      let mNum = 13, mDen = 4;
+      const tilesRow = document.getElementById('tiles-row');
+      const formulaEl = document.getElementById('mixed-formula');
+
+      function updateTiles() {
+        document.getElementById('m-num-val').textContent = mNum;
+        document.getElementById('m-den-val').textContent = mDen;
+        const wholes = Math.floor(mNum / mDen);
+        const rem = mNum % mDen;
+
+        let html = '';
+        for (let w = 0; w < wholes; w++) {
+          html += `<div class="whole-tile">${Array.from({ length: mDen }, () => '<div class="tile-cell on"></div>').join('')}</div>`;
+        }
+        if (rem > 0) {
+          html += `<div class="whole-tile partial">${Array.from({ length: mDen }, (_, i) => `<div class="tile-cell ${i < rem ? 'on-rem' : ''}"></div>`).join('')}</div>`;
+        }
+        tilesRow.innerHTML = html;
+        if (rem === 0) {
+          formulaEl.innerHTML = tex(`\\frac{${mNum}}{${mDen}} = ${wholes}`) + ` (ровно ${wholes} целых плиток без остатка)`;
+        } else {
+          formulaEl.innerHTML = tex(`\\frac{${mNum}}{${mDen}} = ${wholes}\\frac{${rem}}{${mDen}}`) + ` (${mNum} : ${mDen} = ${wholes}, ост. ${rem})`;
+        }
+      }
+      document.getElementById('m-num-dec').onclick = () => { if (mNum > mDen + 1) { mNum--; updateTiles(); } };
+      document.getElementById('m-num-inc').onclick = () => { if (mNum < 24) { mNum++; updateTiles(); } };
+      document.getElementById('m-den-dec').onclick = () => { if (mDen > 2) { mDen--; if (mNum <= mDen) mNum = mDen + 1; updateTiles(); } };
+      document.getElementById('m-den-inc').onclick = () => { if (mDen < 7) { mDen++; if (mNum <= mDen) mNum = mDen + 1; updateTiles(); } };
+
+      const quizExplanations = {
+        1: { ok: 'Верно! 23 : 4 = 5 (остаток 3), значит 5 целых и 3/4.', wrong1: 'Дробная часть осталась неправильной (7/4) — можно выделить ещё одну целую!', wrong2: 'Остаток от деления 23 на 4 равен 3 (так как 5 · 4 = 20), а не 2.' },
+        2: { ok: 'Точно! 4 · 7 + 3 = 28 + 3 = 31 седьмая доля.', wrong1: 'Осторожно: нужно 4 умножить на 7 (28) и прибавить 3 (= 31).' }
+      };
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      updateTiles();
+    })();
+  </script>
+</body>
+</html>

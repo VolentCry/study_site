@@ -762,6 +762,19 @@
         });
     }
 
+    // Delegated handler for Informatics OGE code language tabs (Python / АлгЯз / Pascal)
+    document.addEventListener('click', (e) => {
+        const langBtn = e.target.closest('.inf-lang-btn');
+        if (!langBtn) return;
+        const group = langBtn.closest('.inf-code-tabs');
+        if (!group) return;
+        const lang = langBtn.dataset.lang;
+        group.querySelectorAll('.inf-lang-btn').forEach(b => b.classList.toggle('active', b === langBtn));
+        group.querySelectorAll('.inf-code-pre').forEach(p => {
+            p.style.display = p.dataset.lang === lang ? 'block' : 'none';
+        });
+    });
+
     // Start loading
     loadHomework();
 })();

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Графики с параметром (ОГЭ №11, №22) · 9 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body { background-color: var(--paper); color: var(--ink); font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .site-nav { position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn { min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700; border-radius: 8px; background: var(--paper-light); }
+    .lesson-shell { max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px; display: flex; flex-direction: column; gap: 28px; }
+    .lesson-hero { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+    .lesson-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold)); }
+    .eyebrow { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+    .concept-card { background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px; }
+    .concept-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box { background: var(--gold-light); border-left: 4px solid var(--gold); padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px; }
+
+    .graph-lab { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; }
+    @media (max-width: 720px) { .graph-lab { grid-template-columns: 1fr; } }
+    .svg-box { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px; display: flex; justify-content: center; }
+
+    .quiz-item { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--paper-light); display: flex; flex-direction: column; gap: 12px; }
+    .quiz-q { font-weight: 700; font-size: 15.5px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .quiz-opt { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 700; color: var(--indigo); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta { background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff; border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text"><span class="brand-name">НЕШкола</span><span class="brand-sub">9 класс · ОГЭ · Конспект</span></span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_9.html">← Назад к 9 классу</a>
+      <a class="nav-btn" href="../math_moduls/oge_task_22_trainer.html">Тренажёр №22 ОГЭ →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">ОГЭ №11 и №22 · 9 класс · Интерактивный разбор</span>
+      <h1>Графики с параметром $y = m$ и выколотые точки</h1>
+      <p>Двигайте горизонтальную линейку $y = m$ по параболе с выколотой точкой и посмотрите своими глазами, в каких положениях получается ровно 1 общая точка.</p>
+    </header>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Сканер пересечений: $y = x^2 - 2$ при $x \ne 2$ и прямая $y = m$</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        <strong>Главный секрет 22-го задания:</strong> у обычной параболы прямая $y = m$ имеет $1$ общую точку только в вершине ($m = -2$). Но если на ветке есть <strong>выколотая точка</strong> $(2; 2)$, то на высоте $m = 2$ одно из двух пересечений «проваливается в дырку» — и снова остаётся ровно <strong>1 общая точка</strong>!
+      </div>
+      <div class="graph-lab">
+        <div class="svg-box"><svg id="param-svg" width="280" height="280" viewBox="-140 -140 280 280"></svg></div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div id="param-val-box" style="font-size:19px; font-weight:800; color:var(--indigo-dark); background:#fff; padding:12px; border-radius:10px; border:1px solid var(--line); text-align:center;"></div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13.5px; margin-bottom:6px;">
+              <span>Высота прямой $y = m$:</span>
+              <span id="m-lbl" style="color:var(--vermilion); font-weight:800;">-2</span>
+            </div>
+            <input type="range" id="m-slider" min="-3" max="4" step="1" value="-2" style="width:100%; accent-color:var(--vermilion);">
+          </div>
+          <div id="param-status" style="background:#fff; border:1px solid var(--line); padding:12px 14px; border-radius:10px; font-size:14px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head"><div><span class="concept-num">Самопроверка</span><h2>Проверьте понимание в 2 вопросах</h2></div></div>
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-q">1. Сколько общих точек имеет прямая $y = m$ с графиком параболы $y = |x^2 - 4|$ ровно на уровне $m = 4$?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">$3$ общие точки (две на ветвях и одна в отражённой вершине $(0; 4)$)</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">$2$ общие точки</button>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-q">2. Когда прямая $y = kx$ имеет с гиперболой с выколотой точкой ровно 1 общую точку?</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="ok">Когда проходит прямо через выколотую точку (второе пересечение на другой ветке остаётся)</button>
+          <button type="button" class="quiz-opt" data-ans="wrong1">Никогда</button>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div><h3>Закрепите графики на тренажёрах ОГЭ</h3><p>Задание №11 (сопоставление графиков) и №22 (построение и исследование параметра).</p></div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/oge_task_22_trainer.html">Задание №22 (2 балла) →</a>
+        <a class="cta-btn secondary" href="../math_moduls/oge_task_11_trainer.html">Задание №11</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) { return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s; }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = []; let n;
+        while ((n = walker.nextNode())) { if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) nodes.push(n); }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      const svg = document.getElementById('param-svg');
+      const slider = document.getElementById('m-slider');
+      const mLbl = document.getElementById('m-lbl');
+      const valBox = document.getElementById('param-val-box');
+      const statusEl = document.getElementById('param-status');
+      const SCALE = 24;
+
+      function updateParam() {
+        const m = parseInt(slider.value, 10);
+        mLbl.textContent = m;
+        valBox.innerHTML = tex(`y = ${m}`);
+
+        let count = 0;
+        if (m < -2) count = 0;
+        else if (m === -2 || m === 2) count = 1;
+        else count = 2;
+
+        if (count === 1) {
+          statusEl.innerHTML = `<strong style="color:#2e7d32;">✅ Ровно 1 общая точка!</strong> ` +
+            (m === -2 ? '(Прямая касается вершины параболы в точке (0; −2)).' : '(Правое пересечение провалилось в выколотую точку (2; 2), осталось только левое (−2; 2)!).');
+        } else if (count === 0) {
+          statusEl.innerHTML = `<strong style="color:#b7464e;">0 общих точек:</strong> прямая проходит ниже вершины параболы.`;
+        } else {
+          statusEl.innerHTML = `<strong style="color:#263f61;">2 общие точки:</strong> прямая пересекает обе ветви параболы.`;
+        }
+
+        let html = '';
+        for (let i = -5; i <= 5; i++) {
+          html += `<line x1="${i * SCALE}" y1="-140" x2="${i * SCALE}" y2="140" stroke="#e5e9ee" stroke-width="1"/>`;
+          html += `<line x1="-140" y1="${i * SCALE}" x2="140" y2="${i * SCALE}" stroke="#e5e9ee" stroke-width="1"/>`;
+        }
+        html += `<line x1="-140" y1="0" x2="140" y2="0" stroke="#697383" stroke-width="1.6"/>`;
+        html += `<line x1="0" y1="-140" x2="0" y2="140" stroke="#697383" stroke-width="1.6"/>`;
+
+        let pts = [];
+        for (let x = -3; x <= 3; x += 0.1) {
+          pts.push(`${(x * SCALE).toFixed(1)},${(-(x * x - 2) * SCALE).toFixed(1)}`);
+        }
+        html += `<polyline points="${pts.join(' ')}" fill="none" stroke="#263f61" stroke-width="2.6"/>`;
+        // Horizontal line y = m
+        html += `<line x1="-140" y1="${-m * SCALE}" x2="140" y2="${-m * SCALE}" stroke="#b7464e" stroke-width="2.2" stroke-dasharray="6 4"/>`;
+        // Intersections
+        if (m >= -2) {
+          const rx = Math.sqrt(m + 2);
+          if (rx === 0) {
+            html += `<circle cx="0" cy="${-m * SCALE}" r="5" fill="#2e7d32"/>`;
+          } else {
+            html += `<circle cx="${-rx * SCALE}" cy="${-m * SCALE}" r="5" fill="#2e7d32"/>`;
+            if (m !== 2) html += `<circle cx="${rx * SCALE}" cy="${-m * SCALE}" r="5" fill="#2e7d32"/>`;
+          }
+        }
+        // Hole at (2, 2)
+        html += `<circle cx="${2 * SCALE}" cy="${-2 * SCALE}" r="5.5" fill="#fff" stroke="#263f61" stroke-width="2.5"/>`;
+        svg.innerHTML = html;
+      }
+      slider.addEventListener('input', updateParam);
+
+      const quizExplanations = {
+        1: { ok: 'Верно! Нижняя часть параболы отразилась вверх в вершину (0; 4), поэтому на высоте y = 4 ровно 3 общие точки!', wrong1: 'Не забывайте про отражённую вверх часть: при x = 0 будет точка (0; 4) плюс две боковые ветви.' },
+        2: { ok: 'Точно! Вторая точка пересечения на противоположной ветке остаётся, а первая выколота — итого ровно 1 точка.', wrong1: 'Если направить прямую ровно в выколотую точку, одна из двух точек исчезнет, и останется ровно одна!' }
+      };
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz; const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans; btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      updateParam();
+    })();
+  </script>
+</body>
+</html>

@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Compute counts
         const countTotal = trainers.length || cards.length;
         const countMath = trainers.filter(t => t.subject === 'Математика').length || cards.length;
+        const countInf = trainers.filter(t => t.subject === 'Информатика').length;
         const countPhys = trainers.filter(t => t.subject === 'Физика').length;
         const countRus = trainers.filter(t => t.subject === 'Русский язык').length;
         const countEng = trainers.filter(t => t.subject === 'Английский').length;
@@ -124,6 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button type="button" class="trainer-pill-btn ${trainerFilterState.subject === 'Математика' ? 'active' : ''}" data-subject="Математика" role="radio" aria-checked="${trainerFilterState.subject === 'Математика'}">
                         <span>📐 Математика</span>
                         <span class="trainer-pill-count">(${countMath})</span>
+                    </button>
+                    <button type="button" class="trainer-pill-btn ${trainerFilterState.subject === 'Информатика' ? 'active' : ''}" data-subject="Информатика" role="radio" aria-checked="${trainerFilterState.subject === 'Информатика'}">
+                        <span>💻 Информатика</span>
+                        <span class="trainer-pill-count">(${countInf})</span>
                     </button>
                     <button type="button" class="trainer-pill-btn ${trainerFilterState.subject === 'Физика' ? 'active' : ''}" data-subject="Физика" role="radio" aria-checked="${trainerFilterState.subject === 'Физика'}">
                         <span>⚡ Физика</span>
