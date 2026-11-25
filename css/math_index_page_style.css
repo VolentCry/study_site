@@ -13,6 +13,9 @@
     --sakura: #e5b5b8;
     --gold: #c8956c;
     --line: rgba(38, 63, 97, 0.2);
+    --surface-card: var(--paper-light);
+    --accent: var(--vermilion);
+    --accent-glow: rgba(183, 70, 78, 0.22);
 }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'DM Sans', sans-serif; }
@@ -209,6 +212,47 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     border-radius: 4px; text-decoration: none; white-space: nowrap; transition: background .2s, transform .2s;
 }
 .profile-link:hover { background: #9c363d; transform: translateY(-1px); }
+
+/* Profile dropdown menu theme override (matches .class-dropdown-menu) */
+.nav-actions .auth-dropdown-menu {
+    background: rgba(251, 249, 244, 0.98);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 14px 32px rgba(38, 63, 97, 0.16), 0 3px 8px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 6px;
+}
+.nav-actions .auth-dropdown-header {
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
+}
+.nav-actions .auth-dropdown-user {
+    color: var(--indigo);
+    font-weight: 700;
+}
+.nav-actions .auth-dropdown-role {
+    color: var(--muted);
+}
+.nav-actions .auth-dropdown-item {
+    color: var(--ink);
+    border-radius: 8px;
+}
+.nav-actions .auth-dropdown-item:hover {
+    background: rgba(183, 70, 78, 0.07);
+    color: var(--vermilion);
+}
+.nav-actions .auth-dropdown-logout-btn {
+    color: var(--vermilion) !important;
+    border-top: 1px solid var(--line) !important;
+    margin-top: 4px;
+    padding-top: 10px;
+}
+.nav-actions .auth-dropdown-logout-btn:hover {
+    background: rgba(183, 70, 78, 0.1) !important;
+    color: #9c363d !important;
+}
 
 /* HERO WITH SAKURA/TEMPLE & GAUSSIAN-DIFFUSED FROST DISSIPATION */
 .hero {
