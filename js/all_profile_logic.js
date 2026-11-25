@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span>⚡ Физика</span>
                         <span class="trainer-pill-count">(${countPhys})</span>
                     </button>
+                    ${'' /* [СКРЫТО: Русский язык и Английский]
                     <button type="button" class="trainer-pill-btn ${trainerFilterState.subject === 'Русский язык' ? 'active' : ''}" data-subject="Русский язык" role="radio" aria-checked="${trainerFilterState.subject === 'Русский язык'}">
                         <span>📖 Русский язык</span>
                         <span class="trainer-pill-count">(${countRus})</span>
@@ -142,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span>🇬🇧 Английский</span>
                         <span class="trainer-pill-count">(${countEng})</span>
                     </button>
+                    */}
                 </div>
             </div>
 

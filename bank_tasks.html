@@ -509,7 +509,7 @@
             <option value="">Все предметы</option>
             <option value="math">Математика</option>
             <option value="informatics">Информатика</option>
-            <option value="english">Английский</option>
+            <!-- [СКРЫТО] <option value="english">Английский</option> -->
             <option value="physics">Физика</option>
           </select>
         </div>
@@ -579,6 +579,7 @@
       const query = normalize(taskSearch.value);
       const allTopics = getTopicList();
       const visibleTasks = allTopics.filter(task => {
+        if (!['math', 'informatics', 'physics'].includes(task.subject)) return false;
         const sLabel = subjectLabels[task.subject] || task.subjectLabel || '';
         const searchTags = `${task.title} ${task.description || ''} ${task.class} ${sLabel} ${task.isTest ? 'тест тестирование физика 8' : ''}`;
         const matchesSearch = normalize(searchTags).includes(query);

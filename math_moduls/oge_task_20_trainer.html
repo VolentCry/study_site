@@ -399,6 +399,18 @@
     .feedback-banner.error {
       background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);
     }
+    .feedback-banner.hint {
+      background: var(--gold-light); color: #7c4d1e; border: 1px solid rgba(200,149,108,0.5);
+    }
+    .diag-actions {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px;
+    }
+    .diag-link-btn {
+      display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; text-decoration: none; cursor: pointer;
+      border: 1px solid rgba(38,63,97,0.22); background: #fff; color: var(--indigo); transition: all .15s;
+    }
+    .diag-link-btn:hover { border-color: var(--vermilion); color: var(--vermilion); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
     /* CARD ACTION TOOLS */
@@ -668,6 +680,7 @@
       let currentCategory = 'mixed_all';
       let currentTask = null;
       let hasAnsweredCurrent = false;
+      let attemptCount = 0;
 
       // Active widget state
       let activeWidgetController = null;
@@ -745,6 +758,7 @@
           return;
         }
         hasAnsweredCurrent = false;
+        attemptCount = 0;
         currentTask = window.OgeTask20Trainer.generateTask(currentCategory);
         window._currentTask = currentTask;
 
@@ -840,11 +854,48 @@
           }
         } else {
           playTone(220, 'sawtooth', 0.25);
+          attemptCount++;
+          const isTimed = window.TrainerTimedMode && window.TrainerTimedMode.isActive;
+          const diag = (typeof window.OgeTask20Trainer.diagnoseMistake === 'function')
+            ? window.OgeTask20Trainer.diagnoseMistake(valToTest, currentTask)
+            : { hint: 'Проверь вычисления и знаки.', lessonUrl: '', lessonLabel: '' };
+          const lessonBtnHtml = diag.lessonUrl
+            ? `<a href="${diag.lessonUrl}" class="diag-link-btn" target="_blank">📘 ${diag.lessonLabel} →</a>`
+            : '';
+
+          if (!isTimed && attemptCount === 1) {
+            feedbackBanner.className = 'feedback-banner show hint';
+            feedbackBanner.innerHTML = `
+              <div>💡 <strong>Подсказка перед разбором:</strong> ${diag.hint}</div>
+              <div class="diag-actions">
+                ${lessonBtnHtml}
+                <button type="button" class="diag-link-btn" id="btn-reveal-answer-early">Показать ответ и решение</button>
+              </div>
+            `;
+            const earlyBtn = document.getElementById('btn-reveal-answer-early');
+            if (earlyBtn) {
+              earlyBtn.addEventListener('click', () => {
+                attemptCount = 2;
+                feedbackBanner.className = 'feedback-banner show error';
+                feedbackBanner.innerHTML = `
+                  <div>✕ <strong>Правильный ответ:</strong> <code>${currentTask.displayAnswer}</code></div>
+                  <div class="diag-actions">${lessonBtnHtml}</div>
+                `;
+                solutionPanel.classList.add('active');
+              });
+            }
+            if (activeWidgetController) activeWidgetController.focus();
+            return;
+          }
 
           feedbackBanner.className = 'feedback-banner show error';
-          feedbackBanner.innerHTML = `✕ <strong>Не совсем так.</strong> Правильный ответ: <code>${currentTask.displayAnswer}</code>.<br><span style="font-weight:400;">Нажмите кнопку «Показать решение», чтобы увидеть оформление по критериям ФИПИ.</span>`;
+          feedbackBanner.innerHTML = `
+            <div>✕ <strong>Не совсем так.</strong> Правильный ответ: <code>${currentTask.displayAnswer}</code>.</div>
+            <div style="font-weight:400; margin-top:4px;">Нажмите кнопку «Показать решение», чтобы увидеть оформление по критериям ФИПИ.</div>
+            <div class="diag-actions">${lessonBtnHtml}</div>
+          `;
 
-          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+          if (isTimed) {
             window.TrainerTimedMode.recordAttempt(false);
           }
 

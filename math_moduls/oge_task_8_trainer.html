@@ -324,6 +324,18 @@
     .feedback-banner.error {
       background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion);
     }
+    .feedback-banner.hint {
+      background: var(--gold-light); border: 1px solid rgba(200,149,108,0.5); color: #7c4d1e;
+    }
+    .diag-actions {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 8px;
+    }
+    .diag-link-btn {
+      display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; text-decoration: none; cursor: pointer;
+      border: 1px solid rgba(38,63,97,0.22); background: #fff; color: var(--indigo); transition: all .15s;
+    }
+    .diag-link-btn:hover { border-color: var(--vermilion); color: var(--vermilion); }
 
     /* CARD ACTION TOOLS */
     .card-tools {
@@ -602,6 +614,7 @@
       let currentCategory = 'mixed_all';
       let currentTask = null;
       let hasAnsweredCurrent = false;
+      let attemptCount = 0;
 
       // DOM элементы
       const mathContainer = document.getElementById('task-math-container');
@@ -666,6 +679,7 @@
           currentCategory = 'mixed_all';
         }
         hasAnsweredCurrent = false;
+        attemptCount = 0;
         currentTask = OgeTask8Trainer.generateTask(currentCategory);
         if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
           mathContainer.innerHTML = window.StudyMath.formatMath(currentTask.questionHtml, true);
@@ -744,8 +758,43 @@
           answerInput.className = 'answer-input wrong';
           playTone(220, 'triangle', 0.25);
 
+          attemptCount++;
+          const isTimed = window.TrainerTimedMode && window.TrainerTimedMode.isActive;
+          const userNum = parseFloat(val.replace(',', '.'));
+          const isSignError = !isNaN(userNum) && Math.abs(userNum + currentTask.answer) < 0.0001 && currentTask.answer !== 0;
+          const isPowers = (currentTask.category || '').startsWith('powers');
+          const lessonUrl = isPowers ? '../pages/math_7_powers_lesson.html' : '../pages/math_8_roots_lesson.html';
+          const lessonTitle = isPowers ? 'Повторить свойства степеней' : 'Разобрать корни в конспекте';
+
+          let diagHint = currentTask.hint || 'Проверь вычисления и попробуй ещё раз.';
+          if (isSignError) {
+            diagHint = 'Значение по модулю найдено верно, но потерян или лишний знак минус! Проверь знаки показателей или скобки.';
+          }
+
+          if (!isTimed && attemptCount === 1) {
+            feedbackBanner.className = 'feedback-banner show hint';
+            feedbackBanner.innerHTML = `
+              <div>💡 <strong>Подсказка-наводка:</strong> ${diagHint}</div>
+              <div class="diag-actions">
+                <a href="${lessonUrl}" class="diag-link-btn" target="_blank">📘 ${lessonTitle} →</a>
+                <button type="button" class="diag-link-btn" id="btn-reveal-sol8">Показать решение</button>
+              </div>
+            `;
+            const revBtn = document.getElementById('btn-reveal-sol8');
+            if (revBtn) {
+              revBtn.addEventListener('click', () => {
+                solutionPanel.classList.add('active');
+              });
+            }
+            answerInput.focus();
+            return;
+          }
+
           feedbackBanner.className = 'feedback-banner show error';
-          feedbackBanner.innerHTML = '❌ <strong>Пока неверно.</strong> Проверь знаки степеней или загляни в решение.';
+          feedbackBanner.innerHTML = `
+            <div>❌ <strong>Пока неверно.</strong> Правильный ответ: <code>${currentTask.displayAnswer}</code>.</div>
+            <div class="diag-actions"><a href="${lessonUrl}" class="diag-link-btn" target="_blank">📘 ${lessonTitle} →</a></div>
+          `;
 
           if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
             window.TrainerTimedMode.recordAttempt(false);

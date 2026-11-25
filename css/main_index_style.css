@@ -624,19 +624,19 @@ box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 opacity: 1;
 }
 
-/* Hero Subject: Math (Takes 8 cols) */
+/* Hero Subject: Math (Takes 12 cols while only Math, Physics and Informatics are visible) */
 .card-math-hero {
-grid-column: span 8;
+grid-column: span 12;
 background: linear-gradient(135deg, #171d2b 0%, #10141f 100%);
 border: 1px solid rgba(255, 119, 40, 0.28);
 }
 
-.card-physics { grid-column: span 4; }
+.card-physics { grid-column: span 6; }
 .card-astronomy { grid-column: span 4; }
 .card-quantum { grid-column: span 4; }
 .card-chemistry { grid-column: span 4; }
 .card-english { grid-column: span 4; }
-.card-informatics { grid-column: span 4; }
+.card-informatics { grid-column: span 6; }
 .card-biology { grid-column: span 4; }
 
 .card-top {
@@ -852,6 +852,11 @@ display: grid;
 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 gap: 1.5rem;
 margin-bottom: 3rem;
+}
+
+.sim-grid:has(> :only-child) {
+grid-template-columns: minmax(280px, 460px);
+justify-content: center;
 }
 
 .sim-card {

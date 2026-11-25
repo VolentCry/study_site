@@ -2258,9 +2258,131 @@
     return null;
   }
 
+  /* --------------------------------------------------------------------------
+     ДИАГНОСТИКА ТИПОВЫХ ОШИБОК (для промежуточной подсказки без показа ответа)
+     -------------------------------------------------------------------------- */
+  function diagnoseMistake(userRaw, task) {
+    if (!task) return { hint: 'Проверь вычисления и знаки, затем попробуй ещё раз.', lessonUrl: '', lessonLabel: '' };
+    const id = String(task.id || '');
+    const taskType = (task.answerData && task.answerData.type) || task.type;
+
+    // Подбираем ссылку на нужный тематический конспект
+    let lessonUrl = '../pages/math_9_intervals_lesson.html';
+    let lessonLabel = 'Разобрать тему в конспекте';
+    if (taskType === 'equation') {
+      if (id.startsWith('eq_odz_')) {
+        lessonUrl = '../pages/math_8_roots_lesson.html';
+        lessonLabel = 'Разобрать корни и ОДЗ в конспекте';
+      } else {
+        lessonUrl = '../pages/math_8_quadratic_lesson.html';
+        lessonLabel = 'Разобрать квадратные уравнения в конспекте';
+      }
+    } else if (taskType === 'inequality') {
+      lessonUrl = '../pages/math_9_intervals_lesson.html';
+      lessonLabel = 'Разобрать метод интервалов и ОДЗ';
+    } else if (taskType === 'system') {
+      lessonUrl = '../pages/math_9_graphs_param_lesson.html';
+      lessonLabel = 'Разобрать системы и графики';
+    }
+
+    // 1. Уравнения
+    if (taskType === 'equation' && task.answerData) {
+      const correctRoots = (task.answerData.roots || []).map(r => normalizeNum(r)).sort((a, b) => a - b);
+      let userNums = [];
+      if (typeof userRaw === 'object' && userRaw !== null && Array.isArray(userRaw.roots)) {
+        userNums = userRaw.roots.map(normalizeNum).filter(n => !isNaN(n));
+      } else {
+        const matches = String(userRaw || '').match(/[-−]?\d+(?:[.,]\d+)?/g);
+        if (matches) userNums = matches.map(normalizeNum).filter(n => !isNaN(n));
+      }
+
+      if (id.startsWith('eq_odz_')) {
+        if (userNums.length > correctRoots.length) {
+          return {
+            hint: 'Ты нашёл корни квадратного уравнения верно, но не проверил ОДЗ! Подставь каждый корень обратно под корень √(k − x) — один из них посторонний.',
+            lessonUrl,
+            lessonLabel
+          };
+        }
+        return {
+          hint: 'Не забудь два шага: сначала найди ОДЗ (подкоренное выражение ≥ 0), а затем отбрось посторонний корень.',
+          lessonUrl,
+          lessonLabel
+        };
+      }
+
+      if (id.startsWith('eq_biquad_')) {
+        if (correctRoots.length >= 2 && userNums.length > 0 && userNums.length < correctRoots.length) {
+          return {
+            hint: 'Похоже, ты нашёл t или потерял отрицательные корни! При обратной замене x² = t не забудь про оба знака: x = ±√t (и отбрось t < 0).',
+            lessonUrl,
+            lessonLabel
+          };
+        }
+      }
+
+      if (userNums.length > 0 && correctRoots.length > 0 && userNums.length !== correctRoots.length) {
+        return {
+          hint: `Проверь количество корней: здесь должно получиться ${correctRoots.length}, а у тебя указано ${userNums.length}.`,
+          lessonUrl,
+          lessonLabel
+        };
+      }
+    }
+
+    // 2. Неравенства
+    if (taskType === 'inequality' && task.answerData && Array.isArray(task.answerData.parts)) {
+      const correctParts = task.answerData.parts;
+      const correctHasPoint = correctParts.some(p => p.type === 'point' || p.val !== undefined);
+      const userParts = (typeof userRaw === 'object' && userRaw && Array.isArray(userRaw.parts)) ? userRaw.parts : [];
+      const userHasPoint = userParts.some(p => p.type === 'point' || p.val !== undefined);
+
+      if (correctHasPoint && !userHasPoint) {
+        return {
+          hint: 'Промежуток близок к ответу, но ты забыл изолированную точку {c}! Проверь скобку в квадрате (x − c)² в числителе — при нестрогом знаке (≤ или ≥) она добавляет отдельную точку в ответ.',
+          lessonUrl,
+          lessonLabel
+        };
+      }
+
+      // Проверяем совпадение чисел при несовпадении скобок
+      const cInts = correctParts.filter(p => !p.type || p.type === 'interval');
+      const uInts = userParts.filter(p => !p.type || p.type === 'interval');
+      if (cInts.length === 1 && uInts.length === 1) {
+        const cL = cInts[0].leftVal === -Infinity ? -Infinity : normalizeNum(cInts[0].leftVal);
+        const cR = cInts[0].rightVal === Infinity ? Infinity : normalizeNum(cInts[0].rightVal);
+        const uL = uInts[0].leftVal === -Infinity ? -Infinity : normalizeNum(uInts[0].leftVal);
+        const uR = uInts[0].rightVal === Infinity ? Infinity : normalizeNum(uInts[0].rightVal);
+        if (cL === uL && cR === uR && (cInts[0].leftBracket !== uInts[0].leftBracket || cInts[0].rightBracket !== uInts[0].rightBracket)) {
+          return {
+            hint: 'Границы промежутка найдены абсолютно верно! Но перепроверь скобки: на ноль делить нельзя, поэтому нуль знаменателя всегда выколот (круглая скобка).',
+            lessonUrl,
+            lessonLabel
+          };
+        }
+      }
+    }
+
+    // 3. Системы уравнений
+    if (taskType === 'system') {
+      return {
+        hint: 'Проверь пары координат (x; y): подставь найденные x и y в оба уравнения системы и убедись, что не потеряны симметричные или противоположные пары.',
+        lessonUrl,
+        lessonLabel
+      };
+    }
+
+    return {
+      hint: 'Перепроверь знаки, дискриминант или ОДЗ и попробуй скорректировать ответ.',
+      lessonUrl,
+      lessonLabel
+    };
+  }
+
   return {
     generateTask,
     checkAnswer,
+    diagnoseMistake,
     createInputWidget,
     formatNum,
     fracHtml
