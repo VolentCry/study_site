@@ -64,6 +64,7 @@
             currentTeacher = data.teacher;
             showDashboard(data.stats);
             loadClasses();
+            refreshGradingTabBadge();
         } catch(err) {
             console.error('Error init teacher dashboard:', err);
             showGate('guest');
@@ -4037,6 +4038,39 @@
         }
     }
 
+    function updateGradingTabBadge(homeworks) {
+        const badge = document.getElementById('tab-grading-badge');
+        if (!badge || !Array.isArray(homeworks)) return;
+
+        let totalUnreviewedWorks = 0;
+        homeworks.forEach(h => {
+            const subCount = h.submittedCount !== undefined ? h.submittedCount : (h.submissions_count || 0);
+            const chkCount = h.checkedCount !== undefined ? h.checkedCount : (h.checked_count || 0);
+            totalUnreviewedWorks += Math.max(0, subCount - chkCount);
+        });
+
+        if (totalUnreviewedWorks > 0) {
+            badge.textContent = totalUnreviewedWorks > 99 ? '99+' : String(totalUnreviewedWorks);
+            badge.classList.remove('hidden');
+        } else {
+            badge.textContent = '0';
+            badge.classList.add('hidden');
+        }
+    }
+
+    async function refreshGradingTabBadge() {
+        try {
+            const res = await fetch('/api/teacher/homeworks', { cache: 'no-store' });
+            const data = await res.json();
+            if (data && data.success && Array.isArray(data.homeworks)) {
+                gradingHomeworksCache = data.homeworks;
+                updateGradingTabBadge(gradingHomeworksCache);
+            }
+        } catch (e) {
+            console.error('Error refreshing grading tab badge:', e);
+        }
+    }
+
     function updateGradingCounters() {
         const total = gradingHomeworksCache.length;
         let unreviewed = 0;
@@ -4059,6 +4093,8 @@
         if (cntUnrev) cntUnrev.textContent = unreviewed;
         if (cntChk) cntChk.textContent = checked;
         if (cntPend) cntPend.textContent = pending;
+
+        updateGradingTabBadge(gradingHomeworksCache);
     }
 
     function renderGradingGrid() {
@@ -4544,11 +4580,131 @@
 
             currentHwSubmissions = data.submissions || [];
             updateSubmissionsCounters();
+            renderSubmissionsHeatmap(hw, currentHwSubmissions);
             renderSubmissionsTable(hw);
 
         } catch(e) {
             submissionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">Ошибка при запросе к серверу</td></tr>';
         }
+    }
+
+    function evaluateStudentTaskAnswer(t, i, answers) {
+        const taskId = t.taskId || t.id || `task_${i + 1}`;
+        const safeAnswers = answers || {};
+        const rawAns = (safeAnswers[i] !== undefined)
+            ? safeAnswers[i]
+            : (safeAnswers[String(i)] !== undefined
+                ? safeAnswers[String(i)]
+                : (safeAnswers[taskId] !== undefined
+                    ? safeAnswers[taskId]
+                    : (safeAnswers[`task_${i + 1}`] !== undefined ? safeAnswers[`task_${i + 1}`] : '')));
+
+        const studentAns = (typeof rawAns === 'object' && rawAns !== null)
+            ? String(rawAns.answer !== undefined ? rawAns.answer : '').trim()
+            : String(rawAns !== undefined ? rawAns : '').trim();
+
+        const primaryCorrectAns = String(t.answer !== undefined && String(t.answer).trim() !== '' ? t.answer : (t.displayAnswer || '')).trim();
+        const correctAns = cleanDisplayAnswer(t.displayAnswer || t.answer || '').trim();
+
+        const normStudent = studentAns.replace(/\s+/g, '').replace(',', '.');
+        const normPrimary = primaryCorrectAns.replace(/\s+/g, '').replace(',', '.');
+        const normDisplay = correctAns.replace(/\s+/g, '').replace(',', '.');
+        let isCorrect = false;
+
+        if (typeof rawAns === 'object' && rawAns !== null && typeof rawAns.isCorrect === 'boolean') {
+            isCorrect = rawAns.isCorrect;
+        } else if (normStudent !== '' && (normPrimary !== '' || normDisplay !== '')) {
+            const checkEquiv = (s, c) => {
+                if (!s || !c) return false;
+                const fs = parseFloat(s);
+                const fc = parseFloat(c);
+                if (!isNaN(fs) && !isNaN(fc)) return Math.abs(fs - fc) < 0.0001;
+                if (s.toLowerCase() === c.toLowerCase()) return true;
+                const getNums = (str) => (str.replace(/−/g, '-').replace(/;/g, ' ').replace(/,/g, ' ').match(/[-+]?\d+(?:\.\d+)?/g) || []);
+                const ns = getNums(s);
+                const nc = getNums(c);
+                if (ns.length && ns.length === nc.length && (ns.length === 2 || ns.length === 4)) {
+                    return ns.every((val, idx) => Math.abs(parseFloat(val) - parseFloat(nc[idx])) < 0.0001);
+                }
+                return false;
+            };
+            isCorrect = checkEquiv(normStudent, normPrimary) || checkEquiv(normStudent, normDisplay);
+            if (!isCorrect && Array.isArray(t.acceptedAnswers)) {
+                isCorrect = t.acceptedAnswers.some(acc => checkEquiv(normStudent, String(acc).replace(/\s+/g, '').replace(',', '.')));
+            }
+        }
+
+        return { studentAns, correctAns, isCorrect };
+    }
+
+    function renderSubmissionsHeatmap(hw, submissions) {
+        const container = document.getElementById('submissions-error-heatmap');
+        if (!container) return;
+
+        const tasks = (hw && Array.isArray(hw.tasks)) ? hw.tasks : [];
+        const completedSubs = (submissions || []).filter(s => s.status === 'submitted' || s.status === 'checked');
+
+        if (tasks.length === 0 || completedSubs.length === 0) {
+            container.classList.add('hidden');
+            container.innerHTML = '';
+            return;
+        }
+
+        const stats = tasks.map((t, i) => {
+            let errorCount = 0;
+            completedSubs.forEach(s => {
+                const { isCorrect } = evaluateStudentTaskAnswer(t, i, s.answers);
+                if (!isCorrect) errorCount++;
+            });
+            const errorPct = Math.round((errorCount / completedSubs.length) * 100);
+            return {
+                index: i + 1,
+                label: t.catName || t.category || `Задача №${i + 1}`,
+                errorCount,
+                total: completedSubs.length,
+                errorPct
+            };
+        });
+
+        const topHard = [...stats]
+            .filter(st => st.errorPct > 0)
+            .sort((a, b) => b.errorPct - a.errorPct)
+            .slice(0, 2);
+
+        const summaryLine = topHard.length === 0
+            ? '<span style="color: var(--accent-emerald); font-weight: 700;">🎉 Все сдавшие решили задания без ошибок</span>'
+            : `<span>Проблемные: ${topHard.map(st => `<strong style="color: ${st.errorPct >= 50 ? '#f87171' : '#fbbf24'};">№${st.index} (${st.errorPct}%)</strong>`).join(', ')}</span>`;
+
+        container.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.65rem;">
+                <div style="font-size: 0.84rem; font-weight: 700; color: var(--ink);">
+                    🔥 Тепловая карта ошибок по классу <span style="color: var(--muted); font-weight: 500;">(по ${completedSubs.length} сданным работам)</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--muted);">${summaryLine}</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px;">
+                ${stats.map(st => {
+                    const color = st.errorPct >= 50 ? '#ef4444' : (st.errorPct >= 25 ? '#f59e0b' : '#10b981');
+                    const bg = st.errorPct >= 50 ? 'rgba(239, 68, 68, 0.1)' : (st.errorPct >= 25 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.08)');
+                    const border = st.errorPct >= 50 ? 'rgba(239, 68, 68, 0.35)' : (st.errorPct >= 25 ? 'rgba(245, 158, 11, 0.35)' : 'rgba(16, 185, 129, 0.3)');
+                    return `
+                        <div title="${escapeHtml(st.label)}: ${st.errorCount} ошибок из ${st.total}" style="padding: 7px 9px; border-radius: 8px; background: ${bg}; border: 1px solid ${border};">
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; margin-bottom: 4px;">
+                                <strong style="color: var(--ink);">Задача №${st.index}</strong>
+                                <span style="font-weight: 800; color: ${color};">${st.errorPct}%</span>
+                            </div>
+                            <div style="height: 4px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-bottom: 4px;">
+                                <div style="width: ${st.errorPct}%; height: 100%; background: ${color}; border-radius: 999px;"></div>
+                            </div>
+                            <div style="font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${st.errorCount} из ${st.total} ош. · ${escapeHtml(st.label)}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+        container.classList.remove('hidden');
     }
 
     async function openReviewSubmissionModal(sub, hw) {
@@ -4595,49 +4751,7 @@
         let autoCorrectCount = 0;
 
         tasks.forEach((t, i) => {
-            const taskId = t.taskId || t.id || `task_${i + 1}`;
-            const rawAns = (answers[i] !== undefined)
-                ? answers[i]
-                : (answers[String(i)] !== undefined
-                    ? answers[String(i)]
-                    : (answers[taskId] !== undefined
-                        ? answers[taskId]
-                        : (answers[`task_${i + 1}`] !== undefined ? answers[`task_${i + 1}`] : '')));
-
-            const studentAns = (typeof rawAns === 'object' && rawAns !== null)
-                ? String(rawAns.answer !== undefined ? rawAns.answer : '').trim()
-                : String(rawAns !== undefined ? rawAns : '').trim();
-
-            const primaryCorrectAns = String(t.answer !== undefined && String(t.answer).trim() !== '' ? t.answer : (t.displayAnswer || '')).trim();
-            const correctAns = cleanDisplayAnswer(t.displayAnswer || t.answer || '').trim();
-
-            // Check equality
-            const normStudent = studentAns.replace(/\s+/g, '').replace(',', '.');
-            const normPrimary = primaryCorrectAns.replace(/\s+/g, '').replace(',', '.');
-            const normDisplay = correctAns.replace(/\s+/g, '').replace(',', '.');
-            let isCorrect = false;
-            if (typeof rawAns === 'object' && rawAns !== null && typeof rawAns.isCorrect === 'boolean') {
-                isCorrect = rawAns.isCorrect;
-            } else if (normStudent !== '' && (normPrimary !== '' || normDisplay !== '')) {
-                const checkEquiv = (s, c) => {
-                    if (!s || !c) return false;
-                    const fs = parseFloat(s);
-                    const fc = parseFloat(c);
-                    if (!isNaN(fs) && !isNaN(fc)) return Math.abs(fs - fc) < 0.0001;
-                    if (s.toLowerCase() === c.toLowerCase()) return true;
-                    const getNums = (str) => (str.replace(/−/g, '-').replace(/;/g, ' ').replace(/,/g, ' ').match(/[-+]?\d+(?:\.\d+)?/g) || []);
-                    const ns = getNums(s);
-                    const nc = getNums(c);
-                    if (ns.length && ns.length === nc.length && (ns.length === 2 || ns.length === 4)) {
-                        return ns.every((val, i) => Math.abs(parseFloat(val) - parseFloat(nc[i])) < 0.0001);
-                    }
-                    return false;
-                };
-                isCorrect = checkEquiv(normStudent, normPrimary) || checkEquiv(normStudent, normDisplay);
-                if (!isCorrect && Array.isArray(t.acceptedAnswers)) {
-                    isCorrect = t.acceptedAnswers.some(acc => checkEquiv(normStudent, String(acc).replace(/\s+/g, '').replace(',', '.')));
-                }
-            }
+            const { studentAns, correctAns, isCorrect } = evaluateStudentTaskAnswer(t, i, answers);
 
             if (isCorrect) autoCorrectCount++;
 

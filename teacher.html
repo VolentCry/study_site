@@ -129,6 +129,7 @@
                 </button>
                 <button type="button" class="teacher-tab-btn" id="tab-btn-grading" role="tab" aria-selected="false" aria-controls="pane-grading">
                     <span>📝 Проверка работ</span>
+                    <span id="tab-grading-badge" class="hidden" style="display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #ef4444; color: #fff; font-size: 0.72rem; font-weight: 800; line-height: 1; box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);" title="Работ, ожидающих проверки">0</span>
                 </button>
                 <button type="button" class="teacher-tab-btn" id="tab-btn-users" role="tab" aria-selected="false" aria-controls="pane-users">
                     <span>👥 Все пользователи</span>
@@ -1307,6 +1308,9 @@
                     ⏳ Не сдано (<span id="sub-cnt-pending">0</span>)
                 </button>
             </div>
+
+            <!-- Тепловая карта ошибок по классу -->
+            <div id="submissions-error-heatmap" class="hidden" style="margin-bottom: 1rem; padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); border-radius: var(--r-sm);"></div>
 
             <div class="table-responsive" style="max-height: 440px; overflow-y: auto;">
                 <table class="data-table">
