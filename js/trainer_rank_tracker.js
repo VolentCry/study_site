@@ -99,6 +99,26 @@
             ]
         },
         {
+            id: 'triangle_lines',
+            name: 'Биссектриса, медиана и высота (7 класс)',
+            shortName: 'Задачи на треугольники',
+            subject: 'Математика',
+            category: 'Геометрия',
+            classNum: '7 класс',
+            url: '../math_moduls/triangle_lines_trainer.html',
+            profileUrl: 'math_moduls/triangle_lines_trainer.html',
+            icon: '📐',
+            description: 'Задачи на биссектрису, медиану и высоту треугольника: углы, периметры, пересечение биссектрис и высот, равнобедренный и прямоугольный треугольники.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг планиметрии 👑' },
+                { min: 20, title: 'Архитектор геометрии 🧙' },
+                { min: 14, title: 'Мастер построений 💎' },
+                { min: 8,  title: 'Знаток треугольников 🥇' },
+                { min: 4,  title: 'Исследователь чертежей 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'powers_compare',
             name: 'Сравнение степеней (<, >, =)',
             shortName: 'Сравнение степеней',

@@ -3550,6 +3550,10 @@
             if (window.LinearFunctionTrainer) {
                 t = window.LinearFunctionTrainer.generateTask(type);
             }
+        } else if (type.startsWith('triangle_lines_')) {
+            if (window.TriangleLinesTrainer) {
+                t = window.TriangleLinesTrainer.generateTask(type);
+            }
         }
         return t;
     }

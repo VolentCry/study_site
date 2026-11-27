@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр «Задачи на биссектрису, медиану и высоту в треугольнике» · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --emerald: #10b981;
+      --emerald-light: #ecfdf5;
+      --emerald-border: rgba(16,185,129,.3);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.14) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.13) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 8px 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Zen Old Mincho', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light);
+      transition: all .2s; white-space: nowrap;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: var(--paper-card); }
+    .nav-btn.primary { background: var(--vermilion); color: #fff; border-color: var(--vermilion); }
+    .nav-btn.primary:hover { background: #9c363d; color: #fff; }
+    .xp-counter {
+      font-size: 11px; font-weight: 800; background: var(--vermilion-light); color: var(--vermilion);
+      padding: 4px 10px; border-radius: 999px; border: 1px solid var(--vermilion-border);
+    }
+
+    /* MAIN SHELL */
+    .trainer-shell {
+      max-width: 940px; margin: 0 auto; width: 100%; padding: 20px 5vw 48px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    /* HEADER */
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 6px;
+    }
+    .trainer-title {
+      font: 700 clamp(24px, 3.6vw, 34px) 'Zen Old Mincho', serif;
+      color: var(--indigo-dark); margin-bottom: 6px; line-height: 1.15;
+    }
+    .trainer-desc {
+      color: var(--muted); font-size: 14px; max-width: 700px; margin: 0 auto; line-height: 1.45;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .stat-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 12px 14px; text-align: center; box-shadow: var(--shadow-sm);
+    }
+    .stat-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 20px; font-weight: 800; color: var(--indigo); font-feature-settings: "tnum";
+    }
+    .stat-value.streak { color: var(--vermilion); }
+    .stat-rank-text {
+      font-size: 13px; font-weight: 700; color: var(--gold);
+    }
+
+    /* CATEGORIES PILLS */
+    .cat-selector {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .cat-pill {
+      white-space: nowrap; padding: 8px 15px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--paper-card);
+      font-size: 13px; font-weight: 600; color: var(--indigo); transition: all .2s;
+    }
+    .cat-pill:hover { border-color: var(--vermilion); color: var(--vermilion); }
+    .cat-pill.active {
+      background: var(--indigo); color: #fff; border-color: var(--indigo);
+      box-shadow: 0 4px 12px rgba(38,63,97,.2);
+    }
+
+    /* CHEAT SHEET ACCORDION */
+    .cheat-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-md);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .cheat-header {
+      padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; background: var(--paper-light); user-select: none;
+      font-size: 14px; font-weight: 700; color: var(--indigo); gap: 12px;
+    }
+    .cheat-header:hover { background: var(--paper-card); }
+    .cheat-body {
+      display: none; padding: 18px 20px; font-size: 13.5px; line-height: 1.6;
+      border-top: 1px solid var(--line); background: var(--paper-card);
+    }
+    .cheat-card.open .cheat-body { display: block; }
+    .cheat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;
+    }
+    .cheat-item {
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .cheat-item h4 {
+      font-size: 13px; font-weight: 700; color: var(--vermilion); margin-bottom: 6px;
+    }
+    .cheat-item p { color: var(--ink); margin-bottom: 4px; }
+    .cheat-footer-link {
+      margin-top: 14px; display: flex; justify-content: flex-end;
+    }
+    .cheat-footer-link a {
+      font-size: 13px; font-weight: 700; color: var(--indigo); text-decoration: none;
+      padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper-light);
+    }
+    .cheat-footer-link a:hover { border-color: var(--vermilion); color: var(--vermilion); }
+
+    /* MAIN TASK CARD */
+    .task-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 22px 26px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 16px;
+      position: relative;
+    }
+
+    .task-top {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .task-topic-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+      color: var(--vermilion); background: var(--vermilion-light); padding: 4px 12px; border-radius: 999px;
+    }
+    .mode-toggle-btn {
+      font-size: 12px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px; border-radius: 6px; border: 1px dashed var(--line); transition: all .2s;
+    }
+    .mode-toggle-btn:hover { color: var(--indigo); border-color: var(--indigo); background: var(--paper-light); }
+
+    /* TASK QUESTION & SVG */
+    .task-content { text-align: center; }
+    .task-prompt {
+      font-size: 13.5px; font-weight: 600; color: var(--muted); margin-bottom: 10px;
+    }
+    .task-question-box {
+      font-size: clamp(15.5px, 2.2vw, 17.5px);
+      line-height: 1.55;
+      color: var(--indigo-dark);
+      padding: 16px 20px 12px;
+      background: var(--paper-light);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+    .tri-canvas-wrap svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* MULTIPLE CHOICE GRID (4 OPTIONS) */
+    .options-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+    }
+    .option-btn {
+      min-height: 56px; padding: 12px 18px; background: var(--paper-light);
+      border: 1.5px solid var(--line); border-radius: var(--r-md);
+      font-size: 18px; font-weight: 700; color: var(--indigo);
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all .18s ease-out; text-align: left;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--vermilion); color: var(--vermilion); background: var(--paper-card);
+      transform: translateY(-2px); box-shadow: var(--shadow-sm);
+    }
+    .option-btn .opt-badge {
+      font-size: 12px; font-weight: 700; color: var(--muted); background: var(--indigo-soft);
+      width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center;
+      transition: all .2s; flex-shrink: 0;
+    }
+    .option-btn:hover:not(:disabled) .opt-badge {
+      background: var(--vermilion-light); color: var(--vermilion);
+    }
+    .option-btn.correct {
+      background: var(--emerald-light) !important; border-color: var(--emerald) !important;
+      color: var(--emerald) !important;
+    }
+    .option-btn.wrong {
+      background: var(--vermilion-light) !important; border-color: var(--vermilion) !important;
+      color: var(--vermilion) !important;
+    }
+
+    /* MANUAL INPUT BOX */
+    .input-mode-box {
+      display: none; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .input-row {
+      display: flex; gap: 10px; width: 100%; max-width: 420px;
+    }
+    .answer-input {
+      flex: 1; height: 52px; border-radius: var(--r-md); border: 2px solid var(--line);
+      background: var(--paper-light); font-size: 20px; font-weight: 700; color: var(--indigo);
+      padding: 0 16px; outline: none; transition: all .2s; text-align: center;
+    }
+    .answer-input:focus {
+      border-color: var(--vermilion); background: var(--paper-card); box-shadow: 0 0 0 4px rgba(183,70,78,.12);
+    }
+    .submit-answer-btn {
+      height: 52px; padding: 0 24px; background: var(--vermilion); color: #fff;
+      font-size: 15px; font-weight: 700; border-radius: var(--r-md); transition: all .2s;
+    }
+    .submit-answer-btn:hover { background: #9c363d; }
+    .input-hint-text {
+      font-size: 12px; color: var(--muted); text-align: center;
+    }
+
+    /* HINT BOX */
+    .hint-box {
+      display: none; padding: 12px 16px; border-radius: 10px;
+      background: var(--gold-light); border-left: 4px solid var(--gold);
+      font-size: 13.5px; color: var(--ink); line-height: 1.5;
+    }
+    .hint-box.show { display: block; animation: fadeIn .25s; }
+
+    /* FEEDBACK & SOLUTION */
+    .feedback-banner {
+      display: none; padding: 14px 18px; border-radius: var(--r-md);
+      font-size: 14px; font-weight: 600; align-items: center; gap: 10px;
+    }
+    .feedback-banner.correct {
+      background: var(--emerald-light); border: 1px solid var(--emerald-border); color: #065f46;
+    }
+    .feedback-banner.wrong {
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: #991b1b;
+    }
+    .feedback-icon { font-size: 20px; flex-shrink: 0; }
+
+    .solution-card {
+      display: none; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 18px 20px; font-size: 14px; line-height: 1.65;
+    }
+    .solution-card.show { display: block; animation: fadeIn .3s; }
+    .solution-title {
+      font-size: 13px; font-weight: 700; color: var(--vermilion); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .solution-steps {
+      list-style-type: none; display: flex; flex-direction: column; gap: 6px;
+    }
+
+    /* ACTIONS BOTTOM */
+    .card-actions {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-top: 1px solid var(--line); padding-top: 18px;
+    }
+    .left-actions {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .aux-btn {
+      font-size: 12px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-light);
+      transition: all .2s;
+    }
+    .aux-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--indigo); background: var(--paper-card); }
+    .aux-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .next-wrap { display: flex; gap: 10px; }
+    .next-btn {
+      min-height: 46px; padding: 0 24px; background: var(--indigo); color: #fff;
+      font-size: 14px; font-weight: 700; border-radius: 8px; display: none;
+      align-items: center; gap: 8px; transition: all .2s;
+    }
+    .next-btn:hover { background: var(--indigo-dark); }
+
+    /* FOOTER */
+    .page-footer {
+      margin-top: auto; padding: 24px 5vw; display: flex; justify-content: space-between;
+      align-items: center; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line);
+      background: var(--paper-light); gap: 12px; flex-wrap: wrap;
+    }
+    .page-footer a { color: var(--indigo); font-weight: 600; text-decoration: none; }
+    .page-footer a:hover { color: var(--vermilion); }
+
+    /* TOAST */
+    .toast-popup {
+      position: fixed; bottom: 24px; right: 24px; background: var(--indigo-dark);
+      color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;
+      box-shadow: var(--shadow-lg); z-index: 1000; transform: translateY(100px); opacity: 0;
+      transition: all .28s cubic-bezier(.16,1,.3,1); pointer-events: none;
+    }
+    .toast-popup.visible { transform: translateY(0); opacity: 1; }
+
+    /* DARK THEME ADJUSTMENTS */
+    html[data-theme="dark"] .feedback-banner.correct { color: #a7f3d0; }
+    html[data-theme="dark"] .feedback-banner.wrong { color: #fecaca; }
+    html[data-theme="dark"] .cat-pill.active,
+    html[data-theme="dark"] .next-btn { color: #0c1018; }
+    html[data-theme="dark"] .hint-box { color: var(--ink); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 680px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .options-grid { grid-template-columns: 1fr; }
+      .task-card { padding: 18px 16px; }
+      .task-question-box { padding: 14px 14px 10px; font-size: 15px; }
+      .card-actions { flex-direction: column-reverse; align-items: stretch; }
+      .next-btn { width: 100%; justify-content: center; }
+      .input-row { flex-direction: column; }
+      .answer-input { flex: none; width: 100%; }
+    }
+  </style>
+  <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');document.documentElement.dataset.theme=t==='dark'?'dark':'light';}catch(e){}})();</script>
+  <link rel="stylesheet" href="../css/math_theme_support.css" />
+</head>
+<body>
+  <!-- SITE NAV -->
+  <header class="site-nav">
+    <a class="brand" href="../pages/math_7.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">7 класс · Геометрия</span>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <span class="xp-counter" id="nav-xp-counter">0 XP</span>
+      <a class="nav-btn" href="../pages/math_7_triangle_lines_lesson.html">📘 Конспект</a>
+      <a class="nav-btn" href="../profile.html">Мой профиль</a>
+      <a class="nav-btn primary" href="../pages/math_7.html">← В 7 класс</a>
+    </div>
+  </header>
+
+  <!-- MAIN SHELL -->
+  <main class="trainer-shell">
+    <!-- HEADER -->
+    <header class="trainer-header">
+      <span class="trainer-kicker">ГЕОМЕТРИЯ · ТРЕНАЖЁР 7 КЛАСС</span>
+      <h1 class="trainer-title">Биссектриса, медиана и высота в треугольнике</h1>
+      <p class="trainer-desc">
+        Задачи на углы, периметры, пересечение биссектрис и высот, свойства равнобедренного и прямоугольного треугольников с точными чертежами.
+      </p>
+    </header>
+
+    <!-- STATS BAR -->
+    <section class="stats-bar" aria-label="Статистика тренировки">
+      <div class="stat-card">
+        <div class="stat-label">Серия побед</div>
+        <div class="stat-value streak" id="stat-streak">0 <span aria-hidden="true">🔥</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Точность</div>
+        <div class="stat-value" id="stat-accuracy">100%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Решено задач</div>
+        <div class="stat-value" id="stat-solved">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Текущее звание</div>
+        <div class="stat-rank-text" id="stat-rank">Начинающий 🥉</div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES SELECTOR -->
+    <nav class="cat-selector" aria-label="Темы заданий">
+      <button class="cat-pill active" data-cat="all" aria-selected="true">Все темы (Микс)</button>
+      <button class="cat-pill" data-cat="bisector" aria-selected="false">Биссектриса</button>
+      <button class="cat-pill" data-cat="median" aria-selected="false">Медиана</button>
+      <button class="cat-pill" data-cat="height" aria-selected="false">Высота</button>
+      <button class="cat-pill" data-cat="isosceles" aria-selected="false">Равнобедренный △</button>
+      <button class="cat-pill" data-cat="combined" aria-selected="false">Комбинированные</button>
+    </nav>
+
+    <!-- CHEAT SHEET ACCORDION -->
+    <section class="cheat-card" id="cheat-card" aria-label="Справочные материалы">
+      <div class="cheat-header" id="cheat-header" role="button" aria-expanded="false" tabindex="0">
+        <span>📖 Шпаргалка: свойства биссектрисы, медианы и высоты</span>
+        <span id="cheat-toggle-text">Показать правила ▾</span>
+      </div>
+      <div class="cheat-body" id="cheat-body">
+        <div class="cheat-grid">
+          <div class="cheat-item">
+            <h4>1. Биссектриса</h4>
+            <p>Делит угол треугольника пополам. Точка пересечения двух биссектрис образует угол:</p>
+            <p>$\angle AOB = 90^\circ + \frac{\angle C}{2}$.</p>
+          </div>
+          <div class="cheat-item">
+            <h4>2. Медиана</h4>
+            <p>Соединяет вершину с серединой противоположной стороны: $AM = MC$.</p>
+            <p>Разность периметров частей: $P_{\triangle ABM} - P_{\triangle CBM} = AB - BC$.</p>
+            <p>В прямоугольном $\triangle$ медиана к гипотенузе: $CM = \frac{AB}{2} = AM = BM$.</p>
+          </div>
+          <div class="cheat-item">
+            <h4>3. Высота</h4>
+            <p>Перпендикуляр к стороне или её продолжению ($\angle = 90^\circ$).</p>
+            <p>В остроугольном $\triangle$ тупой угол между двумя высотами из $A$ и $B$: $\angle AHB = 180^\circ - \angle C$.</p>
+          </div>
+          <div class="cheat-item">
+            <h4>4. Равнобедренный и прямоугольный △</h4>
+            <p>В равнобедренном $\triangle$ высота, медиана и биссектриса к основанию <strong>совпадают</strong>.</p>
+            <p>Угол между биссектрисой и высотой из одной вершины: $\frac{|\angle A - \angle C|}{2}$.</p>
+          </div>
+        </div>
+        <div class="cheat-footer-link">
+          <a href="../pages/math_7_triangle_lines_lesson.html">Открыть полный интерактивный конспект с живым чертежом →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN TASK CARD -->
+    <section class="task-card" aria-live="polite">
+      <div class="task-top">
+        <span class="task-topic-badge" id="task-topic-badge">Геометрия 7 класс</span>
+        <button class="mode-toggle-btn" id="task-mode-toggle" title="Переключить режим ввода ответа">
+          <span id="toggle-label">Режим: Выбор варианта (1–4)</span>
+          <span aria-hidden="true">⇄</span>
+        </button>
+      </div>
+
+      <div class="task-content">
+        <div class="task-prompt" id="task-prompt">Загрузка задания...</div>
+        <div class="task-question-box" id="formula-expression">
+          ...
+        </div>
+      </div>
+
+      <!-- Multiple Choice Mode -->
+      <div class="options-grid" id="options-grid">
+        <button class="option-btn" data-idx="0">
+          <span class="opt-text">—</span>
+          <span class="opt-badge">1</span>
+        </button>
+        <button class="option-btn" data-idx="1">
+          <span class="opt-text">—</span>
+          <span class="opt-badge">2</span>
+        </button>
+        <button class="option-btn" data-idx="2">
+          <span class="opt-text">—</span>
+          <span class="opt-badge">3</span>
+        </button>
+        <button class="option-btn" data-idx="3">
+          <span class="opt-text">—</span>
+          <span class="opt-badge">4</span>
+        </button>
+      </div>
+
+      <!-- Manual Input Mode -->
+      <div class="input-mode-box" id="input-mode-box">
+        <div class="input-row">
+          <input type="text" class="answer-input" id="answer-input" placeholder="Введите число..." autocomplete="off" inputmode="decimal">
+          <button class="submit-answer-btn" id="submit-answer-btn">Ответить</button>
+        </div>
+        <div class="input-hint-text" id="input-hint-text">Введите число (можно без единиц измерения) и нажмите Enter</div>
+      </div>
+
+      <!-- Hint Box -->
+      <div class="hint-box" id="hint-box"></div>
+
+      <!-- Feedback Banner -->
+      <div class="feedback-banner" id="feedback-banner">
+        <span class="feedback-icon" id="feedback-icon">✓</span>
+        <div class="feedback-text" id="feedback-text"></div>
+      </div>
+
+      <!-- Step-by-Step Solution Card -->
+      <div class="solution-card" id="solution-card">
+        <div class="solution-title">
+          <span>💡 Пошаговый разбор решения:</span>
+        </div>
+        <ol class="solution-steps" id="solution-steps"></ol>
+      </div>
+
+      <!-- Actions Bottom -->
+      <div class="card-actions">
+        <div class="left-actions">
+          <button class="aux-btn" id="btn-show-hint" type="button">
+            <span>💡</span>
+            <span>Подсказка</span>
+          </button>
+          <button class="aux-btn" id="btn-use-skip" type="button" title="Пропустить задание без потери серии с помощью буста прокачки">
+            <span>🛡️</span>
+            <span>Буст пропуска</span>
+          </button>
+        </div>
+        <div class="next-wrap">
+          <button class="next-btn" id="next-btn" type="button">
+            <span>Следующее задание</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-popup" id="toast-popup"></div>
+
+  <footer class="page-footer">
+    <span>НЕШкола · Математика 7 класс · Геометрия</span>
+    <a href="../pages/math_7.html">← Вернуться в 7 класс</a>
+  </footer>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/trainer_rank_tracker.js"></script>
+  <script src="../js/triangle_lines_trainer.js"></script>
+  <script src="../js/auth_sync.js"></script>
+
+  <script>
+    (function () {
+      const TRAINER_ID = 'triangle_lines';
+      let currentCategory = 'all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+      let isManualMode = false;
+
+      let streak = 0;
+      let totalSolved = 0;
+      let sessionSolved = 0;
+      let totalAttempts = 0;
+
+      const statStreak = document.getElementById('stat-streak');
+      const statAccuracy = document.getElementById('stat-accuracy');
+      const statSolved = document.getElementById('stat-solved');
+      const statRank = document.getElementById('stat-rank');
+      const navXpCounter = document.getElementById('nav-xp-counter');
+
+      const catPills = document.querySelectorAll('.cat-pill');
+      const cheatCard = document.getElementById('cheat-card');
+      const cheatHeader = document.getElementById('cheat-header');
+      const cheatBody = document.getElementById('cheat-body');
+      const cheatToggleText = document.getElementById('cheat-toggle-text');
+
+      const taskTopicBadge = document.getElementById('task-topic-badge');
+      const taskPrompt = document.getElementById('task-prompt');
+      const formulaExpr = document.getElementById('formula-expression');
+      const optionsGrid = document.getElementById('options-grid');
+      const inputModeBox = document.getElementById('input-mode-box');
+      const answerInput = document.getElementById('answer-input');
+      const submitAnswerBtn = document.getElementById('submit-answer-btn');
+      const taskModeToggle = document.getElementById('task-mode-toggle');
+      const toggleLabel = document.getElementById('toggle-label');
+
+      const hintBox = document.getElementById('hint-box');
+      const btnShowHint = document.getElementById('btn-show-hint');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const feedbackText = document.getElementById('feedback-text');
+      const feedbackIcon = document.getElementById('feedback-icon');
+      const solutionCard = document.getElementById('solution-card');
+      const solutionSteps = document.getElementById('solution-steps');
+      const nextBtn = document.getElementById('next-btn');
+      const btnUseSkip = document.getElementById('btn-use-skip');
+      const toastPopup = document.getElementById('toast-popup');
+
+      function renderInlineTex(root) {
+        if (!root || !window.StudyMath || typeof window.StudyMath.renderTeX !== 'function') return;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = [];
+        let n;
+        while ((n = walker.nextNode())) {
+          if (n.parentElement && !n.parentElement.closest('.katex, script, style, code, svg') && n.nodeValue && n.nodeValue.includes('$')) {
+            nodes.push(n);
+          }
+        }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, tex) => window.StudyMath.renderTeX(tex, false));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      // Web Audio sound synthesizer
+      let audioCtx = null;
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) audioCtx = new AudioContext();
+        }
+        return audioCtx;
+      }
+
+      function playSuccessSound() {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.16, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.32);
+        } catch (e) {}
+      }
+
+      function playErrorSound() {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(140, ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.14, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.27);
+        } catch (e) {}
+      }
+
+      function playRankUpSound() {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+            gain.gain.setValueAtTime(0.14, ctx.currentTime + idx * 0.1);
+            gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.1);
+            osc.stop(ctx.currentTime + idx * 0.1 + 0.28);
+          });
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        if (!toastPopup) return;
+        toastPopup.textContent = msg;
+        toastPopup.classList.add('visible');
+        setTimeout(() => toastPopup.classList.remove('visible'), 3200);
+      }
+
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const rec = TrainerTracker.getRecord(TRAINER_ID);
+          streak = TrainerTracker.getSessionStreak(TRAINER_ID) || 0;
+          if (rec) {
+            totalSolved = rec.totalSolved || 0;
+            statRank.textContent = (rec.maxRank && rec.maxRank !== 'Не начат') ? rec.maxRank : 'Начинающий 🥉';
+          }
+        }
+        statStreak.innerHTML = `${streak} <span aria-hidden="true">🔥</span>`;
+        statSolved.textContent = totalSolved;
+        const acc = totalAttempts > 0 ? Math.round((sessionSolved / totalAttempts) * 100) : 100;
+        statAccuracy.textContent = `${acc}%`;
+
+        try {
+          const curXp = localStorage.getItem('user_xp') || localStorage.getItem('studyBonusXp') || '0';
+          if (navXpCounter) navXpCounter.textContent = `${curXp} XP`;
+        } catch (e) {}
+
+        updateSkipBoostButton();
+      }
+
+      function updateSkipBoostButton() {
+        try {
+          const rawInv = localStorage.getItem('study_boosts_inventory');
+          const inv = rawInv ? JSON.parse(rawInv) : {};
+          const count = (inv.streak_shield || 0) + (inv.spy_hint || 0);
+          if (count > 0) {
+            btnUseSkip.disabled = false;
+            btnUseSkip.style.display = 'inline-flex';
+            btnUseSkip.title = `У вас доступно бустов: ${count}`;
+          } else {
+            btnUseSkip.disabled = true;
+            btnUseSkip.title = 'В магазине прокачки нет бустов пропуска';
+          }
+        } catch (e) {
+          btnUseSkip.disabled = true;
+        }
+      }
+
+      // Cheat Accordion
+      function toggleCheat() {
+        const isOpen = cheatCard.classList.toggle('open');
+        cheatHeader.setAttribute('aria-expanded', String(isOpen));
+        cheatToggleText.textContent = isOpen ? 'Скрыть правила ▴' : 'Показать правила ▾';
+      }
+      cheatHeader.addEventListener('click', toggleCheat);
+      cheatHeader.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleCheat();
+        }
+      });
+
+      // Categories
+      catPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          catPills.forEach(p => {
+            p.classList.remove('active');
+            p.setAttribute('aria-selected', 'false');
+          });
+          pill.classList.add('active');
+          pill.setAttribute('aria-selected', 'true');
+          currentCategory = pill.getAttribute('data-cat') || 'all';
+          loadNewTask();
+        });
+      });
+
+      // Mode Toggle
+      taskModeToggle.addEventListener('click', () => {
+        isManualMode = !isManualMode;
+        if (isManualMode) {
+          optionsGrid.style.display = 'none';
+          inputModeBox.style.display = 'flex';
+          toggleLabel.textContent = 'Режим: Ввод с клавиатуры';
+          answerInput.focus();
+        } else {
+          optionsGrid.style.display = 'grid';
+          inputModeBox.style.display = 'none';
+          toggleLabel.textContent = 'Режим: Выбор варианта (1–4)';
+        }
+      });
+
+      // Hint Button
+      btnShowHint.addEventListener('click', () => {
+        if (!currentTask || !currentTask.hint) return;
+        hintBox.innerHTML = `<strong>Подсказка:</strong> ${currentTask.hint}`;
+        hintBox.classList.add('show');
+      });
+
+      function loadNewTask() {
+        if (!window.TriangleLinesTrainer) return;
+
+        hasAnsweredCurrent = false;
+        feedbackBanner.style.display = 'none';
+        feedbackBanner.className = 'feedback-banner';
+        hintBox.classList.remove('show');
+        hintBox.innerHTML = '';
+        solutionCard.classList.remove('show');
+        solutionSteps.innerHTML = '';
+        nextBtn.style.display = 'none';
+
+        currentTask = TriangleLinesTrainer.generateTask(currentCategory);
+
+        taskTopicBadge.textContent = currentTask.catName || 'Геометрия 7 класс';
+        taskPrompt.textContent = currentTask.prompt || 'Решите задачу:';
+        formulaExpr.innerHTML = currentTask.questionHtml || '';
+        renderInlineTex(formulaExpr);
+
+        const optionBtns = optionsGrid.querySelectorAll('.option-btn');
+        optionBtns.forEach((btn, idx) => {
+          btn.className = 'option-btn';
+          btn.disabled = false;
+          const opt = (currentTask.options && currentTask.options[idx]) ? currentTask.options[idx] : null;
+          const spanText = btn.querySelector('.opt-text');
+          if (opt && spanText) {
+            spanText.innerHTML = opt.html || opt.text || '—';
+          }
+          btn.onclick = () => handleOptionClick(idx, btn);
+        });
+
+        answerInput.value = '';
+        answerInput.disabled = false;
+        submitAnswerBtn.disabled = false;
+
+        if (isManualMode) {
+          answerInput.focus();
+        }
+      }
+
+      function handleOptionClick(optIdx, btnEl) {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const res = TriangleLinesTrainer.checkAnswer(currentTask, optIdx);
+        finishAnswer(res.isCorrect, btnEl);
+      }
+
+      submitAnswerBtn.addEventListener('click', () => {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const val = answerInput.value.trim();
+        if (!val) {
+          answerInput.focus();
+          return;
+        }
+        const res = TriangleLinesTrainer.checkAnswer(currentTask, val);
+        finishAnswer(res.isCorrect, null);
+      });
+
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitAnswerBtn.click();
+        }
+      });
+
+      function finishAnswer(isCorrect, clickedBtn) {
+        hasAnsweredCurrent = true;
+
+        const optionBtns = optionsGrid.querySelectorAll('.option-btn');
+        optionBtns.forEach((btn, idx) => {
+          btn.disabled = true;
+          if (idx === currentTask.correctOptionIndex) {
+            btn.classList.add('correct');
+          }
+        });
+
+        if (clickedBtn && !isCorrect) {
+          clickedBtn.classList.add('wrong');
+        }
+
+        answerInput.disabled = true;
+        submitAnswerBtn.disabled = true;
+
+        feedbackBanner.style.display = 'flex';
+        feedbackBanner.classList.add('show');
+
+        totalAttempts++;
+        if (isCorrect) {
+          sessionSolved++;
+          playSuccessSound();
+          feedbackBanner.classList.add('correct');
+          feedbackIcon.textContent = '✓';
+          feedbackText.innerHTML = `<strong>Верно!</strong> Ответ <code>${currentTask.displayAnswer}</code> правильный! (+15 XP)`;
+
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+            const curBonus = parseInt(localStorage.getItem('studyBonusXp') || '0', 10);
+            localStorage.setItem('studyBonusXp', String(curBonus + 15));
+          } catch (e) {}
+
+          const prevMaxRank = window.TrainerTracker ? (TrainerTracker.getRecord(TRAINER_ID).maxRank || '') : '';
+          if (window.TrainerTracker) {
+            const res = TrainerTracker.recordAttempt(TRAINER_ID, true);
+            syncStats();
+            if (res && res.maxRank && res.maxRank !== 'Не начат' && prevMaxRank && prevMaxRank !== 'Не начат' && res.maxRank !== prevMaxRank) {
+              playRankUpSound();
+              showToast('🎖️ Поздравляем! Новое звание: ' + res.maxRank);
+            } else if (res && res.currentStreak > 0 && res.currentStreak % 5 === 0) {
+              showToast(`🔥 Отличная серия: ${res.currentStreak} правильных ответов подряд!`);
+            }
+          }
+        } else {
+          playErrorSound();
+          feedbackBanner.classList.add('wrong');
+          feedbackIcon.textContent = '✕';
+          feedbackText.innerHTML = `<strong>Не совсем так.</strong> Правильный ответ: <code>${currentTask.displayAnswer}</code>. Посмотрите разбор ниже.`;
+
+          if (window.TrainerTracker) {
+            TrainerTracker.recordAttempt(TRAINER_ID, false);
+            syncStats();
+          }
+
+          showSolution();
+        }
+
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.focus();
+      }
+
+      function showSolution() {
+        if (!currentTask || !currentTask.solutionSteps) return;
+        solutionSteps.innerHTML = '';
+        currentTask.solutionSteps.forEach(step => {
+          const li = document.createElement('li');
+          li.innerHTML = step;
+          solutionSteps.appendChild(li);
+        });
+        renderInlineTex(solutionSteps);
+        solutionCard.classList.add('show');
+      }
+
+      btnUseSkip.addEventListener('click', () => {
+        if (hasAnsweredCurrent || !currentTask) return;
+        try {
+          const rawInv = localStorage.getItem('study_boosts_inventory');
+          const inv = rawInv ? JSON.parse(rawInv) : {};
+          if ((inv.streak_shield || 0) > 0) {
+            inv.streak_shield--;
+            localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+            hasAnsweredCurrent = true;
+            feedbackBanner.style.display = 'flex';
+            feedbackBanner.className = 'feedback-banner correct show';
+            feedbackIcon.textContent = '🛡️';
+            feedbackText.innerHTML = `<strong>Защита серии активирована!</strong> Задание пропущено без сброса серии. Правильный ответ: <code>${currentTask.displayAnswer}</code>.`;
+            showSolution();
+            nextBtn.style.display = 'inline-flex';
+            showToast('🛡️ Буст защиты серии использован!');
+            syncStats();
+            return;
+          }
+          if ((inv.spy_hint || 0) > 0) {
+            inv.spy_hint--;
+            localStorage.setItem('study_boosts_inventory', JSON.stringify(inv));
+            showToast(`🕵️ Шпионская подсказка: правильный ответ — ${currentTask.displayAnswer}`);
+            answerInput.value = currentTask.answer;
+            syncStats();
+            return;
+          }
+          showToast('У вас нет активных бустов пропуска');
+        } catch (e) {}
+      });
+
+      nextBtn.addEventListener('click', loadNewTask);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target && e.target.tagName === 'INPUT') return;
+        if (!hasAnsweredCurrent && !isManualMode) {
+          if (['1', '2', '3', '4'].includes(e.key)) {
+            const idx = parseInt(e.key, 10) - 1;
+            const btn = optionsGrid.querySelector(`[data-idx="${idx}"]`);
+            if (btn) handleOptionClick(idx, btn);
+          }
+        } else if (hasAnsweredCurrent) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            loadNewTask();
+          }
+        }
+      });
+
+      renderInlineTex(cheatBody);
+      syncStats();
+      loadNewTask();
+    })();
+  </script>
+</body>
+</html>
