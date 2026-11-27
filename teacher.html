@@ -625,6 +625,40 @@
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- Пакетная генерация «микса» (Сборная солянка) -->
+                                <details id="mix-generator-details" style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--line);">
+                                    <summary style="cursor: pointer; font-size: 0.88rem; font-weight: 700; color: var(--accent-cyan); user-select: none; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                        <span>🎲 Сборная солянка (микс из нескольких тем)</span>
+                                        <span id="mix-selected-badge" style="font-size: 0.78rem; color: var(--muted); font-weight: 600;">Выбрано: 0</span>
+                                    </summary>
+                                    <div style="margin-top: 0.85rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.6rem;">
+                                            <span style="font-size: 0.78rem; color: var(--muted);">Отметьте темы (учитываются фильтры предмета и класса):</span>
+                                            <div style="display: flex; gap: 6px;">
+                                                <button type="button" class="btn btn-secondary btn-sm" id="btn-mix-select-all" style="padding: 4px 10px; font-size: 0.75rem;">Выбрать все</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" id="btn-mix-clear-all" style="padding: 4px 10px; font-size: 0.75rem;">Снять все</button>
+                                            </div>
+                                        </div>
+                                        <div id="mix-topics-list" style="max-height: 210px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; padding: 8px; background: rgba(0, 0, 0, 0.18); border: 1px solid var(--line); border-radius: var(--r-sm); margin-bottom: 0.85rem;">
+                                            <!-- Заполняется динамически -->
+                                        </div>
+                                        <div class="generator-row">
+                                            <div style="flex: 1; min-width: 140px;">
+                                                <label class="form-label" for="mix-tasks-per-topic">Задач на каждую тему</label>
+                                                <input type="number" id="mix-tasks-per-topic" class="form-input" min="1" max="10" value="2">
+                                            </div>
+                                            <div style="margin-top: 1.4rem;">
+                                                <button type="button" class="btn btn-emerald" id="btn-generate-mix">
+                                                    🎲 Сгенерировать микс
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="mix-summary-hint" style="margin-top: 0.5rem; font-size: 0.78rem; color: var(--muted);">
+                                            Выберите хотя бы одну тему выше.
+                                        </div>
+                                    </div>
+                                </details>
                             </div>
 
                             <!-- Блок добавления из Банка задач НЕшколы -->

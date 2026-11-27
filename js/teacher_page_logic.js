@@ -2702,6 +2702,15 @@
     const genFilterSubject = document.getElementById('gen-filter-subject');
     const genFilterGrade = document.getElementById('gen-filter-grade');
     const genTrainerCount = document.getElementById('gen-trainer-count');
+    const mixTopicsList = document.getElementById('mix-topics-list');
+    const mixTasksPerTopic = document.getElementById('mix-tasks-per-topic');
+    const mixSelectedBadge = document.getElementById('mix-selected-badge');
+    const mixSummaryHint = document.getElementById('mix-summary-hint');
+    const btnMixSelectAll = document.getElementById('btn-mix-select-all');
+    const btnMixClearAll = document.getElementById('btn-mix-clear-all');
+    const btnGenerateMix = document.getElementById('btn-generate-mix');
+
+    const selectedMixTypes = new Set();
 
     if (genTrainerType && genFilterSubject && genFilterGrade) {
         const allTrainerOptgroups = Array.from(genTrainerType.querySelectorAll('optgroup'))
@@ -2713,6 +2722,88 @@
             'oge': '9 класс (ОГЭ)',
             'base': 'Базовая арифметика'
         };
+
+        const subjectDisplayNames = {
+            'math': 'Математика',
+            'inf': 'Информатика'
+        };
+
+        function syncSubjectFromTrainer() {
+            if (!hwInputSubject) return;
+            const selectedOpt = genTrainerType.options[genTrainerType.selectedIndex];
+            const optgroup = selectedOpt ? selectedOpt.parentElement : null;
+            const subjectCode = (optgroup && optgroup.dataset && optgroup.dataset.subject)
+                || (genFilterSubject.value !== 'all' ? genFilterSubject.value : '');
+            if (subjectCode && subjectDisplayNames[subjectCode]) {
+                hwInputSubject.value = subjectDisplayNames[subjectCode];
+            }
+        }
+
+        function updateMixSummary() {
+            if (!mixTopicsList) return;
+            const visibleCheckboxes = Array.from(mixTopicsList.querySelectorAll('input[type="checkbox"]'));
+            const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
+            const perTopic = mixTasksPerTopic
+                ? Math.max(1, Math.min(10, parseInt(mixTasksPerTopic.value, 10) || 2))
+                : 2;
+
+            if (mixSelectedBadge) {
+                mixSelectedBadge.textContent = `Выбрано: ${checkedCount}`;
+            }
+            if (mixSummaryHint) {
+                if (checkedCount === 0) {
+                    mixSummaryHint.textContent = 'Выберите хотя бы одну тему выше.';
+                } else {
+                    mixSummaryHint.textContent = `Будет добавлено: ${checkedCount * perTopic} задач (${checkedCount} тем × ${perTopic})`;
+                }
+            }
+        }
+
+        function renderMixTopicsList(matchingGroups) {
+            if (!mixTopicsList) return;
+            const items = [];
+            matchingGroups.forEach(og => {
+                const subjectCode = og.dataset.subject || '';
+                Array.from(og.querySelectorAll('option')).forEach(opt => {
+                    if (opt.value.endsWith('_all') || opt.value.startsWith('mult_')) {
+                        items.push({
+                            value: opt.value,
+                            label: opt.textContent.trim(),
+                            subject: subjectCode
+                        });
+                    }
+                });
+            });
+
+            if (items.length === 0) {
+                mixTopicsList.innerHTML = '<div style="font-size:0.8rem; color:var(--muted); padding:6px;">Нет тем для выбранных фильтров</div>';
+                updateMixSummary();
+                return;
+            }
+
+            mixTopicsList.innerHTML = items.map(item => {
+                const checked = selectedMixTypes.has(item.value) ? 'checked' : '';
+                return `
+                    <label style="display:flex; align-items:flex-start; gap:8px; padding:6px 8px; border-radius:6px; cursor:pointer; font-size:0.8rem; line-height:1.3; color:var(--ink); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);">
+                        <input type="checkbox" class="mix-topic-checkbox" value="${escapeHtml(item.value)}" data-subject="${escapeHtml(item.subject)}" ${checked} style="margin-top:2px; accent-color: var(--accent-emerald);">
+                        <span>${escapeHtml(item.label)}</span>
+                    </label>
+                `;
+            }).join('');
+
+            mixTopicsList.querySelectorAll('.mix-topic-checkbox').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    if (cb.checked) {
+                        selectedMixTypes.add(cb.value);
+                    } else {
+                        selectedMixTypes.delete(cb.value);
+                    }
+                    updateMixSummary();
+                });
+            });
+
+            updateMixSummary();
+        }
 
         function updateGradeFilterOptions() {
             const subject = genFilterSubject.value;
@@ -2774,14 +2865,46 @@
             if (genTrainerCount) {
                 genTrainerCount.textContent = `(доступно: ${optionCount})`;
             }
+
+            renderMixTopicsList(matchingGroups);
         }
 
         genFilterSubject.addEventListener('change', () => {
             updateGradeFilterOptions();
             filterTrainerOptions();
+            syncSubjectFromTrainer();
         });
 
-        genFilterGrade.addEventListener('change', filterTrainerOptions);
+        genFilterGrade.addEventListener('change', () => {
+            filterTrainerOptions();
+            syncSubjectFromTrainer();
+        });
+
+        genTrainerType.addEventListener('change', syncSubjectFromTrainer);
+
+        if (btnMixSelectAll && mixTopicsList) {
+            btnMixSelectAll.addEventListener('click', () => {
+                mixTopicsList.querySelectorAll('.mix-topic-checkbox').forEach(cb => {
+                    cb.checked = true;
+                    selectedMixTypes.add(cb.value);
+                });
+                updateMixSummary();
+            });
+        }
+
+        if (btnMixClearAll && mixTopicsList) {
+            btnMixClearAll.addEventListener('click', () => {
+                mixTopicsList.querySelectorAll('.mix-topic-checkbox').forEach(cb => {
+                    cb.checked = false;
+                    selectedMixTypes.delete(cb.value);
+                });
+                updateMixSummary();
+            });
+        }
+
+        if (mixTasksPerTopic) {
+            mixTasksPerTopic.addEventListener('input', updateMixSummary);
+        }
 
         updateGradeFilterOptions();
         filterTrainerOptions();
@@ -3098,203 +3221,219 @@
         }
     }
 
+    function generateSingleTaskByType(type) {
+        let t = null;
+        if (type.startsWith('oge6_')) {
+            if (window.OgeTask6Trainer) {
+                const catMap = {
+                    'oge6_all': 'mixed_all',
+                    'oge6_common': 'common_fractions',
+                    'oge6_decimal': 'decimal_fractions',
+                    'oge6_multistory': 'multistory_fractions',
+                    'oge6_powers': 'powers_of_ten_mixed'
+                };
+                t = window.OgeTask6Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge7_')) {
+            if (window.OgeTask7Trainer) {
+                const catMap = {
+                    'oge7_all': 'mixed_all',
+                    'oge7_roots': 'roots_on_line',
+                    'oge7_fractions': 'fractions_and_intervals',
+                    'oge7_variables': 'variable_inequalities',
+                    'oge7_differences': 'differences_comparison'
+                };
+                t = window.OgeTask7Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge8_')) {
+            if (window.OgeTask8Trainer) {
+                const catMap = {
+                    'oge8_all': 'mixed_all',
+                    'oge8_roots': 'roots_numbers',
+                    'oge8_powers': 'powers_properties'
+                };
+                t = window.OgeTask8Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge9_')) {
+            if (window.OgeTask9Trainer) {
+                const catMap = {
+                    'oge9_all': 'mixed_all',
+                    'oge9_linear': 'linear_equations',
+                    'oge9_quadratic': 'quadratic_equations',
+                    'oge9_rational': 'rational_equations',
+                    'oge9_systems': 'equation_systems'
+                };
+                t = window.OgeTask9Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge10_')) {
+            if (window.OgeTask10Trainer) {
+                const catMap = {
+                    'oge10_all': 'mixed_all',
+                    'oge10_classic': 'fipi_classic',
+                    'oge10_athletes': 'athletes_draw',
+                    'oge10_taxis': 'taxis_colors',
+                    'oge10_tickets': 'exam_tickets',
+                    'oge10_quality': 'quality_defect',
+                    'oge10_dice': 'dice_coins'
+                };
+                t = window.OgeTask10Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge11_')) {
+            if (window.OgeTask11Trainer) {
+                const catMap = {
+                    'oge11_all': 'mixed_all',
+                    'oge11_parabolas': 'parabolas',
+                    'oge11_linear': 'linear',
+                    'oge11_hyperbolas': 'hyperbolas',
+                    'oge11_mixed_types': 'mixed_types',
+                    'oge11_find_value': 'find_value'
+                };
+                t = window.OgeTask11Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge13_')) {
+            if (window.OgeTask13Trainer) {
+                const catMap = {
+                    'oge13_all': 'mixed_all',
+                    'oge13_linear': 'linear',
+                    'oge13_systems': 'systems',
+                    'oge13_quadratic': 'quadratic',
+                    'oge13_special': 'no_solution_or_all'
+                };
+                t = window.OgeTask13Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge18_')) {
+            if (window.OgeTask18Trainer) {
+                const catMap = {
+                    'oge18_all': 'mixed_all',
+                    'oge18_triangle': 'area_triangle',
+                    'oge18_trapezoid': 'area_trapezoid',
+                    'oge18_parallelogram': 'area_parallelogram',
+                    'oge18_tangent': 'angle_tangent',
+                    'oge18_midline': 'midline',
+                    'oge18_distance': 'distance'
+                };
+                t = window.OgeTask18Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge20_')) {
+            if (window.OgeTask20Trainer) {
+                const catMap = {
+                    'oge20_all': 'mixed_all',
+                    'oge20_equations': 'equations',
+                    'oge20_inequalities': 'inequalities',
+                    'oge20_systems': 'systems'
+                };
+                t = window.OgeTask20Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('inf_oge')) {
+            const infMap = {
+                'inf_oge1_all': window.InfOgeTask1Trainer,
+                'inf_oge2_all': window.InfOgeTask2Trainer,
+                'inf_oge3_all': window.InfOgeTask3Trainer,
+                'inf_oge4_all': window.InfOgeTask4Trainer,
+                'inf_oge5_all': window.InfOgeTask5Trainer,
+                'inf_oge6_all': window.InfOgeTask6Trainer,
+                'inf_oge7_all': window.InfOgeTask7Trainer,
+                'inf_oge8_all': window.InfOgeTask8Trainer,
+                'inf_oge9_all': window.InfOgeTask9Trainer,
+                'inf_oge10_all': window.InfOgeTask10Trainer
+            };
+            const engine = infMap[type];
+            if (engine) {
+                t = engine.generateTask('mixed_all');
+            }
+        } else if (type.startsWith('mult_')) {
+            t = generateMultiplicationTask(type);
+        } else if (type.startsWith('powers_compare')) {
+            if (window.PowersCompareTrainer) {
+                t = window.PowersCompareTrainer.generateTask('compare_all');
+            }
+        } else if (type.startsWith('fractions_compare')) {
+            if (window.FractionCompareTrainer) {
+                t = window.FractionCompareTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('powers_')) {
+            if (window.PowersTrainer) {
+                t = window.PowersTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('complex_fractions_powers')) {
+            if (window.ComplexFractionsPowersTrainer) {
+                t = window.ComplexFractionsPowersTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('complex_fractions')) {
+            if (window.ComplexFractionsTrainer) {
+                t = window.ComplexFractionsTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('divisibility_')) {
+            if (window.DivisibilityTrainer) {
+                t = window.DivisibilityTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('extract_whole_adv_')) {
+            if (window.ExtractWholeAdvancedTrainer) {
+                t = window.ExtractWholeAdvancedTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('monomials_')) {
+            if (window.MonomialsTrainer) {
+                t = window.MonomialsTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('polynomials_')) {
+            if (window.PolynomialsTrainer) {
+                t = window.PolynomialsTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('linear_')) {
+            if (window.LinearFunctionTrainer) {
+                t = window.LinearFunctionTrainer.generateTask(type);
+            }
+        }
+        return t;
+    }
+
+    function generateUniqueTasksForType(type, count, existingFPs, batchFPs) {
+        const generated = [];
+        let attempts = 0;
+        const maxAttempts = count * 45;
+
+        while (generated.length < count && attempts < maxAttempts) {
+            attempts++;
+            const t = generateSingleTaskByType(type);
+            if (!t) break;
+
+            const fp = getTaskFingerprint(t);
+            if (!existingFPs.has(fp) && !batchFPs.has(fp)) {
+                batchFPs.add(fp);
+                existingFPs.add(fp);
+                if (!t.taskId) {
+                    t.taskId = (type.startsWith('oge') ? type.split('_')[0] : 'task') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
+                }
+                generated.push(t);
+            }
+        }
+        return generated;
+    }
+
     if (btnGenerateTasks) {
         btnGenerateTasks.addEventListener('click', () => {
             const type = genTrainerType.value;
             const count = Math.max(1, Math.min(20, parseInt(genTasksCount.value, 10) || 5));
 
-            // Deduplicate against existing draft tasks and within batch
             const existingFPs = new Set(constructorDraftTasks.map(getTaskFingerprint));
             const batchFPs = new Set();
-            const generated = [];
-
-            let attempts = 0;
-            const maxAttempts = count * 45; // Generous retry budget to ensure uniqueness
-
-            while (generated.length < count && attempts < maxAttempts) {
-                attempts++;
-                let t = null;
-                if (type.startsWith('oge6_')) {
-                    if (window.OgeTask6Trainer) {
-                        const catMap = {
-                            'oge6_all': 'mixed_all',
-                            'oge6_common': 'common_fractions',
-                            'oge6_decimal': 'decimal_fractions',
-                            'oge6_multistory': 'multistory_fractions',
-                            'oge6_powers': 'powers_of_ten_mixed'
-                        };
-                        t = window.OgeTask6Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge7_')) {
-                    if (window.OgeTask7Trainer) {
-                        const catMap = {
-                            'oge7_all': 'mixed_all',
-                            'oge7_roots': 'roots_on_line',
-                            'oge7_fractions': 'fractions_and_intervals',
-                            'oge7_variables': 'variable_inequalities',
-                            'oge7_differences': 'differences_comparison'
-                        };
-                        t = window.OgeTask7Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge8_')) {
-                    if (window.OgeTask8Trainer) {
-                        const catMap = {
-                            'oge8_all': 'mixed_all',
-                            'oge8_roots': 'roots_numbers',
-                            'oge8_powers': 'powers_properties'
-                        };
-                        t = window.OgeTask8Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge9_')) {
-                    if (window.OgeTask9Trainer) {
-                        const catMap = {
-                            'oge9_all': 'mixed_all',
-                            'oge9_linear': 'linear_equations',
-                            'oge9_quadratic': 'quadratic_equations',
-                            'oge9_rational': 'rational_equations',
-                            'oge9_systems': 'equation_systems'
-                        };
-                        t = window.OgeTask9Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge10_')) {
-                    if (window.OgeTask10Trainer) {
-                        const catMap = {
-                            'oge10_all': 'mixed_all',
-                            'oge10_classic': 'fipi_classic',
-                            'oge10_athletes': 'athletes_draw',
-                            'oge10_taxis': 'taxis_colors',
-                            'oge10_tickets': 'exam_tickets',
-                            'oge10_quality': 'quality_defect',
-                            'oge10_dice': 'dice_coins'
-                        };
-                        t = window.OgeTask10Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge11_')) {
-                    if (window.OgeTask11Trainer) {
-                        const catMap = {
-                            'oge11_all': 'mixed_all',
-                            'oge11_parabolas': 'parabolas',
-                            'oge11_linear': 'linear',
-                            'oge11_hyperbolas': 'hyperbolas',
-                            'oge11_mixed_types': 'mixed_types',
-                            'oge11_find_value': 'find_value'
-                        };
-                        t = window.OgeTask11Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge13_')) {
-                    if (window.OgeTask13Trainer) {
-                        const catMap = {
-                            'oge13_all': 'mixed_all',
-                            'oge13_linear': 'linear',
-                            'oge13_systems': 'systems',
-                            'oge13_quadratic': 'quadratic',
-                            'oge13_special': 'no_solution_or_all'
-                        };
-                        t = window.OgeTask13Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge18_')) {
-                    if (window.OgeTask18Trainer) {
-                        const catMap = {
-                            'oge18_all': 'mixed_all',
-                            'oge18_triangle': 'area_triangle',
-                            'oge18_trapezoid': 'area_trapezoid',
-                            'oge18_parallelogram': 'area_parallelogram',
-                            'oge18_tangent': 'angle_tangent',
-                            'oge18_midline': 'midline',
-                            'oge18_distance': 'distance'
-                        };
-                        t = window.OgeTask18Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('oge20_')) {
-                    if (window.OgeTask20Trainer) {
-                        const catMap = {
-                            'oge20_all': 'mixed_all',
-                            'oge20_equations': 'equations',
-                            'oge20_inequalities': 'inequalities',
-                            'oge20_systems': 'systems'
-                        };
-                        t = window.OgeTask20Trainer.generateTask(catMap[type] || 'mixed_all');
-                    }
-                } else if (type.startsWith('inf_oge')) {
-                    const infMap = {
-                        'inf_oge1_all': window.InfOgeTask1Trainer,
-                        'inf_oge2_all': window.InfOgeTask2Trainer,
-                        'inf_oge3_all': window.InfOgeTask3Trainer,
-                        'inf_oge4_all': window.InfOgeTask4Trainer,
-                        'inf_oge5_all': window.InfOgeTask5Trainer,
-                        'inf_oge6_all': window.InfOgeTask6Trainer,
-                        'inf_oge7_all': window.InfOgeTask7Trainer,
-                        'inf_oge8_all': window.InfOgeTask8Trainer,
-                        'inf_oge9_all': window.InfOgeTask9Trainer,
-                        'inf_oge10_all': window.InfOgeTask10Trainer
-                    };
-                    const engine = infMap[type];
-                    if (engine) {
-                        t = engine.generateTask('mixed_all');
-                        if (hwInputSubject && (!hwInputSubject.value || hwInputSubject.value.trim() === 'Математика')) {
-                            hwInputSubject.value = 'Информатика';
-                        }
-                    }
-                } else if (type.startsWith('mult_')) {
-                    t = generateMultiplicationTask(type);
-                } else if (type.startsWith('powers_compare')) {
-                    if (window.PowersCompareTrainer) {
-                        t = window.PowersCompareTrainer.generateTask('compare_all');
-                    }
-                } else if (type.startsWith('fractions_compare')) {
-                    if (window.FractionCompareTrainer) {
-                        t = window.FractionCompareTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('powers_')) {
-                    if (window.PowersTrainer) {
-                        t = window.PowersTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('complex_fractions_powers')) {
-                    if (window.ComplexFractionsPowersTrainer) {
-                        t = window.ComplexFractionsPowersTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('complex_fractions')) {
-                    if (window.ComplexFractionsTrainer) {
-                        t = window.ComplexFractionsTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('divisibility_')) {
-                    if (window.DivisibilityTrainer) {
-                        t = window.DivisibilityTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('extract_whole_adv_')) {
-                    if (window.ExtractWholeAdvancedTrainer) {
-                        t = window.ExtractWholeAdvancedTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('monomials_')) {
-                    if (window.MonomialsTrainer) {
-                        t = window.MonomialsTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('polynomials_')) {
-                    if (window.PolynomialsTrainer) {
-                        t = window.PolynomialsTrainer.generateTask(type);
-                    }
-                } else if (type.startsWith('linear_')) {
-                    if (window.LinearFunctionTrainer) {
-                        t = window.LinearFunctionTrainer.generateTask(type);
-                    }
-                }
-
-                if (!t) break;
-
-                const fp = getTaskFingerprint(t);
-                if (!existingFPs.has(fp) && !batchFPs.has(fp)) {
-                    batchFPs.add(fp);
-                    existingFPs.add(fp);
-                    if (!t.taskId) {
-                        t.taskId = (type.startsWith('oge') ? type.split('_')[0] : 'task') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
-                    }
-                    generated.push(t);
-                }
-            }
+            const generated = generateUniqueTasksForType(type, count, existingFPs, batchFPs);
 
             if (generated.length === 0) {
                 alert('Все доступные уникальные задачи этого типа уже добавлены в черновик.');
                 return;
+            }
+
+            if (hwInputSubject) {
+                if (type.startsWith('inf_oge')) {
+                    hwInputSubject.value = 'Информатика';
+                } else {
+                    const selectedOpt = genTrainerType.options[genTrainerType.selectedIndex];
+                    const optgroup = selectedOpt ? selectedOpt.parentElement : null;
+                    if (optgroup && optgroup.dataset && optgroup.dataset.subject === 'math') {
+                        hwInputSubject.value = 'Математика';
+                    }
+                }
             }
 
             constructorDraftTasks = constructorDraftTasks.concat(generated);
@@ -3304,6 +3443,47 @@
             } else {
                 showToast(`Сгенерировано и добавлено ${generated.length} уникальных задач без повторов!`);
             }
+        });
+    }
+
+    if (btnGenerateMix && mixTopicsList) {
+        btnGenerateMix.addEventListener('click', () => {
+            const checkedBoxes = Array.from(mixTopicsList.querySelectorAll('.mix-topic-checkbox:checked'));
+            if (checkedBoxes.length === 0) {
+                alert('Выберите хотя бы одну тему для генерации микса.');
+                return;
+            }
+
+            const perTopic = mixTasksPerTopic
+                ? Math.max(1, Math.min(10, parseInt(mixTasksPerTopic.value, 10) || 2))
+                : 2;
+
+            const existingFPs = new Set(constructorDraftTasks.map(getTaskFingerprint));
+            const batchFPs = new Set();
+            const generatedAll = [];
+            const subjectsUsed = new Set();
+
+            checkedBoxes.forEach(cb => {
+                const type = cb.value;
+                if (cb.dataset.subject) subjectsUsed.add(cb.dataset.subject);
+                const batch = generateUniqueTasksForType(type, perTopic, existingFPs, batchFPs);
+                generatedAll.push(...batch);
+            });
+
+            if (generatedAll.length === 0) {
+                alert('Все доступные уникальные задачи по выбранным темам уже добавлены в черновик.');
+                return;
+            }
+
+            if (hwInputSubject && subjectsUsed.size === 1) {
+                const onlySubj = Array.from(subjectsUsed)[0];
+                if (onlySubj === 'inf') hwInputSubject.value = 'Информатика';
+                else if (onlySubj === 'math') hwInputSubject.value = 'Математика';
+            }
+
+            constructorDraftTasks = constructorDraftTasks.concat(generatedAll);
+            renderConstructorDraft();
+            showToast(`🎲 Добавлен микс: ${generatedAll.length} задач из ${checkedBoxes.length} тем!`);
         });
     }
 
