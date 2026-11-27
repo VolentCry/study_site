@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Высота, медиана и биссектриса · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body {
+      background-color: var(--paper); color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion);
+      font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700;
+      border-radius: 8px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+    .lesson-shell {
+      max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .lesson-hero {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .lesson-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold));
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light);
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+
+    .concept-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px;
+    }
+    .concept-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box {
+      background: var(--gold-light); border-left: 4px solid var(--gold);
+      padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px;
+    }
+
+    .tri-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .line-card {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px;
+      background: var(--paper-light); display: flex; flex-direction: column; gap: 8px; font-size: 14px;
+    }
+    .line-pill {
+      align-self: flex-start; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 3px 10px; border-radius: 999px;
+    }
+    .pill-h { background: var(--vermilion-light); color: var(--vermilion); }
+    .pill-m { background: var(--green-light); color: var(--green); }
+    .pill-l { background: var(--gold-light); color: #8b5a2b; }
+    .line-card h3 { font: 700 16.5px 'Lora', serif; color: var(--indigo-dark); }
+
+    /* Interactive Lab */
+    .lab-box {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 20px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .controls-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ctrl-btn {
+      padding: 8px 13px; border-radius: 9px; border: 1px solid var(--line); background: #fff;
+      color: var(--indigo); font-size: 13px; font-weight: 700; transition: all .15s;
+    }
+    .ctrl-btn:hover { border-color: var(--indigo); }
+    .ctrl-btn.active { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+    .ctrl-btn.active-h { background: var(--vermilion); color: #fff; border-color: var(--vermilion); }
+    .ctrl-btn.active-m { background: var(--green); color: #fff; border-color: var(--green); }
+    .ctrl-btn.active-l { background: #a86f3e; color: #fff; border-color: #a86f3e; }
+
+    .svg-stage {
+      width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      padding: 8px; display: flex; justify-content: center; touch-action: none;
+    }
+    .svg-stage svg { width: 100%; max-width: 660px; height: auto; display: block; user-select: none; }
+    .lab-readout {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      padding: 12px 16px; font-size: 13.5px; color: var(--ink);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+
+    /* Centers: Orthocenter & Centroid */
+    .centers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .center-box {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px;
+      background: var(--paper-light); display: flex; flex-direction: column; gap: 10px; font-size: 14px;
+    }
+    .center-box h3 { font: 700 17px 'Lora', serif; color: var(--indigo-dark); }
+    .center-box ul { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+
+    /* Interactive Trainer */
+    .trainer-shell {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px;
+      background: var(--paper-light); display: flex; flex-direction: column; gap: 16px;
+    }
+    .trainer-stats {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--line);
+    }
+    .stat-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stat-pill {
+      background: #fff; border: 1px solid var(--line); border-radius: 999px;
+      padding: 5px 13px; font-size: 13px; font-weight: 700; color: var(--indigo-dark);
+    }
+    .stat-pill span { color: var(--vermilion); font-weight: 800; }
+    .trainer-body { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .trainer-visual {
+      flex: 0 0 250px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px;
+    }
+    .trainer-visual svg { width: 100%; height: auto; display: block; }
+    .trainer-qa { flex: 1 1 280px; display: flex; flex-direction: column; gap: 12px; }
+    .trainer-q { font-size: 16px; font-weight: 700; color: var(--indigo-dark); }
+    .trainer-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+    .t-opt {
+      padding: 9px 15px; border-radius: 9px; border: 1px solid var(--line); background: #fff;
+      font-size: 14px; font-weight: 700; color: var(--indigo); transition: all .15s;
+    }
+    .t-opt:hover:not(:disabled) { border-color: var(--indigo); transform: translateY(-1px); }
+    .t-opt:disabled { cursor: default; }
+    .t-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .t-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .t-input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .t-input {
+      width: 110px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 9px;
+      font-family: inherit; font-size: 15px; font-weight: 700; color: var(--indigo-dark); background: #fff;
+    }
+    .t-submit {
+      padding: 9px 16px; border-radius: 9px; background: var(--indigo); color: #fff;
+      font-size: 14px; font-weight: 700; transition: background .15s;
+    }
+    .t-submit:hover { background: var(--indigo-dark); }
+    .t-feedback {
+      display: none; padding: 11px 14px; border-radius: 10px; font-size: 13.5px;
+    }
+    .t-feedback.show { display: block; }
+    .t-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .t-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+    .t-next {
+      align-self: flex-start; padding: 9px 16px; border-radius: 9px;
+      background: var(--vermilion); color: #fff; font-size: 13.5px; font-weight: 700;
+      display: none;
+    }
+    .t-next.show { display: inline-flex; align-items: center; gap: 6px; }
+
+    .practice-cta {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff;
+      border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text"><span class="brand-name">НЕШкола</span><span class="brand-sub">7 класс · Конспект урока</span></span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_7.html">← Назад к 7 классу</a>
+      <a class="nav-btn" href="math_7_triangle_congruence_lesson.html">Признаки равенства →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Геометрия · 7 класс · Интерактивный разбор и тренажёр</span>
+      <h1>Высота, медиана и биссектриса в треугольниках</h1>
+      <p>Три главных отрезка внутри треугольника, их замечательные точки пересечения — ортоцентр и центроид, а также встроенный интерактивный тренажёр.</p>
+    </header>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Три отрезка из вершины к противоположной стороне</h2>
+        </div>
+      </div>
+      <div class="tri-grid">
+        <article class="line-card">
+          <span class="line-pill pill-h">Высота ($h$)</span>
+          <h3>Перпендикуляр</h3>
+          <p>Отрезок, опущенный из вершины треугольника на прямую, содержащую противоположную сторону, под углом $90^\circ$.</p>
+          <p style="color:var(--muted); font-size:13px;">В тупоугольном треугольнике высота из острого угла падает <strong>на продолжение стороны</strong>!</p>
+        </article>
+        <article class="line-card">
+          <span class="line-pill pill-m">Медиана ($m$)</span>
+          <h3>Делит сторону пополам</h3>
+          <p>Отрезок, соединяющий вершину треугольника с <strong>серединой</strong> противоположной стороны.</p>
+          <p style="color:var(--muted); font-size:13px;">Всегда лежит строго внутри треугольника и делит его на два равновеликих (равных по площади).</p>
+        </article>
+        <article class="line-card">
+          <span class="line-pill pill-l">Биссектриса ($l$)</span>
+          <h3>Делит угол пополам</h3>
+          <p>Отрезок биссектрисы угла треугольника, соединяющий вершину с точкой на противоположной стороне.</p>
+          <p style="color:var(--muted); font-size:13px;">Любая точка биссектрисы равноудалена от сторон этого угла.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Живой чертёж: двигайте вершину $B$ и следите за точками</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        Перетащите красную вершину <strong>$B$</strong> мышкой (или выберите готовый вид треугольника). Наблюдайте, как меняются высота, медиана и биссектриса, и куда смещаются <strong>ортоцентр</strong> и <strong>центроид</strong>!
+      </div>
+      <div class="lab-box">
+        <div class="controls-bar">
+          <div class="btn-group" id="layer-btns">
+            <button type="button" class="ctrl-btn active-h" data-layer="h">Высота + Ортоцентр</button>
+            <button type="button" class="ctrl-btn" data-layer="m">Медиана + Центроид</button>
+            <button type="button" class="ctrl-btn" data-layer="l">Биссектриса</button>
+            <button type="button" class="ctrl-btn" data-layer="all">Все три сразу</button>
+          </div>
+          <div class="btn-group" id="preset-btns">
+            <button type="button" class="ctrl-btn" data-preset="acute">Остроугольный</button>
+            <button type="button" class="ctrl-btn" data-preset="right">Прямоугольный</button>
+            <button type="button" class="ctrl-btn" data-preset="obtuse">Тупоугольный</button>
+            <button type="button" class="ctrl-btn" data-preset="iso">Равнобедренный</button>
+          </div>
+        </div>
+
+        <div class="svg-stage">
+          <svg id="tri-lab-svg" viewBox="0 0 660 320" aria-label="Интерактивный треугольник с высотой, медианой и биссектрисой"></svg>
+        </div>
+
+        <div class="lab-readout" id="lab-readout"></div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 03</span>
+          <h2>Замечательные точки: ортоцентр и центроид</h2>
+        </div>
+      </div>
+      <div class="centers-grid">
+        <article class="center-box" style="border-color: var(--vermilion-border);">
+          <span class="line-pill pill-h">Точка пересечения высот</span>
+          <h3>Ортоцентр ($H$)</h3>
+          <p>Все три высоты треугольника (или их продолжения) пересекаются в одной точке — <strong>ортоцентре</strong>.</p>
+          <ul>
+            <li>В <strong>остроугольном</strong> треугольнике ортоцентр лежит <strong>внутри</strong>.</li>
+            <li>В <strong>прямоугольном</strong> — совпадает с <strong>вершиной прямого угла</strong>.</li>
+            <li>В <strong>тупоугольном</strong> — лежит <strong>вне</strong> треугольника (на пересечении продолжений высот).</li>
+          </ul>
+        </article>
+        <article class="center-box" style="border-color: var(--green-border);">
+          <span class="line-pill pill-m">Точка пересечения медиан</span>
+          <h3>Центроид ($M$)</h3>
+          <p>Все три медианы треугольника пересекаются в одной точке — <strong>центроиде</strong> (центре тяжести треугольника).</p>
+          <ul>
+            <li>Центроид <strong>всегда</strong> находится строго внутри любого треугольника.</li>
+            <li><strong>Главное свойство:</strong> центроид делит каждую медиану в отношении <strong>$2 : 1$</strong>, считая от вершины! Например, если вся медиана $12\text{ см}$, то кусок от вершины — $8\text{ см}$, а до стороны — $4\text{ см}$.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="intuition-box">
+        <strong>Частный случай (равнобедренный треугольник):</strong> высота, медиана и биссектриса, проведённые к основанию, <strong>совпадают</strong> в одном отрезке. А в равностороннем треугольнике совпадают и ортоцентр, и центроид!
+      </div>
+    </section>
+
+    <section class="concept-card" id="trainer-section">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Интерактивный тренажёр</span>
+          <h2>Определи линию и реши задачу</h2>
+        </div>
+      </div>
+      <div class="trainer-shell">
+        <div class="trainer-stats">
+          <div class="stat-pills">
+            <div class="stat-pill">Решено верно: <span id="tr-score">0</span></div>
+            <div class="stat-pill">Серия: <span id="tr-streak">0</span></div>
+            <div class="stat-pill">Всего попыток: <span id="tr-total">0</span></div>
+          </div>
+          <div class="btn-group" id="tr-filter">
+            <button type="button" class="ctrl-btn active" data-kind="mix">Все типы</button>
+            <button type="button" class="ctrl-btn" data-kind="visual">По чертежу</button>
+            <button type="button" class="ctrl-btn" data-kind="calc">Вычисления</button>
+          </div>
+        </div>
+
+        <div class="trainer-body">
+          <div class="trainer-visual">
+            <svg id="trainer-svg" viewBox="0 0 250 185" aria-label="Чертёж к задаче тренажёра"></svg>
+          </div>
+          <div class="trainer-qa">
+            <div class="trainer-q" id="trainer-q"></div>
+            <div id="trainer-controls"></div>
+            <div class="t-feedback" id="trainer-fb"></div>
+            <button type="button" class="t-next" id="trainer-next">Следующая задача →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Закрепите геометрию на тренажёре</h3>
+        <p>Потренируйтесь находить углы, площади, медианы и высоты на клетчатой бумаге.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="../math_moduls/oge_task_18_trainer.html">Геометрия на клетках →</a>
+        <a class="cta-btn secondary" href="math_7_triangle_congruence_lesson.html">Признаки равенства</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) {
+        return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s;
+      }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = [];
+        let n;
+        while ((n = walker.nextNode())) {
+          if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) {
+            nodes.push(n);
+          }
+        }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      /* ===== INTERACTIVE TRIANGLE LAB ===== */
+      const labSvg = document.getElementById('tri-lab-svg');
+      const readout = document.getElementById('lab-readout');
+      const A = { x: 170, y: 245 };
+      const C = { x: 490, y: 245 };
+      let B = { x: 270, y: 68 };
+      let activeLayer = 'h';
+      let dragging = false;
+
+      function dist(p, q) { return Math.hypot(p.x - q.x, p.y - q.y); }
+      function projectOnLine(P, Q, R) {
+        const dx = R.x - Q.x, dy = R.y - Q.y;
+        const t = ((P.x - Q.x) * dx + (P.y - Q.y) * dy) / (dx * dx + dy * dy);
+        return { x: Q.x + t * dx, y: Q.y + t * dy };
+      }
+      function lineIntersect(p1, p2, p3, p4) {
+        const d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+        if (Math.abs(d) < 1e-6) return null;
+        const a = p1.x * p2.y - p1.y * p2.x;
+        const b = p3.x * p4.y - p3.y * p4.x;
+        return {
+          x: (a * (p3.x - p4.x) - (p1.x - p2.x) * b) / d,
+          y: (a * (p3.y - p4.y) - (p1.y - p2.y) * b) / d
+        };
+      }
+      function rightAngleSquare(foot, from, to, size, color) {
+        const ux = (from.x - foot.x) / (dist(from, foot) || 1);
+        const uy = (from.y - foot.y) / (dist(from, foot) || 1);
+        const vx = (to.x - foot.x) / (dist(to, foot) || 1);
+        const vy = (to.y - foot.y) / (dist(to, foot) || 1);
+        const p1 = `${(foot.x + ux * size).toFixed(1)},${(foot.y + uy * size).toFixed(1)}`;
+        const p2 = `${(foot.x + (ux + vx) * size).toFixed(1)},${(foot.y + (uy + vy) * size).toFixed(1)}`;
+        const p3 = `${(foot.x + vx * size).toFixed(1)},${(foot.y + vy * size).toFixed(1)}`;
+        return `<polyline points="${p1} ${p2} ${p3}" fill="none" stroke="${color}" stroke-width="1.8"/>`;
+      }
+
+      function renderLab() {
+        const a = dist(B, C), b = dist(A, C), c = dist(A, B);
+        // Altitudes
+        const Ha = projectOnLine(A, B, C);
+        const Hb = projectOnLine(B, A, C);
+        const Hc = projectOnLine(C, A, B);
+        const ortho = lineIntersect(B, Hb, A, Ha);
+
+        // Medians
+        const Ma = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
+        const Mb = { x: (A.x + C.x) / 2, y: (A.y + C.y) / 2 };
+        const Mc = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+        const centroid = { x: (A.x + B.x + C.x) / 3, y: (A.y + B.y + C.y) / 3 };
+
+        // Angle bisector from B
+        const Lb = {
+          x: (a * A.x + c * C.x) / (a + c),
+          y: (a * A.y + c * C.y) / (a + c)
+        };
+        const incenter = {
+          x: (a * A.x + b * B.x + c * C.x) / (a + b + c),
+          y: (a * A.y + b * B.y + c * C.y) / (a + b + c)
+        };
+
+        // Classify triangle by dot products
+        const cosA = ((B.x - A.x) * (C.x - A.x) + (B.y - A.y) * (C.y - A.y)) / (c * b);
+        const cosB = ((A.x - B.x) * (C.x - B.x) + (A.y - B.y) * (C.y - B.y)) / (c * a);
+        const cosC = ((A.x - C.x) * (B.x - C.x) + (A.y - C.y) * (B.y - C.y)) / (b * a);
+        const minCos = Math.min(cosA, cosB, cosC);
+        let triType = 'остроугольный';
+        if (Math.abs(minCos) < 0.03) triType = 'прямоугольный';
+        else if (minCos < 0) triType = 'тупоугольный';
+
+        let out = `
+          <line x1="30" y1="${A.y}" x2="630" y2="${A.y}" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <polygon points="${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.5"/>
+        `;
+
+        if (activeLayer === 'h' || activeLayer === 'all') {
+          if (Hb.x < A.x || Hb.x > C.x) {
+            out += `<line x1="${Hb.x < A.x ? Hb.x : C.x}" y1="${A.y}" x2="${Hb.x < A.x ? A.x : Hb.x}" y2="${A.y}" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+          }
+          if (ortho) {
+            out += `<line x1="${A.x}" y1="${A.y}" x2="${ortho.x}" y2="${ortho.y}" stroke="rgba(183,70,78,0.32)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+            out += `<line x1="${C.x}" y1="${C.y}" x2="${ortho.x}" y2="${ortho.y}" stroke="rgba(183,70,78,0.32)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+            out += `<line x1="${B.x}" y1="${B.y}" x2="${ortho.x}" y2="${ortho.y}" stroke="rgba(183,70,78,0.35)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+          }
+          out += `<line x1="${B.x}" y1="${B.y}" x2="${Hb.x}" y2="${Hb.y}" stroke="#b7464e" stroke-width="2.6"/>`;
+          out += rightAngleSquare(Hb, B, (Hb.x > A.x + 12 ? A : C), 11, '#b7464e');
+          out += `<circle cx="${Hb.x}" cy="${Hb.y}" r="3.5" fill="#b7464e"/>`;
+          out += `<text x="${Hb.x - 6}" y="${Hb.y + 18}" font-size="13" font-weight="700" fill="#b7464e">H₁</text>`;
+          if (ortho && ortho.y > -20 && ortho.y < 340) {
+            out += `<circle cx="${ortho.x}" cy="${ortho.y}" r="5.5" fill="#b7464e" stroke="#fff" stroke-width="1.5"/>`;
+            out += `<text x="${ortho.x + 8}" y="${ortho.y - 6}" font-size="12.5" font-weight="800" fill="#b7464e">Ортоцентр H</text>`;
+          }
+        }
+
+        if (activeLayer === 'm' || activeLayer === 'all') {
+          out += `<line x1="${A.x}" y1="${A.y}" x2="${Ma.x}" y2="${Ma.y}" stroke="rgba(46,125,50,0.42)" stroke-width="1.7" stroke-dasharray="4 3"/>`;
+          out += `<line x1="${C.x}" y1="${C.y}" x2="${Mc.x}" y2="${Mc.y}" stroke="rgba(46,125,50,0.42)" stroke-width="1.7" stroke-dasharray="4 3"/>`;
+          out += `<line x1="${B.x}" y1="${B.y}" x2="${Mb.x}" y2="${Mb.y}" stroke="#2e7d32" stroke-width="2.6"/>`;
+          // midpoint ticks on AC
+          const t1x = (A.x + Mb.x) / 2, t2x = (Mb.x + C.x) / 2;
+          out += `<line x1="${t1x}" y1="${A.y - 6}" x2="${t1x}" y2="${A.y + 6}" stroke="#2e7d32" stroke-width="2.2"/>`;
+          out += `<line x1="${t2x}" y1="${A.y - 6}" x2="${t2x}" y2="${A.y + 6}" stroke="#2e7d32" stroke-width="2.2"/>`;
+          out += `<circle cx="${Mb.x}" cy="${Mb.y}" r="3.5" fill="#2e7d32"/>`;
+          out += `<text x="${Mb.x - 6}" y="${Mb.y + 18}" font-size="13" font-weight="700" fill="#2e7d32">M₁</text>`;
+          out += `<circle cx="${centroid.x}" cy="${centroid.y}" r="5.5" fill="#2e7d32" stroke="#fff" stroke-width="1.5"/>`;
+          out += `<text x="${centroid.x + 8}" y="${centroid.y + 4}" font-size="12.5" font-weight="800" fill="#2e7d32">Центроид M</text>`;
+        }
+
+        if (activeLayer === 'l' || activeLayer === 'all') {
+          out += `<line x1="${B.x}" y1="${B.y}" x2="${Lb.x}" y2="${Lb.y}" stroke="#c8956c" stroke-width="2.6"/>`;
+          // angle arcs at B
+          const angA = Math.atan2(A.y - B.y, A.x - B.x);
+          const angL = Math.atan2(Lb.y - B.y, Lb.x - B.x);
+          const angC = Math.atan2(C.y - B.y, C.x - B.x);
+          const r1 = 24, r2 = 29;
+          out += `<path d="M${(B.x + Math.cos(angC) * r1).toFixed(1)},${(B.y + Math.sin(angC) * r1).toFixed(1)} A${r1},${r1} 0 0,1 ${(B.x + Math.cos(angL) * r1).toFixed(1)},${(B.y + Math.sin(angL) * r1).toFixed(1)}" fill="none" stroke="#a86f3e" stroke-width="2"/>`;
+          out += `<path d="M${(B.x + Math.cos(angL) * r2).toFixed(1)},${(B.y + Math.sin(angL) * r2).toFixed(1)} A${r2},${r2} 0 0,1 ${(B.x + Math.cos(angA) * r2).toFixed(1)},${(B.y + Math.sin(angA) * r2).toFixed(1)}" fill="none" stroke="#a86f3e" stroke-width="2"/>`;
+          out += `<circle cx="${Lb.x}" cy="${Lb.y}" r="3.5" fill="#a86f3e"/>`;
+          out += `<text x="${Lb.x - 5}" y="${Lb.y + 18}" font-size="13" font-weight="700" fill="#a86f3e">L₁</text>`;
+          if (activeLayer === 'l') {
+            out += `<circle cx="${incenter.x}" cy="${incenter.y}" r="4.5" fill="#a86f3e" stroke="#fff" stroke-width="1.4"/>`;
+            out += `<text x="${incenter.x + 8}" y="${incenter.y + 4}" font-size="12" font-weight="700" fill="#a86f3e">Инцентр</text>`;
+          }
+        }
+
+        // Vertices
+        out += `
+          <circle cx="${A.x}" cy="${A.y}" r="5" fill="#263f61"/>
+          <circle cx="${C.x}" cy="${C.y}" r="5" fill="#263f61"/>
+          <circle cx="${B.x}" cy="${B.y}" r="8" fill="#b7464e" stroke="#fff" stroke-width="2.2" style="cursor:grab;"/>
+          <text x="${A.x - 16}" y="${A.y + 18}" font-size="14" font-weight="700" fill="#19273c">A</text>
+          <text x="${C.x + 8}" y="${C.y + 18}" font-size="14" font-weight="700" fill="#19273c">C</text>
+          <text x="${B.x - 5}" y="${B.y - 14}" font-size="14" font-weight="800" fill="#b7464e">B (тяни!)</text>
+        `;
+        labSvg.innerHTML = out;
+
+        let orthoWhere = 'внутри треугольника';
+        if (triType === 'прямоугольный') orthoWhere = 'в вершине прямого угла';
+        else if (triType === 'тупоугольный') orthoWhere = 'снаружи треугольника (на пересечении продолжений высот)';
+
+        const iso = Math.abs(c - a) < 6;
+        readout.innerHTML = `
+          <div><strong>Вид треугольника:</strong> ${triType}${iso ? ' и почти равнобедренный ($AB \\approx BC$ — высота, медиана и биссектриса совпадают!)' : ''}</div>
+          <div style="color:var(--muted);">Ортоцентр $H$ сейчас находится <strong>${orthoWhere}</strong>. Центроид $M$ всегда внутри и делит медиану $BM_1$ в отношении $2:1$.</div>
+        `;
+        renderAllInlineTex(readout);
+      }
+
+      function svgPoint(evt) {
+        const rect = labSvg.getBoundingClientRect();
+        const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+        const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+        return {
+          x: Math.max(55, Math.min(605, ((clientX - rect.left) / rect.width) * 660)),
+          y: Math.max(30, Math.min(220, ((clientY - rect.top) / rect.height) * 320))
+        };
+      }
+      labSvg.addEventListener('pointerdown', (e) => {
+        const pt = svgPoint(e);
+        if (dist(pt, B) < 34) {
+          dragging = true;
+          labSvg.setPointerCapture(e.pointerId);
+        }
+      });
+      labSvg.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        B = svgPoint(e);
+        renderLab();
+      });
+      labSvg.addEventListener('pointerup', () => { dragging = false; });
+
+      document.querySelectorAll('#layer-btns .ctrl-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#layer-btns .ctrl-btn').forEach(b => b.className = 'ctrl-btn');
+          activeLayer = btn.dataset.layer;
+          btn.classList.add(activeLayer === 'h' ? 'active-h' : activeLayer === 'm' ? 'active-m' : activeLayer === 'l' ? 'active-l' : 'active');
+          renderLab();
+        });
+      });
+
+      document.querySelectorAll('#preset-btns .ctrl-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p = btn.dataset.preset;
+          if (p === 'acute') B = { x: 270, y: 68 };
+          else if (p === 'right') B = { x: 170, y: 75 };
+          else if (p === 'obtuse') B = { x: 95, y: 95 };
+          else if (p === 'iso') B = { x: 330, y: 58 };
+          renderLab();
+        });
+      });
+
+      /* ===== INTERACTIVE TRAINER ===== */
+      const trSvg = document.getElementById('trainer-svg');
+      const trQ = document.getElementById('trainer-q');
+      const trControls = document.getElementById('trainer-controls');
+      const trFb = document.getElementById('trainer-fb');
+      const trNext = document.getElementById('trainer-next');
+      let score = 0, streak = 0, total = 0, filterKind = 'mix', currentTask = null, locked = false;
+
+      function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+      function drawTrainerTriangle(kind) {
+        const tA = [30, 155], tB = [110, 26], tC = [220, 155];
+        let extra = '';
+        let D = [125, 155];
+        if (kind === 'height') {
+          D = [110, 155];
+          extra = `
+            <line x1="110" y1="26" x2="110" y2="155" stroke="#b7464e" stroke-width="2.4"/>
+            <polyline points="110,143 122,143 122,155" fill="none" stroke="#b7464e" stroke-width="2"/>
+          `;
+        } else if (kind === 'median') {
+          D = [125, 155];
+          extra = `
+            <line x1="110" y1="26" x2="125" y2="155" stroke="#2e7d32" stroke-width="2.4"/>
+            <line x1="77" y1="149" x2="77" y2="161" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="172" y1="149" x2="172" y2="161" stroke="#2e7d32" stroke-width="2"/>
+          `;
+        } else if (kind === 'bisector') {
+          D = [118, 155];
+          extra = `
+            <line x1="110" y1="26" x2="118" y2="155" stroke="#c8956c" stroke-width="2.4"/>
+            <path d="M96,49 A26,26 0 0,0 112,52" fill="none" stroke="#a86f3e" stroke-width="2"/>
+            <path d="M112,52 A31,31 0 0,0 130,49" fill="none" stroke="#a86f3e" stroke-width="2"/>
+          `;
+        } else if (kind === 'centroid') {
+          D = [125, 155];
+          const M = [120, 112];
+          extra = `
+            <line x1="110" y1="26" x2="125" y2="155" stroke="#2e7d32" stroke-width="2.4"/>
+            <line x1="30" y1="155" x2="165" y2="90" stroke="rgba(46,125,50,0.4)" stroke-width="1.6" stroke-dasharray="4 3"/>
+            <line x1="220" y1="155" x2="70" y2="90" stroke="rgba(46,125,50,0.4)" stroke-width="1.6" stroke-dasharray="4 3"/>
+            <circle cx="${M[0]}" cy="${M[1]}" r="4.5" fill="#2e7d32"/>
+            <text x="${M[0] + 7}" y="${M[1] + 4}" font-size="12" font-weight="800" fill="#2e7d32">O</text>
+          `;
+        }
+        trSvg.innerHTML = `
+          <polygon points="${tA} ${tB} ${tC}" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.3"/>
+          ${extra}
+          <text x="16" y="162" font-size="13" font-weight="700" fill="#19273c">A</text>
+          <text x="105" y="18" font-size="13" font-weight="700" fill="#19273c">B</text>
+          <text x="225" y="162" font-size="13" font-weight="700" fill="#19273c">C</text>
+          <text x="${D[0] - 5}" y="173" font-size="13" font-weight="700" fill="#19273c">${kind === 'centroid' ? 'M' : 'D'}</text>
+        `;
+      }
+
+      function generateTask() {
+        locked = false;
+        trFb.className = 't-feedback';
+        trFb.textContent = '';
+        trNext.classList.remove('show');
+
+        const visualPool = ['v_line', 'v_ortho', 'v_center_name'];
+        const calcPool = ['c_bisector', 'c_median', 'c_centroid_top', 'c_centroid_bot', 'c_height_angle'];
+        let pool = filterKind === 'visual' ? visualPool : filterKind === 'calc' ? calcPool : visualPool.concat(calcPool);
+        const type = pool[randInt(0, pool.length - 1)];
+
+        if (type === 'v_line') {
+          const kinds = [
+            { k: 'height', ans: 'Высота', why: 'Отрезок BD образует со стороной AC угол 90° (показан квадратик прямого угла) — значит, это высота.' },
+            { k: 'median', ans: 'Медиана', why: 'Одинаковые риски показывают, что AD = DC (точка D — середина стороны AC). Это медиана.' },
+            { k: 'bisector', ans: 'Биссектриса', why: 'Равные дуги при вершине B показывают, что ∠ABD = ∠CBD. Отрезок делит угол пополам — это биссектриса.' }
+          ];
+          const pick = kinds[randInt(0, 2)];
+          drawTrainerTriangle(pick.k);
+          currentTask = { mode: 'choice', answer: pick.ans, why: pick.why };
+          trQ.textContent = 'Какой отрезок BD изображён на чертеже?';
+          renderChoiceOpts(['Высота', 'Медиана', 'Биссектриса']);
+        } else if (type === 'v_ortho') {
+          const cases = [
+            { q: 'Где находится ортоцентр (точка пересечения высот) тупоугольного треугольника?', a: 'Снаружи треугольника', why: 'В тупоугольном треугольнике высоты из острых углов падают на продолжения сторон, поэтому их пересечение (ортоцентр) лежит вне треугольника.' },
+            { q: 'Где находится ортоцентр прямоугольного треугольника?', a: 'В вершине прямого угла', why: 'Катеты прямоугольного треугольника сами являются его высотами, поэтому все три высоты сходятся в вершине прямого угла.' },
+            { q: 'Где находится центроид (точка пересечения медиан) любого треугольника?', a: 'Всегда внутри треугольника', why: 'Центроид — это центр тяжести треугольника, он всегда лежит строго внутри него.' }
+          ];
+          const pick = cases[randInt(0, 2)];
+          drawTrainerTriangle(pick.q.includes('центроид') ? 'centroid' : 'height');
+          currentTask = { mode: 'choice', answer: pick.a, why: pick.why };
+          trQ.textContent = pick.q;
+          renderChoiceOpts(['Всегда внутри треугольника', 'Снаружи треугольника', 'В вершине прямого угла']);
+        } else if (type === 'v_center_name') {
+          const isOrtho = randInt(0, 1) === 0;
+          drawTrainerTriangle(isOrtho ? 'height' : 'centroid');
+          currentTask = {
+            mode: 'choice',
+            answer: isOrtho ? 'Ортоцентр' : 'Центроид',
+            why: isOrtho ? 'Точка пересечения высот (или их продолжений) называется ортоцентром.' : 'Точка пересечения медиан треугольника называется центроидом.'
+          };
+          trQ.textContent = isOrtho ? 'Как называется точка пересечения трёх высот треугольника?' : 'Как называется точка пересечения трёх медиан треугольника?';
+          renderChoiceOpts(['Ортоцентр', 'Центроид', 'Инцентр']);
+        } else if (type === 'c_bisector') {
+          const half = randInt(18, 44);
+          const full = half * 2;
+          drawTrainerTriangle('bisector');
+          currentTask = {
+            mode: 'input',
+            answer: half,
+            why: `Биссектриса BD делит угол ABC пополам: ${full}° : 2 = ${half}°.`
+          };
+          trQ.innerHTML = `BD — биссектриса треугольника $ABC$. Известно, что $\\angle ABC = ${full}^\\circ$. Найдите $\\angle ABD$ (в градусах).`;
+          renderInputBox();
+        } else if (type === 'c_median') {
+          const half = randInt(5, 19);
+          const full = half * 2;
+          drawTrainerTriangle('median');
+          currentTask = {
+            mode: 'input',
+            answer: half,
+            why: `Медиана BD делит сторону AC пополам: ${full} : 2 = ${half}.`
+          };
+          trQ.innerHTML = `BD — медиана треугольника $ABC$, причём $AC = ${full}$. Найдите длину отрезка $AD$.`;
+          renderInputBox();
+        } else if (type === 'c_centroid_top') {
+          const k = randInt(3, 9);
+          const bm = 3 * k;
+          const bo = 2 * k;
+          drawTrainerTriangle('centroid');
+          currentTask = {
+            mode: 'input',
+            answer: bo,
+            why: `Центроид O делит медиану BM в отношении 2 : 1 от вершины B. Одна часть равна ${bm} : 3 = ${k}, значит BO = 2 · ${k} = ${bo}.`
+          };
+          trQ.innerHTML = `Точка $O$ — центроид треугольника $ABC$, медиана $BM = ${bm}$. Найдите длину отрезка $BO$ (от вершины до центроида).`;
+          renderInputBox();
+        } else if (type === 'c_centroid_bot') {
+          const k = randInt(3, 9);
+          const bm = 3 * k;
+          drawTrainerTriangle('centroid');
+          currentTask = {
+            mode: 'input',
+            answer: k,
+            why: `Центроид O делит медиану BM в отношении 2 : 1 от вершины B. Всего 3 равные части, значит OM = ${bm} : 3 = ${k}.`
+          };
+          trQ.innerHTML = `Точка $O$ — центроид треугольника $ABC$, медиана $BM = ${bm}$. Найдите длину отрезка $OM$ (от центроида до стороны).`;
+          renderInputBox();
+        } else {
+          const angA = randInt(25, 72);
+          const angABD = 90 - angA;
+          drawTrainerTriangle('height');
+          currentTask = {
+            mode: 'input',
+            answer: angABD,
+            why: `Так как BD — высота, ∠ADB = 90°. В прямоугольном △ABD сумма острых углов 90°, поэтому ∠ABD = 90° − ${angA}° = ${angABD}°.`
+          };
+          trQ.innerHTML = `BD — высота треугольника $ABC$, $\\angle A = ${angA}^\\circ$. Найдите $\\angle ABD$ (в градусах).`;
+          renderInputBox();
+        }
+        renderAllInlineTex(trQ);
+      }
+
+      function updateStats(isOk) {
+        total++;
+        if (isOk) { score++; streak++; } else { streak = 0; }
+        document.getElementById('tr-score').textContent = score;
+        document.getElementById('tr-streak').textContent = streak;
+        document.getElementById('tr-total').textContent = total;
+      }
+
+      function showResult(isOk, msg) {
+        locked = true;
+        updateStats(isOk);
+        trFb.className = `t-feedback show ${isOk ? 'ok' : 'err'}`;
+        trFb.textContent = (isOk ? '✅ Верно! ' : '❌ Неверно. ') + msg;
+        trNext.classList.add('show');
+      }
+
+      function renderChoiceOpts(opts) {
+        trControls.innerHTML = `<div class="trainer-opts">${opts.map(o => `<button type="button" class="t-opt" data-val="${o}">${o}</button>`).join('')}</div>`;
+        trControls.querySelectorAll('.t-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (locked) return;
+            const pick = btn.dataset.val;
+            const isOk = pick === currentTask.answer;
+            trControls.querySelectorAll('.t-opt').forEach(b => {
+              b.disabled = true;
+              if (b.dataset.val === currentTask.answer) b.classList.add('correct');
+              else if (b === btn && !isOk) b.classList.add('wrong');
+            });
+            showResult(isOk, currentTask.why);
+          });
+        });
+      }
+
+      function renderInputBox() {
+        trControls.innerHTML = `
+          <form class="t-input-row" id="tr-form">
+            <input type="number" class="t-input" id="tr-input" placeholder="Ответ" required />
+            <button type="submit" class="t-submit">Проверить</button>
+          </form>
+        `;
+        const form = document.getElementById('tr-form');
+        const inp = document.getElementById('tr-input');
+        inp.focus();
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (locked) return;
+          const val = Number(inp.value.trim());
+          const isOk = val === currentTask.answer;
+          inp.disabled = true;
+          showResult(isOk, currentTask.why + ` Правильный ответ: ${currentTask.answer}.`);
+        });
+      }
+
+      trNext.addEventListener('click', generateTask);
+      document.querySelectorAll('#tr-filter .ctrl-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#tr-filter .ctrl-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          filterKind = btn.dataset.kind;
+          generateTask();
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      renderLab();
+      generateTask();
+    })();
+  </script>
+</body>
+</html>

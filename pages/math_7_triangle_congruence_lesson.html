@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Интерактивный конспект: Три признака равенства треугольников · 7 класс · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb; --paper-light: #fbf9f4; --paper-card: #ffffff;
+      --ink: #202a3a; --muted: #697383; --indigo: #263f61; --indigo-soft: #e5e9ee; --indigo-dark: #19273c;
+      --vermilion: #b7464e; --vermilion-light: #fbf0f1; --vermilion-border: rgba(183, 70, 78, 0.25);
+      --gold: #c8956c; --gold-light: #fdf6ec; --green: #2e7d32; --green-light: #e8f5e9; --green-border: rgba(46, 125, 50, 0.28);
+      --line: rgba(38, 63, 97, 0.16); --shadow-sm: 0 2px 10px rgba(38, 63, 97, 0.06); --shadow-md: 0 10px 28px rgba(38, 63, 97, 0.09);
+      --r-md: 14px; --r-lg: 20px;
+    }
+    body {
+      background-color: var(--paper); color: var(--ink);
+      font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(229, 181, 184, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(200, 149, 108, 0.14) 0%, transparent 40%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251, 249, 244, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion);
+      font: 700 17px 'Lora', serif; background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Lora', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      min-height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12.5px; font-weight: 700;
+      border-radius: 8px; background: var(--paper-light); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+
+    .lesson-shell {
+      max-width: 920px; width: 100%; margin: 0 auto; padding: 36px 5vw 72px;
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .lesson-hero {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 32px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .lesson-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--vermilion), var(--gold));
+    }
+    .eyebrow {
+      display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--vermilion); background: var(--vermilion-light);
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .lesson-hero h1 { font: 700 clamp(26px, 4vw, 35px)/1.2 'Lora', serif; color: var(--indigo-dark); margin-bottom: 10px; }
+    .lesson-hero p { color: var(--muted); font-size: 15.5px; max-width: 72ch; }
+
+    .concept-card {
+      background: var(--paper-card); border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 28px 30px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 18px;
+    }
+    .concept-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--line); padding-bottom: 12px;
+    }
+    .concept-num { font-size: 12px; font-weight: 800; color: var(--vermilion); letter-spacing: 0.06em; text-transform: uppercase; }
+    .concept-head h2 { font: 700 clamp(20px, 2.8vw, 24px)/1.25 'Lora', serif; color: var(--indigo-dark); }
+    .intuition-box {
+      background: var(--gold-light); border-left: 4px solid var(--gold);
+      padding: 14px 18px; border-radius: 0 10px 10px 0; font-size: 14.5px;
+    }
+
+    .tab-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tab-btn {
+      padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line);
+      background: var(--paper-light); color: var(--indigo); font-size: 13.5px; font-weight: 700;
+      transition: all .18s;
+    }
+    .tab-btn:hover { border-color: var(--indigo); background: #fff; }
+    .tab-btn.active { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+    .tab-btn.trap-tab.active { background: var(--vermilion); border-color: var(--vermilion); color: #fff; }
+
+    .lab-box {
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: var(--r-md);
+      padding: 20px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .svg-stage {
+      width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      padding: 10px; display: flex; justify-content: center; overflow: hidden;
+    }
+    .svg-stage svg { width: 100%; max-width: 680px; height: auto; display: block; }
+    .criterion-caption {
+      background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .criterion-title { font: 700 17px 'Lora', serif; color: var(--indigo-dark); }
+    .criterion-formula { font-size: 14.5px; color: var(--ink); }
+    .criterion-note { font-size: 13.5px; color: var(--muted); }
+    .trap-toggle {
+      align-self: flex-start; padding: 8px 14px; border-radius: 8px;
+      background: var(--vermilion-light); color: var(--vermilion); border: 1px solid var(--vermilion-border);
+      font-size: 13px; font-weight: 700; transition: all .15s;
+    }
+    .trap-toggle:hover { background: var(--vermilion); color: #fff; }
+
+    .criteria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .crit-card {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px;
+      background: var(--paper-light); display: flex; flex-direction: column; gap: 8px;
+    }
+    .crit-tag {
+      align-self: flex-start; font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 3px 10px; border-radius: 999px;
+      background: var(--indigo-soft); color: var(--indigo-dark);
+    }
+    .crit-card h3 { font: 700 16px 'Lora', serif; color: var(--indigo-dark); }
+    .crit-card p { font-size: 13.5px; color: var(--ink); }
+
+    .trap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .trap-box {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px;
+      background: var(--paper-light); display: flex; flex-direction: column; gap: 8px; font-size: 14px;
+    }
+    .trap-box.good { background: var(--green-light); border-color: var(--green-border); }
+    .trap-box.warn { background: var(--vermilion-light); border-color: var(--vermilion-border); }
+
+    .quiz-item {
+      border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px;
+      background: var(--paper-light); display: flex; flex-direction: column; gap: 12px;
+    }
+    .quiz-top { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+    .quiz-svg {
+      flex: 0 0 210px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 6px;
+    }
+    .quiz-body { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; }
+    .quiz-q { font-weight: 700; font-size: 15px; color: var(--indigo-dark); }
+    .quiz-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quiz-opt {
+      padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: #fff;
+      font-size: 13.5px; font-weight: 700; color: var(--indigo); transition: all .15s;
+    }
+    .quiz-opt:hover { border-color: var(--indigo); }
+    .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong { background: var(--vermilion-light); border-color: var(--vermilion); color: var(--vermilion); }
+    .quiz-feedback { display: none; font-size: 13.5px; padding: 10px 14px; border-radius: 8px; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--green-light); color: #1b5e20; border: 1px solid var(--green-border); }
+    .quiz-feedback.err { background: var(--vermilion-light); color: #8c262d; border: 1px solid var(--vermilion-border); }
+
+    .practice-cta {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo)); color: #fff;
+      border-radius: var(--r-lg); padding: 28px 32px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .practice-cta h3 { font: 700 22px 'Lora', serif; margin-bottom: 6px; }
+    .practice-cta p { font-size: 14px; opacity: 0.88; max-width: 52ch; }
+    .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn { padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; background: #fff; color: var(--indigo-dark); }
+    .cta-btn.secondary { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <span class="brand-text"><span class="brand-name">НЕШкола</span><span class="brand-sub">7 класс · Конспект урока</span></span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-btn" href="math_7.html">← Назад к 7 классу</a>
+      <a class="nav-btn" href="math_7_triangle_lines_lesson.html">Высота, медиана и биссектриса →</a>
+    </div>
+  </nav>
+
+  <main class="lesson-shell">
+    <header class="lesson-hero">
+      <span class="eyebrow">Геометрия · 7 класс · Интерактивный разбор</span>
+      <h1>Три признака равенства треугольников</h1>
+      <p>Как доказать, что два треугольника абсолютно одинаковы, проверив всего три элемента вместо шести — и почему комбинация «две стороны и угол не между ними» не работает.</p>
+    </header>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 01</span>
+          <h2>Интерактивная лаборатория признаков равенства</h2>
+        </div>
+      </div>
+      <div class="intuition-box">
+        <strong>Главная идея:</strong> у треугольника 6 основных элементов (3 стороны и 3 угла). Чтобы убедиться, что $\triangle ABC = \triangle A_1B_1C_1$, не нужно измерять все 6 — достаточно проверить одну из <strong>трёх жёстких троек</strong>. Переключайте вкладки и смотрите, какие именно элементы фиксируют форму треугольника.
+      </div>
+      <div class="lab-box">
+        <div class="tab-row" role="tablist" aria-label="Выбор признака равенства">
+          <button type="button" class="tab-btn active" data-mode="sas">I признак (СУС)</button>
+          <button type="button" class="tab-btn" data-mode="asa">II признак (УСУ)</button>
+          <button type="button" class="tab-btn" data-mode="sss">III признак (ССС)</button>
+          <button type="button" class="tab-btn trap-tab" data-mode="ssa">Ловушка (ССУ)</button>
+        </div>
+
+        <div class="svg-stage">
+          <svg id="congruence-svg" viewBox="0 0 680 260" aria-label="Схема признаков равенства треугольников"></svg>
+        </div>
+
+        <div class="criterion-caption" id="criterion-caption"></div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Концепция 02</span>
+          <h2>Все три признака и скрытые элементы в задачах</h2>
+        </div>
+      </div>
+      <div class="criteria-grid">
+        <article class="crit-card">
+          <span class="crit-tag">I признак · СУС</span>
+          <h3>Две стороны и угол между ними</h3>
+          <p>Если $AB = A_1B_1$, $AC = A_1C_1$ и $\angle A = \angle A_1$, то $\triangle ABC = \triangle A_1B_1C_1$. Угол обязан лежать <strong>строго между</strong> этими сторонами.</p>
+        </article>
+        <article class="crit-card">
+          <span class="crit-tag">II признак · УСУ</span>
+          <h3>Сторона и два прилежащих угла</h3>
+          <p>Если $BC = B_1C_1$, $\angle B = \angle B_1$ и $\angle C = \angle C_1$, то $\triangle ABC = \triangle A_1B_1C_1$. Оба угла сидят на концах выбранной стороны.</p>
+        </article>
+        <article class="crit-card">
+          <span class="crit-tag">III признак · ССС</span>
+          <h3>Три стороны</h3>
+          <p>Если $AB = A_1B_1$, $BC = B_1C_1$ и $AC = A_1C_1$, то $\triangle ABC = \triangle A_1B_1C_1$. Треугольник — единственная жёсткая фигура, задаваемая только сторонами.</p>
+        </article>
+      </div>
+
+      <div class="trap-grid">
+        <div class="trap-box good">
+          <strong style="color:var(--green);">Где искать «спрятанные» равные элементы?</strong>
+          <p>В условии часто даны только 2 пары элементов, а 3-ю нужно увидеть на чертеже: <strong>общая сторона</strong> ($AC = AC$), <strong>вертикальные углы</strong> (равны всегда) или <strong>биссектриса</strong> (делит угол пополам).</p>
+        </div>
+        <div class="trap-box warn">
+          <strong style="color:var(--vermilion);">Ловушка: УУУ (три угла) тоже не работает!</strong>
+          <p>Если все три угла одного треугольника равны углам другого, треугольники имеют одинаковую форму (<em>подобны</em>), но могут быть разного размера — как маленькая и большая копии.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="concept-card">
+      <div class="concept-head">
+        <div>
+          <span class="concept-num">Самопроверка</span>
+          <h2>Определите признак равенства по чертежу</h2>
+        </div>
+      </div>
+
+      <div class="quiz-item" data-quiz="1">
+        <div class="quiz-top">
+          <svg class="quiz-svg" viewBox="0 0 210 140" aria-label="Чертёж к задаче 1">
+            <line x1="25" y1="25" x2="185" y2="115" stroke="#263f61" stroke-width="2.2"/>
+            <line x1="25" y1="115" x2="185" y2="25" stroke="#263f61" stroke-width="2.2"/>
+            <line x1="25" y1="25" x2="25" y2="115" stroke="#263f61" stroke-width="2.2"/>
+            <line x1="185" y1="25" x2="185" y2="115" stroke="#263f61" stroke-width="2.2"/>
+            <!-- Тicks on AO=OC and BO=OD -->
+            <line x1="60" y1="40" x2="66" y2="50" stroke="#b7464e" stroke-width="2"/>
+            <line x1="144" y1="90" x2="150" y2="100" stroke="#b7464e" stroke-width="2"/>
+            <line x1="59" y1="90" x2="67" y2="99" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="64" y1="87" x2="72" y2="96" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="138" y1="44" x2="146" y2="53" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="143" y1="41" x2="151" y2="50" stroke="#2e7d32" stroke-width="2"/>
+            <circle cx="105" cy="70" r="3.5" fill="#b7464e"/>
+            <text x="12" y="24" font-size="12" font-weight="700" fill="#19273c">A</text>
+            <text x="12" y="125" font-size="12" font-weight="700" fill="#19273c">B</text>
+            <text x="189" y="125" font-size="12" font-weight="700" fill="#19273c">C</text>
+            <text x="189" y="24" font-size="12" font-weight="700" fill="#19273c">D</text>
+            <text x="101" y="56" font-size="12" font-weight="700" fill="#b7464e">O</text>
+          </svg>
+          <div class="quiz-body">
+            <div class="quiz-q">1. Отрезки $AC$ и $BD$ пересекаются в точке $O$ так, что $AO = OC$ и $BO = OD$. По какому признаку равны $\triangle AOB$ и $\triangle COD$?</div>
+            <div class="quiz-opts">
+              <button type="button" class="quiz-opt" data-ans="ok">I признак (СУС)</button>
+              <button type="button" class="quiz-opt" data-ans="wrong1">II признак (УСУ)</button>
+              <button type="button" class="quiz-opt" data-ans="wrong2">III признак (ССС)</button>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qf-1"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="2">
+        <div class="quiz-top">
+          <svg class="quiz-svg" viewBox="0 0 210 140" aria-label="Чертёж к задаче 2">
+            <polygon points="30,70 105,22 180,70" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.2"/>
+            <polygon points="30,70 105,118 180,70" fill="rgba(200,149,108,0.10)" stroke="#263f61" stroke-width="2.2"/>
+            <line x1="30" y1="70" x2="180" y2="70" stroke="#b7464e" stroke-width="2.6"/>
+            <path d="M52,56 A25,25 0 0,1 55,70" fill="none" stroke="#2e7d32" stroke-width="2"/>
+            <path d="M55,70 A25,25 0 0,1 52,84" fill="none" stroke="#2e7d32" stroke-width="2"/>
+            <path d="M155,70 A25,25 0 0,1 158,56" fill="none" stroke="#c8956c" stroke-width="2"/>
+            <path d="M158,84 A25,25 0 0,1 155,70" fill="none" stroke="#c8956c" stroke-width="2"/>
+            <text x="16" y="74" font-size="12" font-weight="700" fill="#19273c">A</text>
+            <text x="101" y="16" font-size="12" font-weight="700" fill="#19273c">B</text>
+            <text x="184" y="74" font-size="12" font-weight="700" fill="#19273c">C</text>
+            <text x="101" y="133" font-size="12" font-weight="700" fill="#19273c">D</text>
+          </svg>
+          <div class="quiz-body">
+            <div class="quiz-q">2. Известно, что $\angle BAC = \angle DAC$ и $\angle BCA = \angle DCA$. По какому признаку равны $\triangle ABC$ и $\triangle ADC$?</div>
+            <div class="quiz-opts">
+              <button type="button" class="quiz-opt" data-ans="wrong1">I признак (СУС)</button>
+              <button type="button" class="quiz-opt" data-ans="ok">II признак (УСУ)</button>
+              <button type="button" class="quiz-opt" data-ans="wrong2">Недостаточно данных</button>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qf-2"></div>
+      </div>
+
+      <div class="quiz-item" data-quiz="3">
+        <div class="quiz-top">
+          <svg class="quiz-svg" viewBox="0 0 210 140" aria-label="Чертёж к задаче 3">
+            <polygon points="20,108 66,32 102,108" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2"/>
+            <polygon points="116,108 162,32 140,108" fill="rgba(183,70,78,0.08)" stroke="#b7464e" stroke-width="2"/>
+            <path d="M35,108 A16,16 0 0,0 28,94" fill="none" stroke="#2e7d32" stroke-width="2"/>
+            <path d="M131,108 A16,16 0 0,0 124,94" fill="none" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="39" y1="67" x2="47" y2="73" stroke="#263f61" stroke-width="2"/>
+            <line x1="135" y1="67" x2="143" y2="73" stroke="#b7464e" stroke-width="2"/>
+            <line x1="80" y1="67" x2="88" y2="63" stroke="#263f61" stroke-width="2"/>
+            <line x1="82" y1="72" x2="90" y2="68" stroke="#263f61" stroke-width="2"/>
+            <line x1="147" y1="67" x2="155" y2="70" stroke="#b7464e" stroke-width="2"/>
+            <line x1="145" y1="72" x2="153" y2="75" stroke="#b7464e" stroke-width="2"/>
+          </svg>
+          <div class="quiz-body">
+            <div class="quiz-q">3. У двух треугольников равны по две стороны и по одному острому углу, который НЕ лежит между этими сторонами. Можно ли утверждать, что треугольники равны?</div>
+            <div class="quiz-opts">
+              <button type="button" class="quiz-opt" data-ans="wrong1">Да, по I признаку</button>
+              <button type="button" class="quiz-opt" data-ans="ok">Нет, это ловушка (ССУ)</button>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qf-3"></div>
+      </div>
+    </section>
+
+    <section class="practice-cta">
+      <div>
+        <h3>Продолжите геометрию треугольника</h3>
+        <p>Изучите высоты, медианы, биссектрисы, ортоцентр и центроид в следующем конспекте с интерактивным тренажёром.</p>
+      </div>
+      <div class="cta-btns">
+        <a class="cta-btn" href="math_7_triangle_lines_lesson.html">Высота, медиана и биссектриса →</a>
+        <a class="cta-btn secondary" href="../math_moduls/oge_task_18_trainer.html">Геометрия на клетках</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/katex/katex.min.js"></script>
+  <script src="../js/math_render.js"></script>
+  <script src="../js/auth_sync.js"></script>
+  <script>
+    (function () {
+      function tex(s) {
+        return (window.StudyMath && window.StudyMath.renderTeX) ? window.StudyMath.renderTeX(s, false) : s;
+      }
+      function renderAllInlineTex(root) {
+        const walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = [];
+        let n;
+        while ((n = walker.nextNode())) {
+          if (n.parentElement && !n.parentElement.closest('.katex, script, style, code') && n.nodeValue.includes('$')) {
+            nodes.push(n);
+          }
+        }
+        nodes.forEach(tn => {
+          if (!/\$[^$\n]+\$/.test(tn.nodeValue)) return;
+          const sp = document.createElement('span');
+          sp.innerHTML = tn.nodeValue.replace(/\$([^$\n]+?)\$/g, (_, m) => tex(m));
+          tn.parentNode.replaceChild(sp, tn);
+        });
+      }
+
+      const svg = document.getElementById('congruence-svg');
+      const caption = document.getElementById('criterion-caption');
+      let currentMode = 'sas';
+      let ssaAlt = false;
+
+      function tickMark(x1, y1, x2, y2, count, color) {
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const ux = dx / len;
+        const uy = dy / len;
+        let out = '';
+        const spacing = 6;
+        const start = -((count - 1) * spacing) / 2;
+        for (let i = 0; i < count; i++) {
+          const off = start + i * spacing;
+          const cx = mx + ux * off;
+          const cy = my + uy * off;
+          out += `<line x1="${(cx - nx * 7).toFixed(1)}" y1="${(cy - ny * 7).toFixed(1)}" x2="${(cx + nx * 7).toFixed(1)}" y2="${(cy + ny * 7).toFixed(1)}" stroke="${color}" stroke-width="2.4" stroke-linecap="round"/>`;
+        }
+        return out;
+      }
+
+      function angleArc(vx, vy, p1x, p1y, p2x, p2y, r, count, color) {
+        const a1 = Math.atan2(p1y - vy, p1x - vx);
+        const a2 = Math.atan2(p2y - vy, p2x - vx);
+        let diff = a2 - a1;
+        while (diff <= -Math.PI) diff += 2 * Math.PI;
+        while (diff > Math.PI) diff -= 2 * Math.PI;
+        const sweep = diff >= 0 ? 1 : 0;
+        let out = '';
+        for (let i = 0; i < count; i++) {
+          const rad = r + i * 5;
+          const sx = vx + Math.cos(a1) * rad;
+          const sy = vy + Math.sin(a1) * rad;
+          const ex = vx + Math.cos(a2) * rad;
+          const ey = vy + Math.sin(a2) * rad;
+          out += `<path d="M${sx.toFixed(1)},${sy.toFixed(1)} A${rad},${rad} 0 0,${sweep} ${ex.toFixed(1)},${ey.toFixed(1)}" fill="none" stroke="${color}" stroke-width="2.4"/>`;
+        }
+        return out;
+      }
+
+      function renderScene() {
+        const A = [60, 210], B = [135, 55], C = [285, 210];
+        const A1 = [385, 210], B1 = [460, 55], C1 = [610, 210];
+
+        if (currentMode === 'sas') {
+          svg.innerHTML = `
+            <polygon points="${A} ${B} ${C}" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.4"/>
+            <polygon points="${A1} ${B1} ${C1}" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.4"/>
+            <line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="#b7464e" stroke-width="3.2"/>
+            <line x1="${A[0]}" y1="${A[1]}" x2="${C[0]}" y2="${C[1]}" stroke="#b7464e" stroke-width="3.2"/>
+            <line x1="${A1[0]}" y1="${A1[1]}" x2="${B1[0]}" y2="${B1[1]}" stroke="#b7464e" stroke-width="3.2"/>
+            <line x1="${A1[0]}" y1="${A1[1]}" x2="${C1[0]}" y2="${C1[1]}" stroke="#b7464e" stroke-width="3.2"/>
+            ${tickMark(A[0], A[1], B[0], B[1], 1, '#b7464e')}
+            ${tickMark(A1[0], A1[1], B1[0], B1[1], 1, '#b7464e')}
+            ${tickMark(A[0], A[1], C[0], C[1], 2, '#b7464e')}
+            ${tickMark(A1[0], A1[1], C1[0], C1[1], 2, '#b7464e')}
+            ${angleArc(A[0], A[1], B[0], B[1], C[0], C[1], 26, 1, '#2e7d32')}
+            ${angleArc(A1[0], A1[1], B1[0], B1[1], C1[0], C1[1], 26, 1, '#2e7d32')}
+            <text x="42" y="226" font-size="14" font-weight="700" fill="#19273c">A</text>
+            <text x="130" y="44" font-size="14" font-weight="700" fill="#19273c">B</text>
+            <text x="292" y="226" font-size="14" font-weight="700" fill="#19273c">C</text>
+            <text x="366" y="226" font-size="14" font-weight="700" fill="#19273c">A₁</text>
+            <text x="455" y="44" font-size="14" font-weight="700" fill="#19273c">B₁</text>
+            <text x="617" y="226" font-size="14" font-weight="700" fill="#19273c">C₁</text>
+          `;
+          caption.innerHTML = `
+            <div class="criterion-title">I признак: по двум сторонам и углу между ними (СУС)</div>
+            <div class="criterion-formula">${tex('AB = A_1B_1,\\quad AC = A_1C_1,\\quad \\angle A = \\angle A_1 \\;\\Rightarrow\\; \\triangle ABC = \\triangle A_1B_1C_1')}</div>
+            <div class="criterion-note">Угол при вершине A как шарнир жёстко фиксирует угол между сторонами AB и AC, поэтому третья сторона BC определяется однозначно.</div>
+          `;
+        } else if (currentMode === 'asa') {
+          svg.innerHTML = `
+            <polygon points="${A} ${B} ${C}" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.4"/>
+            <polygon points="${A1} ${B1} ${C1}" fill="rgba(38,63,97,0.06)" stroke="#263f61" stroke-width="2.4"/>
+            <line x1="${A[0]}" y1="${A[1]}" x2="${C[0]}" y2="${C[1]}" stroke="#b7464e" stroke-width="3.2"/>
+            <line x1="${A1[0]}" y1="${A1[1]}" x2="${C1[0]}" y2="${C1[1]}" stroke="#b7464e" stroke-width="3.2"/>
+            ${tickMark(A[0], A[1], C[0], C[1], 1, '#b7464e')}
+            ${tickMark(A1[0], A1[1], C1[0], C1[1], 1, '#b7464e')}
+            ${angleArc(A[0], A[1], B[0], B[1], C[0], C[1], 24, 1, '#2e7d32')}
+            ${angleArc(A1[0], A1[1], B1[0], B1[1], C1[0], C1[1], 24, 1, '#2e7d32')}
+            ${angleArc(C[0], C[1], A[0], A[1], B[0], B[1], 24, 2, '#c8956c')}
+            ${angleArc(C1[0], C1[1], A1[0], A1[1], B1[0], B1[1], 24, 2, '#c8956c')}
+            <text x="42" y="226" font-size="14" font-weight="700" fill="#19273c">A</text>
+            <text x="130" y="44" font-size="14" font-weight="700" fill="#19273c">B</text>
+            <text x="292" y="226" font-size="14" font-weight="700" fill="#19273c">C</text>
+            <text x="366" y="226" font-size="14" font-weight="700" fill="#19273c">A₁</text>
+            <text x="455" y="44" font-size="14" font-weight="700" fill="#19273c">B₁</text>
+            <text x="617" y="226" font-size="14" font-weight="700" fill="#19273c">C₁</text>
+          `;
+          caption.innerHTML = `
+            <div class="criterion-title">II признак: по стороне и двум прилежащим к ней углам (УСУ)</div>
+            <div class="criterion-formula">${tex('AC = A_1C_1,\\quad \\angle A = \\angle A_1,\\quad \\angle C = \\angle C_1 \\;\\Rightarrow\\; \\triangle ABC = \\triangle A_1B_1C_1')}</div>
+            <div class="criterion-note">Лучи из концов стороны AC под фиксированными углами A и C могут пересечься только в одной-единственной точке B.</div>
+          `;
+        } else if (currentMode === 'sss') {
+          svg.innerHTML = `
+            <polygon points="${A} ${B} ${C}" fill="rgba(46,125,50,0.06)" stroke="#263f61" stroke-width="2.8"/>
+            <polygon points="${A1} ${B1} ${C1}" fill="rgba(46,125,50,0.06)" stroke="#263f61" stroke-width="2.8"/>
+            ${tickMark(A[0], A[1], B[0], B[1], 1, '#b7464e')}
+            ${tickMark(A1[0], A1[1], B1[0], B1[1], 1, '#b7464e')}
+            ${tickMark(B[0], B[1], C[0], C[1], 2, '#2e7d32')}
+            ${tickMark(B1[0], B1[1], C1[0], C1[1], 2, '#2e7d32')}
+            ${tickMark(A[0], A[1], C[0], C[1], 3, '#c8956c')}
+            ${tickMark(A1[0], A1[1], C1[0], C1[1], 3, '#c8956c')}
+            <text x="42" y="226" font-size="14" font-weight="700" fill="#19273c">A</text>
+            <text x="130" y="44" font-size="14" font-weight="700" fill="#19273c">B</text>
+            <text x="292" y="226" font-size="14" font-weight="700" fill="#19273c">C</text>
+            <text x="366" y="226" font-size="14" font-weight="700" fill="#19273c">A₁</text>
+            <text x="455" y="44" font-size="14" font-weight="700" fill="#19273c">B₁</text>
+            <text x="617" y="226" font-size="14" font-weight="700" fill="#19273c">C₁</text>
+          `;
+          caption.innerHTML = `
+            <div class="criterion-title">III признак: по трём сторонам (ССС)</div>
+            <div class="criterion-formula">${tex('AB = A_1B_1,\\quad BC = B_1C_1,\\quad AC = A_1C_1 \\;\\Rightarrow\\; \\triangle ABC = \\triangle A_1B_1C_1')}</div>
+            <div class="criterion-note">Из-за этой жёсткости строительные фермы и мосты собирают именно из треугольников: при заданных длинах сторон углы не могут измениться.</div>
+          `;
+        } else {
+          // SSA trap: A=(55,210), B=(150,70). Ray AC horizontal y=210. Circle around B of radius R=155 intersects y=210 at x = 150 +- sqrt(155^2 - 140^2) = 150 +- 66.5 -> x=216.5 and x=83.5 (Wait: 83.5 > 55! Both on positive ray!).
+          // Let's make it super clear:
+          const tA = [60, 210], tB = [165, 65];
+          const tC_far = [245, 210], tC_near = [85, 210];
+          const rA = [385, 210], rB = [490, 65];
+          const rC = ssaAlt ? [410, 210] : [570, 210];
+          svg.innerHTML = `
+            <line x1="60" y1="210" x2="295" y2="210" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <polygon points="${tA} ${tB} ${tC_far}" fill="rgba(38,63,97,0.07)" stroke="#263f61" stroke-width="2.4"/>
+            <line x1="${tA[0]}" y1="${tA[1]}" x2="${tB[0]}" y2="${tB[1]}" stroke="#b7464e" stroke-width="3"/>
+            <line x1="${tB[0]}" y1="${tB[1]}" x2="${tC_far[0]}" y2="${tC_far[1]}" stroke="#2e7d32" stroke-width="3"/>
+            ${tickMark(tA[0], tA[1], tB[0], tB[1], 1, '#b7464e')}
+            ${tickMark(tB[0], tB[1], tC_far[0], tC_far[1], 2, '#2e7d32')}
+            ${angleArc(tA[0], tA[1], tB[0], tB[1], tC_far[0], tC_far[1], 24, 1, '#c8956c')}
+
+            <line x1="385" y1="210" x2="620" y2="210" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <path d="M398,175 A166,166 0 0,0 582,190" fill="none" stroke="rgba(46,125,50,0.35)" stroke-width="1.8" stroke-dasharray="5 4"/>
+            <polygon points="${rA} ${rB} ${rC}" fill="rgba(183,70,78,0.10)" stroke="#263f61" stroke-width="2.4"/>
+            <line x1="${rA[0]}" y1="${rA[1]}" x2="${rB[0]}" y2="${rB[1]}" stroke="#b7464e" stroke-width="3"/>
+            <line x1="${rB[0]}" y1="${rB[1]}" x2="${rC[0]}" y2="${rC[1]}" stroke="#2e7d32" stroke-width="3"/>
+            ${tickMark(rA[0], rA[1], rB[0], rB[1], 1, '#b7464e')}
+            ${tickMark(rB[0], rB[1], rC[0], rC[1], 2, '#2e7d32')}
+            ${angleArc(rA[0], rA[1], rB[0], rB[1], rC[0], rC[1], 24, 1, '#c8956c')}
+
+            <text x="44" y="226" font-size="14" font-weight="700" fill="#19273c">A</text>
+            <text x="160" y="54" font-size="14" font-weight="700" fill="#19273c">B</text>
+            <text x="242" y="226" font-size="14" font-weight="700" fill="#19273c">C</text>
+            <text x="369" y="226" font-size="14" font-weight="700" fill="#19273c">A₁</text>
+            <text x="485" y="54" font-size="14" font-weight="700" fill="#19273c">B₁</text>
+            <text x="${rC[0] - 4}" y="226" font-size="14" font-weight="700" fill="#b7464e">${ssaAlt ? 'C₁ (тупой!)' : 'C₁'}</text>
+          `;
+          caption.innerHTML = `
+            <div class="criterion-title" style="color:var(--vermilion);">Ловушка ССУ: две стороны и угол НЕ между ними</div>
+            <div class="criterion-formula">Стороны $AB = A_1B_1$, $BC = B_1C_1$ и острый угол $\\angle A = \\angle A_1$ равны, но сторону $B_1C_1$ можно «качнуть» как циркулем и получить <strong>два разных треугольника</strong>!</div>
+            <button type="button" class="trap-toggle" id="ssa-flip-btn">${ssaAlt ? 'Вернуть C₁ вправо (остроугольный)' : 'Качнуть сторону B₁C₁ влево (контрпример!)'}</button>
+          `;
+          renderAllInlineTex(caption);
+          document.getElementById('ssa-flip-btn').addEventListener('click', () => {
+            ssaAlt = !ssaAlt;
+            renderScene();
+          });
+          return;
+        }
+        renderAllInlineTex(caption);
+      }
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = btn.dataset.mode;
+          ssaAlt = currentMode === 'ssa';
+          renderScene();
+        });
+      });
+
+      const quizExplanations = {
+        1: {
+          ok: 'Верно! У нас есть две пары равных сторон (AO = OC и BO = OD), а углы ∠AOB и ∠COD между ними равны как вертикальные. Это I признак (СУС).',
+          wrong1: 'Углов при стороне AB или CD нам не дано — известны две стороны и угол между ними.',
+          wrong2: 'О третьей паре сторон (AB и CD) в условии ничего не сказано, её равенство мы лишь сможем доказать потом.'
+        },
+        2: {
+          ok: 'Точно! Отрезок AC — общая сторона для обоих треугольников, а данные в условии углы прилежат именно к ней. Это II признак (УСУ).',
+          wrong1: 'Здесь известна только одна (общая) сторона AC и два угла при ней, а не две стороны.',
+          wrong2: 'Данных хватает! Третий элемент спрятан на чертеже — это общая сторона AC.'
+        },
+        3: {
+          ok: 'Молодец! Если угол не лежит между равными сторонами (ССУ), треугольник не задаётся однозначно — вторую сторону можно «качнуть» и получить другой треугольник.',
+          wrong1: 'Осторожно! В I признаке угол обязан лежать СТРОГО МЕЖДУ двумя равными сторонами.'
+        }
+      };
+
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const qId = item.dataset.quiz;
+        const fb = document.getElementById(`qf-${qId}`);
+        item.querySelectorAll('.quiz-opt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            item.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('correct', 'wrong'));
+            const ans = btn.dataset.ans;
+            btn.classList.add(ans === 'ok' ? 'correct' : 'wrong');
+            fb.className = `quiz-feedback show ${ans === 'ok' ? 'ok' : 'err'}`;
+            fb.textContent = quizExplanations[qId][ans];
+          });
+        });
+      });
+
+      renderAllInlineTex(document.body);
+      renderScene();
+    })();
+  </script>
+</body>
+</html>
