@@ -13,8 +13,78 @@
 
     const API_BASE = '/api';
     const SYNC_DEBOUNCE_MS = 2500;
+    const ACTIVE_USER_STORAGE_KEY = 'study_active_user_id';
+    const USER_PROGRESS_STORAGE_KEYS = [
+        'loggedInUser',
+        'studyUserName',
+        'user_xp',
+        'studyBonusXp',
+        'study_peak_xp',
+        'totalSolvedTasks',
+        'studyMetrics',
+        'studyTrainerRecords',
+        'study_trainer_trackers',
+        'studyClaimedTrainerGifts',
+        'study_boosts_inventory',
+        'study_buff_double_xp_until',
+        'study_hw_pass_usage_history',
+        'study_last_free_spin_ts',
+        'study_tower_state',
+        'profileAvatarFrame',
+        'study_unlocked_frame_cosmic',
+        'study_unlocked_frame_emerald',
+        'study_unlocked_frame_gargantua',
+        'study_unlocked_frame_neon',
+        'study_unlocked_frame_solar',
+        'oge13_trainer_stats',
+        'physics_test_results',
+        'bank_solved_tasks',
+        'study_oge_roadmap_studied',
+        'teacher_hw_draft_tasks',
+        'genshin_guaranteed_won',
+        'genshin_pity_count',
+        'genshin_primogems'
+    ];
     let syncTimer = null;
     let currentUser = null;
+
+    function clearUserLocalStorage() {
+        try {
+            USER_PROGRESS_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+            localStorage.removeItem(ACTIVE_USER_STORAGE_KEY);
+        } catch (e) {}
+    }
+
+    function ensureLocalStorageOwner(userId) {
+        if (!userId) return;
+        try {
+            const prevId = localStorage.getItem(ACTIVE_USER_STORAGE_KEY);
+            if (prevId && String(prevId) !== String(userId)) {
+                clearUserLocalStorage();
+            }
+            localStorage.setItem(ACTIVE_USER_STORAGE_KEY, String(userId));
+        } catch (e) {}
+    }
+
+    function resetAuthUiAfterLogout(reloadProtected = true) {
+        if (typeof window.refreshProfileExperience === 'function') {
+            window.refreshProfileExperience();
+        }
+        if (typeof window.applyStoredFrame === 'function') {
+            window.applyStoredFrame();
+        }
+        if (typeof window.updateProfileIdentity === 'function') {
+            window.updateProfileIdentity('Ученик');
+        }
+        if (typeof window.initProfileCharts === 'function') {
+            window.initProfileCharts();
+        }
+        updateUIForAuthState();
+        window.dispatchEvent(new CustomEvent('study-auth-changed', { detail: null }));
+        if (reloadProtected && (window.location.pathname.endsWith('profile.html') || window.location.pathname.endsWith('teacher.html'))) {
+            window.location.reload();
+        }
+    }
 
     // --- Unified Global Theme Controller ---
     const StudyTheme = {
@@ -1301,9 +1371,16 @@
                         const pCodeInput = dialog.querySelector('#auth-input-parent-code');
                         parentCode = pCodeInput ? pCodeInput.value.trim().toUpperCase() : null;
                     }
+                    // Если ранее в браузере был другой авторизованный пользователь — не переносим его прогресс в новый аккаунт
+                    try {
+                        if (localStorage.getItem(ACTIVE_USER_STORAGE_KEY)) {
+                            clearUserLocalStorage();
+                        }
+                    } catch (e) {}
                     const localData = role === 'student' ? collectLocalState() : null;
                     const res = await apiRegister(username, password, displayName, localData, role, parentCode);
                     currentUser = res.user;
+                    ensureLocalStorageOwner(currentUser.id);
                     const authDisplayName = res.user.displayName || res.user.username;
                     localStorage.setItem('studyUserName', authDisplayName);
                     localStorage.setItem('loggedInUser', authDisplayName);
@@ -1327,6 +1404,7 @@
                 } else {
                     const res = await apiLogin(username, password);
                     currentUser = res.user;
+                    ensureLocalStorageOwner(currentUser.id);
                     const authDisplayName = res.user.displayName || res.user.username;
                     localStorage.setItem('studyUserName', authDisplayName);
                     localStorage.setItem('loggedInUser', authDisplayName);
@@ -1474,8 +1552,11 @@
             if (currentUser) {
                 btn.classList.add('is-logged-in');
                 const displayName = currentUser.displayName || currentUser.username;
-                const roleBadge = isTeacher ? '🎓 ' : '';
-                btn.title = `Личный кабинет: ${displayName} (${isTeacher ? 'Учитель' : 'Ученик'}). Нажмите для перехода`;
+                const isParent = currentUser.role === 'parent';
+                const hideXp = isTeacher || isParent;
+                const roleLabel = isTeacher ? 'Учитель' : (isParent ? 'Родитель' : 'Ученик');
+                const roleBadge = isTeacher ? '🎓 ' : (isParent ? '👨‍👩‍👧 ' : '');
+                btn.title = `Личный кабинет: ${displayName} (${roleLabel}). Нажмите для перехода`;
 
                 const inner = btn.querySelector('.profile-cta-inner');
                 const xpEl = btn.querySelector('.xp-badge, #header-xp-badge, .xp-counter, #nav-xp-badge');
@@ -1493,12 +1574,12 @@
                         <span class="auth-status-dot"></span>
                         <span class="auth-btn-text">${roleBadge}${escapeHtml(displayName)}</span>
                         ${caretSvg}
-                        ${(!isTeacher && xpEl) ? xpEl.outerHTML : (!isTeacher ? `<span class="xp-badge">${xpText}</span>` : '')}
+                        ${(!hideXp && xpEl) ? xpEl.outerHTML : (!hideXp ? `<span class="xp-badge">${xpText}</span>` : '')}
                     `;
                 }
 
                 if (xpEl) {
-                    if (isTeacher) {
+                    if (hideXp) {
                         xpEl.style.display = 'none';
                     } else {
                         xpEl.style.display = '';
@@ -1517,7 +1598,7 @@
                     dropdown.innerHTML = `
                         <div class="auth-dropdown-header">
                             <div class="auth-dropdown-user">${escapeHtml(displayName)}</div>
-                            <div class="auth-dropdown-role">@${escapeHtml(currentUser.username)} · ${isTeacher ? 'Учитель' : 'Ученик'}</div>
+                            <div class="auth-dropdown-role">@${escapeHtml(currentUser.username)} · ${roleLabel}</div>
                         </div>
                         <a href="${getSiteRootUrl('profile.html')}" class="auth-dropdown-item">
                             <span>👤 Личный кабинет</span>
@@ -1538,9 +1619,7 @@
                             e.preventDefault();
                             e.stopPropagation();
                             if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-                                await apiLogout();
-                                currentUser = null;
-                                updateUIForAuthState();
+                                await logout(true);
                                 showToast('Вы вышли из аккаунта', 'success');
                             }
                         });
@@ -1715,13 +1794,8 @@
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', async () => {
                     if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-                        await apiLogout();
-                        currentUser = null;
-                        updateUIForAuthState();
+                        await logout(true);
                         showToast('Вы вышли из аккаунта', 'success');
-                        if (window.location.pathname.endsWith('profile.html')) {
-                            window.location.reload();
-                        }
                     }
                 });
             }
@@ -1867,10 +1941,8 @@
 
         dialog.querySelector('#quick-logout-btn').addEventListener('click', async () => {
             if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-                await apiLogout();
-                currentUser = null;
-                updateUIForAuthState();
                 dialog.close();
+                await logout(true);
                 showToast('Вы вышли из аккаунта', 'success');
             }
         });
@@ -1912,6 +1984,7 @@
             const me = await apiCheckMe();
             if (me.loggedIn && me.user) {
                 currentUser = me.user;
+                ensureLocalStorageOwner(currentUser.id);
                 // Fetch latest cloud data and merge
                 try {
                     const serverData = await apiGetUserData();
@@ -1940,22 +2013,34 @@
     async function login(username, password) {
         const res = await apiLogin(username, password);
         currentUser = res.user;
+        ensureLocalStorageOwner(currentUser.id);
         if (res.data) applyServerState(res.data);
         updateUIForAuthState();
         return res;
     }
 
     async function register(username, password, displayName, localData) {
+        try {
+            if (localStorage.getItem(ACTIVE_USER_STORAGE_KEY)) {
+                clearUserLocalStorage();
+            }
+        } catch (e) {}
         const res = await apiRegister(username, password, displayName, localData || collectLocalState());
         currentUser = res.user;
+        ensureLocalStorageOwner(currentUser.id);
         updateUIForAuthState();
         return res;
     }
 
-    async function logout() {
+    async function logout(reloadProtected = true) {
+        if (syncTimer) {
+            clearTimeout(syncTimer);
+            syncTimer = null;
+        }
         const res = await apiLogout();
         currentUser = null;
-        updateUIForAuthState();
+        clearUserLocalStorage();
+        resetAuthUiAfterLogout(reloadProtected);
         return res;
     }
 

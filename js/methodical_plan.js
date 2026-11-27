@@ -721,9 +721,8 @@
 
     // Получение текущего пользователя и роли
     async function fetchUserRole() {
-        if (window.location.pathname.includes('teacher') || document.querySelector('.teacher-dashboard')) {
-            isTeacherUser = true;
-        }
+        currentUser = null;
+        isTeacherUser = window.location.pathname.includes('teacher') || !!document.querySelector('.teacher-dashboard');
         try {
             const res = await fetch('/api/auth/me', { cache: 'no-store' });
             if (res.ok) {
@@ -1925,6 +1924,33 @@
             }
         } else {
             dialog.setAttribute('open', 'true');
+        }
+
+        if (!currentUser && !isTeacherUser) {
+            const body = document.getElementById('plan-modal-body');
+            const statusInd = document.getElementById('plan-status-indicator');
+            if (statusInd) statusInd.textContent = 'Гостевой режим';
+            if (body) {
+                body.innerHTML = `
+                    <div style="text-align:center; padding:3rem 1.5rem; display:flex; flex-direction:column; align-items:center; gap:14px;">
+                        <div style="font-size:2.2rem;">🔐</div>
+                        <div style="font-size:1.05rem; font-weight:700; color:var(--ink);">Методический план доступен после входа</div>
+                        <div style="font-size:0.9rem; color:var(--muted); max-width:420px;">
+                            Войдите в свой аккаунт ученика или родителя, чтобы увидеть персональный план занятий и пройденные темы.
+                        </div>
+                        <button type="button" class="btn btn-emerald" id="mp-guest-login-btn" style="margin-top:4px;">
+                            Войти в аккаунт
+                        </button>
+                    </div>
+                `;
+                document.getElementById('mp-guest-login-btn')?.addEventListener('click', () => {
+                    if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+                    if (window.AuthSync && typeof window.AuthSync.openModal === 'function') {
+                        window.AuthSync.openModal('login');
+                    }
+                });
+            }
+            return;
         }
 
         await loadPlansList(studentId, studentName);

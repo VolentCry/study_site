@@ -6,8 +6,8 @@
 - **Job of the Page:** Вовлечь с первой секунды через интерактивность, перенаправить в разделы предметов, интерактивные 3D-симуляторы, банк задач и личный кабинет с геймификацией.
 - **Language:** Русский (ru) с академической и современной научно-популярной терминологией.
 - **Explicit Assumptions:**
-  - `placeholder: false` для всех предметов и симуляций — они уже созданы в проекте (`math_4.html`, `math_9.html`, `physics.html`, `chemistry.html`, `quantum_physics.html`, `english_4.html`, `astronomy.html`, `bank_tasks.html`, `pages/all_tools.html`, `pages/astronomy/solar_system_3D_model.html`, `profile.html`).
-  - `placeholder: true` для информатики и биологии — помечены статусом «В лаборатории / Скоро».
+  - `placeholder: false` для основных разделов: математика (4–9 классы, роадмап и марафон ОГЭ), информатика ОГЭ (Часть 1: № 1–10 в `inf_moduls/`), физика (`physics.html`, `all_simulations.html`, `tasks/index.html`, `games/memo.html`), банк задач (`bank_tasks.html`), личный кабинет (`profile.html`, `teacher.html`, `homework.html`) и 3D-лаборатории (`solar_system_3D_model.html`, `molekular_constructor.html`, `atoms_maker.html`, `llm_anatomy.html`, `wave_simulator.html`).
+  - Скрытые в навигации главной страницы (`index.html`), но присутствующие в репозитории модули: химия (`chemistry.html`), астрономия (`astronomy.html`), квантовая физика (`quantum_physics.html`), английский (`english_4.html`), биология (`В лаборатории`).
   - Платформа ориентирована на скорость загрузки, нулевую зависимость от сборщиков (vanilla HTML5 + modern modular CSS & JS + GSAP/Lenis CDN) и 60fps на мобильных устройствах (390px).
 
 ---

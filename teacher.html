@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель учителя · НЕШкола</title>
     <meta name="description" content="Админ-панель преподавателя: управление классами, мониторинг всех пользователей и детальный журнал выполнения заданий.">
-    <link rel="canonical" href="http://127.0.0.1:5000/teacher.html">
+    <meta name="robots" content="noindex, nofollow">
 
     <link rel="stylesheet" href="assets/fonts/fonts.css">
     <link rel="stylesheet" href="assets/katex/katex.min.css">
@@ -54,13 +54,18 @@
             </button>
         </section>
 
-        <!-- GATE 2: LOGGED IN BUT ROLE = STUDENT -->
+        <!-- GATE 2: LOGGED IN BUT NOT TEACHER (STUDENT / PARENT) -->
         <section id="gate-student" class="gate-card hidden">
-            <div class="gate-icon">🎓</div>
-            <h1 class="gate-title">Активация статуса учителя</h1>
-            <p class="gate-desc">
-                Ваш текущий аккаунт зарегистрирован со статусом <strong>Ученик</strong>. Если вы преподаватель, введите секретный код доступа школы для активации панели управления:
+            <div class="gate-icon" id="gate-role-icon">🎓</div>
+            <h1 class="gate-title" id="gate-role-title">Активация статуса учителя</h1>
+            <p class="gate-desc" id="gate-role-desc">
+                Ваш текущий аккаунт зарегистрирован со статусом <strong id="gate-current-role-label">Ученик</strong>. Если вы преподаватель, введите секретный код доступа школы для активации панели управления:
             </p>
+            <div id="gate-parent-hint" class="hidden" style="margin-bottom:12px;">
+                <a href="profile.html" class="btn btn-secondary" style="width:100%; justify-content:center; text-decoration:none;">
+                    👨‍👩‍👧 Перейти в кабинет родителя
+                </a>
+            </div>
             <form id="become-teacher-form" class="gate-input-group">
                 <input type="text" id="teacher-code-input" class="gate-input" type="password" placeholder="Секретный код доступа" required spellcheck="false">
                 <button type="submit" class="btn btn-emerald" id="become-teacher-submit-btn">
@@ -115,6 +120,14 @@
                     </div>
                 </div>
             </section>
+
+            <!-- NOTIFICATION BANNER FOR NEW SUBMISSIONS -->
+            <div id="grading-notify-banner" class="grading-notify-banner hidden" role="status" aria-live="polite">
+                <div id="grading-notify-text">🔔 Есть новые работы, ожидающие проверки</div>
+                <button type="button" class="btn btn-emerald btn-sm" id="grading-notify-open-btn">
+                    Проверить работы →
+                </button>
+            </div>
 
             <!-- TABS NAV -->
             <nav class="teacher-tabs-nav" role="tablist">
@@ -206,6 +219,7 @@
                         <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                             <button type="button" class="btn btn-secondary btn-sm filter-role-btn active" data-role="">Все роли</button>
                             <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="student">Ученики</button>
+                            <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="parent">Родители</button>
                             <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="teacher">Учителя</button>
                             <button type="button" class="btn btn-secondary btn-sm filter-role-btn" data-role="admin">Админы</button>
                         </div>
@@ -277,6 +291,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="users-pagination-bar" class="pagination-bar hidden"></div>
             </section>
 
             <!-- PANE 4: РАСПИСАНИЕ ЗАНЯТИЙ -->
@@ -784,6 +799,7 @@
                 <div class="hw-cards-grid" id="grading-hw-grid">
                     <!-- Загружается динамически -->
                 </div>
+                <div id="grading-pagination-bar" class="pagination-bar hidden"></div>
             </section>
         </div>
     </main>

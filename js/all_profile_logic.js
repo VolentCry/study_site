@@ -560,6 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCalDate = new Date();
     let monthScheduleData = null;
     let studentHomeworksData = [];
+    let studentBillingData = null;
     let selectedDateStr = null;
 
     const calMonthTitle = document.getElementById('cal-month-title');
@@ -655,6 +656,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.addEventListener('study-cloud-synced', () => {
+        if (typeof checkAndApplyRoleView === 'function') {
+            checkAndApplyRoleView().then(() => {
+                if (!isParentUser() && tabContentStudy && !tabContentStudy.classList.contains('hidden')) {
+                    loadStudyData();
+                }
+            });
+        } else if (tabContentStudy && !tabContentStudy.classList.contains('hidden')) {
+            loadStudyData();
+        }
+    });
+
+    function renderGuestScheduleState() {
+        monthScheduleData = null;
+        renderCalendar();
+        renderDayDetails(selectedDateStr || toDateKey(new Date()));
+
+        if (nextLessonTitle) nextLessonTitle.textContent = 'Войдите в аккаунт';
+        if (nextLessonTime) nextLessonTime.textContent = 'Гостевой режим';
+        if (nextLessonClass) nextLessonClass.textContent = 'Расписание занятий и дедлайны доступны после входа';
+        if (nextLessonTeacher) nextLessonTeacher.textContent = '';
+        if (nextLessonActionWrap) {
+            nextLessonActionWrap.innerHTML = `
+                <button type="button" class="hw-action-btn hw-btn-primary" id="guest-login-schedule-btn">
+                    🔐 Войти в аккаунт
+                </button>
+            `;
+            document.getElementById('guest-login-schedule-btn')?.addEventListener('click', () => {
+                if (window.AuthSync && typeof window.AuthSync.openModal === 'function') {
+                    window.AuthSync.openModal('login');
+                }
+            });
+        }
+    }
+
+    function renderGuestHomeworksState() {
+        studentHomeworksData = [];
+        if (activeHwCount) activeHwCount.textContent = '0';
+        if (studentHomeworksList) {
+            studentHomeworksList.innerHTML = `
+                <div style="text-align:center; padding:1.75rem 1rem; color:var(--muted); font-size:0.88rem; display:flex; flex-direction:column; align-items:center; gap:0.85rem;">
+                    <div>Домашние задания и разборы от преподавателя доступны после входа в аккаунт.</div>
+                    <button type="button" class="hw-action-btn hw-btn-primary" id="guest-login-hw-btn" style="width:auto; padding:0.55rem 1.2rem;">
+                        🔐 Войти или зарегистрироваться
+                    </button>
+                </div>
+            `;
+            document.getElementById('guest-login-hw-btn')?.addEventListener('click', () => {
+                if (window.AuthSync && typeof window.AuthSync.openModal === 'function') {
+                    window.AuthSync.openModal('login');
+                }
+            });
+        }
+    }
+
     async function fetchMonthSchedule() {
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth() + 1;
@@ -666,9 +722,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const res = await fetch(`/api/schedule/month?year=${year}&month=${month}`, { cache: 'no-store' });
+            if (res.status === 401) {
+                renderGuestScheduleState();
+                return;
+            }
             const data = await res.json();
             if (data.success && data.schedule) {
                 monthScheduleData = data.schedule;
+                if (data.schedule.billing) {
+                    studentBillingData = data.schedule.billing;
+                }
                 renderCalendar();
                 renderUpcomingHero();
                 renderDayDetails(selectedDateStr || toDateKey(new Date()));
@@ -683,14 +746,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchStudentBilling() {
         if (isTeacherUser()) {
+            studentBillingData = null;
             const card = document.getElementById('student-billing-card');
             if (card) card.style.display = 'none';
             return;
         }
         try {
             const res = await fetch('/api/student/billing', { cache: 'no-store' });
+            if (res.status === 401 || !res.ok) {
+                studentBillingData = null;
+                const card = document.getElementById('student-billing-card');
+                if (card) card.style.display = 'none';
+                return;
+            }
             const data = await res.json();
             if (data.success && data.billing) {
+                studentBillingData = data.billing;
                 renderStudentBilling(data.billing);
             }
         } catch(e) {
@@ -699,6 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderStudentBilling(billing) {
+        studentBillingData = billing || null;
         const card = document.getElementById('student-billing-card');
         if (!card) return;
 
@@ -767,14 +839,27 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchStudentHomeworks() {
         try {
             const res = await fetch('/api/student/homeworks', { cache: 'no-store' });
+            if (res.status === 401) {
+                renderGuestHomeworksState();
+                return;
+            }
             const data = await res.json();
             if (data.success && data.homeworks) {
                 studentHomeworksData = data.homeworks;
                 renderStudentHomeworks();
                 renderLatestTeacherFeedback(studentHomeworksData);
+            } else {
+                renderGuestHomeworksState();
             }
         } catch(e) {
             console.error('Error fetching student homeworks', e);
+            if (studentHomeworksList) {
+                studentHomeworksList.innerHTML = `
+                    <div style="text-align:center; padding:1.5rem 1rem; color:var(--muted); font-size:0.88rem;">
+                        Не удалось загрузить домашние задания. Попробуйте обновить страницу.
+                    </div>
+                `;
+            }
         }
     }
 
@@ -1103,10 +1188,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const indBadge = isInd ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(251, 191, 36, 0.15); color:var(--accent-gold); font-weight:700; margin-left:6px; border:1px solid rgba(251, 191, 36, 0.35);">👤 1-на-1</span>' : '';
             const isCompleted = Boolean(les.isCompleted || les.is_completed);
             const completedBadge = isCompleted ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(16, 185, 129, 0.15); color:var(--accent-emerald); font-weight:700; margin-left:6px; border:1px solid rgba(16, 185, 129, 0.35);">✅ Проведено</span>' : '';
+            const canSeePaymentBadge = isTeacherUser() || (studentBillingData && studentBillingData.payer === 'student');
             const isPaid = Boolean(les.isPaid || les.is_paid);
-            const paidBadge = isPaid
-                ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(16, 185, 129, 0.15); color:var(--accent-emerald); font-weight:700; margin-left:6px; border:1px solid rgba(16, 185, 129, 0.35);">💳 Оплачен</span>'
-                : '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(239, 68, 68, 0.12); color:var(--danger, #ef4444); font-weight:700; margin-left:6px; border:1px solid rgba(239, 68, 68, 0.3);">⏳ Не оплачен</span>';
+            const paidBadge = canSeePaymentBadge
+                ? (isPaid
+                    ? '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(16, 185, 129, 0.15); color:var(--accent-emerald); font-weight:700; margin-left:6px; border:1px solid rgba(16, 185, 129, 0.35);">💳 Оплачен</span>'
+                    : '<span style="font-size:0.72rem; padding:2px 7px; border-radius:9999px; background:rgba(239, 68, 68, 0.12); color:var(--danger, #ef4444); font-weight:700; margin-left:6px; border:1px solid rgba(239, 68, 68, 0.3);">⏳ Не оплачен</span>')
+                : '';
 
             htmlItems += `
                 <div class="day-event-card">
@@ -1469,11 +1557,12 @@ async function checkAndApplyRoleView() {
     }
 }
 
-async function initParentDashboard(user) {
+async function initParentDashboard(user, selectedStudentId = null) {
     const greetingTitle = document.getElementById('parent-greeting-title');
     const childBox = document.getElementById('parent-child-box');
     const kpiCompleted = document.getElementById('kpi-completed-count');
     const kpiPaid = document.getElementById('kpi-paid-count');
+    const kpiPaidHint = document.getElementById('kpi-paid-hint');
     const kpiUnpaid = document.getElementById('kpi-unpaid-count');
     const kpiUnpaidCard = document.getElementById('kpi-unpaid-card');
     const kpiLessonPrice = document.getElementById('kpi-lesson-price');
@@ -1488,7 +1577,10 @@ async function initParentDashboard(user) {
     }
 
     try {
-        const res = await fetch('/api/parent/dashboard', { cache: 'no-store' });
+        const dashUrl = selectedStudentId
+            ? `/api/parent/dashboard?studentId=${encodeURIComponent(selectedStudentId)}`
+            : '/api/parent/dashboard';
+        const res = await fetch(dashUrl, { cache: 'no-store' });
         const data = await res.json();
 
         if (!data.success || !data.dashboard) {
@@ -1500,10 +1592,18 @@ async function initParentDashboard(user) {
 
         // 1. KPI CARDS
         if (dash.kpi) {
+            const prepaid = Math.max(0, parseInt(dash.kpi.prepaidLessons, 10) || 0);
+            const debtAmount = Math.max(0, parseInt(dash.kpi.debtAmount, 10) || 0);
+
             if (kpiCompleted) kpiCompleted.textContent = dash.kpi.completedLessons || 0;
             if (kpiPaid) kpiPaid.textContent = dash.kpi.paidLessons || 0;
+            if (kpiPaidHint) {
+                kpiPaidHint.textContent = prepaid > 0
+                    ? `✨ Оплачено наперёд: +${prepaid} ур.`
+                    : 'Успешно внесены';
+            }
             if (kpiUnpaid) {
-                const unpaid = dash.kpi.unpaidLessons || 0;
+                const unpaid = Math.max(0, parseInt(dash.kpi.unpaidLessons, 10) || 0);
                 kpiUnpaid.textContent = unpaid;
                 if (kpiUnpaidCard) {
                     kpiUnpaidCard.classList.remove('has-unpaid', 'unpaid-yellow', 'unpaid-orange', 'unpaid-red');
@@ -1511,13 +1611,21 @@ async function initParentDashboard(user) {
                         kpiUnpaidCard.classList.add('unpaid-red');
                     } else if (unpaid >= 2) {
                         kpiUnpaidCard.classList.add('unpaid-orange');
-                    } else {
+                    } else if (unpaid === 1) {
                         kpiUnpaidCard.classList.add('unpaid-yellow');
                     }
                 }
                 const kpiHint = document.getElementById('kpi-unpaid-hint');
                 if (kpiHint) {
-                    kpiHint.textContent = unpaid > 0 ? 'К оплате' : 'Задолженность отсутствует';
+                    if (unpaid > 0) {
+                        kpiHint.textContent = debtAmount > 0
+                            ? `К оплате: ${debtAmount.toLocaleString('ru-RU')} ₽`
+                            : 'К оплате';
+                    } else if (prepaid > 0) {
+                        kpiHint.textContent = `Аванс: +${prepaid} ур.`;
+                    } else {
+                        kpiHint.textContent = 'Задолженность отсутствует';
+                    }
                 }
             }
             if (kpiLessonPrice) {
@@ -1534,8 +1642,23 @@ async function initParentDashboard(user) {
         if (childBox) {
             if (dash.linked && dash.student) {
                 const s = dash.student;
+                const studentsList = Array.isArray(dash.students) ? dash.students : [s];
                 const initial = (s.displayName || s.username || 'У').charAt(0).toUpperCase();
+                const switcherHtml = studentsList.length > 1 ? `
+                    <div style="margin-bottom:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <label for="parent-child-switcher" style="font-size:0.78rem; color:var(--muted); font-weight:700;">Выбранный ребёнок:</label>
+                        <select id="parent-child-switcher" class="settings-name-input" style="flex:1; min-width:180px; padding:6px 10px; font-size:0.85rem;">
+                            ${studentsList.map(st => `
+                                <option value="${st.id}" ${st.id === s.id ? 'selected' : ''}>
+                                    ${escapeHtml(st.displayName || st.username)} (@${escapeHtml(st.username)})
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                ` : '';
+
                 childBox.innerHTML = `
+                    ${switcherHtml}
                     <div class="parent-child-status">
                         <div class="parent-child-meta">
                             <div class="parent-child-avatar">${escapeHtml(initial)}</div>
@@ -1544,9 +1667,14 @@ async function initParentDashboard(user) {
                                 <div class="parent-child-sub">@${escapeHtml(s.username)} · Код: <span class="parent-child-code-badge">${escapeHtml(s.parentCode || '')}</span></div>
                             </div>
                         </div>
-                        <button type="button" id="btn-change-child" class="settings-btn settings-btn-secondary" style="padding:6px 12px; font-size:0.8rem; min-height:auto;">
-                            Привязать ещё код
-                        </button>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <button type="button" id="btn-change-child" class="settings-btn settings-btn-secondary" style="padding:6px 12px; font-size:0.8rem; min-height:auto;">
+                                ➕ Привязать ещё
+                            </button>
+                            <button type="button" id="btn-unlink-child" class="settings-btn settings-btn-secondary" style="padding:6px 10px; font-size:0.8rem; min-height:auto; color:var(--danger, #ef4444); border-color:rgba(239,68,68,0.35);" title="Отвязать этого ребёнка">
+                                Отвязать
+                            </button>
+                        </div>
                     </div>
                     <div id="parent-inline-link-form" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--line);">
                         <div style="font-size:0.82rem; color:var(--muted); margin-bottom:6px;">Введите код ребёнка STU-XXXXX:</div>
@@ -1558,6 +1686,44 @@ async function initParentDashboard(user) {
                     </div>
                 `;
 
+                const switcherEl = childBox.querySelector('#parent-child-switcher');
+                if (switcherEl) {
+                    switcherEl.addEventListener('change', () => {
+                        const nextId = parseInt(switcherEl.value, 10);
+                        if (!isNaN(nextId)) {
+                            initParentDashboard(user, nextId);
+                        }
+                    });
+                }
+
+                const unlinkBtn = childBox.querySelector('#btn-unlink-child');
+                if (unlinkBtn) {
+                    unlinkBtn.addEventListener('click', async () => {
+                        if (!confirm(`Отвязать ученика «${s.displayName || s.username}» от вашего кабинета?`)) return;
+                        unlinkBtn.disabled = true;
+                        try {
+                            const unRes = await fetch('/api/parent/unlink-student', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ studentId: s.id })
+                            });
+                            const unData = await unRes.json();
+                            if (unData.success) {
+                                if (window.AuthSync && typeof window.AuthSync.showToast === 'function') {
+                                    window.AuthSync.showToast('Ребёнок отвязан от кабинета', 'success');
+                                }
+                                await initParentDashboard(user);
+                            } else {
+                                alert(unData.error || 'Не удалось отвязать ребёнка.');
+                            }
+                        } catch (err) {
+                            alert('Ошибка сети при отвязке ребёнка.');
+                        } finally {
+                            unlinkBtn.disabled = false;
+                        }
+                    });
+                }
+
                 const changeBtn = childBox.querySelector('#btn-change-child');
                 const inlineForm = childBox.querySelector('#parent-inline-link-form');
                 if (changeBtn && inlineForm) {
@@ -1565,7 +1731,7 @@ async function initParentDashboard(user) {
                         inlineForm.classList.toggle('hidden');
                     });
                 }
-                bindParentInlineLinkForm(childBox);
+                bindParentInlineLinkForm(childBox, user);
             } else {
                 childBox.innerHTML = `
                     <div style="display:flex; flex-direction:column; gap:8px;">
@@ -1578,7 +1744,7 @@ async function initParentDashboard(user) {
                         <div id="parent-inline-link-msg" style="font-size:0.78rem; margin-top:4px;"></div>
                     </div>
                 `;
-                bindParentInlineLinkForm(childBox);
+                bindParentInlineLinkForm(childBox, user);
             }
         }
 
@@ -1790,7 +1956,7 @@ async function initParentDashboard(user) {
     }
 }
 
-function bindParentInlineLinkForm(container) {
+function bindParentInlineLinkForm(container, user = null) {
     const input = container.querySelector('#parent-inline-code-input');
     const btn = container.querySelector('#parent-inline-link-btn');
     const msg = container.querySelector('#parent-inline-link-msg');
@@ -1819,8 +1985,8 @@ function bindParentInlineLinkForm(container) {
                 if (window.AuthSync && typeof window.AuthSync.showToast === 'function') {
                     window.AuthSync.showToast('Ребёнок успешно привязан!', 'success');
                 }
-                const curUser = window.AuthSync ? window.AuthSync.getUser() : null;
-                initParentDashboard(curUser);
+                const curUser = user || (window.AuthSync ? window.AuthSync.getUser() : null);
+                await initParentDashboard(curUser, data.student ? data.student.id : null);
             } else {
                 if (msg) {
                     msg.textContent = data.error || 'Ошибка привязки';

@@ -222,6 +222,28 @@
         const isTeacher = Boolean(window.isTeacher || (hwData && hwData.isTeacherView));
         const isFinal = (status === 'submitted' || status === 'checked');
 
+        const submittedWrap = document.getElementById('hw-submitted-wrap');
+        const submittedAtEl = document.getElementById('hw-submitted-at');
+        const rawSubmitted = sub.submitted_at || sub.submittedAt;
+        if (submittedWrap && submittedAtEl) {
+            if (rawSubmitted) {
+                const sd = new Date(rawSubmitted);
+                const formattedSub = sd.toLocaleString('ru-RU', {
+                    day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+                });
+                const isLate = rawDeadline && !isNaN(sd.getTime()) && sd > new Date(rawDeadline);
+                submittedAtEl.innerHTML = isLate
+                    ? `${escapeHtml(formattedSub)} <span style="color: var(--danger); font-size: 0.85em; font-weight: 600;">(после дедлайна)</span>`
+                    : escapeHtml(formattedSub);
+                submittedWrap.style.display = '';
+            } else if (isTeacher && (studentIdParam || hwData.studentId)) {
+                submittedAtEl.innerHTML = '<span style="color: var(--muted); font-weight: 500;">ещё не сдано</span>';
+                submittedWrap.style.display = '';
+            } else {
+                submittedWrap.style.display = 'none';
+            }
+        }
+
         if (isTeacher) {
             bottomBar.style.display = 'none';
         }

@@ -1,19 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://127.0.0.1:4400/</loc>
+    <loc>https://neshkola.ru/</loc>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>http://127.0.0.1:4400/profile.html</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://127.0.0.1:4400/bank_tasks.html</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://127.0.0.1:4400/pages/informatics.html</loc>
+    <loc>https://neshkola.ru/pages/math_9.html</loc>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/informatics.html</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/physics.html</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/oge_roadmap.html</loc>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/oge_marathon_line.html</loc>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/bank_tasks.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/tasks_catalog.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/physics/all_simulations.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/physics/tasks/index.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/physics/games/memo.html</loc>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/math_4.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/math_5.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/math_6.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/math_7.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://neshkola.ru/pages/math_8.html</loc>
+    <priority>0.7</priority>
   </url>
 </urlset>

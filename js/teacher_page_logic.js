@@ -41,6 +41,24 @@
     });
 
     // --- Initialize Dashboard ---
+    let lastKnownUnreviewedWorks = null;
+    let gradingPollTimer = null;
+
+    async function resolveCurrentUserRole() {
+        try {
+            if (window.AuthSync && typeof window.AuthSync.getUser === 'function') {
+                const u = window.AuthSync.getUser();
+                if (u && u.role) return u.role;
+            }
+            const res = await fetch('/api/auth/me', { cache: 'no-store' });
+            if (res.ok) {
+                const d = await res.json();
+                if (d && d.loggedIn && d.user && d.user.role) return d.user.role;
+            }
+        } catch (e) {}
+        return 'student';
+    }
+
     async function init() {
         try {
             const res = await fetch('/api/teacher/dashboard', { cache: 'no-store' });
@@ -50,14 +68,15 @@
                 return;
             }
             if (res.status === 403) {
-                // Logged in as student
-                showGate('student');
+                const role = await resolveCurrentUserRole();
+                showGate('student', role);
                 return;
             }
 
             const data = await res.json();
             if (!data.success) {
-                showGate('student');
+                const role = await resolveCurrentUserRole();
+                showGate('student', role);
                 return;
             }
 
@@ -65,16 +84,43 @@
             showDashboard(data.stats);
             loadClasses();
             refreshGradingTabBadge();
+
+            document.getElementById('grading-notify-open-btn')?.addEventListener('click', () => {
+                activeGradingFilter = 'needs_review';
+                gradingCurrentPage = 1;
+                document.querySelectorAll('.grading-filter-btn').forEach(b => {
+                    b.classList.toggle('active', b.getAttribute('data-filter') === 'needs_review');
+                });
+                switchTab('grading');
+            });
+
+            if (!gradingPollTimer) {
+                gradingPollTimer = setInterval(() => {
+                    if (currentTeacher && !document.hidden) {
+                        refreshGradingTabBadge();
+                    }
+                }, 60000);
+            }
         } catch(err) {
             console.error('Error init teacher dashboard:', err);
             showGate('guest');
         }
     }
 
-    function showGate(gate) {
+    function showGate(gate, userRole = 'student') {
         document.getElementById('gate-guest').classList.toggle('hidden', gate !== 'guest');
         document.getElementById('gate-student').classList.toggle('hidden', gate !== 'student');
         document.getElementById('teacher-dashboard').classList.add('hidden');
+
+        if (gate === 'student') {
+            const isParent = userRole === 'parent';
+            const iconEl = document.getElementById('gate-role-icon');
+            const labelEl = document.getElementById('gate-current-role-label');
+            const parentHintEl = document.getElementById('gate-parent-hint');
+            if (iconEl) iconEl.textContent = isParent ? '👨‍👩‍👧' : '🎓';
+            if (labelEl) labelEl.textContent = isParent ? 'Родитель' : 'Ученик';
+            if (parentHintEl) parentHintEl.classList.toggle('hidden', !isParent);
+        }
     }
 
     function showDashboard(stats) {
@@ -455,6 +501,55 @@
 
     // --- All Users Table Logic & Rich Filters ---
     let currentUsersFilter = '';
+    let usersCurrentPage = 1;
+    const USERS_PAGE_SIZE = 20;
+
+    function renderPaginationBar(containerId, totalItems, currentPage, pageSize, onPageChange) {
+        const bar = document.getElementById(containerId);
+        if (!bar) return;
+
+        const totalPages = Math.ceil(totalItems / pageSize);
+        if (totalItems <= pageSize || totalPages <= 1) {
+            bar.innerHTML = '';
+            bar.classList.add('hidden');
+            return;
+        }
+
+        const safePage = Math.min(Math.max(1, currentPage), totalPages);
+        const startIdx = (safePage - 1) * pageSize + 1;
+        const endIdx = Math.min(totalItems, safePage * pageSize);
+
+        const pages = [];
+        for (let p = 1; p <= totalPages; p++) {
+            if (p === 1 || p === totalPages || Math.abs(p - safePage) <= 1) {
+                pages.push(p);
+            } else if (pages[pages.length - 1] !== '...') {
+                pages.push('...');
+            }
+        }
+
+        bar.classList.remove('hidden');
+        bar.innerHTML = `
+            <div>Показано <strong>${startIdx}–${endIdx}</strong> из <strong>${totalItems}</strong></div>
+            <div class="pagination-controls">
+                <button type="button" class="btn btn-secondary btn-sm" data-page="${safePage - 1}" ${safePage <= 1 ? 'disabled' : ''}>← Назад</button>
+                ${pages.map(p => p === '...'
+                    ? '<span style="padding:0 4px;">…</span>'
+                    : `<button type="button" class="btn ${p === safePage ? 'btn-emerald' : 'btn-secondary'} btn-sm" data-page="${p}">${p}</button>`
+                ).join('')}
+                <button type="button" class="btn btn-secondary btn-sm" data-page="${safePage + 1}" ${safePage >= totalPages ? 'disabled' : ''}>Вперёд →</button>
+            </div>
+        `;
+
+        bar.querySelectorAll('button[data-page]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetPage = parseInt(btn.getAttribute('data-page'), 10);
+                if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages && targetPage !== safePage) {
+                    onPageChange(targetPage);
+                }
+            });
+        });
+    }
 
     function updateUsersClassFilterOptions() {
         const optgroup = document.getElementById('users-filter-classes-group');
@@ -466,7 +561,8 @@
         optgroup.innerHTML = currentClasses.map(c => `<option value="class_${c.id}">${escapeHtml(c.name)}</option>`).join('');
     }
 
-    function applyUsersFiltersAndRender() {
+    function applyUsersFiltersAndRender(resetPage = true) {
+        if (resetPage) usersCurrentPage = 1;
         const totalEl = document.getElementById('users-count-total');
         const currEl = document.getElementById('users-count-current');
         if (totalEl) totalEl.textContent = allUsersCache.length;
@@ -585,14 +681,22 @@
 
         if (!users.length) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">Пользователи не найдены.</td></tr>';
+            renderPaginationBar('users-pagination-bar', 0, 1, USERS_PAGE_SIZE, () => {});
             return;
         }
 
-        tbody.innerHTML = users.map(u => {
-            const roleBadgeClass = u.role === 'admin' ? 'badge-admin' : (u.role === 'teacher' ? 'badge-teacher' : 'badge-student');
-            const roleLabel = u.role === 'admin' ? 'Админ' : (u.role === 'teacher' ? 'Учитель' : 'Ученик');
+        const totalPages = Math.max(1, Math.ceil(users.length / USERS_PAGE_SIZE));
+        if (usersCurrentPage > totalPages) usersCurrentPage = totalPages;
+        const startIdx = (usersCurrentPage - 1) * USERS_PAGE_SIZE;
+        const pageUsers = users.slice(startIdx, startIdx + USERS_PAGE_SIZE);
+
+        tbody.innerHTML = pageUsers.map(u => {
+            const role = u.role || 'student';
+            const roleBadgeClass = role === 'admin' ? 'badge-admin' : (role === 'teacher' ? 'badge-teacher' : (role === 'parent' ? 'badge-parent' : 'badge-student'));
+            const roleLabel = role === 'admin' ? 'Админ' : (role === 'teacher' ? 'Учитель' : (role === 'parent' ? 'Родитель' : 'Ученик'));
             const classesNames = u.classes && u.classes.length ? u.classes.map(c => escapeHtml(c.className)).join(', ') : '—';
             const isSelf = currentTeacher && currentTeacher.id === u.id;
+            const isParent = role === 'parent';
 
             return `
                 <tr id="user-row-${u.id}">
@@ -613,13 +717,15 @@
                     </td>
                     <td style="font-size:0.8rem; color:var(--muted);">${formatRelativeTime(u.lastLogin)}</td>
                     <td style="text-align: right; white-space: nowrap;">
+                        ${isParent ? '' : `
                         <button type="button" class="btn btn-secondary btn-sm btn-dossier" data-user-id="${u.id}">
                             📊 Досье
                         </button>
                         <button type="button" class="btn btn-emerald btn-sm btn-add-user-to-class" data-user-id="${u.id}" data-name="${escapeHtml(u.displayName || u.username)}" data-uname="${escapeHtml(u.username)}">
                             ➕ В класс
                         </button>
-                        <button type="button" class="btn btn-secondary btn-sm btn-toggle-role" data-user-id="${u.id}" data-role="${u.role}" title="Сменить роль">
+                        `}
+                        <button type="button" class="btn btn-secondary btn-sm btn-toggle-role" data-user-id="${u.id}" data-role="${role}" title="Сменить роль">
                             👑
                         </button>
                         ${isSelf ? '' : `
@@ -631,6 +737,11 @@
                 </tr>
             `;
         }).join('');
+
+        renderPaginationBar('users-pagination-bar', users.length, usersCurrentPage, USERS_PAGE_SIZE, (nextPage) => {
+            usersCurrentPage = nextPage;
+            renderUsersTable(users);
+        });
 
         tbody.querySelectorAll('.btn-dossier').forEach(b => {
             b.addEventListener('click', () => openStudentDossier(parseInt(b.getAttribute('data-user-id'))));
@@ -4016,6 +4127,9 @@
         return 2;
     }
 
+    let gradingCurrentPage = 1;
+    const GRADING_PAGE_SIZE = 12;
+
     function initGradingToolbar() {
         if (gradingToolbarBound) return;
         gradingToolbarBound = true;
@@ -4025,6 +4139,7 @@
                 document.querySelectorAll('.grading-filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 activeGradingFilter = btn.getAttribute('data-filter') || 'all';
+                gradingCurrentPage = 1;
                 renderGradingGrid();
             });
         });
@@ -4033,6 +4148,7 @@
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 gradingSearchQuery = (e.target.value || '').trim().toLowerCase();
+                gradingCurrentPage = 1;
                 renderGradingGrid();
             });
         }
@@ -4040,21 +4156,41 @@
 
     function updateGradingTabBadge(homeworks) {
         const badge = document.getElementById('tab-grading-badge');
+        const notifyBanner = document.getElementById('grading-notify-banner');
+        const notifyText = document.getElementById('grading-notify-text');
         if (!badge || !Array.isArray(homeworks)) return;
 
         let totalUnreviewedWorks = 0;
+        let unreviewedHwCount = 0;
         homeworks.forEach(h => {
             const subCount = h.submittedCount !== undefined ? h.submittedCount : (h.submissions_count || 0);
             const chkCount = h.checkedCount !== undefined ? h.checkedCount : (h.checked_count || 0);
-            totalUnreviewedWorks += Math.max(0, subCount - chkCount);
+            const diff = Math.max(0, subCount - chkCount);
+            if (diff > 0) {
+                totalUnreviewedWorks += diff;
+                unreviewedHwCount++;
+            }
         });
+
+        if (lastKnownUnreviewedWorks !== null && totalUnreviewedWorks > lastKnownUnreviewedWorks) {
+            const added = totalUnreviewedWorks - lastKnownUnreviewedWorks;
+            if (window.AuthSync && typeof window.AuthSync.showToast === 'function') {
+                window.AuthSync.showToast(`🔔 Новые сданные работы (+${added})`, 'success', 4500);
+            }
+        }
+        lastKnownUnreviewedWorks = totalUnreviewedWorks;
 
         if (totalUnreviewedWorks > 0) {
             badge.textContent = totalUnreviewedWorks > 99 ? '99+' : String(totalUnreviewedWorks);
             badge.classList.remove('hidden');
+            if (notifyBanner && notifyText) {
+                notifyText.innerHTML = `🔔 Ожидают проверки: <strong>${totalUnreviewedWorks}</strong> раб. (по ${unreviewedHwCount} Д/З)`;
+                notifyBanner.classList.remove('hidden');
+            }
         } else {
             badge.textContent = '0';
             badge.classList.add('hidden');
+            if (notifyBanner) notifyBanner.classList.add('hidden');
         }
     }
 
@@ -4101,6 +4237,7 @@
         if (!gradingHwGrid) return;
 
         if (gradingHomeworksCache.length === 0) {
+            renderPaginationBar('grading-pagination-bar', 0, 1, GRADING_PAGE_SIZE, () => {});
             gradingHwGrid.innerHTML = `
                 <div style="grid-column:1/-1; text-align:center; padding:3.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
                     <div style="font-size:2.5rem; margin-bottom:0.75rem;">📝</div>
@@ -4138,6 +4275,7 @@
         }
 
         if (filtered.length === 0) {
+            renderPaginationBar('grading-pagination-bar', 0, 1, GRADING_PAGE_SIZE, () => {});
             gradingHwGrid.innerHTML = `
                 <div style="grid-column:1/-1; text-align:center; padding:2.5rem 1rem; background:var(--surface-card); border:1px solid var(--line); border-radius:var(--r); color:var(--muted);">
                     <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
@@ -4170,12 +4308,17 @@
             return tB - tA;
         });
 
-        // 4. Отрисовка карточек с визуальными разделителями групп при отображении всех
+        // 4. Отрисовка карточек с пагинацией и визуальными разделителями групп
+        const totalGradingPages = Math.max(1, Math.ceil(filtered.length / GRADING_PAGE_SIZE));
+        if (gradingCurrentPage > totalGradingPages) gradingCurrentPage = totalGradingPages;
+        const pageStart = (gradingCurrentPage - 1) * GRADING_PAGE_SIZE;
+        const pageItems = filtered.slice(pageStart, pageStart + GRADING_PAGE_SIZE);
+
         let html = '';
         let lastPriority = null;
         const showDividers = (activeGradingFilter === 'all' && !gradingSearchQuery);
 
-        filtered.forEach(h => {
+        pageItems.forEach(h => {
             const p = getHwGradingPriority(h);
 
             if (showDividers && p !== lastPriority) {
@@ -4286,6 +4429,11 @@
         });
 
         gradingHwGrid.innerHTML = html;
+
+        renderPaginationBar('grading-pagination-bar', filtered.length, gradingCurrentPage, GRADING_PAGE_SIZE, (nextPage) => {
+            gradingCurrentPage = nextPage;
+            renderGradingGrid();
+        });
 
         // View submissions buttons
         gradingHwGrid.querySelectorAll('.btn-view-submissions').forEach(b => {
