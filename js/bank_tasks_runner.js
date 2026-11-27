@@ -1038,6 +1038,14 @@
   let studentContext = null;
   let studentHistoryPromise = null;
 
+  function formatBankMath(raw) {
+    if (!raw) return '';
+    if (window.StudyMath && typeof window.StudyMath.formatMath === 'function') {
+      return window.StudyMath.formatMath(raw);
+    }
+    return raw;
+  }
+
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -1365,7 +1373,7 @@
           }
 
           if (task.explanation) {
-            explBox.innerHTML = `<strong>💡 Пояснение к решению:</strong><br>${task.explanation}`;
+            explBox.innerHTML = `<strong>💡 Пояснение к решению:</strong><br>${formatBankMath(task.explanation)}`;
             explBox.style.display = 'block';
           } else {
             explBox.style.display = 'none';
@@ -1573,7 +1581,7 @@
                   <span class="btd-list-row-title">№${task.num || idx + 1}. ${escapeHtml(task.title || 'Задание')}</span>
                   ${statusHtml}
                 </div>
-                <div class="btd-list-row-preview">${escapeHtml(preview || 'Открыть задачу для просмотра')}</div>
+                <div class="btd-list-row-preview">${formatBankMath(escapeHtml(preview || 'Открыть задачу для просмотра'))}</div>
                 ${metaHtml}
               </div>
               <div class="btd-list-row-actions">
@@ -1701,7 +1709,7 @@
 
     // Текст задания
     const textEl = document.getElementById('btd-text');
-    textEl.innerHTML = task.html || `<p class="task-text">${task.text}</p>`;
+    textEl.innerHTML = formatBankMath(task.html || `<p class="task-text">${task.text}</p>`);
 
     // Единица измерения
     const unitEl = document.getElementById('btd-unit');
@@ -1751,7 +1759,7 @@
         return `
           <button type="button" class="btd-option-btn${isThisCorrect ? ' is-correct' : ''}" data-opt-idx="${i}" role="radio" aria-checked="${isThisCorrect}">
             <span class="btd-opt-letter">${letter}</span>
-            <span class="btd-opt-text">${opt}</span>
+            <span class="btd-opt-text">${formatBankMath(opt)}</span>
           </button>
         `;
       }).join('');
@@ -1766,7 +1774,7 @@
       feedback.className = 'btd-feedback correct';
       feedback.textContent = '✓ Задание уже выполнено';
       if (task.explanation) {
-        explBox.innerHTML = `<strong>💡 Пояснение к решению:</strong><br>${task.explanation}`;
+        explBox.innerHTML = `<strong>💡 Пояснение к решению:</strong><br>${formatBankMath(task.explanation)}`;
         explBox.style.display = 'block';
       }
     }

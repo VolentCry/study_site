@@ -4027,10 +4027,14 @@
                 }
             }
 
-            let previewText = t.html ? t.html : (t.text || '');
-            if (previewText.length > 250) {
-                previewText = previewText.slice(0, 250) + '...';
+            const rawPreviewHtml = t.html ? t.html : (t.text || '');
+            const previewTmp = document.createElement('div');
+            previewTmp.innerHTML = rawPreviewHtml;
+            let plainPreview = (previewTmp.textContent || previewTmp.innerText || '').replace(/\s+/g, ' ').trim();
+            if (plainPreview.length > 250) {
+                plainPreview = plainPreview.slice(0, 250).trim() + '...';
             }
+            const previewText = formatMathHtml(escapeHtml(plainPreview));
 
             let optionsPreview = '';
             if (t.options && Array.isArray(t.options)) {
@@ -4049,7 +4053,7 @@
             }
 
             return `
-                <div class="bank-picker-task-card" data-task-id="${t.id}" style="display:flex; gap:12px; align-items:flex-start; padding:10px 14px; background:${itemBg}; border:1px solid ${itemBorder}; border-radius:var(--r-sm); opacity:${isAlreadyInDraft ? 0.6 : 1};">
+                <div class="bank-picker-task-card" data-task-id="${t.id}" style="display:flex; gap:12px; align-items:flex-start; flex-shrink:0; padding:10px 14px; background:${itemBg}; border:1px solid ${itemBorder}; border-radius:var(--r-sm); opacity:${isAlreadyInDraft ? 0.6 : 1};">
                     <input type="checkbox" class="bank-picker-cb" data-task-id="${t.id}" ${isAlreadyInDraft ? 'disabled' : ''} ${isChecked ? 'checked' : ''} style="margin-top:4px; width:18px; height:18px; cursor:${isAlreadyInDraft ? 'default' : 'pointer'}; accent-color:var(--accent-cyan);">
                     ${thumbHtml}
                     <div style="flex:1; min-width:0;">
