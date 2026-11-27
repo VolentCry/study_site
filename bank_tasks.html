@@ -335,6 +335,28 @@
     .empty-state { padding: 48px 20px; border: 1px dashed rgba(33, 74, 64, .28); color: #71847d; text-align: center; }
     .empty-state strong { display: block; margin-bottom: 7px; color: var(--forest); font: 700 20px 'Playfair Display', Georgia, serif; }
 
+    .student-history-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding: 14px 18px;
+      border: 1.5px solid rgba(33, 74, 64, .28);
+      border-radius: 6px;
+      background: rgba(255, 250, 240, .96);
+      box-shadow: 0 6px 20px rgba(33, 74, 64, .08);
+    }
+    .student-history-banner[hidden] { display: none; }
+    .shb-info { display: flex; flex-direction: column; gap: 3px; }
+    .shb-title { color: var(--forest-dark); font-size: 15px; font-weight: 800; }
+    .shb-sub { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .shb-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .shb-toggle { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--forest); cursor: pointer; user-select: none; }
+    .shb-toggle input { width: 16px; height: 16px; accent-color: var(--forest); cursor: pointer; }
+    .shb-reset { font-size: 12px; font-weight: 800; color: #a75a31; text-decoration: underline; }
+
     .bank-bottom {
       display: flex;
       min-height: 112px;
@@ -471,6 +493,20 @@
         <p>Выбирай любую тему — задача или тестирование откроется и решится прямо здесь, с моментальной проверкой ответа и сохранением прогресса.</p>
       </header>
 
+      <div id="student-history-banner" class="student-history-banner" hidden>
+        <div class="shb-info">
+          <div class="shb-title" id="shb-student-title">👤 Подбор задач для ученика</div>
+          <div class="shb-sub" id="shb-student-stats"></div>
+        </div>
+        <div class="shb-controls">
+          <label class="shb-toggle">
+            <input type="checkbox" id="hide-completed-topics" />
+            <span>Скрыть темы, где все задачи уже были в ДЗ</span>
+          </label>
+          <a href="bank_tasks.html#catalog-section" class="shb-reset">Сбросить режим ученика</a>
+        </div>
+      </div>
+
       <div class="search-toolbar">
         <label class="search-box">
           <span class="search-mark" aria-hidden="true"></span>
@@ -562,6 +598,10 @@
     const filterPanel = document.getElementById('filter-panel');
     const resultsCount = document.getElementById('results-count');
     const emptyState = document.getElementById('empty-state');
+    const studentBanner = document.getElementById('student-history-banner');
+    const studentBannerTitle = document.getElementById('shb-student-title');
+    const studentBannerStats = document.getElementById('shb-student-stats');
+    const hideCompletedTopicsCb = document.getElementById('hide-completed-topics');
     const appliedFilters = { difficulty: '', class: '', subject: '', type: '' };
 
     function normalize(value) {
@@ -578,8 +618,17 @@
     function renderTasks() {
       const query = normalize(taskSearch.value);
       const allTopics = getTopicList();
+      const studentCtx = window.BankTasksRunner && typeof window.BankTasksRunner.getStudentContext === 'function'
+        ? window.BankTasksRunner.getStudentContext()
+        : null;
+      const hideCompleted = Boolean(studentCtx && hideCompletedTopicsCb && hideCompletedTopicsCb.checked);
+
       const visibleTasks = allTopics.filter(task => {
         if (!['math', 'informatics', 'physics'].includes(task.subject)) return false;
+        if (hideCompleted && Array.isArray(task.tasks) && task.tasks.length > 0) {
+          const allInHw = task.tasks.every(t => Boolean(studentCtx.history && studentCtx.history[t.id]));
+          if (allInHw) return false;
+        }
         const sLabel = subjectLabels[task.subject] || task.subjectLabel || '';
         const searchTags = `${task.title} ${task.description || ''} ${task.class} ${sLabel} ${task.isTest ? 'тест тестирование физика 8' : ''}`;
         const matchesSearch = normalize(searchTags).includes(query);
@@ -664,9 +713,54 @@
       appliedFilters.class = '';
       appliedFilters.subject = '';
       appliedFilters.type = '';
+      if (hideCompletedTopicsCb) hideCompletedTopicsCb.checked = false;
       renderTasks();
       taskSearch.focus();
     });
+
+    if (hideCompletedTopicsCb) {
+      hideCompletedTopicsCb.addEventListener('change', renderTasks);
+    }
+
+    function updateStudentBanner(ctx) {
+      if (!studentBanner || !ctx || !ctx.student) return;
+      const hwCount = ctx.history ? Object.keys(ctx.history).length : 0;
+      let solvedInHwCount = 0;
+      if (ctx.history) {
+        Object.values(ctx.history).forEach(item => {
+          if (item && item.solvedInHw) solvedInHwCount++;
+        });
+      }
+      let selfCount = 0;
+      if (ctx.selfSolvedSet && typeof BankTasksData !== 'undefined' && Array.isArray(BankTasksData.topics)) {
+        const seenSelf = new Set();
+        BankTasksData.topics.forEach(topic => {
+          (topic.tasks || []).forEach(t => {
+            if (ctx.selfSolvedSet.has(t.id)) seenSelf.add(t.id);
+          });
+        });
+        selfCount = seenSelf.size;
+      }
+      if (studentBannerTitle) {
+        studentBannerTitle.textContent = `👤 Подбор задач для ученика: ${ctx.student.displayName} (@${ctx.student.username})`;
+      }
+      if (studentBannerStats) {
+        studentBannerStats.textContent = `В ДЗ уже встречалось: ${hwCount} (решено в ДЗ: ${solvedInHwCount}) · Самостоятельно на сайте: ${selfCount}`;
+      }
+      studentBanner.hidden = false;
+    }
+
+    window.addEventListener('bank-student-history-loaded', (e) => {
+      updateStudentBanner(e.detail);
+      renderTasks();
+    });
+
+    if (window.BankTasksRunner && typeof window.BankTasksRunner.getStudentContext === 'function') {
+      const existingCtx = window.BankTasksRunner.getStudentContext();
+      if (existingCtx) {
+        updateStudentBanner(existingCtx);
+      }
+    }
 
     renderTasks();
   </script>

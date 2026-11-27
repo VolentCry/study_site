@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Zen+Old+Mincho:wght@500;600;700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root, html[data-theme="dark"], html[data-theme="light"], body {
+    :root {
       --paper: #f5f2eb;
       --paper-light: #fbf9f4;
       --paper-card: #ffffff;
@@ -35,8 +35,8 @@
     }
 
     body {
-      background-color: var(--paper) !important;
-      color: var(--ink) !important;
+      background-color: var(--paper);
+      color: var(--ink);
       font-family: 'DM Sans', -apple-system, sans-serif;
       min-height: 100vh;
       display: flex; flex-direction: column;
@@ -395,6 +395,8 @@
     }
   </style>
   <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');document.documentElement.dataset.theme=t==='dark'?'dark':'light';}catch(e){}})();</script>
+  <link rel="stylesheet" href="../css/math_theme_support.css" />
 </head>
 <body>
 

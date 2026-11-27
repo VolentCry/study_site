@@ -721,7 +721,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res = await fetch(`/api/schedule/month?year=${year}&month=${month}`, { cache: 'no-store' });
+            const tzOff = new Date().getTimezoneOffset();
+            const res = await fetch(`/api/schedule/month?year=${year}&month=${month}&tzOffset=${encodeURIComponent(tzOff)}`, { cache: 'no-store' });
             if (res.status === 401) {
                 renderGuestScheduleState();
                 return;
@@ -752,7 +753,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         try {
-            const res = await fetch('/api/student/billing', { cache: 'no-store' });
+            const tzOff = new Date().getTimezoneOffset();
+            const res = await fetch(`/api/student/billing?tzOffset=${encodeURIComponent(tzOff)}`, { cache: 'no-store' });
             if (res.status === 401 || !res.ok) {
                 studentBillingData = null;
                 const card = document.getElementById('student-billing-card');
@@ -1577,9 +1579,10 @@ async function initParentDashboard(user, selectedStudentId = null) {
     }
 
     try {
+        const tzOff = new Date().getTimezoneOffset();
         const dashUrl = selectedStudentId
-            ? `/api/parent/dashboard?studentId=${encodeURIComponent(selectedStudentId)}`
-            : '/api/parent/dashboard';
+            ? `/api/parent/dashboard?studentId=${encodeURIComponent(selectedStudentId)}&tzOffset=${encodeURIComponent(tzOff)}`
+            : `/api/parent/dashboard?tzOffset=${encodeURIComponent(tzOff)}`;
         const res = await fetch(dashUrl, { cache: 'no-store' });
         const data = await res.json();
 

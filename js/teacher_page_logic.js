@@ -1351,7 +1351,8 @@
                     lessonPrice: price,
                     paidLessons: paid,
                     passedLessons: passed,
-                    payer: payer
+                    payer: payer,
+                    tzOffset: new Date().getTimezoneOffset()
                 })
             });
             const d = await res.json();
@@ -1445,7 +1446,7 @@
                     syncBtn.textContent = '⏳ Синхронизация...';
 
                     // Запрашиваем актуальные данные досье/биллинга с сервера
-                    const res = await fetch(`/api/teacher/students/${currentDossierStudentId}/dossier`, { cache: 'no-store' });
+                    const res = await fetch(`/api/teacher/students/${currentDossierStudentId}/dossier?tzOffset=${encodeURIComponent(new Date().getTimezoneOffset())}`, { cache: 'no-store' });
                     const d = await res.json();
                     if (!res.ok || !d.success) throw new Error(d.error || 'Ошибка загрузки данных');
 
@@ -1543,7 +1544,7 @@
 
     async function openStudentDossier(studentId) {
         try {
-            const res = await fetch(`/api/teacher/students/${studentId}/dossier`, { cache: 'no-store' });
+            const res = await fetch(`/api/teacher/students/${studentId}/dossier?tzOffset=${encodeURIComponent(new Date().getTimezoneOffset())}`, { cache: 'no-store' });
             const d = await res.json();
             if (!res.ok || !d.success) throw new Error(d.error || 'Не удалось открыть досье');
 
@@ -3056,7 +3057,10 @@
     async function loadStudentsForHwClass(classId, selectedStudentId = null) {
         if (!hwTargetStudent) return;
         hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
-        if (!classId) return;
+        if (!classId) {
+            syncFullBankLink();
+            return;
+        }
 
         try {
             const res = await fetch(`/api/teacher/classes/${classId}`, { cache: 'no-store' });
@@ -3064,7 +3068,7 @@
             if (data.success && data.class && Array.isArray(data.class.students)) {
                 if (data.class.students.length > 0) {
                     hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>' +
-                        data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
+                        data.class.students.map(s => `<option value="${s.id}">👤 Индивидуально: ${escapeHtml(s.displayName || s.display_name || s.username)} (@${escapeHtml(s.username)})</option>`).join('');
                 } else {
                     hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (в классе пока нет учеников)</option>';
                 }
@@ -3074,6 +3078,8 @@
             }
         } catch(e) {
             console.error('Error fetching students for homework target class', e);
+        } finally {
+            syncFullBankLink();
         }
     }
 
@@ -3141,6 +3147,7 @@
         if (hwInputDesc) hwInputDesc.value = '';
         if (hwTargetClass) hwTargetClass.value = '';
         if (hwTargetStudent) hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
+        syncFullBankLink();
         loadDraftFromStorage();
         renderConstructorDraft();
         showToast('Режим редактирования отменён');
@@ -3156,6 +3163,47 @@
     const btnAddBankRandom = document.getElementById('btn-add-bank-random');
     const btnOpenBankPicker = document.getElementById('btn-open-bank-picker');
     const bankTopicStatsText = document.getElementById('bank-topic-stats-text');
+    const linkFullBankTasks = document.getElementById('link-full-bank-tasks');
+
+    const studentBankHistoryCache = new Map();
+
+    function syncFullBankLink() {
+        if (!linkFullBankTasks) return;
+        const sid = hwTargetStudent ? String(hwTargetStudent.value || '').trim() : '';
+        if (sid) {
+            linkFullBankTasks.href = `bank_tasks.html?student_id=${encodeURIComponent(sid)}#catalog-section`;
+            linkFullBankTasks.textContent = 'Весь Банк задач (с историей ученика) ↗';
+            linkFullBankTasks.title = 'Открыть полный Банк задач с пометками по задачам этого ученика';
+        } else {
+            linkFullBankTasks.href = 'bank_tasks.html';
+            linkFullBankTasks.textContent = 'Весь Банк задач ↗';
+            linkFullBankTasks.title = 'Открыть полный Банк задач в новой вкладке';
+        }
+    }
+
+    async function fetchStudentBankHistory(studentId) {
+        const sid = String(studentId || '').trim();
+        if (!sid) return null;
+        if (studentBankHistoryCache.has(sid)) {
+            return studentBankHistoryCache.get(sid);
+        }
+        try {
+            const res = await fetch(`/api/teacher/students/${encodeURIComponent(sid)}/bank-history`, { cache: 'no-store' });
+            if (!res.ok) return null;
+            const data = await res.json();
+            if (!data || !data.success) return null;
+            const parsed = {
+                student: data.student || null,
+                history: data.history || {},
+                selfSolvedSet: new Set(Array.isArray(data.selfSolvedIds) ? data.selfSolvedIds : [])
+            };
+            studentBankHistoryCache.set(sid, parsed);
+            return parsed;
+        } catch (e) {
+            console.error('Error fetching student bank history', e);
+            return null;
+        }
+    }
 
     // Modal Bank Picker elements
     const modalBankTasksPicker = document.getElementById('modal-bank-tasks-picker');
@@ -3209,6 +3257,13 @@
                 loadStudentsForHwClass(hwTargetClass.value);
             });
         }
+        if (hwTargetStudent && !hwTargetStudent.__hasBankLinkListener) {
+            hwTargetStudent.__hasBankLinkListener = true;
+            hwTargetStudent.addEventListener('change', () => {
+                syncFullBankLink();
+            });
+        }
+        syncFullBankLink();
         if (!editingHomeworkId) {
             renderConstructorDraft();
         }
@@ -3680,6 +3735,7 @@
                     });
                     const data = await res.json();
                     if (data.success) {
+                        studentBankHistoryCache.clear();
                         showToast('✓ Домашнее задание успешно обновлено!');
                         cancelEditingHomework();
                         switchTab('grading');
@@ -3703,6 +3759,7 @@
                     });
                     const data = await res.json();
                     if (data.success) {
+                        studentBankHistoryCache.clear();
                         showToast('Домашнее задание успешно опубликовано!');
                         constructorDraftTasks = [];
                         saveDraftToStorage();
@@ -3711,6 +3768,7 @@
                         if (hwTargetStudent) {
                             hwTargetStudent.innerHTML = '<option value="">👥 Всему классу (все ученики)</option>';
                         }
+                        syncFullBankLink();
                         renderConstructorDraft();
                         switchTab('grading');
                         loadGrading();
@@ -3886,6 +3944,7 @@
     // --- Manual Task Picker Modal Logic ---
     let pickerCurrentTopic = null;
     let pickerSelectedTaskIds = new Set();
+    let pickerStudentHistory = null;
 
     function openBankPickerModal(topicId) {
         if (!modalBankTasksPicker || !window.BankTasksData) return;
@@ -3894,9 +3953,19 @@
         if (modalBankTopicSelect) {
             modalBankTopicSelect.value = defaultTid;
         }
+        const selectedSid = hwTargetStudent ? String(hwTargetStudent.value || '').trim() : '';
+        pickerStudentHistory = selectedSid ? (studentBankHistoryCache.get(selectedSid) || null) : null;
         loadPickerTopic(defaultTid);
         if (modalBankSearch) modalBankSearch.value = '';
         modalBankTasksPicker.showModal();
+        if (selectedSid && !pickerStudentHistory) {
+            fetchStudentBankHistory(selectedSid).then(hist => {
+                if (hist && hwTargetStudent && String(hwTargetStudent.value || '').trim() === selectedSid) {
+                    pickerStudentHistory = hist;
+                    renderPickerTasks();
+                }
+            });
+        }
     }
 
     function loadPickerTopic(topicId) {
@@ -3940,6 +4009,24 @@
             const itemBg = isAlreadyInDraft ? 'rgba(255, 255, 255, 0.02)' : 'var(--surface-card)';
             const itemBorder = isChecked ? 'var(--accent-cyan)' : 'var(--line)';
 
+            let studentStatusBadge = '';
+            if (pickerStudentHistory) {
+                const hwInfo = pickerStudentHistory.history ? pickerStudentHistory.history[t.id] : null;
+                const isSelfSolved = pickerStudentHistory.selfSolvedSet && pickerStudentHistory.selfSolvedSet.has(t.id);
+                if (hwInfo) {
+                    const delTag = hwInfo.lastHwDeleted ? ' · удалено' : '';
+                    if (hwInfo.solvedInHw) {
+                        studentStatusBadge = `<span style="font-size:0.72rem; padding:2px 7px; border-radius:4px; background:rgba(16,185,129,0.16); color:#34d399; font-weight:700;" title="ДЗ: ${escapeHtml(hwInfo.lastHwTitle)}${delTag}">✓ Выполнена в ДЗ${delTag}</span>`;
+                    } else if (hwInfo.attemptedInHw) {
+                        studentStatusBadge = `<span style="font-size:0.72rem; padding:2px 7px; border-radius:4px; background:rgba(245,158,11,0.18); color:#fbbf24; font-weight:700;" title="ДЗ: ${escapeHtml(hwInfo.lastHwTitle)}${delTag}">📌 Была в ДЗ (ошибка)${delTag}</span>`;
+                    } else {
+                        studentStatusBadge = `<span style="font-size:0.72rem; padding:2px 7px; border-radius:4px; background:rgba(99,102,241,0.18); color:#a5b4fc; font-weight:700;" title="ДЗ: ${escapeHtml(hwInfo.lastHwTitle)}${delTag}">📌 Была в ДЗ${delTag}</span>`;
+                    }
+                } else if (isSelfSolved) {
+                    studentStatusBadge = `<span style="font-size:0.72rem; padding:2px 7px; border-radius:4px; background:rgba(56,189,248,0.15); color:#38bdf8; font-weight:700;" title="Ученик решал задачу самостоятельно на сайте">💡 Решена на сайте</span>`;
+                }
+            }
+
             let previewText = t.html ? t.html : (t.text || '');
             if (previewText.length > 250) {
                 previewText = previewText.slice(0, 250) + '...';
@@ -3966,11 +4053,14 @@
                     <input type="checkbox" class="bank-picker-cb" data-task-id="${t.id}" ${isAlreadyInDraft ? 'disabled' : ''} ${isChecked ? 'checked' : ''} style="margin-top:4px; width:18px; height:18px; cursor:${isAlreadyInDraft ? 'default' : 'pointer'}; accent-color:var(--accent-cyan);">
                     ${thumbHtml}
                     <div style="flex:1; min-width:0;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
                             <span style="font-weight:700; font-size:0.88rem; color:var(--ink);">
                                 №${t.num || idx + 1}. ${escapeHtml(t.title || 'Задание')}
                             </span>
-                            ${isAlreadyInDraft ? '<span style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700;">✓ Уже в Д/З</span>' : ''}
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                ${studentStatusBadge}
+                                ${isAlreadyInDraft ? '<span style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700;">✓ Уже в Д/З</span>' : ''}
+                            </div>
                         </div>
                         <div style="font-size:0.84rem; color:var(--ink); line-height:1.4;">${previewText}</div>
                         ${optionsPreview}

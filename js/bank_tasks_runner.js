@@ -577,6 +577,288 @@
         border: 1px solid rgba(46, 125, 50, 0.25);
       }
 
+      .topic-solved-badge.mode-hw-partial {
+        background: #fef3c7;
+        color: #92400e;
+        border-color: rgba(180, 83, 9, 0.25);
+      }
+
+      .topic-solved-badge.mode-self-solved {
+        background: #e0f2fe;
+        color: #0369a1;
+        border-color: rgba(3, 105, 161, 0.25);
+      }
+
+      .topic-solved-badge.mode-new {
+        background: #eef7ee;
+        color: #214a40;
+        border-color: rgba(33, 74, 64, 0.2);
+      }
+
+      .btd-nav-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btd-view-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 11px;
+        border-radius: 6px;
+        border: 1px solid rgba(33, 74, 64, 0.25);
+        background: #fff;
+        color: #214a40;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .btd-view-toggle:hover,
+      .btd-view-toggle.active {
+        background: #214a40;
+        color: #fffaf0;
+        border-color: #214a40;
+      }
+
+      .btd-pill.hw-solved {
+        border-color: #2e7d32;
+        color: #1e5c2b;
+        background: #d7edd8;
+      }
+
+      .btd-pill.hw-assigned {
+        border-color: #d97706;
+        color: #92400e;
+        background: #fef3c7;
+      }
+
+      .btd-pill.self-solved {
+        border-color: #0284c7;
+        color: #075985;
+        background: #e0f2fe;
+      }
+
+      .btd-pill.active.hw-solved,
+      .btd-pill.active.hw-assigned,
+      .btd-pill.active.self-solved {
+        background: #214a40;
+        color: #fffaf0;
+        border-color: #214a40;
+      }
+
+      .btd-student-status-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 1px solid rgba(33, 74, 64, 0.16);
+        background: #f4f0df;
+        color: #203b34;
+      }
+
+      .btd-student-status-banner.is-hw-solved {
+        background: #e6f4ea;
+        border-color: rgba(46, 125, 50, 0.35);
+        color: #1e5c2b;
+      }
+
+      .btd-student-status-banner.is-hw-attempted {
+        background: #fef3c7;
+        border-color: rgba(217, 119, 6, 0.35);
+        color: #92400e;
+      }
+
+      .btd-student-status-banner.is-hw-assigned {
+        background: #eef2ff;
+        border-color: rgba(79, 70, 229, 0.3);
+        color: #3730a3;
+      }
+
+      .btd-student-status-banner.is-self-solved {
+        background: #e0f2fe;
+        border-color: rgba(2, 132, 199, 0.3);
+        color: #075985;
+      }
+
+      .btd-student-status-banner.is-new {
+        background: #f0fdf4;
+        border-color: rgba(22, 163, 74, 0.25);
+        color: #166534;
+      }
+
+      .btd-list-view {
+        padding: 18px 24px 24px;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 200px;
+        background: #fffdf7;
+      }
+
+      .btd-list-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+
+      .btd-list-filters {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .btd-list-filter-btn {
+        padding: 5px 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(33, 74, 64, 0.2);
+        background: #fff;
+        color: #214a40;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .btd-list-filter-btn.active {
+        background: #214a40;
+        color: #fffaf0;
+        border-color: #214a40;
+      }
+
+      .btd-list-items {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btd-list-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(33, 74, 64, 0.16);
+        border-radius: 10px;
+        background: #fff;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .btd-list-row:hover {
+        border-color: rgba(33, 74, 64, 0.35);
+        box-shadow: 0 3px 10px rgba(33, 74, 64, 0.06);
+      }
+
+      .btd-list-row-main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .btd-list-row-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 5px;
+      }
+
+      .btd-list-row-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #183a34;
+      }
+
+      .btd-list-row-preview {
+        font-size: 13px;
+        line-height: 1.45;
+        color: #48675d;
+        word-break: break-word;
+      }
+
+      .btd-list-row-meta {
+        margin-top: 5px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #698078;
+      }
+
+      .btd-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .btd-status-pill.hw-solved { background: #d7edd8; color: #1e5c2b; }
+      .btd-status-pill.hw-attempted { background: #fef3c7; color: #92400e; }
+      .btd-status-pill.hw-assigned { background: #e0e7ff; color: #3730a3; }
+      .btd-status-pill.self-solved { background: #e0f2fe; color: #0369a1; }
+      .btd-status-pill.task-new { background: #f0fdf4; color: #166534; border: 1px solid rgba(22, 163, 74, 0.25); }
+
+      .btd-list-row-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+
+      .btd-row-btn {
+        padding: 6px 11px;
+        border-radius: 6px;
+        border: 1px solid rgba(33, 74, 64, 0.22);
+        background: #fff;
+        color: #214a40;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.15s ease;
+      }
+
+      .btd-row-btn:hover {
+        background: #214a40;
+        color: #fffaf0;
+        border-color: #214a40;
+      }
+
+      .btd-row-btn.add-btn {
+        background: #eef7ee;
+        color: #183a34;
+        border-color: rgba(46, 125, 50, 0.35);
+      }
+
+      .btd-row-btn.add-btn:hover,
+      .btd-row-btn.add-btn.added {
+        background: #2e7d32;
+        color: #fff;
+        border-color: #2e7d32;
+      }
+
+      @media (max-width: 600px) {
+        .btd-list-view { padding: 14px 16px 20px; }
+        .btd-list-row { flex-direction: column; }
+        .btd-list-row-actions { flex-direction: row; width: 100%; }
+        .btd-row-btn { flex: 1; text-align: center; }
+      }
+
       .test-badge-pill {
         display: inline-flex;
         align-items: center;
@@ -748,9 +1030,134 @@
     return false;
   }
 
-  // Состояние модального окна
+  // Состояние модального окна и истории ученика (для режима учителя)
   let currentTopic = null;
   let currentTaskIdx = 0;
+  let isListView = false;
+  let listFilterMode = 'all';
+  let studentContext = null;
+  let studentHistoryPromise = null;
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function stripHtmlPreview(rawHtml, maxLen) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = String(rawHtml || '');
+    const txt = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+    if (maxLen && txt.length > maxLen) {
+      return txt.slice(0, maxLen).trim() + '…';
+    }
+    return txt;
+  }
+
+  function formatShortDate(isoStr) {
+    if (!isoStr) return '';
+    try {
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('ru-RU');
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function getStudentIdFromUrl() {
+    try {
+      const val = new URLSearchParams(window.location.search).get('student_id');
+      return val && /^\d+$/.test(val.trim()) ? val.trim() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function loadStudentHistoryIfNeeded() {
+    const sid = getStudentIdFromUrl();
+    if (!sid) return Promise.resolve(null);
+    if (studentHistoryPromise) return studentHistoryPromise;
+
+    studentHistoryPromise = fetch(`/api/teacher/students/${encodeURIComponent(sid)}/bank-history`, {
+      cache: 'no-store'
+    })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (!data || !data.success) return null;
+        studentContext = {
+          student: data.student,
+          history: data.history || {},
+          selfSolvedSet: new Set(Array.isArray(data.selfSolvedIds) ? data.selfSolvedIds : [])
+        };
+        updateTopicCardBadges();
+        window.dispatchEvent(new CustomEvent('bank-student-history-loaded', { detail: studentContext }));
+        const dialog = document.getElementById('bank-task-dialog');
+        if (dialog && dialog.open && currentTopic) {
+          let hasExplicitTask = false;
+          try {
+            hasExplicitTask = new URLSearchParams(window.location.search).has('task');
+          } catch (e) {}
+          if (!hasExplicitTask && !isListView) {
+            setViewMode(true);
+          } else if (isListView) {
+            renderTaskListView();
+          } else {
+            renderTaskInModal(currentTaskIdx);
+          }
+        }
+        return studentContext;
+      })
+      .catch(() => null);
+
+    return studentHistoryPromise;
+  }
+
+  function getTaskStudentStatus(taskId) {
+    if (!studentContext) return null;
+    const hw = studentContext.history ? (studentContext.history[taskId] || null) : null;
+    const selfSolved = studentContext.selfSolvedSet ? studentContext.selfSolvedSet.has(taskId) : false;
+    return { hw, selfSolved };
+  }
+
+  function getDraftTasksList() {
+    try {
+      const raw = localStorage.getItem('teacher_hw_draft_tasks');
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function isTaskInDraft(taskId) {
+    const list = getDraftTasksList();
+    return list.some(t => (t.bankTaskId && t.bankTaskId === taskId) || t.id === taskId);
+  }
+
+  function addTaskToDraft(task, topic) {
+    if (!task) return { added: false, total: getDraftTasksList().length };
+    const hwTask = convertBankTaskToHomeworkTask(task, topic);
+    const list = getDraftTasksList();
+    const exists = list.some(t => (t.bankTaskId && t.bankTaskId === task.id) || t.id === hwTask.id);
+    if (exists) {
+      return { added: false, alreadyExists: true, total: list.length };
+    }
+    list.push(hwTask);
+    try {
+      localStorage.setItem('teacher_hw_draft_tasks', JSON.stringify(list));
+    } catch (e) {
+      console.error('Error saving to teacher_hw_draft_tasks', e);
+    }
+    return { added: true, alreadyExists: false, total: list.length };
+  }
+
+  // Начинаем загрузку истории ученика сразу, если в URL передан student_id
+  loadStudentHistoryIfNeeded();
 
   // Инициализация модального окна
   function initTaskModal() {
@@ -777,13 +1184,19 @@
         </div>
 
         <div class="btd-nav-bar">
-          <span>Задание <strong id="btd-cur-num">1</strong> из <strong id="btd-total-num">10</strong></span>
-          <span class="btd-topic-progress-badge" id="btd-topic-progress">Решено: 0</span>
+          <span id="btd-nav-counter">Задание <strong id="btd-cur-num">1</strong> из <strong id="btd-total-num">10</strong></span>
+          <div class="btd-nav-right">
+            <span class="btd-topic-progress-badge" id="btd-topic-progress">Решено: 0</span>
+            <button type="button" class="btd-view-toggle" id="btd-view-toggle" title="Переключить между списком всех задач и просмотром по одной">☰ Перечень задач</button>
+          </div>
         </div>
 
         <div class="btd-pills-scroll" id="btd-pills-scroll" role="tablist" aria-label="Список заданий"></div>
 
-        <div class="btd-body">
+        <div class="btd-list-view" id="btd-list-view" style="display:none;"></div>
+
+        <div class="btd-body" id="btd-body">
+          <div class="btd-student-status-banner" id="btd-student-status-banner" style="display:none;"></div>
           <div class="btd-illustration-wrap" id="btd-illustration-wrap" style="display:none;">
             <img src="" alt="Иллюстрация к задаче" class="btd-illustration" id="btd-illustration" onerror="this.parentElement.style.display='none'">
           </div>
@@ -825,6 +1238,13 @@
       const pillsScroll = document.getElementById('btd-pills-scroll');
       const optionsList = document.getElementById('btd-options-list');
       const addToHwBtn = document.getElementById('btd-add-to-hw-btn');
+      const viewToggleBtn = document.getElementById('btd-view-toggle');
+
+      if (viewToggleBtn) {
+        viewToggleBtn.onclick = () => {
+          setViewMode(!isListView);
+        };
+      }
 
       const handleClose = () => {
         dialog.close();
@@ -899,33 +1319,20 @@
         addToHwBtn.onclick = () => {
           if (!currentTopic || !currentTopic.tasks[currentTaskIdx]) return;
           const task = currentTopic.tasks[currentTaskIdx];
-          const hwTask = convertBankTaskToHomeworkTask(task, currentTopic);
+          const res = addTaskToDraft(task, currentTopic);
 
-          try {
-            let list = [];
-            const raw = localStorage.getItem('teacher_hw_draft_tasks');
-            if (raw) list = JSON.parse(raw);
-            if (!Array.isArray(list)) list = [];
-
-            const exists = list.some(t => (t.bankTaskId && t.bankTaskId === task.id) || t.id === hwTask.id);
-            if (exists) {
-              addToHwBtn.textContent = '✓ Уже в Д/З';
-              setTimeout(() => { addToHwBtn.textContent = '➕ В домашнее задание'; }, 1600);
-              return;
-            }
-
-            list.push(hwTask);
-            localStorage.setItem('teacher_hw_draft_tasks', JSON.stringify(list));
-
-            addToHwBtn.textContent = `✓ Добавлено (${list.length})`;
-            addToHwBtn.classList.add('added');
-            setTimeout(() => {
-              addToHwBtn.textContent = '➕ В домашнее задание';
-              addToHwBtn.classList.remove('added');
-            }, 1800);
-          } catch (e) {
-            console.error('Error saving to teacher_hw_draft_tasks', e);
+          if (res.alreadyExists) {
+            addToHwBtn.textContent = '✓ Уже в Д/З';
+            setTimeout(() => { addToHwBtn.textContent = '✓ Уже в Д/З'; }, 1600);
+            return;
           }
+
+          addToHwBtn.textContent = `✓ Добавлено (${res.total})`;
+          addToHwBtn.classList.add('added');
+          setTimeout(() => {
+            addToHwBtn.textContent = '✓ Уже в Д/З';
+            addToHwBtn.classList.add('added');
+          }, 1800);
         };
       }
 
@@ -986,7 +1393,7 @@
 
       // Быстрая смена задания стрелками клавиатуры
       document.addEventListener('keydown', (e) => {
-        if (!dialog.open) return;
+        if (!dialog.open || isListView) return;
         if (document.activeElement === document.getElementById('btd-input')) return;
         if (e.key === 'ArrowLeft' && currentTopic && currentTaskIdx > 0) {
           renderTaskInModal(currentTaskIdx - 1);
@@ -997,6 +1404,221 @@
     }
 
     return dialog;
+  }
+
+  function formatTaskStudentSummary(statusInfo) {
+    if (!statusInfo) return null;
+    const { hw, selfSolved } = statusInfo;
+    if (hw) {
+      const delTag = hw.lastHwDeleted ? ' (ДЗ удалено)' : '';
+      const dt = formatShortDate(hw.lastHwDate);
+      const dtStr = dt ? `, ${dt}` : '';
+      const selfNote = selfSolved ? ' · также решал(а) сам(а) на сайте' : '';
+      if (hw.solvedInHw) {
+        return {
+          bannerClass: 'is-hw-solved',
+          pillClass: 'hw-solved',
+          pillText: `✓ Выполнена в ДЗ${hw.lastHwDeleted ? ' · удалено' : ''}`,
+          detailText: `✓ Задача решена в ДЗ «${hw.lastHwTitle}»${dtStr}${delTag}${selfNote}`,
+          tooltip: `Выполнена в ДЗ: «${hw.lastHwTitle}»${dtStr}${delTag}`
+        };
+      }
+      if (hw.attemptedInHw) {
+        return {
+          bannerClass: 'is-hw-attempted',
+          pillClass: 'hw-assigned',
+          pillText: `📌 Была в ДЗ (ошибка)${hw.lastHwDeleted ? ' · удалено' : ''}`,
+          detailText: `📌 Задача была в ДЗ «${hw.lastHwTitle}»${dtStr}${delTag} — сдана с ошибкой${selfNote}`,
+          tooltip: `Была в ДЗ (ошибка): «${hw.lastHwTitle}»${dtStr}${delTag}`
+        };
+      }
+      return {
+        bannerClass: 'is-hw-assigned',
+        pillClass: 'hw-assigned',
+        pillText: `📌 Была в ДЗ${hw.lastHwDeleted ? ' · удалено' : ''}`,
+        detailText: `📌 Задача уже была в ДЗ «${hw.lastHwTitle}»${dtStr}${delTag}${selfNote}`,
+        tooltip: `Была в ДЗ: «${hw.lastHwTitle}»${dtStr}${delTag}`
+      };
+    }
+    if (selfSolved) {
+      return {
+        bannerClass: 'is-self-solved',
+        pillClass: 'self-solved',
+        pillText: '💡 Решена на сайте',
+        detailText: '💡 Не была в ДЗ, но ученик уже решил её самостоятельно на сайте',
+        tooltip: 'Решена самостоятельно на сайте'
+      };
+    }
+    return {
+      bannerClass: 'is-new',
+      pillClass: 'task-new',
+      pillText: '🆕 Не задавалась',
+      detailText: '🆕 Эта задача ещё не была в ДЗ ученика',
+      tooltip: 'Ещё не задавалась ученику'
+    };
+  }
+
+  function setViewMode(listMode) {
+    isListView = Boolean(listMode);
+    const pillsScroll = document.getElementById('btd-pills-scroll');
+    const listView = document.getElementById('btd-list-view');
+    const bodyEl = document.getElementById('btd-body');
+    const footerEl = document.querySelector('#bank-task-dialog .btd-footer');
+    const toggleBtn = document.getElementById('btd-view-toggle');
+    const navCounter = document.getElementById('btd-nav-counter');
+
+    if (isListView) {
+      if (pillsScroll) pillsScroll.style.display = 'none';
+      if (bodyEl) bodyEl.style.display = 'none';
+      if (footerEl) footerEl.style.display = 'none';
+      if (listView) listView.style.display = 'block';
+      if (toggleBtn) {
+        toggleBtn.classList.add('active');
+        toggleBtn.textContent = '📄 Карточка задачи';
+      }
+      if (navCounter && currentTopic) {
+        navCounter.innerHTML = `Перечень: <strong>${currentTopic.tasks.length}</strong> заданий`;
+      }
+      renderTaskListView();
+    } else {
+      if (pillsScroll) pillsScroll.style.display = 'flex';
+      if (bodyEl) bodyEl.style.display = 'block';
+      if (footerEl) footerEl.style.display = 'flex';
+      if (listView) listView.style.display = 'none';
+      if (toggleBtn) {
+        toggleBtn.classList.remove('active');
+        toggleBtn.textContent = '☰ Перечень задач';
+      }
+      if (navCounter && currentTopic) {
+        navCounter.innerHTML = `Задание <strong id="btd-cur-num">${currentTaskIdx + 1}</strong> из <strong id="btd-total-num">${currentTopic.tasks.length}</strong>`;
+      }
+      renderTaskInModal(currentTaskIdx);
+    }
+  }
+
+  function renderTaskListView() {
+    const listView = document.getElementById('btd-list-view');
+    if (!listView || !currentTopic) return;
+
+    const tasks = currentTopic.tasks || [];
+    let hwCount = 0;
+    let selfOnlyCount = 0;
+    let newCount = 0;
+
+    const enriched = tasks.map((t, idx) => {
+      const st = getTaskStudentStatus(t.id);
+      const summary = formatTaskStudentSummary(st);
+      if (st) {
+        if (st.hw) hwCount++;
+        else if (st.selfSolved) selfOnlyCount++;
+        else newCount++;
+      }
+      return { task: t, idx, st, summary };
+    });
+
+    const filtered = enriched.filter(item => {
+      if (!studentContext || listFilterMode === 'all') return true;
+      if (listFilterMode === 'new') return !item.st.hw;
+      if (listFilterMode === 'hw') return Boolean(item.st.hw);
+      if (listFilterMode === 'self') return Boolean(item.st.selfSolved);
+      return true;
+    });
+
+    const toolbarHtml = studentContext ? `
+      <div class="btd-list-toolbar">
+        <div style="font-size:12px; font-weight:800; color:#214a40;">
+          Ученик: ${escapeHtml(studentContext.student ? studentContext.student.displayName : '')}
+        </div>
+        <div class="btd-list-filters">
+          <button type="button" class="btd-list-filter-btn${listFilterMode === 'all' ? ' active' : ''}" data-filter="all">Все (${tasks.length})</button>
+          <button type="button" class="btd-list-filter-btn${listFilterMode === 'new' ? ' active' : ''}" data-filter="new">🆕 Не были в ДЗ (${tasks.length - hwCount})</button>
+          <button type="button" class="btd-list-filter-btn${listFilterMode === 'hw' ? ' active' : ''}" data-filter="hw">📌 Были в ДЗ (${hwCount})</button>
+          ${selfOnlyCount > 0 ? `<button type="button" class="btd-list-filter-btn${listFilterMode === 'self' ? ' active' : ''}" data-filter="self">💡 Решены на сайте (${selfOnlyCount})</button>` : ''}
+        </div>
+      </div>
+    ` : `
+      <div class="btd-list-toolbar">
+        <div style="font-size:12px; font-weight:800; color:#48675d;">
+          Всего задач в теме: ${tasks.length}
+        </div>
+      </div>
+    `;
+
+    const rowsHtml = filtered.length === 0
+      ? '<div style="text-align:center; padding:32px 16px; color:#58736a; font-weight:700;">Нет задач по выбранному фильтру</div>'
+      : filtered.map(({ task, idx, st, summary }) => {
+          const inDraft = isTaskInDraft(task.id);
+          const preview = stripHtmlPreview(task.html || task.text || '', 170);
+          let statusHtml = '';
+          let metaHtml = '';
+
+          if (summary) {
+            const pillCls = st.hw ? (st.hw.solvedInHw ? 'hw-solved' : (st.hw.attemptedInHw ? 'hw-attempted' : 'hw-assigned')) : (st.selfSolved ? 'self-solved' : 'task-new');
+            statusHtml = `<span class="btd-status-pill ${pillCls}">${escapeHtml(summary.pillText)}</span>`;
+            if (st.hw && st.selfSolved) {
+              statusHtml += ` <span class="btd-status-pill self-solved">💡 И на сайте</span>`;
+            }
+            if (st.hw) {
+              const dt = formatShortDate(st.hw.lastHwDate);
+              metaHtml = `<div class="btd-list-row-meta">ДЗ: «${escapeHtml(st.hw.lastHwTitle)}»${dt ? ' · ' + dt : ''}${st.hw.lastHwDeleted ? ' · (удалено)' : ''}</div>`;
+            }
+          } else if (getSolvedSet().has(task.id)) {
+            statusHtml = '<span class="btd-status-pill hw-solved">✓ Решена</span>';
+          }
+
+          return `
+            <div class="btd-list-row">
+              <div class="btd-list-row-main">
+                <div class="btd-list-row-head">
+                  <span class="btd-list-row-title">№${task.num || idx + 1}. ${escapeHtml(task.title || 'Задание')}</span>
+                  ${statusHtml}
+                </div>
+                <div class="btd-list-row-preview">${escapeHtml(preview || 'Открыть задачу для просмотра')}</div>
+                ${metaHtml}
+              </div>
+              <div class="btd-list-row-actions">
+                <button type="button" class="btd-row-btn btn-open-task-card" data-task-idx="${idx}">Открыть ▶</button>
+                <button type="button" class="btd-row-btn add-btn btn-add-row-hw${inDraft ? ' added' : ''}" data-task-idx="${idx}">
+                  ${inDraft ? '✓ Уже в Д/З' : '➕ В Д/З'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+    listView.innerHTML = `${toolbarHtml}<div class="btd-list-items">${rowsHtml}</div>`;
+
+    const progEl = document.getElementById('btd-topic-progress');
+    if (progEl && studentContext) {
+      progEl.textContent = `В ДЗ: ${hwCount} из ${tasks.length}`;
+    }
+
+    listView.querySelectorAll('.btd-list-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        listFilterMode = btn.getAttribute('data-filter') || 'all';
+        renderTaskListView();
+      });
+    });
+
+    listView.querySelectorAll('.btn-open-task-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-task-idx'), 10);
+        if (!isNaN(idx)) {
+          currentTaskIdx = idx;
+          setViewMode(false);
+        }
+      });
+    });
+
+    listView.querySelectorAll('.btn-add-row-hw').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-task-idx'), 10);
+        if (isNaN(idx) || !currentTopic.tasks[idx]) return;
+        const res = addTaskToDraft(currentTopic.tasks[idx], currentTopic);
+        btn.classList.add('added');
+        btn.textContent = res.alreadyExists ? '✓ Уже в Д/З' : `✓ Добавлено (${res.total})`;
+      });
+    });
   }
 
   function openTopicModal(topicId, startTaskIdx) {
@@ -1010,6 +1632,7 @@
     const dialog = initTaskModal();
     currentTopic = topic;
     currentTaskIdx = typeof startTaskIdx === 'number' ? startTaskIdx : 0;
+    listFilterMode = 'all';
 
     // Заполнение метаинформации
     document.getElementById('btd-subject').textContent = topic.subjectLabel || 'Задания';
@@ -1017,14 +1640,16 @@
     document.getElementById('btd-level').textContent = topic.level === 'easy' ? 'Лёгкий' : (topic.level === 'hard' ? 'Сложный' : 'Средний');
     document.getElementById('btd-level').className = 'btd-badge level-' + topic.level;
     document.getElementById('btd-title').textContent = topic.title;
-    document.getElementById('btd-total-num').textContent = topic.tasks.length;
+    const totalNumEl = document.getElementById('btd-total-num');
+    if (totalNumEl) totalNumEl.textContent = topic.tasks.length;
 
     const testBadge = document.getElementById('btd-badge-test');
     if (testBadge) {
       testBadge.style.display = topic.isTest ? 'inline-flex' : 'none';
     }
 
-    renderTaskInModal(currentTaskIdx);
+    const shouldDefaultToList = Boolean(studentContext && typeof startTaskIdx !== 'number');
+    setViewMode(shouldDefaultToList);
     dialog.showModal();
   }
 
@@ -1034,15 +1659,33 @@
     const task = currentTopic.tasks[idx];
     const total = currentTopic.tasks.length;
 
-    document.getElementById('btd-cur-num').textContent = idx + 1;
+    const curNumEl = document.getElementById('btd-cur-num');
+    if (curNumEl) curNumEl.textContent = idx + 1;
 
-    // Обновление URL
+    // Обновление URL (сохраняя student_id и прочие query-параметры)
     try {
       const url = new URL(window.location.href);
       url.searchParams.set('topic', currentTopic.id);
       url.searchParams.set('task', idx + 1);
       window.history.replaceState(null, '', url.pathname + url.search + (url.hash || ''));
     } catch (e) {}
+
+    // Статус задачи для выбранного ученика (если открыто из Конструктора ДЗ)
+    const statusBanner = document.getElementById('btd-student-status-banner');
+    if (statusBanner) {
+      if (studentContext) {
+        const st = getTaskStudentStatus(task.id);
+        const summary = formatTaskStudentSummary(st);
+        statusBanner.className = `btd-student-status-banner ${summary.bannerClass}`;
+        statusBanner.innerHTML = `
+          <span>${escapeHtml(summary.detailText)}</span>
+          <span style="font-size:11px; opacity:0.8;">Ученик: ${escapeHtml(studentContext.student ? studentContext.student.displayName : '')}</span>
+        `;
+        statusBanner.style.display = 'flex';
+      } else {
+        statusBanner.style.display = 'none';
+      }
+    }
 
     // Иллюстрация
     const imgWrap = document.getElementById('btd-illustration-wrap');
@@ -1082,17 +1725,13 @@
 
     // Проверка, добавлена ли задача уже в черновик Д/З
     if (addToHwBtn) {
-      try {
-        const raw = localStorage.getItem('teacher_hw_draft_tasks');
-        const list = raw ? JSON.parse(raw) : [];
-        if (Array.isArray(list) && list.some(t => (t.bankTaskId && t.bankTaskId === task.id) || t.id === task.id)) {
-          addToHwBtn.textContent = '✓ Уже в Д/З';
-          addToHwBtn.classList.add('added');
-        } else {
-          addToHwBtn.textContent = '➕ В домашнее задание';
-          addToHwBtn.classList.remove('added');
-        }
-      } catch (e) {}
+      if (isTaskInDraft(task.id)) {
+        addToHwBtn.textContent = '✓ Уже в Д/З';
+        addToHwBtn.classList.add('added');
+      } else {
+        addToHwBtn.textContent = '➕ В домашнее задание';
+        addToHwBtn.classList.remove('added');
+      }
     }
 
     // Проверка, решена ли задача ранее
@@ -1140,7 +1779,7 @@
 
     updatePillsStatus();
     setTimeout(() => {
-      if (!task.options) {
+      if (!task.options && !isListView) {
         input.focus();
       }
     }, 60);
@@ -1151,11 +1790,32 @@
     const pillsScroll = document.getElementById('btd-pills-scroll');
     const solvedSet = getSolvedSet();
     let solvedCount = 0;
+    let hwCount = 0;
 
     const html = currentTopic.tasks.map((t, i) => {
+      const isActive = (i === currentTaskIdx);
+      if (studentContext) {
+        const st = getTaskStudentStatus(t.id);
+        const summary = formatTaskStudentSummary(st);
+        let cls = '';
+        let icon = '';
+        if (st && st.hw) {
+          hwCount++;
+          cls = st.hw.solvedInHw ? ' hw-solved' : ' hw-assigned';
+          icon = st.hw.solvedInHw ? '✓ ' : '📌 ';
+        } else if (st && st.selfSolved) {
+          cls = ' self-solved';
+          icon = '💡 ';
+        }
+        return `
+          <button type="button" class="btd-pill${isActive ? ' active' : ''}${cls}" data-task-idx="${i}" role="tab" aria-selected="${isActive}" title="${escapeHtml(summary.tooltip)}">
+            ${icon}${i + 1}
+          </button>
+        `;
+      }
+
       const isSolved = solvedSet.has(t.id);
       if (isSolved) solvedCount++;
-      const isActive = (i === currentTaskIdx);
       return `
         <button type="button" class="btd-pill${isActive ? ' active' : ''}${isSolved ? ' solved' : ''}" data-task-idx="${i}" role="tab" aria-selected="${isActive}">
           ${isSolved ? '✓ ' : ''}${i + 1}
@@ -1172,7 +1832,11 @@
 
     const progEl = document.getElementById('btd-topic-progress');
     if (progEl) {
-      progEl.textContent = `Решено: ${solvedCount} из ${currentTopic.tasks.length}`;
+      if (studentContext) {
+        progEl.textContent = `В ДЗ: ${hwCount} из ${currentTopic.tasks.length}`;
+      } else {
+        progEl.textContent = `Решено: ${solvedCount} из ${currentTopic.tasks.length}`;
+      }
     }
   }
 
@@ -1181,9 +1845,24 @@
     const solvedSet = getSolvedSet();
 
     BankTasksData.topics.forEach(topic => {
+      const totalTasks = topic.tasks ? topic.tasks.length : 0;
       let solvedCount = 0;
+      let inHwCount = 0;
+      let solvedInHwCount = 0;
+      let selfOnlyCount = 0;
+
       topic.tasks.forEach(t => {
-        if (solvedSet.has(t.id)) solvedCount++;
+        if (studentContext) {
+          const st = getTaskStudentStatus(t.id);
+          if (st && st.hw) {
+            inHwCount++;
+            if (st.hw.solvedInHw) solvedInHwCount++;
+          } else if (st && st.selfSolved) {
+            selfOnlyCount++;
+          }
+        } else if (solvedSet.has(t.id)) {
+          solvedCount++;
+        }
       });
 
       const cards = document.querySelectorAll(`[data-card-topic-id="${topic.id}"]`);
@@ -1197,10 +1876,32 @@
             meta.appendChild(badge);
           }
         }
-        if (badge) {
+        if (!badge) return;
+
+        if (studentContext) {
+          badge.style.display = 'inline-flex';
+          if (inHwCount > 0 && inHwCount === totalTasks) {
+            badge.className = 'topic-solved-badge';
+            badge.textContent = `✓ Все в ДЗ (${inHwCount}/${totalTasks})`;
+            badge.title = `Решено в ДЗ: ${solvedInHwCount}`;
+          } else if (inHwCount > 0) {
+            badge.className = 'topic-solved-badge mode-hw-partial';
+            badge.textContent = `📌 В ДЗ: ${inHwCount}/${totalTasks}`;
+            badge.title = `Было в ДЗ: ${inHwCount}, решено в ДЗ: ${solvedInHwCount}${selfOnlyCount ? `, самостоятельно: ${selfOnlyCount}` : ''}`;
+          } else if (selfOnlyCount > 0) {
+            badge.className = 'topic-solved-badge mode-self-solved';
+            badge.textContent = `💡 Сам: ${selfOnlyCount}/${totalTasks}`;
+            badge.title = 'Ученик решал задачи этой темы самостоятельно на сайте';
+          } else {
+            badge.className = 'topic-solved-badge mode-new';
+            badge.textContent = `🆕 Новая тема (0/${totalTasks})`;
+            badge.title = 'Задачи этой темы ещё не задавались ученику';
+          }
+        } else {
+          badge.className = 'topic-solved-badge';
           if (solvedCount > 0) {
             badge.style.display = 'inline-flex';
-            badge.textContent = `✓ ${solvedCount}/${topic.tasks.length}`;
+            badge.textContent = `✓ ${solvedCount}/${totalTasks}`;
           } else {
             badge.style.display = 'none';
           }
@@ -1216,20 +1917,23 @@
     markTaskSolved: markTaskSolved,
     updateTopicCardBadges: updateTopicCardBadges,
     initTaskModal: initTaskModal,
-    convertBankTaskToHomeworkTask: convertBankTaskToHomeworkTask
+    convertBankTaskToHomeworkTask: convertBankTaskToHomeworkTask,
+    getStudentContext: function () { return studentContext; },
+    getTaskStudentStatus: getTaskStudentStatus
   };
 
   // Инициализация при загрузке DOM
   document.addEventListener('DOMContentLoaded', () => {
     initTaskModal();
     updateTopicCardBadges();
+    loadStudentHistoryIfNeeded();
 
     const urlParams = new URLSearchParams(window.location.search);
     const topicParam = urlParams.get('topic');
     const taskParam = urlParams.get('task');
     if (topicParam) {
-      const startIdx = taskParam ? parseInt(taskParam, 10) - 1 : 0;
-      setTimeout(() => openTopicModal(topicParam, isNaN(startIdx) ? 0 : startIdx), 250);
+      const startIdx = taskParam ? parseInt(taskParam, 10) - 1 : undefined;
+      setTimeout(() => openTopicModal(topicParam, (typeof startIdx === 'number' && !isNaN(startIdx)) ? startIdx : undefined), 250);
     }
   });
 

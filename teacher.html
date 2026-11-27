@@ -704,7 +704,7 @@
                                 </div>
                                 <div id="bank-topic-preview-meta" style="margin-top: 0.65rem; font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
                                     <span id="bank-topic-stats-text">Выберите тему для просмотра</span>
-                                    <a href="bank_tasks.html" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 600;">Весь Банк задач ↗</a>
+                                    <a id="link-full-bank-tasks" href="bank_tasks.html" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 600;">Весь Банк задач ↗</a>
                                 </div>
                             </div>
 
@@ -1389,8 +1389,8 @@
     </dialog>
 
     <!-- Модальное окно ручного выбора заданий из Банка задач -->
-    <dialog id="modal-bank-tasks-picker" class="admin-modal">
-        <div class="modal-body" style="max-width: 860px; width: min(860px, 95vw);">
+    <dialog id="modal-bank-tasks-picker" class="admin-modal" style="max-width: 920px;">
+        <div class="modal-body">
             <div class="modal-header">
                 <div>
                     <h3 class="modal-title" id="bank-picker-modal-title">Выбор заданий из Банка задач</h3>

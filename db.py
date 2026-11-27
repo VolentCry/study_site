@@ -16,6 +16,10 @@ from collections import Counter
 from datetime import datetime, timezone, date, timedelta
 from pathlib import Path
 from typing import Optional, Dict, Any, Tuple, List, Set
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    ZoneInfo = None
 from werkzeug.security import generate_password_hash, check_password_hash
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -23,6 +27,56 @@ DB_PATH = BASE_DIR / 'study_site.db'
 
 # Символы для генерации индивидуального кода ученика для родителей (без легко путаемых O/0, I/1/L)
 PARENT_CODE_CHARS = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
+
+STUDENT_LESSONS_JOIN_WHERE = """
+    LEFT JOIN class_members cm ON l.class_id = cm.class_id AND cm.student_id = ?
+    WHERE (l.student_id = ? OR (l.student_id IS NULL AND cm.student_id IS NOT NULL))
+"""
+
+
+def get_app_timezone(tz_offset_minutes: Optional[int] = None):
+    """
+    Возвращает часовой пояс для расчётов локального расписания:
+    1) явный tz_offset_minutes (как JS Date.getTimezoneOffset: минуты к UTC, например -300 для UTC+5);
+    2) переменная окружения APP_TZ_OFFSET_MINUTES или APP_TIMEZONE;
+    3) локальная таймзона хоста или UTC.
+    """
+    if tz_offset_minutes is not None:
+        try:
+            offset_min = int(tz_offset_minutes)
+            if -720 <= offset_min <= 840:
+                return timezone(timedelta(minutes=-offset_min))
+        except (ValueError, TypeError):
+            pass
+
+    env_offset = os.environ.get('APP_TZ_OFFSET_MINUTES')
+    if env_offset is not None and str(env_offset).strip() != '':
+        try:
+            offset_min = int(str(env_offset).strip())
+            if -720 <= offset_min <= 840:
+                return timezone(timedelta(minutes=-offset_min))
+        except ValueError:
+            pass
+
+    env_tz = (os.environ.get('APP_TIMEZONE') or '').strip()
+    if env_tz and ZoneInfo is not None:
+        try:
+            return ZoneInfo(env_tz)
+        except Exception:
+            pass
+
+    local_tz = datetime.now().astimezone().tzinfo
+    return local_tz or timezone.utc
+
+
+def now_app_local(tz_offset_minutes: Optional[int] = None) -> datetime:
+    """Текущее время в часовом поясе пользователя/платформы."""
+    return datetime.now(get_app_timezone(tz_offset_minutes))
+
+
+def now_utc_iso() -> str:
+    """Единый ISO-формат времени в UTC для технических меток БД."""
+    return datetime.now(timezone.utc).isoformat()
 
 
 def generate_parent_code(length: int = 5) -> str:
@@ -1201,30 +1255,38 @@ def get_all_users_for_teacher(
         conn.close()
 
 
-def is_lesson_passed(scheduled_at: Any, is_completed: Any) -> bool:
+def is_lesson_passed(scheduled_at: Any, is_completed: Any, tz_offset_minutes: Optional[int] = None) -> bool:
     """
     Урок считается прошедшим, если:
     1) он отмечен как проведённый (is_completed = 1), ЛИБО
-    2) его запланированные дата и время уже наступили (не в будущем!).
+    2) его запланированные дата и время уже наступили (с учётом часового пояса).
     Уроки в будущем ни при каких условиях не считаются прошедшими.
     """
     if bool(is_completed):
         return True
     if not scheduled_at:
         return False
+    app_now = now_app_local(tz_offset_minutes)
+    app_tz = app_now.tzinfo
     try:
         raw_str = str(scheduled_at).strip().replace(' ', 'T')
         if raw_str.endswith('Z'):
-            raw_str = raw_str[:-1]
-        dt = datetime.fromisoformat(raw_str)
-        now = datetime.now(dt.tzinfo) if dt.tzinfo else datetime.now()
-        return dt <= now
+            dt = datetime.fromisoformat(raw_str[:-1]).replace(tzinfo=timezone.utc)
+        else:
+            dt = datetime.fromisoformat(raw_str)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=app_tz)
+        return dt.astimezone(timezone.utc) <= app_now.astimezone(timezone.utc)
     except Exception:
-        now_str = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        now_str = app_now.strftime('%Y-%m-%dT%H:%M')
         return str(scheduled_at).strip().replace(' ', 'T') <= now_str
 
 
-def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = None) -> Dict[str, Any]:
+def get_student_billing(
+    student_id: int,
+    conn: Optional[sqlite3.Connection] = None,
+    tz_offset_minutes: Optional[int] = None
+) -> Dict[str, Any]:
     """
     Получает информацию об оплате и занятиях ученика:
     - количество прошедших занятий (по расписанию или вручную скорректированное)
@@ -1240,15 +1302,12 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
     try:
         cursor = conn.cursor()
 
-        # 1. Загружаем все занятия, назначенные лично ученику или его классам
+        # 1. Загружаем все занятия, назначенные лично ученику или его текущим классам (единое условие)
         cursor.execute(
-            """
-            SELECT l.id, l.scheduled_at, l.is_completed, l.is_paid
+            f"""
+            SELECT l.id, l.scheduled_at, l.is_completed, l.is_paid, l.student_id
             FROM lessons l
-            WHERE l.student_id = ?
-               OR (l.student_id IS NULL AND l.class_id IN (
-                   SELECT class_id FROM class_members WHERE student_id = ?
-               ))
+            {STUDENT_LESSONS_JOIN_WHERE}
             ORDER BY l.scheduled_at ASC
             """,
             (student_id, student_id)
@@ -1259,7 +1318,7 @@ def get_student_billing(student_id: int, conn: Optional[sqlite3.Connection] = No
         # Будущие (ещё не прошедшие) уроки сюда не попадают и не формируют долг.
         schedule_passed_count = sum(
             1 for r in lesson_rows
-            if is_lesson_passed(r['scheduled_at'], r['is_completed'])
+            if is_lesson_passed(r['scheduled_at'], r['is_completed'], tz_offset_minutes=tz_offset_minutes)
         )
         schedule_paid_count = sum(
             1 for r in lesson_rows
@@ -1356,7 +1415,8 @@ def update_student_billing(
     paid_lessons: int = 0,
     manual_passed_lessons: Optional[int] = None,
     teacher_id: Optional[int] = None,
-    payer: str = 'student'
+    payer: str = 'student',
+    tz_offset_minutes: Optional[int] = None
 ) -> Dict[str, Any]:
     """
     Обновляет настройки биллинга ученика:
@@ -1364,12 +1424,13 @@ def update_student_billing(
     - количество оплаченных уроков
     - при необходимости ручное количество проведённых уроков
     - кто производит оплату ('student' или 'parent')
-    Синхронизирует флаг is_paid для индивидуальных уроков ученика в расписании.
+    Синхронизирует флаг is_paid для индивидуальных уроков ученика в расписании
+    и автоматически выходит из ручного режима, когда числа совпадают с расписанием.
     """
     price = max(0, int(lesson_price)) if lesson_price is not None else 700
     paid = max(0, int(paid_lessons)) if paid_lessons is not None else 0
     passed = max(0, int(manual_passed_lessons)) if manual_passed_lessons is not None else None
-    now_ts = datetime.now().isoformat()
+    now_ts = now_utc_iso()
 
     conn = get_db_connection()
     try:
@@ -1382,39 +1443,57 @@ def update_student_billing(
             has_parent = bool(cursor.fetchone())
             final_payer = 'parent' if (has_parent and str(payer).lower() == 'parent') else 'student'
 
+            # Читаем актуальную картину расписания ученика (единый SQL)
+            cursor.execute(
+                f"""
+                SELECT l.id, l.scheduled_at, l.is_completed, l.is_paid, l.student_id
+                FROM lessons l
+                {STUDENT_LESSONS_JOIN_WHERE}
+                ORDER BY l.scheduled_at ASC
+                """,
+                (student_id, student_id)
+            )
+            all_lessons = cursor.fetchall()
+            schedule_passed_count = sum(
+                1 for r in all_lessons
+                if is_lesson_passed(r['scheduled_at'], r['is_completed'], tz_offset_minutes=tz_offset_minutes)
+            )
+            group_paid_count = sum(1 for r in all_lessons if r['student_id'] is None and bool(r['is_paid']))
+            ind_lessons = [r for r in all_lessons if r['student_id'] == student_id]
+
+            # Синхронизация флага is_paid для индивидуальных уроков ученика с учётом оплаченных групповых
+            ind_paid_target = max(0, paid - group_paid_count)
+            actual_ind_paid = 0
+            for idx, r in enumerate(ind_lessons):
+                should_be_paid = 1 if idx < ind_paid_target else 0
+                if should_be_paid:
+                    actual_ind_paid += 1
+                if int(bool(r['is_paid'])) != should_be_paid:
+                    cursor.execute(
+                        "UPDATE lessons SET is_paid = ? WHERE id = ?",
+                        (should_be_paid, r['id'])
+                    )
+
+            actual_schedule_paid = group_paid_count + actual_ind_paid
+            is_manual_paid_flag = 0 if paid == actual_schedule_paid else 1
+            final_manual_passed = None if (passed is None or passed == schedule_passed_count) else passed
+
             cursor.execute(
                 """
                 INSERT INTO student_billing (student_id, teacher_id, lesson_price, paid_lessons, manual_passed_lessons, is_manual_paid, payer, updated_at)
-                VALUES (?, ?, ?, ?, ?, 1, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(student_id) DO UPDATE SET
                     teacher_id = COALESCE(excluded.teacher_id, student_billing.teacher_id),
                     lesson_price = excluded.lesson_price,
                     paid_lessons = excluded.paid_lessons,
                     manual_passed_lessons = excluded.manual_passed_lessons,
-                    is_manual_paid = 1,
+                    is_manual_paid = excluded.is_manual_paid,
                     payer = excluded.payer,
                     updated_at = excluded.updated_at
                 """,
-                (student_id, teacher_id, price, paid, passed, final_payer, now_ts)
+                (student_id, teacher_id, price, paid, final_manual_passed, is_manual_paid_flag, final_payer, now_ts)
             )
-
-            # Синхронизация флага is_paid для индивидуальных уроков ученика
-            cursor.execute(
-                """
-                SELECT id FROM lessons
-                WHERE student_id = ?
-                ORDER BY scheduled_at ASC
-                """,
-                (student_id,)
-            )
-            ind_lessons = cursor.fetchall()
-            for idx, r in enumerate(ind_lessons):
-                should_be_paid = 1 if idx < paid else 0
-                cursor.execute(
-                    "UPDATE lessons SET is_paid = ? WHERE id = ?",
-                    (should_be_paid, r['id'])
-                )
-        return get_student_billing(student_id)
+        return get_student_billing(student_id, tz_offset_minutes=tz_offset_minutes)
     finally:
         conn.close()
 
@@ -1511,7 +1590,11 @@ def set_teacher_student_alias(
         conn.close()
 
 
-def get_student_dossier(student_id: int, teacher_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+def get_student_dossier(
+    student_id: int,
+    teacher_id: Optional[int] = None,
+    tz_offset_minutes: Optional[int] = None
+) -> Optional[Dict[str, Any]]:
     """
     Получает подробнейшее досье ученика:
     - Персональная информация и уровень
@@ -1716,8 +1799,161 @@ def get_student_dossier(student_id: int, teacher_id: Optional[int] = None) -> Op
             'classes': enrolled_classes,
             'recentTasks': sorted_tasks[:60],  # последние 60 выполненных заданий (внеурочных и домашних)
             'trainerRecords': trainer_records,
-            'billing': get_student_billing(student_id, conn=conn),
+            'billing': get_student_billing(student_id, conn=conn, tz_offset_minutes=tz_offset_minutes),
             'recurringSchedule': get_student_recurring_schedule(teacher_id, student_id, conn=conn) if teacher_id is not None else None
+        }
+    finally:
+        conn.close()
+
+
+def get_student_bank_task_history(
+    student_id: int,
+    teacher_id: Optional[int] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Возвращает компактную историю задач из Банка задач для ученика:
+    - все задачи из назначенных Д/З ученика (включая мягко удалённые is_deleted = 1);
+    - статус выполнения в Д/З (solvedInHw, attemptedInHw);
+    - задачи из Банка, решённые учеником самостоятельно вне Д/З (user_data.metrics_json).
+    Не требует создания новых таблиц или колонок в БД.
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, username, display_name FROM users WHERE id = ?",
+            (student_id,)
+        )
+        student_row = cursor.fetchone()
+        if not student_row:
+            return None
+
+        custom_name = get_teacher_student_alias(teacher_id, student_id, conn=conn) if teacher_id is not None else None
+        display_name = custom_name or student_row['display_name'] or student_row['username']
+
+        cursor.execute(
+            """
+            WITH relevant_hw AS (
+                SELECT id FROM homeworks WHERE student_id = ?
+                UNION
+                SELECT homework_id AS id FROM homework_submissions WHERE student_id = ?
+                UNION
+                SELECT h.id
+                FROM homeworks h
+                JOIN class_members cm ON cm.class_id = h.class_id AND cm.student_id = ?
+                WHERE h.student_id IS NULL
+                  AND (h.is_deleted IS NULL OR h.is_deleted = 0 OR h.created_at >= cm.joined_at)
+            )
+            SELECT h.id, h.title, h.created_at, h.is_deleted, h.tasks_json,
+                   hs.status AS sub_status, hs.answers_json
+            FROM relevant_hw r
+            JOIN homeworks h ON h.id = r.id
+            LEFT JOIN homework_submissions hs ON hs.homework_id = h.id AND hs.student_id = ?
+            WHERE h.tasks_json LIKE '%bank%'
+            ORDER BY h.created_at DESC, h.id DESC
+            """,
+            (student_id, student_id, student_id, student_id)
+        )
+
+        history: Dict[str, Dict[str, Any]] = {}
+        for row in cursor.fetchall():
+            try:
+                tasks = json.loads(row['tasks_json'] or '[]')
+            except Exception:
+                continue
+            if not isinstance(tasks, list):
+                continue
+
+            sub_status = row['sub_status'] or 'not_started'
+            hw_answers: Dict[str, Any] = {}
+            if row['answers_json']:
+                try:
+                    parsed_ans = json.loads(row['answers_json'])
+                    if isinstance(parsed_ans, dict):
+                        hw_answers = parsed_ans
+                except Exception:
+                    hw_answers = {}
+
+            for idx, t in enumerate(tasks):
+                if not isinstance(t, dict):
+                    continue
+                bank_id = t.get('bankTaskId')
+                if not bank_id:
+                    cat = str(t.get('category') or '')
+                    if t.get('source') == 'bank_tasks' or cat.startswith('bank_'):
+                        bank_id = t.get('taskId') or t.get('id')
+                if not bank_id:
+                    continue
+                bank_id_str = str(bank_id).strip()
+                if not bank_id_str:
+                    continue
+
+                ans_rec = None
+                if hw_answers:
+                    for ck in (str(idx), f"task_{idx + 1}", bank_id_str, t.get('taskId'), t.get('id')):
+                        if ck is not None and str(ck) in hw_answers:
+                            ans_rec = hw_answers[str(ck)]
+                            break
+
+                if sub_status == 'waived':
+                    occ_attempted = True
+                    occ_solved = True
+                elif sub_status in ('submitted', 'checked'):
+                    occ_attempted = True
+                    occ_solved = bool(ans_rec.get('isCorrect')) if isinstance(ans_rec, dict) else False
+                else:
+                    occ_attempted = False
+                    occ_solved = False
+
+                entry = history.get(bank_id_str)
+                if not entry:
+                    history[bank_id_str] = {
+                        'inHomework': True,
+                        'solvedInHw': occ_solved,
+                        'attemptedInHw': occ_attempted,
+                        'solvedSelf': False,
+                        'count': 1,
+                        'lastHwId': row['id'],
+                        'lastHwTitle': row['title'] or 'Домашнее задание',
+                        'lastHwDate': row['created_at'],
+                        'lastHwDeleted': bool(row['is_deleted']),
+                        'lastSubStatus': sub_status
+                    }
+                else:
+                    entry['count'] += 1
+                    if occ_solved:
+                        entry['solvedInHw'] = True
+                    if occ_attempted:
+                        entry['attemptedInHw'] = True
+
+        # Также отмечаем задачи из Банка задач, решённые учеником самостоятельно на сайте
+        self_solved_ids: Set[str] = set()
+        cursor.execute("SELECT metrics_json FROM user_data WHERE user_id = ?", (student_id,))
+        ud_row = cursor.fetchone()
+        if ud_row and ud_row['metrics_json']:
+            try:
+                metrics = json.loads(ud_row['metrics_json'])
+            except Exception:
+                metrics = []
+            if isinstance(metrics, list):
+                for m in metrics:
+                    if not isinstance(m, dict) or not m.get('correct'):
+                        continue
+                    tid = str(m.get('taskId') or '').strip()
+                    if not tid or len(tid) > 64 or '/' in tid:
+                        continue
+                    self_solved_ids.add(tid)
+                    if tid in history:
+                        history[tid]['solvedSelf'] = True
+
+        return {
+            'student': {
+                'id': student_row['id'],
+                'username': student_row['username'],
+                'displayName': display_name
+            },
+            'history': history,
+            'selfSolvedIds': sorted(self_solved_ids)
         }
     finally:
         conn.close()
@@ -1991,9 +2227,13 @@ def update_homework(
         conn.close()
 
 
-def waive_homework_submission(homework_id: int, student_id: int) -> Dict[str, Any]:
+def waive_homework_submission(
+    homework_id: int,
+    student_id: int,
+    tz_offset_minutes: Optional[int] = None
+) -> Dict[str, Any]:
     """Отмечает домашнее задание как освобождённое по бусту прокачки «Отказ от Д/З» (100% зачёт)."""
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now_iso = now_utc_iso()
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
@@ -2028,8 +2268,8 @@ def waive_homework_submission(homework_id: int, student_id: int) -> Dict[str, An
                     'maxScore': max_score
                 }
 
-            # Проверка лимита: не более 2 раз в календарный месяц
-            month_prefix = datetime.now(timezone.utc).strftime('%Y-%m')
+            # Проверка лимита: не более 2 раз в календарный месяц (по локальному времени)
+            month_prefix = now_app_local(tz_offset_minutes).strftime('%Y-%m')
             cursor.execute(
                 """
                 SELECT COUNT(*) as cnt FROM homework_submissions
@@ -2353,8 +2593,8 @@ def delete_homework(homework_id: int, teacher_id: Optional[int] = None) -> bool:
 
 
 def save_homework_draft(homework_id: int, student_id: int, answers: Dict[str, Any]) -> Dict[str, Any]:
-    """Сохраняет черновик ответов ученика."""
-    now_iso = datetime.now(timezone.utc).isoformat()
+    """Сохраняет черновик ответов ученика (только пока работа не сдана и не проверена)."""
+    now_iso = now_utc_iso()
     answers_json = json.dumps(answers, ensure_ascii=False)
 
     conn = get_db_connection()
@@ -2362,6 +2602,21 @@ def save_homework_draft(homework_id: int, student_id: int, answers: Dict[str, An
         cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id FROM homeworks WHERE id = ? AND COALESCE(is_deleted, 0) = 0",
+                (homework_id,)
+            )
+            if not cursor.fetchone():
+                return {'success': False, 'error': 'Домашнее задание не найдено.'}
+
+            cursor.execute(
+                "SELECT status FROM homework_submissions WHERE homework_id = ? AND student_id = ?",
+                (homework_id, student_id)
+            )
+            existing = cursor.fetchone()
+            if existing and existing['status'] in ('submitted', 'checked', 'waived'):
+                return {'success': False, 'error': 'Работа уже сдана и заблокирована для редактирования.'}
+
             cursor.execute(
                 """
                 INSERT INTO homework_submissions (homework_id, student_id, status, answers_json, created_at)
@@ -2378,16 +2633,27 @@ def save_homework_draft(homework_id: int, student_id: int, answers: Dict[str, An
 
 
 def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) -> Dict[str, Any]:
-    """Сдача домашнего задания учеником с автоматической сверкой эталонных ответов."""
-    now_iso = datetime.now(timezone.utc).isoformat()
+    """Сдача домашнего задания учеником (однократная сдача без перезаписи уже сданной работы)."""
+    now_iso = now_utc_iso()
 
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT tasks_json FROM homeworks WHERE id = ?", (homework_id,))
+        cursor.execute(
+            "SELECT tasks_json FROM homeworks WHERE id = ? AND COALESCE(is_deleted, 0) = 0",
+            (homework_id,)
+        )
         hw_row = cursor.fetchone()
         if not hw_row:
             raise ValueError("Домашнее задание не найдено.")
+
+        cursor.execute(
+            "SELECT status FROM homework_submissions WHERE homework_id = ? AND student_id = ?",
+            (homework_id, student_id)
+        )
+        existing_sub = cursor.fetchone()
+        if existing_sub and existing_sub['status'] in ('submitted', 'checked', 'waived'):
+            raise ValueError("Домашнее задание уже сдано или проверено и не может быть отправлено повторно.")
 
         tasks = json.loads(hw_row['tasks_json']) if hw_row['tasks_json'] else []
         total_points = len(tasks)
@@ -2581,7 +2847,8 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
 
         cursor = conn.cursor()
         with conn:
-            conn.execute(
+            cur_tx = conn.cursor()
+            cur_tx.execute(
                 """
                 INSERT INTO homework_submissions (
                     homework_id, student_id, status, answers_json, score, max_score, submitted_at, created_at
@@ -2593,9 +2860,12 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
                     score = excluded.score,
                     max_score = excluded.max_score,
                     submitted_at = excluded.submitted_at
+                WHERE status = 'draft'
                 """,
                 (homework_id, student_id, answers_json, computed_score, total_points, now_iso, now_iso)
             )
+            if cur_tx.rowcount == 0:
+                raise ValueError("Домашнее задание уже сдано или проверено и не может быть отправлено повторно.")
 
         return {
             'success': True,
@@ -2968,14 +3238,20 @@ def get_teacher_lessons(teacher_id: int) -> List[Dict[str, Any]]:
         conn.close()
 
 
-def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[str, Any]:
+def get_month_schedule(
+    user_id: int,
+    role: str,
+    year: int,
+    month: int,
+    tz_offset_minutes: Optional[int] = None
+) -> Dict[str, Any]:
     """
     Возвращает расписание занятий и домашних заданий за указанный месяц.
-    Для ученика — по всем его классам.
+    Для ученика — по всем его классам и персональным занятиям.
     Для учителя — по всем группам, которые он ведёт.
     """
     month_prefix = f"{year:04d}-{month:02d}"
-    now_local_prefix = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    now_local_prefix = now_app_local(tz_offset_minutes).strftime('%Y-%m-%dT%H:%M')
 
     conn = get_db_connection()
     try:
@@ -2996,20 +3272,18 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
             )
         else:
             cursor.execute(
-                """
+                f"""
                 SELECT l.*, c.name as class_name, u.display_name as teacher_name,
                        su.display_name as student_name,
                        h.title as homework_title, h.deadline_at as homework_deadline,
                        hs.status as submission_status, hs.score as submission_score, hs.max_score as submission_max_score
                 FROM lessons l
                 JOIN classes c ON l.class_id = c.id
-                JOIN class_members cm ON c.id = cm.class_id
                 JOIN users u ON l.teacher_id = u.id
                 LEFT JOIN users su ON l.student_id = su.id
                 LEFT JOIN homeworks h ON l.homework_id = h.id
                 LEFT JOIN homework_submissions hs ON h.id = hs.homework_id AND hs.student_id = ?
-                WHERE cm.student_id = ?
-                  AND (l.student_id IS NULL OR l.student_id = ?)
+                {STUDENT_LESSONS_JOIN_WHERE}
                   AND l.scheduled_at LIKE ?
                 ORDER BY l.scheduled_at ASC
                 """,
@@ -3114,18 +3388,16 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
             )
         else:
             cursor.execute(
-                """
+                f"""
                 SELECT l.*, c.name as class_name, u.display_name as teacher_name,
                        su.display_name as student_name,
                        h.title as homework_title, h.deadline_at as homework_deadline
                 FROM lessons l
                 JOIN classes c ON l.class_id = c.id
-                JOIN class_members cm ON c.id = cm.class_id
                 JOIN users u ON l.teacher_id = u.id
                 LEFT JOIN users su ON l.student_id = su.id
                 LEFT JOIN homeworks h ON l.homework_id = h.id
-                WHERE cm.student_id = ?
-                  AND (l.student_id IS NULL OR l.student_id = ?)
+                {STUDENT_LESSONS_JOIN_WHERE}
                   AND l.scheduled_at >= ?
                 ORDER BY l.scheduled_at ASC
                 LIMIT 1
@@ -3166,7 +3438,7 @@ def get_month_schedule(user_id: int, role: str, year: int, month: int) -> Dict[s
 
         billing_data = None
         if role not in ('teacher', 'admin'):
-            billing_data = get_student_billing(user_id, conn=conn)
+            billing_data = get_student_billing(user_id, conn=conn, tz_offset_minutes=tz_offset_minutes)
 
         return {
             'year': year,
@@ -3209,24 +3481,69 @@ def toggle_lesson_completed(lesson_id: int, teacher_id: Optional[int] = None, is
 
 
 def toggle_lesson_paid(lesson_id: int, teacher_id: Optional[int] = None, is_paid: Optional[bool] = None) -> bool:
-    """Переключение или установка статуса оплаты занятия в расписании."""
+    """
+    Переключение или установка статуса оплаты занятия в расписании.
+    Синхронизирует ручной счётчик paid_lessons в student_billing для затронутых учеников.
+    """
     conn = get_db_connection()
+    now_ts = now_utc_iso()
     try:
         cursor = conn.cursor()
         with conn:
             cursor = conn.cursor()
-            if is_paid is None:
-                if teacher_id:
-                    cursor.execute("UPDATE lessons SET is_paid = CASE WHEN is_paid = 1 THEN 0 ELSE 1 END WHERE id = ? AND teacher_id = ?", (lesson_id, teacher_id))
-                else:
-                    cursor.execute("UPDATE lessons SET is_paid = CASE WHEN is_paid = 1 THEN 0 ELSE 1 END WHERE id = ?", (lesson_id,))
+            if teacher_id:
+                cursor.execute(
+                    "SELECT id, class_id, student_id, is_paid FROM lessons WHERE id = ? AND teacher_id = ?",
+                    (lesson_id, teacher_id)
+                )
             else:
-                val = 1 if is_paid else 0
-                if teacher_id:
-                    cursor.execute("UPDATE lessons SET is_paid = ? WHERE id = ? AND teacher_id = ?", (val, lesson_id, teacher_id))
+                cursor.execute(
+                    "SELECT id, class_id, student_id, is_paid FROM lessons WHERE id = ?",
+                    (lesson_id,)
+                )
+            row = cursor.fetchone()
+            if not row:
+                return False
+
+            old_paid = 1 if row['is_paid'] else 0
+            new_paid = (1 if is_paid else 0) if is_paid is not None else (0 if old_paid else 1)
+            if new_paid != old_paid:
+                cursor.execute("UPDATE lessons SET is_paid = ? WHERE id = ?", (new_paid, lesson_id))
+                delta = 1 if new_paid == 1 else -1
+
+                if row['student_id'] is not None:
+                    affected_students = [row['student_id']]
                 else:
-                    cursor.execute("UPDATE lessons SET is_paid = ? WHERE id = ?", (val, lesson_id))
-            return cursor.rowcount > 0
+                    cursor.execute("SELECT student_id FROM class_members WHERE class_id = ?", (row['class_id'],))
+                    affected_students = [r['student_id'] for r in cursor.fetchall()]
+
+                for sid in affected_students:
+                    cursor.execute(
+                        "SELECT paid_lessons, is_manual_paid FROM student_billing WHERE student_id = ?",
+                        (sid,)
+                    )
+                    sb = cursor.fetchone()
+                    if sb and sb['is_manual_paid']:
+                        new_manual_paid = max(0, int(sb['paid_lessons'] or 0) + delta)
+                        cursor.execute(
+                            f"""
+                            SELECT l.is_paid
+                            FROM lessons l
+                            {STUDENT_LESSONS_JOIN_WHERE}
+                            """,
+                            (sid, sid)
+                        )
+                        sched_paid = sum(1 for lr in cursor.fetchall() if bool(lr['is_paid']))
+                        new_is_manual = 0 if new_manual_paid == sched_paid else 1
+                        cursor.execute(
+                            """
+                            UPDATE student_billing
+                            SET paid_lessons = ?, is_manual_paid = ?, updated_at = ?
+                            WHERE student_id = ?
+                            """,
+                            (new_manual_paid, new_is_manual, now_ts, sid)
+                        )
+            return True
     finally:
         conn.close()
 
@@ -3843,7 +4160,7 @@ def get_methodical_plan_by_id(plan_id: int) -> Optional[Dict[str, Any]]:
 def create_methodical_plan(teacher_id: int, data: Dict[str, Any]) -> int:
     """Создание нового методического плана."""
     conn = get_db_connection()
-    now_iso = datetime.now().isoformat()
+    now_iso = now_utc_iso()
     try:
         cursor = conn.cursor()
         with conn:
@@ -3896,7 +4213,7 @@ def create_methodical_plan(teacher_id: int, data: Dict[str, Any]) -> int:
 def update_methodical_plan(plan_id: int, teacher_id: int, data: Dict[str, Any], is_admin: bool = False) -> bool:
     """Обновление существующего методического плана."""
     conn = get_db_connection()
-    now_iso = datetime.now().isoformat()
+    now_iso = now_utc_iso()
     try:
         cursor = conn.cursor()
         with conn:
@@ -3963,7 +4280,7 @@ def update_methodical_plan(plan_id: int, teacher_id: int, data: Dict[str, Any], 
 def attach_student_to_methodical_plan(plan_id: int, teacher_id: int, student_id: int, student_name: str, copy_as_new: bool = False, is_admin: bool = False) -> Optional[int]:
     """Привязка ученика к существующему плану или создание персональной копии."""
     conn = get_db_connection()
-    now_iso = datetime.now().isoformat()
+    now_iso = now_utc_iso()
     try:
         cursor = conn.cursor()
         with conn:
@@ -4025,7 +4342,7 @@ def attach_student_to_methodical_plan(plan_id: int, teacher_id: int, student_id:
 def toggle_methodical_lesson(plan_id: int, month: str, lesson_index: int, is_conducted: bool, user_id: int, is_teacher: bool) -> bool:
     """Быстрое переключение статуса проведения урока в методическом плане."""
     conn = get_db_connection()
-    now_iso = datetime.now().isoformat()
+    now_iso = now_utc_iso()
     try:
         cursor = conn.cursor()
         with conn:
@@ -4256,7 +4573,11 @@ def get_linked_students_for_parent(parent_id: int) -> List[Dict[str, Any]]:
         conn.close()
 
 
-def get_parent_dashboard_data(parent_id: int, student_id: Optional[int] = None) -> Dict[str, Any]:
+def get_parent_dashboard_data(
+    parent_id: int,
+    student_id: Optional[int] = None,
+    tz_offset_minutes: Optional[int] = None
+) -> Dict[str, Any]:
     """
     Формирует полный набор данных для кабинета родителя:
     - Привязанные ученики и текущий выбранный ребёнок
@@ -4301,16 +4622,14 @@ def get_parent_dashboard_data(parent_id: int, student_id: Optional[int] = None) 
     try:
         cursor = conn.cursor()
         cursor.execute(
-            """
+            f"""
             SELECT l.*, c.name as class_name, u.display_name as teacher_name,
                    h.title as homework_title, h.deadline_at as homework_deadline
             FROM lessons l
             JOIN classes c ON l.class_id = c.id
-            JOIN class_members cm ON c.id = cm.class_id
             JOIN users u ON l.teacher_id = u.id
             LEFT JOIN homeworks h ON l.homework_id = h.id
-            WHERE cm.student_id = ?
-              AND (l.student_id IS NULL OR l.student_id = ?)
+            {STUDENT_LESSONS_JOIN_WHERE}
             ORDER BY l.scheduled_at DESC
             """,
             (sid, sid)
@@ -4350,7 +4669,7 @@ def get_parent_dashboard_data(parent_id: int, student_id: Optional[int] = None) 
     plans_list = get_methodical_plans(student_id=sid)
 
     # 4. Биллинг и финансовые расчёты
-    billing_data = get_student_billing(sid)
+    billing_data = get_student_billing(sid, tz_offset_minutes=tz_offset_minutes)
 
     return {
         'linked': True,

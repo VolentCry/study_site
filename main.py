@@ -59,6 +59,20 @@ def is_safe_path(target_path: Path) -> bool:
         return False
 
 
+def parse_tz_offset():
+    """Читает смещение часового пояса клиента в минутах (JS Date.getTimezoneOffset) из query или заголовка."""
+    raw = request.args.get('tzOffset') or request.headers.get('X-TZ-Offset')
+    if raw is None or str(raw).strip() == '':
+        return None
+    try:
+        val = int(str(raw).strip())
+        if -720 <= val <= 840:
+            return val
+    except (ValueError, TypeError):
+        pass
+    return None
+
+
 def check_teacher_auth():
     """Проверяет авторизацию учителя. Возвращает (teacher_user, None) или (None, (json_response, status_code))."""
     user_id = session.get('user_id')
@@ -506,10 +520,23 @@ def api_teacher_student_dossier(student_id: int):
     if err:
         return err
 
-    dossier = db.get_student_dossier(student_id, teacher_id=teacher['id'])
+    dossier = db.get_student_dossier(student_id, teacher_id=teacher['id'], tz_offset_minutes=parse_tz_offset())
     if not dossier:
         return jsonify({'success': False, 'error': 'Ученик не найден.'}), 404
     return jsonify({'success': True, 'dossier': dossier})
+
+
+@app.route('/api/teacher/students/<int:student_id>/bank-history', methods=['GET'])
+def api_teacher_student_bank_history(student_id: int):
+    """История задач из Банка задач по всем Д/З ученика (включая удалённые) и самостоятельным решениям."""
+    teacher, err = check_teacher_auth()
+    if err:
+        return err
+
+    data = db.get_student_bank_task_history(student_id, teacher_id=teacher['id'])
+    if not data:
+        return jsonify({'success': False, 'error': 'Ученик не найден.'}), 404
+    return jsonify({'success': True, **data})
 
 
 @app.route('/api/teacher/students/<int:student_id>/display-name', methods=['POST', 'PUT'])
@@ -663,13 +690,20 @@ def api_teacher_update_student_billing(student_id: int):
     payer_raw = data.get('payer', 'student')
     payer = 'parent' if str(payer_raw).strip().lower() == 'parent' else 'student'
 
+    tz_offset = data.get('tzOffset')
+    try:
+        tz_offset = int(tz_offset) if tz_offset is not None else parse_tz_offset()
+    except (ValueError, TypeError):
+        tz_offset = parse_tz_offset()
+
     billing = db.update_student_billing(
         student_id=student_id,
         lesson_price=price,
         paid_lessons=paid,
         manual_passed_lessons=passed,
         teacher_id=teacher['id'],
-        payer=payer
+        payer=payer,
+        tz_offset_minutes=tz_offset
     )
     return jsonify({'success': True, 'billing': billing})
 
@@ -685,7 +719,7 @@ def api_student_billing():
     if not user:
         return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 404
 
-    billing = db.get_student_billing(user_id)
+    billing = db.get_student_billing(user_id, tz_offset_minutes=parse_tz_offset())
     return jsonify({'success': True, 'billing': billing})
 
 
@@ -726,7 +760,8 @@ def api_get_month_schedule():
     if not user:
         return jsonify({'success': False, 'error': 'Пользователь не найден.'}), 404
 
-    now = datetime.now()
+    tz_offset = parse_tz_offset()
+    now = db.now_app_local(tz_offset)
     try:
         year = int(request.args.get('year', now.year))
         month = int(request.args.get('month', now.month))
@@ -736,7 +771,7 @@ def api_get_month_schedule():
         year = now.year
         month = now.month
 
-    schedule_data = db.get_month_schedule(user['id'], user['role'], year, month)
+    schedule_data = db.get_month_schedule(user['id'], user['role'], year, month, tz_offset_minutes=tz_offset)
     return jsonify({'success': True, 'schedule': schedule_data})
 
 
@@ -955,7 +990,7 @@ def api_parent_dashboard():
     sid_arg = request.args.get('studentId') or request.args.get('student_id')
     student_id = int(sid_arg) if sid_arg and str(sid_arg).isdigit() else None
 
-    dashboard = db.get_parent_dashboard_data(parent['id'], student_id=student_id)
+    dashboard = db.get_parent_dashboard_data(parent['id'], student_id=student_id, tz_offset_minutes=parse_tz_offset())
     return jsonify({'success': True, 'dashboard': dashboard})
 
 
@@ -1384,7 +1419,7 @@ def api_student_waive_homework(homework_id: int):
         return jsonify({'success': False, 'error': 'Требуется авторизация.'}), 401
 
     try:
-        res = db.waive_homework_submission(homework_id, user_id)
+        res = db.waive_homework_submission(homework_id, user_id, tz_offset_minutes=parse_tz_offset())
         return jsonify({'success': True, 'submission': res})
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400

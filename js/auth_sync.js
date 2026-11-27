@@ -1608,10 +1608,24 @@
                             <span>🎓 Панель учителя</span>
                         </a>
                         ` : ''}
+                        <button type="button" class="auth-dropdown-item auth-dropdown-theme-btn">
+                            <span>${StudyTheme.get() === 'dark' ? '☀️ Светлая тема' : '🌙 Тёмная тема'}</span>
+                        </button>
                         <button type="button" class="auth-dropdown-item auth-dropdown-logout-btn">
                             <span>🚪 Выйти из аккаунта</span>
                         </button>
                     `;
+
+                    const themeSwitchBtn = dropdown.querySelector('.auth-dropdown-theme-btn');
+                    if (themeSwitchBtn) {
+                        themeSwitchBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const nextTh = StudyTheme.toggle(true);
+                            const span = themeSwitchBtn.querySelector('span');
+                            if (span) span.textContent = nextTh === 'dark' ? '☀️ Светлая тема' : '🌙 Тёмная тема';
+                        });
+                    }
 
                     const logoutBtn = dropdown.querySelector('.auth-dropdown-logout-btn');
                     if (logoutBtn) {

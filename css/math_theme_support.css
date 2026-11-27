@@ -1,0 +1,61 @@
+/* Единая поддержка тёмной темы для математических разделов и тренажёров (синхронизируется через StudyTheme / data-theme) */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0c1018;
+  --paper-light: #131926;
+  --paper-card: #171f2e;
+  --ink: #f1f5f9;
+  --muted: #94a3b8;
+  --indigo: #60a5fa;
+  --indigo-soft: rgba(96, 165, 250, 0.14);
+  --indigo-dark: #e2e8f0;
+  --vermilion: #f87171;
+  --vermilion-light: rgba(248, 113, 113, 0.14);
+  --vermilion-border: rgba(248, 113, 113, 0.3);
+  --gold: #fbbf24;
+  --gold-light: rgba(251, 191, 36, 0.14);
+  --green: #34d399;
+  --green-light: rgba(52, 211, 153, 0.14);
+  --line: rgba(255, 255, 255, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] body {
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .site-nav,
+html[data-theme="dark"] header.site-nav {
+  background: rgba(12, 16, 24, 0.92);
+  border-bottom-color: var(--line);
+}
+
+html[data-theme="dark"] .brand-mark {
+  background: var(--paper-light);
+}
+
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .trainer-card,
+html[data-theme="dark"] .task-card,
+html[data-theme="dark"] .theory-card,
+html[data-theme="dark"] .roadmap-card,
+html[data-theme="dark"] .marathon-card,
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .topic-card,
+html[data-theme="dark"] .lesson-card {
+  background: var(--paper-card);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="number"],
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background: var(--paper-light);
+  color: var(--ink);
+  border-color: var(--line);
+}
