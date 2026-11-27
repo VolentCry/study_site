@@ -354,7 +354,7 @@
       acceptedAnswers: Array.from(accepted),
       options: allOptions,
       correctOptionIndex: allOptions.findIndex(o => o.isCorrect),
-      solutionSteps: cfg.solutionSteps,
+      solutionSteps: (cfg.solutionSteps || []).map(s => String(s).replace(/^\s*\d+\.\s+/, '')),
       hint: cfg.hint,
       meta: cfg.meta
     };

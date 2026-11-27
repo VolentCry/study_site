@@ -146,7 +146,12 @@
         if (/<(?:br|code|pre|ul|ol|li|table|tr|td|th|h[1-6]|p|blockquote|strong)\b/i.test(str)) {
             return true;
         }
-        // 2. Длинный русский текст (2 и более русских слова рядом, исключая слово "при")
+        // 2. Встроенные формулы $...$ вперемешку с текстом (например, "Находим $\angle C = ...$.")
+        const trimmed = String(str).trim();
+        if (/\$[^$\n]+\$/.test(trimmed) && !(/^\$[^$]+\$$/.test(trimmed) || /^\$\$[\s\S]+\$\$$/.test(trimmed))) {
+            return true;
+        }
+        // 3. Длинный русский текст (2 и более русских слова рядом, исключая слово "при")
         const withoutTags = str.replace(/<[^>]+>/g, ' ').replace(/\bпри\b/gi, ' ');
         if (/[а-яё]{2,}\s+[а-яё]{2,}/i.test(withoutTags)) {
             return true;
