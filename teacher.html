@@ -441,36 +441,56 @@
                             <h3 class="constructor-section-title">2. Добавить задачи из тренажёров</h3>
                             <div class="generator-subcard">
                                 <div class="generator-subcard-title">⚡ Автогенерация задач</div>
+                                <div class="form-row-2col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="gen-filter-subject">Предмет</label>
+                                        <select id="gen-filter-subject" class="form-select">
+                                            <option value="all">Все предметы</option>
+                                            <option value="math">Математика</option>
+                                            <option value="inf">Информатика</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="gen-filter-grade">Класс / Экзамен</label>
+                                        <select id="gen-filter-grade" class="form-select">
+                                            <option value="all">Все классы</option>
+                                            <option value="5">5 класс</option>
+                                            <option value="7">7 класс</option>
+                                            <option value="oge">9 класс (ОГЭ)</option>
+                                            <option value="base">Базовая арифметика</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group">
-                                    <label class="form-label">Тип тренажёра</label>
+                                    <label class="form-label" for="gen-trainer-type">Тип тренажёра <span id="gen-trainer-count" style="font-weight: 500; color: var(--muted); text-transform: none; letter-spacing: 0;"></span></label>
                                     <select id="gen-trainer-type" class="form-select">
-                                        <optgroup label="ОГЭ Математика Задание №6 (Дроби и вычисления)">
+                                        <optgroup label="ОГЭ Математика Задание №6 (Дроби и вычисления)" data-subject="math" data-grade="oge">
                                             <option value="oge6_all">ОГЭ №6 · Все прототипы вперемешку</option>
                                             <option value="oge6_common">ОГЭ №6 · Обыкновенные дроби</option>
                                             <option value="oge6_decimal">ОГЭ №6 · Десятичные дроби</option>
                                             <option value="oge6_multistory">ОГЭ №6 · Многоэтажные дроби</option>
                                             <option value="oge6_powers">ОГЭ №6 · Степени 10 и стандартный вид</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №7 (Координатная прямая и неравенства)">
+                                        <optgroup label="ОГЭ Математика Задание №7 (Координатная прямая и неравенства)" data-subject="math" data-grade="oge">
                                             <option value="oge7_all">ОГЭ №7 · Все прототипы задания 7</option>
                                             <option value="oge7_roots">ОГЭ №7 · Квадратные корни на прямой</option>
                                             <option value="oge7_fractions">ОГЭ №7 · Дроби и числовые отрезки</option>
                                             <option value="oge7_variables">ОГЭ №7 · Неравенства с переменными (x, y)</option>
                                             <option value="oge7_differences">ОГЭ №7 · Сравнение разностей</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №8 (Числа, корни и степени)">
+                                        <optgroup label="ОГЭ Математика Задание №8 (Числа, корни и степени)" data-subject="math" data-grade="oge">
                                             <option value="oge8_all">ОГЭ №8 · Все типы корней и степеней</option>
                                             <option value="oge8_roots">ОГЭ №8 · Квадратные корни</option>
                                             <option value="oge8_powers">ОГЭ №8 · Свойства степеней с целым показателем</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №9 (Уравнения)">
+                                        <optgroup label="ОГЭ Математика Задание №9 (Уравнения)" data-subject="math" data-grade="oge">
                                             <option value="oge9_all">ОГЭ №9 · Все прототипы уравнений</option>
                                             <option value="oge9_linear">ОГЭ №9 · Линейные уравнения</option>
                                             <option value="oge9_quadratic">ОГЭ №9 · Квадратные уравнения</option>
                                             <option value="oge9_rational">ОГЭ №9 · Дробно-рациональные уравнения</option>
                                             <option value="oge9_systems">ОГЭ №9 · Системы уравнений</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №10 (Теория вероятностей)">
+                                        <optgroup label="ОГЭ Математика Задание №10 (Теория вероятностей)" data-subject="math" data-grade="oge">
                                             <option value="oge10_all">ОГЭ №10 · Все прототипы вероятностей</option>
                                             <option value="oge10_classic">ОГЭ №10 · Пирожки и тарелки</option>
                                             <option value="oge10_athletes">ОГЭ №10 · Жеребьёвка участников</option>
@@ -479,7 +499,7 @@
                                             <option value="oge10_quality">ОГЭ №10 · Контроль качества (брак)</option>
                                             <option value="oge10_dice">ОГЭ №10 · Кости и монеты</option>
                                         </optgroup>
-                                                                                <optgroup label="ОГЭ Математика Задание №11 (Графики функций · Часть 1 · 1 балл)">
+                                        <optgroup label="ОГЭ Математика Задание №11 (Графики функций · Часть 1 · 1 балл)" data-subject="math" data-grade="oge">
                                             <option value="oge11_all">ОГЭ №11 · Все типы задания №11 (Графики функций)</option>
                                             <option value="oge11_parabolas">ОГЭ №11 · Параболы (знаки a, c, вершины, формулы)</option>
                                             <option value="oge11_linear">ОГЭ №11 · Прямые (знаки k, b, наклон, пересечение с Oy)</option>
@@ -487,14 +507,14 @@
                                             <option value="oge11_mixed_types">ОГЭ №11 · Разные функции (прямая, парабола, гипербола)</option>
                                             <option value="oge11_find_value">ОГЭ №11 · Поиск коэффициентов и значений по графику</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №13 (Неравенства и системы · Часть 1 · 1 балл)">
+                                        <optgroup label="ОГЭ Математика Задание №13 (Неравенства и системы · Часть 1 · 1 балл)" data-subject="math" data-grade="oge">
                                             <option value="oge13_all">ОГЭ №13 · Все типы задания №13 (Неравенства)</option>
                                             <option value="oge13_linear">ОГЭ №13 · Линейные неравенства (числовая прямая, скобки)</option>
                                             <option value="oge13_systems">ОГЭ №13 · Системы неравенств (пересечение решений)</option>
                                             <option value="oge13_quadratic">ОГЭ №13 · Квадратные неравенства (метод интервалов/параболы)</option>
                                             <option value="oge13_special">ОГЭ №13 · Без решений / любое x</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №18 (Геометрия на клетках)">
+                                        <optgroup label="ОГЭ Математика Задание №18 (Геометрия на клетках)" data-subject="math" data-grade="oge">
                                             <option value="oge18_all">ОГЭ №18 · Все типы геометрии</option>
                                             <option value="oge18_triangle">ОГЭ №18 · Площадь треугольника</option>
                                             <option value="oge18_trapezoid">ОГЭ №18 · Площадь трапеции</option>
@@ -503,13 +523,13 @@
                                             <option value="oge18_midline">ОГЭ №18 · Средняя линия</option>
                                             <option value="oge18_distance">ОГЭ №18 · Расстояние от точки до прямой</option>
                                         </optgroup>
-                                        <optgroup label="ОГЭ Математика Задание №20 (Уравнения, неравенства, системы · Часть 2 · 2 балла)">
+                                        <optgroup label="ОГЭ Математика Задание №20 (Уравнения, неравенства, системы · Часть 2 · 2 балла)" data-subject="math" data-grade="oge">
                                             <option value="oge20_all">ОГЭ №20 · Все типы задания №20 (Часть 2)</option>
                                             <option value="oge20_equations">ОГЭ №20 · Уравнения (3–4 ст., биквадратные, ОДЗ)</option>
                                             <option value="oge20_inequalities">ОГЭ №20 · Неравенства (дробно-рациональные, метод интервалов)</option>
                                             <option value="oge20_systems">ОГЭ №20 · Системы уравнений (нелинейные, симметричные)</option>
                                         </optgroup>
-                                        <optgroup label="Математика 5 класс (Сложные вычисления и дроби)">
+                                        <optgroup label="Математика 5 класс (Сложные вычисления и дроби)" data-subject="math" data-grade="5">
                                             <option value="complex_fractions_all">Сложные вычисления (Дроби) · Все прототипы</option>
                                             <option value="complex_fractions_brackets">Сложные вычисления (Дроби) · Смешанные дроби в скобках</option>
                                             <option value="complex_fractions_multistory">Сложные вычисления (Дроби) · Многоэтажные дроби с десятичными</option>
@@ -521,14 +541,14 @@
                                             <option value="complex_fractions_powers_base10">Сложные вычисления (Дроби, степени) · Степени 10</option>
                                             <option value="complex_fractions_powers_distributive">Сложные вычисления (Дроби, степени) · Группировка со степенями</option>
                                         </optgroup>
-                                        <optgroup label="Математика 5 класс (Сравнение дробей)">
+                                        <optgroup label="Математика 5 класс (Сравнение дробей)" data-subject="math" data-grade="5">
                                             <option value="fractions_compare_all">Сравнение дробей · Все прототипы (&lt;, &gt;, =)</option>
                                             <option value="fractions_compare_same_denom">Сравнение дробей · Одинаковые знаменатели</option>
                                             <option value="fractions_compare_same_num">Сравнение дробей · Одинаковые числители</option>
                                             <option value="fractions_compare_diff_denom">Сравнение дробей · Разные знаменатели (через НОЗ)</option>
                                             <option value="fractions_compare_mixed">Сравнение дробей · Смешанные числа и сравнение с 1</option>
                                         </optgroup>
-                                        <optgroup label="Математика 5 класс (Степени чисел)">
+                                        <optgroup label="Математика 5 класс (Степени чисел)" data-subject="math" data-grade="5">
                                             <option value="powers_all">Степени · Все прототипы вперемешку</option>
                                             <option value="powers_calculate">Степени · Возведение числа в степень</option>
                                             <option value="powers_equations">Степени · Уравнения со степенями</option>
@@ -536,7 +556,7 @@
                                             <option value="powers_ten">Степени · Степени 10 (4,6 × 10⁴, 34 × 10³)</option>
                                             <option value="powers_compare_all">Степени · Сравнение выражений со степенями (&lt;, &gt;, =)</option>
                                         </optgroup>
-                                        <optgroup label="Математика 5 класс (Признаки делимости чисел)">
+                                        <optgroup label="Математика 5 класс (Признаки делимости чисел)" data-subject="math" data-grade="5">
                                             <option value="divisibility_all">Проверка делимости · Все признаки (2, 3, 4, 5, 7, 9, 10)</option>
                                             <option value="divisibility_2">Проверка делимости · Признак делимости на 2</option>
                                             <option value="divisibility_3">Проверка делимости · Признак делимости на 3</option>
@@ -546,13 +566,13 @@
                                             <option value="divisibility_9">Проверка делимости · Признак делимости на 9</option>
                                             <option value="divisibility_10">Проверка делимости · Признак делимости на 10</option>
                                         </optgroup>
-                                        <optgroup label="Математика 5 класс (Выделение целой части в дробях — слож.)">
+                                        <optgroup label="Математика 5 класс (Выделение целой части в дробях — слож.)" data-subject="math" data-grade="5">
                                             <option value="extract_whole_adv_all">Выделение целой части (слож.) · Все прототипы (3–4 знака)</option>
                                             <option value="extract_whole_adv_full">Выделение целой части (слож.) · Смешанное число и перевод в десятичную</option>
                                             <option value="extract_whole_adv_decimal">Выделение целой части (слож.) · Перевод неправильной дроби в десятичную</option>
                                             <option value="extract_whole_adv_only">Выделение целой части (слож.) · Только смешанное число</option>
                                         </optgroup>
-                                        <optgroup label="Математика 7 класс (Одночлены)">
+                                        <optgroup label="Математика 7 класс (Одночлены)" data-subject="math" data-grade="7">
                                             <option value="monomials_all">Одночлены · Все действия (Микс)</option>
                                             <option value="monomials_addition">Одночлены · Сложение подобных слагаемых</option>
                                             <option value="monomials_subtraction">Одночлены · Вычитание одночленов</option>
@@ -560,7 +580,7 @@
                                             <option value="monomials_division">Одночлены · Деление одночленов</option>
                                             <option value="monomials_power">Одночлены · Возведение в степень</option>
                                         </optgroup>
-                                        <optgroup label="Математика 7 класс (Многочлены)">
+                                        <optgroup label="Математика 7 класс (Многочлены)" data-subject="math" data-grade="7">
                                             <option value="polynomials_all">Многочлены · Все действия (Микс)</option>
                                             <option value="polynomials_similar">Многочлены · Приведение подобных слагаемых</option>
                                             <option value="polynomials_addition">Многочлены · Сложение многочленов</option>
@@ -569,14 +589,14 @@
                                             <option value="polynomials_mult_polynomial">Многочлены · Умножение многочлена на многочлен</option>
                                             <option value="polynomials_factoring">Многочлены · Вынесение общего множителя</option>
                                         </optgroup>
-                                        <optgroup label="Математика 7 класс (Линейная функция)">
+                                        <optgroup label="Математика 7 класс (Линейная функция)" data-subject="math" data-grade="7">
                                             <option value="linear_all">Линейная функция · Все типы (Микс)</option>
                                             <option value="linear_value">Линейная функция · Значение функции и аргумента</option>
                                             <option value="linear_domain">Линейная функция · Область определения функции</option>
                                             <option value="linear_axes">Линейная функция · Пересечение с осями Ox и Oy</option>
                                             <option value="linear_intersection">Линейная функция · Пересечение графиков двух функций</option>
                                         </optgroup>
-                                        <optgroup label="💻 ОГЭ Информатика · Задания №1–10 (Часть 1)">
+                                        <optgroup label="💻 ОГЭ Информатика · Задания №1–10 (Часть 1)" data-subject="inf" data-grade="oge">
                                             <option value="inf_oge1_all">Инф. ОГЭ №1 · Объём информации и кодировки</option>
                                             <option value="inf_oge2_all">Инф. ОГЭ №2 · Кодирование и декодирование</option>
                                             <option value="inf_oge3_all">Инф. ОГЭ №3 · Значение логического выражения</option>
@@ -588,7 +608,7 @@
                                             <option value="inf_oge9_all">Инф. ОГЭ №9 · Подсчёт путей в графе</option>
                                             <option value="inf_oge10_all">Инф. ОГЭ №10 · Системы счисления (2, 8, 10, 16)</option>
                                         </optgroup>
-                                        <optgroup label="Устный счёт и базовая арифметика">
+                                        <optgroup label="Устный счёт и базовая арифметика" data-subject="math" data-grade="base">
                                             <option value="mult_table">Таблица умножения (2–9)</option>
                                             <option value="mult_2digit">Умножение двузначных на однозначные</option>
                                         </optgroup>

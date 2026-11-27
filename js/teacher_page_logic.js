@@ -2699,6 +2699,93 @@
     const hwInputDeadline = document.getElementById('hw-input-deadline');
     const hwInputDesc = document.getElementById('hw-input-desc');
     const genTrainerType = document.getElementById('gen-trainer-type');
+    const genFilterSubject = document.getElementById('gen-filter-subject');
+    const genFilterGrade = document.getElementById('gen-filter-grade');
+    const genTrainerCount = document.getElementById('gen-trainer-count');
+
+    if (genTrainerType && genFilterSubject && genFilterGrade) {
+        const allTrainerOptgroups = Array.from(genTrainerType.querySelectorAll('optgroup'))
+            .map(og => og.cloneNode(true));
+
+        const gradeLabels = {
+            '5': '5 класс',
+            '7': '7 класс',
+            'oge': '9 класс (ОГЭ)',
+            'base': 'Базовая арифметика'
+        };
+
+        function updateGradeFilterOptions() {
+            const subject = genFilterSubject.value;
+            const prevGrade = genFilterGrade.value;
+            const availableGrades = [];
+
+            allTrainerOptgroups.forEach(og => {
+                if (subject !== 'all' && og.dataset.subject !== subject) return;
+                const g = og.dataset.grade;
+                if (g && !availableGrades.includes(g)) {
+                    availableGrades.push(g);
+                }
+            });
+
+            const order = ['5', '7', 'oge', 'base'];
+            availableGrades.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+            genFilterGrade.innerHTML = '<option value="all">Все классы</option>' +
+                availableGrades.map(g => `<option value="${g}">${gradeLabels[g] || g}</option>`).join('');
+
+            if (prevGrade !== 'all' && availableGrades.includes(prevGrade)) {
+                genFilterGrade.value = prevGrade;
+            } else {
+                genFilterGrade.value = 'all';
+            }
+        }
+
+        function filterTrainerOptions() {
+            const subject = genFilterSubject.value;
+            const grade = genFilterGrade.value;
+            const prevValue = genTrainerType.value;
+
+            const matchingGroups = allTrainerOptgroups.filter(og => {
+                const matchSubject = subject === 'all' || og.dataset.subject === subject;
+                const matchGrade = grade === 'all' || og.dataset.grade === grade;
+                return matchSubject && matchGrade;
+            });
+
+            genTrainerType.innerHTML = '';
+            let optionCount = 0;
+            let hasPrevValue = false;
+
+            matchingGroups.forEach(og => {
+                const cloned = og.cloneNode(true);
+                const opts = cloned.querySelectorAll('option');
+                optionCount += opts.length;
+                opts.forEach(opt => {
+                    if (opt.value === prevValue) hasPrevValue = true;
+                });
+                genTrainerType.appendChild(cloned);
+            });
+
+            if (hasPrevValue) {
+                genTrainerType.value = prevValue;
+            } else if (genTrainerType.options.length > 0) {
+                genTrainerType.selectedIndex = 0;
+            }
+
+            if (genTrainerCount) {
+                genTrainerCount.textContent = `(доступно: ${optionCount})`;
+            }
+        }
+
+        genFilterSubject.addEventListener('change', () => {
+            updateGradeFilterOptions();
+            filterTrainerOptions();
+        });
+
+        genFilterGrade.addEventListener('change', filterTrainerOptions);
+
+        updateGradeFilterOptions();
+        filterTrainerOptions();
+    }
     const genTasksCount = document.getElementById('gen-tasks-count');
     const btnGenerateTasks = document.getElementById('btn-generate-tasks');
     const draftTasksList = document.getElementById('draft-tasks-list');
