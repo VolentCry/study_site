@@ -216,15 +216,25 @@
     const correctInOrder = items.filter(it => it.isDivisible).map(it => it.value);
     const correctSorted = correctInOrder.slice().sort((a, b) => a - b);
 
+    function getPermutations(arr) {
+      if (arr.length <= 1) return [arr];
+      const res = [];
+      for (let i = 0; i < arr.length; i++) {
+        const rest = arr.slice(0, i).concat(arr.slice(i + 1));
+        for (const perm of getPermutations(rest)) {
+          res.push([arr[i]].concat(perm));
+        }
+      }
+      return res;
+    }
+
     const canonical = correctSorted.join(', ');
-    const acceptedSet = new Set([
-      canonical,
-      correctSorted.join(','),
-      correctSorted.join(' '),
-      correctInOrder.join(', '),
-      correctInOrder.join(','),
-      correctInOrder.join(' ')
-    ]);
+    const acceptedSet = new Set();
+    getPermutations(correctSorted).forEach(perm => {
+      acceptedSet.add(perm.join(', '));
+      acceptedSet.add(perm.join(' '));
+      acceptedSet.add(perm.join('; '));
+    });
 
     const breakdownSteps = items.map(it => {
       const mark = it.isDivisible ? '✅' : '❌';
@@ -238,7 +248,7 @@
       category: 'divisibility',
       catName: `Выбор делящихся чисел (на ${divisor})`,
       prompt: `Какие из данных чисел делятся на ${divisor}? Выберите их:`,
-      questionHtml: `<div class="math-expr">Какие из данных чисел делятся на <strong>${divisor}</strong>? Выберите их:<br><div style="margin-top:10px; font-size:1.05em; letter-spacing:0.02em;">${selectNumbers.map(n => `<span style="display:inline-block; padding:4px 10px; margin:3px 4px; border:1px solid rgba(38,63,97,0.22); border-radius:8px; background:rgba(38,63,97,0.05); font-weight:700;">${formatNumber(n)}</span>`).join('')}</div></div>`,
+      questionHtml: `<div class="math-expr">Какие из данных чисел делятся на <strong>${divisor}</strong>? Выберите их:<br><div style="margin-top:10px; font-size:1.05em; letter-spacing:0.02em;">${selectNumbers.map(n => `<span style="display:inline-block; padding:4px 10px; margin:3px 4px; border:1px solid rgba(38,63,97,0.22); border-radius:8px; background:rgba(38,63,97,0.05); font-weight:700;">${formatNumber(n)}</span>`).join('')}</div><div style="margin-top:6px;"><span style="font-size:0.85em; color:var(--muted); font-weight:500;">(Ответ запишите через запятую в любом порядке)</span></div></div>`,
       answer: canonical,
       displayAnswer: canonical,
       acceptedAnswers: Array.from(acceptedSet),
