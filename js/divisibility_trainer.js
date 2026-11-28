@@ -166,7 +166,93 @@
     };
   }
 
+  function generateSelectTask(category) {
+    let divisor;
+    const stripped = String(category || '').replace('divisibility_select_', '').replace('divisibility_select', '');
+    if (!stripped || stripped === 'all') {
+      divisor = ALLOWED_DIVISORS[Math.floor(Math.random() * ALLOWED_DIVISORS.length)];
+    } else {
+      const parsed = parseInt(stripped, 10);
+      divisor = ALLOWED_DIVISORS.includes(parsed)
+        ? parsed
+        : ALLOWED_DIVISORS[Math.floor(Math.random() * ALLOWED_DIVISORS.length)];
+    }
+
+    const countChoices = [1, 2, 2, 3, 3, 4];
+    const divisibleCount = countChoices[Math.floor(Math.random() * countChoices.length)];
+    const used = new Set();
+    const items = [];
+
+    for (let i = 0; i < 5; i++) {
+      const wantDivisible = i < divisibleCount;
+      let num = 0;
+      let guard = 0;
+      do {
+        const raw = generateRawTask(String(divisor));
+        if ((raw.number % divisor === 0) === wantDivisible) {
+          num = raw.number;
+        } else {
+          const base = Math.floor(Math.random() * 400) + 12;
+          num = wantDivisible ? base * divisor : base * divisor + (divisor === 2 ? 1 : (Math.floor(Math.random() * (divisor - 1)) + 1));
+        }
+        guard++;
+      } while ((used.has(num) || (num % divisor === 0) !== wantDivisible) && guard < 40);
+
+      used.add(num);
+      items.push({
+        value: num,
+        isDivisible: num % divisor === 0
+      });
+    }
+
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = items[i];
+      items[i] = items[j];
+      items[j] = tmp;
+    }
+
+    const selectNumbers = items.map(it => it.value);
+    const correctInOrder = items.filter(it => it.isDivisible).map(it => it.value);
+    const correctSorted = correctInOrder.slice().sort((a, b) => a - b);
+
+    const canonical = correctSorted.join(', ');
+    const acceptedSet = new Set([
+      canonical,
+      correctSorted.join(','),
+      correctSorted.join(' '),
+      correctInOrder.join(', '),
+      correctInOrder.join(','),
+      correctInOrder.join(' ')
+    ]);
+
+    const breakdownSteps = items.map(it => {
+      const mark = it.isDivisible ? '✅' : '❌';
+      return `${mark} <strong>${formatNumber(it.value)}</strong> — ${it.isDivisible ? 'делится' : 'не делится'} на ${divisor}`;
+    });
+
+    return {
+      type: 'divisibility_select',
+      divisor,
+      selectNumbers,
+      category: 'divisibility',
+      catName: `Выбор делящихся чисел (на ${divisor})`,
+      prompt: `Какие из данных чисел делятся на ${divisor}? Выберите их:`,
+      questionHtml: `<div class="math-expr">Какие из данных чисел делятся на <strong>${divisor}</strong>? Выберите их:<br><div style="margin-top:10px; font-size:1.05em; letter-spacing:0.02em;">${selectNumbers.map(n => `<span style="display:inline-block; padding:4px 10px; margin:3px 4px; border:1px solid rgba(38,63,97,0.22); border-radius:8px; background:rgba(38,63,97,0.05); font-weight:700;">${formatNumber(n)}</span>`).join('')}</div></div>`,
+      answer: canonical,
+      displayAnswer: canonical,
+      acceptedAnswers: Array.from(acceptedSet),
+      solutionSteps: [
+        ...breakdownSteps,
+        `<strong>Ответ:</strong> ${canonical}`
+      ]
+    };
+  }
+
   function generateTask(category) {
+    if (String(category || '').startsWith('divisibility_select')) {
+      return generateSelectTask(category);
+    }
     const raw = generateRawTask(category);
     const isYes = raw.answer === 'yes';
     const ansRu = isYes ? 'да' : 'нет';
@@ -208,6 +294,7 @@
 
   return {
     generateRawTask,
+    generateSelectTask,
     generateTask,
     checkAnswer,
     formatNumber,

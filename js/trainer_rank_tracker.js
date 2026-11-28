@@ -179,6 +179,26 @@
             ]
         },
         {
+            id: 'divisibility_select',
+            name: 'Выбор делящихся чисел (2, 3, 4, 5, 7, 9, 10)',
+            shortName: 'Выбор чисел (делимость)',
+            subject: 'Математика',
+            category: 'Делимость',
+            classNum: '5 класс',
+            url: '../math_moduls/divisibility_select_trainer.html',
+            profileUrl: 'math_moduls/divisibility_select_trainer.html',
+            icon: '🎯',
+            description: 'Выбор всех чисел из ряда по 5 штук, которые делятся на 2, 3, 4, 5, 7, 9 или 10.',
+            rankTiers: [
+                { min: 30, title: 'Архимаг делимости 👑' },
+                { min: 20, title: 'Мастер признаков делимости 🧙' },
+                { min: 14, title: 'Эксперт по числам 💎' },
+                { min: 8,  title: 'Знаток делимости 🥇' },
+                { min: 4,  title: 'Быстрый счетовод 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'extract_whole_advanced',
             name: 'Выделение целой части в дробях (слож.)',
             shortName: 'Выделение целой части (слож.)',
@@ -864,6 +884,7 @@
                 else if (path.includes('complex_fractions_powers')) trainerId = 'complex_fractions_powers';
                 else if (path.includes('complex_fractions')) trainerId = 'complex_fractions';
                 else if (path.includes('extract_whole_advanced')) trainerId = 'extract_whole_advanced';
+                else if (path.includes('divisibility_select')) trainerId = 'divisibility_select';
                 else if (path.includes('divisibility')) trainerId = 'divisibility';
 
                 if (!trainerId) return;

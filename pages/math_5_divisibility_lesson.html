@@ -123,6 +123,8 @@
         <strong>1. Для $2$, $5$ и $10$:</strong> любой десяток $10$, сотня $100$ или тысяча $1000$ <strong>уже делятся на $2$ и на $5$</strong>! Значит, всё, что стоит левее последней цифры ($3420 = 342 \cdot 10$), гарантированно делится. Всё решает последняя цифра!
         <br><br>
         <strong>2. Для $3$ и $9$:</strong> $10 = 9 + 1$, $100 = 99 + 1$. От каждой сотни остаётся ровно $1$ единичка остатка. Значит, у числа $252$ останется $2 + 5 + 2 = 9$ единичек — поэтому достаточно проверить сумму его цифр!
+        <br><br>
+        <strong>3. Для $7$:</strong> отбросим последнюю цифру $b$ (останется число $a$) и вычтем её удвоенной: проверяем $a - 2b$. Почему это работает? Заметим, что $2 \cdot (10a + b) = 21a - (a - 2b)$, а $21a$ всегда делится на $7$. Например, для $343$: $34 - 2 \cdot 3 = 28$ делится на $7$, значит и $343$ делится на $7$.
       </div>
     </section>
 
@@ -130,7 +132,7 @@
       <div class="concept-head">
         <div>
           <span class="concept-num">Самопроверка</span>
-          <h2>Проверьте понимание в 3 вопросах</h2>
+          <h2>Проверьте понимание в 4 вопросах</h2>
         </div>
       </div>
 
@@ -162,15 +164,26 @@
         </div>
         <div class="quiz-feedback" id="qf-3"></div>
       </div>
+
+      <div class="quiz-item" data-quiz="4">
+        <div class="quiz-q">4. Какое число делится на $7$? (Проверьте правилом $a - 2b$)</div>
+        <div class="quiz-opts">
+          <button type="button" class="quiz-opt" data-ans="wrong1">$162$</button>
+          <button type="button" class="quiz-opt" data-ans="ok">$154$</button>
+          <button type="button" class="quiz-opt" data-ans="wrong2">$233$</button>
+        </div>
+        <div class="quiz-feedback" id="qf-4"></div>
+      </div>
     </section>
 
     <section class="practice-cta">
       <div>
-        <h3>Закрепите признаки на тренажёре делимости</h3>
-        <p>Мгновенная тренировка проверки делимости на 2, 3, 4, 5, 9 и 10.</p>
+        <h3>Закрепите признаки на тренажёрах делимости</h3>
+        <p>Мгновенная тренировка проверки делимости на 2, 3, 4, 5, 7, 9 и 10.</p>
       </div>
       <div class="cta-btns">
-        <a class="cta-btn" href="../math_moduls/divisibility_trainer.html">Открыть тренажёр →</a>
+        <a class="cta-btn" href="../math_moduls/divisibility_trainer.html">Тренажёр №1 (Да/Нет) →</a>
+        <a class="cta-btn" href="../math_moduls/divisibility_select_trainer.html">Тренажёр №2 (Выбор из 5) →</a>
       </div>
     </section>
   </main>
@@ -205,13 +218,17 @@
         const lastTwo = raw % 100;
         const digits = str.split('').map(Number);
         const digitSum = digits.reduce((a, b) => a + b, 0);
+        const headWithoutLast = Math.floor(raw / 10);
+        const diff7 = headWithoutLast - 2 * lastDigit;
+        const ok7 = raw % 7 === 0;
 
         const checks = [
           { d: 2, ok: lastDigit % 2 === 0, why: `Последняя цифра ${lastDigit} (${lastDigit % 2 === 0 ? 'чётная' : 'нечётная'})` },
           { d: 5, ok: lastDigit === 0 || lastDigit === 5, why: `Оканчивается на ${lastDigit}` },
           { d: 3, ok: digitSum % 3 === 0, why: `Сумма цифр: ${digits.join('+')} = ${digitSum}` },
           { d: 9, ok: digitSum % 9 === 0, why: `Сумма цифр ${digitSum} ${digitSum % 9 === 0 ? 'делится' : 'не делится'} на 9` },
-          { d: 4, ok: lastTwo % 4 === 0, why: `Последние две цифры: ${lastTwo}` }
+          { d: 4, ok: lastTwo % 4 === 0, why: `Последние две цифры: ${lastTwo}` },
+          { d: 7, ok: ok7, why: `${headWithoutLast} − 2×${lastDigit} = ${diff7} (${ok7 ? 'делится' : 'не делится'} на 7)` }
         ];
 
         resEl.innerHTML = checks.map(c => `
@@ -226,7 +243,8 @@
       const quizExplanations = {
         1: { ok: 'Верно! 135 оканчивается на 5 (делится на 5), а сумма цифр 1+3+5 = 9 (делится на 3).', wrong1: '125 делится на 5, но сумма цифр 1+2+5 = 8 не делится на 3.', wrong2: '123 делится на 3, но не оканчивается на 0 или 5.' },
         2: { ok: 'Точно! 4 + 3 + 2 = 9 — делится на 9!', wrong1: '4 + 6 + 2 = 12 — делится на 3, но не на 9.', wrong2: '4 + 0 + 2 = 6 — не делится на 9.' },
-        3: { ok: 'Верно! Обратное утверждение верно (если делится на 9, то точно делится и на 3), но не наоборот.', wrong1: 'Пример 6 или 12 опровергает это: они делятся на 3, но на 9 не делятся.' }
+        3: { ok: 'Верно! Обратное утверждение верно (если делится на 9, то точно делится и на 3), но не наоборот.', wrong1: 'Пример 6 или 12 опровергает это: они делятся на 3, но на 9 не делятся.' },
+        4: { ok: 'Верно! Для 154: 15 − 2·4 = 7, а 7 делится на 7.', wrong1: 'Для 162: 16 − 2·2 = 12, не делится на 7.', wrong2: 'Для 233: 23 − 2·3 = 17, не делится на 7.' }
       };
       document.querySelectorAll('.quiz-item').forEach(item => {
         const qId = item.dataset.quiz;

@@ -116,7 +116,7 @@
 
     function formatSolutionStep(step) {
         if (!step) return '';
-        let s = String(step);
+        let s = String(step).replace(/^\s*\d+\.\s+/, '');
         const hasTags = /<[a-z][\s\S]*>/i.test(s);
         if (!hasTags) {
             s = escapeHtml(s);
@@ -542,10 +542,31 @@
                     (task.catName && (task.catName.includes('№20') || task.catName.includes('Биквадратное') || task.catName.includes('Неравенство') || task.catName.includes('Система уравнений')))
                 );
 
+                const isDivSelect = Boolean(
+                    task.type === 'divisibility_select' && Array.isArray(task.selectNumbers) && task.selectNumbers.length > 0
+                );
+
                 if (isTask20 && window.OgeTask20Trainer) {
                     answerUiHtml = `
                         <div class="answer-box task20-hw-answer-box" style="padding:14px; background:rgba(38,63,97,0.03); border:1px solid rgba(38,63,97,0.12); border-radius:14px; width:100%;">
                             <div id="task20-widget-container-${index}" style="width:100%;"></div>
+                        </div>
+                    `;
+                } else if (isDivSelect) {
+                    const selectedNums = new Set(
+                        String(studentVal || '')
+                            .split(/[\s,;]+/)
+                            .map(s => parseInt(s, 10))
+                            .filter(n => !isNaN(n))
+                    );
+                    const btnsHtml = task.selectNumbers.map(num => {
+                        const isSel = selectedNums.has(num);
+                        const fmt = String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                        return `<button type="button" class="div-select-hw-btn${isSel ? ' selected' : ''}" data-num="${num}" style="padding:10px 16px; border-radius:10px; border:2px solid ${isSel ? '#263f61' : 'rgba(38,63,97,0.22)'}; background:${isSel ? '#263f61' : 'rgba(38,63,97,0.04)'}; color:${isSel ? '#fff' : 'inherit'}; font-weight:800; font-size:16px; cursor:pointer; transition:all .15s;">${fmt}</button>`;
+                    }).join('');
+                    answerUiHtml = `
+                        <div class="answer-box div-select-hw-box" id="div-select-box-${index}" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; width:100%;">
+                            ${btnsHtml}
                         </div>
                     `;
                 } else {
@@ -600,6 +621,24 @@
                             currentAnswers[index] = canonicalVal.trim();
                             triggerAutoSaveDraft();
                         }
+                    });
+                } else if (card.querySelector(`#div-select-box-${index}`)) {
+                    const box = card.querySelector(`#div-select-box-${index}`);
+                    box.querySelectorAll('.div-select-hw-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            btn.classList.toggle('selected');
+                            const isSel = btn.classList.contains('selected');
+                            btn.style.borderColor = isSel ? '#263f61' : 'rgba(38,63,97,0.22)';
+                            btn.style.background = isSel ? '#263f61' : 'rgba(38,63,97,0.04)';
+                            btn.style.color = isSel ? '#fff' : 'inherit';
+
+                            const chosen = Array.from(box.querySelectorAll('.div-select-hw-btn.selected'))
+                                .map(b => parseInt(b.dataset.num, 10))
+                                .filter(n => !isNaN(n))
+                                .sort((a, b) => a - b);
+                            currentAnswers[index] = chosen.join(', ');
+                            triggerAutoSaveDraft();
+                        });
                     });
                 } else {
                     const input = card.querySelector(`#input-task-${index}`);
