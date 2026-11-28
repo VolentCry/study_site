@@ -1,4 +1,4 @@
-*, *::before, *::after { box-sizing: border-box; }
+﻿*, *::before, *::after { box-sizing: border-box; }
 :root {
     --paper: #f5f2eb;
     --paper-light: #fbf9f4;
@@ -31,10 +31,10 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; white-space: nowrap; }
 .brand-mark {
     width: 36px; height: 36px; display: grid; place-items: center;
-    border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 18px 'Zen Old Mincho', serif;
+    border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 18px 'Cormorant Garamond', serif;
     background: var(--paper-light); border-radius: 4px;
 }
-.brand-name { color: var(--indigo); font: 700 19px 'Zen Old Mincho', serif; }
+.brand-name { color: var(--indigo); font: 700 19px 'Cormorant Garamond', serif; }
 .brand-class { margin-left: 2px; color: var(--muted); font-size: 11px; font-weight: 600; }
 
 /* CLASS DROPDOWN SWITCHER */
@@ -79,7 +79,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     place-items: center;
     font-size: 11px;
     font-weight: 700;
-    font-family: 'Zen Old Mincho', serif;
+    font-family: 'Cormorant Garamond', serif;
     line-height: 1;
     box-shadow: 0 1px 4px rgba(183, 70, 78, 0.3);
     flex-shrink: 0;
@@ -160,7 +160,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     color: var(--indigo);
     font-size: 12px;
     font-weight: 700;
-    font-family: 'Zen Old Mincho', serif;
+    font-family: 'Cormorant Garamond', serif;
 }
 .class-dropdown-item.active .class-item-badge {
     background: rgba(255, 255, 255, 0.22);
@@ -340,7 +340,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     letter-spacing: .2em; text-transform: uppercase; animation: rise .7s both;
 }
 .hero h1 {
-    max-width: 660px; margin: 0; font: 700 clamp(42px, 6vw, 68px)/1.08 'Zen Old Mincho', serif;
+    max-width: 660px; margin: 0; font: 700 clamp(42px, 6vw, 68px)/1.08 'Cormorant Garamond', serif;
     animation: rise .7s .08s both;
 }
 .hero-copy {
@@ -373,7 +373,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 .section-inner { width: min(1080px, 100%); margin: 0 auto; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .eyebrow { margin: 0 0 8px; color: var(--vermilion); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
-.section-heading h2 { margin: 0; color: var(--indigo); font: 600 32px/1.2 'Zen Old Mincho', serif; }
+.section-heading h2 { margin: 0; color: var(--indigo); font: 600 32px/1.2 'Cormorant Garamond', serif; }
 .section-note { max-width: 440px; margin: 0 0 2px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 
 /* TRAINERS (CLASSES 4-8) */
@@ -396,7 +396,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 .trainer-link:hover .trainer-number {
     background: var(--vermilion); color: #fff;
 }
-.trainer-name { color: var(--indigo); font: 700 17px 'Zen Old Mincho', serif; line-height: 1.25; }
+.trainer-name { color: var(--indigo); font: 700 17px 'Cormorant Garamond', serif; line-height: 1.25; }
 .trainer-level { display: block; margin-top: 4px; color: var(--muted); font: 500 12px 'DM Sans', sans-serif; line-height: 1.4; }
 .trainer-arrow { color: var(--muted); font-size: 16px; transition: transform .2s, color .2s; }
 .trainer-link:hover .trainer-arrow { transform: translate(3px, -3px); color: var(--vermilion); }
@@ -441,7 +441,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     border-color: var(--vermilion-border);
 }
 .part-subheading-title {
-    font: 700 clamp(20px, 3.2vw, 26px)/1.2 'Zen Old Mincho', serif; color: var(--indigo-dark);
+    font: 700 clamp(20px, 3.2vw, 26px)/1.2 'Cormorant Garamond', serif; color: var(--indigo-dark);
     margin: 2px 0 0;
 }
 .part-subheading-desc {
@@ -476,7 +476,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     background: rgba(38, 63, 97, 0.08); color: var(--indigo); font-size: 20px;
 }
 .trainer-card h3 {
-    font: 700 22px 'Zen Old Mincho', serif; color: var(--indigo); margin-bottom: 10px;
+    font: 700 22px 'Cormorant Garamond', serif; color: var(--indigo); margin-bottom: 10px;
 }
 .trainer-card p {
     font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; flex-grow: 1;
@@ -585,7 +585,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 .note-title {
     margin: 0;
     color: var(--indigo-dark);
-    font: 700 21px/1.25 'Zen Old Mincho', serif;
+    font: 700 21px/1.25 'Cormorant Garamond', serif;
 }
 .note-formula-box {
     display: flex;
@@ -727,7 +727,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 .grade-4 { background: #e3f2fd; color: #1565c0; }
 .grade-5 { background: #e8f5e9; color: #2e7d32; }
 .strategy-card h3 {
-    font: 700 20px 'Zen Old Mincho', serif; color: var(--indigo); margin-bottom: 8px;
+    font: 700 20px 'Cormorant Garamond', serif; color: var(--indigo); margin-bottom: 8px;
 }
 .strategy-card p {
     font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px;
@@ -765,8 +765,8 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     border-bottom: 2px solid var(--vermilion);
 }
 .route-link.featured:hover { background: #faecee; }
-.route-index { color: var(--vermilion); font: 700 20px 'Zen Old Mincho', serif; }
-.route-title { display: block; color: var(--indigo); font: 700 20px 'Zen Old Mincho', serif; }
+.route-index { color: var(--vermilion); font: 700 20px 'Cormorant Garamond', serif; }
+.route-title { display: block; color: var(--indigo); font: 700 20px 'Cormorant Garamond', serif; }
 .route-copy { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .route-arrow { color: var(--vermilion); font-size: 20px; transition: transform .2s; }
 .route-link:hover .route-arrow { transform: translateX(5px); }
@@ -782,7 +782,7 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
 }
 .banner-text h2 {
-    font: 700 32px 'Zen Old Mincho', serif; margin-bottom: 10px; color: #fff;
+    font: 700 32px 'Cormorant Garamond', serif; margin-bottom: 10px; color: #fff;
 }
 .banner-text p {
     max-width: 580px; font-size: 15px; color: rgba(255, 255, 255, 0.8); line-height: 1.6;

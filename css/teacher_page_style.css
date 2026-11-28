@@ -1763,6 +1763,9 @@ dialog.admin-modal::backdrop {
     flex-direction: column;
     justify-content: space-between;
     gap: 1.1rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     transition: all 0.2s var(--ease-out);
 }
 .hw-card:hover {
@@ -1773,12 +1776,18 @@ dialog.admin-modal::backdrop {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
+}
+.hw-card-top p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 .hw-card-title {
     font-family: var(--f-display);
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--ink);
+    overflow-wrap: anywhere;
 }
 .hw-card-meta {
     display: flex;

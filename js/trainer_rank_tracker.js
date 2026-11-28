@@ -540,6 +540,26 @@
             ]
         },
         {
+            id: 'oge_task_17',
+            name: 'ОГЭ №17 · Четырёхугольники и площади фигур',
+            shortName: 'ОГЭ Задание 17',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_17_trainer.html',
+            profileUrl: 'math_moduls/oge_task_17_trainer.html',
+            icon: '📐',
+            description: 'Площади и углы треугольников, параллелограммов, ромбов, трапеций, прямоугольников и квадратов.',
+            rankTiers: [
+                { min: 25, title: 'Архимаг планиметрии 👑' },
+                { min: 18, title: 'Мастер площадей 🧙' },
+                { min: 12, title: 'Геометр-эксперт 💎' },
+                { min: 7,  title: 'Знаток фигур 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Чертёжник 🥉' }
+            ]
+        },
+        {
             id: 'oge_task_18',
             name: 'ОГЭ №18 · Геометрия на клетках',
             shortName: 'ОГЭ Задание 18',

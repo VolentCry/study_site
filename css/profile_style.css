@@ -6463,6 +6463,9 @@ dialog::backdrop {
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     transition: all 0.2s ease;
 }
 .student-hw-card:hover {

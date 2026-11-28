@@ -3468,6 +3468,18 @@
                 };
                 t = window.OgeTask13Trainer.generateTask(catMap[type] || 'mixed_all');
             }
+        } else if (type.startsWith('oge17_')) {
+            if (window.OgeTask17Trainer) {
+                const catMap = {
+                    'oge17_all': 'mixed_all',
+                    'oge17_triangle': 'triangle',
+                    'oge17_parallelogram': 'parallelogram',
+                    'oge17_rhombus': 'rhombus',
+                    'oge17_trapezoid': 'trapezoid',
+                    'oge17_rect_square': 'rect_square'
+                };
+                t = window.OgeTask17Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
         } else if (type.startsWith('oge18_')) {
             if (window.OgeTask18Trainer) {
                 const catMap = {
