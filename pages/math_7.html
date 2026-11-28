@@ -172,44 +172,67 @@
                     </div>
                     <p class="section-note">Выбери тему и подходящий уровень. Можно возвращаться к упражнениям сколько угодно раз.</p>
                 </div>
+                <div class="trainer-filter-bar" data-trainer-filter-bar>
+                    <div class="trainer-filter-chips" role="group" aria-label="Фильтр тренажёров по предмету">
+                        <button class="trainer-filter-btn active" type="button" data-filter="all" aria-pressed="true">
+                            <span>Все</span>
+                            <span class="trainer-filter-count" data-count-for="all">11</span>
+                        </button>
+                        <button class="trainer-filter-btn" type="button" data-filter="algebra" aria-pressed="false">
+                            <span>Только алгебра</span>
+                            <span class="trainer-filter-count" data-count-for="algebra">9</span>
+                        </button>
+                        <button class="trainer-filter-btn" type="button" data-filter="geometry" aria-pressed="false">
+                            <span>Только геометрия</span>
+                            <span class="trainer-filter-count" data-count-for="geometry">2</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="trainer-grid">
-                    <a class="trainer-link" href="../math_moduls/fsu_trainer.html">
+                    <a class="trainer-link" href="../math_moduls/fsu_trainer.html" data-subject="algebra">
                         <span class="trainer-number">01</span>
-                        <span class="trainer-name">Формулы сокращённого умножения (ФСУ)
+                        <span class="trainer-name">
+                            <span class="trainer-subject-tag">Алгебра</span>
+                            <span class="trainer-name-title">Формулы сокращённого умножения (ФСУ)</span>
                             <span class="trainer-level">Квадрат суммы, разности, разность квадратов и быстрый счёт</span>
                         </span>
                         <span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/oge_task_8_trainer.html">
-                        <span class="trainer-number">02</span><span class="trainer-name">Свойства степеней и алгебра<span class="trainer-level">Умножение, деление и возведение степеней в степень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/oge_task_8_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">02</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Свойства степеней и алгебра</span><span class="trainer-level">Умножение, деление и возведение степеней в степень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/oge_task_9_trainer.html">
-                        <span class="trainer-number">03</span><span class="trainer-name">Линейные уравнения 7 класса<span class="trainer-level">Уравнения первой степени с одним неизвестным</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/oge_task_9_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">03</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Линейные уравнения 7 класса</span><span class="trainer-level">Уравнения первой степени с одним неизвестным</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/equations_trainer_medium.html">
-                        <span class="trainer-number">04</span><span class="trainer-name">Уравнения со скобками<span class="trainer-level">Раскрытие скобок и приведение подобных слагаемых</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/equations_trainer_medium.html" data-subject="algebra">
+                        <span class="trainer-number">04</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Уравнения со скобками</span><span class="trainer-level">Раскрытие скобок и приведение подобных слагаемых</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/oge_task_7_trainer.html">
-                        <span class="trainer-number">05</span><span class="trainer-name">Координатная прямая и неравенства<span class="trainer-level">Сравнение чисел на оси и числовые промежутки</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/oge_task_7_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">05</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Координатная прямая и неравенства</span><span class="trainer-level">Сравнение чисел на оси и числовые промежутки</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/oge_task_18_trainer.html">
-                        <span class="trainer-number">06</span><span class="trainer-name">Геометрия на клетках<span class="trainer-level">Углы, треугольники, медианы и высоты</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/oge_task_18_trainer.html" data-subject="geometry">
+                        <span class="trainer-number">06</span><span class="trainer-name"><span class="trainer-subject-tag">Геометрия</span><span class="trainer-name-title">Геометрия на клетках</span><span class="trainer-level">Углы, треугольники, медианы и высоты</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/powers_compare_trainer.html">
-                        <span class="trainer-number">07</span><span class="trainer-name">Сравнение степеней (<, >, =)<span class="trainer-level">Сравнение алгебраических и числовых выражений со степенями</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/powers_compare_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">07</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Сравнение степеней (&lt;, &gt;, =)</span><span class="trainer-level">Сравнение алгебраических и числовых выражений со степенями</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/monomials_trainer.html">
-                        <span class="trainer-number">08</span><span class="trainer-name">Одночлены<span class="trainer-level">Сложение, вычитание, умножение, деление и возведение в степень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/monomials_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">08</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Одночлены</span><span class="trainer-level">Сложение, вычитание, умножение, деление и возведение в степень</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/polynomials_trainer.html">
-                        <span class="trainer-number">09</span><span class="trainer-name">Многочлены<span class="trainer-level">Приведение подобных, сложение, вычитание, умножение и вынесение за скобки</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/polynomials_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">09</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Многочлены</span><span class="trainer-level">Приведение подобных, сложение, вычитание, умножение и вынесение за скобки</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/linear_function_trainer.html">
-                        <span class="trainer-number">10</span><span class="trainer-name">Линейная функция<span class="trainer-level">Значения аргумента и функции, область определения, пересечение с осями координат и графиков</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/linear_function_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">10</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Линейная функция</span><span class="trainer-level">Значения аргумента и функции, область определения, пересечение с осями координат и графиков</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/triangle_lines_trainer.html">
-                        <span class="trainer-number">11</span><span class="trainer-name">Биссектриса, медиана и высота в треугольнике<span class="trainer-level">Задачи на углы, периметры, пересечение биссектрис и высот, равнобедренный и прямоугольный треугольники</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/triangle_lines_trainer.html" data-subject="geometry">
+                        <span class="trainer-number">11</span><span class="trainer-name"><span class="trainer-subject-tag">Геометрия</span><span class="trainer-name-title">Биссектриса, медиана и высота в треугольнике</span><span class="trainer-level">Задачи на углы, периметры, пересечение биссектрис и высот, равнобедренный и прямоугольный треугольники</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
+                </div>
+                <div class="trainer-empty-state" data-trainer-empty hidden>
+                    <p class="trainer-empty-title">В этом разделе пока нет тренажёров</p>
+                    <p class="trainer-empty-copy">Попробуйте выбрать другую категорию или показать все доступные тренажёры 7 класса.</p>
+                    <button class="trainer-empty-reset" type="button" data-reset-trainer-filter>Показать все тренажёры</button>
                 </div>
 
             </div>
@@ -681,6 +704,7 @@
 
     </script>
 
+<script src="../js/math_trainers_filter.js"></script>
 <script src="../js/auth_sync.js"></script>
 
 </body>

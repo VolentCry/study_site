@@ -175,28 +175,49 @@
                     </div>
                     <p class="section-note">Выбери тему и подходящий уровень. Можно возвращаться к упражнениям сколько угодно раз.</p>
                 </div>
+                <div class="trainer-filter-bar" data-trainer-filter-bar>
+                    <div class="trainer-filter-chips" role="group" aria-label="Фильтр тренажёров по предмету">
+                        <button class="trainer-filter-btn active" type="button" data-filter="all" aria-pressed="true">
+                            <span>Все</span>
+                            <span class="trainer-filter-count" data-count-for="all">7</span>
+                        </button>
+                        <button class="trainer-filter-btn" type="button" data-filter="algebra" aria-pressed="false">
+                            <span>Только алгебра</span>
+                            <span class="trainer-filter-count" data-count-for="algebra">7</span>
+                        </button>
+                        <button class="trainer-filter-btn" type="button" data-filter="geometry" aria-pressed="false">
+                            <span>Только геометрия</span>
+                            <span class="trainer-filter-count" data-count-for="geometry">0</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="trainer-grid">
-                    <a class="trainer-link" href="../math_moduls/oge_task9_trainer.html">
-                        <span class="trainer-number">01</span><span class="trainer-name">Уравнения ОГЭ (№9)<span class="trainer-level">Линейные, квадратные и неполные квадратные уравнения</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/oge_task9_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">01</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Уравнения ОГЭ (№9)</span><span class="trainer-level">Линейные, квадратные и неполные квадратные уравнения</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/powers_trainer.html">
-                        <span class="trainer-number">02</span><span class="trainer-name">Степени чисел<span class="trainer-level">Свойства степеней и сложные вычисления</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/powers_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">02</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Степени чисел</span><span class="trainer-level">Свойства степеней и сложные вычисления</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/powers_compare_trainer.html">
-                        <span class="trainer-number">03</span><span class="trainer-name">Сравнение степеней (<, >, =)<span class="trainer-level">Сравнение выражений и корней со степенями</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/powers_compare_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">03</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Сравнение степеней (&lt;, &gt;, =)</span><span class="trainer-level">Сравнение выражений и корней со степенями</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/equations_trainer_medium.html">
-                        <span class="trainer-number">04</span><span class="trainer-name">Уравнения со скобками<span class="trainer-level">Преобразования сложных выражений</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/equations_trainer_medium.html" data-subject="algebra">
+                        <span class="trainer-number">04</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Уравнения со скобками</span><span class="trainer-level">Преобразования сложных выражений</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/common_fraction_trainer.html">
-                        <span class="trainer-number">05</span><span class="trainer-name">Обыкновенные дроби<span class="trainer-level">Действия с дробно-рациональными числами</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/common_fraction_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">05</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Обыкновенные дроби</span><span class="trainer-level">Действия с дробно-рациональными числами</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/decimal_fraction_trainer.html">
-                        <span class="trainer-number">06</span><span class="trainer-name">Десятичные дроби<span class="trainer-level">Вычисления и округление результатов</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/decimal_fraction_trainer.html" data-subject="algebra">
+                        <span class="trainer-number">06</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Десятичные дроби</span><span class="trainer-level">Вычисления и округление результатов</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
-                    <a class="trainer-link" href="../math_moduls/multiplication_trainer_hard_level.html">
-                        <span class="trainer-number">07</span><span class="trainer-name">Умножение чисел<span class="trainer-level">Безошибочный счёт для второй части экзаменов</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
+                    <a class="trainer-link" href="../math_moduls/multiplication_trainer_hard_level.html" data-subject="algebra">
+                        <span class="trainer-number">07</span><span class="trainer-name"><span class="trainer-subject-tag">Алгебра</span><span class="trainer-name-title">Умножение чисел</span><span class="trainer-level">Безошибочный счёт для второй части экзаменов</span></span><span class="trainer-arrow" aria-hidden="true">↗</span>
                     </a>
+                </div>
+                <div class="trainer-empty-state" data-trainer-empty hidden>
+                    <p class="trainer-empty-title">В этом разделе пока нет тренажёров</p>
+                    <p class="trainer-empty-copy">Тренажёры по геометрии для 8 класса скоро появятся. Пока можно вернуться ко всем тренажёрам или попрактиковаться в алгебре.</p>
+                    <button class="trainer-empty-reset" type="button" data-reset-trainer-filter>Показать все тренажёры</button>
                 </div>
 
             </div>
@@ -536,6 +557,7 @@
 
     </script>
 
+<script src="../js/math_trainers_filter.js"></script>
 <script src="../js/auth_sync.js"></script>
 
 </body>

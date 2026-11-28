@@ -378,12 +378,79 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
 
 /* TRAINERS (CLASSES 4-8) */
 .trainers { padding: 64px 24px 72px; }
+.trainer-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+.trainer-filter-chips {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.trainer-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper-light);
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+.trainer-filter-btn:hover {
+    color: var(--indigo);
+    border-color: var(--indigo);
+    transform: translateY(-1px);
+}
+.trainer-filter-btn:focus-visible {
+    outline: 3px solid var(--vermilion);
+    outline-offset: 2px;
+}
+.trainer-filter-btn.active {
+    background: var(--vermilion);
+    border-color: var(--vermilion);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(183, 70, 78, 0.28);
+}
+.trainer-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(38, 63, 97, 0.08);
+    color: var(--indigo);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+.trainer-filter-btn.active .trainer-filter-count {
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+}
 .trainer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .trainer-link {
     min-height: 104px; padding: 22px 20px; display: grid; grid-template-columns: 44px 1fr 20px;
     align-items: center; gap: 16px; border: 1px solid var(--line); background: var(--paper-light);
     text-decoration: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(38, 63, 97, 0.04);
     transition: all .25s ease;
+}
+.trainer-link.is-hidden,
+.trainer-link[hidden] {
+    display: none !important;
 }
 .trainer-link:hover {
     border-color: var(--vermilion); background: #fff; transform: translateY(-2px);
@@ -397,9 +464,70 @@ a:focus-visible { outline: 3px solid var(--vermilion); outline-offset: 4px; }
     background: var(--vermilion); color: #fff;
 }
 .trainer-name { color: var(--indigo); font: 700 17px 'Cormorant Garamond', serif; line-height: 1.25; }
+.trainer-subject-tag {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font: 700 10px/1.3 'DM Sans', sans-serif;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: rgba(38, 63, 97, 0.08);
+    color: var(--indigo);
+}
+.trainer-link[data-subject="geometry"] .trainer-subject-tag {
+    background: var(--vermilion-light);
+    color: var(--vermilion);
+    border: 1px solid var(--vermilion-border);
+}
+.trainer-name-title {
+    display: block;
+}
 .trainer-level { display: block; margin-top: 4px; color: var(--muted); font: 500 12px 'DM Sans', sans-serif; line-height: 1.4; }
 .trainer-arrow { color: var(--muted); font-size: 16px; transition: transform .2s, color .2s; }
 .trainer-link:hover .trainer-arrow { transform: translate(3px, -3px); color: var(--vermilion); }
+.trainer-empty-state {
+    margin-top: 16px;
+    padding: 28px 24px;
+    border-radius: 12px;
+    border: 1px dashed var(--line);
+    background: var(--paper-light);
+    text-align: center;
+}
+.trainer-empty-state[hidden] {
+    display: none !important;
+}
+.trainer-empty-title {
+    margin: 0 0 6px;
+    color: var(--indigo);
+    font: 700 20px/1.25 'Cormorant Garamond', serif;
+}
+.trainer-empty-copy {
+    max-width: 520px;
+    margin: 0 auto 16px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+}
+.trainer-empty-reset {
+    min-height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid var(--vermilion);
+    background: transparent;
+    color: var(--vermilion);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+.trainer-empty-reset:hover {
+    background: var(--vermilion);
+    color: #fff;
+}
 
 /* OGE TRAINERS SHOWCASE (CLASS 9 & EXAMS) */
 .part-block {

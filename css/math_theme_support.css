@@ -59,3 +59,46 @@ html[data-theme="dark"] textarea {
   color: var(--ink);
   border-color: var(--line);
 }
+
+html[data-theme="dark"] .trainer-filter-btn {
+  background: var(--paper-card);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .trainer-filter-btn:hover {
+  color: var(--ink);
+  border-color: var(--indigo);
+}
+
+html[data-theme="dark"] .trainer-filter-btn.active {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+  color: #0c1018;
+}
+
+html[data-theme="dark"] .trainer-filter-count {
+  background: rgba(96, 165, 250, 0.14);
+  color: var(--indigo);
+}
+
+html[data-theme="dark"] .trainer-filter-btn.active .trainer-filter-count {
+  background: rgba(12, 16, 24, 0.22);
+  color: #0c1018;
+}
+
+html[data-theme="dark"] .trainer-link {
+  background: var(--paper-card);
+}
+
+html[data-theme="dark"] .trainer-link:hover {
+  background: #1e293b;
+}
+
+html[data-theme="dark"] .trainer-subject-tag {
+  background: rgba(96, 165, 250, 0.14);
+}
+
+html[data-theme="dark"] .trainer-empty-state {
+  background: var(--paper-card);
+}
