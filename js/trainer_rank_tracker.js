@@ -219,6 +219,46 @@
             ]
         },
         {
+            id: 'units_conversion',
+            name: 'Перевод единиц измерения',
+            shortName: 'Единицы измерения',
+            subject: 'Математика',
+            category: 'Величины',
+            classNum: '5 класс',
+            url: '../math_moduls/units_conversion_trainer.html',
+            profileUrl: 'math_moduls/units_conversion_trainer.html',
+            icon: '📏',
+            description: 'Перевод единиц длины, массы, времени, площади (а, га) и объёма (л, дм³, м³).',
+            rankTiers: [
+                { min: 30, title: 'Магистр величин 👑' },
+                { min: 20, title: 'Архимаг измерений 🧙' },
+                { min: 14, title: 'Эксперт метрики 💎' },
+                { min: 8,  title: 'Знаток величин 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
+            id: 'visual_geometry_5',
+            name: 'Наглядная геометрия (5 класс)',
+            shortName: 'Наглядная геометрия',
+            subject: 'Математика',
+            category: 'Геометрия',
+            classNum: '5 класс',
+            url: '../math_moduls/visual_geometry_5_trainer.html',
+            profileUrl: 'math_moduls/visual_geometry_5_trainer.html',
+            icon: '🧊',
+            description: 'Углы и транспортир, ломаные и окружность, составные фигуры, куб и прямоугольный параллелепипед.',
+            rankTiers: [
+                { min: 30, title: 'Архитектор пространства 👑' },
+                { min: 20, title: 'Мастер наглядной геометрии 🧙' },
+                { min: 14, title: 'Эксперт чертежей 💎' },
+                { min: 8,  title: 'Знаток фигур 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Начинающий 🥉' }
+            ]
+        },
+        {
             id: 'complex_fractions',
             name: 'Сложные вычисления (Дроби)',
             shortName: 'Сложные дроби',
@@ -520,6 +560,26 @@
             ]
         },
         {
+            id: 'oge_task_12',
+            name: 'ОГЭ №12 · Расчёты по формулам',
+            shortName: 'ОГЭ Задание 12',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_12_trainer.html',
+            profileUrl: 'math_moduls/oge_task_12_trainer.html',
+            icon: '🧪',
+            description: 'Вычисления по физическим, геометрическим и бытовым формулам и выражение неизвестных величин.',
+            rankTiers: [
+                { min: 25, title: 'Архимаг формул 👑' },
+                { min: 18, title: 'Мастер подстановок 🧙' },
+                { min: 12, title: 'Аналитик ОГЭ 💎' },
+                { min: 7,  title: 'Знаток формул 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Ученик 🥉' }
+            ]
+        },
+        {
             id: 'oge_task_13',
             name: 'ОГЭ №13 · Неравенства и системы',
             shortName: 'ОГЭ Задание 13',
@@ -537,6 +597,66 @@
                 { min: 7,  title: 'Знаток штриховок 🥇' },
                 { min: 4,  title: 'Практик ОГЭ 🥈' },
                 { min: 1,  title: 'Ученик 🥉' }
+            ]
+        },
+        {
+            id: 'oge_task_14',
+            name: 'ОГЭ №14 · Прогрессии',
+            shortName: 'ОГЭ Задание 14',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_14_trainer.html',
+            profileUrl: 'math_moduls/oge_task_14_trainer.html',
+            icon: '🪜',
+            description: 'Арифметическая и геометрическая прогрессии: амфитеатр, охлаждение, распад изотопа, бактерии, отскоки мячика и суммы.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель прогрессий 👑' },
+                { min: 18, title: 'Мастер последовательностей 🧙' },
+                { min: 12, title: 'Аналитик шагов 💎' },
+                { min: 7,  title: 'Знаток прогрессий 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Ученик 🥉' }
+            ]
+        },
+        {
+            id: 'oge_task_15',
+            name: 'ОГЭ №15 · Треугольники и многоугольники',
+            shortName: 'ОГЭ Задание 15',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_15_trainer.html',
+            profileUrl: 'math_moduls/oge_task_15_trainer.html',
+            icon: '🔺',
+            description: 'Углы и линии треугольника, равнобедренный и правильный треугольники, Пифагор, sin/cos/tg и параллелограмм.',
+            rankTiers: [
+                { min: 25, title: 'Мастер треугольников 👑' },
+                { min: 18, title: 'Архитектор планиметрии 🧙' },
+                { min: 12, title: 'Геометр-эксперт 💎' },
+                { min: 7,  title: 'Знаток углов 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Чертёжник 🥉' }
+            ]
+        },
+        {
+            id: 'oge_task_16',
+            name: 'ОГЭ №16 · Окружность, круг и их элементы',
+            shortName: 'ОГЭ Задание 16',
+            subject: 'Математика',
+            category: 'ОГЭ 9 класс',
+            classNum: '9 класс',
+            url: '../math_moduls/oge_task_16_trainer.html',
+            profileUrl: 'math_moduls/oge_task_16_trainer.html',
+            icon: '⭕',
+            description: 'Центральные и вписанные углы, касательные, секущие, хорды, вписанные и описанные многоугольники.',
+            rankTiers: [
+                { min: 25, title: 'Повелитель окружностей 👑' },
+                { min: 18, title: 'Мастер касательных 🧙' },
+                { min: 12, title: 'Геометр-эксперт 💎' },
+                { min: 7,  title: 'Знаток дуг и углов 🥇' },
+                { min: 4,  title: 'Практик 🥈' },
+                { min: 1,  title: 'Чертёжник 🥉' }
             ]
         },
         {
@@ -906,6 +1026,8 @@
                 else if (path.includes('extract_whole_advanced')) trainerId = 'extract_whole_advanced';
                 else if (path.includes('divisibility_select')) trainerId = 'divisibility_select';
                 else if (path.includes('divisibility')) trainerId = 'divisibility';
+                else if (path.includes('units_conversion')) trainerId = 'units_conversion';
+                else if (path.includes('visual_geometry_5')) trainerId = 'visual_geometry_5';
 
                 if (!trainerId) return;
 

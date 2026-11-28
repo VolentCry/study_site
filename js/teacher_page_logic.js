@@ -3457,6 +3457,17 @@
                 };
                 t = window.OgeTask11Trainer.generateTask(catMap[type] || 'mixed_all');
             }
+        } else if (type.startsWith('oge12_')) {
+            if (window.OgeTask12Trainer) {
+                const catMap = {
+                    'oge12_all': 'mixed_all',
+                    'oge12_physics': 'physics_energy',
+                    'oge12_electricity': 'electricity',
+                    'oge12_geometry': 'geometry_formulas',
+                    'oge12_everyday': 'everyday'
+                };
+                t = window.OgeTask12Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
         } else if (type.startsWith('oge13_')) {
             if (window.OgeTask13Trainer) {
                 const catMap = {
@@ -3467,6 +3478,39 @@
                     'oge13_special': 'no_solution_or_all'
                 };
                 t = window.OgeTask13Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge14_')) {
+            if (window.OgeTask14Trainer) {
+                const catMap = {
+                    'oge14_all': 'mixed_all',
+                    'oge14_arith_term': 'arith_term',
+                    'oge14_arith_sum': 'arith_sum',
+                    'oge14_geom_term': 'geom_term',
+                    'oge14_geom_sum': 'geom_sum'
+                };
+                t = window.OgeTask14Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge15_')) {
+            if (window.OgeTask15Trainer) {
+                const catMap = {
+                    'oge15_all': 'mixed_all',
+                    'oge15_angles': 'angles_triangle',
+                    'oge15_lines': 'lines_similarity',
+                    'oge15_right': 'right_trig_area',
+                    'oge15_parallelogram': 'parallelogram_angles'
+                };
+                t = window.OgeTask15Trainer.generateTask(catMap[type] || 'mixed_all');
+            }
+        } else if (type.startsWith('oge16_')) {
+            if (window.OgeTask16Trainer) {
+                const catMap = {
+                    'oge16_all': 'mixed_all',
+                    'oge16_angles': 'central_inscribed',
+                    'oge16_tangents': 'tangents_secants_chords',
+                    'oge16_quad': 'inscribed_quad',
+                    'oge16_triangle': 'circle_triangle'
+                };
+                t = window.OgeTask16Trainer.generateTask(catMap[type] || 'mixed_all');
             }
         } else if (type.startsWith('oge17_')) {
             if (window.OgeTask17Trainer) {
@@ -3565,6 +3609,14 @@
         } else if (type.startsWith('triangle_lines_')) {
             if (window.TriangleLinesTrainer) {
                 t = window.TriangleLinesTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('units_')) {
+            if (window.UnitsConversionTrainer) {
+                t = window.UnitsConversionTrainer.generateTask(type);
+            }
+        } else if (type.startsWith('geo5_')) {
+            if (window.VisualGeometry5Trainer) {
+                t = window.VisualGeometry5Trainer.generateTask(type, { numericOnly: true });
             }
         }
         return t;

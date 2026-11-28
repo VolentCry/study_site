@@ -2822,13 +2822,13 @@ def submit_homework(homework_id: int, student_id: int, answers: Dict[str, Any]) 
                     if not is_correct and '(' in display_ans and ')' in display_ans:
                         inner_opt = display_ans[display_ans.find('(') + 1 : display_ans.rfind(')')].strip()
                         is_correct = _answers_match(user_ans, inner_opt)
-                    if not is_correct:
-                        acc_list = t.get('acceptedAnswers') or t.get('accepted_answers') or []
-                        if isinstance(acc_list, list):
-                            for acc in acc_list:
-                                if acc and _answers_match(user_ans, str(acc)):
-                                    is_correct = True
-                                    break
+                if not is_correct:
+                    acc_list = t.get('acceptedAnswers') or t.get('accepted_answers') or []
+                    if isinstance(acc_list, list):
+                        for acc in acc_list:
+                            if acc and _answers_match(user_ans, str(acc)):
+                                is_correct = True
+                                break
 
             if is_correct:
                 computed_score += 1

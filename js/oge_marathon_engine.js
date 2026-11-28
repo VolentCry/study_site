@@ -100,8 +100,10 @@
       taskNum: 12,
       title: 'Расчёты по формулам',
       count: 25,
-      active: false,
+      active: true,
       icon: '🧪',
+      trainer: 'OgeTask12Trainer',
+      category: 'mixed_all',
       desc: 'Физические и геометрические формулы, подстановка значений и выражение неизвестных.'
     },
     {
@@ -120,8 +122,10 @@
       taskNum: 14,
       title: 'Прогрессии',
       count: 25,
-      active: false,
+      active: true,
       icon: '🪜',
+      trainer: 'OgeTask14Trainer',
+      category: 'mixed_all',
       desc: 'Арифметическая и геометрическая прогрессии, формулы n-го члена и суммы членов.'
     },
     {
@@ -129,17 +133,21 @@
       taskNum: 15,
       title: 'Треугольники и многоугольники',
       count: 25,
-      active: false,
+      active: true,
       icon: '🔺',
-      desc: 'Свойства треугольников, параллелограммов, трапеций, углы и соотношения сторон.'
+      trainer: 'OgeTask15Trainer',
+      category: 'mixed_all',
+      desc: 'Свойства треугольников, параллелограммов, углы, Пифагор и тригонометрия.'
     },
     {
       id: 16,
       taskNum: 16,
       title: 'Окружность, круг и их элементы',
       count: 25,
-      active: false,
+      active: true,
       icon: '⭕',
+      trainer: 'OgeTask16Trainer',
+      category: 'mixed_all',
       desc: 'Центральные и вписанные углы, касательные, хорды, описанные и вписанные окружности.'
     },
     {

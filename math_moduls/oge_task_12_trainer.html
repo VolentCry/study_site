@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f2eb" />
+  <title>Тренажёр ОГЭ №12 · Расчёты по формулам · НЕШкола</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f2eb;
+      --paper-light: #fbf9f4;
+      --paper-card: #ffffff;
+      --ink: #202a3a;
+      --muted: #697383;
+      --indigo: #263f61;
+      --indigo-soft: #e5e9ee;
+      --indigo-dark: #19273c;
+      --vermilion: #b7464e;
+      --vermilion-light: #fbf0f1;
+      --vermilion-border: rgba(183,70,78,.25);
+      --gold: #c8956c;
+      --gold-light: #fdf6ec;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --line: rgba(38,63,97,.18);
+      --shadow-sm: 0 2px 8px rgba(38,63,97,.06);
+      --shadow-md: 0 8px 24px rgba(38,63,97,.09);
+      --shadow-lg: 0 16px 40px rgba(38,63,97,.14);
+      --r-md: 14px;
+      --r-lg: 20px;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(229,181,184,.12) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(200,149,108,.12) 0%, transparent 40%);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* SITE NAV */
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; min-height: 64px; padding: 0 5vw;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: rgba(251,249,244,.95); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border: 1px solid var(--vermilion); color: var(--vermilion); font: 700 17px 'Cormorant Garamond', serif;
+      background: var(--paper-light); border-radius: 6px;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { color: var(--indigo); font: 700 17px 'Cormorant Garamond', serif; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .nav-task-divider { width: 1px; height: 16px; background: var(--line); margin: 0 4px; display: inline-block; }
+    .nav-task-part-badge { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--vermilion); letter-spacing: .08em; padding: 0 2px; }
+    .task-pill.task-pill-part2 { border: 1px dashed rgba(183,70,78,.4); color: var(--vermilion); background: var(--vermilion-light); }
+    .task-pill.task-pill-part2:hover { background: var(--vermilion); color: #fff; }
+
+    .nav-task-switcher {
+      display: inline-flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; background: rgba(38,63,97,.08);
+      border-radius: 999px; padding: 3px 6px; gap: 2px; border: 1px solid var(--line);
+    }
+    .task-pill {
+      padding: 4px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700;
+      text-decoration: none; color: var(--muted); transition: all .2s ease; white-space: nowrap;
+    }
+    .task-pill:hover { color: var(--vermilion); }
+    .task-pill.active { background: var(--vermilion); color: #fff; box-shadow: 0 2px 6px rgba(183,70,78,.35); }
+
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-btn {
+      min-height: 36px; padding: 0 11px; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); color: var(--indigo); font-size: 12px; font-weight: 700;
+      text-decoration: none; border-radius: 6px; background: var(--paper-light); transition: all .2s; white-space: nowrap;
+    }
+    .nav-btn:hover { border-color: var(--vermilion); color: var(--vermilion); background: #fff; }
+    .xp-counter { font-size: 11px; font-weight: 800; background: rgba(183,70,78,.12); color: var(--vermilion); padding: 4px 10px; border-radius: 999px; }
+
+    .trainer-shell {
+      max-width: 960px; margin: 0 auto; width: 100%; padding: 36px 5vw 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .trainer-header { text-align: center; }
+    .trainer-kicker {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      background: var(--vermilion-light); border: 1px solid var(--vermilion-border);
+      color: var(--vermilion); font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; border-radius: 999px; margin-bottom: 12px;
+    }
+    .trainer-title { font: 700 clamp(28px, 4.5vw, 42px)/1.12 'Cormorant Garamond', serif; color: var(--indigo-dark); margin-bottom: 8px; }
+    .trainer-subtitle { max-width: 680px; margin: 0 auto; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    .stats-dashboard {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .stat-box { display: flex; align-items: center; gap: 12px; }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(38,63,97,.08); color: var(--indigo); font-size: 18px; flex-shrink: 0;
+    }
+    .stat-box.streak-box .stat-icon { background: var(--vermilion-light); color: var(--vermilion); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-num { font: 700 18px/1.2 'Cormorant Garamond', serif; color: var(--indigo); }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .category-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .cat-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--paper-light); color: var(--muted); border: 1px solid var(--line); transition: all .2s ease;
+    }
+    .cat-btn:hover { color: var(--indigo); border-color: var(--indigo); }
+    .cat-btn.active { background: var(--indigo); color: #fff; border-color: var(--indigo); box-shadow: 0 2px 8px rgba(38,63,97,.2); }
+
+    .problem-card {
+      background: var(--paper-card); border: 1px solid var(--line);
+      border-radius: var(--r-lg); padding: 40px 36px; box-shadow: var(--shadow-md);
+      display: flex; flex-direction: column; align-items: center; gap: 22px; position: relative; overflow: hidden;
+    }
+    .card-top-tag {
+      position: absolute; top: 16px; left: 20px; font-size: 11px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .1em;
+    }
+    .card-help-badge {
+      position: absolute; top: 16px; right: 20px; font-size: 11px; font-weight: 700;
+      color: var(--gold); background: var(--gold-light); padding: 3px 10px;
+      border-radius: 999px; border: 1px solid rgba(200,149,108,.3);
+    }
+
+    .task-display {
+      width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 12px;
+    }
+    .task-prompt { font-size: 14px; color: var(--muted); font-weight: 500; text-align: center; }
+    .task-question-box {
+      width: 100%; max-width: 760px; padding: 24px 28px;
+      background: var(--paper-light); border: 1px solid var(--line); border-radius: 14px;
+      text-align: left; font-size: 17px; line-height: 1.75; color: var(--indigo-dark);
+    }
+    .formula-inline {
+      display: inline-block; padding: 2px 10px; border-radius: 8px;
+      background: rgba(38,63,97,.07); border: 1px solid rgba(38,63,97,.14);
+      font-weight: 700; color: var(--indigo-dark); margin: 0 2px;
+    }
+
+    .fraction {
+      display: inline-flex; flex-direction: column; vertical-align: middle;
+      text-align: center; padding: 0 4px; font-size: 0.88em; line-height: 1.08;
+    }
+    .fraction .num { border-bottom: 1.8px solid currentColor; padding-bottom: 2px; }
+    .fraction .den { padding-top: 2px; }
+
+    .answer-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 500px;
+    }
+    .answer-input-wrap { flex: 1; min-width: 180px; }
+    .answer-input {
+      width: 100%; height: 52px; padding: 0 18px; border: 2px solid var(--line); border-radius: 10px;
+      background: #fff; color: var(--ink); font-size: 20px; font-weight: 700;
+      font-family: 'DM Sans', monospace; text-align: center; transition: all .2s ease;
+    }
+    .answer-input:focus { outline: 2px solid var(--indigo); outline-offset: 1px; border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(38,63,97,.12); }
+    .answer-input.correct { border-color: var(--green); background: var(--green-light); color: var(--green); }
+    .answer-input.wrong { border-color: var(--vermilion); background: var(--vermilion-light); color: var(--vermilion); }
+
+    .btn-check, .btn-next {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      height: 52px; padding: 0 28px; border-radius: 10px; border: none;
+      font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+      white-space: nowrap; transition: all .2s ease;
+    }
+    .btn-check { background: var(--vermilion); color: #fff; box-shadow: 0 4px 14px rgba(183,70,78,.35); }
+    .btn-check:hover { background: #d3525b; transform: translateY(-1px); }
+    .btn-next { background: var(--indigo); color: #fff; box-shadow: 0 4px 14px rgba(38,63,97,.25); }
+    .btn-next:hover { background: #19273c; transform: translateY(-1px); }
+
+    .feedback-banner {
+      width: 100%; max-width: 560px; padding: 12px 18px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; text-align: center; display: none; animation: popIn .3s ease;
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.success { background: var(--green-light); border: 1px solid rgba(46,125,50,.3); color: var(--green); }
+    .feedback-banner.error { background: var(--vermilion-light); border: 1px solid var(--vermilion-border); color: var(--vermilion); }
+
+    .card-tools {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+      padding-top: 10px; border-top: 1px dashed var(--line); width: 100%;
+    }
+    .tool-link-btn {
+      font-size: 13px; font-weight: 700; color: var(--indigo);
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+      border-radius: 8px; background: var(--paper-light); border: 1px solid var(--line); transition: all .2s ease;
+    }
+    .tool-link-btn:hover { background: #fff; color: var(--vermilion); border-color: var(--vermilion); }
+
+    .accordion-panel {
+      width: 100%; background: var(--paper-light); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 20px 24px; display: none; animation: fadeIn .25s ease;
+    }
+    .accordion-panel.active { display: block; }
+    .accordion-panel h3 { font: 700 19px 'Cormorant Garamond', serif; color: var(--indigo); margin-bottom: 12px; }
+    .solution-list { display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.6; }
+    .solution-step { background: #fff; padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--indigo); }
+    .theory-content { font-size: 14px; line-height: 1.7; color: var(--ink); display: flex; flex-direction: column; gap: 14px; }
+    .theory-rule-box { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+    .theory-rule-title { font-weight: 700; color: var(--indigo); margin-bottom: 6px; }
+
+    .milestone-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--indigo-dark); color: #fff; padding: 14px 28px;
+      border-radius: 999px; box-shadow: var(--shadow-lg); font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; z-index: 100;
+      opacity: 0; transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .milestone-toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @keyframes popIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media (max-width: 1120px) {
+      .nav-task-switcher { display: none; }
+    }
+    @media (max-width: 820px) {
+      .stats-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .problem-card { padding: 36px 20px 28px; }
+      .task-question-box { padding: 18px 16px; font-size: 15.5px; }
+      .btn-check, .btn-next { width: 100%; }
+    }
+  </style>
+  <script>(function(){try{var t=localStorage.getItem('profileTheme')||localStorage.getItem('site_theme')||'light';document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');document.documentElement.dataset.theme=t==='dark'?'dark':'light';}catch(e){}})();</script>
+  <link rel="stylesheet" href="../css/math_theme_support.css" />
+</head>
+<body>
+
+  <header class="site-nav" role="banner">
+    <a class="brand" href="../pages/math_9.html" aria-label="Вернуться в Математика 9 класс">
+      <span class="brand-mark" aria-hidden="true">数</span>
+      <div class="brand-text">
+        <span class="brand-name">НЕШкола</span>
+        <span class="brand-sub">ОГЭ Математика</span>
+      </div>
+    </a>
+
+    <div class="nav-task-switcher" role="group" aria-label="Выбор задания">
+      <span class="nav-task-part-badge" style="color:var(--muted);">Ч. 1:</span>
+      <a href="oge_task_6_trainer.html" class="task-pill">№6</a>
+      <a href="oge_task_7_trainer.html" class="task-pill">№7</a>
+      <a href="oge_task_8_trainer.html" class="task-pill">№8</a>
+      <a href="oge_task_9_trainer.html" class="task-pill">№9</a>
+      <a href="oge_task_10_trainer.html" class="task-pill">№10</a>
+      <a href="oge_task_11_trainer.html" class="task-pill">№11</a>
+      <span class="task-pill active" aria-current="page">№12</span>
+      <a href="oge_task_13_trainer.html" class="task-pill">№13</a>
+      <a href="oge_task_14_trainer.html" class="task-pill">№14</a>
+      <a href="oge_task_15_trainer.html" class="task-pill">№15</a>
+      <a href="oge_task_16_trainer.html" class="task-pill">№16</a>
+      <a href="oge_task_17_trainer.html" class="task-pill">№17</a>
+      <a href="oge_task_18_trainer.html" class="task-pill">№18</a>
+      <a href="oge_task_19_trainer.html" class="task-pill">№19</a>
+      <span class="nav-task-divider" aria-hidden="true"></span>
+      <span class="nav-task-part-badge">Ч. 2:</span>
+      <a href="oge_task_20_trainer.html" class="task-pill task-pill-part2">№20</a>
+      <a href="oge_task_22_trainer.html" class="task-pill task-pill-part2">№22</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="../profile.html" class="nav-btn">
+        <span>👤 Мой профиль</span>
+        <span class="xp-counter" id="nav-xp-badge">XP +0</span>
+      </a>
+      <a href="../pages/oge_roadmap.html" class="nav-btn">🗺️ Роадмап</a>
+      <a href="../index.html" class="nav-btn">В лобби</a>
+    </div>
+  </header>
+
+  <main class="trainer-shell">
+    <div class="trainer-header">
+      <div class="trainer-kicker">ОГЭ 2026 · Модуль «Алгебра»</div>
+      <h1 class="trainer-title">Задание №12: Расчёты по формулам</h1>
+      <p class="trainer-subtitle">
+        Кинетическая и потенциальная энергия, закон Джоуля–Ленца, мощность тока, сила Архимеда, центростремительное ускорение, площадь четырёхугольника и бытовые формулы.
+      </p>
+    </div>
+
+    <div class="stats-dashboard" aria-label="Статистика тренировки">
+      <div class="stat-box streak-box">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-streak">0</span>
+          <span class="stat-label">Текущая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">👑</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-max-streak">0</span>
+          <span class="stat-label">Лучшая серия</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Решено задач</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🎖️</div>
+        <div class="stat-info">
+          <span class="stat-num" id="stat-rank">Не начат</span>
+          <span class="stat-label">Текущее звание</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-filter" role="tablist" aria-label="Категории прототипов">
+      <button type="button" class="cat-btn active" data-cat="mixed_all">🎲 Все формулы №12</button>
+      <button type="button" class="cat-btn" data-cat="physics_energy">🚀 Энергия и силы</button>
+      <button type="button" class="cat-btn" data-cat="electricity">⚡ Электричество</button>
+      <button type="button" class="cat-btn" data-cat="geometry_formulas">📐 Геометрия в формулах</button>
+      <button type="button" class="cat-btn" data-cat="everyday">🌡️ Температура и колодцы</button>
+    </div>
+
+    <article class="problem-card">
+      <span class="card-top-tag" id="task-badge">Задание №12 · ОГЭ</span>
+      <span class="card-help-badge" id="task-cat-badge">Формулы</span>
+
+      <div class="task-display">
+        <p class="task-prompt">Подставьте данные в формулу, выразите неизвестную величину и запишите ответ:</p>
+        <div class="task-question-box" id="task-container"></div>
+      </div>
+
+      <div class="answer-row">
+        <div class="answer-input-wrap">
+          <input type="text" id="answer-input" class="answer-input" placeholder="Ответ (число)" autocomplete="off" aria-label="Ваш ответ" />
+        </div>
+        <button type="button" class="btn-check" id="btn-check">Проверить</button>
+        <button type="button" class="btn-next" id="btn-next" style="display: none;">Следующее задание →</button>
+      </div>
+
+      <div class="feedback-banner" id="feedback-banner"></div>
+
+      <div class="card-tools">
+        <button type="button" class="tool-link-btn" id="btn-toggle-solution">💡 Разбор решения</button>
+        <button type="button" class="tool-link-btn" id="btn-toggle-theory">📖 Памятка по формулам</button>
+        <button type="button" class="tool-link-btn" id="btn-new-task">🔄 Другое задание</button>
+      </div>
+
+      <div class="accordion-panel" id="solution-panel">
+        <h3>💡 Пошаговое решение задания:</h3>
+        <div class="solution-list" id="solution-content"></div>
+      </div>
+
+      <div class="accordion-panel" id="theory-panel">
+        <h3>📖 Основные приёмы и формулы Задания №12 ОГЭ</h3>
+        <div class="theory-content">
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">1. Внимательно проверяйте единицы и «тысячи»</div>
+            <p>• Если энергия дана в <strong>тысячах джоулей</strong> (например, 315 тыс. Дж), перед подстановкой умножьте на <strong>1000</strong>: 315 000 Дж.</p>
+            <p>• Запись вроде <code>с⁻¹</code> или <code>м/с²</code> относится только к размерности, а не к числу!</p>
+          </div>
+          <div class="theory-rule-box">
+            <div class="theory-rule-title">2. Как быстро выражать переменную</div>
+            <p>• <i>E</i> = <span class="fraction"><span class="num"><i>mv</i>²</span><span class="den">2</span></span> ⇒ <i>v</i> = √(<span class="fraction"><span class="num">2<i>E</i></span><span class="den"><i>m</i></span></span>)</p>
+            <p>• <i>P</i> = <i>I</i>²<i>R</i> ⇒ <i>R</i> = <span class="fraction"><span class="num"><i>P</i></span><span class="den"><i>I</i>²</span></span> &emsp;|&emsp; <i>Q</i> = <i>I</i>²<i>Rt</i> ⇒ <i>R</i> = <span class="fraction"><span class="num"><i>Q</i></span><span class="den"><i>I</i>²<i>t</i></span></span></p>
+            <p>• <i>a</i> = <i>ω</i>²<i>R</i> ⇒ <i>R</i> = <span class="fraction"><span class="num"><i>a</i></span><span class="den"><i>ω</i>²</span></span> &emsp;|&emsp; <i>S</i> = <span class="fraction"><span class="num"><i>d</i>₁<i>d</i>₂ sin <i>α</i></span><span class="den">2</span></span> ⇒ <i>d</i>₂ = <span class="fraction"><span class="num">2<i>S</i></span><span class="den"><i>d</i>₁ sin <i>α</i></span></span></p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <div class="milestone-toast" id="milestone-toast"></div>
+
+  <script src="../js/trainer_rank_tracker.js?v=2.2"></script>
+  <script src="../js/trainer_timed_mode.js?v=1.0"></script>
+  <script src="../js/oge_task_12_trainer.js"></script>
+  <script>
+    (function () {
+      const TRAINER_ID = 'oge_task_12';
+      let currentCategory = 'mixed_all';
+      let currentTask = null;
+      let hasAnsweredCurrent = false;
+
+      const taskContainer = document.getElementById('task-container');
+      const taskBadge = document.getElementById('task-badge');
+      const taskCatBadge = document.getElementById('task-cat-badge');
+      const answerInput = document.getElementById('answer-input');
+      const btnCheck = document.getElementById('btn-check');
+      const btnNext = document.getElementById('btn-next');
+      const feedbackBanner = document.getElementById('feedback-banner');
+      const solutionPanel = document.getElementById('solution-panel');
+      const solutionContent = document.getElementById('solution-content');
+      const theoryPanel = document.getElementById('theory-panel');
+
+      const statStreak = document.getElementById('stat-streak');
+      const statMaxStreak = document.getElementById('stat-max-streak');
+      const statTotal = document.getElementById('stat-total');
+      const statRank = document.getElementById('stat-rank');
+      const navXpBadge = document.getElementById('nav-xp-badge');
+      const milestoneToast = document.getElementById('milestone-toast');
+
+      let audioCtx = null;
+      function playTone(freq, type, dur) {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.11, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + dur);
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        milestoneToast.textContent = msg;
+        milestoneToast.classList.add('active');
+        setTimeout(() => milestoneToast.classList.remove('active'), 3600);
+      }
+
+      function syncStats() {
+        if (window.TrainerTracker) {
+          const rec = window.TrainerTracker.getRecord(TRAINER_ID);
+          statStreak.textContent = rec.currentStreak || 0;
+          statMaxStreak.textContent = rec.maxStreak || 0;
+          statTotal.textContent = rec.totalSolved || 0;
+          statRank.textContent = rec.maxRank || 'Не начат';
+        }
+        try {
+          const xp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+          navXpBadge.textContent = `XP +${xp}`;
+        } catch (e) {}
+      }
+
+      function loadNewTask() {
+        if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+          currentCategory = 'mixed_all';
+        }
+        hasAnsweredCurrent = false;
+        currentTask = OgeTask12Trainer.generateTask(currentCategory);
+        window._currentTask = currentTask;
+        taskContainer.innerHTML = currentTask.questionHtml;
+        taskCatBadge.textContent = currentTask.catName;
+        taskBadge.textContent = 'Задание №12 · ' + (currentTask.catName || 'ОГЭ');
+
+        answerInput.value = '';
+        answerInput.className = 'answer-input';
+        answerInput.disabled = false;
+        answerInput.focus();
+
+        feedbackBanner.className = 'feedback-banner';
+        feedbackBanner.textContent = '';
+        btnCheck.style.display = 'inline-flex';
+        btnNext.style.display = 'none';
+
+        solutionContent.innerHTML = currentTask.solutionSteps.map((step, idx) => `
+          <div class="solution-step"><strong>Шаг ${idx + 1}:</strong> ${step}</div>
+        `).join('');
+        solutionPanel.classList.remove('active');
+      }
+
+      function handleCheck() {
+        if (hasAnsweredCurrent || !currentTask) return;
+        const val = answerInput.value.trim();
+        if (!val) { answerInput.focus(); return; }
+
+        const isCorrect = OgeTask12Trainer.checkAnswer(val, currentTask.answer);
+        if (isCorrect) {
+          hasAnsweredCurrent = true;
+          answerInput.className = 'answer-input correct';
+          answerInput.disabled = true;
+          playTone(587, 'sine', 0.15);
+          setTimeout(() => playTone(880, 'sine', 0.25), 120);
+
+          feedbackBanner.className = 'feedback-banner show success';
+          feedbackBanner.innerHTML = '🎉 <strong>Верно!</strong> Расчёт по формуле выполнен точно (+15 XP).';
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(true);
+          } else {
+            btnCheck.style.display = 'none';
+            btnNext.style.display = 'inline-flex';
+            btnNext.focus();
+          }
+
+          try {
+            const curXp = parseInt(localStorage.getItem('user_xp') || '0', 10);
+            localStorage.setItem('user_xp', String(curXp + 15));
+          } catch (e) {}
+
+          if (window.TrainerTracker) {
+            const res = window.TrainerTracker.recordAttempt(TRAINER_ID, true);
+            syncStats();
+            if (res.currentStreak === 5) showToast('🔥 Серия 5! Формулы под контролем!');
+            if (res.currentStreak === 10) showToast('⚡ Серия 10! Отличная точность!');
+            if (res.currentStreak === 25) showToast('💎 Серия 25! Звание «Архимаг формул 👑»!');
+          }
+        } else {
+          answerInput.className = 'answer-input wrong';
+          playTone(220, 'triangle', 0.25);
+          feedbackBanner.className = 'feedback-banner show error';
+          feedbackBanner.innerHTML = '❌ <strong>Пока неверно.</strong> Проверьте подстановку или откройте разбор решения.';
+
+          if (window.TrainerTimedMode && window.TrainerTimedMode.isActive) {
+            window.TrainerTimedMode.recordAttempt(false);
+          }
+          if (window.TrainerTracker) {
+            window.TrainerTracker.recordAttempt(TRAINER_ID, false);
+            syncStats();
+          }
+        }
+      }
+
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.dataset.cat;
+          loadNewTask();
+        });
+      });
+
+      btnCheck.addEventListener('click', handleCheck);
+      btnNext.addEventListener('click', loadNewTask);
+      document.getElementById('btn-new-task').addEventListener('click', loadNewTask);
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (hasAnsweredCurrent) loadNewTask();
+          else handleCheck();
+        }
+      });
+      document.getElementById('btn-toggle-solution').addEventListener('click', () => solutionPanel.classList.toggle('active'));
+      document.getElementById('btn-toggle-theory').addEventListener('click', () => theoryPanel.classList.toggle('active'));
+
+      syncStats();
+      if (window.TrainerTimedMode) {
+        window.TrainerTimedMode.init({ trainerId: TRAINER_ID, title: 'Задание №12', onNextTask: loadNewTask });
+      }
+      loadNewTask();
+    })();
+  </script>
+  <script src="../js/auth_sync.js"></script>
+</body>
+</html>
